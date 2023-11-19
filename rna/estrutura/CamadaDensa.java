@@ -1,6 +1,7 @@
 package rna.estrutura;
 
 import rna.ativacoes.*;
+import rna.core.Array;
 import rna.core.Matriz;
 import rna.inicializadores.Inicializador;
 import rna.serializacao.DicionarioAtivacoes;
@@ -28,7 +29,7 @@ public class CamadaDensa implements Cloneable{
     *    pesos = [entrada][neuronios]
     * </pre>
     */
-   public volatile double[][] pesos;
+   public double[][] pesos;
 
    /**
     * Matriz coluna contendo os viéses da camada, seu formato se dá por:
@@ -38,7 +39,7 @@ public class CamadaDensa implements Cloneable{
     * ]
     * </pre>
     */
-   public volatile double[][] bias;
+   public double[][] bias;
 
    /**
     * Auxiliar na verificação do uso do bias na camada.
@@ -55,7 +56,7 @@ public class CamadaDensa implements Cloneable{
     * ]
     * </pre>
     */
-   public volatile double[][] entrada;
+   public double[][] entrada;
 
    /**
     * Matriz coluna contendo os valores de resultado da multiplicação matricial entre
@@ -66,7 +67,7 @@ public class CamadaDensa implements Cloneable{
     * ]
     * </pre>
     */
-   public volatile double[][] somatorio;
+   public double[][] somatorio;
 
    /**
     * Matriz coluna contendo os valores de resultado da soma entre os valores da
@@ -77,7 +78,7 @@ public class CamadaDensa implements Cloneable{
     * ]
     * </pre>
     */
-   public volatile double[][] saida;
+   public double[][] saida;
    
    /**
     * Matriz coluna contendo os valores de erro de cada neurônio da camada, seu 
@@ -88,7 +89,7 @@ public class CamadaDensa implements Cloneable{
     * ]
     * </pre>
     */
-   public volatile double[][] erros;
+   public double[][] erros;
 
    /**
     * Matriz contendo os valores dos gradientes de cada conexão da
@@ -100,12 +101,12 @@ public class CamadaDensa implements Cloneable{
     *    gradientes = [linPesos][colPesos]
     * </pre>
     */
-   public volatile double[][] gradientes;
+   public double[][] gradientes;
    
    /**
     * Auxiliar no treino em lotes.
     */
-   public volatile double[][] gradientesAcumulados;
+   public double[][] gradientesAcumulados;
 
    /**
     * Matriz coluna contendo os valores de derivada do resultado do somatório.
@@ -115,7 +116,7 @@ public class CamadaDensa implements Cloneable{
     * ]
     * </pre>
     */
-   public volatile double[][] derivada;
+   public double[][] derivada;
 
    /**
     * Identificador único da camada dentro da Rede Neural.
@@ -268,15 +269,14 @@ public class CamadaDensa implements Cloneable{
       if(entrada.length != this.tamanhoEntrada()){
          throw new IllegalArgumentException(
             "Entradas (" + entrada.length + 
-            ") incompatíveis com a entrada da camada (" + this.entrada.length + 
+            ") incompatíveis com a entrada da camada (" + this.tamanhoEntrada() + 
             ")."
          );
       }
 
-      System.arraycopy(entrada, 0, this.entrada[0], 0, this.entrada[0].length);
-     
-      //propagar entrada
-      Matriz.multT(this.entrada, this.pesos, this.somatorio);
+      Array.copiar(entrada, this.entrada[0]);     
+
+      Matriz.mult(this.entrada, this.pesos, this.somatorio);
       if(usarBias){
          Matriz.add(this.somatorio, this.bias, this.somatorio);
       }

@@ -721,6 +721,14 @@ public class RedeNeural implements Cloneable{
       );
    }
 
+   /**
+    * 
+    * @param entrada
+    * @param saida
+    * @param eps
+    * @param tA
+    * @param epochs
+    */
    public void diferencaFinita(double[][] entrada, double[][] saida, double eps, double tA, int epochs){
       double salvo;
 

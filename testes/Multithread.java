@@ -1,5 +1,7 @@
 package testes;
 
+import java.util.concurrent.TimeUnit;
+
 import ged.Ged;
 import rna.core.Matriz;
 
@@ -7,7 +9,7 @@ public class Multithread {
    public static void main(String[] args){
       Ged ged = new Ged();
 
-      int lin = 1024;
+      int lin = 1024 + 256;
       int col = lin;
 
       double[][] a = new double[lin][col];
@@ -19,12 +21,23 @@ public class Multithread {
             a[i][j] = (i* a.length) + j + 1;
          }
       }
-      // ged.imprimirMatriz(a);
-
       ged.matIdentidade(b);
+
+      Matriz.configurarThreads(2);
+      //treinar e marcar tempo
+      long t1, t2;
+      long minutos, segundos;
+
+      t1 = System.nanoTime();
       Matriz.multT(a, b, r);
-      // ged.imprimirMatriz(r);
-      System.out.println("concluído.");
+      t2 = System.nanoTime();
+      
+      long tempoDecorrido = t2 - t1;
+      long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempoDecorrido);
+      minutos = (segundosTotais % 3600) / 60;
+      segundos = segundosTotais % 60;
+
+      System.out.println("Concluído em: " + minutos + "m " + segundos + "s");
    }
 
 }

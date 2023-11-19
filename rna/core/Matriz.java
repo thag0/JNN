@@ -5,36 +5,27 @@ import java.util.Random;
 public class Matriz{
    static Random random = new Random();
 
-   static int numThreads = 2;
+   static int nThreads = 2;
+
+   public static void configurarThreads(int numThreads){
+      if(numThreads < 1){
+         throw new IllegalArgumentException(
+            "O número de threads deve ser maior que zero."
+         );
+      }
+
+      if(numThreads > Runtime.getRuntime().availableProcessors()){
+         System.out.println("Aviso: alto número de threads pode causar intabilidade ou lentidão.");
+      }
+
+      nThreads = numThreads;
+   }
 
    public static void randomizar(double[][] a){
       int alcance = 2;
       for(int i = 0; i < a.length; i++){
          for(int j = 0; j < a[0].length; j++){
             a[i][j] = random.nextDouble(-alcance, alcance);
-         }
-      }     
-   }
-
-   public static void Xavier(double[][] m){
-      int numRows = m.length;
-      int numCols = m[0].length;
-      
-      double limit = Math.sqrt(6.0 / (numRows + numCols));
-      
-      for (int i = 0; i < numRows; i++) {
-         for (int j = 0; j < numCols; j++) {
-            m[i][j] = Math.random() * 2 * limit - limit;
-         }
-      }
-   }
-
-   public static void he(double[][] m){
-      double desvio = Math.sqrt(2 / m.length);
-
-      for(int i = 0; i < m.length; i++){
-         for(int j = 0; j < m[0].length; j++){
-            m[i][j] = random.nextGaussian() * desvio;
          }
       }     
    }
@@ -141,9 +132,11 @@ public class Matriz{
     * </pre>
     * @param a primeita matriz.
     * @param b segunda matriz.
-    * @param r matriz contendo o resultado.
+    * @param r matriz contendo o resultado da multiplicação.
     */
    public static void multT(double[][] a, double[][] b, double[][] r){
+      //TODO
+      //corrigir problema de uso quando recebe matrizes das camadas
       int linA = a.length;
       int colA = a[0].length;
       int linB = b.length;
@@ -169,36 +162,35 @@ public class Matriz{
          );
       }
 
-      int linPorThread = linA / numThreads;
-      Thread[] threads = new Thread[numThreads];
+      int linPorThread = linA / nThreads;
+      Thread[] threads = new Thread[nThreads];
 
-      for(int t = 0; t < numThreads; t++){
+      for(int t = 0; t < nThreads; t++){
          final int id = t;
 
          threads[t] = new Thread(() -> {
             int inicio = id * linPorThread;
-            int fim = (id == numThreads - 1) ? linA : (id + 1) * linPorThread;
-
+            int fim = (id == nThreads - 1) ? linA : (id + 1) * linPorThread;
+            
+            double[] res = new double[r[0].length];
             for(int i = inicio; i < fim; i++){
                
+               res[i] = 0;
                for(int j = 0; j < linR; j++){
-                  double res = 0;
                   for(int k = 0; k < colA; k++){
-                     res += a[i][k] * b[k][j];
+                     res[j] += a[i][k] * b[k][j];
                   }
                   
-                  synchronized(r[i]){
-                     r[i][j] = res;
-                  }
                }
+
+               r[i] = res;
             }
          });
-         
          threads[t].start();
       }
    
       try{
-         for(int i = 0; i < numThreads; i++){
+         for(int i = 0; i < nThreads; i++){
             threads[i].join();
          }
       }catch(InterruptedException e){
@@ -208,10 +200,14 @@ public class Matriz{
    }
 
    /**
-    * 
-    * @param a
-    * @param b
-    * @param r
+    * Adiciona o conteúdo resultante da soma entre A e B na matriz R de acordo
+    * com a expressão:
+    * <pre>
+    * R = A + B
+    * </pre>
+    * @param a primeita matriz.
+    * @param b segunda matriz.
+    * @param r matriz contendo o resultado da soma.
     */
    public static void add(double[][] a, double[][] b, double[][] r){
       if(a.length != b.length){
@@ -234,6 +230,16 @@ public class Matriz{
       }
    }
 
+   /**
+    * Adiciona o conteúdo resultante da subtração entre A e B na matriz R de acordo
+    * com a expressão:
+    * <pre>
+    * R = A - B
+    * </pre>
+    * @param a primeita matriz.
+    * @param b segunda matriz.
+    * @param r matriz contendo o resultado da subtração.
+    */
    public static void sub(double[][] a, double[][] b, double[][] r){
       if(a.length != b.length){
          throw new IllegalArgumentException(
@@ -259,6 +265,16 @@ public class Matriz{
       }
    }
 
+   /**
+    * Adiciona o conteúdo resultante do produto elemeto a elemento entre A e B na matriz 
+    * R de acordo com a expressão:
+    * <pre>
+    * R = A ⊙ B
+    * </pre>
+    * @param a primeita matriz.
+    * @param b segunda matriz.
+    * @param r matriz contendo o resultado do produto hadamard.
+    */
    public static void hadamard(double[][] a, double[][]b, double[][] r){
       if(a.length != b.length){
          throw new IllegalArgumentException("Linhas de A e B são diferentes.");
@@ -280,6 +296,15 @@ public class Matriz{
       }
    }
 
+   /**
+    * Adiciona o conteúdo resultante da multiplicação elemento a elemento do conteúdo da matriz
+    * A por um valor escalar de acordo com a expressão:
+    * <pre>
+    * A = A * esc
+    * </pre>
+    * @param a matriz alvo.
+    * @param e escalar utilizado para a multiplicação.
+    */
    public static void escalar(double[][] a, double e){
       for(int i = 0; i < a.length; i++){
          for(int j = 0; j < a[0].length; j++){
