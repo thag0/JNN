@@ -1,0 +1,1010 @@
+package rna.estrutura;
+
+import rna.ativacoes.Ativacao;
+import rna.avaliacao.Avaliador;
+import rna.avaliacao.perda.ErroMedioQuadrado;
+import rna.avaliacao.perda.Perda;
+import rna.inicializadores.Aleatorio;
+import rna.inicializadores.Inicializador;
+import rna.otimizadores.Otimizador;
+import rna.otimizadores.SGD;
+import rna.treinamento.Treinador;
+
+public class RedeNeural implements Cloneable{
+   
+   /**
+    * Região crítica
+    * <p>
+    *    Conjunto de camadas densas (ou fully connected) da Rede Neural.
+    * </p>
+    */
+   public CamadaDensa[] camadas;
+
+   /**
+    * Array contendo a arquitetura de cada camada dentro da Rede Neural.
+    * <p>
+    *    Cada elemento da arquitetura representa a quantidade de neurônios 
+    *    presente na camada correspondente.
+    * </p>
+    * <p>
+    *    A "camada de entrada" não é considerada camada, pois não é alocada na
+    *    rede, ela serve apenas de parâmetro para o tamanho de entrada da primeira
+    *    camada densa da Rede Neural.
+    * </p>
+    */
+   private int[] arquitetura;
+
+   /**
+    * Constante auxiliar que ajuda no controle do bias dentro da rede.
+    */
+   private boolean bias = true;
+
+   /**
+    * Valor máximo e mínimo na hora de aleatorizar os pesos da rede neural, para
+    * alguns inicializadores.
+    */
+   private double alcancePeso = 0.5;
+
+   /**
+    * Ponto inicial para os geradores aleatórios.
+    * <p>
+    *    0 não é considerado uma seed e ela só é configurada quando esse valor é
+    *    alterado.
+    * </p>
+    */
+   private long seedInicial = 0;
+
+   /**
+    * Auxiliar no controle da compilação da Rede Neural, ajuda a evitar uso 
+    * indevido caso a rede não tenha suas variáveis e dependências inicializadas 
+    * previamente.
+    */
+   private boolean compilado;
+
+   /**
+    * Função de perda usada durante o processo de treinamento.
+    */
+   private Perda perda;
+
+   /**
+    * Otimizador que será utilizado durante o processo de aprendizagem da
+    * da Rede Neural.
+    */
+   private Otimizador otimizador;
+
+   /**
+    * Nome específico da instância da Rede Neural.
+    */
+   private String nome = getClass().getSimpleName();
+
+   /**
+    * Gerenciador de treino da Rede Neural. contém implementações dos 
+    * algoritmos de treino.
+    */
+   private Treinador treinador = new Treinador();
+
+   /**
+    * Responsável pelo retorno de desempenho da Rede Neural.
+    * Contém implementações de métodos tanto para cálculo de perdas
+    * quanto de métricas.
+    * <p>
+    *    Cada instância de rede neural possui seu próprio avaliador.
+    * </p>
+    */
+   public Avaliador avaliador = new Avaliador(this);
+
+   /**
+    * <p>
+    *    Cria uma instância de rede neural artificial. A arquitetura da rede será baseada de acordo 
+    *    com cada posição do array, cada valor contido nele representará a quantidade de neurônios da 
+    *    camada correspondente.
+    * </p> 
+    * <p>
+    *   Nenhum dos elementos de arquitetura deve ser menor do que 1.
+    * </p>
+    * <p>
+    *    Exemplo de uso:
+    * </p>
+    * <pre>
+    * int[] arq = {
+    *    1, //tamanho de entrada da rede
+    *    2, //neurônios da primeira camada
+    *    3  //neurônios da segunda camada
+    * };
+    * </pre>
+    * <p>
+    *    É obrigatório que a arquitetura tenha no mínimo dois elementos, um para a entrada e outro
+    *    para a saída da Rede Neural.
+    * </p>
+    * <p>
+    *    Após instanciar o modelo, é necessário compilar por meio da função {@code compilar()};
+    * </p>
+    * <p>
+    *    Certifique-se de configurar as propriedades da rede por meio das funções de configuração fornecidas 
+    *    para obter os melhores resultados na aplicação específica. Caso não seja usada nenhuma das funções de 
+    *    configuração, a rede será compilada com os valores padrão.
+    * </p>
+    * @author Thiago Barroso, acadêmico de Engenharia da Computação pela Universidade Federal do Pará, 
+    * Campus Tucuruí. Maio/2023.
+    * @param arquitetura modelo de arquitetura específico da rede.
+    * @throws IllegalArgumentException se o array de arquitetura for nulo.
+    * @throws IllegalArgumentException se o array de arquitetura não possuir, pelo menos, dois elementos.
+    * @throws IllegalArgumentException se os valores fornecidos forem menores que um.
+    */
+   public RedeNeural(int[] arquitetura){
+      if(arquitetura == null){
+         throw new IllegalArgumentException("A arquitetura fornecida não deve ser nula.");
+      }
+      if(arquitetura.length < 2){
+         throw new IllegalArgumentException(
+            "A arquitetura fornecida deve conter no mínimo dois elementos (entrada e saída), tamanho recebido = " + arquitetura.length
+         );
+      }
+      for(int i = 0; i < arquitetura.length; i++){
+         if(arquitetura[i] < 1){
+            throw new IllegalArgumentException(
+               "Os valores de arquitetura fornecidos não devem ser maiores que zero."
+            );
+         }
+      }
+
+      this.arquitetura = arquitetura;
+      this.compilado = false;
+   }
+
+   /**
+    * <p>
+    *    Altera o nome da rede neural.
+    * </p>
+    * O nome é apenas estético e não influencia na performance ou na 
+    * usabilidade da rede neural.
+    * <p>
+    *    O nome padrão é o mesmo nome da classe (RedeNeural).
+    * </p>
+    * @param nome novo nome da rede.
+    * @throws IllegalArgumentException se o novo nome for uulo ou inválido.
+    */
+   public void configurarNome(String nome){
+      if(nome == null){
+         throw new IllegalArgumentException("O novo nome da rede neural não pode ser nulo.");
+      }
+      if(nome.isBlank() || nome.isEmpty()){
+         throw new IllegalArgumentException("O novo nome da rede neural não pode estar vazio.");
+      }
+
+      this.nome = nome;
+   }
+
+   /**
+    * Define o valor máximo e mínimo na hora de aleatorizar os pesos iniciais da 
+    * rede para a compilação, os novos valores não podem ser menores ou iguais a zero.
+    * <p>
+    *    É necessário informar o alcance <strong>antes</strong> de compilar a rede.
+    * </p>
+    * <p>
+    *    {@code O valor padrão de alcance é 0.5}
+    * </p>
+    * @param alcance novo valor máximo e mínimo.
+    * @throws IllegalArgumentException se o novo valor for menor ou igual a zero.
+    */
+   public void configurarAlcancePesos(double alcance){
+      if(alcance <= 0){
+         throw new IllegalArgumentException(
+            "O novo valor de alcance dos pesos (" + alcance + 
+            ") deve ser maior que zero."
+         );
+      }
+      
+      this.alcancePeso = alcance;
+   }
+
+   public void configurarBias(boolean usarBias){
+      this.bias = usarBias;
+   }
+
+   /**
+    * Configura a nova seed inicial para os geradores de números aleatórios utilizados 
+    * durante o processo de inicialização de pesos e treinamento da Rede Neural.
+    * <p>
+    *    Configurações personalizadas de seed permitem fazer testes com diferentes
+    *    parâmetros da Rede Neural, buscando encontrar um melhor ajuste para o modelo.
+    * </p>
+    * <p>
+    *    A configuração de seed deve ser feita antes da compilação do modelo.
+    * </p>
+    * @param seed nova seed.
+    */
+   public void configurarSeed(long seed){
+      this.seedInicial = seed;
+   }
+
+   /**
+    * Configura a função de ativação de todas as camadas da rede. É preciso
+    * compilar o modelo previamente para poder configurar suas funções de ativação.
+    * <p>
+    *    Letras maiúsculas e minúsculas não serão diferenciadas.
+    * </p>
+    * <p>
+    *    Segue a lista das funções de ativação disponíveis:
+    * </p>
+    * <ul>
+    *    <li> ReLU. </li>
+    *    <li> Sigmoid. </li>
+    *    <li> Tangente Hiperbólica. </li>
+    *    <li> Leaky ReLU. </li>
+    *    <li> ELU .</li>
+    *    <li> Swish. </li>
+    *    <li> GELU. </li>
+    *    <li> Linear. </li>
+    *    <li> Seno. </li>
+    *    <li> Argmax. </li>
+    *    <li> Softmax. </li>
+    *    <li> Softplus. </li>
+    * </ul>
+    * <p>
+    *    {@code A função de ativação padrão é a ReLU para todas as camadas}
+    * </p>
+    * @param ativacao valor relativo a lista de ativações disponíveis.
+    * @throws IllegalArgumentException se o modelo não foi compilado previamente.
+    */
+   public void configurarAtivacao(Ativacao ativacao){
+      this.verificarCompilacao();
+      
+      for(CamadaDensa camada : this.camadas){
+         camada.configurarAtivacao(ativacao);
+      }
+   }
+
+   public void configurarAtivacao(CamadaDensa camada, Ativacao ativacao){
+      if(camada == null){
+         throw new IllegalArgumentException(
+            "A camada não pode ser nula."
+         );
+      }
+
+      camada.configurarAtivacao(ativacao);
+   }
+
+   /**
+    * Configura a função de perda que será utilizada durante o processo
+    * de treinamento da Rede Neural.
+    * @param perda nova função de perda.
+    */
+   public void configurarPerda(Perda perda){
+      if(perda == null){
+         throw new IllegalArgumentException("A função de perda não pode ser nula.");
+      }
+
+      this.perda = perda;
+   }
+
+   /**
+    * Configura o novo otimizador da Rede Neural com base numa nova instância de otimizador.
+    * <p>
+    *    Configurando o otimizador passando diretamente uma nova instância permite configurar
+    *    os hiperparâmetros do otimizador fora dos valores padrão, o que pode ajudar a
+    *    melhorar o desempenho de aprendizado da Rede Neural em cenário específicos.
+    * </p>
+    * Otimizadores disponíveis.
+    * <ol>
+    *    <li>
+    *       <strong> GradientDescent </strong>: Método clássico de retropropagação de erro e 
+    *       ajuste de pesos para treinamento de Redes Neurais.
+    *    </li>
+    *    <li>
+    *       <strong> SGD (Gradiente Descendente Estocástico) </strong>: Atualiza os pesos 
+    *       usando o conjunto de treino embaralhado a cada época, com adicional de momentum
+    *       e correção de nesterov para a atualização.
+    *    </li>
+    *    <li>
+    *       <strong> AdaGrad </strong>: Um otimizador que adapta a taxa de aprendizado para 
+    *       cada parâmetro da rede com base em iterações anteriores.
+    *    </li>
+    *    <li>
+    *       <strong> RMSProp </strong>: Um otimizador que utiliza a média móvel dos quadrados 
+    *       dos gradientes acumulados para ajustar a taxa de aprendizado.
+    *    </li>
+    *    <li>
+    *       <strong> Adam </strong>: Um otimizador que combina o AdaGrad e o Momentum para 
+    *       convergência rápida e estável.
+    *    </li>
+    *    <li>
+    *       <strong> Nadam </strong>: Possui as mesmas vantagens de se utilizar o adam, com 
+    *       o adicional do acelerador de Nesterov na atualização dos pesos.
+    *    </li>
+    *    <li>
+    *       <strong> AMSGrad </strong>: Um otimizador que mantém um histórico dos valores
+    *       dos gradientes acumulados para evitar a degradação da taxa de aprendizado,
+    *       proporcionando uma convergência mais estável.
+    *    </li>
+    *    <li>
+    *       <strong> Adamax </strong>: Um otimizador que é uma variação do Adam e
+    *       mantém o máximo absoluto dos valores dos gradientes acumulados em vez de usar
+    *       a média móvel dos quadrados dos gradientes.
+    *    </li>
+    *    <li>
+    *       <strong> Lion </strong>: Esse é particularmente novo e não conheço muito bem. 
+    *    </li>
+    *    <li>
+    *       <strong> Adadelta </strong>: Também é novo pra mim e ainda to testando melhor. 
+    *    </li>
+    * </ol>
+    * <p>
+    *    {@code O otimizador padrão é o SGD}
+    * </p>
+    * @param otimizador novo otimizador.
+    * @throws IllegalArgumentException se o novo otimizador for nulo.
+    */
+   public void configurarOtimizador(Otimizador otimizador){
+      if(otimizador == null){
+         throw new IllegalArgumentException("O novo otimizador não pode ser nulo.");
+      }
+
+      this.otimizador = otimizador;
+   }
+
+   /**
+    * Compila o modelo de Rede Neural inicializando as camadas, neurônios e pesos respectivos, 
+    * baseado nos valores fornecidos.
+    * <p>
+    *    Caso nenhuma configuração inicial seja feita, a rede será inicializada com os argumentos padrão. 
+    * </p>
+    * Após a compilação o modelo está pronto para ser usado, mas deverá ser treinado.
+    * <p>
+    *    Para treinar o modelo deve-se fazer uso da função função {@code treinar()} informando os 
+    *    dados necessários para a rede.
+    * </p>
+    * <p>
+    *    Para usar as predições da rede basta usar a função {@code calcularSaida()} informando os
+    *    dados necessários. Após a predição pode-se obter o resultado da rede por meio da função 
+    *    {@code obterSaidas()};
+    * </p>
+    * Os valores de função de perda, otimizador e inicializador serão definidos como os padrões 
+    * {@code ErroMedioQuadrado (MSE)}, {@code SGD} e {@code Aleatorio}. 
+    * <p>
+    *    Valores de perda e otimizador configurados previamente são mantidos.
+    * </p>
+    */
+   public void compilar(){
+      //usando valores de configuração prévia, se forem criados.
+      if(this.perda == null && this.otimizador == null){
+         this.compilar(new ErroMedioQuadrado(), new SGD(), new Aleatorio());
+         
+      }else if(this.perda == null){
+         this.compilar(new ErroMedioQuadrado(), this.otimizador, new Aleatorio());
+         
+      }else{
+         this.compilar(this.perda, this.otimizador, new Aleatorio());
+      }
+   }
+
+   /**
+    * Compila o modelo de Rede Neural inicializando as camadas, neurônios e pesos respectivos, 
+    * baseado nos valores fornecidos.
+    * <p>
+    *    Caso nenhuma configuração inicial seja feita, a rede será inicializada com os argumentos padrão. 
+    * </p>
+    * Após a compilação o modelo está pronto para ser usado, mas deverá ser treinado.
+    * <p>
+    *    Para treinar o modelo deve-se fazer uso da função função {@code treinar()} informando os 
+    *    dados necessários para a rede.
+    * </p>
+    * <p>
+    *    Para usar as predições da rede basta usar a função {@code calcularSaida()} informando os
+    *    dados necessários. Após a predição pode-se obter o resultado da rede por meio da função 
+    *    {@code obterSaidas()};
+    * </p>
+    * O valor do otimizador será definido como {@code SGD} o valor do inicializador 
+    * será definido como o padrão {@code Aleatorio}.
+    * <p>
+    *    Valor de otimizador configurado previamente é mantido.
+    * </p>
+    * @param perda função de perda da Rede Neural usada durante o treinamento.
+    * @throws IllegalArgumentException se a função de perda for nula.
+    */
+   public void compilar(Perda perda){
+      if(perda == null){
+         throw new IllegalArgumentException("A função de perda não pode ser nula.");
+      }
+
+      //usando valores de configuração prévia, se forem criados.
+      if(this.otimizador == null){
+         this.compilar(perda, new SGD(), new Aleatorio());
+
+      }else{
+         this.compilar(perda, this.otimizador, new Aleatorio());
+      }
+   }
+
+   /**
+    * Compila o modelo de Rede Neural inicializando as camadas, neurônios e pesos respectivos, 
+    * baseado nos valores fornecidos.
+    * <p>
+    *    Caso nenhuma configuração inicial seja feita, a rede será inicializada com os argumentos padrão. 
+    * </p>
+    * Após a compilação o modelo está pronto para ser usado, mas deverá ser treinado.
+    * <p>
+    *    Para treinar o modelo deve-se fazer uso da função função {@code treinar()} informando os 
+    *    dados necessários para a rede.
+    * </p>
+    * <p>
+    *    Para usar as predições da rede basta usar a função {@code calcularSaida()} informando os
+    *    dados necessários. Após a predição pode-se obter o resultado da rede por meio da função 
+    *    {@code obterSaidas()};
+    * </p>
+    * A função de perda será definida como {@code ErroMedioQuadrado (MSE)} O valor do inicializador 
+    * será definido como o padrão {@code Aleatorio}.
+    * <p>
+    *    Valor de função de perda configurada previamente é mantido.
+    * </p>
+    * @param otimizador otimizador que será usado durante o treino da Rede Neural.
+    * @throws IllegalArgumentException se o otimizador for nulo.
+    */
+   public void compilar(Otimizador otimizador){
+      if(otimizador == null){
+         throw new IllegalArgumentException("O otimizador fornecido não pode ser nulo.");
+      }
+
+      //usando valores de configuração prévia, se forem criados.
+      if(this.perda == null){
+         this.compilar(new ErroMedioQuadrado(), otimizador, new Aleatorio());
+
+      }else{
+         this.compilar(this.perda, otimizador, new Aleatorio());
+      }
+   }
+
+   /**
+    * Compila o modelo de Rede Neural inicializando as camadas, neurônios e pesos respectivos, 
+    * baseado nos valores fornecidos.
+    * <p>
+    *    Caso nenhuma configuração inicial seja feita, a rede será inicializada com os argumentos padrão. 
+    * </p>
+    * Após a compilação o modelo está pronto para ser usado, mas deverá ser treinado.
+    * <p>
+    *    Para treinar o modelo deve-se fazer uso da função função {@code treinar()} informando os 
+    *    dados necessários para a rede.
+    * </p>
+    * <p>
+    *    Para usar as predições da rede basta usar a função {@code calcularSaida()} informando os
+    *    dados necessários. Após a predição pode-se obter o resultado da rede por meio da função 
+    *    {@code obterSaidas()};
+    * </p>
+    * A função de perda usada será a {@code ErroMedioQuadrado (MSE)}.
+    * <p>
+    *    Valor de função de perda configurada previamente é mantido.
+    * </p>
+    * @param otimizador otimizador que será usando para o treino da Rede Neural.
+    * @param inicializador inicializador de pesos dos neurônios da Rede Neural.
+    * @throws IllegalArgumentException se o otimizador ou inicializador forem nulos.
+    */
+   public void compilar(Otimizador otimizador, Inicializador inicializador){
+      if(otimizador == null){
+         throw new IllegalArgumentException("O otimizador fornecido não pode ser nulo.");
+      }
+      if(inicializador == null){
+         throw new IllegalArgumentException("O inicializador fornecido não pode ser nulo.");
+      }
+
+      //usando valores de configuração prévia, se forem criados.
+      if(this.perda == null){
+         this.compilar(new ErroMedioQuadrado(), otimizador, inicializador);
+
+      }else{
+         this.compilar(this.perda, otimizador, inicializador);
+      }   
+   }
+
+   /**
+    * Compila o modelo de Rede Neural inicializando as camadas, neurônios e pesos respectivos, 
+    * baseado nos valores fornecidos.
+    * <p>
+    *    Caso nenhuma configuração inicial seja feita, a rede será inicializada com os argumentos padrão. 
+    * </p>
+    * Após a compilação o modelo está pronto para ser usado, mas deverá ser treinado.
+    * <p>
+    *    Para treinar o modelo deve-se fazer uso da função função {@code treinar()} informando os 
+    *    dados necessários para a rede.
+    * </p>
+    * <p>
+    *    Para usar as predições da rede basta usar a função {@code calcularSaida()} informando os
+    *    dados necessários. Após a predição pode-se obter o resultado da rede por meio da função 
+    *    {@code obterSaidas()};
+    * </p>
+    * @param perda função de perda da Rede Neural usada durante o treinamento.
+    * @param otimizador otimizador que será usando para o treino da Rede Neural.
+    * @param inicializador inicializador de pesos dos neurônios da Rede Neural.
+    * @throws IllegalArgumentException se a perda, otimizador ou inicializador forem nulos.
+    */
+   public void compilar(Perda perda, Otimizador otimizador, Inicializador inicializador){
+      if(inicializador == null){
+         throw new IllegalArgumentException("O inicializador não pode ser nulo.");
+      }
+      if(perda == null){
+         throw new IllegalArgumentException("A função de perda não pode ser nula.");
+      }
+      if(otimizador == null){
+         throw new IllegalArgumentException("O otimizador não pode ser nulo.");
+      }
+
+      if(seedInicial != 0){
+         inicializador.configurarSeed(seedInicial);
+         this.treinador.configurarSeed(seedInicial);
+      }
+
+      this.camadas = new CamadaDensa[this.arquitetura.length-1];
+      this.camadas[0] = new CamadaDensa(this.arquitetura[0], this.arquitetura[1], this.bias);
+      for(int i = 1; i < this.camadas.length; i++){
+         this.camadas[i] = new CamadaDensa(this.arquitetura[i], this.arquitetura[i+1], this.bias);
+         this.camadas[i].inicializar(inicializador, this.alcancePeso);
+         this.camadas[i].configurarId(i);
+      }
+
+      this.perda = perda;
+
+      this.otimizador = otimizador;
+      this.otimizador.inicializar(this.camadas);
+
+      this.compilado = true;
+   }
+
+   /**
+    * Verifica se o modelo já foi compilado para evitar problemas de uso indevido, 
+    * bem como componentes nulos.
+    * @throws IllegalArgumentException se o modelo não foi compilado.
+    */
+   private void verificarCompilacao(){
+      if(!this.compilado){
+         throw new IllegalArgumentException("O modelo ainda não foi compilado");
+      }
+   }
+
+   /**
+    * Verifica se os dados são apropriados para serem usados dentro da rede neural, incluindo:
+    * <ul>
+    *    <li>
+    *       Mesma quantidade de amostras nos dados de entrada e saída.
+    *    </li>
+    *    <li>
+    *       Dados de entrada possuem a mesma quantidade de exemplos que a capacidade da camada 
+    *       de entrada da rede.
+    *    </li>
+    *    <li>
+    *       Dados de saída possuem a mesma quantidade de exemplos que a quantidade de 
+    *       neurônios da camada de saída da rede.
+    *    </li>
+    * </ul>
+    * Caso os dados fornecidos atendam a essas condições, o fluxo de execução segue normalmente.
+    * @param entrada conjunto de dados de entrada.
+    * @param saida conjunto de dados de saída.
+    */
+   private void consistenciaDados(double[][] entrada, double[][] saida){
+      if(entrada.length != saida.length){
+         throw new IllegalArgumentException(
+            "Quantidade de amostras de dados de entrada (" + entrada.length +
+            ") e saída (" + saida.length + 
+            ") devem ser iguais."
+         );
+      }
+
+      int tamEntrada = this.obterTamanhoEntrada();
+      if(tamEntrada != entrada[0].length){
+         throw new IllegalArgumentException(
+         "Dimensões dos dados de entrada (" + entrada[0].length +
+         ") e capacidade de entrada da rede (" + tamEntrada + 
+         ") incompatíveis."
+         );
+      }
+
+      int tamSaida = this.obterTamanhoSaida();
+      if(tamSaida != saida[0].length){
+         throw new IllegalArgumentException(
+            "Dados de saída (" + saida[0].length +
+            ") e neurônios de saída da rede (" + tamSaida + 
+            ") incompatíveis."
+         );
+      }
+   }
+
+   /**
+    * Alimenta os dados pela rede neural usando o método de feedforward através do conjunto
+    * de dados fornecido. 
+    * <p>
+    *    Os dados são alimentados para as entradas dos neurônios e é calculado o produto junto 
+    *    com os pesos. No final é aplicado a função de ativação da camada no neurônio e o resultado 
+    *    fica armazenado na saída dele.
+    * </p>
+    * @param entrada dados usados para alimentar a camada de entrada.
+    * @throws IllegalArgumentException se o modelo não foi compilado previamente.
+    * @throws IllegalArgumentException se o tamanho dos dados de entrada for diferente da capacidade
+    * de entrada da rede.
+    */
+   public void calcularSaida(double[] entrada){
+      this.verificarCompilacao();
+
+      if(entrada.length != this.obterTamanhoEntrada()){
+         throw new IllegalArgumentException(
+            "Dimensões dos dados de entrada (" + entrada.length + 
+            ") com a camada de entrada (" + this.obterTamanhoEntrada() + 
+            ") incompatíveis."
+         );
+      }
+
+      this.camadas[0].calcularSaida(entrada);
+      for(int i = 1; i < this.camadas.length; i++){
+         this.camadas[i].calcularSaida(this.camadas[i-1].obterSaida()[0]);
+      }
+   }
+
+   /**
+    * Alimenta os dados pela rede neural usando o método de feedforward através do conjunto
+    * de dados fornecido. 
+    * <p>
+    *    Os dados são alimentados para as entradas dos neurônios e é calculado o produto junto 
+    *    com os pesos. No final é aplicado a função de ativação da camada no neurônio e o resultado 
+    *    fica armazenado na saída dele.
+    * </p>
+    * @param entradas dados usados para alimentar a camada de entrada.
+    * @throws IllegalArgumentException se o modelo não foi compilado previamente.
+    * @throws IllegalArgumentException se a quantidade de amostras em cada linha dos dados for diferente.
+    * @throws IllegalArgumentException se o tamanho dos dados de entrada for diferente da capacidade
+    * de entrada da rede.
+    * @return matriz contendo os resultados das predições da rede.
+    */
+   public double[][] calcularSaida(double[][] entradas){
+      this.verificarCompilacao();
+
+      int cols = entradas[0].length;
+      for(int i = 1; i < entradas.length; i++){
+         if(entradas[i].length != cols){
+            throw new IllegalArgumentException(
+               "As dimensões dos dados de entrada possuem tamanhos diferentes."
+            );
+         }
+      }
+
+      int nEntrada = this.obterTamanhoEntrada();
+      if(entradas[0].length != nEntrada){
+         throw new IllegalArgumentException(
+            "Dimensões dos dados de entrada (" + entradas.length +
+            ") e capacidade de entrada da rede (" + nEntrada + 
+            ") incompatíveis."
+         );
+      }
+
+      //dimensões dos dados
+      int nAmostras = entradas.length;
+      int tamEntrada = this.obterTamanhoEntrada();
+      int tamSaida = this.obterTamanhoSaida();
+      double[][] resultados = new double[nAmostras][tamSaida];
+      double[] entradaRede = new double[tamEntrada];
+      double[] saidaRede = new double[tamSaida];
+
+      for(int i = 0; i < nAmostras; i++){
+         System.arraycopy(entradas[i], 0, entradaRede, 0, entradas[i].length);
+         this.calcularSaida(entradaRede);
+         System.arraycopy(this.obterSaidas(), 0, saidaRede, 0, saidaRede.length);
+         System.arraycopy(saidaRede, 0, resultados[i], 0, saidaRede.length);
+      }
+
+      return resultados;
+   }
+
+   /**
+    * Treina a Rede Neural de acordo com as configurações predefinidas.
+    * <p>
+    *    Certifique-se de configurar adequadamente o modelo para obter os 
+    *    melhores resultados.
+    * </p>
+    * @param entradas dados de entrada do treino (features).
+    * @param saidas dados de saída correspondente a entrada (class).
+    * @param epochs quantidade de épocas de treinamento.
+    * @throws IllegalArgumentException se o modelo não foi compilado previamente.
+    * @throws IllegalArgumentException se houver alguma inconsistência dos dados de entrada e saída para a operação.
+    * @throws IllegalArgumentException se o valor de épocas for menor que um.
+    */
+   public void treinar(double[][] entradas, double[][] saidas, int epochs){
+      this.verificarCompilacao();
+      consistenciaDados(entradas, saidas);
+
+      if(epochs < 1){
+         throw new IllegalArgumentException(
+            "O valor de epochs (" + epochs + ") não pode ser menor que um"
+         );
+      }
+
+      this.treinador.treino(
+         this,
+         entradas,
+         saidas,
+         epochs
+      );
+   }
+
+   public void diferencaFinita(double[][] entrada, double[][] saida, double eps, double tA, int epochs){
+      double salvo;
+
+      CamadaDensa[] gradiente = new CamadaDensa[this.camadas.length];
+      for(int i = 0; i < gradiente.length; i++){
+         gradiente[i] = new CamadaDensa(this.camadas[i].tamanhoEntrada(), this.camadas[i].quantidadeNeuronios(), bias);
+      }
+
+      double custo = this.avaliador.erroMedioQuadrado(entrada, saida);
+      for(int i = 0; i < epochs; i++){
+         
+         for(int j = 0; j < this.camadas.length; j++){
+            
+            //pesos
+            for(int lin = 0; lin < this.camadas[j].pesos.length; lin++){
+               for(int col = 0; col < this.camadas[j].pesos[lin].length; col++){
+                  salvo = this.camadas[j].pesos[lin][col];
+                  this.camadas[j].pesos[lin][col] += eps;
+                  gradiente[j].pesos[lin][col] = (this.avaliador.erroMedioQuadrado(entrada, saida) - custo) / eps;
+                  this.camadas[j].pesos[lin][col] = salvo;
+               }
+            }
+
+            //bias
+            for(int lin = 0; lin < this.camadas[j].bias.length; lin++){
+               salvo = this.camadas[j].bias[lin][0];
+               this.camadas[j].bias[lin][0] += eps;
+               gradiente[j].bias[lin][0] = (this.avaliador.erroMedioQuadrado(entrada, saida) - custo) / eps;
+               this.camadas[j].bias[lin][0] = salvo;               
+            }
+
+         }
+
+         for(int j = 0; j < this.camadas.length; j++){            
+            //pesos
+            for(int lin = 0; lin < this.camadas[j].pesos.length; lin++){
+               for(int col = 0; col < this.camadas[j].pesos[lin].length; col++){
+                  this.camadas[j].pesos[lin][col] -= tA * gradiente[j].pesos[lin][col];
+               }
+            }
+            
+            //bias
+            for(int lin = 0; lin < this.camadas[j].bias.length; lin++){
+               this.camadas[j].bias[lin][0] -= tA * gradiente[j].bias[lin][0];
+            }
+
+         }
+      }
+
+   }
+
+   /**
+    * Retorna a função de perda configurada da Rede Neural.
+    * @return função de perda atual da rede.
+    */
+    public Perda obterPerda(){
+      return this.perda;
+   }
+
+   /**
+    * Retorna o otimizador que está sendo usado para o treino da Rede Neural.
+    * @return otimizador atual da rede.
+    */
+   public Otimizador obterOtimizador(){
+      return this.otimizador;
+   }
+
+   /**
+    * Retorna a {@code camada} da Rede Neural correspondente ao índice fornecido.
+    * @param id índice da busca.
+    * @return camada baseada na busca.
+    * @throws IllegalArgumentException se o modelo não foi compilado previamente.
+    * @throws IllegalArgumentException se o índice estiver fora do alcance do tamanho 
+    * das camadas ocultas.
+    */
+   public CamadaDensa obterCamada(int id){
+      this.verificarCompilacao();
+
+      if((id < 0) || (id >= this.camadas.length)){
+         throw new IllegalArgumentException(
+            "O índice fornecido (" + id + 
+            ") é inválido ou fora de alcance."
+         );
+      }
+   
+      return this.camadas[id];
+   }
+
+   /**
+    * Retorna todo o conjunto de camadas densas presente na Rede Neural.
+    * @throws IllegalArgumentException se o modelo não foi compilado previamente.
+    * @return conjunto de camadas da rede.
+    */
+   public CamadaDensa[] obterCamadas(){
+      this.verificarCompilacao();
+      return this.camadas;
+   }
+
+   /**
+    * Retorna a {@code camada de saída} da Rede Neural.
+    * @return camada de saída, ou ultima camada densa.
+    * @throws IllegalArgumentException se o modelo não foi compilado previamente.
+    */
+   public CamadaDensa obterCamadaSaida(){
+      this.verificarCompilacao();
+      return this.camadas[this.camadas.length-1];
+   }
+
+   /**
+    * Retorna os dados de saída da última camada da Rede Neural. 
+    * <p>
+    *    A ordem de cópia é crescente, do primeiro neurônio da saída ao último.
+    * </p>
+    * @return array com os dados das saídas da rede.
+    * @throws IllegalArgumentException se o modelo não foi compilado previamente.
+    */
+   public double[] obterSaidas(){
+      this.verificarCompilacao();
+      return this.obterCamadaSaida().obterSaida()[0];
+   }
+
+   /**
+    * Retorna o array que representa a estrutura da Rede Neural. Nele cada elemento 
+    * indica uma camada da rede e cada valor contido nesse elemento indica a 
+    * quantidade de neurônios daquela camada correspondente.
+    * <p>
+    *    Nessa estrutura de rede, a camada de entrada não é considerada uma camada,
+    *    o que significa dizer também que ela não é uma instância de camada dentro
+    *    da Rede Neural.
+    * </p>
+    * <p>
+    *    A "camada de entrada" representa o tamanho de entrada da primeira camada densa
+    *    da rede, ou seja, ela é apenas um parâmetro pro tamanho de entrada da primeira
+    *    camada oculta. 
+    * </p>
+    * @return array com a arquitetura da rede.
+    * @throws IllegalArgumentException se o modelo não foi compilado previamente.
+    */
+   public int[] obterArquitetura(){
+      this.verificarCompilacao();
+      return this.arquitetura;
+   }
+
+   /**
+    * Informa o nome configurado da Rede Neural.
+    * @return nome específico da rede.
+    */
+   public String obterNome(){
+      return this.nome;
+   }
+
+   /**
+    * Retorna a quantidade total de parâmetros da rede.
+    * <p>
+    *    isso inclui todos os pesos de todos os neurônios presentes 
+    *    (incluindo o peso adicional do bias).
+    * </p>
+    * @return quantiade de parâmetros total da rede.
+    */
+   public int obterQuantidadeParametros(){
+      int parametros = 0;
+      for(CamadaDensa camada : this.camadas){
+         parametros += camada.numParametros();
+      }
+      return parametros;
+   }
+
+   /**
+    * Retorna a quantidade de camadas densas presente na Rede Neural.
+    * <p>
+    *    A {@code camada de entrada} não é considerada uma camada densa e é usada
+    *    apenas para especificar o tamanho de entrada suportado pela rede.
+    * </p>
+    * @return quantidade de camadas da Rede Neural.
+    * @throws IllegalArgumentException se o modelo não foi compilado previamente.
+    */
+   public int obterQuantidadeCamadas(){
+      this.verificarCompilacao();
+      return this.camadas.length;
+   }
+
+   /**
+    * Retorna a capacidade da camada de entrada da Rede Neural. Em outras palavras
+    * diz quantos dados de entrada a rede suporta.
+    * @return tamanho de entrada da Rede Neural.
+    * @throws IllegalArgumentException se o modelo não foi compilado previamente.
+    */
+   public int obterTamanhoEntrada(){
+      this.verificarCompilacao();
+      return this.arquitetura[0];
+   }
+
+   /**
+    * Retorna a capacidade de saída da Rede Neural. Em outras palavras
+    * diz quantos dados de saída a rede produz.
+    * @return tamanho de saída da Rede Neural.
+    * @throws IllegalArgumentException se o modelo não foi compilado previamente.
+    */
+   public int obterTamanhoSaida(){
+      this.verificarCompilacao();
+      return this.arquitetura[this.arquitetura.length-1];
+   }
+
+   /**
+    * Retorna o valor de uso do bias da Rede Neural.
+    * @return valor de uso do bias da Rede Neural.
+    */
+   public boolean temBias(){
+      return this.bias;
+   }
+
+   /**
+    * Exibe algumas informações importantes sobre a Rede Neural, como:
+    * <ul>
+    *    <li>
+    *       Otimizador atual e suas informações específicas.
+    *    </li>
+    *    <li>
+    *       Contém bias como neurônio adicional.
+    *    </li>
+    *    <li>
+    *       Função de ativação de todas as camadas.
+    *    </li>
+    *    <li>
+    *       Arquitetura da rede.
+    *    </li>
+    * </ul>
+    * @return buffer formatado contendo as informações.
+    * @throws IllegalArgumentException se o modelo não foi compilado previamente.
+    */
+   public String info(){
+      this.verificarCompilacao();
+
+      String buffer = "";
+      String espacamento = "    ";
+      System.out.println("\nInformações " + this.nome + " = [");
+
+      //perda
+      buffer += espacamento + "Perda: " + this.perda.getClass().getSimpleName() + "\n\n";
+
+      //otimizador
+      buffer += espacamento + "Otimizador: " + this.otimizador.getClass().getSimpleName() + "\n";
+      buffer += this.otimizador.info();
+
+      //bias
+      buffer += "\n" + espacamento + "Bias = " + this.bias;
+      buffer += "\n\n";
+
+      for(int i = 0; i < this.camadas.length; i++){
+         buffer += espacamento + "Ativação camada " + i + ": " + this.camadas[i].obterAtivacao().getClass().getSimpleName() + "\n";
+      }
+
+      //arquitetura
+      buffer += "\n" + espacamento + "arquitetura = [(" + this.arquitetura[0] + ")";
+      for(int i = 1; i < this.arquitetura.length; i++){
+         buffer += ", " + this.arquitetura[i];
+      }
+      buffer += "]";
+
+      buffer += "\n]\n";
+
+      return buffer;
+   }
+
+   @Override
+   public RedeNeural clone(){
+      try{
+         RedeNeural clone = (RedeNeural) super.clone();
+
+         clone.arquitetura = this.arquitetura.clone();
+         clone.bias = this.bias;
+         clone.otimizador = this.otimizador;
+         clone.perda = this.perda;
+
+         clone.camadas = new CamadaDensa[this.camadas.length];
+         for(int i = 0; i < this.camadas.length; i++){
+            clone.camadas[i] = this.camadas[i].clone();
+         }
+
+         return clone;
+      }catch(Exception e){
+         throw new RuntimeException(e);
+      }
+   }
+
+
+}
