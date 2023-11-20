@@ -56,7 +56,7 @@ public class Treino{
             rede.calcularSaida(dadoEntrada);
             backpropagation(rede.camadas, rede.obterPerda(), dadoSaida);  
             
-            // atualizarPesos(rede.camadas, rede.TAXA_APRENDIZAGEM);
+            // atualizarPesos(rede.camadas, 0.01);
             rede.obterOtimizador().atualizar(rede.obterCamadas());
          }
       }
@@ -89,7 +89,8 @@ public class Treino{
          Matriz.add(camada.pesos, camada.gradientes, camada.pesos);
 
          if(camada.temBias()){
-            Matriz.sub(camada.erros, camada.bias, camada.bias);
+            Matriz.escalar(camada.erros, taxaAprendizagem, camada.erros);
+            Matriz.add(camada.bias, camada.erros, camada.bias);
          }
       }
    }
