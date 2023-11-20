@@ -144,12 +144,10 @@ public class CamadaDensa implements Cloneable{
 
       this.entrada = new double[1][entrada];
       this.pesos =   new double[entrada][neuronios];
-      Matriz.randomizar(pesos);
       this.saida =   new double[1][neuronios];
       
       if(usarBias){
          this.bias = new double[saida.length][saida[0].length];
-         Matriz.randomizar(bias);
       }
 
       this.somatorio =  new double[this.saida.length][this.saida[0].length];

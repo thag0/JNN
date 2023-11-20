@@ -13,7 +13,7 @@ import rna.inicializadores.*;
 import rna.otimizadores.*;
 
 public class Main{
-   static final int epocas = 5*1000;
+   static final int epocas = 10*1000;
    static final float escalaRender = 7;
    static Ged ged = new Ged();
    static Geim geim = new Geim();
@@ -55,8 +55,7 @@ public class Main{
    }
 
    public static RedeNeural criarRede(int entradas, int saidas){
-      // int[] arq = {entradas, 13, 13, saidas};//28x28
-      int[] arq = {entradas, 40, 40, saidas};//28x28
+      int[] arq = {entradas, 13, 13, saidas};//28x28
       RedeNeural rede = new RedeNeural(arq);
 
       Perda perda = new ErroMedioQuadrado();
@@ -71,7 +70,7 @@ public class Main{
    }
 
    public static void treinoEmPainel(RedeNeural rede, BufferedImage imagem, double[][] dadosEntrada, double[][] dadosSaida){
-      final int fps = 60;
+      final int fps = 600;
       int epocasPorFrame = 30;
 
       //acelerar o processo de desenho

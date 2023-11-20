@@ -80,11 +80,12 @@ public class Treino{
       }
    }
 
+   @Deprecated
    public void atualizarPesos(CamadaDensa[] camadas, double taxaAprendizagem){
       for(int i = 0; i < camadas.length; i++){
          CamadaDensa camada = camadas[i];
 
-         Matriz.escalar(camada.gradientes, taxaAprendizagem);
+         Matriz.escalar(camada.gradientes, taxaAprendizagem, camada.gradientes);
          Matriz.add(camada.pesos, camada.gradientes, camada.pesos);
 
          if(camada.temBias()){

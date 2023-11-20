@@ -110,7 +110,7 @@ public class TreinoLote{
 
    void zerarGradientesAcumulados(CamadaDensa[] redec){
       for(CamadaDensa camada : redec){
-         Matriz.escalar(camada.gradientesAcumulados, 0);
+         Matriz.preencher(camada.gradientesAcumulados, 0);
       }
    }
    

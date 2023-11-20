@@ -5,30 +5,7 @@ import java.util.Random;
 public class Matriz{
    static Random random = new Random();
 
-   static int nThreads = 2;
 
-   public static void configurarThreads(int numThreads){
-      if(numThreads < 1){
-         throw new IllegalArgumentException(
-            "O número de threads deve ser maior que zero."
-         );
-      }
-
-      if(numThreads > Runtime.getRuntime().availableProcessors()){
-         System.out.println("Aviso: alto número de threads pode causar intabilidade ou lentidão.");
-      }
-
-      nThreads = numThreads;
-   }
-
-   public static void randomizar(double[][] a){
-      int alcance = 2;
-      for(int i = 0; i < a.length; i++){
-         for(int j = 0; j < a[0].length; j++){
-            a[i][j] = random.nextDouble(-alcance, alcance);
-         }
-      }     
-   }
 
    public static double[][] arrayParaMatrizColuna(double[] entrada){
       double[][] matriz = new double[1][entrada.length];
@@ -75,6 +52,14 @@ public class Matriz{
       }
    }
 
+   public static void preencher(double[][] m, double val){
+      for(int i = 0; i < m.length; i++){
+         for(int j = 0; j < m[i].length; j++){
+            m[i][j] = val;
+         }
+      }    
+   }
+
    public static double[][] transpor(double[][] a){
       double[][] t = new double[a[0].length][a.length];
 
@@ -117,85 +102,12 @@ public class Matriz{
 
       for(int i = 0; i < r.length; i++){
          for(int j = 0; j < r[i].length; j++){
-            r[i][j] = 0;
+            double res = 0;
             for(int k = 0; k < a[0].length; k++){
-               r[i][j] += a[i][k] * b[k][j];
+               res += a[i][k] * b[k][j];
             }
+            r[i][j] = res;    
          }
-      }
-   }
-
-   /**
-    * Multiplicação matricial em paralelo seguindo a expressão:
-    * <pre>
-    * R = A * B
-    * </pre>
-    * @param a primeita matriz.
-    * @param b segunda matriz.
-    * @param r matriz contendo o resultado da multiplicação.
-    */
-   public static void multT(double[][] a, double[][] b, double[][] r){
-      //TODO
-      //corrigir problema de uso quando recebe matrizes das camadas
-      int linA = a.length;
-      int colA = a[0].length;
-      int linB = b.length;
-      int colB = b[0].length;
-      int linR = r.length;
-      int colR = r[0].length;
-
-      if(colA != linB){
-         throw new IllegalArgumentException("Dimensões de A e B incompatíveis");
-      }
-      if(linR != linA){
-         throw new IllegalArgumentException(
-            "As linhas de A (" + linA + 
-            ") e R (" + linR + 
-            ") devem ser iguais."
-         );
-      }
-      if(colR != colB){
-         throw new IllegalArgumentException(
-            "As colunas de B (" + colB + 
-            ") e R (" + colR + 
-            ") devem ser iguais."
-         );
-      }
-
-      int linPorThread = linA / nThreads;
-      Thread[] threads = new Thread[nThreads];
-
-      for(int t = 0; t < nThreads; t++){
-         final int id = t;
-
-         threads[t] = new Thread(() -> {
-            int inicio = id * linPorThread;
-            int fim = (id == nThreads - 1) ? linA : (id + 1) * linPorThread;
-            
-            double[] res = new double[r[0].length];
-            for(int i = inicio; i < fim; i++){
-               
-               res[i] = 0;
-               for(int j = 0; j < linR; j++){
-                  for(int k = 0; k < colA; k++){
-                     res[j] += a[i][k] * b[k][j];
-                  }
-                  
-               }
-
-               r[i] = res;
-            }
-         });
-         threads[t].start();
-      }
-   
-      try{
-         for(int i = 0; i < nThreads; i++){
-            threads[i].join();
-         }
-      }catch(InterruptedException e){
-         e.printStackTrace();
-         System.exit(1);
       }
    }
 
@@ -223,11 +135,17 @@ public class Matriz{
          throw new IllegalArgumentException("Colunas de R são diferentes.");
       }
 
-      for(int i = 0; i < r.length; i++){
-         for(int j = 0; j < r[0].length; j++){
-            r[i][j] = a[i][j] + b[i][j];
+      if(a.length == 1){
+         Array.add(a[0], b[0], r[0]);
+      
+      }else{
+         for(int i = 0; i < r.length; i++){
+            for(int j = 0; j < r[0].length; j++){
+               r[i][j] = a[i][j] + b[i][j];
+            }
          }
       }
+
    }
 
    /**
@@ -257,12 +175,18 @@ public class Matriz{
       if(a[0].length != r[0].length){
          throw new IllegalArgumentException("Colunas de R são diferentes.");
       }
+
+      if(a.length == 1){
+         Array.sub(a[0], b[0], r[0]);
       
-      for(int i = 0; i < r.length; i++){
-         for(int j = 0; j < r[0].length; j++){
-            r[i][j] = a[i][j] - b[i][j];
+      }else{
+         for(int i = 0; i < r.length; i++){
+            for(int j = 0; j < r[0].length; j++){
+               r[i][j] = a[i][j] - b[i][j];
+            }
          }
       }
+      
    }
 
    /**
@@ -289,27 +213,55 @@ public class Matriz{
          throw new IllegalArgumentException("Colunas de R são diferentes.");
       }
 
-      for(int i = 0; i < r.length; i++){
-         for(int j = 0; j < r[i].length; j++){
-            r[i][j] = a[i][j] * b[i][j];
+      if(a.length == 1){
+         Array.mult(a[0], b[0], r[0]);
+      
+      }else{
+         for(int i = 0; i < r.length; i++){
+            for(int j = 0; j < r[i].length; j++){
+               r[i][j] = a[i][j] * b[i][j];
+            }
          }
       }
+
    }
 
    /**
     * Adiciona o conteúdo resultante da multiplicação elemento a elemento do conteúdo da matriz
     * A por um valor escalar de acordo com a expressão:
     * <pre>
-    * A = A * esc
+    * R = A * esc
     * </pre>
     * @param a matriz alvo.
     * @param e escalar utilizado para a multiplicação.
+    * @param r matriz que terá o resultado.
     */
-   public static void escalar(double[][] a, double e){
-      for(int i = 0; i < a.length; i++){
-         for(int j = 0; j < a[0].length; j++){
-            a[i][j] = a[i][j] * e;
+   public static void escalar(double[][] a, double e, double[][] r){
+      if(a.length != r.length){
+         throw new IllegalArgumentException(
+            "As linhas de A (" + a.length + 
+            ") e R (" + r.length + 
+            ") devem ser iguais."
+         );
+      }
+      if(a[0].length != r[0].length){
+         throw new IllegalArgumentException(
+            "As colunas de A (" + a.length + 
+            ") e R (" + r.length + 
+            ") devem ser iguais."
+         );
+      }
+
+      if(a.length == 1){
+         Array.escalar(a[0], e, r[0]);
+      
+      }else{
+         for(int i = 0; i < r.length; i++){
+            for(int j = 0; j < r[i].length; j++){
+               r[i][j] = a[i][j] * e;
+            }
          }
-      }     
+      }
+
    }
 }
