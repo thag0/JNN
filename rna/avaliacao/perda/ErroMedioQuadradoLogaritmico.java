@@ -31,9 +31,10 @@ public class ErroMedioQuadradoLogaritmico extends Perda{
    public double[] derivada(double[] previsto, double[] real){
       verificarDimensoes(previsto.length, real.length);
 
+      int amostras = previsto.length;
       double[] derivadas = new double[previsto.length];
-      for (int i = 0; i < previsto.length; i++) {
-         derivadas[i] = 2 * (Math.log(1 + real[i]) - Math.log(1 + previsto[i]));
+      for(int i = 0; i < amostras; i++){
+         derivadas[i] = 2 * (Math.log(1 + real[i]) - Math.log(1 + previsto[i])) / amostras;
       }
       return derivadas;
    }

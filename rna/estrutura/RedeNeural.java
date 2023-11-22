@@ -265,6 +265,16 @@ public class RedeNeural implements Cloneable{
       camada.configurarAtivacao(ativacao);
    }
 
+   public void configurarAtivacao(CamadaDensa camada, String ativacao){
+      if(camada == null){
+         throw new IllegalArgumentException(
+            "A camada não pode ser nula."
+         );
+      }
+
+      camada.configurarAtivacao(ativacao);
+   }
+
    /**
     * Configura a função de perda que será utilizada durante o processo
     * de treinamento da Rede Neural.
@@ -722,59 +732,111 @@ public class RedeNeural implements Cloneable{
    }
 
    /**
-    * 
-    * @param entrada
-    * @param saida
-    * @param eps
-    * @param tA
-    * @param epochs
+    * Treina a rede de acordo com as configurações predefinidas.
+    * <p>
+    *    O modo de treinamento em lote costuma ser mais lento para convergir
+    *    e não é recomendável utilizar as mesma configurações da rede que foram
+    *    usadas pelo método sequencial convencional.
+    * </p>
+    * <p>
+    *    Em compensação ele tende a ser mais estável e possui menos ruídos durante
+    *    o treinamento.
+    * </p>
+    * Certifique-se de configurar adequadamente o modelo para obter os 
+    * melhores resultados.
+    * @param entradas dados de entrada do treino (features).
+    * @param saidas dados de saída correspondente a entrada (class).
+    * @param epochs quantidade de épocas de treinamento.
+    * @param tamLote tamanho que o lote vai assumir durante o treino.
+    * @throws IllegalArgumentException se o modelo não foi compilado previamente.
+    * @throws IllegalArgumentException se houver alguma inconsistência dos dados de entrada e saída para a operação.
+    * @throws IllegalArgumentException se o valor de épocas for menor que um.
     */
-   public void diferencaFinita(double[][] entrada, double[][] saida, double eps, double tA, int epochs){
-      double salvo;
+    public void treinar(double[][] entradas, double[][] saidas, int epochs, int tamLote){
+      this.verificarCompilacao();
+      consistenciaDados(entradas, saidas);
 
-      CamadaDensa[] gradiente = new CamadaDensa[this.camadas.length];
-      for(int i = 0; i < gradiente.length; i++){
-         gradiente[i] = new CamadaDensa(this.camadas[i].tamanhoEntrada(), this.camadas[i].quantidadeNeuronios(), bias);
+      if(epochs < 1){
+         throw new IllegalArgumentException(
+            "O valor de epochs (" + epochs + ") não pode ser menor que um"
+         );
+      }
+      if(tamLote <= 0 || tamLote > entradas.length){
+         throw new IllegalArgumentException(
+            "O valor de tamanho do lote (" + tamLote + ") é inválido."
+         );
       }
 
-      double custo = this.avaliador.erroMedioQuadrado(entrada, saida);
-      for(int i = 0; i < epochs; i++){
-         
-         for(int j = 0; j < this.camadas.length; j++){
-            
-            //pesos
-            for(int lin = 0; lin < this.camadas[j].pesos.length; lin++){
-               for(int col = 0; col < this.camadas[j].pesos[lin].length; col++){
-                  salvo = this.camadas[j].pesos[lin][col];
-                  this.camadas[j].pesos[lin][col] += eps;
-                  gradiente[j].pesos[lin][col] = (this.avaliador.erroMedioQuadrado(entrada, saida) - custo) / eps;
-                  this.camadas[j].pesos[lin][col] = salvo;
+      this.treinador.treino(
+         this,
+         entradas,
+         saidas,
+         epochs,
+         tamLote
+      );
+   }
+
+   /**
+    * Método alternativo no treino da rede neural usando diferenciação finita (finite difference), 
+    * que calcula a "derivada" da função de custo levando a rede ao mínimo local dela. É importante 
+    * encontrar um bom balanço entre a taxa de aprendizagem da rede e o valor de perturbação usado.
+    * <p>
+    *    Vale ressaltar que esse método é mais lento e menos eficiente que o backpropagation, em 
+    *    arquiteturas de rede maiores e que tenha uma grande volume de dados de treino ou para 
+    *    problemas mais complexos ele pode demorar muito para convergir ou simplemente não funcionar 
+    *    como esperado.
+    * </p>
+    * <p>
+    *    Ainda sim não deixa de ser uma abordagem válida.
+    * </p>
+    * @param entradas matriz com os dados de entrada 
+    * @param saidas matriz com os dados de saída
+    * @param eps valor de perturbação
+    * @param tA valor de taxa de aprendizagem do método, contribui para o quanto os pesos
+    * serão atualizados. Valores altos podem convergir rápido mas geram instabilidade, valores pequenos
+    * atrasam a convergência.
+    * @param epochs número de épocas do treinamento
+    * @throws IllegalArgumentException se o modelo não foi compilado previamente.
+    * @throws IllegalArgumentException se houver alguma inconsistência dos dados de entrada e saída para a operação.
+    * @throws IllegalArgumentException se o valor de perturbação for igual a zero.
+    * @throws IllegalArgumentException se o valor de épocas for menor que um.
+    * @throws IllegalArgumentException se o valor de custo mínimo for menor que zero.
+    */
+   public void diferencaFinita(double[][] entradas, double[][] saidas, double eps, double tA, int epochs){      
+      double salvo;
+      for(int e = 0; e < epochs; e++){
+
+         double custo = this.avaliador.erroMedioQuadrado(entradas, saidas);
+         for(CamadaDensa camada : this.camadas){   
+            for(int i = 0; i < camada.pesos.length; i++){
+               for(int j = 0; j < camada.pesos[i].length; j++){
+                  salvo = camada.pesos[i][j];
+                  camada.pesos[i][j] += eps;
+                  camada.gradientes[i][j] = (this.avaliador.erroMedioQuadrado(entradas, saidas) - custo) / eps;
+                  camada.pesos[i][j] = salvo;
                }
             }
-
-            //bias
-            for(int lin = 0; lin < this.camadas[j].bias.length; lin++){
-               salvo = this.camadas[j].bias[lin][0];
-               this.camadas[j].bias[lin][0] += eps;
-               gradiente[j].bias[lin][0] = (this.avaliador.erroMedioQuadrado(entrada, saida) - custo) / eps;
-               this.camadas[j].bias[lin][0] = salvo;               
+            for(int i = 0; i < camada.bias.length; i++){
+               for(int j = 0; j < camada.bias[i].length; j++){
+                  salvo = camada.bias[i][j];
+                  camada.bias[i][j] += eps;
+                  camada.erros[i][j] = (this.avaliador.erroMedioQuadrado(entradas, saidas) - custo) / eps;
+                  camada.bias[i][j] = salvo;       
+               }
             }
-
          }
 
-         for(int j = 0; j < this.camadas.length; j++){            
-            //pesos
-            for(int lin = 0; lin < this.camadas[j].pesos.length; lin++){
-               for(int col = 0; col < this.camadas[j].pesos[lin].length; col++){
-                  this.camadas[j].pesos[lin][col] -= tA * gradiente[j].pesos[lin][col];
+         for(CamadaDensa camada : this.camadas){            
+            for(int i = 0; i < camada.pesos.length; i++){
+               for(int j = 0; j < camada.pesos[i].length; j++){
+                  camada.pesos[i][j] -= tA * camada.gradientes[i][j];
                }
             }
-            
-            //bias
-            for(int lin = 0; lin < this.camadas[j].bias.length; lin++){
-               this.camadas[j].bias[lin][0] -= tA * gradiente[j].bias[lin][0];
+            for(int i = 0; i < camada.bias.length; i++){
+               for(int j = 0; j < camada.bias[i].length; j++){
+                  camada.bias[i][j] -= tA * camada.erros[i][j];
+               }
             }
-
          }
       }
 

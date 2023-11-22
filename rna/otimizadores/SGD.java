@@ -89,7 +89,7 @@ public class SGD extends Otimizador{
          CamadaDensa camada = redec[i];
 
          this.m[i] = new double[camada.pesos.length][camada.pesos[0].length];
-         if(redec[i].temBias()){
+         if(camada.temBias()){
             mb[i] = new double[camada.bias.length][camada.bias[0].length];
          }
       }
@@ -126,30 +126,30 @@ public class SGD extends Otimizador{
     */
    @Override
    public void atualizar(CamadaDensa[] redec){
-      for(int id = 0; id < redec.length; id++){
-         CamadaDensa camada = redec[id];
+      for(int i = 0; i < redec.length; i++){
+         CamadaDensa camada = redec[i];
 
-         for(int i = 0; i < camada.pesos.length; i++){
-            for(int j = 0; j < camada.pesos[i].length; j++){
-               m[id][i][j] = calcular(m[id][i][j], camada.gradientes[i][j]);
+         for(int j = 0; j < camada.pesos.length; j++){
+            for(int k = 0; k < camada.pesos[j].length; k++){
+               m[i][j][k] = calcular(m[i][j][k], camada.gradientes[j][k]);
                
                if(nesterov){
-                  camada.pesos[i][j] += (camada.gradientes[i][j] * taxaAprendizagem) + (momentum * m[id][i][j]);
+                  camada.pesos[j][k] -= (camada.gradientes[j][k] * taxaAprendizagem) + (momentum * m[i][j][k]);
                }else{
-                  camada.pesos[i][j] += m[id][i][j];
+                  camada.pesos[j][k] -= m[i][j][k];
                }
             }
          }
 
          if(camada.temBias()){
-            for(int i = 0; i < camada.bias.length; i++){
-               for(int j = 0; j < camada.bias[i].length; j++){
-                  mb[id][i][j] = calcular(mb[id][i][j], camada.erros[i][j]);
+            for(int j = 0; j < camada.bias.length; j++){
+               for(int k = 0; k < camada.bias[j].length; k++){
+                  mb[i][j][k] = calcular(mb[i][j][k], camada.erros[j][k]);
                   
                   if(nesterov){
-                     camada.bias[i][j] += (camada.erros[i][j] * taxaAprendizagem) + (momentum * mb[id][i][j]);
+                     camada.bias[j][k] -= (camada.erros[j][k] * taxaAprendizagem) + (momentum * mb[i][j][k]);
                   }else{
-                     camada.bias[i][j] += mb[id][i][j];
+                     camada.bias[j][k] -= mb[j][j][k];
                   }
                }
             }
@@ -158,7 +158,7 @@ public class SGD extends Otimizador{
    }
 
    private double calcular(double m, double grad){
-      return (momentum * m) + (taxaAprendizagem * grad);
+      return (-grad * this.taxaAprendizagem) + (m * this.momentum);
    }
 
    @Override

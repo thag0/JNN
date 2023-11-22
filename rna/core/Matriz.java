@@ -1,19 +1,21 @@
 package rna.core;
 
-import java.util.Random;
-
 public class Matriz{
-   static Random random = new Random();
 
+   /**
+    * Impelementações de operações matriciais.
+    */
+   public Matriz(){
 
+   }
 
-   public static double[][] arrayParaMatrizColuna(double[] entrada){
+   public double[][] arrayParaMatrizColuna(double[] entrada){
       double[][] matriz = new double[1][entrada.length];
       System.arraycopy(entrada, 0, matriz[0], 0, entrada.length);
       return matriz;
    }
 
-   public static double[][] arrayParaMatrizLinha(double[] entrada){
+   public double[][] arrayParaMatrizLinha(double[] entrada){
       double[][] matriz = new double[entrada.length][1];
       
       for(int i = 0; i < entrada.length; i++){
@@ -23,13 +25,13 @@ public class Matriz{
       return matriz;
    }
 
-   public static double[] matrizParaArrayColuna(double[][] entrada){
+   public double[] matrizParaArrayColuna(double[][] entrada){
       double[] e = new double[entrada[0].length];
       System.arraycopy(entrada[0], 0, e, 0, e.length);
       return e;
    }
 
-   public static void copiar(double[][] m, double[][] r){
+   public void copiar(double[][] m, double[][] r){
       if(m.length != r.length){
          throw new IllegalArgumentException(
             "As linhas de M (" + m.length + 
@@ -52,7 +54,12 @@ public class Matriz{
       }
    }
 
-   public static void preencher(double[][] m, double val){
+   /**
+    * Substitui cada elemento da matriz pelo valor fornecido.
+    * @param m matriz.
+    * @param val valor desejado para preenchimento.
+    */
+   public void preencher(double[][] m, double val){
       for(int i = 0; i < m.length; i++){
          for(int j = 0; j < m[i].length; j++){
             m[i][j] = val;
@@ -60,12 +67,17 @@ public class Matriz{
       }    
    }
 
-   public static double[][] transpor(double[][] a){
-      double[][] t = new double[a[0].length][a.length];
+   /**
+    * Transpõe a matriz fornecida, invertendo suas linhas e colunas.
+    * @param m matriz.
+    * @return transposta da matriz alvo.
+    */
+   public double[][] transpor(double[][] m){
+      double[][] t = new double[m[0].length][m.length];
 
-      for(int i = 0; i < a.length; i++){
-         for(int j = 0; j < a[i].length; j++){
-            t[j][i] = a[i][j];
+      for(int i = 0; i < m.length; i++){
+         for(int j = 0; j < m[i].length; j++){
+            t[j][i] = m[i][j];
          }
       }
 
@@ -81,7 +93,7 @@ public class Matriz{
     * @param b segunda matriz.
     * @param r matriz contendo o resultado.
     */
-   public static void mult(double[][] a, double[][] b, double[][] r){
+   public void mult(double[][] a, double[][] b, double[][] r){
       if(a[0].length != b.length){
          throw new IllegalArgumentException("Dimensões de A e B incompatíveis");
       }
@@ -121,7 +133,7 @@ public class Matriz{
     * @param b segunda matriz.
     * @param r matriz contendo o resultado da soma.
     */
-   public static void add(double[][] a, double[][] b, double[][] r){
+   public void add(double[][] a, double[][] b, double[][] r){
       if(a.length != b.length){
          throw new IllegalArgumentException("Linhas de A e B são diferentes.");
       }
@@ -137,7 +149,7 @@ public class Matriz{
 
       if(a.length == 1){
          Array.add(a[0], b[0], r[0]);
-      
+
       }else{
          for(int i = 0; i < r.length; i++){
             for(int j = 0; j < r[0].length; j++){
@@ -158,7 +170,7 @@ public class Matriz{
     * @param b segunda matriz.
     * @param r matriz contendo o resultado da subtração.
     */
-   public static void sub(double[][] a, double[][] b, double[][] r){
+   public void sub(double[][] a, double[][] b, double[][] r){
       if(a.length != b.length){
          throw new IllegalArgumentException(
             "Linhas de A (" + a.length + ") e B (" + b.length + ") são diferentes."
@@ -178,7 +190,7 @@ public class Matriz{
 
       if(a.length == 1){
          Array.sub(a[0], b[0], r[0]);
-      
+
       }else{
          for(int i = 0; i < r.length; i++){
             for(int j = 0; j < r[0].length; j++){
@@ -199,7 +211,7 @@ public class Matriz{
     * @param b segunda matriz.
     * @param r matriz contendo o resultado do produto hadamard.
     */
-   public static void hadamard(double[][] a, double[][]b, double[][] r){
+   public void hadamard(double[][] a, double[][]b, double[][] r){
       if(a.length != b.length){
          throw new IllegalArgumentException("Linhas de A e B são diferentes.");
       }
@@ -215,7 +227,7 @@ public class Matriz{
 
       if(a.length == 1){
          Array.mult(a[0], b[0], r[0]);
-      
+
       }else{
          for(int i = 0; i < r.length; i++){
             for(int j = 0; j < r[i].length; j++){
@@ -236,7 +248,7 @@ public class Matriz{
     * @param e escalar utilizado para a multiplicação.
     * @param r matriz que terá o resultado.
     */
-   public static void escalar(double[][] a, double e, double[][] r){
+   public void escalar(double[][] a, double e, double[][] r){
       if(a.length != r.length){
          throw new IllegalArgumentException(
             "As linhas de A (" + a.length + 

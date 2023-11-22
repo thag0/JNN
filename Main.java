@@ -6,14 +6,13 @@ import ged.*;
 import geim.Geim;
 import render.JanelaTreino;
 import rna.ativacoes.*;
-import rna.avaliacao.perda.ErroMedioQuadrado;
-import rna.avaliacao.perda.Perda;
+import rna.avaliacao.perda.*;
 import rna.estrutura.*;
 import rna.inicializadores.*;
 import rna.otimizadores.*;
 
 public class Main{
-   static final int epocas = 10*1000;
+   static final int epocas = 5*1000;
    static final float escalaRender = 7;
    static Ged ged = new Ged();
    static Geim geim = new Geim();
@@ -59,8 +58,9 @@ public class Main{
       RedeNeural rede = new RedeNeural(arq);
 
       Perda perda = new ErroMedioQuadrado();
-      Otimizador otm = new SGD(0.0001, 0.99, true);
-      Inicializador ini = new LeCun();
+      // Otimizador otm = new SGD(0.0001, 0.99, true);
+      Otimizador otm = new RMSProp(0.0001, 0.95, 1e-7);
+      Inicializador ini = new Xavier();
 
       rede.compilar(perda, otm, ini);
       rede.configurarAtivacao(new TanH());

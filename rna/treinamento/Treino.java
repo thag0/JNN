@@ -8,6 +8,7 @@ import rna.estrutura.CamadaDensa;
 import rna.estrutura.RedeNeural;
 
 public class Treino{
+   Matriz mat = new Matriz();
    public boolean calcularHistorico = false;
    double[] historico;
    Auxiliar aux = new Auxiliar();
@@ -73,10 +74,9 @@ public class Treino{
       aux.calcularErros(camadas, perda, real);
 
       //gradientes ou delta para os pesos
-      for(int i = 0; i < camadas.length; i++){
-         CamadaDensa camadaAtual = camadas[i];
-         double[][] entradaT = Matriz.transpor(camadaAtual.entrada);
-         Matriz.mult(entradaT, camadaAtual.erros, camadaAtual.gradientes);
+      for(CamadaDensa camada : camadas){
+         double[][] entradaT = mat.transpor(camada.entrada);
+         mat.mult(entradaT, camada.erros, camada.gradientes);
       }
    }
 
@@ -85,12 +85,12 @@ public class Treino{
       for(int i = 0; i < camadas.length; i++){
          CamadaDensa camada = camadas[i];
 
-         Matriz.escalar(camada.gradientes, taxaAprendizagem, camada.gradientes);
-         Matriz.add(camada.pesos, camada.gradientes, camada.pesos);
+         mat.escalar(camada.gradientes, taxaAprendizagem, camada.gradientes);
+         mat.add(camada.pesos, camada.gradientes, camada.pesos);
 
          if(camada.temBias()){
-            Matriz.escalar(camada.erros, taxaAprendizagem, camada.erros);
-            Matriz.add(camada.bias, camada.erros, camada.bias);
+            mat.escalar(camada.erros, taxaAprendizagem, camada.erros);
+            mat.add(camada.bias, camada.erros, camada.bias);
          }
       }
    }

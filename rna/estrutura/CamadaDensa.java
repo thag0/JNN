@@ -18,7 +18,12 @@ import rna.serializacao.DicionarioAtivacoes;
  * </pre>
  */
 public class CamadaDensa implements Cloneable{
-   
+
+   /**
+    * .
+    */
+   private Matriz mat = new Matriz();
+
    /**
     * Matriz contendo os valores dos pesos de cada conexão da
     * entrada com a saída da camada.
@@ -134,7 +139,19 @@ public class CamadaDensa implements Cloneable{
    private boolean inicializada;
 
    /**
-    * Instancia uma nova camada densa de neurônios.
+    * Instancia uma nova camada densa de neurônios, inicializando seus atributos como:
+    * <ul>
+    *    <li> Pesos </li>
+    *    <li> Bias </li>
+    *    <li> Entrada </li>
+    *    <li> Somatório </li>
+    *    <li> Saída </li>
+    *    <li> Erros </li>
+    *    <li> Gradientes </li>
+    *    <li> Saída </li>
+    * </ul>
+    * Após a inicialização os pesos e bias da Camada estarão zerados e devem ser inicializados
+    * com o método {@code inicializar()}.
     * @param entrada quantidade de conexões de entrada.
     * @param neuronios quantidade de neurônios.
     * @param usarBias adicionar uso do bias para a camada.
@@ -150,16 +167,30 @@ public class CamadaDensa implements Cloneable{
          this.bias = new double[saida.length][saida[0].length];
       }
 
-      this.somatorio =  new double[this.saida.length][this.saida[0].length];
-      this.derivada =   new double[this.saida.length][this.saida[0].length];
-      this.erros =      new double[this.saida.length][this.saida[0].length];
-      this.gradientes = new double[this.pesos.length][this.pesos[0].length];
+      this.somatorio =              new double[this.saida.length][this.saida[0].length];
+      this.derivada =               new double[this.saida.length][this.saida[0].length];
+      this.erros =                  new double[this.saida.length][this.saida[0].length];
+
+      this.gradientes =             new double[this.pesos.length][this.pesos[0].length];
+      this.gradientesAcumulados =   new double[this.pesos.length][this.pesos[0].length];
 
       this.inicializada = false;
    }
 
    /**
-    * Instancia uma nova camada densa de neurônios.
+    * Instancia uma nova camada densa de neurônios, inicializando seus atributos como:
+    * <ul>
+    *    <li> Pesos </li>
+    *    <li> Bias </li>
+    *    <li> Entrada </li>
+    *    <li> Somatório </li>
+    *    <li> Saída </li>
+    *    <li> Erros </li>
+    *    <li> Gradientes </li>
+    *    <li> Saída </li>
+    * </ul>
+    * Após a inicialização os pesos e bias da Camada estarão zerados e devem ser 
+    * inicializados com o método {@code inicializar()}.
     * @param entrada quantidade de conexões de entrada.
     * @param neuronios quantidade de neurônios.
     * @param usarBias adicionar uso do bias para a camada.
@@ -274,9 +305,9 @@ public class CamadaDensa implements Cloneable{
 
       Array.copiar(entrada, this.entrada[0]);     
 
-      Matriz.mult(this.entrada, this.pesos, this.somatorio);
+      mat.mult(this.entrada, this.pesos, this.somatorio);
       if(usarBias){
-         Matriz.add(this.somatorio, this.bias, this.somatorio);
+         mat.add(this.somatorio, this.bias, this.somatorio);
       }
       ativacao.calcular(this);
    }
@@ -452,28 +483,28 @@ public class CamadaDensa implements Cloneable{
 
          clone.usarBias = this.usarBias;
          clone.bias = new double[this.bias.length][this.bias[0].length];
-         Matriz.copiar(this.bias, clone.bias);
+         mat.copiar(this.bias, clone.bias);
 
          clone.entrada = new double[this.entrada.length][this.entrada[0].length];
-         Matriz.copiar(this.entrada, clone.entrada);
+         mat.copiar(this.entrada, clone.entrada);
 
          clone.pesos = new double[this.pesos.length][this.pesos[0].length];
-         Matriz.copiar(this.pesos, clone.pesos);
+         mat.copiar(this.pesos, clone.pesos);
 
          clone.somatorio = new double[this.somatorio.length][this.somatorio[0].length];
-         Matriz.copiar(this.somatorio, clone.somatorio);
+         mat.copiar(this.somatorio, clone.somatorio);
 
          clone.saida = new double[this.saida.length][this.saida[0].length];
-         Matriz.copiar(this.saida, clone.saida);
+         mat.copiar(this.saida, clone.saida);
 
          clone.erros = new double[this.erros.length][this.erros[0].length];
-         Matriz.copiar(this.erros, clone.erros);
+         mat.copiar(this.erros, clone.erros);
 
          clone.derivada = new double[this.derivada.length][this.derivada[0].length];
-         Matriz.copiar(this.derivada, clone.derivada);
+         mat.copiar(this.derivada, clone.derivada);
 
          clone.gradientes = new double[this.gradientes.length][this.gradientes[0].length];
-         Matriz.copiar(this.gradientes, clone.gradientes);
+         mat.copiar(this.gradientes, clone.gradientes);
 
          return clone;
       }catch(Exception e){

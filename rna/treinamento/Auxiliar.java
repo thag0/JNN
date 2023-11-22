@@ -3,11 +3,14 @@ package rna.treinamento;
 import java.util.Random;
 
 import rna.avaliacao.perda.Perda;
+import rna.core.Array;
 import rna.core.Matriz;
 import rna.estrutura.CamadaDensa;
 
 class Auxiliar{
    Random random = new Random();
+   Matriz mat = new Matriz();
+   Array arr = new Array();
 
    /**
     * Configura a seed inicial do gerador de números aleatórios.
@@ -35,9 +38,9 @@ class Auxiliar{
       for(int i = camadas.length-2; i >= 0; i--){
          camadas[i].calcularDerivadas();
 
-         double[][] pesoTransposto = Matriz.transpor(camadas[i+1].pesos);
-         Matriz.mult(camadas[i+1].erros, pesoTransposto, camadas[i].erros);
-         Matriz.hadamard(camadas[i].derivada, camadas[i].erros, camadas[i].erros);
+         double[][] pesoTransposto = mat.transpor(camadas[i+1].pesos);
+         mat.mult(camadas[i+1].erros, pesoTransposto, camadas[i].erros);
+         mat.hadamard(camadas[i].derivada, camadas[i].erros, camadas[i].erros);
       }
    }
    

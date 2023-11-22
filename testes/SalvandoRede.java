@@ -21,10 +21,11 @@ public class SalvandoRede{
       double[][] saida   = (double[][]) ged.separarDadosSaida(dados, 1);
 
       RedeNeural rede = criar();
-      rede.treinar(entrada, saida, 10_000);
+      // rede.treinar(entrada, saida, 10_000);
+      rede.diferencaFinita(entrada, saida, 0.1, 0.1, 30_000);
       // Serializador.salvar(rede, "/rede-xor.txt");
 
-      System.out.println(rede.avaliador.erroMedioQuadrado(entrada, saida));
+      System.out.println("Perda: " + rede.avaliador.erroMedioQuadrado(entrada, saida));
 
       for(int i = 0; i < 2; i++){
          for(int j = 0; j < 2; j++){

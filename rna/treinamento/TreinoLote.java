@@ -10,11 +10,12 @@ import rna.otimizadores.GD;
 import rna.otimizadores.Otimizador;
 
 public class TreinoLote{
+   Matriz mat = new Matriz();
+   Auxiliar aux = new Auxiliar();
+   Random random = new Random();
+
    public boolean calcularHistorico = false;
    double[] historico;
-   Auxiliar aux = new Auxiliar();
-
-   Random random = new Random();
    boolean ultimoUsado = false;
 
    /**
@@ -102,21 +103,21 @@ public class TreinoLote{
       //gradientes ou delta para os pesos
       for(int i = 0; i < redec.length; i++){
          CamadaDensa camada = redec[i];
-         double[][] entradaT = Matriz.transpor(camada.entrada);
-         Matriz.mult(entradaT, camada.erros, camada.gradientes);
-         Matriz.add(camada.gradientes, camada.gradientesAcumulados, camada.gradientesAcumulados);
+         double[][] entradaT = mat.transpor(camada.entrada);
+         mat.mult(entradaT, camada.erros, camada.gradientes);
+         mat.add(camada.gradientes, camada.gradientesAcumulados, camada.gradientesAcumulados);
       }
    }
 
    void zerarGradientesAcumulados(CamadaDensa[] redec){
       for(CamadaDensa camada : redec){
-         Matriz.preencher(camada.gradientesAcumulados, 0);
+         mat.preencher(camada.gradientesAcumulados, 0);
       }
    }
    
    void calcularMediaGradientesLote(CamadaDensa[] redec, int tamLote){
       for(CamadaDensa camada : redec){
-         Matriz.copiar(camada.gradientesAcumulados, camada.gradientes);
+         mat.copiar(camada.gradientesAcumulados, camada.gradientes);
          
          for(int i = 0; i < camada.gradientes.length; i++){
             for(int j = 0; j < camada.gradientes[i].length; j++){

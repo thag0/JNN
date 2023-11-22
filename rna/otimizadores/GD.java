@@ -9,6 +9,8 @@ import rna.estrutura.CamadaDensa;
  */
 public class GD extends Otimizador{
 
+   Matriz mat = new Matriz();
+
    /**
     * Valor de taxa de aprendizagem do otimizador.
     */
@@ -61,12 +63,14 @@ public class GD extends Otimizador{
     @Override
    public void atualizar(CamadaDensa[] redec){
       for(CamadaDensa camada : redec){
-         Matriz.escalar(camada.gradientes, taxaAprendizagem, camada.gradientes);
-         Matriz.add(camada.pesos, camada.gradientes, camada.pesos);
+         mat.escalar(camada.gradientes, taxaAprendizagem, camada.gradientes);
+         mat.escalar(camada.gradientes, -1, camada.gradientes);
+         mat.sub(camada.pesos, camada.gradientes, camada.pesos);
 
          if(camada.temBias()){
-            Matriz.escalar(camada.erros, taxaAprendizagem, camada.erros);
-            Matriz.add(camada.bias, camada.erros, camada.bias);
+            mat.escalar(camada.erros, taxaAprendizagem, camada.erros);
+            mat.escalar(camada.erros, -1, camada.erros);
+            mat.sub(camada.bias, camada.erros, camada.bias);
          }
       } 
    }
