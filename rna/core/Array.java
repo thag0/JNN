@@ -17,9 +17,7 @@ public class Array{
          );
       }
 
-      for(int i = 0; i < r.length; i++){
-         r[i] = a[i];
-      }
+      System.arraycopy(a, 0, r, 0, r.length);
    }
 
    /**

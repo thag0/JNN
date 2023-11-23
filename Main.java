@@ -58,8 +58,8 @@ public class Main{
       RedeNeural rede = new RedeNeural(arq);
 
       Perda perda = new ErroMedioQuadrado();
-      // Otimizador otm = new SGD(0.0001, 0.99, true);
-      Otimizador otm = new RMSProp(0.0001, 0.95, 1e-7);
+      Otimizador otm = new SGD(0.0001, 0.99, true);
+      // Otimizador otm = new Adadelta();
       Inicializador ini = new Xavier();
 
       rede.compilar(perda, otm, ini);

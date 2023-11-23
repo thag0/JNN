@@ -35,7 +35,7 @@ public class MatrizT{
     * @param b segunda matriz.
     * @param r matriz contendo o resultado da multiplicação.
     */
-   public void mult(double[][] a, double[][] b, double[][] r){
+   public synchronized void mult(double[][] a, double[][] b, double[][] r){
       int linA = a.length;
       int colA = a[0].length;
       int linB = b.length;
@@ -91,7 +91,7 @@ public class MatrizT{
    
       try{
          for(int i = 0; i < nThreads; i++){
-            threads[i].join();
+            threads[i].join(1);
          }
       }catch(InterruptedException e){
          e.printStackTrace();
@@ -100,6 +100,42 @@ public class MatrizT{
 
       for(int i = 0; i < r.length; i++){
          System.arraycopy(tempR[i], 0, r[i], 0, r[i].length);
+      }
+   }
+
+   /**
+    * Adiciona o conteúdo resultante da soma entre A e B na matriz R de acordo
+    * com a expressão:
+    * <pre>
+    * R = A + B
+    * </pre>
+    * @param a primeita matriz.
+    * @param b segunda matriz.
+    * @param r matriz contendo o resultado da soma.
+    */
+   public void add(double[][] a, double[][] b, double[][] r){
+      if(a.length != b.length){
+         throw new IllegalArgumentException("Linhas de A e B são diferentes.");
+      }
+      if(a[0].length != b[0].length){
+         throw new IllegalArgumentException("Colunas de A e B são diferentes.");
+      }
+      if(a.length != r.length){
+         throw new IllegalArgumentException("Linhas de R são diferentes.");
+      }
+      if(a[0].length != r[0].length){
+         throw new IllegalArgumentException("Colunas de R são diferentes.");
+      }
+
+      if(a.length == 1){
+         Array.add(a[0], b[0], r[0]);
+
+      }else{
+         for(int i = 0; i < r.length; i++){
+            for(int j = 0; j < r[0].length; j++){
+               r[i][j] = a[i][j] + b[i][j];
+            }
+         }
       }
 
    }

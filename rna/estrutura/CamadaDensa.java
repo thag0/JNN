@@ -309,6 +309,7 @@ public class CamadaDensa implements Cloneable{
       if(usarBias){
          mat.add(this.somatorio, this.bias, this.somatorio);
       }
+
       ativacao.calcular(this);
    }
 

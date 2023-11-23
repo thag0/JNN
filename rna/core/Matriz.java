@@ -9,28 +9,11 @@ public class Matriz{
 
    }
 
-   public double[][] arrayParaMatrizColuna(double[] entrada){
-      double[][] matriz = new double[1][entrada.length];
-      System.arraycopy(entrada, 0, matriz[0], 0, entrada.length);
-      return matriz;
-   }
-
-   public double[][] arrayParaMatrizLinha(double[] entrada){
-      double[][] matriz = new double[entrada.length][1];
-      
-      for(int i = 0; i < entrada.length; i++){
-         matriz[i][0] = entrada[i];
-      }
-
-      return matriz;
-   }
-
-   public double[] matrizParaArrayColuna(double[][] entrada){
-      double[] e = new double[entrada[0].length];
-      System.arraycopy(entrada[0], 0, e, 0, e.length);
-      return e;
-   }
-
+   /**
+    * Copia todo o conteúdo a matriz para o destino.
+    * @param m matriz com os dados.
+    * @param r matriz de destino da cópia.
+    */
    public void copiar(double[][] m, double[][] r){
       if(m.length != r.length){
          throw new IllegalArgumentException(
@@ -48,9 +31,7 @@ public class Matriz{
       }
 
       for(int i = 0; i < m.length; i++){
-         for(int j = 0; j < m[i].length; j++){
-            r[i][j] = m[i][j];
-         }
+         System.arraycopy(m[i], 0, r[i], 0, r[i].length);
       }
    }
 
@@ -149,11 +130,12 @@ public class Matriz{
 
       if(a.length == 1){
          Array.add(a[0], b[0], r[0]);
-
+      
       }else{
          for(int i = 0; i < r.length; i++){
+            System.arraycopy(a[i], 0, r[i], 0, r[i].length);
             for(int j = 0; j < r[0].length; j++){
-               r[i][j] = a[i][j] + b[i][j];
+               r[i][j] += b[i][j];
             }
          }
       }
@@ -190,11 +172,12 @@ public class Matriz{
 
       if(a.length == 1){
          Array.sub(a[0], b[0], r[0]);
-
+      
       }else{
          for(int i = 0; i < r.length; i++){
+            System.arraycopy(a[i], 0, r[i], 0, r[i].length);
             for(int j = 0; j < r[0].length; j++){
-               r[i][j] = a[i][j] - b[i][j];
+               r[i][j] -= b[i][j];
             }
          }
       }
@@ -227,11 +210,12 @@ public class Matriz{
 
       if(a.length == 1){
          Array.mult(a[0], b[0], r[0]);
-
+      
       }else{
          for(int i = 0; i < r.length; i++){
-            for(int j = 0; j < r[i].length; j++){
-               r[i][j] = a[i][j] * b[i][j];
+            System.arraycopy(a[i], 0, r[i], 0, r[i].length);
+            for(int j = 0; j < r[0].length; j++){
+               r[i][j] *= b[i][j];
             }
          }
       }
