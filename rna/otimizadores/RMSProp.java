@@ -82,7 +82,7 @@ public class RMSProp extends Otimizador{
 
          this.ac[i] = new double[camada.pesos.length][camada.pesos[0].length];
          if(camada.temBias()){
-            acb[i] = new double[camada.bias.length][camada.bias[0].length];
+            this.acb[i] = new double[camada.bias.length][camada.bias[0].length];
          }
       }
    }
@@ -113,27 +113,24 @@ public class RMSProp extends Otimizador{
     */
    @Override
    public void atualizar(CamadaDensa[] redec){
-      //TODO 
-      //resolver problema de convergência, rede não aprendendo nada
+      double g;
       for(int i = 0; i < redec.length; i++){
          CamadaDensa camada = redec[i];
 
          for(int j = 0; j < camada.pesos.length; j++){
             for(int k = 0; k < camada.pesos[j].length; k++){
-               double grad = camada.gradientes[j][k];
-               ac[i][j][k] += (rho * ac[i][j][k]) + (1 - rho) * (grad * grad);
-               // camada.pesos[j][k] -= calcular(grad, ac[i][j][k]);
-               camada.pesos[j][k] += (taxaAprendizagem * grad) / (Math.sqrt(ac[i][j][k] + epsilon));
+               g = camada.gradientes[j][k];
+               ac[i][j][k] = (rho * ac[i][j][k]) + (1 - rho) * (g * g);
+               camada.pesos[j][k] += calcular(g, ac[i][j][k]);
             }
          }
          
          if(camada.temBias()){
             for(int j = 0; j < camada.bias.length; j++){
                for(int k = 0; k < camada.bias[j].length; k++){
-                  double grad = camada.erros[j][k];
-                  acb[i][j][k] += (rho * acb[i][j][k]) + (1 - rho) * (grad * grad);
-                  // camada.bias[j][k] -= calcular(grad, acb[i][j][k]);
-                  camada.bias[j][k] += (taxaAprendizagem * grad) / (Math.sqrt(acb[i][j][k] + epsilon));
+                  g = camada.erros[j][k];
+                  acb[i][j][k] = (rho * acb[i][j][k]) + (1 - rho) * (g * g);
+                  camada.bias[j][k] += calcular(g, acb[i][j][k]);
                }
             }
          }
@@ -141,7 +138,7 @@ public class RMSProp extends Otimizador{
    }
 
    private double calcular(double grad, double ac){
-      return (taxaAprendizagem * grad) / (Math.sqrt(ac + epsilon));
+      return (grad * taxaAprendizagem) / (Math.sqrt(ac + epsilon));
    }
 
    @Override

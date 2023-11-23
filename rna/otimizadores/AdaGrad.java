@@ -73,7 +73,7 @@ public class AdaGrad extends Otimizador{
          mat.preencher(this.ac[i], valorInicial);
 
          if(camada.temBias()){
-            acb[i] = new double[camada.bias.length][camada.bias[0].length];
+            this.acb[i] = new double[camada.bias.length][camada.bias[0].length];
             mat.preencher(this.acb[i], valorInicial);
          }
       }
@@ -108,23 +108,24 @@ public class AdaGrad extends Otimizador{
     */
    @Override
    public void atualizar(CamadaDensa[] redec){
+      double g;
       for(int i = 0; i < redec.length; i++){
          CamadaDensa camada = redec[i];
 
          for(int j = 0; j < camada.pesos.length; j++){
             for(int k = 0; k < camada.pesos[j].length; k++){
-               double grad = camada.gradientes[j][k];
-               ac[i][j][k] += grad * grad;
-               camada.pesos[j][k] += calcular(grad, ac[i][j][k]);
+               g = camada.gradientes[j][k];
+               ac[i][j][k] += g * g;
+               camada.pesos[j][k] += calcular(g, ac[i][j][k]);
             }
          }
          
          if(camada.temBias()){
             for(int j = 0; j < camada.bias.length; j++){
                for(int k = 0; k < camada.bias[j].length; k++){
-                  double grad = camada.erros[j][k];
-                  acb[i][j][k] += grad * grad;
-                  camada.bias[j][k] += calcular(grad, acb[i][j][k]);
+                  g = camada.erros[j][k];
+                  acb[i][j][k] += g * g;
+                  camada.bias[j][k] += calcular(g, acb[i][j][k]);
                }
             }
          }

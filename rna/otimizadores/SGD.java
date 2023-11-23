@@ -90,7 +90,7 @@ public class SGD extends Otimizador{
 
          this.m[i] = new double[camada.pesos.length][camada.pesos[0].length];
          if(camada.temBias()){
-            mb[i] = new double[camada.bias.length][camada.bias[0].length];
+            this.mb[i] = new double[camada.bias.length][camada.bias[0].length];
          }
       }
    }
