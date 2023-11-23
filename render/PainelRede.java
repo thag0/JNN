@@ -125,7 +125,7 @@ public class PainelRede extends JPanel{
    
       int neuronios = camada.quantidadeNeuronios();
       for(int i = 0; i < neuronios; i++){
-         desenharNeuronio(g2, x, y, camada.saida[0][i]);
+         desenharNeuronio(g2, x, y, camada.obterSaida().linha(0)[i]);
          y += alturaDesenho + padNeuronios;
       }
    }

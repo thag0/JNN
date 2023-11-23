@@ -6,19 +6,19 @@ public class Sigmoid extends Ativacao{
 
    @Override
    public void calcular(CamadaDensa camada){
-      for(int i = 0; i < camada.saida.length; i++){
-         for(int j = 0; j < camada.saida[i].length; j++){
-            camada.saida[i][j] = sigmoid(camada.somatorio[i][j]);
+      for(int i = 0; i < camada.saida.lin; i++){
+         for(int j = 0; j < camada.saida.col; j++){
+            camada.saida.editar(i, j, sigmoid(camada.somatorio.dado(i, j)));
          }
       }
    }
 
    @Override
    public void derivada(CamadaDensa camada){
-      for(int i = 0; i < camada.derivada.length; i++){
-         for(int j = 0; j < camada.derivada[i].length; j++){
-            double sig = camada.saida[i][j];
-            camada.derivada[i][j] = sig * (1 - sig);
+      for(int i = 0; i < camada.saida.lin; i++){
+         for(int j = 0; j < camada.saida.col; j++){
+            double sig = camada.saida.dado(i, j);
+            camada.derivada.editar(i, j, (sig * (1 - sig)));
          }
       }
    }

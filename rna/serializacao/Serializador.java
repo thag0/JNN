@@ -130,9 +130,9 @@ public class Serializador{
          //pesos dos neuronios
          for(CamadaDensa camada : rede.obterCamadas()){
 
-            for(int i = 0; i < camada.pesos.length; i++){
-               for(int j = 0; j < camada.pesos[i].length; j++){
-                  double peso = camada.pesos[i][j];
+            for(int i = 0; i < camada.pesos.lin; i++){
+               for(int j = 0; j < camada.pesos.col; j++){
+                  double peso = camada.pesos.dado(i, j);
                   
                   if(tipo.equals(Double.TYPE)){
                      writer.write(Double.toString(peso));
@@ -155,8 +155,8 @@ public class Serializador{
             }
 
             if(camada.temBias()){
-               for(int i = 0; i < camada.bias[0].length; i++){
-                  double bias = camada.bias[0][i];
+               for(int i = 0; i < camada.bias.col; i++){
+                  double bias = camada.bias.dado(0, i);
 
                   if(tipo.equals(Double.TYPE)){
                      writer.write(Double.toString(bias));
@@ -246,16 +246,18 @@ public class Serializador{
          int cont = 1;
          try{
             for(CamadaDensa camada : rede.obterCamadas()){
-               for(int i = 0; i < camada.pesos.length; i++){
-                  for(int j = 0; j < camada.pesos[i].length; j++){
-                     camada.pesos[i][j] = Double.parseDouble(reader.readLine());
+               for(int i = 0; i < camada.pesos.lin; i++){
+                  for(int j = 0; j < camada.pesos.col; j++){
+                     double d = Double.parseDouble(reader.readLine());
+                     camada.pesos.editar(i, j, d);
                      cont++;
                   }
                }
 
                if(camada.temBias()){
-                  for(int i = 0; i < camada.bias[0].length; i++){
-                     camada.bias[0][i] = Double.parseDouble(reader.readLine());
+                  for(int i = 0; i < camada.bias.col; i++){
+                     double d = Double.parseDouble(reader.readLine());
+                     camada.bias.editar(0, i, d);
                      cont++;
                   }
                }

@@ -4,6 +4,7 @@ import java.util.Random;
 
 import rna.avaliacao.perda.Perda;
 import rna.core.Array;
+import rna.core.Mat;
 import rna.core.Matriz;
 import rna.estrutura.CamadaDensa;
 
@@ -29,16 +30,16 @@ class Auxiliar{
    public void calcularErros(CamadaDensa[] camadas, Perda perda, double[] real){
       //saida
       CamadaDensa saida = camadas[camadas.length-1];
-      double[] erros = perda.derivada(saida.obterSaida()[0], real);
+      double[] erros = perda.derivada(saida.obterSaida().linha(0), real);
       for(int i = 0; i < saida.tamanhoSaida(); i++){
-         saida.erros[0][i] = erros[i];
+         saida.erros.editar(0, i, erros[i]);
       }
 
       //ocultas
       for(int i = camadas.length-2; i >= 0; i--){
          camadas[i].calcularDerivadas();
 
-         double[][] pesoTransposto = mat.transpor(camadas[i+1].pesos);
+         Mat pesoTransposto = mat.transpor(camadas[i+1].pesos);
          mat.mult(camadas[i+1].erros, pesoTransposto, camadas[i].erros);
          mat.hadamard(camadas[i].derivada, camadas[i].erros, camadas[i].erros);
       }

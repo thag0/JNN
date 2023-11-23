@@ -16,19 +16,20 @@ public class SoftPlus extends Ativacao{
    }
    @Override
    public void calcular(CamadaDensa camada){
-      for(int i = 0; i < camada.saida.length; i++){
-         for(int j = 0; j < camada.saida[i].length; j++){
-            camada.saida[i][j] = Math.log(1 + Math.exp(camada.somatorio[i][j]));
+      for(int i = 0; i < camada.saida.lin; i++){
+         for(int j = 0; j < camada.saida.col; j++){
+            double s = Math.log(1 + Math.exp(camada.somatorio.dado(i, j)));
+            camada.saida.editar(i, j, s);
          }
       }
    }
 
    @Override
    public void derivada(CamadaDensa camada){
-      for(int i = 0; i < camada.derivada.length; i++){
-         for(int j = 0; j < camada.derivada[i].length; j++){
-            double exp = Math.exp(camada.somatorio[i][j]);
-            camada.derivada[i][j] = exp / (1 + exp);
+      for(int i = 0; i < camada.derivada.lin; i++){
+         for(int j = 0; j < camada.derivada.col; j++){
+            double exp = Math.exp(camada.somatorio.dado(i, j));
+            camada.derivada.editar(i, j, (exp / (1 + exp)));
          }
       }
    }

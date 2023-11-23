@@ -9,30 +9,57 @@ public class Matriz{
 
    }
 
+   private void verificarLinhas(Mat a, Mat b){
+      if(a.lin != b.lin){
+         throw new IllegalArgumentException(
+            "Linhas de A (" + a.lin + ") e B (" + b.lin + ") são diferentes."
+         );
+      }
+   }
+
+   private void verificarColunas(Mat a, Mat b){
+      if(a.col != b.col){
+         throw new IllegalArgumentException(
+            "Colunas de A (" + a.col + ") e B (" + b.col + ") são diferentes."
+         );
+      }
+   }
+
    /**
     * Copia todo o conteúdo a matriz para o destino.
     * @param m matriz com os dados.
     * @param r matriz de destino da cópia.
     */
-   public void copiar(double[][] m, double[][] r){
-      if(m.length != r.length){
+   public void copiar(Mat m, Mat r){
+      if(m.lin != r.lin){
          throw new IllegalArgumentException(
-            "As linhas de M (" + m.length + 
-            ") e R (" + r.length + 
+            "As linhas de M (" + m.lin + 
+            ") e R (" + r.lin + 
             ") devem ser iguais"
          );
       }
-      if(m[0].length != r[0].length){
+      if(m.col != r.col){
          throw new IllegalArgumentException(
-            "As colunas de M (" + m[0].length + 
-            ") e R (" + r[0].length + 
+            "As colunas de M (" + m.col + 
+            ") e R (" + r.col + 
             ") devem ser iguais"
          );
       }
 
-      for(int i = 0; i < m.length; i++){
-         System.arraycopy(m[i], 0, r[i], 0, r[i].length);
-      }
+      r.copiar(m);
+   }
+
+   /**
+    * Substitui cada elemento da matriz pelo valor fornecido.
+    * @param m matriz.
+    * @param val valor desejado para preenchimento.
+    */
+   public void preencher(Mat m, double val){
+      for(int i = 0; i < m.lin; i++){
+         for(int j = 0; j < m.col; j++){
+            m.editar(i, j, val);
+         }
+      }    
    }
 
    /**
@@ -53,12 +80,12 @@ public class Matriz{
     * @param m matriz.
     * @return transposta da matriz alvo.
     */
-   public double[][] transpor(double[][] m){
-      double[][] t = new double[m[0].length][m.length];
+   public Mat transpor(Mat m){
+      Mat t = new Mat(m.col, m.lin);
 
-      for(int i = 0; i < m.length; i++){
-         for(int j = 0; j < m[i].length; j++){
-            t[j][i] = m[i][j];
+      for(int i = 0; i < m.lin; i++){
+         for(int j = 0; j < m.col; j++){
+            t.editar(j, i, m.dado(i, j));
          }
       }
 
@@ -74,33 +101,69 @@ public class Matriz{
     * @param b segunda matriz.
     * @param r matriz contendo o resultado.
     */
-   public void mult(double[][] a, double[][] b, double[][] r){
-      if(a[0].length != b.length){
+   public void mult(Mat a, Mat b, Mat r){
+      if(a.col != b.lin){
          throw new IllegalArgumentException("Dimensões de A e B incompatíveis");
       }
-      if(r.length != a.length){
-         throw new IllegalArgumentException(
-            "As linhas de A (" + a.length + 
-            ") e R (" + r.length + 
-            ") devem ser iguais."
-         );
-      }
-      if(r[0].length != b[0].length){
-         throw new IllegalArgumentException(
-            "As colunas de B (" + b[0].length + 
-            ") e R (" + r[0].length + 
-            ") devem ser iguais."
-         );
-      }
+      verificarLinhas(a, r);
+      verificarColunas(r, b);
 
-      for(int i = 0; i < r.length; i++){
-         for(int j = 0; j < r[i].length; j++){
+      for(int i = 0; i < r.lin; i++){
+         for(int j = 0; j < r.col; j++){
             double res = 0;
-            for(int k = 0; k < a[0].length; k++){
-               res += a[i][k] * b[k][j];
+            for(int k = 0; k < a.col; k++){
+               res += a.dado(i, k) * b.dado(k, j);
             }
-            r[i][j] = res;    
+            r.editar(i, j, res);    
          }
+      }
+   }
+
+   /**
+    * 
+    * @param a
+    * @param b
+    * @param r
+    */
+   public void multT(Mat a, Mat b, Mat r){
+      if(a.col != b.lin){
+         throw new IllegalArgumentException("Dimensões de A e B incompatíveis");
+      }
+      verificarLinhas(a, r);
+      verificarColunas(r, b);
+
+      int nThreads = 2;
+      int linPorThread = a.lin / nThreads;
+      Thread[] threads = new Thread[nThreads];
+
+      for(int t = 0; t < nThreads; t++){
+         final int id = t;
+
+         threads[t] = new Thread(() -> {
+            int inicio = id * linPorThread;
+            int fim = (id == nThreads - 1) ? a.lin : (id + 1) * linPorThread;
+            
+            for(int i = inicio; i < fim; i++){
+               for(int j = 0; j < r.col; j++){
+                  double res = 0;
+                  for(int k = 0; k < a.col; k++){
+                     res += a.dado(i, k) * b.dado(k, j);
+                  }
+                  r.editar(i, j, res);
+               }
+            }
+         });
+
+         threads[t].start();
+      }
+   
+      try{
+         for(int i = 0; i < nThreads; i++){
+            threads[i].join(0);
+         }
+      }catch(InterruptedException e){
+         e.printStackTrace();
+         System.exit(1);
       }
    }
 
@@ -114,32 +177,18 @@ public class Matriz{
     * @param b segunda matriz.
     * @param r matriz contendo o resultado da soma.
     */
-   public void add(double[][] a, double[][] b, double[][] r){
-      if(a.length != b.length){
-         throw new IllegalArgumentException("Linhas de A e B são diferentes.");
-      }
-      if(a[0].length != b[0].length){
-         throw new IllegalArgumentException("Colunas de A e B são diferentes.");
-      }
-      if(a.length != r.length){
-         throw new IllegalArgumentException("Linhas de R são diferentes.");
-      }
-      if(a[0].length != r[0].length){
-         throw new IllegalArgumentException("Colunas de R são diferentes.");
-      }
+   public void add(Mat a, Mat b, Mat r){
+      verificarLinhas(a, b);
+      verificarColunas(a, b);
+      verificarLinhas(a, r);
+      verificarColunas(a, r);
 
-      if(a.length == 1){
-         Array.add(a[0], b[0], r[0]);
-      
-      }else{
-         for(int i = 0; i < r.length; i++){
-            System.arraycopy(a[i], 0, r[i], 0, r[i].length);
-            for(int j = 0; j < r[0].length; j++){
-               r[i][j] += b[i][j];
-            }
+      for(int i = 0; i < r.lin; i++){
+         for(int j = 0; j < r.col; j++){
+            double d = a.dado(i, j) + b.dado(i, j);
+            r.editar(i, j, d);
          }
       }
-
    }
 
    /**
@@ -152,36 +201,18 @@ public class Matriz{
     * @param b segunda matriz.
     * @param r matriz contendo o resultado da subtração.
     */
-   public void sub(double[][] a, double[][] b, double[][] r){
-      if(a.length != b.length){
-         throw new IllegalArgumentException(
-            "Linhas de A (" + a.length + ") e B (" + b.length + ") são diferentes."
-         );
-      }
-      if(a[0].length != b[0].length){
-         throw new IllegalArgumentException(
-            "Colunas de A (" + a[0].length + ") e B (" + b[0].length + ") são diferentes."
-         );
-      }
-      if(a.length != r.length){
-         throw new IllegalArgumentException("Linhas de R são diferentes.");
-      }
-      if(a[0].length != r[0].length){
-         throw new IllegalArgumentException("Colunas de R são diferentes.");
-      }
+   public void sub(Mat a, Mat b, Mat r){
+      verificarLinhas(a, b);
+      verificarColunas(a, b);
+      verificarLinhas(a, r);
+      verificarColunas(a, r);
 
-      if(a.length == 1){
-         Array.sub(a[0], b[0], r[0]);
-      
-      }else{
-         for(int i = 0; i < r.length; i++){
-            System.arraycopy(a[i], 0, r[i], 0, r[i].length);
-            for(int j = 0; j < r[0].length; j++){
-               r[i][j] -= b[i][j];
-            }
+      for(int i = 0; i < r.lin; i++){
+         for(int j = 0; j < r.col; j++){
+            double d = a.dado(i, j) - b.dado(i, j);
+            r.editar(i, j, d);
          }
       }
-      
    }
 
    /**
@@ -194,32 +225,18 @@ public class Matriz{
     * @param b segunda matriz.
     * @param r matriz contendo o resultado do produto hadamard.
     */
-   public void hadamard(double[][] a, double[][]b, double[][] r){
-      if(a.length != b.length){
-         throw new IllegalArgumentException("Linhas de A e B são diferentes.");
-      }
-      if(a[0].length != b[0].length){
-         throw new IllegalArgumentException("Colunas de A e B são diferentes.");
-      }
-      if(a.length != r.length){
-         throw new IllegalArgumentException("Linhas de R são diferentes.");
-      }
-      if(a[0].length != r[0].length){
-         throw new IllegalArgumentException("Colunas de R são diferentes.");
-      }
+   public void hadamard(Mat a, Mat b, Mat r){
+      verificarLinhas(a, b);
+      verificarColunas(a, b);
+      verificarLinhas(a, r);
+      verificarColunas(a, r);
 
-      if(a.length == 1){
-         Array.mult(a[0], b[0], r[0]);
-      
-      }else{
-         for(int i = 0; i < r.length; i++){
-            System.arraycopy(a[i], 0, r[i], 0, r[i].length);
-            for(int j = 0; j < r[0].length; j++){
-               r[i][j] *= b[i][j];
-            }
+      for(int i = 0; i < r.lin; i++){
+         for(int j = 0; j < r.col; j++){
+            double d = a.dado(i, j) * b.dado(i, j);
+            r.editar(i, j, d);
          }
       }
-
    }
 
    /**
@@ -232,32 +249,15 @@ public class Matriz{
     * @param e escalar utilizado para a multiplicação.
     * @param r matriz que terá o resultado.
     */
-   public void escalar(double[][] a, double e, double[][] r){
-      if(a.length != r.length){
-         throw new IllegalArgumentException(
-            "As linhas de A (" + a.length + 
-            ") e R (" + r.length + 
-            ") devem ser iguais."
-         );
-      }
-      if(a[0].length != r[0].length){
-         throw new IllegalArgumentException(
-            "As colunas de A (" + a.length + 
-            ") e R (" + r.length + 
-            ") devem ser iguais."
-         );
-      }
+   public void escalar(Mat a, double e, Mat r){
+      verificarLinhas(a, r);
+      verificarColunas(a, r);
 
-      if(a.length == 1){
-         Array.escalar(a[0], e, r[0]);
-      
-      }else{
-         for(int i = 0; i < r.length; i++){
-            for(int j = 0; j < r[i].length; j++){
-               r[i][j] = a[i][j] * e;
-            }
+      for(int i = 0; i < r.lin; i++){
+         for(int j = 0; j < r.col; j++){
+            double d = a.dado(i, j) * e;
+            r.editar(i, j, d);
          }
       }
-
    }
 }

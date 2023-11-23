@@ -642,7 +642,7 @@ public class RedeNeural implements Cloneable{
 
       this.camadas[0].calcularSaida(entrada);
       for(int i = 1; i < this.camadas.length; i++){
-         this.camadas[i].calcularSaida(this.camadas[i-1].obterSaida()[0]);
+         this.camadas[i].calcularSaida(this.camadas[i-1].obterSaida().linha(0));
       }
    }
 
@@ -808,33 +808,38 @@ public class RedeNeural implements Cloneable{
 
          double custo = this.avaliador.erroMedioQuadrado(entradas, saidas);
          for(CamadaDensa camada : this.camadas){   
-            for(int i = 0; i < camada.pesos.length; i++){
-               for(int j = 0; j < camada.pesos[i].length; j++){
-                  salvo = camada.pesos[i][j];
-                  camada.pesos[i][j] += eps;
-                  camada.gradientes[i][j] = (this.avaliador.erroMedioQuadrado(entradas, saidas) - custo) / eps;
-                  camada.pesos[i][j] = salvo;
+            for(int i = 0; i < camada.pesos.lin; i++){
+               for(int j = 0; j < camada.pesos.col; j++){
+                  salvo = camada.pesos.dado(i, j);
+                  camada.pesos.add(i, j, eps);
+                  double d = (this.avaliador.erroMedioQuadrado(entradas, saidas) - custo) / eps;
+                  camada.gradientes.editar(i, j, d);
+                  camada.pesos.editar(i, j, salvo);
                }
             }
-            for(int i = 0; i < camada.bias.length; i++){
-               for(int j = 0; j < camada.bias[i].length; j++){
-                  salvo = camada.bias[i][j];
-                  camada.bias[i][j] += eps;
-                  camada.erros[i][j] = (this.avaliador.erroMedioQuadrado(entradas, saidas) - custo) / eps;
-                  camada.bias[i][j] = salvo;       
+            for(int i = 0; i < camada.bias.lin; i++){
+               for(int j = 0; j < camada.bias.col; j++){
+                  salvo = camada.bias.dado(i, j);
+                  camada.bias.add(i, j, eps);
+                  double d = (this.avaliador.erroMedioQuadrado(entradas, saidas) - custo) / eps;
+                  camada.erros.editar(i, j, d);
+                  camada.bias.editar(i, j, salvo);    
                }
             }
          }
 
          for(CamadaDensa camada : this.camadas){            
-            for(int i = 0; i < camada.pesos.length; i++){
-               for(int j = 0; j < camada.pesos[i].length; j++){
-                  camada.pesos[i][j] -= tA * camada.gradientes[i][j];
+            for(int i = 0; i < camada.pesos.lin; i++){
+               for(int j = 0; j < camada.pesos.col; j++){
+                  camada.pesos.sub(i, j, (tA * camada.gradientes.dado(i, j)));
                }
             }
-            for(int i = 0; i < camada.bias.length; i++){
-               for(int j = 0; j < camada.bias[i].length; j++){
-                  camada.bias[i][j] -= tA * camada.erros[i][j];
+
+            if(camada.temBias()){
+               for(int i = 0; i < camada.bias.lin; i++){
+                  for(int j = 0; j < camada.bias.col; j++){
+                     camada.bias.sub(i, j, (tA * camada.erros.dado(i, j)));
+                  }
                }
             }
          }
@@ -909,7 +914,7 @@ public class RedeNeural implements Cloneable{
     */
    public double[] obterSaidas(){
       this.verificarCompilacao();
-      return this.obterCamadaSaida().obterSaida()[0];
+      return this.obterCamadaSaida().obterSaida().linha(0);
    }
 
    /**

@@ -1,5 +1,6 @@
 package rna.otimizadores;
 
+import rna.core.Mat;
 import rna.estrutura.CamadaDensa;
 
 /**
@@ -29,12 +30,12 @@ public class SGD extends Otimizador{
    /**
     * Coeficientes de momentum para os pesos.
     */
-   public double[][][] m;
+   public Mat[] m;
    
    /**
     * Coeficientes de momentum para os bias.
     */
-   public double[][][] mb;
+   public Mat[] mb;
 
    /**
     * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient Descent (SGD) </strong> 
@@ -82,15 +83,15 @@ public class SGD extends Otimizador{
 
    @Override
    public void inicializar(CamadaDensa[] redec){
-      this.m = new double[redec.length][][];
-      this.mb = new double[redec.length][][];
+      this.m = new Mat[redec.length];
+      this.mb = new Mat[redec.length];
 
       for(int i = 0; i < redec.length; i++){
          CamadaDensa camada = redec[i];
 
-         this.m[i] = new double[camada.pesos.length][camada.pesos[0].length];
+         this.m[i] = new Mat(camada.pesos.lin, camada.pesos.col);
          if(camada.temBias()){
-            this.mb[i] = new double[camada.bias.length][camada.bias[0].length];
+            this.mb[i] = new Mat(camada.bias.lin, camada.bias.col);
          }
       }
    }
@@ -129,27 +130,29 @@ public class SGD extends Otimizador{
       for(int i = 0; i < redec.length; i++){
          CamadaDensa camada = redec[i];
 
-         for(int j = 0; j < camada.pesos.length; j++){
-            for(int k = 0; k < camada.pesos[j].length; k++){
-               m[i][j][k] = calcular(m[i][j][k], camada.gradientes[j][k]);
+         for(int j = 0; j < camada.pesos.lin; j++){
+            for(int k = 0; k < camada.pesos.col; k++){
+               m[i].editar(j, k, calcular(m[i].dado(j, k), camada.gradientes.dado(j, k)));
                
                if(nesterov){
-                  camada.pesos[j][k] -= (camada.gradientes[j][k] * taxaAprendizagem) + (momentum * m[i][j][k]);
+                  double s = (camada.gradientes.dado(j, k) * taxaAprendizagem) + (momentum * m[i].dado(j, k));
+                  camada.pesos.sub(j, k, s);
                }else{
-                  camada.pesos[j][k] -= m[i][j][k];
+                  camada.pesos.sub(j, k, m[i].dado(j, k));
                }
             }
          }
 
          if(camada.temBias()){
-            for(int j = 0; j < camada.bias.length; j++){
-               for(int k = 0; k < camada.bias[j].length; k++){
-                  mb[i][j][k] = calcular(mb[i][j][k], camada.erros[j][k]);
+            for(int j = 0; j < camada.bias.lin; j++){
+               for(int k = 0; k < camada.bias.col; k++){
+                  mb[i].editar(j, k, calcular(mb[i].dado(j, k), camada.erros.dado(j, k)));
                   
                   if(nesterov){
-                     camada.bias[j][k] -= (camada.erros[j][k] * taxaAprendizagem) + (momentum * mb[i][j][k]);
+                     double s = (camada.erros.dado(j, k) * taxaAprendizagem) + (momentum * mb[i].dado(j, k));
+                     camada.bias.sub(j, k, s);
                   }else{
-                     camada.bias[j][k] -= mb[j][j][k];
+                     camada.bias.sub(j, k, mb[i].dado(j, k));
                   }
                }
             }

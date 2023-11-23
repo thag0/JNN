@@ -1,19 +1,19 @@
 package rna.inicializadores;
 
+import rna.core.Mat;
+
 public class Gaussiano extends Inicializador{
 
    /**
     * Aplica o algoritmo de inicialização gaussiano/normal nos pesos.
-   * @param array array de pesos do neurônio
-   * @param entradas quantidade de conexões do neurônio também corresponde a quantidade de saídas
-   * da camada anterior.
+   * @param m matriz que será inicializada
+   * @param alcance valor de alcance da aleatorização
    */
    @Override
-   public void inicializar(double[][] m, double alcance){
-      double a = Math.sqrt(1.0 / m.length);
-      for(int i = 0; i < m.length; i++){
-         for(int j = 0; j < m[i].length; j++){
-            m[i][j] = super.random.nextGaussian(-a, a);
+   public void inicializar(Mat m, double alcance){
+      for(int i = 0; i < m.lin; i++){
+         for(int j = 0; j < m.col; j++){
+            m.editar(i, j, super.random.nextGaussian(-alcance, alcance));
          }
       }
    }

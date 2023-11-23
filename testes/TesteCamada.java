@@ -2,6 +2,7 @@ package testes;
 
 import ged.Ged;
 import rna.ativacoes.Sigmoid;
+import rna.core.Mat;
 import rna.estrutura.CamadaDensa;
 import rna.inicializadores.Xavier;
 
@@ -32,8 +33,8 @@ public class TesteCamada{
       for(int i = 0; i < entrada.length; i++){
          double[] amostra = entrada[i];
          camada.calcularSaida(amostra);
-         double[] saida = camada.obterSaida()[0];
-         System.out.println(amostra[0] + " - " + amostra[1] + " = " + saida[0]);
+         Mat saida = camada.obterSaida();
+         System.out.println(amostra[0] + " - " + amostra[1] + " = " + saida.dado(0, 0));
       }
 
       System.out.println(camada.info());

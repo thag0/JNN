@@ -21,19 +21,21 @@ public class Swish extends Ativacao{
 
    @Override
    public void calcular(CamadaDensa camada){
-      for(int i = 0; i < camada.saida.length; i++){
-         for(int j = 0; j < camada.saida[i].length; j++){
-            camada.saida[i][j] = camada.somatorio[i][j] * sigmoid(camada.somatorio[i][j]);
+      for(int i = 0; i < camada.saida.lin; i++){
+         for(int j = 0; j < camada.saida.col; j++){
+            double s = camada.somatorio.dado(i, j) * sigmoid(camada.somatorio.dado(i, j));
+            camada.saida.editar(i, j, s);
          }
       }
    }
 
    @Override
    public void derivada(CamadaDensa camada){
-      for(int i = 0; i < camada.derivada.length; i++){
-         for(int j = 0; j < camada.derivada[i].length; j++){
-            double sig = sigmoid(camada.somatorio[i][j]);
-            camada.derivada[i][j] = sig + (camada.somatorio[i][j] * sig * (1 - sig));
+      for(int i = 0; i < camada.derivada.lin; i++){
+         for(int j = 0; j < camada.derivada.col; j++){
+            double sig = sigmoid(camada.somatorio.dado(i, j));
+            double d = sig + (camada.somatorio.dado(i, j) * sig * (1 - sig));
+            camada.derivada.editar(i, j, d);
          }
       }
    }

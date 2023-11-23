@@ -42,8 +42,9 @@ public class Array{
          );      
       }
 
+      System.arraycopy(a, 0, r, 0, r.length);
       for(int i = 0; i < r.length; i++){
-         r[i] = a[i] + b[i];
+         r[i] += b[i];
       }
    }
 
@@ -69,8 +70,9 @@ public class Array{
          );      
       }
 
+      System.arraycopy(a, 0, r, 0, r.length);
       for(int i = 0; i < r.length; i++){
-         r[i] = a[i] - b[i];
+         r[i] -= b[i];
       }
    }
 

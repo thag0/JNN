@@ -24,17 +24,17 @@ public class Argmax extends Ativacao{
    @Override
    public void calcular(CamadaDensa camada){
       int indiceMaximo = 0;
-      double valorMaximo = camada.somatorio[0][0];
+      double valorMaximo = camada.somatorio.dado(0, 0);
 
-      for(int i = 1; i < camada.somatorio[0].length; i++){
-         if(camada.somatorio[0][i] > valorMaximo){
+      for(int i = 1; i < camada.somatorio.col; i++){
+         if(camada.somatorio.dado(0, i) > valorMaximo){
             indiceMaximo = i;
-            valorMaximo = camada.somatorio[0][i];
+            valorMaximo = camada.somatorio.dado(0, i);
          }
       }
 
-      for(int i = 0; i < camada.somatorio[0].length; i++){
-         camada.saida[0][i] = (i == indiceMaximo) ? 1 : 0;
+      for(int i = 0; i < camada.somatorio.col; i++){
+         camada.saida.editar(0, i, ((i == indiceMaximo) ? 1 : 0));
       }
    }
 }

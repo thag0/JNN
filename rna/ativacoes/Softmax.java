@@ -23,13 +23,13 @@ public class Softmax extends Ativacao{
    public void calcular(CamadaDensa camada){
       double somaExp = 0;
 
-      for(int i = 0; i < camada.somatorio[0].length; i++){
-         somaExp += Math.exp(camada.somatorio[0][i]);
+      for(int i = 0; i < camada.somatorio.col; i++){
+         somaExp += Math.exp(camada.somatorio.dado(0, i));
       }
 
-      for(int i = 0; i < camada.saida[0].length; i++){
-         camada.saida[0][i] = Math.exp(camada.somatorio[0][i]) / somaExp;
-         somaExp += Math.exp(camada.somatorio[0][i]);
+      for(int i = 0; i < camada.saida.col; i++){
+         double s = Math.exp(camada.somatorio.dado(0, i)) / somaExp;
+         camada.saida.editar(0, i, s);
       }
    }
 }

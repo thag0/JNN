@@ -3,21 +3,22 @@ package rna.ativacoes;
 import rna.estrutura.CamadaDensa;
 
 public class TanH extends Ativacao{
+
    @Override
    public void calcular(CamadaDensa camada){
-      for(int i = 0; i < camada.saida.length; i++){
-         for(int j = 0; j < camada.saida[i].length; j++){
-            camada.saida[i][j] = tanh(camada.somatorio[i][j]);
+      for(int i = 0; i < camada.saida.lin; i++){
+         for(int j = 0; j < camada.saida.col; j++){
+            camada.saida.editar(i, j, tanh(camada.somatorio.dado(i, j)));
          }
       }
    }
 
    @Override
    public void derivada(CamadaDensa camada){
-      for(int i = 0; i < camada.derivada.length; i++){
-         for(int j = 0; j < camada.derivada[i].length; j++){
-            double tanh = camada.saida[i][j];
-            camada.derivada[i][j] = 1 - (tanh * tanh);
+      for(int i = 0; i < camada.saida.lin; i++){
+         for(int j = 0; j < camada.saida.col; j++){
+            double tanh = camada.saida.dado(i, j);
+            camada.derivada.editar(i, j, (1 - (tanh * tanh)));
          }
       }
    }

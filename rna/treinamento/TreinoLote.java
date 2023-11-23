@@ -3,6 +3,7 @@ package rna.treinamento;
 import java.util.Random;
 
 import rna.avaliacao.perda.Perda;
+import rna.core.Mat;
 import rna.core.Matriz;
 import rna.estrutura.CamadaDensa;
 import rna.estrutura.RedeNeural;
@@ -103,7 +104,7 @@ public class TreinoLote{
       //gradientes ou delta para os pesos
       for(int i = 0; i < redec.length; i++){
          CamadaDensa camada = redec[i];
-         double[][] entradaT = mat.transpor(camada.entrada);
+         Mat entradaT = mat.transpor(camada.entrada);
          mat.mult(entradaT, camada.erros, camada.gradientes);
          mat.add(camada.gradientes, camada.gradientesAcumulados, camada.gradientesAcumulados);
       }
@@ -119,9 +120,9 @@ public class TreinoLote{
       for(CamadaDensa camada : redec){
          mat.copiar(camada.gradientesAcumulados, camada.gradientes);
          
-         for(int i = 0; i < camada.gradientes.length; i++){
-            for(int j = 0; j < camada.gradientes[i].length; j++){
-               camada.gradientes[i][j] /= tamLote;
+         for(int i = 0; i < camada.gradientes.lin; i++){
+            for(int j = 0; j < camada.gradientes.col; j++){
+               camada.gradientes.div(i, j, tamLote);
             }
          }
       }

@@ -42,7 +42,7 @@ public class TesteFeedForward {
 
       for(int i = 0; i < entrada.length; i++){
          rede.calcularSaida(entrada[i]);
-         System.out.println(entrada[i][0] + " - " + entrada[i][1] + " R:" + saida[i][0] + " P:" + rede.camadas[1].saida[0][0]);
+         System.out.println(entrada[i][0] + " - " + entrada[i][1] + " R:" + saida[i][0] + " P:" + rede.camadas[1].saida.dado(0 ,0));
       }
 
    }

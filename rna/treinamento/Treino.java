@@ -3,6 +3,7 @@ package rna.treinamento;
 import java.util.Random;
 
 import rna.avaliacao.perda.Perda;
+import rna.core.Mat;
 import rna.core.Matriz;
 import rna.estrutura.CamadaDensa;
 import rna.estrutura.RedeNeural;
@@ -75,7 +76,7 @@ public class Treino{
 
       //gradientes ou delta para os pesos
       for(CamadaDensa camada : camadas){
-         double[][] entradaT = mat.transpor(camada.entrada);
+         Mat entradaT = mat.transpor(camada.entrada);
          mat.mult(entradaT, camada.erros, camada.gradientes);
       }
    }

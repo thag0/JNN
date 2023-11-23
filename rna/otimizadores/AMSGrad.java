@@ -117,14 +117,14 @@ public class AMSGrad extends Otimizador{
       for(int i = 0; i < redec.length; i++){
          CamadaDensa camada = redec[i];
 
-         this.m[i] = new double[camada.pesos.length][camada.pesos[0].length];
-         this.v[i] = new double[camada.pesos.length][camada.pesos[0].length];
-         this.vc[i] = new double[camada.pesos.length][camada.pesos[0].length];
+         this.m[i]  = new double[camada.pesos.lin][camada.pesos.col];
+         this.v[i]  = new double[camada.pesos.lin][camada.pesos.col];
+         this.vc[i] = new double[camada.pesos.lin][camada.pesos.col];
          
          if(camada.temBias()){
-            this.mb[i] = new double[camada.bias.length][camada.bias[0].length];
-            this.vb[i] = new double[camada.bias.length][camada.bias[0].length];
-            this.vcb[i] = new double[camada.bias.length][camada.bias[0].length];
+            this.mb[i]  = new double[camada.bias.lin][camada.bias.col];
+            this.vb[i]  = new double[camada.bias.lin][camada.bias.col];
+            this.vcb[i] = new double[camada.bias.lin][camada.bias.col];
          }
       }
    }
@@ -194,28 +194,28 @@ public class AMSGrad extends Otimizador{
 		for(int i = 0; i < redec.length; i++){
 			CamadaDensa camada = redec[i];
 
-			for(int j = 0; j < camada.pesos.length; j++){
-				for(int k = 0; k < camada.pesos[j].length; k++){
-					g = camada.gradientes[j][k];
+			for(int j = 0; j < camada.pesos.lin; j++){
+				for(int k = 0; k < camada.pesos.col; k++){
+					g = camada.gradientes.dado(j, k);
 
 					m[i][j][k] = (beta1 * m[i][j][k]) + ((1 - beta1) * g);
 					v[i][j][k] = (beta2 * v[i][j][k]) + ((1 - beta2) * g * g);
 					vc[i][j][k] = Math.max(vc[i][j][k], v[i][j][k]);
 
-					camada.pesos[j][k] += calcular(m[i][j][k], vc[i][j][k], forcaB1, forcaB2);
+					camada.pesos.add(j, k, calcular(m[i][j][k], vc[i][j][k], forcaB1, forcaB2));
 				}			
 			}
 
          if(camada.temBias()){
-            for(int j = 0; j < camada.bias.length; j++){
-               for(int k = 0; k < camada.bias[j].length; k++){
-                  g = camada.erros[j][k];
+            for(int j = 0; j < camada.bias.lin; j++){
+               for(int k = 0; k < camada.bias.col; k++){
+                  g = camada.erros.dado(j, k);
 
 						mb[i][j][k] = (beta1 * mb[i][j][k]) + ((1 - beta1) * g);
 						vb[i][j][k] = (beta2 * vb[i][j][k]) + ((1 - beta2) * g * g);
 						vcb[i][j][k] = Math.max(vcb[i][j][k], vb[i][j][k]);
 
-                  camada.bias[j][k] += calcular(mb[i][j][k], vcb[i][j][k], forcaB1, forcaB2);
+                  camada.bias.add(j, k, calcular(mb[i][j][k], vcb[i][j][k], forcaB1, forcaB2));
                }
             }
          } 

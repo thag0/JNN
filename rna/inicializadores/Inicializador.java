@@ -2,6 +2,8 @@ package rna.inicializadores;
 
 import java.util.Random;
 
+import rna.core.Mat;
+
 /**
  * Classe responsável pelas funções de inicialização dos pesos
  * da Rede Neural.
@@ -28,10 +30,10 @@ public class Inicializador{
 
    /**
     * Inicializa os valores do array de acordo com o inicializador configurado.
-    * @param array array de pesos do neurônio.
+    * @param m matriz de dados.
     * @param alcance valor de alcance da aleatorização
     */
-   public void inicializar(double[][] m, double alcance){
+   public void inicializar(Mat m, double alcance){
       throw new UnsupportedOperationException(
          "Método de inicialização não implementado."
       );

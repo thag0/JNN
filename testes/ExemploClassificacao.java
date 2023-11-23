@@ -42,15 +42,15 @@ public class ExemploClassificacao{
       double[][] testeY = (double[][]) ged.separarDadosSaida(teste, qSaidas);
 
       //criando e configurando a rede neural
-      int[] arq = {qEntradas, 8, 8, qSaidas};
+      int[] arq = {qEntradas, 9, 9, qSaidas};
       RedeNeural rede = new RedeNeural(arq);
 
       Perda perda = new EntropiaCruzada();
-      Otimizador otimizador = new SGD(0.0001, 0.9);
+      Otimizador otimizador = new SGD(0.001, 0.9);
       Inicializador inicializador = new Xavier();
 
       rede.compilar(perda, otimizador, inicializador);
-      rede.configurarAtivacao(new TanH());
+      rede.configurarAtivacao(new ReLU());
       rede.configurarAtivacao(rede.obterCamadaSaida(), "softmax");
       System.out.println(rede.info());
       

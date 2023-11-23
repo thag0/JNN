@@ -3,29 +3,34 @@ package testes;
 import java.util.concurrent.TimeUnit;
 
 import ged.Ged;
-import rna.core.Array;
-import rna.core.MatrizT;
-import rna.inicializadores.Inicializador;
+import rna.core.Mat;
+import rna.core.Matriz;
 
 public class Multithread {
    public static void main(String[] args){
       Ged ged = new Ged();
+      Matriz mat = new Matriz();
       ged.limparConsole();
       
-      Teste t = new Teste(3, 4);
-      for(int i = 0; i < t.pesos.length; i++){
-         for(int j = 0; j < t.pesos[i].length; j++){
-            t.pesos[i][j] = (i* t.pesos.length) + j + 1;
+      int lin = 1024;
+      int col = lin;
+      Mat a = new Mat(lin, col);
+      Mat b = new Mat(lin, col);
+      Mat c = new Mat(lin, col);
+      for(int i = 0; i < a.lin; i++){
+         for(int j = 0; j < a.col; j++){
+            a.editar(i, j, ((i* a.lin) + j + 1));
+         
+            b.editar(i, j, ((i == j) ? 1 : 0));
          }
       }
-      ged.matIdentidade(t.entrada);
 
       //treinar e marcar tempo
       long t1, t2;
       long minutos, segundos;
 
       t1 = System.nanoTime();
-      t.calcularSaida(new double[]{1, 1, 1});
+      mat.multT(a, b, c);
       t2 = System.nanoTime();
       
       long tempoDecorrido = t2 - t1;
@@ -33,80 +38,6 @@ public class Multithread {
       minutos = (segundosTotais % 3600) / 60;
       segundos = segundosTotais % 60;
       System.out.println("Concluído em: " + minutos + "m " + segundos + "s");
-
-      ged.imprimirMatriz(t.somatorio);
    }
 
-}
-
-class Teste{
-   MatrizT mat = new MatrizT(2);
-   public double[][] pesos;
-   public double[][] bias;
-   boolean usarBias = true;
-
-   public double[][] entrada;
-   public double[][] somatorio;
-   public double[][] saida;
-   public double[][] erros;
-   public double[][] gradientes;
-   public double[][] gradientesAcumulados;
-   public double[][] derivada;
-
-   public Teste(int entrada, int neuronios, boolean usarBias){
-      this.usarBias = usarBias;
-
-      this.entrada = new double[1][entrada];
-      this.pesos =   new double[entrada][neuronios];
-      this.saida =   new double[1][neuronios];
-      
-      if(usarBias){
-         this.bias = new double[saida.length][saida[0].length];
-      }
-
-      this.somatorio =              new double[this.saida.length][this.saida[0].length];
-      this.derivada =               new double[this.saida.length][this.saida[0].length];
-      this.erros =                  new double[this.saida.length][this.saida[0].length];
-
-      this.gradientes =             new double[this.pesos.length][this.pesos[0].length];
-      this.gradientesAcumulados =   new double[this.pesos.length][this.pesos[0].length];
-   }
-
-   public Teste(int entrada, int neuronios){
-      this(entrada, neuronios, true);
-   }
-
-   public void inicializar(Inicializador inicializador, double alcance){
-      if(inicializador == null){
-         throw new IllegalArgumentException(
-            "O inicializador não pode ser nulo."
-         );
-      }
-
-      inicializador.inicializar(this.pesos, alcance);
-      if(this.usarBias){
-         inicializador.inicializar(this.bias, alcance);
-      }
-   }
-
-   public void calcularSaida(double[] entrada){
-      if(entrada.length != this.tamanhoEntrada()){
-         throw new IllegalArgumentException(
-            "Entradas (" + entrada.length + 
-            ") incompatíveis com a entrada da camada (" + this.tamanhoEntrada() + 
-            ")."
-         );
-      }
-
-      Array.copiar(entrada, this.entrada[0]);     
-
-      mat.mult(this.entrada, this.pesos, this.somatorio);
-      if(usarBias){
-         mat.add(this.somatorio, this.bias, this.somatorio);
-      }
-   }
-
-   public int tamanhoEntrada(){
-      return this.entrada[0].length;
-   }
 }
