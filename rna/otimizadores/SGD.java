@@ -129,39 +129,37 @@ public class SGD extends Otimizador{
    public void atualizar(CamadaDensa[] redec){
       for(int i = 0; i < redec.length; i++){
          CamadaDensa camada = redec[i];
+         Mat pesos = camada.pesos;
+         Mat grads = camada.gradientes;
 
-         for(int j = 0; j < camada.pesos.lin; j++){
-            for(int k = 0; k < camada.pesos.col; k++){
-               m[i].editar(j, k, calcular(m[i].dado(j, k), camada.gradientes.dado(j, k)));
-               
-               if(nesterov){
-                  double s = (camada.gradientes.dado(j, k) * taxaAprendizagem) + (momentum * m[i].dado(j, k));
-                  camada.pesos.sub(j, k, s);
-               }else{
-                  camada.pesos.sub(j, k, m[i].dado(j, k));
-               }
+         for(int j = 0; j < pesos.lin; j++){
+            for(int k = 0; k < pesos.col; k++){
+               calcular(pesos, grads, m[i], j, k);
             }
          }
 
          if(camada.temBias()){
-            for(int j = 0; j < camada.bias.lin; j++){
-               for(int k = 0; k < camada.bias.col; k++){
-                  mb[i].editar(j, k, calcular(mb[i].dado(j, k), camada.erros.dado(j, k)));
-                  
-                  if(nesterov){
-                     double s = (camada.erros.dado(j, k) * taxaAprendizagem) + (momentum * mb[i].dado(j, k));
-                     camada.bias.sub(j, k, s);
-                  }else{
-                     camada.bias.sub(j, k, mb[i].dado(j, k));
-                  }
+            Mat bias = camada.bias;
+            Mat gradsB = camada.erros;
+            for(int j = 0; j < bias.lin; j++){
+               for(int k = 0; k < bias.col; k++){
+                  calcular(bias, gradsB, mb[i], j, k);
                }
             }
          }
       }
    }
 
-   private double calcular(double m, double grad){
-      return (-grad * this.taxaAprendizagem) + (m * this.momentum);
+   private void calcular(Mat var, Mat grad, Mat m, int lin, int col){
+      double att = (-grad.dado(lin, col) * this.taxaAprendizagem) + (m.dado(lin, col) * this.momentum);
+      m.editar(lin, col, att);
+      
+      if(nesterov){
+         double d = (grad.dado(lin, col) * taxaAprendizagem) + (momentum * m.dado(lin, col));
+         var.sub(lin, col, d);
+      }else{
+         var.sub(lin, col, m.dado(lin, col));
+      }
    }
 
    @Override

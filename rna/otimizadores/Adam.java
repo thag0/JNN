@@ -1,5 +1,6 @@
 package rna.otimizadores;
 
+import rna.core.Mat;
 import rna.estrutura.CamadaDensa;
 
 /**
@@ -65,22 +66,22 @@ public class Adam extends Otimizador{
    /**
     * Coeficientes de momentum.
     */
-   private double[][][] m;
+   private Mat[] m;
 
    /**
     * Coeficientes de momentum para os bias.
     */
-   private double[][][] mb;
+   private Mat[] mb;
 
    /**
     * Coeficientes de momentum de segunda ordem.
     */
-   private double[][][] v;
+   private Mat[] v;
 
    /**
     * Coeficientes de momentum de segunda ordem para os bias.
     */
-   private double[][][] vb;
+   private Mat[] vb;
    
    /**
     * Contador de iterações.
@@ -127,20 +128,20 @@ public class Adam extends Otimizador{
 
    @Override
    public void inicializar(CamadaDensa[] redec){
-      this.m = new double[redec.length][][];
-      this.v = new double[redec.length][][];
-      this.mb = new double[redec.length][][];
-      this.vb = new double[redec.length][][];
+      this.m  = new Mat[redec.length];
+      this.v  = new Mat[redec.length];
+      this.mb = new Mat[redec.length];
+      this.vb = new Mat[redec.length];
    
       for(int i = 0; i < redec.length; i++){
          CamadaDensa camada = redec[i];
 
-         this.m[i] = new double[camada.pesos.lin][camada.pesos.col];
-         this.v[i] = new double[camada.pesos.lin][camada.pesos.col];
+         this.m[i] = new Mat(camada.pesos.lin, camada.pesos.col);
+         this.v[i] = new Mat(camada.pesos.lin, camada.pesos.col);
          
          if(camada.temBias()){
-            this.mb[i] = new double[camada.bias.lin][camada.bias.col];
-            this.vb[i] = new double[camada.bias.lin][camada.bias.col];
+            this.mb[i] = new Mat(camada.bias.lin, camada.bias.col);
+            this.vb[i] = new Mat(camada.bias.lin, camada.bias.col);
          }
       }
    }
@@ -195,7 +196,6 @@ public class Adam extends Otimizador{
     */
    @Override
    public void atualizar(CamadaDensa[] redec){
-      double g;
       interacoes++;
       double forcaB1 = Math.pow(beta1, interacoes);
       double forcaB2 = Math.pow(beta2, interacoes);
@@ -203,35 +203,36 @@ public class Adam extends Otimizador{
    
       for(int i = 0; i < redec.length; i++){
          CamadaDensa camada = redec[i];
+         Mat pesos = camada.pesos;
+         Mat grads = camada.gradientes;
 
          for(int j = 0; j < camada.pesos.lin; j++){
             for(int k = 0; k < camada.pesos.col; k++){
-               g = camada.gradientes.dado(j, k);
-               
-               m[i][j][k] += (1 - beta1) * (g - m[i][j][k]);
-               v[i][j][k] += (1 - beta2) * ((g*g) - v[i][j][k]); 
-
-               camada.pesos.add(j, k, calcular(alfa, m[i][j][k], v[i][j][k]));
+               calcular(pesos, grads, m[i], v[i], j, k, alfa, forcaB1, forcaB2);
             }
          }
          
          if(camada.temBias()){
-            for(int j = 0; j < camada.bias.lin; j++){
-               for(int k = 0; k < camada.bias.col; k++){
-                  g = camada.erros.dado(j, k);
-                  
-                  mb[i][j][k] += (1 - beta1) * (g - mb[i][j][k]);
-                  vb[i][j][k] += (1 - beta2) * ((g*g) - vb[i][j][k]); 
-
-                  camada.bias.add(j, k, calcular(alfa, mb[i][j][k], vb[i][j][k]));
+            Mat bias = camada.bias;
+            Mat gradsB = camada.erros;
+            for(int j = 0; j < bias.lin; j++){
+               for(int k = 0; k < bias.col; k++){
+                  calcular(bias, gradsB, mb[i], vb[i], j, k, alfa, forcaB1, forcaB2);
                }
             }
          }     
       }
    }
 
-   private double calcular(double alfa, double m, double v){
-      return (alfa * m) / (Math.sqrt(v) + this.epsilon);
+   private void calcular(Mat var, Mat grad, Mat m, Mat v, int lin, int col, double alfa, double fb1, double fb2){
+      double g = grad.dado(lin, col);
+      double d1 = (1 - beta1) * (g - m.dado(lin, col));
+      double d2 = (1 - beta2) * ((g*g) - v.dado(lin, col)); 
+      m.add(lin, col, d1); 
+      v.add(lin, col, d2);
+
+      double att = (alfa * m.dado(lin, col)) / (Math.sqrt(v.dado(lin, col)) + this.epsilon);
+      var.add(lin, col, att);
    }
 
    @Override

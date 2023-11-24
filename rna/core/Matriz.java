@@ -9,6 +9,11 @@ public class Matriz{
 
    }
 
+   /**
+    * Checa se as linhas das matrizes fornecidas são iguais.
+    * @param a matriz A.
+    * @param b matriz B.
+    */
    private void verificarLinhas(Mat a, Mat b){
       if(a.lin != b.lin){
          throw new IllegalArgumentException(
@@ -17,6 +22,11 @@ public class Matriz{
       }
    }
 
+   /**
+    * Checa se as colunas das matrizes fornecidas são iguais.
+    * @param a matriz A.
+    * @param b matriz B.
+    */
    private void verificarColunas(Mat a, Mat b){
       if(a.col != b.col){
          throw new IllegalArgumentException(
@@ -120,10 +130,14 @@ public class Matriz{
    }
 
    /**
-    * 
-    * @param a
-    * @param b
-    * @param r
+    * Experimental.
+    * Multiplicação matricial paralela seguindo a expressão:
+    * <pre>
+    * R = A * B
+    * </pre>
+    * @param a primeita matriz.
+    * @param b segunda matriz.
+    * @param r matriz contendo o resultado.
     */
    public void multT(Mat a, Mat b, Mat r){
       if(a.col != b.lin){
@@ -183,11 +197,12 @@ public class Matriz{
       verificarLinhas(a, r);
       verificarColunas(a, r);
 
+      double[] d = new double[r.col];
       for(int i = 0; i < r.lin; i++){
          for(int j = 0; j < r.col; j++){
-            double d = a.dado(i, j) + b.dado(i, j);
-            r.editar(i, j, d);
+            d[j] = a.dado(i, j) + b.dado(i, j);
          }
+         r.substituir(i, d);
       }
    }
 
@@ -207,11 +222,12 @@ public class Matriz{
       verificarLinhas(a, r);
       verificarColunas(a, r);
 
+      double[] d = new double[r.col];
       for(int i = 0; i < r.lin; i++){
          for(int j = 0; j < r.col; j++){
-            double d = a.dado(i, j) - b.dado(i, j);
-            r.editar(i, j, d);
+            d[j] = a.dado(i, j) - b.dado(i, j);
          }
+         r.substituir(i, d);
       }
    }
 
@@ -231,11 +247,19 @@ public class Matriz{
       verificarLinhas(a, r);
       verificarColunas(a, r);
 
+      // for(int i = 0; i < r.lin; i++){
+      //    for(int j = 0; j < r.col; j++){
+      //       double d = a.dado(i, j) * b.dado(i, j);
+      //       r.editar(i, j, d);
+      //    }
+      // }
+
+      double[] d = new double[r.col];
       for(int i = 0; i < r.lin; i++){
          for(int j = 0; j < r.col; j++){
-            double d = a.dado(i, j) * b.dado(i, j);
-            r.editar(i, j, d);
+            d[j] = a.dado(i, j) * b.dado(i, j);
          }
+         r.substituir(i, d);
       }
    }
 
@@ -254,9 +278,9 @@ public class Matriz{
       verificarColunas(a, r);
 
       for(int i = 0; i < r.lin; i++){
+         r.substituir(i, a.linha(i));
          for(int j = 0; j < r.col; j++){
-            double d = a.dado(i, j) * e;
-            r.editar(i, j, d);
+            r.mult(i, j, e);
          }
       }
    }

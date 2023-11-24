@@ -1,5 +1,6 @@
 package rna.otimizadores;
 
+import rna.core.Mat;
 import rna.core.Matriz;
 import rna.estrutura.CamadaDensa;
 
@@ -26,12 +27,12 @@ public class AdaGrad extends Otimizador{
    /**
     * Acumuladores dos gradientes ao quadrado.
     */
-   private double[][][] ac;
+   private Mat[] ac;
 
    /**
     * Acumuladores dos bias.
     */
-   private double[][][] acb;
+   private Mat[] acb;
 
    /**
     * Inicializa uma nova instância de otimizador <strong> AdaGrad </strong> 
@@ -62,18 +63,18 @@ public class AdaGrad extends Otimizador{
 
    @Override
    public void inicializar(CamadaDensa[] redec){
-      this.ac = new double[redec.length][][];
-      this.acb = new double[redec.length][][];
+      this.ac  = new Mat[redec.length];
+      this.acb = new Mat[redec.length];
       double valorInicial = 0.1;
 
       for(int i = 0; i < redec.length; i++){
          CamadaDensa camada = redec[i];
 
-         this.ac[i] = new double[camada.pesos.lin][camada.pesos.col];
+         this.ac[i] = new Mat(camada.pesos.lin, camada.pesos.col);
          mat.preencher(this.ac[i], valorInicial);
 
          if(camada.temBias()){
-            this.acb[i] = new double[camada.bias.lin][camada.bias.col];
+            this.acb[i] = new Mat(camada.bias.lin, camada.bias.col);
             mat.preencher(this.acb[i], valorInicial);
          }
       }
@@ -108,31 +109,58 @@ public class AdaGrad extends Otimizador{
     */
    @Override
    public void atualizar(CamadaDensa[] redec){
-      double g;
       for(int i = 0; i < redec.length; i++){
          CamadaDensa camada = redec[i];
+         Mat pesos = camada.pesos;
+         Mat grads = camada.gradientes;
 
-         for(int j = 0; j < camada.pesos.lin; j++){
-            for(int k = 0; k < camada.pesos.col; k++){
-               g = camada.gradientes.dado(j, k);
-               ac[i][j][k] += g * g;
-               camada.pesos.add(j, k, calcular(g, ac[i][j][k]));
+         for(int j = 0; j < pesos.lin; j++){
+            for(int k = 0; k < pesos.col; k++){
+               calcular(pesos, grads, ac[i], j, k);
             }
          }
          
          if(camada.temBias()){
-            for(int j = 0; j < camada.bias.lin; j++){
-               for(int k = 0; k < camada.bias.col; k++){
-                  g = camada.erros.dado(j, k);
-                  acb[i][j][k] += g * g;
-                  camada.bias.add(j, k, calcular(g, acb[i][j][k]));
+            Mat bias = camada.bias;
+            Mat gradsB = camada.erros;
+            for(int j = 0; j < bias.lin; j++){
+               for(int k = 0; k < bias.col; k++){
+                  calcular(bias, gradsB, acb[i], j, k);
+               }
+            }
+         }
+      }
+
+      for(int i = 0; i < redec.length; i++){
+         CamadaDensa camada = redec[i];
+         Mat pesos = camada.pesos;
+         Mat grads = camada.gradientes;
+
+         for(int j = 0; j < pesos.lin; j++){
+            for(int k = 0; k < pesos.col; k++){
+               calcular(pesos, grads, ac[i], j, k);
+            }
+         }
+
+         if(camada.temBias()){
+            Mat bias = camada.bias;
+            Mat gradsB = camada.erros;
+            for(int j = 0; j < bias.lin; j++){
+               for(int k = 0; k < bias.col; k++){
+                  calcular(bias, gradsB, ac[i], j, k);
                }
             }
          }
       }
    }
 
-   private double calcular(double g, double ac){
+   private void calcular(Mat var, Mat grad, Mat ac, int lin, int col){
+      double g = grad.dado(lin, col);
+      ac.add(lin, col, g*g);
+      var.add(lin, col, aplicarGradiente(g, ac.dado(lin, col)));
+   }
+
+   private double aplicarGradiente(double g, double ac){
       return (taxaAprendizagem * g) / (Math.sqrt(ac + epsilon));
    }
 

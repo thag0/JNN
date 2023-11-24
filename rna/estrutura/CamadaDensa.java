@@ -302,7 +302,7 @@ public class CamadaDensa implements Cloneable{
          );
       }
 
-      this.entrada.copiarLinha(0, entrada); 
+      this.entrada.substituir(0, entrada); 
 
       mat.mult(this.entrada, this.pesos, this.somatorio);
       if(usarBias){
