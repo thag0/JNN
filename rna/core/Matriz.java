@@ -93,9 +93,9 @@ public class Matriz{
    public Mat transpor(Mat m){
       Mat t = new Mat(m.col, m.lin);
 
-      for(int i = 0; i < m.lin; i++){
-         for(int j = 0; j < m.col; j++){
-            t.editar(j, i, m.dado(i, j));
+      for(int i = 0; i < t.lin; i++){
+         for(int j = 0; j < t.col; j++){
+            t.editar(i, j, m.dado(j, i));
          }
       }
 
@@ -139,14 +139,13 @@ public class Matriz{
     * @param b segunda matriz.
     * @param r matriz contendo o resultado.
     */
-   public void multT(Mat a, Mat b, Mat r){
+   public void multT(Mat a, Mat b, Mat r, int nThreads){
       if(a.col != b.lin){
          throw new IllegalArgumentException("Dimensões de A e B incompatíveis");
       }
       verificarLinhas(a, r);
       verificarColunas(r, b);
 
-      int nThreads = 2;
       int linPorThread = a.lin / nThreads;
       Thread[] threads = new Thread[nThreads];
 

@@ -32,4 +32,5 @@ public class Softmax extends Ativacao{
          camada.saida.editar(0, i, s);
       }
    }
+    
 }

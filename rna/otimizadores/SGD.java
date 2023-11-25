@@ -8,7 +8,30 @@ import rna.estrutura.CamadaDensa;
  * <p>
  *    Também possui o adicional do acelerador de nesterov, mas deve ser configurado.
  * </p>
- * Esse é o otimizador que me deu os melhores resultados de convergência até agora.
+ * <p>
+ *    O SGD funciona usando a seguinte expressão:
+ * </p>
+ * <pre>
+ *    v[i][j] -= (-g[i][j] * tA) - (M * m[i][j])
+ * </pre>
+ * Onde:
+ * <p>
+ *    {@code v} - variável que será otimizada (peso ou bias).
+ * </p>
+ * <p>
+ *    {@code M} - valor de taxa de momentum (ou constante de momentum) 
+ *    do otimizador.
+ * </p>
+ * <p>
+ *    {@code m} - valor de momentum da correspondente a variável que será
+ *    otimizada.
+ * </p>
+ * <p>
+ *    {@code g} - gradientes correspondente a variável que será otimizada.
+ * </p>
+ * <p>
+ *    {@code tA} - taxa de aprendizagem do otimizador.
+ * </p>
  */
 public class SGD extends Otimizador{
 
@@ -40,8 +63,8 @@ public class SGD extends Otimizador{
    /**
     * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient Descent (SGD) </strong> 
     * usando os valores de hiperparâmetros fornecidos.
-    * @param tA valor de taxa de aprendizagem.
-    * @param momentum valor de taxa de momentum.
+    * @param tA taxa de aprendizagem do otimizador.
+    * @param momentum taxa de momentum do otimizador.
     * @param nesterov usar acelerador de nesterov.
     */
    public SGD(double tA, double momentum, boolean nesterov){
@@ -53,12 +76,23 @@ public class SGD extends Otimizador{
    /**
     * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient Descent (SGD) </strong> 
     * usando os valores de hiperparâmetros fornecidos.
-    * @param tA valor de taxa de aprendizagem.
-    * @param momentum valor de taxa de momentum.
+    * @param tA taxa de aprendizagem do otimizador.
+    * @param momentum taxa de momentum do otimizador.
     */
    public SGD(double tA, double momentum){
       this.taxaAprendizagem = tA;
       this.momentum = momentum;
+      this.nesterov = false;
+   }
+
+   /**
+    * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient Descent (SGD) </strong> 
+    * usando os valores de hiperparâmetros fornecidos.
+    * @param tA taxa de aprendizagem do otimizador.
+    */
+   public SGD(double tA){
+      this.taxaAprendizagem = tA;
+      this.momentum = 0;
       this.nesterov = false;
    }
 
@@ -83,7 +117,7 @@ public class SGD extends Otimizador{
 
    @Override
    public void inicializar(CamadaDensa[] redec){
-      this.m = new Mat[redec.length];
+      this.m  = new Mat[redec.length];
       this.mb = new Mat[redec.length];
 
       for(int i = 0; i < redec.length; i++){
@@ -96,35 +130,6 @@ public class SGD extends Otimizador{
       }
    }
 
-   /**
-    * Aplica o algoritmo do SGD com momentum (e nesterov, se configurado) para cada peso 
-    * da rede neural.
-    * <p>
-    *    O SGD funciona usando a seguinte expressão:
-    * </p>
-    * <pre>
-    *    p[i] -= (M * m[i]) + (g[i] * tA)
-    * </pre>
-    * Onde:
-    * <p>
-    *    {@code p} - peso que será atualizado.
-    * </p>
-    * <p>
-    *    {@code M} - valor de taxa de momentum (ou constante de momentum) 
-    *    do otimizador.
-    * </p>
-    * <p>
-    *    {@code m} - valor de momentum da conexão correspondente ao peso
-    *    que será atualizado.
-    * </p>
-    * <p>
-    *    {@code g} - gradiente correspondente a conexão do peso que será
-    *    atualizado.
-    * </p>
-    * <p>
-    *    {@code tA} - taxa de aprendizagem do otimizador.
-    * </p>
-    */
    @Override
    public void atualizar(CamadaDensa[] redec){
       for(int i = 0; i < redec.length; i++){
@@ -153,10 +158,11 @@ public class SGD extends Otimizador{
    private void calcular(Mat var, Mat grad, Mat m, int lin, int col){
       double att = (-grad.dado(lin, col) * this.taxaAprendizagem) + (m.dado(lin, col) * this.momentum);
       m.editar(lin, col, att);
-      
-      if(nesterov){
-         double d = (grad.dado(lin, col) * taxaAprendizagem) + (momentum * m.dado(lin, col));
-         var.sub(lin, col, d);
+
+      if(this.nesterov){
+         double nest = (grad.dado(lin, col) * this.taxaAprendizagem) + (this.momentum * m.dado(lin, col));
+         var.sub(lin, col, nest);
+
       }else{
          var.sub(lin, col, m.dado(lin, col));
       }

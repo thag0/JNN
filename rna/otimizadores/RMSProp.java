@@ -1,5 +1,6 @@
 package rna.otimizadores;
 
+import rna.core.Mat;
 import rna.estrutura.CamadaDensa;
 
 /**
@@ -11,9 +12,34 @@ import rna.estrutura.CamadaDensa;
  * <p>
  * 	Os hiperparâmetros do RMSProp podem ser ajustados para controlar 
  *    o comportamento do otimizador durante o treinamento.
- * </p
+ * </p>
+ * <p>
+ *    O RMSProp funciona usando a seguinte expressão:
+ * </p>
+ * <pre>
+ *    v[i][j] -= (-g[i][j] * tA) / ((√ ac[i][j]) + eps)
+ * </pre>
+ * Onde:
+ * <p>
+ *    {@code v} - variável que será otimizada.
+ * </p>
+ * <p>
+ *    {@code g} - gradiente correspondente a variável
+ *    que será otimizada.
+ * </p>
+ * <p>
+ *    {@code tA} - taxa de aprendizagem do otimizador.
+ * </p>
+ * <p>
+ *    {@code ac} - acumulador de gradiente correspondente a variável
+ *    que será otimizada.
+ * </p>
  */
 public class RMSProp extends Otimizador{
+
+   private static final double padraoTA  = 0.001;
+   private static final double padraoRho = 0.99;
+   private static final double padraoEps = 1e-7;
 
    /**
     * Valor de taxa de aprendizagem do otimizador.
@@ -24,21 +50,21 @@ public class RMSProp extends Otimizador{
     * Usado para evitar divisão por zero.
     */
    private double epsilon;
-  
+
    /**
-    * fator de decaimento do RMSprop.
+    * Fator de decaimento.
     */
    private double rho;
 
    /**
     * Acumuladores para os pesos
     */
-   private double[][][] ac;
+   private Mat[] ac;
 
    /**
     * Acumuladores para os bias.
     */
-   private double[][][] acb;
+   private Mat[] acb;
 
    /**
     * Inicializa uma nova instância de otimizador <strong> RMSProp </strong> 
@@ -51,6 +77,15 @@ public class RMSProp extends Otimizador{
       this.taxaAprendizagem = tA;
       this.rho = rho;
       this.epsilon = epsilon;
+   }
+
+   /**
+    * Inicializa uma nova instância de otimizador <strong> RMSProp </strong> 
+    * usando os valores de hiperparâmetros fornecidos.
+    * @param tA valor de taxa de aprendizagem.
+    */
+   public RMSProp(double tA){
+      this(tA, padraoRho, padraoEps);
    }
 
    /**
@@ -69,76 +104,57 @@ public class RMSProp extends Otimizador{
     * </p>
     */
    public RMSProp(){
-      this(0.001, 0.99, 1e-7);
+      this(padraoTA, padraoRho, padraoEps);
    }
 
    @Override
    public void inicializar(CamadaDensa[] redec){
-      this.ac = new double[redec.length][][];
-      this.acb = new double[redec.length][][];
+      this.ac  = new Mat[redec.length];
+      this.acb = new Mat[redec.length];
 
       for(int i = 0; i < redec.length; i++){
          CamadaDensa camada = redec[i];
 
-         this.ac[i] = new double[camada.pesos.lin][camada.pesos.col];
+         this.ac[i] = new Mat(camada.pesos.lin, camada.pesos.col);
          if(camada.temBias()){
-            this.acb[i] = new double[camada.bias.lin][camada.bias.col];
+            this.acb[i] = new Mat(camada.bias.lin, camada.bias.col);
          }
       }
    }
 
-   /**
-    * Aplica o algoritmo do RMSProp para cada peso da rede neural.
-    * <p>
-    *    O Nadam funciona usando a seguinte expressão:
-    * </p>
-    * <pre>
-    *    p[i] -= tA / ((√ ac[i]) + eps) * g[i]
-    * </pre>
-    * Onde:
-    * <p>
-    *    {@code p} - peso que será atualizado.
-    * </p>
-    * <p>
-    *    {@code tA} - valor de taxa de aprendizagem (learning rate).
-    * </p>
-    * <p>
-    *    {@code ac} - acumulador de gradiente correspondente a conexão do 
-    *    peso que será atualizado.
-    * </p>
-    * <p>
-    *    {@code g} - gradiente correspondente a conexão do peso que será
-    *    atualizado.
-    * </p>
-    */
    @Override
    public void atualizar(CamadaDensa[] redec){
-      double g;
       for(int i = 0; i < redec.length; i++){
          CamadaDensa camada = redec[i];
+         Mat pesos = camada.pesos;
+         Mat grads = camada.gradientes;
 
-         for(int j = 0; j < camada.pesos.lin; j++){
-            for(int k = 0; k < camada.pesos.col; k++){
-               g = camada.gradientes.dado(j, k);
-               ac[i][j][k] = (rho * ac[i][j][k]) + (1 - rho) * (g * g);
-               camada.pesos.add(j, k, calcular(g, ac[i][j][k]));
+         for(int j = 0; j < pesos.lin; j++){
+            for(int k = 0; k < pesos.col; k++){
+               calcular(pesos, grads, ac[i], j, k);
             }
          }
 
          if(camada.temBias()){
-            for(int j = 0; j < camada.bias.lin; j++){
-               for(int k = 0; k < camada.bias.col; k++){
-                  g = camada.erros.dado(j, k);
-                  acb[i][j][k] = (rho * acb[i][j][k]) + (1 - rho) * (g * g);
-                  camada.bias.add(j, j, calcular(g, acb[i][j][k]));
+            Mat bias = camada.bias;
+            Mat gradsB = camada.erros;
+            for(int j = 0; j < bias.lin; j++){
+               for(int k = 0; k < bias.col; k++){
+                  calcular(bias, gradsB, acb[i], j, k);
                }
             }
          }
       }
    }
 
-   private double calcular(double grad, double ac){
-      return (grad * taxaAprendizagem) / (Math.sqrt(ac + epsilon));
+   private void calcular(Mat var, Mat grad, Mat ac, int lin, int col){
+      double g = grad.dado(lin, col);
+
+      double ac2 = (rho * ac.dado(lin, col)) + (1 - rho) * (g*g);
+      ac.editar(lin, col, ac2);
+      
+      double att = (g * this.taxaAprendizagem) / (Math.sqrt(ac2 + this.epsilon));
+      var.sub(lin, col, -att);
    }
 
    @Override

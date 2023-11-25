@@ -81,7 +81,7 @@ public class Mat implements Cloneable{
     * valores de linha e coluna fornecidos.
     * @param lin índice da linha do elemento.
     * @param col índice da coluna do elemento.
-    * @return valor contido de acordo com os índices.
+    * @return valor baseado de acordo com os índices.
     */
    public double dado(int lin, int col){
       return this.dados[indice(lin, col)];

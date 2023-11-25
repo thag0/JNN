@@ -31,14 +31,14 @@ public class EntropiaCruzadaBinaria extends Perda{
 
       //também não econtrei ainda uma boa resposta de como calcular isso
       //na teoria a derivada da entropia cruzada binaria deve ser dada como
-      //d[i] = (1 / n) * ( ((1 - real[i]) / (1 - pred[i])) - (real[i] / pred[i]) )
+      //derivadas[i] = (1 / n) * ( ((1 - real[i]) / (1 - pred[i])) - (real[i] / pred[i]) )
       //mas essa abordagem não ta funcionando
       double[] derivadas = new double[previsto.length];
       int n = previsto.length;
 
       for(int i = 0; i < n; i++){
          derivadas[i] = real[i] - previsto[i];
-         // derivadas[i] = ((1 - real[i])/(1 - previsto[i]) - (real[i]/previsto[i])) / n;
+         // derivadas[i] = (1 / n) * ( ((1 - real[i]) / (1 - previsto[i])) - (real[i] / previsto[i]) );
       }
       return derivadas;
    }

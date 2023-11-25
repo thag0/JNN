@@ -7,6 +7,7 @@ import rna.core.Mat;
 import rna.core.Matriz;
 import rna.estrutura.CamadaDensa;
 import rna.estrutura.RedeNeural;
+import rna.otimizadores.Otimizador;
 
 public class Treino{
    Matriz mat = new Matriz();
@@ -44,22 +45,45 @@ public class Treino{
       this.calcularHistorico = calcularHistorico;
    }
 
+   /**
+    * Treina a rede neural calculando os erros dos neuronios, seus gradientes para cada peso e 
+    * passando essas informações para o otimizador configurado ajustar os pesos.
+    * @param rede instância da rede.
+    * @param entrada dados de entrada para o treino.
+    * @param saida dados de saída correspondente as entradas para o treino.
+    * @param epochs quantidade de épocas de treinamento.
+    */
    public void treinar(RedeNeural rede, double[][] entrada, double[][] saida, int epochs){
       double[] dadoEntrada = new double[entrada[0].length];
       double[] dadoSaida = new double[saida[0].length];
+
+      CamadaDensa[] camadas = rede.obterCamadas();
+      Otimizador otimizador = rede.obterOtimizador();
+      Perda perda = rede.obterPerda();
       
+      double perdaEpoca;
       for(int e = 0; e < epochs; e++){
          aux.embaralharDados(entrada, saida);
+         perdaEpoca = 0;
          
          for(int i = 0; i < entrada.length; i++){
             System.arraycopy(entrada[i], 0, dadoEntrada, 0, dadoEntrada.length);
             System.arraycopy(saida[i], 0, dadoSaida, 0, dadoSaida.length);
 
             rede.calcularSaida(dadoEntrada);
-            backpropagation(rede.camadas, rede.obterPerda(), dadoSaida);  
-            
-            // atualizarPesos(rede.camadas, 0.01);
-            rede.obterOtimizador().atualizar(rede.obterCamadas());
+
+            //feedback de avanço da rede
+            if(calcularHistorico){
+               perdaEpoca += rede.obterPerda().calcular(rede.obterSaidas(), saida[i]);
+            }
+
+            backpropagation(camadas, perda, dadoSaida);  
+            otimizador.atualizar(camadas);
+         }
+
+         //feedback de avanço da rede
+         if(calcularHistorico){
+            this.historico = aux.adicionarPerda(this.historico, perdaEpoca/entrada.length);
          }
       }
    }
@@ -74,7 +98,7 @@ public class Treino{
    public void backpropagation(CamadaDensa[] camadas, Perda perda, double[] real){
       aux.calcularErros(camadas, perda, real);
 
-      //gradientes ou delta para os pesos
+      //gradientes ou deltas para os pesos
       for(CamadaDensa camada : camadas){
          Mat entradaT = mat.transpor(camada.entrada);
          mat.mult(entradaT, camada.erros, camada.gradientes);

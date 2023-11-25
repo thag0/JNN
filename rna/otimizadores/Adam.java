@@ -13,35 +13,58 @@ import rna.estrutura.CamadaDensa;
  * 	Os hiperparâmetros do Adam podem ser ajustados para controlar o 
  * 	comportamento do otimizador durante o treinamento.
  * </p>
- * <strong> Observação </strong> :
  * <p>
- *    Testei a abordagem mais clássica do Adam que encontrei em vários lugares da 
- *    internet que é dada pelas expresões:
+ *    O Adam funciona usando a seguinte expressão:
  * </p>
- * 
- *<pre>
- *m[i] = (beta1 * m[i]) + ((1 - beta1) * g)
- *v[i] = (beta2 * v[i]) + ((1 - beta2) * g²)
- *</pre>
- *<pre>
- *mChapeu = m[i] / (1 - beta1ⁱ)
- *vChapeu = v[i] / (1 - beta2ⁱ)
- *</pre>
  * <pre>
- *    p[i] -= (tA * mChapeu) / ((√ vChapeu) + eps)
+ *    var[i][j] -= (alfa * m[i][j]) / ((√ v[i][j]) + eps)
  * </pre>
- * 
- * Essa abordagem era uma solução boa mas estava tendo problemas de convergência e lentidão, 
- * além de ter que precisar de muitos ajustes finos dos paramêtros do Adam pra conseguir ter
- * um bom resultado comparado com o SGD, que é bem mais simples.
+ * Onde:
  * <p>
- *    Optei por implementar o adam seguindo esse novo ajuste de pesos, essa implementação foi
- *    completamente baseada no código fonte do Adam disponibilizado pelo Keras, então deixo os
- *    créditos a eles.
+ *    {@code var} - variável que será otimizada (peso ou bias).
  * </p>
- * @see https://d2l.ai/chapter_optimization/adam.html
+ * <p>
+ *    {@code alfa} - correção aplicada a taxa de aprendizagem.
+ * </p>
+ * <p>
+ *    {@code m} - coeficiente de momentum correspondente a variável que
+ *    será otimizada;
+ * </p>
+ * <p>
+ *    {@code v} - coeficiente de momentum de segunda orgem correspondente 
+ *    a variável que será otimizada;
+ * </p>
+ * <p>
+ *    {@code eps} - pequeno valor usado para evitar divisão por zero.
+ * </p>
+ * O valor de {@code alfa} é dado por:
+ * <pre>
+ * alfa = taxaAprendizagem * √(1- beta1ⁱ) / (1 - beta2ⁱ)
+ * </pre>
+ * Onde:
+ * <p>
+ *    {@code i} - contador de interações do Adam.
+ * </p>
+ * As atualizações de momentum de primeira e segunda ordem se dão por:
+ *<pre>
+ *m[i][j] += (1 - beta1) * (g  - m[i][j])
+ *v[i][j] += (1 - beta2) * (g² - v[i][j])
+ *</pre>
+ * Onde:
+ * <p>
+ *    {@code beta1 e beta2} - valores de decaimento dos momentums de primeira
+ *    e segunda ordem.
+ * </p>
+ * <p>
+ *    {@code g} - gradiente correspondente a variável que será otimizada.
+ * </p>
  */
 public class Adam extends Otimizador{
+
+   private static final double padraoTA = 0.001;
+   private static final double padraoBeta1 = 0.9;
+   private static final double padraoBeta2 = 0.999;
+   private static final double padraoEps = 1e-7; 
 
    /**
     * Valor de taxa de aprendizagem do otimizador.
@@ -91,7 +114,7 @@ public class Adam extends Otimizador{
    /**
     * Inicializa uma nova instância de otimizador <strong> Adam </strong> 
     * usando os valores de hiperparâmetros fornecidos.
-    * @param tA valor de taxa de aprendizagem.
+    * @param tA taxa de aprendizagem do otimizador.
     * @param beta1 decaimento do momento de primeira ordem.
     * @param beta2 decaimento do momento de segunda ordem.
     * @param epsilon usado para evitar a divisão por zero.
@@ -101,6 +124,15 @@ public class Adam extends Otimizador{
       this.beta1 = beta1;
       this.beta2 = beta2;
       this.epsilon = epsilon;
+   }
+ 
+   /**
+    * Inicializa uma nova instância de otimizador <strong> Adam </strong> 
+    * usando os valores de hiperparâmetros fornecidos.
+    * @param tA taxa de aprendizagem do otimizador.
+    */
+   public Adam(double tA){
+      this(tA, padraoBeta1, padraoBeta2, padraoEps);
    }
 
    /**
@@ -123,7 +155,7 @@ public class Adam extends Otimizador{
     * </p>
     */
    public Adam(){
-      this(0.001, 0.9, 0.999, 1e-7);
+      this(padraoTA, padraoBeta1, padraoBeta2, padraoEps);
    }
 
    @Override
@@ -146,54 +178,6 @@ public class Adam extends Otimizador{
       }
    }
 
-   /**
-    * Aplica o algoritmo do Adam para cada peso da rede neural.
-    * <p>
-    *    O Adam funciona usando a seguinte expressão:
-    * </p>
-    * <pre>
-    *    p[i] -= (alfa * m[i]) / ((√ v[i]) + eps)
-    * </pre>
-    * Onde:
-    * <p>
-    *    {@code p} - peso que será atualizado.
-    * </p>
-    * <p>
-    *    {@code alfa} - correção aplicada a taxa de aprendizagem.
-    * </p>
-    * <p>
-    *    {@code m} - coeficiente de momentum correspondente ao peso
-    *    peso que será atualizado.
-    * </p>
-    * <p>
-    *    {@code v} - coeficiente de momentum de segunda orgem correspondente 
-    *    ao peso peso que será atualizado.
-    * </p>
-    * <p>
-    *    {@code eps} - pequeno valor usado para evitar divisão por zero.
-    * </p>
-    * O valor de {@code alfa} é dado por:
-    * <pre>
-    * alfa = taxaAprendizagem * √(1- beta1ⁱ) / (1 - beta2ⁱ)
-    * </pre>
-    * Onde:
-    * <p>
-    *    {@code i} - contador de interações do Adam.
-    * </p>
-    * As atualizações de momentum de primeira e segunda ordem se dão por:
-    *<pre>
-    *m[i] += (1 - beta1) * (g  - m[i])
-    *v[i] += (1 - beta2) * (g² - v[i])
-    *</pre>
-    * Onde:
-    * <p>
-    *    {@code beta1 e beta2} - valores de decaimento dos momentums de primeira
-    *    e segunda ordem.
-    * </p>
-    * <p>
-    *    {@code g} - gradiente do peso que será atualizado
-    * </p>
-    */
    @Override
    public void atualizar(CamadaDensa[] redec){
       interacoes++;

@@ -10,6 +10,53 @@ import rna.estrutura.CamadaDensa;
  * 	Os hiperparâmetros do AMSGrad podem ser ajustados para controlar o 
  * 	comportamento do otimizador durante o treinamento.
  * </p>
+ * <p>
+ *    O AMSGrad funciona usando a seguinte expressão:
+ * </p>
+ * <pre>
+ *    v[i][j] -= (tA * mc) / ((√ vc) + eps)
+ * </pre>
+ * Onde:
+ * <p>
+ *    {@code p} - variável que será otimizada (peso ou bias).
+ * </p>
+ * <p>
+ *    {@code tA} - valor de taxa de aprendizagem.
+ * </p>
+ * <p>
+ *    {@code mc} - valor de momentum corrigido.
+ * </p>
+ * <p>
+ *    {@code vc} - valor de momentum de segunda ordem corrigido.
+ * </p>
+ * Os valores de momentum corrigido (mc) e momentum de segunda ordem
+ * corrigido (vc) se dão por:
+ * <pre>
+ *    mc = m[i][j] / (1 - beta1ⁱ)
+ * </pre>
+ * <pre>
+ *    vc = vC[i][j] / (1 - beta2ⁱ)
+ * </pre>
+ * Onde:
+ * <p>
+ *    {@code m} - valor de momentum correspondete a variável que será otimizada.
+ * </p>
+ * <p>
+ *    {@code vC} - valor de momentum de segunda ordem corrigido correspondente 
+ * 	a variável que será otimizada.
+ * </p>
+ * <p>
+ *    {@code i} - contador de interações do otimizador.
+ * </p>
+ * O valor de momentum de segunda ordem corrigido (vC) é dado por:
+ * <pre>
+ * vC[i] = max(vC[i], v[i])
+ * </pre>
+ * Onde:
+ * <p>
+ *    {@code v} - coeficiente de momentum de segunda ordem correspondente a
+ *		conexão do peso que está sendo atualizado.
+ * </p>
  */
 public class AMSGrad extends Otimizador{
 
@@ -84,6 +131,15 @@ public class AMSGrad extends Otimizador{
 	}
 
 	/**
+	 * Inicializa uma nova instância de otimizador <strong> AMSGrad </strong> usando os valores de
+	 * hiperparâmetros fornecidos.
+    * @param tA valor de taxa de aprendizagem.
+	 */
+	public AMSGrad(double tA){
+		this(tA, 0.9, 0.999, 1e-7);
+	}
+
+	/**
 	 * Inicializa uma nova instância de otimizador <strong> AMSGrad </strong>.
 	 * <p>
 	 * Os hiperparâmetros do AMSGrad serão inicializados com os valores padrão, que
@@ -130,60 +186,6 @@ public class AMSGrad extends Otimizador{
       }
    }
 
-   /**
-    * Aplica o algoritmo do AMSGrad para cada peso da rede neural.
-    * <p>
-    *    O AMSGrad funciona usando a seguinte expressão:
-    * </p>
-    * <pre>
-    *    p[i] -= (tA * mc) / ((√ vc) + eps)
-    * </pre>
-    * Onde:
-    * <p>
-    *    {@code p} - peso que será atualizado.
-    * </p>
-    * <p>
-    *    {@code tA} - valor de taxa de aprendizagem (learning rate).
-    * </p>
-    * <p>
-    *    {@code mc} - valor de momentum corrigido.
-    * </p>
-    * <p>
-    *    {@code vc} - valor de momentum de segunda ordem corrigido.
-    * </p>
-    * Os valores de momentum corrigido (mc) e momentum de segunda ordem
-    * corrigido (vc) se dão por:
-    * <pre>
-    *    mc = m[i] / (1 - beta1ⁱ)
-    * </pre>
-    * <pre>
-    *    vc = vC[i] / (1 - beta2ⁱ)
-    * </pre>
-    * Onde:
-    * <p>
-    *    {@code m} - valor de momentum correspondete a conexão do peso que está
-    *     sendo atualizado.
-    * </p>
-	 *	<p>
-	 *		{@code max2ordem} - valor máximo de segunda ordem calculado.
-	 *	</p>
-    * <p>
-    *    {@code vC} - valor de momentum de segunda ordem corrigido correspondente a 
-	 *		conexão do peso que está sendo atualizado.
-    * </p>
-    * <p>
-    *    {@code i} - contador de interações do otimizador.
-    * </p>
-	 * O valor de momentum de segunda ordem corrigido (vC) é dado por:
-	 * <pre>
-	 * vC[i] = max(vC[i], v[i])
-	 * </pre>
-	 * Onde:
-	 * <p>
-    *    {@code v} - coeficiente de momentum de segunda ordem correspondente a
-	 *		conexão do peso que está sendo atualizado.
-    * </p>
-    */
 	@Override
 	public void atualizar(CamadaDensa[] redec){
 		interacoes++;

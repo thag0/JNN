@@ -63,6 +63,7 @@ public class Treinador{
       );
 
       treino.ultimoUsado = true;
+      treinoLote.ultimoUsado = false;
    }
 
    /**
@@ -115,7 +116,7 @@ public class Treinador{
     * @return lista com os custo por época durante a fase de treinamento.
     */
    public double[] obterHistorico(){
-      return treino.historico;
+      return treino.ultimoUsado ? treino.historico : treinoLote.historico;
    }
    
 }

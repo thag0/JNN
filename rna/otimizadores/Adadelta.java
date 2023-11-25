@@ -1,16 +1,17 @@
 package rna.otimizadores;
 
+import rna.core.Mat;
 import rna.estrutura.CamadaDensa;
 
 public class Adadelta extends Otimizador{
 
    private double rho;
    private double epsilon;
-   private double[][][] ac;
-   private double[][][] acb;
+   private Mat[] ac;
+   private Mat[] acb;
 
-   private double[][][] acAt;
-   private double[][][] acAtb;
+   private Mat[] acAt;
+   private Mat[] acAtb;
 
    public Adadelta(double beta2, double epsilon){
       this.rho = beta2;
@@ -23,53 +24,60 @@ public class Adadelta extends Otimizador{
 
    @Override
    public void inicializar(CamadaDensa[] redec){
-      this.ac = new double[redec.length][][];
-      this.acAt = new double[redec.length][][];
+      this.ac   = new Mat[redec.length];
+      this.acAt = new Mat[redec.length];
 
-      this.acb = new double[redec.length][][];
-      this.acAtb = new double[redec.length][][];
+      this.acb   = new Mat[redec.length];
+      this.acAtb = new Mat[redec.length];
    
       for(int i = 0; i < redec.length; i++){
          CamadaDensa camada = redec[i];
 
-         this.ac[i] = new double[camada.pesos.lin][camada.pesos.col];
-         this.acAt[i] = new double[camada.pesos.lin][camada.pesos.col];
+         this.ac[i]   = new Mat(camada.pesos.lin, camada.pesos.col);
+         this.acAt[i] = new Mat(camada.pesos.lin, camada.pesos.col);
          
          if(camada.temBias()){
-            this.acb[i] = new double[camada.bias.lin][camada.bias.col];
-            this.acAtb[i] = new double[camada.bias.lin][camada.bias.col];
+            this.acb[i]   = new Mat(camada.bias.lin, camada.bias.col);
+            this.acAtb[i] = new Mat(camada.bias.lin, camada.bias.col);
          }
       }
    }
 
    @Override
    public void atualizar(CamadaDensa[] redec){
-      double g;
       for(int i = 0; i < redec.length; i++){
          CamadaDensa camada = redec[i];
+         Mat pesos = camada.pesos;
+         Mat grads = camada.gradientes;
 
-         for(int j = 0; j < camada.pesos.lin; j++){
-            for(int k = 0; k < camada.pesos.col; k++){
-               g = camada.gradientes.dado(j, k);
-               ac[i][j][k] = (rho * ac[i][j][k]) + ((1 - rho) * (g*g));
-               double delta = Math.sqrt(acAt[i][j][k] + epsilon) / Math.sqrt(ac[i][j][k] + epsilon) * g;
-               acAt[i][j][k] = (rho * acAt[i][j][k]) + ((1 - rho) * (delta*delta));
-               camada.pesos.add(j, k, delta);
+         for(int j = 0; j < pesos.lin; j++){
+            for(int k = 0; k < pesos.col; k++){
+               calcular(pesos, grads, ac[i], acAt[i], j, k);
             }
          }
 
          if(camada.temBias()){
-            for(int j = 0; j < camada.bias.lin; j++){
-               for(int k = 0; k < camada.bias.col; k++){
-                  g = camada.erros.dado(j, k);
-                  acb[i][j][k] = (rho * acb[i][j][k]) + ((1 - rho) * (g*g));
-                  double delta = Math.sqrt(acAtb[i][j][k] + epsilon) / Math.sqrt(acb[i][j][k] + epsilon) * g;
-                  acAtb[i][j][k] = (rho * acAtb[i][j][k]) + ((1 - rho) * (delta*delta));
-                  camada.pesos.add(j, k, delta);
+            Mat bias = camada.bias;
+            Mat gradsB = camada.erros;
+            for(int j = 0; j < bias.lin; j++){
+               for(int k = 0; k < bias.col; k++){
+                  calcular(bias, gradsB, acb[i], acAtb[i], j, k);
                }
-            }      
+            }
          }
       }
+   }
+
+   private void calcular(Mat var, Mat grad, Mat ac, Mat acAt, int lin, int col){
+      double g = grad.dado(lin, col);
+      double ac2 = (rho * ac.dado(lin, col)) + ((1 - rho) * (g*g));
+      ac.editar(lin, col, ac2);
+
+      double delta = Math.sqrt(acAt.dado(lin, col) + epsilon) / Math.sqrt(ac.dado(lin, col) + epsilon) * g;
+      double acAt2 = (rho * acAt.dado(lin, col)) + ((1 - rho) * (delta*delta));
+      acAt.editar(lin, col, acAt2);
+      
+      var.add(lin, col, delta);
    }
 
    @Override

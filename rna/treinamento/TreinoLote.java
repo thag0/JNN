@@ -7,7 +7,6 @@ import rna.core.Mat;
 import rna.core.Matriz;
 import rna.estrutura.CamadaDensa;
 import rna.estrutura.RedeNeural;
-import rna.otimizadores.GD;
 import rna.otimizadores.Otimizador;
 
 public class TreinoLote{
@@ -59,16 +58,14 @@ public class TreinoLote{
     * @param tamLote tamanho do lote.
     */
    public void treinar(RedeNeural rede, double[][] entradas, double[][] saidas, int epochs, int tamLote){      
-      CamadaDensa[] redec = rede.obterCamadas();
+      CamadaDensa[] camadas = rede.obterCamadas();
       Otimizador otimizador = rede.obterOtimizador();
+      Perda perda = rede.obterPerda();
 
-      boolean embaralhar = true;
-      if(otimizador instanceof GD){
-         embaralhar = false;
-      }
-
+      double perdaEpoca;
       for(int i = 0; i < epochs; i++){
-         if(embaralhar) aux.embaralharDados(entradas, saidas);
+         aux.embaralharDados(entradas, saidas);
+         perdaEpoca = 0;
 
          for(int j = 0; j < entradas.length; j += tamLote){
             int fimIndice = Math.min(j + tamLote, entradas.length);
@@ -76,24 +73,27 @@ public class TreinoLote{
             double[][] saidaLote = aux.obterSubMatriz(saidas, j, fimIndice);
 
             //reiniciar gradiente do lote
-            zerarGradientesAcumulados(redec);
+            zerarGradientesAcumulados(camadas);
             for(int k = 0; k < entradaLote.length; k++){
                double[] entrada = entradaLote[k];
                double[] saida = saidaLote[k];
 
                rede.calcularSaida(entrada);
-               backpropagationLote(redec, rede.obterPerda(), saida);
+               backpropagationLote(camadas, perda, saida);
+            }
+
+            if(this.calcularHistorico){
+               perdaEpoca += perda.calcular(rede.obterSaidas(), saidaLote[i]);
             }
 
             //normalizar gradientes para enviar pro otimizador
-            calcularMediaGradientesLote(redec, entradaLote.length);
-            otimizador.atualizar(redec);
+            calcularMediaGradientesLote(camadas, entradaLote.length);
+            otimizador.atualizar(camadas);
          }
 
          //feedback de avanço da rede
          if(calcularHistorico){
-            // TODO corrigir para o novo formato das funções de perda
-            //historico = aux.adicionarPerda(historico, perda.calcular(rede, entradas, saidas));
+            this.historico = aux.adicionarPerda(this.historico, perdaEpoca/tamLote);
          }
       }
    }

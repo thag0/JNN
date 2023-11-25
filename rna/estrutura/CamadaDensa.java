@@ -3,6 +3,7 @@ package rna.estrutura;
 import rna.ativacoes.*;
 import rna.core.Mat;
 import rna.core.Matriz;
+import rna.inicializadores.Constante;
 import rna.inicializadores.Inicializador;
 import rna.serializacao.DicionarioAtivacoes;
 
@@ -160,8 +161,8 @@ public class CamadaDensa implements Cloneable{
       this.usarBias = usarBias;
 
       this.entrada = new Mat(1, entrada);
-      this.pesos =   new Mat(entrada, neuronios);
       this.saida =   new Mat(1, neuronios);
+      this.pesos =   new Mat(entrada, neuronios);
       
       if(usarBias){
          this.bias = new Mat(saida.lin, saida.col);
@@ -192,30 +193,42 @@ public class CamadaDensa implements Cloneable{
     * inicializados com o método {@code inicializar()}.
     * @param entrada quantidade de conexões de entrada.
     * @param neuronios quantidade de neurônios.
-    * @param usarBias adicionar uso do bias para a camada.
     */
    public CamadaDensa(int entrada, int neuronios){
       this(entrada, neuronios, true);
    }
 
    /**
-    * Inicaliza os pesos e bias (caso tenha) da camada de acordo com o inicializador configurado.
-    * @param inicializador inicializador de pesos.
-    * @param alcance valor de alcance inicial para alguns inicializadores.
+    * Inicaliza os pesos e bias (caso tenha) da camada de acordo com o 
+    * inicializador configurado.
+    * @param iniPesos inicializador de pesos.
+    * @param iniBias inicializador de bias.
+    * @param x valor usado pelos inicializadores, dependendo do que for usado
+    * pode servir de alcance na aleatorização, valor de constante, entre outros.
     */
-   public void inicializar(Inicializador inicializador, double alcance){
-      if(inicializador == null){
+   public void inicializar(Inicializador iniPesos, Inicializador iniBias, double x){
+      if(iniPesos == null){
          throw new IllegalArgumentException(
             "O inicializador não pode ser nulo."
          );
       }
 
-      inicializador.inicializar(this.pesos, alcance);
+      iniPesos.inicializar(this.pesos, x);
+      
       if(this.usarBias){
-         inicializador.inicializar(this.bias, alcance);
+         if(iniBias == null) new Constante().inicializar(this.bias, 0.45);
+         else iniBias.inicializar(this.bias, x);
       }
+   }
 
-      this.inicializada = true;
+   /**
+    * Inicaliza os pesos da camada de acordo com o inicializador configurado.
+    * @param iniPesos inicializador de pesos.
+    * @param x valor usado pelos inicializadores, dependendo do que for usado
+    * pode servir de alcance na aleatorização, valor de constante, entre outros.
+    */
+   public void inicializar(Inicializador iniPesos, double x){
+      this.inicializar(iniPesos, null, x);
    }
 
    /**
@@ -286,11 +299,10 @@ public class CamadaDensa implements Cloneable{
     *    Em resumo a expressão que define a saída é dada por:
     * </p>
     * <pre>
-    *    somatorio = mult(pesos, entrada)
+    *somatorio = mult(pesos, entrada)
+    *saida = add(somatorio, bias)
     * </pre>
-    * <pre>
-    *    saida = add(somatorio, bias)
-    * </pre>
+    * O resultado da
     * @param entrada dados de entrada que serão processados.
     */
    public void calcularSaida(double[] entrada){
@@ -304,12 +316,13 @@ public class CamadaDensa implements Cloneable{
 
       this.entrada.substituir(0, entrada); 
 
+      //feedforward
       mat.mult(this.entrada, this.pesos, this.somatorio);
-      if(usarBias){
+      if(this.usarBias){
          mat.add(this.somatorio, this.bias, this.somatorio);
       }
 
-      ativacao.calcular(this);
+      this.ativacao.calcular(this);
    }
 
    /**

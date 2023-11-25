@@ -22,26 +22,33 @@ class Auxiliar{
    }
 
    /**
-    * 
-    * @param camadas
-    * @param perda
-    * @param real
+    * Calcular os erros de todas as camadas da rede de acordo com os valores
+    * previstos e a função de perda configurada pela Rede Neural.
+    * <p>
+    *    Os erros também podem ser chamados diretamentes de gradientes, os gradientes
+    *    específicos da camada são os gradientes em relação aos pesos dela.
+    * </p>
+	 * @param redec Lista de camadas densas da Rede Neural.
+    * @param perda função de perda da Rede Neural.
+    * @param real valores reais dos dados preditos.
     */
-   public void calcularErros(CamadaDensa[] camadas, Perda perda, double[] real){
+   public void calcularErros(CamadaDensa[] redec, Perda perda, double[] real){
       //saida
-      CamadaDensa saida = camadas[camadas.length-1];
+      //multiplicar os erros pela derivada a função de ativação
+      //da camada ta deixando o treinamento muito mais lento.
+      CamadaDensa saida = redec[redec.length-1];
       double[] erros = perda.derivada(saida.obterSaida().linha(0), real);
       for(int i = 0; i < saida.tamanhoSaida(); i++){
          saida.erros.editar(0, i, erros[i]);
       }
 
       //ocultas
-      for(int i = camadas.length-2; i >= 0; i--){
-         camadas[i].calcularDerivadas();
+      for(int i = redec.length-2; i >= 0; i--){
+         redec[i].calcularDerivadas();
 
-         Mat pesoTransposto = mat.transpor(camadas[i+1].pesos);
-         mat.mult(camadas[i+1].erros, pesoTransposto, camadas[i].erros);
-         mat.hadamard(camadas[i].derivada, camadas[i].erros, camadas[i].erros);
+         Mat pesoT = mat.transpor(redec[i+1].pesos);
+         mat.mult(redec[i+1].erros, pesoT, redec[i].erros);
+         mat.hadamard(redec[i].derivada, redec[i].erros, redec[i].erros);
       }
    }
    
@@ -96,5 +103,22 @@ class Auxiliar{
       }
 
       return subMatriz;
+   }
+
+   /**
+    * Adiciona o novo valor de perda no final do histórico.
+    * @param historico histórico com os valores de perda da rede.
+    * @param valor novo valor que será adicionado.
+    */
+   double[] adicionarPerda(double[] historico, double valor){
+      double[] aux = historico;
+      historico = new double[historico.length + 1];
+      
+      for(int i = 0; i < aux.length; i++){
+         historico[i] = aux[i];
+      }
+      historico[historico.length-1] = valor;
+
+      return historico;
    }
 }

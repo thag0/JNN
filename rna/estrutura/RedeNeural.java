@@ -18,7 +18,7 @@ public class RedeNeural implements Cloneable{
     *    Conjunto de camadas densas (ou fully connected) da Rede Neural.
     * </p>
     */
-   public CamadaDensa[] camadas;
+   private CamadaDensa[] camadas;
 
    /**
     * Array contendo a arquitetura de cada camada dentro da Rede Neural.
@@ -354,6 +354,23 @@ public class RedeNeural implements Cloneable{
    }
 
    /**
+    * Define se durante o processo de treinamento, a rede vai salvar dados relacionados a 
+    * função de custo/perda de cada época.
+    * <p>
+    *    Calcular a perda é uma operação que pode ser computacionalmente cara dependendo do 
+    *    tamanho da rede e do conjunto de dados, então deve ser bem avaliado querer habilitar 
+    *    ou não esse recurso.
+    * </p>
+    * <p>
+    *    {@code O valor padrão é false}
+    * </p>
+    * @param calcular se verdadeiro, a rede armazenará o histórico de custo de cada época.
+    */
+   public void configurarHistoricoPerda(boolean calcular){
+      this.treinador.configurarHistoricoCusto(calcular);
+   }
+
+   /**
     * Compila o modelo de Rede Neural inicializando as camadas, neurônios e pesos respectivos, 
     * baseado nos valores fornecidos.
     * <p>
@@ -485,24 +502,49 @@ public class RedeNeural implements Cloneable{
     *    Valor de função de perda configurada previamente é mantido.
     * </p>
     * @param otimizador otimizador que será usando para o treino da Rede Neural.
-    * @param inicializador inicializador de pesos dos neurônios da Rede Neural.
+    * @param iniPesos inicializador de pesos das camadas da Rede Neural.
     * @throws IllegalArgumentException se o otimizador ou inicializador forem nulos.
     */
-   public void compilar(Otimizador otimizador, Inicializador inicializador){
+   public void compilar(Otimizador otimizador, Inicializador iniPesos){
       if(otimizador == null){
          throw new IllegalArgumentException("O otimizador fornecido não pode ser nulo.");
       }
-      if(inicializador == null){
+      if(iniPesos == null){
          throw new IllegalArgumentException("O inicializador fornecido não pode ser nulo.");
       }
 
       //usando valores de configuração prévia, se forem criados.
       if(this.perda == null){
-         this.compilar(new ErroMedioQuadrado(), otimizador, inicializador);
+         this.compilar(new ErroMedioQuadrado(), otimizador, iniPesos);
 
       }else{
-         this.compilar(this.perda, otimizador, inicializador);
+         this.compilar(this.perda, otimizador, iniPesos);
       }   
+   }
+
+   /**
+    * Compila o modelo de Rede Neural inicializando as camadas, neurônios e pesos respectivos, 
+    * baseado nos valores fornecidos.
+    * <p>
+    *    Caso nenhuma configuração inicial seja feita, a rede será inicializada com os argumentos padrão. 
+    * </p>
+    * Após a compilação o modelo está pronto para ser usado, mas deverá ser treinado.
+    * <p>
+    *    Para treinar o modelo deve-se fazer uso da função função {@code treinar()} informando os 
+    *    dados necessários para a rede.
+    * </p>
+    * <p>
+    *    Para usar as predições da rede basta usar a função {@code calcularSaida()} informando os
+    *    dados necessários. Após a predição pode-se obter o resultado da rede por meio da função 
+    *    {@code obterSaidas()};
+    * </p>
+    * O inicializador dos bias será nulo e será gerenciado pela camada.
+    * @param otimizador otimizador que será usando para o treino da Rede Neural.
+    * @param iniPesos inicializador de pesos das camadas da Rede Neural.
+    * @throws IllegalArgumentException se o otimizador ou inicializador forem nulos.
+    */
+   public void compilar(Perda perda, Otimizador otimizador, Inicializador iniPesos){
+      this.compilar(perda, otimizador, iniPesos, null);
    }
 
    /**
@@ -523,11 +565,12 @@ public class RedeNeural implements Cloneable{
     * </p>
     * @param perda função de perda da Rede Neural usada durante o treinamento.
     * @param otimizador otimizador que será usando para o treino da Rede Neural.
-    * @param inicializador inicializador de pesos dos neurônios da Rede Neural.
+    * @param iniPesos inicializador de pesos das camadas da Rede Neural.
+    * @param iniPesos inicializador de bias das camadas da Rede Neural.
     * @throws IllegalArgumentException se a perda, otimizador ou inicializador forem nulos.
     */
-   public void compilar(Perda perda, Otimizador otimizador, Inicializador inicializador){
-      if(inicializador == null){
+   public void compilar(Perda perda, Otimizador otimizador, Inicializador iniPesos, Inicializador iniBias){
+      if(iniPesos == null){
          throw new IllegalArgumentException("O inicializador não pode ser nulo.");
       }
       if(perda == null){
@@ -538,7 +581,7 @@ public class RedeNeural implements Cloneable{
       }
 
       if(seedInicial != 0){
-         inicializador.configurarSeed(seedInicial);
+         iniPesos.configurarSeed(seedInicial);
          this.treinador.configurarSeed(seedInicial);
       }
 
@@ -546,7 +589,7 @@ public class RedeNeural implements Cloneable{
       this.camadas[0] = new CamadaDensa(this.arquitetura[0], this.arquitetura[1], this.bias);
       for(int i = 1; i < this.camadas.length; i++){
          this.camadas[i] = new CamadaDensa(this.arquitetura[i], this.arquitetura[i+1], this.bias);
-         this.camadas[i].inicializar(inicializador, this.alcancePeso);
+         this.camadas[i].inicializar(iniPesos, iniBias, this.alcancePeso);
          this.camadas[i].configurarId(i);
       }
 
@@ -1005,6 +1048,29 @@ public class RedeNeural implements Cloneable{
     */
    public boolean temBias(){
       return this.bias;
+   }
+
+   /**
+    * Disponibiliza o histórico da função de perda da Rede Neural durante cada época
+    * de treinamento.
+    * <p>
+    *    O histórico será o do ultimo processo de treinamento usado, seja ele sequencial ou em
+    *    lotes. Sendo assim, por exemplo, caso o treino seja em sua maioria feito pelo modo sequencial
+    *    mas logo depois é usado o treino em lotes, o histórico retornado será o do treinamento em lote.
+    * </p>
+    * @return lista contendo o histórico de perdas durante o treinamento da rede.
+    * @throws IllegalArgumentException se não foi habilitado previamente o cálculo do 
+    * histórico de custos.
+    */
+   public double[] obterHistorico(){
+      if(this.treinador.calcularHistorico){
+         return this.treinador.obterHistorico();   
+      
+      }else{
+         throw new UnsupportedOperationException(
+            "O histórico de treino da rede deve ser configurado previamente."
+         );
+      }
    }
 
    /**

@@ -58,9 +58,10 @@ public class Main{
       RedeNeural rede = new RedeNeural(arq);
 
       Perda perda = new ErroMedioQuadrado();
-      Otimizador otm = new SGD(0.001, 0.9, false);
+      Otimizador otm = new SGD(0.0001, 0.99, false);
       Inicializador ini = new Xavier();
 
+      rede.configurarSeed(1234);
       rede.compilar(perda, otm, ini);
       rede.configurarAtivacao(new TanH());
       rede.configurarAtivacao(rede.obterCamadaSaida(), new Sigmoid());
@@ -102,6 +103,19 @@ public class Main{
       }
 
       jt.dispose();
+   }
+
+   public static void exportarHistoricoPerda(RedeNeural rede, Ged ged){
+      System.out.println("Exportando histórico de perda");
+      double[] perdas = rede.obterHistorico();
+      double[][] dadosPerdas = new double[perdas.length][1];
+
+      for(int i = 0; i < dadosPerdas.length; i++){
+         dadosPerdas[i][0] = perdas[i];
+      }
+
+      Dados dados = new Dados(dadosPerdas);
+      ged.exportarCsv(dados, "historico-perda");
    }
 
    public static String formatarDecimal(double valor, int casas){

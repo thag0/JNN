@@ -8,7 +8,30 @@ import rna.estrutura.CamadaDensa;
  * Implementa uma versão do algoritmo AdaGrad (Adaptive Gradient Algorithm).
  * O algoritmo otimiza o processo de aprendizado adaptando a taxa de aprendizagem 
  * de cada parâmetro com base no histórico de atualizações 
- * anteriores
+ * anteriores.
+ * <p>
+ *    O Adagrad funciona usando a seguinte expressão:
+ * </p>
+ * <pre>
+ *    v[i][j] -= (tA * g[i][j]) / (√ ac[i][j] + eps)
+ * </pre>
+ * Onde:
+ * <p>
+ *    {@code v} - variável que será otimizada (peso ou bias).
+ * </p>
+ * <p>
+ *    {@code tA} - taxa de aprendizagem do otimizador.
+ * </p>
+ * <p>
+ *    {@code g} - gradientes correspondente a variável que será otimizada.
+ * </p>
+ * <p>
+ *    {@code ac} - acumulador de gradiente correspondente a variável que
+ *    será otimizada.d
+ * </p>
+ * <p>
+ *    {@code eps} - um valor pequeno para evitar divizões por zero.
+ * </p>
  */
 public class AdaGrad extends Otimizador{
 
@@ -46,6 +69,15 @@ public class AdaGrad extends Otimizador{
    }
 
    /**
+    * Inicializa uma nova instância de otimizador <strong> AdaGrad </strong> 
+    * usando os valores de hiperparâmetros fornecidos.
+    * @param tA valor de taxa de aprendizagem.
+    */
+   public AdaGrad(double tA){
+      this(tA, 1e-7);
+   }
+
+   /**
     * Inicializa uma nova instância de otimizador <strong> AdaGrad </strong>.
     * <p>
     *    Os hiperparâmetros do AdaGrad serão inicializados com os valores padrão, que são:
@@ -80,33 +112,6 @@ public class AdaGrad extends Otimizador{
       }
    }
 
-   /**
-    * Aplica o algoritmo do AdaGrad para cada peso da rede neural.
-    * <p>
-    *    O Adagrad funciona usando a seguinte expressão:
-    * </p>
-    * <pre>
-    *    p[i] -= (tA * g[i]) / (√ ac[i] + eps)
-    * </pre>
-    * Onde:
-    * <p>
-    *    {@code p} - peso que será atualizado.
-    * </p>
-    * <p>
-    *    {@code tA} - valor de taxa de aprendizagem (learning rate).
-    * </p>
-    * <p>
-    *    {@code g} - gradiente correspondente a conexão do peso que será
-    *    atualizado.
-    * </p>
-    * <p>
-    *    {@code ac} - acumulador de gradiente correspondente a conexão
-    *    do peso que será atualizado.
-    * </p>
-    * <p>
-    *    {@code eps} - um valor pequeno para evitar divizões por zero.
-    * </p>
-    */
    @Override
    public void atualizar(CamadaDensa[] redec){
       for(int i = 0; i < redec.length; i++){
@@ -126,28 +131,6 @@ public class AdaGrad extends Otimizador{
             for(int j = 0; j < bias.lin; j++){
                for(int k = 0; k < bias.col; k++){
                   calcular(bias, gradsB, acb[i], j, k);
-               }
-            }
-         }
-      }
-
-      for(int i = 0; i < redec.length; i++){
-         CamadaDensa camada = redec[i];
-         Mat pesos = camada.pesos;
-         Mat grads = camada.gradientes;
-
-         for(int j = 0; j < pesos.lin; j++){
-            for(int k = 0; k < pesos.col; k++){
-               calcular(pesos, grads, ac[i], j, k);
-            }
-         }
-
-         if(camada.temBias()){
-            Mat bias = camada.bias;
-            Mat gradsB = camada.erros;
-            for(int j = 0; j < bias.lin; j++){
-               for(int k = 0; k < bias.col; k++){
-                  calcular(bias, gradsB, ac[i], j, k);
                }
             }
          }
