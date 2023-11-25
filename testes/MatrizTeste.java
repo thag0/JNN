@@ -8,6 +8,8 @@ public class MatrizTeste{
    static Ged ged = new Ged();
    
    public static void main(String[] args){
+      ged.limparConsole();
+
       Matriz m = new Matriz();
 
       Mat a = new Mat(2, 2, new double[]{
@@ -20,7 +22,7 @@ public class MatrizTeste{
       });
       Mat c = new Mat(2, 2);
 
-      m.add(a, b, c);
+      m.hadamard(a, b, c);
       c.print();
    }
 }

@@ -1,5 +1,7 @@
 package rna.core;
 
+import java.util.Arrays;
+
 /**
  * Classe que representa uma matriz em forma de array com o objetivo
  * de acelerar as operações dentro da rede neural.
@@ -30,7 +32,8 @@ public class Mat implements Cloneable{
    public Mat(int lin, int col, double[] dados){
       if(lin*col != dados.length){
          throw new IllegalArgumentException(
-            "A quantidade de linhas e colunas não coincide com o tamanho do conjunto de dados fornecido."
+            "A quantidade de linhas e colunas não coincide com o " + 
+            "tamanho do conjunto de dados fornecido."
          );
       }
       this.lin = lin;
@@ -48,13 +51,29 @@ public class Mat implements Cloneable{
    }
 
    /**
-    * Auxiliar
-    * @param lin
-    * @param col
-    * @return
+    * Retorna o índice correspondente dentro do array de 
+    * elementos da matriz.
+    * @param lin índice da linha.
+    * @param col índice da coluna.
+    * @return índice correspondente dentro do array baseado 
+    * na linha e coluna fornecidas.
     */
    private int indice(int lin, int col){
-      return (lin*this.col + col);
+      //não sei se deixo essas verificações porque são importantes
+      //mas elas também pioram o desempenho
+
+      // if(lin < 0 || lin >= this.lin){
+      //    throw new IllegalArgumentException(
+      //       "Linha fornecida fora de alcance."
+      //    );
+      // }
+      // if(col < 0 || col >= this.col){
+      //    throw new IllegalArgumentException(
+      //       "Col fornecida fora de alcance."
+      //    );
+      // }
+
+      return lin*this.col + col;
    }
 
    /**
@@ -65,17 +84,6 @@ public class Mat implements Cloneable{
     * @return valor contido de acordo com os índices.
     */
    public double dado(int lin, int col){
-      if(lin < 0 || lin >= this.lin){
-         throw new IllegalArgumentException(
-            "Linha fornecida fora de alcance."
-         );
-      }
-      if(col < 0 || col >= this.col){
-         throw new IllegalArgumentException(
-            "Col fornecida fora de alcance."
-         );
-      }
-
       return this.dados[indice(lin, col)];
    }
 
@@ -84,40 +92,41 @@ public class Mat implements Cloneable{
     * valores de linha e coluna fornecidos.
     * @param lin índice da linha do elemento.
     * @param col índice da coluna do elemento.
-    * @param d novo valor que será colocado.
+    * @param valor novo valor que será colocado.
     */
-   public void editar(int lin, int col, double d){
-      if(lin < 0 || lin >= this.lin){
-         throw new IllegalArgumentException(
-            "Linha fornecida fora de alcance."
-         );
-      }
-      if(col < 0 || col >= this.col){
-         throw new IllegalArgumentException(
-            "Col fornecida fora de alcance."
-         );
-      }
-
-      this.dados[indice(lin, col)] = d;
+   public void editar(int lin, int col, double valor){
+      this.dados[indice(lin, col)] = valor;
    }
 
    /**
-    * Copia todo o conteúdo da matriz fornecida para a instância que
-    * usar o método.
+    * Subustitui todo o conteúdo da matriz velo valor fornecido.
+    * @param valor novo valor que será colocado.
+    */
+   public void preencher(double valor){
+      for(int i = 0; i < this.dados.length; i++){
+         this.dados[i] = valor;
+      }
+   }
+
+   /**
+    * Copia todo o conteúdo da matriz fornecida para a instância 
+    * que usar o método.
     * @param m matriz com os dados.
     */
    public void copiar(Mat m){
-      System.arraycopy(m.dados, 0, this.dados, 0, this.dados.length);
+      this.dados = Arrays.copyOf(this.dados, this.dados.length);
    }
    
    /**
     * Copia todo o conteúdo contido na linha indicada.
     * @param lin índice da linha desejada.
-    * @param d novos dados que serão escritos na linha. 
+    * @param dados novos dados que serão escritos na linha. 
     */
-   public void substituir(int lin, double[] d){
+   public void substituir(int lin, double[] dados){
+      int id;
       for(int i = 0; i < this.col; i++){
-         this.dados[indice(lin, i)] = d[i];
+         id = indice(lin, i);
+         this.dados[id] = dados[i];
       }
    }
 
@@ -132,10 +141,11 @@ public class Mat implements Cloneable{
     * </pre>
     * @param lin índice da linha.
     * @param col índice da coluna.
-    * @param d dado que será adicionado.
+    * @param valor dado que será adicionado.
     */
-   public void add(int lin, int col, double d){
-      this.editar(lin, col, (this.dado(lin, col) + d));
+   public void add(int lin, int col, double valor){
+      int id = indice(lin, col);
+      this.dados[id] += valor;
    }
 
    /**
@@ -149,10 +159,11 @@ public class Mat implements Cloneable{
     * </pre>
     * @param lin índice da linha.
     * @param col índice da coluna.
-    * @param d dado que será subtraído.
+    * @param valor dado que será subtraído.
     */
-   public void sub(int lin, int col, double d){
-      this.editar(lin, col, (this.dado(lin, col) - d));
+   public void sub(int lin, int col, double valor){
+      int id = indice(lin, col);
+      this.dados[id] -= valor;
    }
 
    /**
@@ -166,10 +177,11 @@ public class Mat implements Cloneable{
     * </pre>
     * @param lin índice da linha.
     * @param col índice da coluna.
-    * @param d dado que será multiplicado.
+    * @param valor dado que será multiplicado.
     */
-  public void mult(int lin, int col, double d){
-      this.editar(lin, col, (this.dado(lin, col) * d));
+  public void mult(int lin, int col, double valor){
+      int id = indice(lin, col);
+      this.dados[id] *= valor;
    }
 
    /**
@@ -183,10 +195,11 @@ public class Mat implements Cloneable{
     * </pre>
     * @param lin índice da linha.
     * @param col índice da coluna.
-    * @param d dado que será divido.
+    * @param valor dado que será divido.
     */
-  public void div(int lin, int col, double d){
-      this.editar(lin, col, this.dado(lin, col) / d);
+  public void div(int lin, int col, double valor){
+      int id = indice(lin, col);
+      this.dados[id] /= valor;
    }
 
    /**
@@ -196,11 +209,10 @@ public class Mat implements Cloneable{
     * desejada.
     */
    public double[] linha(int lin){
-      double[] l = new double[this.col];
-      for(int i = 0; i < this.col; i++){
-         l[i] = this.dado(lin, i);
-      }
-      return l;
+      int inicio = lin * this.col;
+      double[] linha = new double[this.col];
+      System.arraycopy(this.dados, inicio, linha, 0, this.col);
+      return linha;
    }
 
    /**
@@ -221,9 +233,7 @@ public class Mat implements Cloneable{
 
          clone.lin = this.lin;
          clone.col = this.col;
-         
-         clone.dados = new double[this.dados.length];
-         System.arraycopy(this.dados, 0, clone.dados, 0, this.dados.length);
+         clone.dados = Arrays.copyOf(this.dados, this.dados.length);
 
          return clone;
       }catch(CloneNotSupportedException e){

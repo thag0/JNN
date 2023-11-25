@@ -120,7 +120,7 @@ public class PainelTreino extends JPanel{
 
          try{
             for(Thread thread : threads){
-               thread.join();
+               thread.join(0);
             }
          }catch(Exception e){
 
@@ -141,7 +141,7 @@ public class PainelTreino extends JPanel{
 
          try{
             for(Thread thread : threads){
-               thread.join();
+               thread.join(0);
             }
          }catch(Exception e){
 

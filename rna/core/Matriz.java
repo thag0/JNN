@@ -247,13 +247,6 @@ public class Matriz{
       verificarLinhas(a, r);
       verificarColunas(a, r);
 
-      // for(int i = 0; i < r.lin; i++){
-      //    for(int j = 0; j < r.col; j++){
-      //       double d = a.dado(i, j) * b.dado(i, j);
-      //       r.editar(i, j, d);
-      //    }
-      // }
-
       double[] d = new double[r.col];
       for(int i = 0; i < r.lin; i++){
          for(int j = 0; j < r.col; j++){

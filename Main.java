@@ -13,7 +13,7 @@ import rna.otimizadores.*;
 
 public class Main{
    static final int epocas = 5*1000;
-   static final float escalaRender = 7;
+   static final float escalaRender = 7.5f;
    static Ged ged = new Ged();
    static Geim geim = new Geim();
 
@@ -74,7 +74,7 @@ public class Main{
 
       //acelerar o processo de desenho
       //bom em situações de janelas muito grandes
-      int numThreads = (int)(Runtime.getRuntime().availableProcessors() * 0.25);
+      int numThreads = (int)(Runtime.getRuntime().availableProcessors() * 0.5);
 
       JanelaTreino jt = new JanelaTreino(imagem.getWidth(), imagem.getHeight(), escalaRender);
       jt.desenharTreino(rede, 0, numThreads);
