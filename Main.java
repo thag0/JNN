@@ -12,8 +12,8 @@ import rna.inicializadores.*;
 import rna.otimizadores.*;
 
 public class Main{
-   static final int epocas = 5*1000;
-   static final float escalaRender = 7.5f;
+   static final int epocas = 10*1000;
+   static final float escalaRender = 8f;
    static Ged ged = new Ged();
    static Geim geim = new Geim();
 
@@ -51,6 +51,7 @@ public class Main{
       System.out.println("Precisão = " + formatarDecimal(precisao, 2) + "%");
       System.out.println("Perda = " + perda);
       System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
+      // exportarHistoricoPerda(rede, ged);
    }
 
    public static RedeNeural criarRede(int entradas, int saidas){
@@ -58,12 +59,14 @@ public class Main{
       RedeNeural rede = new RedeNeural(arq);
 
       Perda perda = new ErroMedioQuadrado();
-      Otimizador otm = new SGD(0.0001, 0.99, false);
+      Otimizador otm = new SGD(0.001, 0.995);
+      // Otimizador otm = new SGD(0.0001, 0.99);
       Inicializador ini = new Xavier();
 
       rede.configurarSeed(1234);
+      // rede.configurarHistoricoPerda(true);
       rede.compilar(perda, otm, ini);
-      rede.configurarAtivacao(new TanH());
+      rede.configurarAtivacao("tanh");
       rede.configurarAtivacao(rede.obterCamadaSaida(), new Sigmoid());
 
       return rede;
@@ -87,7 +90,8 @@ public class Main{
       
       int i = 0;
       while(i < epocas && jt.isVisible()){
-         rede.treinar(dadosEntrada, dadosSaida, epocasPorFrame);
+         rede.treinar(dadosEntrada, dadosSaida, epocasPorFrame, 64);
+         // rede.treinar(dadosEntrada, dadosSaida, epocasPorFrame);
          jt.desenharTreino(rede, i, numThreads);
          i += epocasPorFrame;
 

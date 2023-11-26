@@ -7,8 +7,8 @@ import rna.estrutura.RedeNeural;
 public class Avaliador{
    private RedeNeural rede;
 
-   EntropiaCruzada entropiaCruzada = new EntropiaCruzada();
-   EntropiaCruzadaBinaria entropiaCruzadaBinaria = new EntropiaCruzadaBinaria();
+   EntropiaCruzada ecc = new EntropiaCruzada();
+   EntropiaCruzadaBinaria ecb = new EntropiaCruzadaBinaria();
    Acuracia acuracia = new Acuracia();
    MatrizConfusao matrizConfusao = new MatrizConfusao();
    F1Score f1Score = new F1Score();
@@ -138,7 +138,7 @@ public class Avaliador{
     * @return entropia cruzada da rede em relação ao dados fornecidos (custo/perda).
     */
    public double entropiaCruzada(double[] previsto, double[] real){  
-      return entropiaCruzada.calcular(previsto, real);
+      return ecc.calcular(previsto, real);
    }
 
    /**
@@ -153,7 +153,7 @@ public class Avaliador{
       double ec = 0;
 
       for(int i = 0; i < saida.length; i++){
-         ec += entropiaCruzada.calcular(previsoes[i], saida[i]);
+         ec += ecc.calcular(previsoes[i], saida[i]);
       }
 
       ec /= saida.length;
@@ -169,7 +169,7 @@ public class Avaliador{
     * @return valor da entropia cruzada binária da rede em relação ao dados fornecidos (custo/perda).
     */
    public double entropiaCruzadaBinaria(double[] previsto, double[] real){
-      return entropiaCruzadaBinaria.calcular(previsto, real);
+      return ecb.calcular(previsto, real);
    }
 
    /**
@@ -182,15 +182,15 @@ public class Avaliador{
    public double entropiaCruzadaBinaria(double[][] entrada, double[][] saida){
       //TODO corrigir valores NaN
       double[][] previsoes = rede.calcularSaida(entrada);
-      double ecb = 0;
+      double res = 0;
 
       for(int i = 0; i < saida.length; i++){
-         ecb += entropiaCruzadaBinaria.calcular(previsoes[i], saida[i]);
+         res += ecb.calcular(previsoes[i], saida[i]);
       }
 
-      ecb /= saida.length;
+      res /= saida.length;
 
-      return ecb;
+      return res;
    }
 
    /**

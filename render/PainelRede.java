@@ -104,7 +104,7 @@ public class PainelRede extends JPanel{
       int xInicial = (largura/2) - (larguraTotal/2);
 
       x = xInicial;
-      for (CamadaDensa camada : rede.obterCamadas()){
+      for(CamadaDensa camada : rede.obterCamadas()){
          desenharCamada(camada);
          x += padCamadas;
          contadorCamadas++;

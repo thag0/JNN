@@ -67,13 +67,13 @@ public class Treino{
          perdaEpoca = 0;
          
          for(int i = 0; i < entrada.length; i++){
-            System.arraycopy(entrada[i], 0, dadoEntrada, 0, dadoEntrada.length);
-            System.arraycopy(saida[i], 0, dadoSaida, 0, dadoSaida.length);
+            aux.copiarArray(entrada[i], dadoEntrada);
+            aux.copiarArray(saida[i], dadoSaida);
 
             rede.calcularSaida(dadoEntrada);
 
             //feedback de avanço da rede
-            if(calcularHistorico){
+            if(this.calcularHistorico){
                perdaEpoca += rede.obterPerda().calcular(rede.obterSaidas(), saida[i]);
             }
 
@@ -82,7 +82,7 @@ public class Treino{
          }
 
          //feedback de avanço da rede
-         if(calcularHistorico){
+         if(this.calcularHistorico){
             this.historico = aux.adicionarPerda(this.historico, perdaEpoca/entrada.length);
          }
       }
@@ -96,12 +96,12 @@ public class Treino{
     * @param real saída real que será usada para calcular os erros e gradientes.
     */
    public void backpropagation(CamadaDensa[] camadas, Perda perda, double[] real){
-      aux.calcularErros(camadas, perda, real);
+      aux.calcularGradientes(camadas, perda, real);
 
       //gradientes ou deltas para os pesos
       for(CamadaDensa camada : camadas){
          Mat entradaT = mat.transpor(camada.entrada);
-         mat.mult(entradaT, camada.erros, camada.gradientes);
+         mat.mult(entradaT, camada.gradientes, camada.gradientePesos);
       }
    }
 
@@ -110,12 +110,12 @@ public class Treino{
       for(int i = 0; i < camadas.length; i++){
          CamadaDensa camada = camadas[i];
 
-         mat.escalar(camada.gradientes, taxaAprendizagem, camada.gradientes);
-         mat.add(camada.pesos, camada.gradientes, camada.pesos);
+         mat.escalar(camada.gradientePesos, taxaAprendizagem, camada.gradientePesos);
+         mat.add(camada.pesos, camada.gradientePesos, camada.pesos);
 
          if(camada.temBias()){
-            mat.escalar(camada.erros, taxaAprendizagem, camada.erros);
-            mat.add(camada.bias, camada.erros, camada.bias);
+            mat.escalar(camada.gradientes, taxaAprendizagem, camada.gradientes);
+            mat.add(camada.bias, camada.gradientes, camada.bias);
          }
       }
    }

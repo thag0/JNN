@@ -31,9 +31,9 @@ public class Inicializador{
    /**
     * Inicializa os valores do array de acordo com o inicializador configurado.
     * @param m matriz de dados.
-    * @param alcance valor de alcance da aleatorização
+    * @param x valor usado pelos inicializadores.
     */
-   public void inicializar(Mat m, double alcance){
+   public void inicializar(Mat m, double x){
       throw new UnsupportedOperationException(
          "Método de inicialização não implementado."
       );

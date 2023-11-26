@@ -7,10 +7,10 @@ public class LeCun extends Inicializador{
    /**
     * Aplica o algoritmo de inicialização LeCun nos pesos.
     * @param m matriz que será inicializada.
-    * @param alcance valor utilizado apenas por outros otimizadores.
+    * @param x valor utilizado apenas por outros otimizadores.
     */
    @Override
-   public void inicializar(Mat m, double alcance){
+   public void inicializar(Mat m, double x){
       double a = Math.sqrt(1.0 / m.lin);
 
       for(int i = 0; i < m.lin; i++){

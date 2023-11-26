@@ -32,14 +32,14 @@ class Auxiliar{
     * @param perda função de perda da Rede Neural.
     * @param real valores reais dos dados preditos.
     */
-   public void calcularErros(CamadaDensa[] redec, Perda perda, double[] real){
+   public void calcularGradientes(CamadaDensa[] redec, Perda perda, double[] real){
       //saida
       //multiplicar os erros pela derivada a função de ativação
       //da camada ta deixando o treinamento muito mais lento.
       CamadaDensa saida = redec[redec.length-1];
-      double[] erros = perda.derivada(saida.obterSaida().linha(0), real);
+      double[] grads = perda.derivada(saida.obterSaida().linha(0), real);
       for(int i = 0; i < saida.tamanhoSaida(); i++){
-         saida.erros.editar(0, i, erros[i]);
+         saida.gradientes.editar(0, i, grads[i]);
       }
 
       //ocultas
@@ -47,8 +47,8 @@ class Auxiliar{
          redec[i].calcularDerivadas();
 
          Mat pesoT = mat.transpor(redec[i+1].pesos);
-         mat.mult(redec[i+1].erros, pesoT, redec[i].erros);
-         mat.hadamard(redec[i].derivada, redec[i].erros, redec[i].erros);
+         mat.mult(redec[i+1].gradientes, pesoT, redec[i].gradientes);
+         mat.hadamard(redec[i].derivada, redec[i].gradientes, redec[i].gradientes);
       }
    }
    
@@ -71,14 +71,14 @@ class Auxiliar{
          idAleatorio = random.nextInt(i+1);
 
          //trocar entradas
-         System.arraycopy(entradas[i], 0, tempEntradas, 0, colEntrada);
-         System.arraycopy(entradas[idAleatorio], 0, entradas[i], 0, colEntrada);
-         System.arraycopy(tempEntradas, 0, entradas[idAleatorio], 0, colEntrada);
+         copiarArray(entradas[i], tempEntradas);
+         copiarArray(entradas[idAleatorio], entradas[i]);
+         copiarArray(tempEntradas, entradas[idAleatorio]);
 
          //trocar saídas
-         System.arraycopy(saidas[i], 0, tempSaidas, 0, colSaida);
-         System.arraycopy(saidas[idAleatorio], 0, saidas[i], 0, colSaida);
-         System.arraycopy(tempSaidas, 0, saidas[idAleatorio], 0, colSaida); 
+         copiarArray(saidas[i], tempSaidas);
+         copiarArray(saidas[idAleatorio], saidas[i]);
+         copiarArray(tempSaidas, saidas[idAleatorio]); 
       }
    }
 
@@ -120,5 +120,23 @@ class Auxiliar{
       historico[historico.length-1] = valor;
 
       return historico;
+   }
+
+   /**
+    * Copia todo o conteúdo do array fornecido para o destino.
+    * @param arr array contendo os dados.
+    * @param dest destino da cópia.
+    */
+   void copiarArray(double[] arr, double[] dest){
+      if(arr.length != dest.length){
+         throw new IllegalArgumentException(
+            "Os arrays devem conter o mesmo tamanho"
+         );
+      }
+
+      System.arraycopy(arr, 0, dest, 0, dest.length);
+      // for(int i = 0; i < arr.length; i++){
+      //    dest[i] = arr[i];
+      // }
    }
 }

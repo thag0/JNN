@@ -79,12 +79,13 @@ public class TreinoLote{
                double[] saida = saidaLote[k];
 
                rede.calcularSaida(entrada);
+               if(this.calcularHistorico){
+                  perdaEpoca += perda.calcular(rede.obterSaidas(), saidaLote[k]);
+               }
+
                backpropagationLote(camadas, perda, saida);
             }
 
-            if(this.calcularHistorico){
-               perdaEpoca += perda.calcular(rede.obterSaidas(), saidaLote[i]);
-            }
 
             //normalizar gradientes para enviar pro otimizador
             calcularMediaGradientesLote(camadas, entradaLote.length);
@@ -92,39 +93,53 @@ public class TreinoLote{
          }
 
          //feedback de avanço da rede
-         if(calcularHistorico){
-            this.historico = aux.adicionarPerda(this.historico, perdaEpoca/tamLote);
+         if(this.calcularHistorico){
+            this.historico = aux.adicionarPerda(this.historico, (perdaEpoca/tamLote));
          }
       }
    }
 
    void backpropagationLote(CamadaDensa[] redec, Perda perda, double[] real){
-      aux.calcularErros(redec, perda, real);
+      aux.calcularGradientes(redec, perda, real);
 
       //gradientes ou delta para os pesos
       for(int i = 0; i < redec.length; i++){
          CamadaDensa camada = redec[i];
          Mat entradaT = mat.transpor(camada.entrada);
-         mat.mult(entradaT, camada.erros, camada.gradientes);
-         mat.add(camada.gradientes, camada.gradientesAcumulados, camada.gradientesAcumulados);
+         mat.mult(entradaT, camada.gradientes, camada.gradientePesos);
+
+         //acumuladores
+         mat.add(camada.gradientesAcPesos, camada.gradientePesos, camada.gradientesAcPesos);
+         mat.add(camada.gradientesAcBias, camada.gradientes, camada.gradientesAcBias);
       }
    }
 
    void zerarGradientesAcumulados(CamadaDensa[] redec){
       for(CamadaDensa camada : redec){
-         mat.preencher(camada.gradientesAcumulados, 0);
+         mat.preencher(camada.gradientesAcPesos, 0);
+         mat.preencher(camada.gradientesAcBias, 0);
       }
    }
    
    void calcularMediaGradientesLote(CamadaDensa[] redec, int tamLote){
       for(CamadaDensa camada : redec){
-         mat.copiar(camada.gradientesAcumulados, camada.gradientes);
          
-         for(int i = 0; i < camada.gradientes.lin; i++){
-            for(int j = 0; j < camada.gradientes.col; j++){
-               camada.gradientes.div(i, j, tamLote);
+         for(int i = 0; i < camada.pesos.lin; i++){
+            for(int j = 0; j < camada.pesos.col; j++){
+               camada.gradientesAcPesos.div(i, j, tamLote);
             }
          }
+         mat.copiar(camada.gradientesAcPesos, camada.gradientePesos);
+
+         if(camada.temBias()){
+            for(int i = 0; i < camada.bias.lin; i++){
+               for(int j = 0; j < camada.bias.col; j++){
+                  camada.gradientesAcBias.div(i, j, tamLote);
+               }
+            }
+            mat.copiar(camada.gradientesAcBias, camada.gradientes);
+         }
+
       }
    }
 }

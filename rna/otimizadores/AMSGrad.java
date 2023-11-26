@@ -189,14 +189,13 @@ public class AMSGrad extends Otimizador{
 	@Override
 	public void atualizar(CamadaDensa[] redec){
 		interacoes++;
-
 		double forcaB1 = (1 - Math.pow(beta1, interacoes));
 		double forcaB2 = (1 - Math.pow(beta2, interacoes));
-
+		
 		for(int i = 0; i < redec.length; i++){
 			CamadaDensa camada = redec[i];
 			Mat pesos = camada.pesos;
-			Mat grads = camada.gradientes;
+			Mat grads = camada.gradientePesos;
 
 			for(int j = 0; j < pesos.lin; j++){
 				for(int k = 0; k < pesos.col; k++){
@@ -206,7 +205,7 @@ public class AMSGrad extends Otimizador{
 
          if(camada.temBias()){
 				Mat bias = camada.bias;
-				Mat gradsB = camada.erros;
+				Mat gradsB = camada.gradientes;
 
             for(int j = 0; j < bias.lin; j++){
                for(int k = 0; k < bias.col; k++){
@@ -220,20 +219,17 @@ public class AMSGrad extends Otimizador{
 	private void calcular(Mat var, Mat grad, Mat m, Mat v, Mat vc, int lin, int col, double fb1, double fb2){
 		double g = grad.dado(lin, col);
 
-		double d1 = (beta1 * m.dado(lin, col)) + ((1 - beta1) * g);
-		double d2 = (beta2 * v.dado(lin, col)) + ((1 - beta2) * g*g);
-		m.editar(lin, col, d1);
-		v.editar(lin, col, d2);
-		vc.editar(lin, col, Math.max(v.dado(lin, col), d2));
-		
-		var.add(lin, col, aplicarGradiente(m.dado(lin, col), vc.dado(lin, col), fb1, fb2));
-	}
+		double m2 = (beta1 * m.dado(lin, col)) + ((1 - beta1) * g);
+		double v2 = (beta2 * v.dado(lin, col)) + ((1 - beta2) * (g*g));
+		m.editar(lin, col, m2);
+		v.editar(lin, col, v2);
+		vc.editar(lin, col, Math.max(v.dado(lin, col), v2));
 
-	private double aplicarGradiente(double m, double vc, double forcaB1, double forcaB2){
-		double mChapeu = m / forcaB1;
-		double vChapeu = vc / forcaB2;
-		return (taxaAprendizagem * mChapeu) / (Math.sqrt(vChapeu) + epsilon);
-   }
+		double mChapeu = m.dado(lin, col) / fb1;
+		double vChapeu = vc.dado(lin, col) / fb2;
+		double att = (mChapeu * taxaAprendizagem) / (Math.sqrt(vChapeu) + epsilon);
+		var.add(lin, col, att);
+	}
 
 	@Override
 	public String info(){

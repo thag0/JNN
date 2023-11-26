@@ -154,19 +154,20 @@ public class PainelTreino extends JPanel{
 
 
    private void calcularParteImagemEscalaCinza(RedeNeural rede, int inicioY, int fimY){
-      int nEntrada = rede.obterTamanhoEntrada();
-      double[] entradaRede = new double[nEntrada];
-      int r, g, b, rgb;
+      double[] entrada = new double[rede.obterTamanhoEntrada()];
+      double[] saida = new double[rede.obterCamadaSaida().tamanhoSaida()];
 
-      int cinza;
-      for (int y = inicioY; y < fimY; y++){
-         for (int x = 0; x < this.largura; x++){
-            entradaRede[0] = (double) x / this.largura;
-            entradaRede[1] = (double) y / this.altura;
+      int r, g, b, rgb, cinza;
+      int x, y;
 
-            rede.calcularSaida(entradaRede);
+      for(y = inicioY; y < fimY; y++){
+         for(x = 0; x < this.largura; x++){
+            entrada[0] = (double) x / this.largura;
+            entrada[1] = (double) y / this.altura;
+
+            rede.calcularSaida(entrada);
             
-            double[] saida = rede.obterCamadaSaida().obterSaida().linha(0);
+            saida = rede.obterCamadaSaida().obterSaida().linha(0);
             cinza = (int)(saida[0] * 255);
             r = cinza;
             g = cinza;
@@ -179,18 +180,18 @@ public class PainelTreino extends JPanel{
 
 
    private void calcularParteImagemRGB(RedeNeural rede, int inicioY, int fimY){
-      int nEntrada = rede.obterTamanhoEntrada();
-      double[] entradaRede = new double[nEntrada];
+      double[] entrada = new double[rede.obterTamanhoEntrada()];
+      double[] saida = new double[rede.obterCamadaSaida().tamanhoSaida()];
       int r, g, b, rgb;
 
-      for (int y = inicioY; y < fimY; y++) {
+      for(int y = inicioY; y < fimY; y++){
          for (int x = 0; x < this.largura; x++){
-            entradaRede[0] = (double) x / this.largura;
-            entradaRede[1] = (double) y / this.altura;
+            entrada[0] = (double) x / this.largura;
+            entrada[1] = (double) y / this.altura;
             
-            rede.calcularSaida(entradaRede);
+            rede.calcularSaida(entrada);
 
-            double[] saida = rede.obterCamadaSaida().obterSaida().linha(0);
+            saida = rede.obterCamadaSaida().obterSaida().linha(0);
             r = (int) (saida[0] * 255);
             g = (int) (saida[1] * 255);
             b = (int) (saida[2] * 255);

@@ -132,23 +132,24 @@ public class SGD extends Otimizador{
 
    @Override
    public void atualizar(CamadaDensa[] redec){
-      for(int i = 0; i < redec.length; i++){
+      int i, j, k;
+      for(i = 0; i < redec.length; i++){
          CamadaDensa camada = redec[i];
          Mat pesos = camada.pesos;
-         Mat grads = camada.gradientes;
+         Mat gradP = camada.gradientePesos;
 
-         for(int j = 0; j < pesos.lin; j++){
-            for(int k = 0; k < pesos.col; k++){
-               calcular(pesos, grads, m[i], j, k);
+         for(j = 0; j < pesos.lin; j++){
+            for(k = 0; k < pesos.col; k++){
+               calcular(pesos, gradP, m[i], j, k);
             }
          }
 
          if(camada.temBias()){
             Mat bias = camada.bias;
-            Mat gradsB = camada.erros;
-            for(int j = 0; j < bias.lin; j++){
-               for(int k = 0; k < bias.col; k++){
-                  calcular(bias, gradsB, mb[i], j, k);
+            Mat gradB = camada.gradientes;
+            for(j = 0; j < bias.lin; j++){
+               for(k = 0; k < bias.col; k++){
+                  calcular(bias, gradB, mb[i], j, k);
                }
             }
          }

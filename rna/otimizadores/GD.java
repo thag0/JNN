@@ -62,12 +62,12 @@ public class GD extends Otimizador{
    @Override
    public void atualizar(CamadaDensa[] redec){
       for(CamadaDensa camada : redec){
-         mat.escalar(camada.gradientes, taxaAprendizagem, camada.gradientes);
-         mat.add(camada.pesos, camada.gradientes, camada.pesos);
+         mat.escalar(camada.gradientePesos, taxaAprendizagem, camada.gradientePesos);
+         mat.add(camada.pesos, camada.gradientePesos, camada.pesos);
 
          if(camada.temBias()){
-            mat.escalar(camada.erros, taxaAprendizagem, camada.erros);
-            mat.add(camada.bias, camada.erros, camada.bias);
+            mat.escalar(camada.gradientes, taxaAprendizagem, camada.gradientes);
+            mat.add(camada.bias, camada.gradientes, camada.bias);
          }
       } 
    }

@@ -244,7 +244,7 @@ public class RedeNeural implements Cloneable{
     * <p>
     *    {@code A função de ativação padrão é a ReLU para todas as camadas}
     * </p>
-    * @param ativacao valor relativo a lista de ativações disponíveis.
+    * @param ativacao instância da função de ativação.
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
    public void configurarAtivacao(Ativacao ativacao){
@@ -255,6 +255,73 @@ public class RedeNeural implements Cloneable{
       }
    }
 
+   /**
+    * Configura a função de ativação de todas as camadas da rede. É preciso
+    * compilar o modelo previamente para poder configurar suas funções de ativação.
+    * <p>
+    *    Letras maiúsculas e minúsculas não serão diferenciadas.
+    * </p>
+    * <p>
+    *    Segue a lista das funções de ativação disponíveis:
+    * </p>
+    * <ul>
+    *    <li> ReLU. </li>
+    *    <li> Sigmoid. </li>
+    *    <li> Tangente Hiperbólica. </li>
+    *    <li> Leaky ReLU. </li>
+    *    <li> ELU .</li>
+    *    <li> Swish. </li>
+    *    <li> GELU. </li>
+    *    <li> Linear. </li>
+    *    <li> Seno. </li>
+    *    <li> Argmax. </li>
+    *    <li> Softmax. </li>
+    *    <li> Softplus. </li>
+    * </ul>
+    * <p>
+    *    {@code A função de ativação padrão é a ReLU para todas as camadas}
+    * </p>
+    * @param ativacao nome da função de ativação.
+    * @throws IllegalArgumentException se o modelo não foi compilado previamente.
+    */
+   public void configurarAtivacao(String ativacao){
+      this.verificarCompilacao();
+      
+      for(CamadaDensa camada : this.camadas){
+         camada.configurarAtivacao(ativacao);
+      }
+   }
+
+   /**
+    * Configura a função de ativação da camada correspondente. É preciso
+    * compilar o modelo previamente para poder configurar suas funções de ativação.
+    * <p>
+    *    Letras maiúsculas e minúsculas não serão diferenciadas.
+    * </p>
+    * <p>
+    *    Segue a lista das funções de ativação disponíveis:
+    * </p>
+    * <ul>
+    *    <li> ReLU. </li>
+    *    <li> Sigmoid. </li>
+    *    <li> Tangente Hiperbólica. </li>
+    *    <li> Leaky ReLU. </li>
+    *    <li> ELU .</li>
+    *    <li> Swish. </li>
+    *    <li> GELU. </li>
+    *    <li> Linear. </li>
+    *    <li> Seno. </li>
+    *    <li> Argmax. </li>
+    *    <li> Softmax. </li>
+    *    <li> Softplus. </li>
+    * </ul>
+    * <p>
+    *    {@code A função de ativação padrão é a ReLU para todas as camadas}
+    * </p>
+    * @param camada camada que será configurada.
+    * @param ativacao instância da função de ativação.
+    * @throws IllegalArgumentException se o modelo não foi compilado previamente.
+    */
    public void configurarAtivacao(CamadaDensa camada, Ativacao ativacao){
       if(camada == null){
          throw new IllegalArgumentException(
@@ -265,6 +332,36 @@ public class RedeNeural implements Cloneable{
       camada.configurarAtivacao(ativacao);
    }
 
+   /**
+    * Configura a função de ativação da camada correspondente. É preciso
+    * compilar o modelo previamente para poder configurar suas funções de ativação.
+    * <p>
+    *    Letras maiúsculas e minúsculas não serão diferenciadas.
+    * </p>
+    * <p>
+    *    Segue a lista das funções de ativação disponíveis:
+    * </p>
+    * <ul>
+    *    <li> ReLU. </li>
+    *    <li> Sigmoid. </li>
+    *    <li> Tangente Hiperbólica. </li>
+    *    <li> Leaky ReLU. </li>
+    *    <li> ELU .</li>
+    *    <li> Swish. </li>
+    *    <li> GELU. </li>
+    *    <li> Linear. </li>
+    *    <li> Seno. </li>
+    *    <li> Argmax. </li>
+    *    <li> Softmax. </li>
+    *    <li> Softplus. </li>
+    * </ul>
+    * <p>
+    *    {@code A função de ativação padrão é a ReLU para todas as camadas}
+    * </p>
+    * @param camada camada que será configurada.
+    * @param ativacao nome da função de ativação.
+    * @throws IllegalArgumentException se o modelo não foi compilado previamente.
+    */
    public void configurarAtivacao(CamadaDensa camada, String ativacao){
       if(camada == null){
          throw new IllegalArgumentException(
@@ -856,7 +953,7 @@ public class RedeNeural implements Cloneable{
                   salvo = camada.pesos.dado(i, j);
                   camada.pesos.add(i, j, eps);
                   double d = (this.avaliador.erroMedioQuadrado(entradas, saidas) - custo) / eps;
-                  camada.gradientes.editar(i, j, d);
+                  camada.gradientePesos.editar(i, j, d);
                   camada.pesos.editar(i, j, salvo);
                }
             }
@@ -865,7 +962,7 @@ public class RedeNeural implements Cloneable{
                   salvo = camada.bias.dado(i, j);
                   camada.bias.add(i, j, eps);
                   double d = (this.avaliador.erroMedioQuadrado(entradas, saidas) - custo) / eps;
-                  camada.erros.editar(i, j, d);
+                  camada.gradientes.editar(i, j, d);
                   camada.bias.editar(i, j, salvo);    
                }
             }
@@ -874,14 +971,14 @@ public class RedeNeural implements Cloneable{
          for(CamadaDensa camada : this.camadas){            
             for(int i = 0; i < camada.pesos.lin; i++){
                for(int j = 0; j < camada.pesos.col; j++){
-                  camada.pesos.sub(i, j, (tA * camada.gradientes.dado(i, j)));
+                  camada.pesos.sub(i, j, (tA * camada.gradientePesos.dado(i, j)));
                }
             }
 
             if(camada.temBias()){
                for(int i = 0; i < camada.bias.lin; i++){
                   for(int j = 0; j < camada.bias.col; j++){
-                     camada.bias.sub(i, j, (tA * camada.erros.dado(i, j)));
+                     camada.bias.sub(i, j, (tA * camada.gradientes.dado(i, j)));
                   }
                }
             }
@@ -1110,8 +1207,10 @@ public class RedeNeural implements Cloneable{
       buffer += "\n" + espacamento + "Bias = " + this.bias;
       buffer += "\n\n";
 
+      //ativações
       for(int i = 0; i < this.camadas.length; i++){
-         buffer += espacamento + "Ativação camada " + i + ": " + this.camadas[i].obterAtivacao().getClass().getSimpleName() + "\n";
+         buffer += espacamento + "Ativação camada " + i + ": " + 
+         this.camadas[i].obterAtivacao().getClass().getSimpleName() + "\n";
       }
 
       //arquitetura

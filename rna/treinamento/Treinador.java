@@ -41,6 +41,7 @@ public class Treinador{
     public void configurarHistoricoCusto(boolean calcularHistorico){
       this.calcularHistorico = calcularHistorico;
       treino.configurarHistorico(calcularHistorico);
+      treinoLote.configurarHistorico(calcularHistorico);
    }
 
    /**

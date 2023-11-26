@@ -4,7 +4,6 @@ import java.text.DecimalFormat;
 
 import rna.estrutura.RedeNeural;
 import rna.inicializadores.*;
-import rna.ativacoes.*;
 import rna.avaliacao.perda.*;
 import rna.otimizadores.*;
 import ged.Dados;
@@ -46,13 +45,12 @@ public class ExemploClassificacao{
       RedeNeural rede = new RedeNeural(arq);
 
       Perda perda = new EntropiaCruzada();
-      Otimizador otimizador = new SGD(0.001, 0.9);
+      Otimizador otimizador = new SGD(0.001, 0.99);
       Inicializador inicializador = new Xavier();
 
       rede.compilar(perda, otimizador, inicializador);
-      rede.configurarAtivacao(new TanH());
+      rede.configurarAtivacao("sigmoid");
       rede.configurarAtivacao(rede.obterCamadaSaida(), "softmax");
-      System.out.println(rede.info());
       
       //treinando e avaliando os resultados
       rede.treinar(treinoX, treinoY, 5_000);
@@ -69,7 +67,6 @@ public class ExemploClassificacao{
 
    public static void compararSaidaRede(RedeNeural rede, double[][] dadosEntrada, double[][] dadosSaida, String texto){
       int nEntrada = rede.obterTamanhoEntrada();
-
       int nSaida = rede.obterCamadaSaida().quantidadeNeuronios();
 
       double[] entrada_rede = new double[nEntrada];

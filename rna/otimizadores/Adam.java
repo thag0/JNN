@@ -188,7 +188,7 @@ public class Adam extends Otimizador{
       for(int i = 0; i < redec.length; i++){
          CamadaDensa camada = redec[i];
          Mat pesos = camada.pesos;
-         Mat grads = camada.gradientes;
+         Mat grads = camada.gradientePesos;
 
          for(int j = 0; j < camada.pesos.lin; j++){
             for(int k = 0; k < camada.pesos.col; k++){
@@ -198,7 +198,7 @@ public class Adam extends Otimizador{
          
          if(camada.temBias()){
             Mat bias = camada.bias;
-            Mat gradsB = camada.erros;
+            Mat gradsB = camada.gradientes;
             for(int j = 0; j < bias.lin; j++){
                for(int k = 0; k < bias.col; k++){
                   calcular(bias, gradsB, mb[i], vb[i], j, k, alfa, forcaB1, forcaB2);

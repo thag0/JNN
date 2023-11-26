@@ -7,10 +7,10 @@ public class He extends Inicializador{
    /**
     * Aplica o algoritmo de inicialização He nos pesos.
     * @param m matriz que será inicializada.
-    * @param alcance valor utilizado apenas por outros otimizadores.
+    * @param x valor utilizado apenas por outros otimizadores.
     */
    @Override
-   public void inicializar(Mat m, double alcance){
+   public void inicializar(Mat m, double x){
       double a = Math.sqrt(2.0 / m.lin);
 
       for(int i = 0; i < m.lin; i++){

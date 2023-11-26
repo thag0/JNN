@@ -1,7 +1,5 @@
 package rna.core;
 
-import java.util.Arrays;
-
 /**
  * Classe que representa uma matriz em forma de array com o objetivo
  * de acelerar as operações dentro da rede neural.
@@ -48,6 +46,55 @@ public class Mat implements Cloneable{
     */
    public Mat(int lin, int col){
       this(lin, col, new double[lin*col]);
+   }
+
+   /**
+    * Inicializa uma nova matriz com seus dados vazios.
+    * @param lin quantidade de linhas da matriz.
+    * @param col quantidade de colunas da matriz.
+    */
+   public Mat(double[][] m){
+      int n = m[0].length;
+      for(int i = 1; i < m.length; i++){
+         if(n != m[i].length){
+            throw new IllegalArgumentException(
+               "As colunas da matriz não podem ter tamanhos diferentes."
+            );
+         }
+      }
+
+      this.lin = m.length;
+      this.col = n;
+      this.dados = new double[this.lin * this.col];
+      
+      int indice = 0;
+      for(int i = 0; i < this.lin; i++){
+         for(int j = 0; j < this.col; j++){
+            this.dados[indice++] = m[i][j];
+         }
+      }
+   }
+
+   /**
+    * Configura o novo formato de representação da matriz.
+    * <p>
+    *    Os dados contidos na matriz são representador com uma estrutura
+    *    vetorial, alterar a quantidade de linha ou colunas não interfere
+    *    no conteúdo dos dados, apenas na forma como eles são representados.
+    * </p>
+    * @param lin nova quantidade de linhas.
+    * @param col nova quantidade de colunas.
+    * @throws IllegalArgumentException se o novo formato for inválido.
+    */
+   public void configurarFormato(int lin, int col){
+      if((lin*col) != this.dados.length){
+         throw new IllegalArgumentException(
+            "O novo formato deve coinscidir com o tamanho dos dados."
+         );
+      }
+
+      this.lin = lin;
+      this.col = col;
    }
 
    /**
@@ -114,15 +161,33 @@ public class Mat implements Cloneable{
     * @param m matriz com os dados.
     */
    public void copiar(Mat m){
-      this.dados = Arrays.copyOf(this.dados, this.dados.length);
+      System.arraycopy(m.dados, 0, this.dados, 0, this.dados.length);
    }
    
+   /**
+    * Copia todo o conteúdo da matriz fornecida para a instância 
+    * que usar o método.
+    * @param m matriz com os dados.
+    */
+   public void copiar(double[][] m){
+      if(this.lin != m.length || this.col != m[0].length){
+         throw new IllegalArgumentException(
+            "Dimensões incompatíveis."
+         );
+      }
+      for(int i = 0; i < this.lin; i++){
+         for(int j = 0; j < this.col; j++){
+            this.dados[indice(i, j)] = m[i][j];
+         }
+      }
+   }
+
    /**
     * Copia todo o conteúdo contido na linha indicada.
     * @param lin índice da linha desejada.
     * @param dados novos dados que serão escritos na linha. 
     */
-   public void substituir(int lin, double[] dados){
+   public void copiar(int lin, double[] dados){
       int id;
       for(int i = 0; i < this.col; i++){
          id = indice(lin, i);
@@ -209,35 +274,64 @@ public class Mat implements Cloneable{
     * desejada.
     */
    public double[] linha(int lin){
-      int inicio = lin * this.col;
+      if(lin < 0 || lin >= this.lin){
+         throw new IllegalArgumentException(
+            "Índice de linha (" + lin + ") inválido."
+         );
+      }
+
       double[] linha = new double[this.col];
+      int inicio = lin * this.col;
       System.arraycopy(this.dados, inicio, linha, 0, this.col);
       return linha;
+   }
+
+   /**
+    * Retorna o conteúdo da coluna indicada.
+    * @param col índice da coluna.
+    * @return array contendo os valores dentro da linha 
+    * desejada.
+    */
+   public double[] coluna(int col){
+      if(col < 0 || col >= this.col){
+         throw new IllegalArgumentException(
+            "Índice de coluna (" + col + ") inválido."
+         );
+      }
+
+      double[] coluna = new double[this.lin];
+      for(int i = 0; i < this.lin; i++){
+         coluna[i] = this.dado(i, col);
+      }
+
+      return coluna;
    }
 
    /**
     * Exibe o conteúdo contido na matriz.
     */
    public void print(){
+      System.out.println("Mat = [");
+
       for(int i = 0; i < this.lin; i++){
+         System.out.print("   ");
          for(int j = 0; j < this.col; j++){
-            System.out.print(this.dado(i, j) + " ");
+            System.out.print(this.dado(i, j) + "  ");
          }
          System.out.println();
       }
+
+      System.out.println("]");
    }
 
+   /**
+    * Cria uma nova matriz contendo os mesmo valores
+    * da original.
+    * @return nova matriz com os mesmos dados.
+    */
    public Mat clone(){
-      try{
-         Mat clone = (Mat) super.clone();
-
-         clone.lin = this.lin;
-         clone.col = this.col;
-         clone.dados = Arrays.copyOf(this.dados, this.dados.length);
-
-         return clone;
-      }catch(CloneNotSupportedException e){
-         throw new RuntimeException(e);
-      }
+      Mat clone = new Mat(this.lin, this.col);
+      System.arraycopy(this.dados, 0, clone.dados, 0, this.dados.length);
+      return clone;
    }
 }

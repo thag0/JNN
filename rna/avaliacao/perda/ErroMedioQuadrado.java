@@ -2,19 +2,9 @@ package rna.avaliacao.perda;
 
 public class ErroMedioQuadrado extends Perda{
 
-   private void verificarDimensoes(int tamPrevisto, int tamReal){
-      if(tamPrevisto != tamReal){
-         throw new IllegalArgumentException(
-            "Dimensões de dados previstos (" + tamPrevisto + 
-            ") diferente da dimensão dos dados reais (" + tamReal + 
-            ")"
-         );
-      }
-   }
-
    @Override
    public double calcular(double[] previsto, double[] real){
-      verificarDimensoes(previsto.length, real.length);
+      super.verificarDimensoes(previsto, real);
       
       int amostras = previsto.length;
       double emq = 0.0;
@@ -29,7 +19,7 @@ public class ErroMedioQuadrado extends Perda{
    
    @Override
    public double[] derivada(double[] previsto, double[] real){
-      verificarDimensoes(previsto.length, real.length);
+      super.verificarDimensoes(previsto, real);
       
       int amostras = previsto.length;
       double[] derivadas = new double[previsto.length];

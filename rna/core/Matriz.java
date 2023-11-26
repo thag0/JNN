@@ -65,8 +65,9 @@ public class Matriz{
     * @param val valor desejado para preenchimento.
     */
    public void preencher(Mat m, double val){
-      for(int i = 0; i < m.lin; i++){
-         for(int j = 0; j < m.col; j++){
+      int i, j;
+      for(i = 0; i < m.lin; i++){
+         for(j = 0; j < m.col; j++){
             m.editar(i, j, val);
          }
       }    
@@ -78,8 +79,9 @@ public class Matriz{
     * @param val valor desejado para preenchimento.
     */
    public void preencher(double[][] m, double val){
-      for(int i = 0; i < m.length; i++){
-         for(int j = 0; j < m[i].length; j++){
+      int i, j;
+      for(i = 0; i < m.length; i++){
+         for(j = 0; j < m[i].length; j++){
             m[i][j] = val;
          }
       }    
@@ -93,13 +95,32 @@ public class Matriz{
    public Mat transpor(Mat m){
       Mat t = new Mat(m.col, m.lin);
 
-      for(int i = 0; i < t.lin; i++){
-         for(int j = 0; j < t.col; j++){
+      int i, j;
+      for(i = 0; i < t.lin; i++){
+         for(j = 0; j < t.col; j++){
             t.editar(i, j, m.dado(j, i));
          }
       }
 
       return t;
+   }
+
+   /**
+    * Cria uma matriz identidade baseada no tamanho fornecido.
+    * @param tamanho tamanho da matriz, valor usado tanto para
+    * o número de linhas quanto para o número de colunas.
+    * @return matriz identidade.
+    */
+   public Mat identidade(int tamanho){
+      Mat id = new Mat(tamanho, tamanho);
+      
+      for(int i = 0; i < id.lin; i++){
+         for(int j = 0; j < id.col; j++){
+            id.editar(i, j, (i == j ? 1 : 0));
+         }
+      }
+
+      return id;
    }
 
    /**
@@ -118,10 +139,12 @@ public class Matriz{
       verificarLinhas(a, r);
       verificarColunas(r, b);
 
-      for(int i = 0; i < r.lin; i++){
-         for(int j = 0; j < r.col; j++){
-            double res = 0;
-            for(int k = 0; k < a.col; k++){
+      int i, j, k;
+      double res;
+      for(i = 0; i < r.lin; i++){
+         for(j = 0; j < r.col; j++){
+            res = 0;
+            for(k = 0; k < a.col; k++){
                res += a.dado(i, k) * b.dado(k, j);
             }
             r.editar(i, j, res);    
@@ -196,12 +219,13 @@ public class Matriz{
       verificarLinhas(a, r);
       verificarColunas(a, r);
 
-      double[] d = new double[r.col];
-      for(int i = 0; i < r.lin; i++){
-         for(int j = 0; j < r.col; j++){
-            d[j] = a.dado(i, j) + b.dado(i, j);
+      int i, j;
+      double d;
+      for(i = 0; i < r.lin; i++){
+         for(j = 0; j < r.col; j++){
+            d = a.dado(i, j) + b.dado(i, j);
+            r.editar(i, j, d);
          }
-         r.substituir(i, d);
       }
    }
 
@@ -221,12 +245,13 @@ public class Matriz{
       verificarLinhas(a, r);
       verificarColunas(a, r);
 
-      double[] d = new double[r.col];
-      for(int i = 0; i < r.lin; i++){
-         for(int j = 0; j < r.col; j++){
-            d[j] = a.dado(i, j) - b.dado(i, j);
+      int i, j;
+      double d;
+      for(i = 0; i < r.lin; i++){
+         for(j = 0; j < r.col; j++){
+            d = a.dado(i, j) - b.dado(i, j);
+            r.editar(i, j, d);
          }
-         r.substituir(i, d);
       }
    }
 
@@ -246,12 +271,13 @@ public class Matriz{
       verificarLinhas(a, r);
       verificarColunas(a, r);
 
-      double[] d = new double[r.col];
-      for(int i = 0; i < r.lin; i++){
-         for(int j = 0; j < r.col; j++){
-            d[j] = a.dado(i, j) * b.dado(i, j);
+      int i, j;
+      double d;
+      for(i = 0; i < r.lin; i++){
+         for(j = 0; j < r.col; j++){
+            d = a.dado(i, j) * b.dado(i, j);
+            r.editar(i, j, d);
          }
-         r.substituir(i, d);
       }
    }
 
@@ -269,9 +295,10 @@ public class Matriz{
       verificarLinhas(a, r);
       verificarColunas(a, r);
 
-      for(int i = 0; i < r.lin; i++){
-         r.substituir(i, a.linha(i));
-         for(int j = 0; j < r.col; j++){
+      int i, j;
+      for(i = 0; i < r.lin; i++){
+         r.copiar(i, a.linha(i));
+         for(j = 0; j < r.col; j++){
             r.mult(i, j, e);
          }
       }

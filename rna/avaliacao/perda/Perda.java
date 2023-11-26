@@ -25,4 +25,20 @@ public abstract class Perda{
          "É necessário implementar o cálculo de derivada."
       );
    }
+
+   /**
+    * Auxiliar para verificar se os tamanhos dos arrays que serão usados
+    * pelas funções de perda são iguais.
+    * @param previsto dados previstos.
+    * @param real dados rotulados.
+    */
+   protected void verificarDimensoes(double[] previsto, double[] real){
+      if(previsto.length != real.length){
+         throw new IllegalArgumentException(
+            "Dimensões de dados previstos (" + previsto.length + 
+            ") diferente da dimensão dos dados reais (" + real.length + 
+            ")"
+         );
+      }
+   }
 }
