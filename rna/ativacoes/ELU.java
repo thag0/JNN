@@ -39,24 +39,31 @@ public class ELU extends Ativacao{
 
    @Override
    public void calcular(CamadaDensa camada){
-      for(int i = 0; i < camada.saida.lin; i++){
-         for(int j = 0; j < camada.saida.col; j++){
-            camada.saida.editar(i, j, elu(camada.somatorio.dado(i, j)));
+      int i, j;
+      double s;
+      for(i = 0; i < camada.saida.lin; i++){
+         for(j = 0; j < camada.saida.col; j++){
+            s = elu(camada.somatorio.dado(i, j));
+            camada.saida.editar(i, j, s);
          }
       }
    }
 
    @Override
    public void derivada(CamadaDensa camada){
-      for(int i = 0; i < camada.derivada.lin; i++){
-         for(int j = 0; j < camada.derivada.col; j++){
-            camada.derivada.editar(i, j, derivada(camada.somatorio.dado(i, j)));
+      int i, j;
+      double d;
+
+      for(i = 0; i < camada.derivada.lin; i++){
+         for(j = 0; j < camada.derivada.col; j++){
+            d = derivada(camada.somatorio.dado(i, j));
+            camada.derivada.editar(i, j, d);
          }
       }
    }
 
    private double elu(double x){
-      return x > 0 ? x : alfa * Math.exp(x) - 1;
+      return x > 0 ? x : alfa * (Math.exp(x) - 1);
    }
 
    private double derivada(double x){

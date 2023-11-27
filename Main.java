@@ -12,7 +12,7 @@ import rna.inicializadores.*;
 import rna.otimizadores.*;
 
 public class Main{
-   static final int epocas = 10*1000;
+   static final int epocas = 5*1000;
    static final float escalaRender = 8f;
    static Ged ged = new Ged();
    static Geim geim = new Geim();
@@ -59,9 +59,9 @@ public class Main{
       RedeNeural rede = new RedeNeural(arq);
 
       Perda perda = new ErroMedioQuadrado();
-      Otimizador otm = new SGD(0.001, 0.995);
-      // Otimizador otm = new SGD(0.0001, 0.99);
-      Inicializador ini = new Xavier();
+      // Otimizador otm = new SGD(0.001, 0.995);
+      Otimizador otm = new SGD(0.0001, 0.99);
+      Inicializador ini = new LeCun();
 
       rede.configurarSeed(1234);
       // rede.configurarHistoricoPerda(true);
@@ -90,8 +90,8 @@ public class Main{
       
       int i = 0;
       while(i < epocas && jt.isVisible()){
-         rede.treinar(dadosEntrada, dadosSaida, epocasPorFrame, 64);
-         // rede.treinar(dadosEntrada, dadosSaida, epocasPorFrame);
+         // rede.treinar(dadosEntrada, dadosSaida, epocasPorFrame, 64);
+         rede.treinar(dadosEntrada, dadosSaida, epocasPorFrame);
          jt.desenharTreino(rede, i, numThreads);
          i += epocasPorFrame;
 

@@ -8,6 +8,9 @@ import rna.estrutura.CamadaDensa;
  */
 public class GELU extends Ativacao{
 
+   private final double RAIZ_2_POR_PI = Math.sqrt(2 / Math.PI); 
+   private final double ALFA = 0.044715;
+
    /**
     * Intancia uma nova função de ativação GELU.
     */
@@ -17,29 +20,40 @@ public class GELU extends Ativacao{
 
    @Override
    public void calcular(CamadaDensa camada){
-      for(int i = 0; i < camada.saida.lin; i++){
-         for(int j = 0; j < camada.saida.col; j++){
-            camada.saida.editar(i, j, gelu(camada.somatorio.dado(i, j)));
+      int i, j;
+      double s;
+
+      for(i = 0; i < camada.saida.lin; i++){
+         for(j = 0; j < camada.saida.col; j++){
+            s = gelu(camada.somatorio.dado(i, j));
+            camada.saida.editar(i, j, s);
          }
       }
    }
 
    @Override
    public void derivada(CamadaDensa camada){
-      for(int i = 0; i < camada.derivada.lin; i++){
-         for(int j = 0; j < camada.derivada.col; j++){
-            camada.derivada.editar(i, j, derivada(camada.somatorio.dado(i, j)));
+      int i, j;
+      double d;
+
+      for(i = 0; i < camada.derivada.lin; i++){
+         for(j = 0; j < camada.derivada.col; j++){
+            d = derivada(camada.somatorio.dado(i, j));
+            camada.derivada.editar(i, j, d);
          }
       }
    }
 
    private double gelu(double x){
-      return x = 0.5 * x * (1.0 + Math.tanh(Math.sqrt(2.0 / Math.PI) * (x + 0.044715 * Math.pow(x, 3))));  
+      double xCubo = x * x * x;
+      double tanh = Math.tanh(RAIZ_2_POR_PI * (x + ALFA * xCubo));
+      return 0.5 * x * (1.0 + tanh);
    }
 
    private double derivada(double x){
-      double cdf;
-      cdf = 0.5 * (1.0 + Math.tanh(Math.sqrt(2.0 / Math.PI) * (x + 0.044715 * Math.pow(x, 3))));
-      return 0.5 * (1.0 + cdf + x * Math.exp(-Math.pow(x, 2) / 2.0) / Math.sqrt(2.0 * Math.PI));
+      double xCubo = x * x * x;
+      double tanh = Math.tanh(RAIZ_2_POR_PI * (x + ALFA * xCubo));
+      double exp = Math.exp(-0.5 * x * x) / RAIZ_2_POR_PI;
+      return 0.5 * (1.0 + tanh + x * exp);
    }
 }

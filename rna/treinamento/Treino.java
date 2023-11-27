@@ -3,14 +3,13 @@ package rna.treinamento;
 import java.util.Random;
 
 import rna.avaliacao.perda.Perda;
-import rna.core.Mat;
-import rna.core.Matriz;
+import rna.core.OpMatriz;
 import rna.estrutura.CamadaDensa;
 import rna.estrutura.RedeNeural;
 import rna.otimizadores.Otimizador;
 
 public class Treino{
-   Matriz mat = new Matriz();
+   OpMatriz mat = new OpMatriz();
    public boolean calcularHistorico = false;
    double[] historico;
    Auxiliar aux = new Auxiliar();
@@ -100,8 +99,7 @@ public class Treino{
 
       //gradientes ou deltas para os pesos
       for(CamadaDensa camada : camadas){
-         Mat entradaT = mat.transpor(camada.entrada);
-         mat.mult(entradaT, camada.gradientes, camada.gradientePesos);
+         mat.mult(camada.entrada.transpor(), camada.gradientes, camada.gradientePesos);
       }
    }
 

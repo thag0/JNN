@@ -15,15 +15,14 @@ public class Swish extends Ativacao{
 
    }
 
-   private double sigmoid(double x){
-      return (1 / (1 + Math.exp(-x)) );
-   }
-
    @Override
    public void calcular(CamadaDensa camada){
-      for(int i = 0; i < camada.saida.lin; i++){
-         for(int j = 0; j < camada.saida.col; j++){
-            double s = camada.somatorio.dado(i, j) * sigmoid(camada.somatorio.dado(i, j));
+      int i, j;
+      double s;
+
+      for(i = 0; i < camada.saida.lin; i++){
+         for(j = 0; j < camada.saida.col; j++){
+            s = swish(camada.somatorio.dado(i, j));
             camada.saida.editar(i, j, s);
          }
       }
@@ -31,12 +30,27 @@ public class Swish extends Ativacao{
 
    @Override
    public void derivada(CamadaDensa camada){
-      for(int i = 0; i < camada.derivada.lin; i++){
-         for(int j = 0; j < camada.derivada.col; j++){
-            double sig = sigmoid(camada.somatorio.dado(i, j));
-            double d = sig + (camada.somatorio.dado(i, j) * sig * (1 - sig));
+      int i, j;
+      double d;
+
+      for(i = 0; i < camada.derivada.lin; i++){
+         for(j = 0; j < camada.derivada.col; j++){
+            d = derivada(camada.somatorio.dado(i, j));
             camada.derivada.editar(i, j, d);
          }
       }
+   }
+
+   private double swish(double x){
+      return x * sigmoid(x);
+   }
+
+   private double derivada(double x){
+      double sig = sigmoid(x);
+      return sig + (x * sig * (1 - sig));
+   }
+
+   private double sigmoid(double x){
+      return 1 / (1 + Math.exp(-x));
    }
 }

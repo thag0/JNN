@@ -188,11 +188,30 @@ public class Mat implements Cloneable{
     * @param dados novos dados que serão escritos na linha. 
     */
    public void copiar(int lin, double[] dados){
-      int id;
-      for(int i = 0; i < this.col; i++){
-         id = indice(lin, i);
-         this.dados[id] = dados[i];
+      int id = lin*this.col;
+      System.arraycopy(dados, 0, this.dados, id, dados.length);
+
+      // for(int i = 0; i < this.col; i++){
+      //    id = indice(lin, i);
+      //    this.dados[id] = dados[i];
+      // }
+   }
+
+   /**
+    * Transpõe o conteúdo da matriz, invertendo suas linhas e colunas.
+    * @return matriz transposta.
+    */
+   public Mat transpor(){
+      Mat t = new Mat(this.col, this.lin);
+
+      int i, j;
+      for(i = 0; i < t.lin; i++){
+         for(j = 0; j < t.col; j++){
+            t.editar(i, j, this.dado(j, i));
+         }
       }
+
+      return t;
    }
 
    /**

@@ -3,14 +3,13 @@ package rna.treinamento;
 import java.util.Random;
 
 import rna.avaliacao.perda.Perda;
-import rna.core.Mat;
-import rna.core.Matriz;
+import rna.core.OpMatriz;
 import rna.estrutura.CamadaDensa;
 import rna.estrutura.RedeNeural;
 import rna.otimizadores.Otimizador;
 
 public class TreinoLote{
-   Matriz mat = new Matriz();
+   OpMatriz mat = new OpMatriz();
    Auxiliar aux = new Auxiliar();
    Random random = new Random();
 
@@ -105,8 +104,7 @@ public class TreinoLote{
       //gradientes ou delta para os pesos
       for(int i = 0; i < redec.length; i++){
          CamadaDensa camada = redec[i];
-         Mat entradaT = mat.transpor(camada.entrada);
-         mat.mult(entradaT, camada.gradientes, camada.gradientePesos);
+         mat.mult(camada.entrada.transpor(), camada.gradientes, camada.gradientePesos);
 
          //acumuladores
          mat.add(camada.gradientesAcPesos, camada.gradientePesos, camada.gradientesAcPesos);

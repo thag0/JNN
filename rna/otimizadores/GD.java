@@ -1,6 +1,6 @@
 package rna.otimizadores;
 
-import rna.core.Matriz;
+import rna.core.OpMatriz;
 import rna.estrutura.CamadaDensa;
 
 /**
@@ -27,7 +27,7 @@ public class GD extends Otimizador{
    /**
     * Operador matricial para o otimizador.
     */
-   Matriz mat = new Matriz();
+   OpMatriz mat = new OpMatriz();
 
    /**
     * Valor de taxa de aprendizagem do otimizador.

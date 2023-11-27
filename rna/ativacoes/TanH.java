@@ -33,6 +33,6 @@ public class TanH extends Ativacao{
    }
 
    private double tanh(double x){
-      return 2 / (1 + Math.exp(-2*x)) -1;
+      return 2 / (1 + Math.exp(-2 * x)) - 1;
    }
 }

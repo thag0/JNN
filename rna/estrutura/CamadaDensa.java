@@ -3,7 +3,7 @@ package rna.estrutura;
 import rna.ativacoes.Ativacao;
 import rna.ativacoes.ReLU;
 import rna.core.Mat;
-import rna.core.Matriz;
+import rna.core.OpMatriz;
 import rna.inicializadores.Constante;
 import rna.inicializadores.Inicializador;
 import rna.serializacao.DicionarioAtivacoes;
@@ -24,7 +24,7 @@ public class CamadaDensa implements Cloneable{
    /**
     * Operador matricial para a camada densa.
     */
-   private Matriz mat = new Matriz();
+   private OpMatriz mat = new OpMatriz();
 
    //core
 
@@ -177,7 +177,7 @@ public class CamadaDensa implements Cloneable{
       this.entrada = new Mat(1, entrada);
       this.saida =   new Mat(1, neuronios);
       this.pesos =   new Mat(entrada, neuronios);
-      
+
       if(usarBias){
          this.bias = new Mat(this.saida.lin, this.saida.col);
       }
@@ -231,7 +231,7 @@ public class CamadaDensa implements Cloneable{
       iniPesos.inicializar(this.pesos, x);
       
       if(this.usarBias){
-         if(iniBias == null) new Constante().inicializar(this.bias, 0.45);
+         if(iniBias == null) new Constante().inicializar(this.bias, 0);
          else iniBias.inicializar(this.bias, x);
       }
    }
@@ -332,9 +332,9 @@ public class CamadaDensa implements Cloneable{
       this.entrada.copiar(0, entrada); 
 
       //feedforward
-      mat.mult(this.entrada, this.pesos, this.somatorio);
+      this.mat.mult(this.entrada, this.pesos, this.somatorio);
       if(this.usarBias){
-         mat.add(this.somatorio, this.bias, this.somatorio);
+         this.mat.add(this.somatorio, this.bias, this.somatorio);
       }
 
       this.ativacao.calcular(this);

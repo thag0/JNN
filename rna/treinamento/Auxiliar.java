@@ -4,13 +4,12 @@ import java.util.Random;
 
 import rna.avaliacao.perda.Perda;
 import rna.core.Array;
-import rna.core.Mat;
-import rna.core.Matriz;
+import rna.core.OpMatriz;
 import rna.estrutura.CamadaDensa;
 
 class Auxiliar{
    Random random = new Random();
-   Matriz mat = new Matriz();
+   OpMatriz mat = new OpMatriz();
    Array arr = new Array();
 
    /**
@@ -22,11 +21,12 @@ class Auxiliar{
    }
 
    /**
-    * Calcular os erros de todas as camadas da rede de acordo com os valores
+    * Calcular os gradientes de todas as camadas da rede de acordo com os valores
     * previstos e a função de perda configurada pela Rede Neural.
     * <p>
-    *    Os erros também podem ser chamados diretamentes de gradientes, os gradientes
-    *    específicos da camada são os gradientes em relação aos pesos dela.
+    *    Multiplicar os erros pela derivada a função de ativação
+    *    da camada ta deixando o treinamento muito mais lento, não 
+    *    sei se deveria acontecer isso.
     * </p>
 	 * @param redec Lista de camadas densas da Rede Neural.
     * @param perda função de perda da Rede Neural.
@@ -34,21 +34,18 @@ class Auxiliar{
     */
    public void calcularGradientes(CamadaDensa[] redec, Perda perda, double[] real){
       //saida
-      //multiplicar os erros pela derivada a função de ativação
-      //da camada ta deixando o treinamento muito mais lento.
       CamadaDensa saida = redec[redec.length-1];
-      double[] grads = perda.derivada(saida.obterSaida().linha(0), real);
-      for(int i = 0; i < saida.tamanhoSaida(); i++){
-         saida.gradientes.editar(0, i, grads[i]);
-      }
+      double[] previsto = saida.obterSaida().linha(0);
+      double[] grads = perda.derivada(previsto, real);
+      saida.gradientes.copiar(0, grads);
 
       //ocultas
       for(int i = redec.length-2; i >= 0; i--){
-         redec[i].calcularDerivadas();
+         CamadaDensa camada = redec[i];
 
-         Mat pesoT = mat.transpor(redec[i+1].pesos);
-         mat.mult(redec[i+1].gradientes, pesoT, redec[i].gradientes);
-         mat.hadamard(redec[i].derivada, redec[i].gradientes, redec[i].gradientes);
+         mat.mult(redec[i+1].gradientes, redec[i+1].pesos.transpor(), camada.gradientes);
+         camada.calcularDerivadas();
+         mat.hadamard(camada.derivada, camada.gradientes, camada.gradientes);
       }
    }
    

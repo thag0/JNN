@@ -1,7 +1,7 @@
 package rna.otimizadores;
 
 import rna.core.Mat;
-import rna.core.Matriz;
+import rna.core.OpMatriz;
 import rna.estrutura.CamadaDensa;
 
 /**
@@ -35,7 +35,7 @@ import rna.estrutura.CamadaDensa;
  */
 public class AdaGrad extends Otimizador{
 
-   Matriz mat = new Matriz();
+   OpMatriz mat = new OpMatriz();
 
    /**
     * Valor de taxa de aprendizagem do otimizador.
