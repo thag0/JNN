@@ -44,16 +44,18 @@ public class ExemploClassificacao{
       int[] arq = {qEntradas, 9, 9, qSaidas};
       RedeNeural rede = new RedeNeural(arq);
 
-      Perda perda = new EntropiaCruzada();
-      Otimizador otimizador = new SGD(0.001, 0.99);
+      // Perda perda = new EntropiaCruzada();
+      Perda perda = new ErroMedioQuadrado();
+      Otimizador otimizador = new SGD(0.0001, 0.99);
       Inicializador inicializador = new Xavier();
 
+      // rede.configurarHistoricoPerda(true);
       rede.compilar(perda, otimizador, inicializador);
-      rede.configurarAtivacao("sigmoid");
+      rede.configurarAtivacao("swish");
       rede.configurarAtivacao(rede.obterCamadaSaida(), "softmax");
       
       //treinando e avaliando os resultados
-      rede.treinar(treinoX, treinoY, 5_000);
+      rede.treinar(treinoX, treinoY, 1_000);
       double acurariaRede = rede.avaliador.acuracia(testeX, testeY);
       double perdaRede = rede.avaliador.entropiaCruzada(testeX, testeY);
       System.out.println("Acurácia = " + formatarDecimal(acurariaRede*100, 4) + "%");
@@ -63,6 +65,7 @@ public class ExemploClassificacao{
       Dados d = new Dados(matrizConfusao);
       d.editarNome("Matriz de confusão");
       d.imprimir();
+      // exportarHistoricoPerda(rede, ged);
    }
 
    public static void compararSaidaRede(RedeNeural rede, double[][] dadosEntrada, double[][] dadosSaida, String texto){
@@ -103,7 +106,6 @@ public class ExemploClassificacao{
       }
    }
 
-
    public static String formatarDecimal(double valor, int casas){
       String valorFormatado = "";
 
@@ -114,5 +116,18 @@ public class ExemploClassificacao{
       valorFormatado = df.format(valor);
 
       return valorFormatado;
+   }
+
+   public static void exportarHistoricoPerda(RedeNeural rede, Ged ged){
+      System.out.println("Exportando histórico de perda");
+      double[] perdas = rede.obterHistorico();
+      double[][] dadosPerdas = new double[perdas.length][1];
+
+      for(int i = 0; i < dadosPerdas.length; i++){
+         dadosPerdas[i][0] = perdas[i];
+      }
+
+      Dados dados = new Dados(dadosPerdas);
+      ged.exportarCsv(dados, "historico-perda");
    }
 }

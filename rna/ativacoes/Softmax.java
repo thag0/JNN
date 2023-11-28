@@ -1,5 +1,7 @@
 package rna.ativacoes;
 
+import rna.core.Mat;
+import rna.core.OpMatriz;
 import rna.estrutura.CamadaDensa;
 
 /**
@@ -7,6 +9,11 @@ import rna.estrutura.CamadaDensa;
  * dentro da {@code Rede Neural}.
  */
 public class Softmax extends Ativacao{
+
+   /**
+    * Operador matricial.
+    */
+   OpMatriz opm = new OpMatriz();
 
    /**
     * Instancia a função de ativação Softmax.
@@ -35,22 +42,18 @@ public class Softmax extends Ativacao{
       }
    }
 
-   // @Override
-   // public void derivada(CamadaDensa camada){
-   //    int n = camada.saida.col;
+   @Override
+   public void derivada(CamadaDensa camada){
+      int n = camada.somatorio.col;
+      Mat tmp = camada.saida.bloco(0, n);
+      Mat ident = opm.identidade(n);
+      Mat transp = tmp.transpor();
 
-   //    for(int i = 0; i < n; i++){
-   //       double softmax_i = camada.saida.dado(0, i);
-
-   //       for(int j = 0; j < n; j++){
-   //          double softmax_j = camada.saida.dado(0, j);
-   //          double deriv;
-
-   //          if(i == j)deriv = softmax_i * (1 - softmax_i);
-   //          else      deriv = -softmax_i * softmax_j;
-   //          camada.derivada.add(0, j, deriv);
-   //       }
-   //    }
-   // }
+      opm.mult(
+         camada.gradienteSaida, 
+         opm.hadamardR(tmp, opm.subR(ident, transp)), 
+         camada.derivada
+      );
+   }
 
 }

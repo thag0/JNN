@@ -88,18 +88,19 @@ public class Treino{
    }
 
    /**
-    * Realiza a retropropagação de erros dentro da Rede Neural e calcula os gradientes
-    * de cada camada para a atualização de pesos.
-    * @param camadas conjunto de camadas densas da Rede Neural.
+    * Realiza a retropropagação de gradientes de cada camada para a atualização de pesos.
+    * @param redec conjunto de camadas densas da Rede Neural.
     * @param perda função de perda configurada para a Rede Neural.
     * @param real saída real que será usada para calcular os erros e gradientes.
     */
-   public void backpropagation(CamadaDensa[] camadas, Perda perda, double[] real){
-      aux.calcularGradientes(camadas, perda, real);
+   public void backpropagation(CamadaDensa[] redec, Perda perda, double[] real){
+      CamadaDensa saida = redec[redec.length-1];
+      double[] previsto = saida.obterSaida().linha(0);
+      double[] gradSaida = perda.derivada(previsto, real);
+      saida.calcularGradiente(gradSaida);
 
-      //gradientes ou deltas para os pesos
-      for(CamadaDensa camada : camadas){
-         mat.mult(camada.entrada.transpor(), camada.gradientes, camada.gradientePesos);
+      for(int i = redec.length-2; i >= 0; i--){
+         redec[i].calcularGradiente(redec[i+1].gradienteEntrada.linha(0));
       }
    }
 
@@ -112,8 +113,8 @@ public class Treino{
          mat.add(camada.pesos, camada.gradientePesos, camada.pesos);
 
          if(camada.temBias()){
-            mat.escalar(camada.gradientes, taxaAprendizagem, camada.gradientes);
-            mat.add(camada.bias, camada.gradientes, camada.bias);
+            mat.escalar(camada.gradienteSaida, taxaAprendizagem, camada.gradienteSaida);
+            mat.add(camada.bias, camada.gradienteSaida, camada.bias);
          }
       }
    }

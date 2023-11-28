@@ -98,11 +98,15 @@ public class CamadaDensa implements Cloneable{
     * ]
     * </pre>
     */
-   public Mat gradientes;
+   public Mat gradienteSaida;
 
    /**
-    * Matriz contendo os valores dos gradientes de cada conexão da
-    * entrada com a saída da camada.
+    * Gradientes usados para retropropagar os erros para camadas anteriores.
+    */
+   public Mat gradienteEntrada;
+
+   /**
+    * Matriz contendo os valores dos gradientes para os pesos da camada.
     * <p>
     *    O formato da matriz de gradientes é definido por:
     * </p>
@@ -111,6 +115,17 @@ public class CamadaDensa implements Cloneable{
     * </pre>
     */
    public Mat gradientePesos;
+
+   /**
+    * Matriz contendo os valores dos gradientes para os bias da camada.
+    * <p>
+    *    O formato da matriz de gradientes é definido por:
+    * </p>
+    * <pre>
+    *    gradientes = [linBias][colBias]
+    * </pre>
+    */
+   public Mat gradienteBias;
    
    /**
     * Auxiliar no treino em lotes.
@@ -118,7 +133,7 @@ public class CamadaDensa implements Cloneable{
     *    Matriz de gradiente para os pesos usada como acumulador
     * </p>
     */
-   public Mat gradientesAcPesos;
+   public Mat gradienteAcPesos;
 
    /**
     * Auxiliar no treino em lotes.
@@ -126,10 +141,10 @@ public class CamadaDensa implements Cloneable{
     *    Matriz de gradiente para os bias usada como acumulador
     * </p>
     */
-   public Mat gradientesAcBias;
+   public Mat gradienteAcBias;
 
    /**
-    * Matriz coluna contendo os valores de derivada do resultado do somatório.
+    * Matriz coluna contendo os valores de derivada da função de ativação.
     * <pre>
     * d = [
     *    d1, d2, d3, dn  
@@ -146,12 +161,7 @@ public class CamadaDensa implements Cloneable{
    /**
     * Função de ativação da camada
     */
-   Ativacao ativacao = new ReLU();
-
-   /**
-    * Variável auxilinar na inicialização dos pesos e bias da camada.
-    */
-   private boolean inicializada;
+   private Ativacao ativacao = new ReLU();
 
    /**
     * Instancia uma nova camada densa de neurônios, inicializando seus atributos como:
@@ -161,35 +171,47 @@ public class CamadaDensa implements Cloneable{
     *    <li> Entrada </li>
     *    <li> Somatório </li>
     *    <li> Saída </li>
-    *    <li> Erros </li>
     *    <li> Gradientes </li>
     *    <li> Saída </li>
     * </ul>
-    * Após a inicialização os pesos e bias da Camada estarão zerados e devem ser inicializados
-    * com o método {@code inicializar()}.
+    * Após a inicialização os pesos e bias da Camada estarão zerados e devem ser 
+    * inicializados com o método {@code inicializar()}.
     * @param entrada quantidade de conexões de entrada.
     * @param neuronios quantidade de neurônios.
     * @param usarBias adicionar uso do bias para a camada.
+    * @throws IllegalArgumentException se os valores de entrada ou neurônios forem 
+    * menores que um.
     */
    public CamadaDensa(int entrada, int neuronios, boolean usarBias){
-      this.usarBias = usarBias;
+      if(entrada < 1){
+         throw new IllegalArgumentException(
+            "A camada deve conter ao menos uma entrada."
+         );
+      }
+      if(neuronios < 1){
+         throw new IllegalArgumentException(
+            "A camada deve conter ao menos um neurônio."
+         );
+      }
 
+      this.usarBias = usarBias;
       this.entrada = new Mat(1, entrada);
       this.saida =   new Mat(1, neuronios);
       this.pesos =   new Mat(entrada, neuronios);
 
       if(usarBias){
          this.bias = new Mat(this.saida.lin, this.saida.col);
+         this.gradienteBias = new Mat(this.bias.lin, this.bias.col);
+         this.gradienteAcBias =  new Mat(this.bias.lin, this.bias.col);
       }
 
       this.somatorio =         new Mat(this.saida.lin, this.saida.col);
       this.derivada =          new Mat(this.saida.lin, this.saida.col);
-      this.gradientes =        new Mat(this.saida.lin, this.saida.col);
+      this.gradienteSaida =    new Mat(this.saida.lin, this.saida.col);
+      this.gradienteEntrada =  new Mat(this.entrada.lin, this.entrada.col);
 
       this.gradientePesos =    new Mat(this.pesos.lin, this.pesos.col);
-      this.gradientesAcPesos = new Mat(this.pesos.lin, this.pesos.col);
-      this.gradientesAcBias =  new Mat(this.bias.lin, this.bias.col);
-      this.inicializada = false;
+      this.gradienteAcPesos =  new Mat(this.pesos.lin, this.pesos.col);
    }
 
    /**
@@ -200,7 +222,6 @@ public class CamadaDensa implements Cloneable{
     *    <li> Entrada </li>
     *    <li> Somatório </li>
     *    <li> Saída </li>
-    *    <li> Erros </li>
     *    <li> Gradientes </li>
     *    <li> Saída </li>
     * </ul>
@@ -314,10 +335,10 @@ public class CamadaDensa implements Cloneable{
     *    Em resumo a expressão que define a saída é dada por:
     * </p>
     * <pre>
-    *somatorio = mult(pesos, entrada)
-    *saida = add(somatorio, bias)
+    *somatorio = (pesos * entrada) + bias
     * </pre>
-    * O resultado da
+    * Após a propagação dos dados, a função de ativação da camada é aplicada
+    * ao resultado do somatório e o resultado é salvo da saída da camada.
     * @param entrada dados de entrada que serão processados.
     */
    public void calcularSaida(double[] entrada){
@@ -341,14 +362,37 @@ public class CamadaDensa implements Cloneable{
    }
 
    /**
-    * Executa a derivada da função de ativação específica da camada
-    * em todos os neurônios dela.
+    * Calcula os gradientes da camada para os pesos e bias baseado nos
+    * gradientes da camada seguinte.
     * <p>
-    *    O resultado da derivada é salvo na propriedade {@code camada.derivada}.
+    *    Após calculdos, os gradientes em relação a entrada da camada são
+    *    calculados e salvos em {@code gradienteEntrada} para serem retropropagados 
+    *    para as camadas anteriores da Rede Neural em que a camada estiver.
     * </p>
+    * @param gradSeguinte gradiente da camada seguinte.
     */
-   public void calcularDerivadas(){
+   public void calcularGradiente(double[] gradSeguinte){
+      if(gradSeguinte.length != this.gradienteSaida.col){
+         throw new IllegalArgumentException(
+            "Dimensões incompatíveis entre o gradiente fornecido e o suportado pela camada."
+         );
+      }
+
+      this.gradienteSaida.copiar(0, gradSeguinte);
+
+      //derivada da função de ativação em relação ao gradiente de saída
       this.ativacao.derivada(this);
+      
+      //derivada da função de ativação em relação ao pesos.
+      mat.mult(this.entrada.transpor(), this.derivada, this.gradientePesos);
+
+      //gradiente para o bias é apenas a derivada da ativação em relação a saída.
+      if(this.temBias()){
+         this.gradienteBias.copiar(this.derivada);
+      }
+
+      //derivada da saída em relação aos pesos para retropropagação.
+      mat.mult(this.derivada, this.pesos.transpor(), this.gradienteEntrada);
    }
 
    /**
@@ -465,7 +509,6 @@ public class CamadaDensa implements Cloneable{
     * Indica algumas informações sobre a camada, como:
     * <ul>
     *    <li>Id da camada dentro da Rede Neural em que foi criada.</li>
-    *    <li>Status de inicialização.</li>
     *    <li>Função de ativação.</li>
     *    <li>Quantidade de neurônios.</li>
     *    <li>Formato da entrada, pessos, bias e saída.</li>
@@ -480,7 +523,6 @@ public class CamadaDensa implements Cloneable{
       
       buffer += "\nInfo " + this.getClass().getSimpleName() + " " + this.id + " = [\n";
 
-      buffer += espacamento + "Inicializada: " + this.inicializada + "\n";
       buffer += espacamento + "Ativação: " + this.ativacao.getClass().getSimpleName() + "\n";
       buffer += espacamento + "Quantidade neurônios: " + this.quantidadeNeuronios() + "\n";
       buffer += "\n";
@@ -510,13 +552,17 @@ public class CamadaDensa implements Cloneable{
          clone.ativacao = this.ativacao;
 
          clone.usarBias = this.usarBias;
-         clone.bias = this.bias.clone();
+         if(this.usarBias){
+            clone.bias = this.bias.clone();
+            clone.gradienteBias = this.gradienteBias.clone();
+            clone.gradienteAcBias = this.gradienteAcBias.clone();
+         }
 
          clone.entrada = this.entrada.clone();
          clone.pesos = this.pesos.clone();
          clone.somatorio = this.somatorio.clone();
          clone.saida = this.saida.clone();
-         clone.gradientes = this.gradientes.clone();
+         clone.gradienteSaida = this.gradienteSaida.clone();
          clone.derivada = this.derivada.clone();
          clone.gradientePesos = this.gradientePesos.clone();
 

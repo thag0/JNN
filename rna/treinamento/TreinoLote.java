@@ -101,21 +101,16 @@ public class TreinoLote{
    void backpropagationLote(CamadaDensa[] redec, Perda perda, double[] real){
       aux.calcularGradientes(redec, perda, real);
 
-      //gradientes ou delta para os pesos
-      for(int i = 0; i < redec.length; i++){
-         CamadaDensa camada = redec[i];
-         mat.mult(camada.entrada.transpor(), camada.gradientes, camada.gradientePesos);
-
-         //acumuladores
-         mat.add(camada.gradientesAcPesos, camada.gradientePesos, camada.gradientesAcPesos);
-         mat.add(camada.gradientesAcBias, camada.gradientes, camada.gradientesAcBias);
+      for(CamadaDensa camada : redec){
+         mat.add(camada.gradienteAcPesos, camada.gradientePesos, camada.gradienteAcPesos);
+         mat.add(camada.gradienteAcBias, camada.gradienteBias, camada.gradienteAcBias);
       }
    }
 
    void zerarGradientesAcumulados(CamadaDensa[] redec){
       for(CamadaDensa camada : redec){
-         mat.preencher(camada.gradientesAcPesos, 0);
-         mat.preencher(camada.gradientesAcBias, 0);
+         mat.preencher(camada.gradienteAcPesos, 0);
+         mat.preencher(camada.gradienteAcBias, 0);
       }
    }
    
@@ -124,18 +119,18 @@ public class TreinoLote{
          
          for(int i = 0; i < camada.pesos.lin; i++){
             for(int j = 0; j < camada.pesos.col; j++){
-               camada.gradientesAcPesos.div(i, j, tamLote);
+               camada.gradienteAcPesos.div(i, j, tamLote);
             }
          }
-         mat.copiar(camada.gradientesAcPesos, camada.gradientePesos);
+         mat.copiar(camada.gradienteAcPesos, camada.gradientePesos);
 
          if(camada.temBias()){
             for(int i = 0; i < camada.bias.lin; i++){
                for(int j = 0; j < camada.bias.col; j++){
-                  camada.gradientesAcBias.div(i, j, tamLote);
+                  camada.gradienteAcBias.div(i, j, tamLote);
                }
             }
-            mat.copiar(camada.gradientesAcBias, camada.gradientes);
+            mat.copiar(camada.gradienteAcBias, camada.gradienteBias);
          }
 
       }

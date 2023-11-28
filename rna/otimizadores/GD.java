@@ -66,8 +66,8 @@ public class GD extends Otimizador{
          mat.add(camada.pesos, camada.gradientePesos, camada.pesos);
 
          if(camada.temBias()){
-            mat.escalar(camada.gradientes, taxaAprendizagem, camada.gradientes);
-            mat.add(camada.bias, camada.gradientes, camada.bias);
+            mat.escalar(camada.gradienteBias, taxaAprendizagem, camada.gradienteBias);
+            mat.add(camada.bias, camada.gradienteBias, camada.bias);
          }
       } 
    }

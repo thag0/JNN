@@ -962,7 +962,7 @@ public class RedeNeural implements Cloneable{
                   salvo = camada.bias.dado(i, j);
                   camada.bias.add(i, j, eps);
                   double d = (this.avaliador.erroMedioQuadrado(entradas, saidas) - custo) / eps;
-                  camada.gradientes.editar(i, j, d);
+                  camada.gradienteSaida.editar(i, j, d);
                   camada.bias.editar(i, j, salvo);    
                }
             }
@@ -978,7 +978,7 @@ public class RedeNeural implements Cloneable{
             if(camada.temBias()){
                for(int i = 0; i < camada.bias.lin; i++){
                   for(int j = 0; j < camada.bias.col; j++){
-                     camada.bias.sub(i, j, (tA * camada.gradientes.dado(i, j)));
+                     camada.bias.sub(i, j, (tA * camada.gradienteSaida.dado(i, j)));
                   }
                }
             }

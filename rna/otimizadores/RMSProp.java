@@ -36,10 +36,9 @@ import rna.estrutura.CamadaDensa;
  * </p>
  */
 public class RMSProp extends Otimizador{
-
-   private static final double padraoTA  = 0.001;
-   private static final double padraoRho = 0.99;
-   private static final double padraoEps = 1e-7;
+   private static final double PADRAO_TA  = 0.001;
+   private static final double PADRAO_RHO = 0.999;
+   private static final double PADRAO_EPS = 1e-7;
 
    /**
     * Valor de taxa de aprendizagem do otimizador.
@@ -85,7 +84,7 @@ public class RMSProp extends Otimizador{
     * @param tA valor de taxa de aprendizagem.
     */
    public RMSProp(double tA){
-      this(tA, padraoRho, padraoEps);
+      this(tA, PADRAO_RHO, PADRAO_EPS);
    }
 
    /**
@@ -104,7 +103,7 @@ public class RMSProp extends Otimizador{
     * </p>
     */
    public RMSProp(){
-      this(padraoTA, padraoRho, padraoEps);
+      this(PADRAO_TA, PADRAO_RHO, PADRAO_EPS);
    }
 
    @Override
@@ -137,7 +136,7 @@ public class RMSProp extends Otimizador{
 
          if(camada.temBias()){
             Mat bias = camada.bias;
-            Mat gradsB = camada.gradientes;
+            Mat gradsB = camada.gradienteSaida;
             for(int j = 0; j < bias.lin; j++){
                for(int k = 0; k < bias.col; k++){
                   calcular(bias, gradsB, acb[i], j, k);

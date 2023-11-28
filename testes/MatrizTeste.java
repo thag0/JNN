@@ -15,35 +15,29 @@ public class MatrizTeste{
    
    public static void main(String[] args){
       ged.limparConsole();
+      derivadaSoftmax();
 
-      double[][] m = {
-         {1, 2, 3},
-         {4, 5, 6},
-         {7, 8, 9},
-      };
-
-      Mat a = new Mat(m);
-      Mat b = new Mat(m);
-      Mat c = new Mat(m);
-
-      Teste teste = new Teste(a, b, c);
-      teste.multiplicar(a, b, c);
-   }
-}
-
-class Teste{
-   public Mat a;
-   public Mat b;
-   public Mat c;
-   private OpMatriz opm = new OpMatriz();
-
-   public Teste(Mat a, Mat b, Mat c){
-      this.a = a;
-      this.b = b;
-      this.c = c;
    }
 
-   public void multiplicar(Mat a, Mat b, Mat c){
-      opm.multT(a, b, c, 2);
+   static void derivadaSoftmax(){
+      double[] saida = {1.0, 2.0, 3.0, 4.0};
+      double[] grad  = {6.0, 6.0, 6.0, 6.0};
+   
+      Mat s = new Mat(1, 4, saida);
+      Mat g = new Mat(1, 4, grad);
+      
+      int n = s.col;
+      Mat tmp = s.bloco(0, n);
+      Mat ident = mat.identidade(n);
+      Mat trans = tmp.transpor();
+
+      Mat derivada = new Mat(1, 4);
+      
+      Mat resSub = new Mat(n, n);
+      mat.sub(ident, trans, resSub);
+      mat.hadamard(tmp, resSub, resSub);
+
+      mat.mult(g, resSub, derivada);
+      derivada.print();
    }
 }

@@ -59,6 +59,10 @@ import rna.estrutura.CamadaDensa;
  * </p>
  */
 public class AMSGrad extends Otimizador{
+	private static final double PADRAO_TA = 0.01;
+   private static final double PADRAO_BETA1 = 0.95;
+   private static final double PADRAO_BETA2 = 0.999;
+   private static final double PADRAO_EPS = 1e-7;
 
    /**
     * Valor de taxa de aprendizagem do otimizador.
@@ -116,8 +120,8 @@ public class AMSGrad extends Otimizador{
 	private long interacoes;
 
 	/**
-	 * Inicializa uma nova instância de otimizador <strong> AMSGrad </strong> usando os valores de
-	 * hiperparâmetros fornecidos.
+	 * Inicializa uma nova instância de otimizador <strong> AMSGrad </strong> usando os 
+	 * valores de hiperparâmetros fornecidos.
     * @param tA valor de taxa de aprendizagem.
 	 * @param epsilon usado para evitar a divisão por zero.
 	 * @param beta1 decaimento do momento.
@@ -131,34 +135,22 @@ public class AMSGrad extends Otimizador{
 	}
 
 	/**
-	 * Inicializa uma nova instância de otimizador <strong> AMSGrad </strong> usando os valores de
-	 * hiperparâmetros fornecidos.
+	 * Inicializa uma nova instância de otimizador <strong> AMSGrad </strong> usando os 
+	 * valores de hiperparâmetros fornecidos.
     * @param tA valor de taxa de aprendizagem.
 	 */
 	public AMSGrad(double tA){
-		this(tA, 0.9, 0.999, 1e-7);
+		this(tA, PADRAO_BETA1, PADRAO_BETA2, PADRAO_EPS);
 	}
 
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> AMSGrad </strong>.
 	 * <p>
-	 * Os hiperparâmetros do AMSGrad serão inicializados com os valores padrão, que
-	 * são:
-    * <p>
-    *    {@code taxaAprendizagem = 0.01}
-    * </p>
-    * <p>
-    *    {@code beta1 = 0.9}
-    * </p>
-    * <p>
-    *    {@code beta2 = 0.999}
-    * </p>
-    * <p>
-    *    {@code epsilon = 1e-7}
-    * </p>
+	 * 	Os hiperparâmetros do AMSGrad serão inicializados com os valores padrão.
+	 * </p>
 	 */
 	public AMSGrad(){
-		this(0.01, 0.9, 0.999, 1e-7);
+		this(PADRAO_TA, PADRAO_BETA1, PADRAO_BETA2, PADRAO_EPS);
 	}
 
 	@Override
@@ -205,7 +197,7 @@ public class AMSGrad extends Otimizador{
 
          if(camada.temBias()){
 				Mat bias = camada.bias;
-				Mat gradsB = camada.gradientes;
+				Mat gradsB = camada.gradienteSaida;
 
             for(int j = 0; j < bias.lin; j++){
                for(int k = 0; k < bias.col; k++){

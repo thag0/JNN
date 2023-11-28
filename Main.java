@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit;
 import ged.*;
 import geim.Geim;
 import render.JanelaTreino;
-import rna.ativacoes.*;
 import rna.avaliacao.perda.*;
 import rna.estrutura.*;
 import rna.inicializadores.*;
@@ -59,15 +58,14 @@ public class Main{
       RedeNeural rede = new RedeNeural(arq);
 
       Perda perda = new ErroMedioQuadrado();
-      // Otimizador otm = new SGD(0.001, 0.995);
-      Otimizador otm = new SGD(0.0001, 0.99);
-      Inicializador ini = new LeCun();
+      Otimizador otm = new SGD(0.001, 0.95);
+      Inicializador ini = new Xavier();
 
-      rede.configurarSeed(1234);
+      // rede.configurarSeed(1234);
       // rede.configurarHistoricoPerda(true);
       rede.compilar(perda, otm, ini);
       rede.configurarAtivacao("tanh");
-      rede.configurarAtivacao(rede.obterCamadaSaida(), new Sigmoid());
+      rede.configurarAtivacao(rede.obterCamadaSaida(), "sigmoid");
 
       return rede;
    }
@@ -90,7 +88,6 @@ public class Main{
       
       int i = 0;
       while(i < epocas && jt.isVisible()){
-         // rede.treinar(dadosEntrada, dadosSaida, epocasPorFrame, 64);
          rede.treinar(dadosEntrada, dadosSaida, epocasPorFrame);
          jt.desenharTreino(rede, i, numThreads);
          i += epocasPorFrame;
@@ -109,6 +106,11 @@ public class Main{
       jt.dispose();
    }
 
+   /**
+    * Salva um arquivo csv com o historico de desempenho da rede.
+    * @param rede rede neural.
+    * @param ged gerenciador de dados.
+    */
    public static void exportarHistoricoPerda(RedeNeural rede, Ged ged){
       System.out.println("Exportando histórico de perda");
       double[] perdas = rede.obterHistorico();

@@ -33,19 +33,13 @@ class Auxiliar{
     * @param real valores reais dos dados preditos.
     */
    public void calcularGradientes(CamadaDensa[] redec, Perda perda, double[] real){
-      //saida
       CamadaDensa saida = redec[redec.length-1];
       double[] previsto = saida.obterSaida().linha(0);
-      double[] grads = perda.derivada(previsto, real);
-      saida.gradientes.copiar(0, grads);
+      double[] gradSaida = perda.derivada(previsto, real);
+      saida.calcularGradiente(gradSaida);
 
-      //ocultas
       for(int i = redec.length-2; i >= 0; i--){
-         CamadaDensa camada = redec[i];
-
-         mat.mult(redec[i+1].gradientes, redec[i+1].pesos.transpor(), camada.gradientes);
-         camada.calcularDerivadas();
-         mat.hadamard(camada.derivada, camada.gradientes, camada.gradientes);
+         redec[i].calcularGradiente(redec[i+1].gradienteEntrada.linha(0));
       }
    }
    

@@ -180,7 +180,6 @@ public class Avaliador{
     * @return valor da entropia cruzada binária.
     */
    public double entropiaCruzadaBinaria(double[][] entrada, double[][] saida){
-      //TODO corrigir valores NaN
       double[][] previsoes = rede.calcularSaida(entrada);
       double res = 0;
 

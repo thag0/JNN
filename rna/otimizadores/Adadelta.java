@@ -45,6 +45,8 @@ import rna.estrutura.CamadaDensa;
  * </p>
  */
 public class Adadelta extends Otimizador{
+   private static final double PADRAO_RHO = 0.99;
+   private static final double PADRAO_EPS = 1e-7;
 
    /**
     * Constante de decaimento do otimizador.
@@ -88,19 +90,23 @@ public class Adadelta extends Otimizador{
    }
 
    /**
+    * Inicializa uma nova instância de otimizador <strong> Adadelta </strong> 
+    * usando os valores de hiperparâmetros fornecidos.
+    * @param rho valor de decaimento do otimizador.
+    * @param epsilon usado para evitar a divisão por zero.
+    */
+   public Adadelta(double rho){
+      this(rho, PADRAO_EPS);
+   }
+
+   /**
     * Inicializa uma nova instância de otimizador <strong> Adadelta </strong>.
     * <p>
-    *    Os hiperparâmetros do Adadelta serão inicializados com os valores padrão, que são:
-    * </p>
-    * <p>
-    *    {@code rho = 0.99}
-    * </p>
-    * <p>
-    *    {@code epsilon = 1e-7}
+    *    Os hiperparâmetros do Adadelta serão inicializados com os valores padrão.
     * </p>
     */
    public Adadelta(){
-      this(0.99, 1e-7);
+      this(PADRAO_RHO, PADRAO_EPS);
    }
 
    @Override
@@ -139,7 +145,7 @@ public class Adadelta extends Otimizador{
 
          if(camada.temBias()){
             Mat bias = camada.bias;
-            Mat gradsB = camada.gradientes;
+            Mat gradsB = camada.gradienteSaida;
             for(int j = 0; j < bias.lin; j++){
                for(int k = 0; k < bias.col; k++){
                   calcular(bias, gradsB, acb[i], acAtb[i], j, k);

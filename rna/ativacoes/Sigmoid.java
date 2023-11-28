@@ -20,14 +20,16 @@ public class Sigmoid extends Ativacao{
 
    @Override
    public void derivada(CamadaDensa camada){
-      double sig;
+      double grad, d;
       int i, j;
 
       for(i = 0; i < camada.saida.lin; i++){
          for(j = 0; j < camada.saida.col; j++){
-            sig = camada.saida.dado(i, j);
-            sig = sig * (1 - sig);
-            camada.derivada.editar(i, j, sig);
+            grad = camada.gradienteSaida.dado(i, j);
+            d = camada.saida.dado(i, j);
+            d = d * (1 - d);
+
+            camada.derivada.editar(i, j, (grad * d));
          }
       }
    }

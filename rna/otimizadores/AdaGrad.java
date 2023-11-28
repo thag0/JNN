@@ -80,13 +80,7 @@ public class AdaGrad extends Otimizador{
    /**
     * Inicializa uma nova instância de otimizador <strong> AdaGrad </strong>.
     * <p>
-    *    Os hiperparâmetros do AdaGrad serão inicializados com os valores padrão, que são:
-    * </p>
-    * <p>
-    *    {@code taxaAprendizagem = 0.01}
-    * </p>
-    * <p>
-    *    {@code epsilon = 1e-7}
+    *    Os hiperparâmetros do AdaGrad serão inicializados com os valores padrão.
     * </p>
     */
    public AdaGrad(){
@@ -127,7 +121,7 @@ public class AdaGrad extends Otimizador{
          
          if(camada.temBias()){
             Mat bias = camada.bias;
-            Mat gradsB = camada.gradientes;
+            Mat gradsB = camada.gradienteSaida;
             for(int j = 0; j < bias.lin; j++){
                for(int k = 0; k < bias.col; k++){
                   calcular(bias, gradsB, acb[i], j, k);

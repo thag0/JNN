@@ -231,8 +231,35 @@ public class OpMatriz{
    }
 
    /**
-    * Adiciona o conteúdo resultante da subtração entre A e B na matriz R de acordo
+    * Adiciona o conteúdo resultante da soma entre A e B na matriz R de acordo
     * com a expressão:
+    * <pre>
+    * R = A + B
+    * </pre>
+    * @param a primeita matriz.
+    * @param b segunda matriz.
+    * @return matriz contendo o resultado da soma.
+    */
+   public Mat addR(Mat a, Mat b){
+      verificarLinhas(a, b);
+      verificarColunas(a, b);
+      Mat r = new Mat(a.lin, a.col);
+
+      int i, j;
+      double d;
+      for(i = 0; i < r.lin; i++){
+         for(j = 0; j < r.col; j++){
+            d = a.dado(i, j) + b.dado(i, j);
+            r.editar(i, j, d);
+         }
+      }
+
+      return r;
+   }
+
+   /**
+    * Adiciona o conteúdo resultante da subtração entre A e B na 
+    * matriz R de acordo com a expressão:
     * <pre>
     * R = A - B
     * </pre>
@@ -257,8 +284,35 @@ public class OpMatriz{
    }
 
    /**
-    * Adiciona o conteúdo resultante do produto elemeto a elemento entre A e B na matriz 
-    * R de acordo com a expressão:
+    * Adiciona o conteúdo resultante da subtração entre A e B na 
+    * matriz R de acordo com a expressão:
+    * <pre>
+    * R = A - B
+    * </pre>
+    * @param a primeita matriz.
+    * @param b segunda matriz.
+    * @return r matriz contendo o resultado da subtração.
+    */
+   public Mat subR(Mat a, Mat b){
+      verificarLinhas(a, b);
+      verificarColunas(a, b);
+      Mat r = new Mat(a.lin, a.col);
+
+      int i, j;
+      double d;
+      for(i = 0; i < r.lin; i++){
+         for(j = 0; j < r.col; j++){
+            d = a.dado(i, j) - b.dado(i, j);
+            r.editar(i, j, d);
+         }
+      }
+
+      return r;
+   }
+
+   /**
+    * Adiciona o conteúdo resultante do produto elemeto a elemento 
+    * entre A e B na matriz R de acordo com a expressão:
     * <pre>
     * R = A ⊙ B
     * </pre>
@@ -280,6 +334,33 @@ public class OpMatriz{
             r.editar(i, j, d);
          }
       }
+   }
+
+   /**
+    * Adiciona o conteúdo resultante do produto elemeto a elemento 
+    * entre A e B na matriz R de acordo com a expressão:
+    * <pre>
+    * R = A ⊙ B
+    * </pre>
+    * @param a primeita matriz.
+    * @param b segunda matriz.
+    * @return matriz contendo o resultado do produto hadamard.
+    */
+   public Mat hadamardR(Mat a, Mat b){
+      verificarLinhas(a, b);
+      verificarColunas(a, b);
+      Mat r = new Mat(a.lin, a.col);
+
+      int i, j;
+      double d;
+      for(i = 0; i < r.lin; i++){
+         for(j = 0; j < r.col; j++){
+            d = a.dado(i, j) * b.dado(i, j);
+            r.editar(i, j, d);
+         }
+      }
+
+      return r;
    }
 
    /**

@@ -3,7 +3,6 @@ package rna.otimizadores;
 import rna.core.Mat;
 import rna.estrutura.CamadaDensa;
 
-
 /**
  * Implementação do algoritmo de otimização Nadam.
  * <p>
@@ -51,6 +50,10 @@ import rna.estrutura.CamadaDensa;
  * </p>
  */
 public class Nadam extends Otimizador{
+   private static final double PADRAO_TA = 0.001;
+   private static final double PADRAO_BETA1 = 0.9;
+   private static final double PADRAO_BETA2 = 0.999;
+   private static final double PADRAO_EPS = 1e-7;
 
    /**
     * Valor de taxa de aprendizagem do otimizador.
@@ -118,29 +121,17 @@ public class Nadam extends Otimizador{
     * @param tA valor de taxa de aprendizagem.
     */
    public Nadam(double tA){
-      this(tA, 0.9, 0.999, 1e-7);
+      this(tA, PADRAO_BETA1, PADRAO_BETA2, PADRAO_EPS);
    }
 
    /**
     * Inicializa uma nova instância de otimizador <strong> Nadam </strong>.
     * <p>
-    *    Os hiperparâmetros do Nadam serão inicializados com os valores padrão, que são:
-    * </p>
-    * <p>
-    *    {@code taxaAprendizagem = 0.001}
-    * </p>
-    * <p>
-    *    {@code beta1 = 0.9}
-    * </p>
-    * <p>
-    *    {@code beta2 = 0.999}
-    * </p>
-    * <p>
-    *    {@code epsilon = 1e-7}
+    *    Os hiperparâmetros do Nadam serão inicializados com os valores padrão.
     * </p>
     */
    public Nadam(){
-      this(0.001, 0.9, 0.999, 1e-7);
+      this(PADRAO_TA, PADRAO_BETA1, PADRAO_BETA2, PADRAO_EPS);
    }
 
    @Override
@@ -182,7 +173,7 @@ public class Nadam extends Otimizador{
          
          if(camada.temBias()){
             Mat bias = camada.bias;
-            Mat gradsB = camada.gradientes;
+            Mat gradsB = camada.gradienteSaida;
             for(int j = 0; j < bias.lin; j++){
                for(int k = 0; k < bias.col; k++){
                   calcular(bias, gradsB, mb[i], vb[i], j, k, forcaB1, forcaB2);
@@ -203,9 +194,9 @@ public class Nadam extends Otimizador{
       //correções
       double mChapeu = (beta1 * m.dado(lin, col) + ((1 - beta1) * g)) / fb1;
       double vChapeu = (beta2 * v.dado(lin, col)) / fb2;
-      double c = (taxaAprendizagem * mChapeu) / (Math.sqrt(vChapeu) + epsilon);
+      double att = (taxaAprendizagem * mChapeu) / (Math.sqrt(vChapeu) + epsilon);
 
-      var.add(lin, col, c);
+      var.add(lin, col, att);
    }
 
    @Override

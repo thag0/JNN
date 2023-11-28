@@ -60,7 +60,6 @@ import rna.estrutura.CamadaDensa;
  * </p>
  */
 public class Adam extends Otimizador{
-
    private static final double padraoTA = 0.001;
    private static final double padraoBeta1 = 0.9;
    private static final double padraoBeta2 = 0.999;
@@ -198,7 +197,7 @@ public class Adam extends Otimizador{
          
          if(camada.temBias()){
             Mat bias = camada.bias;
-            Mat gradsB = camada.gradientes;
+            Mat gradsB = camada.gradienteSaida;
             for(int j = 0; j < bias.lin; j++){
                for(int k = 0; k < bias.col; k++){
                   calcular(bias, gradsB, mb[i], vb[i], j, k, alfa, forcaB1, forcaB2);

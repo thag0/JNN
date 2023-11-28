@@ -99,16 +99,7 @@ public class SGD extends Otimizador{
    /**
     * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient Descent (SGD) </strong>.
     * <p>
-    *    Os hiperparâmetros do SGD serão inicializados com seus os valores padrão, que são:
-    * </p>
-    * <p>
-    *    {@code taxaAprendizagem = 0.001}
-    * </p>
-    * <p>
-    *    {@code momentum = 0.99}
-    * </p>
-    * <p>
-    *    {@code nesterov = false}
+    *    Os hiperparâmetros do SGD serão inicializados com seus os valores padrão.
     * </p>
     */
    public SGD(){
@@ -146,7 +137,7 @@ public class SGD extends Otimizador{
 
          if(camada.temBias()){
             Mat bias = camada.bias;
-            Mat gradB = camada.gradientes;
+            Mat gradB = camada.gradienteBias;
             for(j = 0; j < bias.lin; j++){
                for(k = 0; k < bias.col; k++){
                   calcular(bias, gradB, mb[i], j, k);

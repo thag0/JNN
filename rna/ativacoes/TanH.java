@@ -20,14 +20,16 @@ public class TanH extends Ativacao{
 
    @Override
    public void derivada(CamadaDensa camada){
-      double tanh;
+      double grad, d;
       int i, j;
 
       for(i = 0; i < camada.saida.lin; i++){
          for(j = 0; j < camada.saida.col; j++){
-            tanh = camada.saida.dado(i, j);
-            tanh = 1 - (tanh * tanh);
-            camada.derivada.editar(i, j, tanh);
+            grad = camada.gradienteSaida.dado(i, j);
+            d = camada.saida.dado(i, j);
+            d = 1 - (d * d);
+            
+            camada.derivada.editar(i, j, d * grad);
          }
       }
    }

@@ -214,6 +214,16 @@ public class Mat implements Cloneable{
       return t;
    }
 
+   public Mat bloco(int lin, int n){
+      Mat tile = new Mat(n, this.col);
+
+      for(int i = 0; i < tile.lin; i++){
+         tile.copiar(i, this.linha(lin));
+      }
+
+      return tile;
+   }
+
    /**
     * Adiciona o valor fornecido ao que estiver contido no
     * conteúdo da matriz, de acordo com os índices dados.

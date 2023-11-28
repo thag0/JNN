@@ -17,8 +17,10 @@ public class Linear extends Ativacao{
 
    @Override
    public void calcular(CamadaDensa camada){
-      for(int i = 0; i < camada.saida.lin; i++){
-         for(int j = 0; j < camada.saida.col; j++){
+      int i, j;
+      
+      for(i = 0; i < camada.saida.lin; i++){
+         for(j = 0; j < camada.saida.col; j++){
             camada.saida.editar(i, j, camada.somatorio.dado(i, j));
          }
       }
@@ -26,9 +28,13 @@ public class Linear extends Ativacao{
 
    @Override
    public void derivada(CamadaDensa camada){
-      for(int i = 0; i < camada.derivada.lin; i++){
-         for(int j = 0; j < camada.derivada.col; j++){
-            camada.derivada.editar(i, j, 1);
+      int i, j;
+      double grad;
+
+      for(i = 0; i < camada.derivada.lin; i++){
+         for(j = 0; j < camada.derivada.col; j++){
+            grad = camada.gradienteSaida.dado(i, j);
+            camada.derivada.editar(i, j, (1 * grad));
          }
       }
    }
