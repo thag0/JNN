@@ -23,7 +23,6 @@ public class EntropiaCruzada extends Perda{
       //tentando encontrar uma adaptação que funcione
       for(int i = 0; i < previsto.length; i++){
          derivadas[i] = real[i] - previsto[i];
-         // derivadas[i] = -real[i] / (previsto[i] + eps);
       }
       return derivadas;
    }

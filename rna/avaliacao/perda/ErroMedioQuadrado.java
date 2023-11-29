@@ -24,7 +24,7 @@ public class ErroMedioQuadrado extends Perda{
       int amostras = previsto.length;
       double[] derivadas = new double[previsto.length];
       for(int i = 0; i < amostras; i++){
-         derivadas[i] = 2 * (real[i] - previsto[i]) / amostras;
+         derivadas[i] = (2 * (real[i] - previsto[i])) / amostras;
       }
 
       return derivadas;

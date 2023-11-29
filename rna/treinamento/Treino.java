@@ -53,8 +53,8 @@ public class Treino{
     * @param epochs quantidade de épocas de treinamento.
     */
    public void treinar(RedeNeural rede, double[][] entrada, double[][] saida, int epochs){
-      double[] dadoEntrada = new double[entrada[0].length];
-      double[] dadoSaida = new double[saida[0].length];
+      double[] amostraEntrada = new double[entrada[0].length];
+      double[] amostraSaida = new double[saida[0].length];
 
       CamadaDensa[] camadas = rede.obterCamadas();
       Otimizador otimizador = rede.obterOtimizador();
@@ -66,17 +66,17 @@ public class Treino{
          perdaEpoca = 0;
          
          for(int i = 0; i < entrada.length; i++){
-            aux.copiarArray(entrada[i], dadoEntrada);
-            aux.copiarArray(saida[i], dadoSaida);
+            aux.copiarArray(entrada[i], amostraEntrada);
+            aux.copiarArray(saida[i], amostraSaida);
 
-            rede.calcularSaida(dadoEntrada);
+            rede.calcularSaida(amostraEntrada);
 
             //feedback de avanço da rede
             if(this.calcularHistorico){
-               perdaEpoca += rede.obterPerda().calcular(rede.obterSaidas(), saida[i]);
+               perdaEpoca += perda.calcular(rede.obterSaidas(), saida[i]);
             }
 
-            backpropagation(camadas, perda, dadoSaida);  
+            backpropagation(camadas, perda, amostraSaida);  
             otimizador.atualizar(camadas);
          }
 

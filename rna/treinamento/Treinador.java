@@ -12,7 +12,8 @@ public class Treinador{
     * Auxiliar na verificação do cálculo do histórico de custos.
     */
    public boolean calcularHistorico = false;
-
+   
+   Auxiliar aux;
    Treino treino;
    TreinoLote treinoLote;
 
@@ -20,6 +21,7 @@ public class Treinador{
     * Responsável por organizar os tipos de treino da rede neural.
     */
    public Treinador(){
+      aux =        new Auxiliar();
       treino =     new Treino(calcularHistorico);
       treinoLote = new TreinoLote(calcularHistorico);
    }
@@ -48,12 +50,9 @@ public class Treinador{
     * Treina a rede neural calculando os erros dos neuronios, seus gradientes para cada peso e 
     * passando essas informações para o otimizador configurado ajustar os pesos.
     * @param rede rede neural que será treinada.
-    * @param perda função de perda usada durante o treinamento.
-    * @param otimizador otimizador configurado da rede.
     * @param entradas dados de entrada para o treino.
     * @param saidas dados de saída correspondente as entradas para o treino.
     * @param epochs quantidade de épocas de treinamento.
-    * @param embaralhar embaralhar dados de treino para cada época.
     */
    public void treino(RedeNeural rede, double[][] entradas, double[][] saidas, int epochs){
       treino.treinar(
@@ -71,12 +70,9 @@ public class Treinador{
     * Treina a rede neural calculando os erros dos neuronios, seus gradientes para cada peso e 
     * passando essas informações para o otimizador configurado ajustar os pesos.
     * @param rede rede neural que será treinada.
-    * @param perda função de perda usada durante o treinamento.
-    * @param otimizador otimizador configurado da rede.
     * @param entradas dados de entrada para o treino.
     * @param saidas dados de saída correspondente as entradas para o treino.
     * @param epochs quantidade de épocas de treinamento.
-    * @param embaralhar embaralhar dados de treino para cada época.
     * @param tamLote tamanho do lote.
     */
    public void treino(RedeNeural rede, double[][] entradas, double[][] saidas, int epochs, int tamLote){
@@ -102,10 +98,7 @@ public class Treinador{
       double[][] clone = new double[dados.length][dados[0].length];
 
       for(int i = 0; i < dados.length; i++){
-         // System.arraycopy(dados[i], 0, clone[i], 0, dados[i].length);
-         for(int j = 0; j < dados[i].length; j++){
-            clone[i][j] = dados[i][j];
-         }
+         aux.copiarArray(dados[i], clone[i]);         
       }
 
       return clone;

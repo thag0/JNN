@@ -45,13 +45,13 @@ public class ExemploClassificacao{
       RedeNeural rede = new RedeNeural(arq);
 
       // Perda perda = new EntropiaCruzada();
-      Perda perda = new ErroMedioQuadrado();
+      Perda perda = new EntropiaCruzada();
       Otimizador otimizador = new SGD(0.0001, 0.99);
       Inicializador inicializador = new Xavier();
 
-      // rede.configurarHistoricoPerda(true);
+      rede.configurarHistoricoPerda(true);
       rede.compilar(perda, otimizador, inicializador);
-      rede.configurarAtivacao("swish");
+      rede.configurarAtivacao("tanh");
       rede.configurarAtivacao(rede.obterCamadaSaida(), "softmax");
       
       //treinando e avaliando os resultados
@@ -65,7 +65,7 @@ public class ExemploClassificacao{
       Dados d = new Dados(matrizConfusao);
       d.editarNome("Matriz de confusão");
       d.imprimir();
-      // exportarHistoricoPerda(rede, ged);
+      exportarHistoricoPerda(rede, ged);
    }
 
    public static void compararSaidaRede(RedeNeural rede, double[][] dadosEntrada, double[][] dadosSaida, String texto){
