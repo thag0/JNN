@@ -339,8 +339,13 @@ public class Mat implements Cloneable{
    /**
     * Exibe o conteúdo contido na matriz.
     */
-   public void print(){
-      System.out.println("Mat = [");
+   public void print(String nome){
+      if(nome == null || nome.isBlank() || nome.isEmpty()){
+         System.out.println(this.getClass().getSimpleName() + " = [");
+
+      }else{
+         System.out.println(nome + " = [");
+      }
 
       for(int i = 0; i < this.lin; i++){
          System.out.print("   ");
@@ -351,6 +356,13 @@ public class Mat implements Cloneable{
       }
 
       System.out.println("]");
+   }
+
+   /**
+    * Exibe o conteúdo contido na matriz.
+    */
+   public void print(){
+      this.print(this.getClass().getSimpleName());
    }
 
    /**

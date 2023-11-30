@@ -198,6 +198,21 @@ public class RedeNeural implements Cloneable{
       this.alcancePeso = alcance;
    }
 
+   /**
+    * Define se a Rede Neural usará um viés para seus pesos.
+    * <p>
+    *    O viés é um atributo adicional para cada neurônio que sempre emite um valor de 
+    *    saída constante. A presença de viés permite que a rede neural aprenda relações 
+    *    mais complexas, melhorando a capacidade de modelagem.
+    * </p>
+    * <p>
+    *    O bias deve ser configurado antes da compilação para ser aplicado.
+    * </p>
+    * <p>
+    *    {@code O valor padrão para uso do bias é true}
+    * </p>
+    * @param usarBias novo valor para o uso do bias.
+    */
    public void configurarBias(boolean usarBias){
       this.bias = usarBias;
    }
@@ -230,7 +245,7 @@ public class RedeNeural implements Cloneable{
     * <ul>
     *    <li> ReLU. </li>
     *    <li> Sigmoid. </li>
-    *    <li> Tangente Hiperbólica. </li>
+    *    <li> TanH. </li>
     *    <li> Leaky ReLU. </li>
     *    <li> ELU .</li>
     *    <li> Swish. </li>
@@ -240,6 +255,7 @@ public class RedeNeural implements Cloneable{
     *    <li> Argmax. </li>
     *    <li> Softmax. </li>
     *    <li> Softplus. </li>
+    *    <li> ArcTan. </li>
     * </ul>
     * <p>
     *    {@code A função de ativação padrão é a ReLU para todas as camadas}
@@ -267,7 +283,7 @@ public class RedeNeural implements Cloneable{
     * <ul>
     *    <li> ReLU. </li>
     *    <li> Sigmoid. </li>
-    *    <li> Tangente Hiperbólica. </li>
+    *    <li> TanH. </li>
     *    <li> Leaky ReLU. </li>
     *    <li> ELU .</li>
     *    <li> Swish. </li>
@@ -277,6 +293,7 @@ public class RedeNeural implements Cloneable{
     *    <li> Argmax. </li>
     *    <li> Softmax. </li>
     *    <li> Softplus. </li>
+    *    <li> ArcTan. </li>
     * </ul>
     * <p>
     *    {@code A função de ativação padrão é a ReLU para todas as camadas}
@@ -304,7 +321,7 @@ public class RedeNeural implements Cloneable{
     * <ul>
     *    <li> ReLU. </li>
     *    <li> Sigmoid. </li>
-    *    <li> Tangente Hiperbólica. </li>
+    *    <li> TanH. </li>
     *    <li> Leaky ReLU. </li>
     *    <li> ELU .</li>
     *    <li> Swish. </li>
@@ -314,6 +331,7 @@ public class RedeNeural implements Cloneable{
     *    <li> Argmax. </li>
     *    <li> Softmax. </li>
     *    <li> Softplus. </li>
+    *    <li> ArcTan. </li>
     * </ul>
     * <p>
     *    {@code A função de ativação padrão é a ReLU para todas as camadas}
@@ -344,7 +362,7 @@ public class RedeNeural implements Cloneable{
     * <ul>
     *    <li> ReLU. </li>
     *    <li> Sigmoid. </li>
-    *    <li> Tangente Hiperbólica. </li>
+    *    <li> TanH. </li>
     *    <li> Leaky ReLU. </li>
     *    <li> ELU .</li>
     *    <li> Swish. </li>
@@ -354,6 +372,7 @@ public class RedeNeural implements Cloneable{
     *    <li> Argmax. </li>
     *    <li> Softmax. </li>
     *    <li> Softplus. </li>
+    *    <li> ArcTan. </li>
     * </ul>
     * <p>
     *    {@code A função de ativação padrão é a ReLU para todas as camadas}
@@ -953,7 +972,7 @@ public class RedeNeural implements Cloneable{
                   salvo = camada.pesos.dado(i, j);
                   camada.pesos.add(i, j, eps);
                   double d = (this.avaliador.erroMedioQuadrado(entradas, saidas) - custo) / eps;
-                  camada.gradientePesos.editar(i, j, d);
+                  camada.gradPesos.editar(i, j, d);
                   camada.pesos.editar(i, j, salvo);
                }
             }
@@ -971,7 +990,7 @@ public class RedeNeural implements Cloneable{
          for(CamadaDensa camada : this.camadas){            
             for(int i = 0; i < camada.pesos.lin; i++){
                for(int j = 0; j < camada.pesos.col; j++){
-                  camada.pesos.sub(i, j, (tA * camada.gradientePesos.dado(i, j)));
+                  camada.pesos.sub(i, j, (tA * camada.gradPesos.dado(i, j)));
                }
             }
 

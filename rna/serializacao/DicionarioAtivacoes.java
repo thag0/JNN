@@ -1,5 +1,6 @@
 package rna.serializacao;
 
+import rna.ativacoes.ArcTan;
 import rna.ativacoes.Argmax;
 import rna.ativacoes.ELU;
 import rna.ativacoes.Ativacao;
@@ -51,6 +52,7 @@ public class DicionarioAtivacoes{
          case "softplus"   : return new SoftPlus();
          case "swish"      : return new Swish();
          case "tanh"       : return new TanH();
+         case "arctan"    : return new ArcTan();
 
          default: throw new IllegalArgumentException(
             "Ativação \"" + nome + "\" não encontada."

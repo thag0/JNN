@@ -21,23 +21,21 @@ class Auxiliar{
    }
 
    /**
-    * Calcular os gradientes de todas as camadas da rede de acordo com os valores
-    * previstos e a função de perda configurada pela Rede Neural.
+    * Realiza a retropropagação de gradientes de cada camada para a atualização de pesos.
     * <p>
-    *    Multiplicar os erros pela derivada a função de ativação
-    *    da camada ta deixando o treinamento muito mais lento, não 
-    *    sei se deveria acontecer isso.
+    *    Os gradientes iniciais são calculados usando a derivada da função de perda, com eles
+    *    calculados, são retropropagados da última a primeira camada da rede.
     * </p>
-	 * @param redec Lista de camadas densas da Rede Neural.
-    * @param perda função de perda da Rede Neural.
-    * @param real valores reais dos dados preditos.
+    * @param redec conjunto de camadas densas da Rede Neural.
+    * @param perda função de perda configurada para a Rede Neural.
+    * @param real saída real que será usada para calcular os erros e gradientes.
     */
-   public void calcularGradientes(CamadaDensa[] redec, Perda perda, double[] real){
+   public void backpropagation(CamadaDensa[] redec, Perda perda, double[] real){
       CamadaDensa saida = redec[redec.length-1];
       double[] previsto = saida.obterSaida().linha(0);
-      double[] gradSaida = perda.derivada(previsto, real);
-      saida.calcularGradiente(gradSaida);
-
+      double[] gradPrev = perda.derivada(previsto, real);
+      
+      saida.calcularGradiente(gradPrev);
       for(int i = redec.length-2; i >= 0; i--){
          redec[i].calcularGradiente(redec[i+1].gradienteEntrada.linha(0));
       }
@@ -90,7 +88,7 @@ class Auxiliar{
       double[][] subMatriz = new double[linhas][colunas];
 
       for(int i = 0; i < linhas; i++){
-         System.arraycopy(dados[inicio+i], 0, subMatriz[i], 0, colunas);
+         copiarArray(dados[inicio+1], subMatriz[i]);
       }
 
       return subMatriz;

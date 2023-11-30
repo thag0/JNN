@@ -6,14 +6,14 @@ public class TanH extends Ativacao{
 
    @Override
    public void calcular(CamadaDensa camada){
-      double tanh;
+      double s;
       int i, j;
 
       for(i = 0; i < camada.saida.lin; i++){
          for(j = 0; j < camada.saida.col; j++){
-            tanh = camada.somatorio.dado(i, j);
-            tanh = tanh(tanh);
-            camada.saida.editar(i, j, tanh);
+            s = camada.somatorio.dado(i, j);
+            s = tanh(s);
+            camada.saida.editar(i, j, s);
          }
       }
    }
@@ -29,7 +29,7 @@ public class TanH extends Ativacao{
             d = camada.saida.dado(i, j);
             d = 1 - (d * d);
             
-            camada.derivada.editar(i, j, d * grad);
+            camada.derivada.editar(i, j, (d * grad));
          }
       }
    }

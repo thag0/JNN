@@ -9,12 +9,12 @@ import rna.estrutura.RedeNeural;
 import rna.otimizadores.Otimizador;
 
 public class Treino{
-   OpMatriz mat = new OpMatriz();
+   OpMatriz opmat = new OpMatriz();
+   Auxiliar aux = new Auxiliar();
+   Random random = new Random();
+
    public boolean calcularHistorico = false;
    double[] historico;
-   Auxiliar aux = new Auxiliar();
-
-   Random random = new Random();
    boolean ultimoUsado = false;
 
    /**
@@ -68,7 +68,6 @@ public class Treino{
          for(int i = 0; i < entrada.length; i++){
             aux.copiarArray(entrada[i], amostraEntrada);
             aux.copiarArray(saida[i], amostraSaida);
-
             rede.calcularSaida(amostraEntrada);
 
             //feedback de avanço da rede
@@ -89,32 +88,35 @@ public class Treino{
 
    /**
     * Realiza a retropropagação de gradientes de cada camada para a atualização de pesos.
+    * <p>
+    *    Os gradientes iniciais são calculados usando a derivada da função de perda, com eles
+    *    calculados, são retropropagados da última a primeira camada da rede.
+    * </p>
     * @param redec conjunto de camadas densas da Rede Neural.
     * @param perda função de perda configurada para a Rede Neural.
     * @param real saída real que será usada para calcular os erros e gradientes.
     */
    public void backpropagation(CamadaDensa[] redec, Perda perda, double[] real){
-      CamadaDensa saida = redec[redec.length-1];
-      double[] previsto = saida.obterSaida().linha(0);
-      double[] gradSaida = perda.derivada(previsto, real);
-      saida.calcularGradiente(gradSaida);
-
-      for(int i = redec.length-2; i >= 0; i--){
-         redec[i].calcularGradiente(redec[i+1].gradienteEntrada.linha(0));
-      }
+      aux.backpropagation(redec, perda, real);
    }
 
+   /**
+    * Atualiza os gradientes diretanmente usando o gradiente descendente.
+    * @param redec conjunto de camadas densas da Rede Neural.
+    * @param taxaAprendizagem taxa de aprendizagem, que será aplicada ao gradientes
+    * para as atualizações.
+    */
    @Deprecated
-   public void atualizarPesos(CamadaDensa[] camadas, double taxaAprendizagem){
-      for(int i = 0; i < camadas.length; i++){
-         CamadaDensa camada = camadas[i];
+   public void atualizarPesos(CamadaDensa[] redec, double taxaAprendizagem){
+      for(int i = 0; i < redec.length; i++){
+         CamadaDensa camada = redec[i];
 
-         mat.escalar(camada.gradientePesos, taxaAprendizagem, camada.gradientePesos);
-         mat.add(camada.pesos, camada.gradientePesos, camada.pesos);
+         opmat.escalar(camada.gradPesos, taxaAprendizagem, camada.gradPesos);
+         opmat.add(camada.pesos, camada.gradPesos, camada.pesos);
 
          if(camada.temBias()){
-            mat.escalar(camada.gradienteSaida, taxaAprendizagem, camada.gradienteSaida);
-            mat.add(camada.bias, camada.gradienteSaida, camada.bias);
+            opmat.escalar(camada.gradienteSaida, taxaAprendizagem, camada.gradienteSaida);
+            opmat.add(camada.bias, camada.gradienteSaida, camada.bias);
          }
       }
    }

@@ -187,7 +187,7 @@ public class Adam extends Otimizador{
       for(int i = 0; i < redec.length; i++){
          CamadaDensa camada = redec[i];
          Mat pesos = camada.pesos;
-         Mat grads = camada.gradientePesos;
+         Mat grads = camada.gradPesos;
 
          for(int j = 0; j < camada.pesos.lin; j++){
             for(int k = 0; k < camada.pesos.col; k++){

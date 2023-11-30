@@ -5,8 +5,8 @@ import rna.estrutura.CamadaDensa;
 /**
  * Classe base para implementações de otimizadores do treino da Rede Neural.
  * <p>
- *		O otimizador já deve levar em consideração que os gradientes foram 
- *		calculados previamente.
+ *		O otimizador já deve levar em consideração que os gradientes para todas
+ *		as camadas foram calculados previamente.
  * </p>
  * <p>
  *		Novos otimizadores devem implementar (pelo menos) os métodos {@code inicialziar()} 

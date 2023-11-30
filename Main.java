@@ -12,7 +12,7 @@ import rna.otimizadores.*;
 
 public class Main{
    static final int epocas = 5*1000;
-   static final float escalaRender = 8f;
+   static final float escalaRender = 7f;
    static Ged ged = new Ged();
    static Geim geim = new Geim();
 
@@ -58,10 +58,10 @@ public class Main{
       RedeNeural rede = new RedeNeural(arq);
 
       Perda perda = new ErroMedioQuadrado();
-      Otimizador otm = new SGD(0.001, 0.95, true);
+      Otimizador otm = new SGD(0.01, 0.9);
       Inicializador ini = new Xavier();
 
-      // rede.configurarSeed(1234);
+      rede.configurarSeed(1234);
       // rede.configurarHistoricoPerda(true);
       rede.compilar(perda, otm, ini);
       rede.configurarAtivacao("tanh");
@@ -70,6 +70,13 @@ public class Main{
       return rede;
    }
 
+   /**
+    * Treina e exibe o resultado da Rede Neural no painel.
+    * @param rede modelo de rede neural usado no treino.
+    * @param imagem imagem que o modelo está aprendendo.
+    * @param dadosEntrada dados de entrada para o treino.
+    * @param dadosSaida dados de saída relativos a entrada.
+    */
    public static void treinoEmPainel(RedeNeural rede, BufferedImage imagem, double[][] dadosEntrada, double[][] dadosSaida){
       final int fps = 6000;
       int epocasPorFrame = 30;

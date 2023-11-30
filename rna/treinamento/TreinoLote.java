@@ -9,7 +9,7 @@ import rna.estrutura.RedeNeural;
 import rna.otimizadores.Otimizador;
 
 public class TreinoLote{
-   OpMatriz mat = new OpMatriz();
+   OpMatriz opmat = new OpMatriz();
    Auxiliar aux = new Auxiliar();
    Random random = new Random();
 
@@ -85,7 +85,6 @@ public class TreinoLote{
                backpropagationLote(camadas, perda, saida);
             }
 
-
             //normalizar gradientes para enviar pro otimizador
             calcularMediaGradientesLote(camadas, entradaLote.length);
             otimizador.atualizar(camadas);
@@ -98,39 +97,63 @@ public class TreinoLote{
       }
    }
 
+   /**
+    * Realiza a retropropagação de gradientes de cada camada para a atualização de pesos.
+    * <p>
+    *    Os gradientes iniciais são calculados usando a derivada da função de perda, com eles
+    *    calculados, são retropropagados da última a primeira camada da rede.
+    * </p>
+    * Ao final os gradientes calculados são adicionados aos acumuladores para o lote.
+    * @param redec conjunto de camadas densas da Rede Neural.
+    * @param perda função de perda configurada para a Rede Neural.
+    * @param real saída real que será usada para calcular os erros e gradientes.
+    */
    void backpropagationLote(CamadaDensa[] redec, Perda perda, double[] real){
-      aux.calcularGradientes(redec, perda, real);
+      aux.backpropagation(redec, perda, real);
 
       for(CamadaDensa camada : redec){
-         mat.add(camada.gradienteAcPesos, camada.gradientePesos, camada.gradienteAcPesos);
-         mat.add(camada.gradienteAcBias, camada.gradienteBias, camada.gradienteAcBias);
+         opmat.add(camada.gradAcPesos, camada.gradPesos, camada.gradAcPesos);
+         opmat.add(camada.gradAcBias, camada.gradBias, camada.gradAcBias);
       }
    }
 
+   /**
+    * Zera todos os acumuladores de gradientes das camadas (para pesos e bias)
+    * para iniciar o treinamento de um lote.
+    * @param redec conjunto de camadas densas da Rede Neural.
+    */
    void zerarGradientesAcumulados(CamadaDensa[] redec){
       for(CamadaDensa camada : redec){
-         mat.preencher(camada.gradienteAcPesos, 0);
-         mat.preencher(camada.gradienteAcBias, 0);
+         opmat.preencher(camada.gradPesos, 0);
+         opmat.preencher(camada.gradBias, 0);
+         opmat.preencher(camada.gradAcPesos, 0);
+         opmat.preencher(camada.gradAcBias, 0);
       }
    }
-   
+
+   /**
+    * 
+    * @param redec conjunto de camadas densas da Rede Neural.
+    * @param tamLote tamanho do lote que foi usado para calcular os acumuladores
+    * de gradiente das camadas.
+    */
    void calcularMediaGradientesLote(CamadaDensa[] redec, int tamLote){
       for(CamadaDensa camada : redec){
          
          for(int i = 0; i < camada.pesos.lin; i++){
             for(int j = 0; j < camada.pesos.col; j++){
-               camada.gradienteAcPesos.div(i, j, tamLote);
+               camada.gradAcPesos.div(i, j, tamLote);
             }
          }
-         mat.copiar(camada.gradienteAcPesos, camada.gradientePesos);
+         opmat.copiar(camada.gradAcPesos, camada.gradPesos);
 
          if(camada.temBias()){
             for(int i = 0; i < camada.bias.lin; i++){
                for(int j = 0; j < camada.bias.col; j++){
-                  camada.gradienteAcBias.div(i, j, tamLote);
+                  camada.gradAcBias.div(i, j, tamLote);
                }
             }
-            mat.copiar(camada.gradienteAcBias, camada.gradienteBias);
+            opmat.copiar(camada.gradAcBias, camada.gradBias);
          }
 
       }

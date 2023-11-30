@@ -127,7 +127,7 @@ public class SGD extends Otimizador{
       for(i = 0; i < redec.length; i++){
          CamadaDensa camada = redec[i];
          Mat pesos = camada.pesos;
-         Mat gradP = camada.gradientePesos;
+         Mat gradP = camada.gradPesos;
 
          for(j = 0; j < pesos.lin; j++){
             for(k = 0; k < pesos.col; k++){
@@ -137,7 +137,7 @@ public class SGD extends Otimizador{
 
          if(camada.temBias()){
             Mat bias = camada.bias;
-            Mat gradB = camada.gradienteBias;
+            Mat gradB = camada.gradBias;
             for(j = 0; j < bias.lin; j++){
                for(k = 0; k < bias.col; k++){
                   calcular(bias, gradB, mb[i], j, k);
