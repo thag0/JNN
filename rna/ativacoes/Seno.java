@@ -1,6 +1,6 @@
 package rna.ativacoes;
 
-import rna.estrutura.CamadaDensa;
+import rna.estrutura.Densa;
 
 /**
  * Implementação da função de ativação Seno para uso dentro 
@@ -16,7 +16,7 @@ public class Seno extends Ativacao{
    }
 
    @Override
-   public void calcular(CamadaDensa camada){
+   public void calcular(Densa camada){
       for(int i = 0; i < camada.saida.lin; i++){
          for(int j = 0; j < camada.saida.col; j++){
             camada.saida.editar(i, j, Math.sin(camada.somatorio.dado(i, j)));
@@ -25,7 +25,7 @@ public class Seno extends Ativacao{
    }
 
    @Override
-   public void derivada(CamadaDensa camada){
+   public void derivada(Densa camada){
       int i, j;
       double grad, d;
 

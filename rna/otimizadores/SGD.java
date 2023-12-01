@@ -1,7 +1,7 @@
 package rna.otimizadores;
 
 import rna.core.Mat;
-import rna.estrutura.CamadaDensa;
+import rna.estrutura.Densa;
 
 /**
  * Classe que implementa o otimizador Gradiente Descentente Estocástico com momentum.
@@ -107,12 +107,12 @@ public class SGD extends Otimizador{
    }
 
    @Override
-   public void inicializar(CamadaDensa[] redec){
+   public void inicializar(Densa[] redec){
       this.m  = new Mat[redec.length];
       this.mb = new Mat[redec.length];
 
       for(int i = 0; i < redec.length; i++){
-         CamadaDensa camada = redec[i];
+         Densa camada = redec[i];
 
          this.m[i] = new Mat(camada.pesos.lin, camada.pesos.col);
          if(camada.temBias()){
@@ -122,10 +122,10 @@ public class SGD extends Otimizador{
    }
 
    @Override
-   public void atualizar(CamadaDensa[] redec){
+   public void atualizar(Densa[] redec){
       int i, j, k;
       for(i = 0; i < redec.length; i++){
-         CamadaDensa camada = redec[i];
+         Densa camada = redec[i];
          Mat pesos = camada.pesos;
          Mat gradP = camada.gradPesos;
 

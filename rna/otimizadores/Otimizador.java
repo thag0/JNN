@@ -1,6 +1,6 @@
 package rna.otimizadores;
 
-import rna.estrutura.CamadaDensa;
+import rna.estrutura.Densa;
 
 /**
  * Classe base para implementações de otimizadores do treino da Rede Neural.
@@ -24,7 +24,7 @@ public abstract class Otimizador{
 	 * Inicializa os parâmetros do otimizador para que possa ser usado.
 	 * @param redec Lista de camadas densas da Rede Neural.
 	 */
-	public void inicializar(CamadaDensa[] redec){
+	public void inicializar(Densa[] redec){
 		throw new UnsupportedOperationException(
 			"Inicialização do otimizador não implementada."
 		);
@@ -37,7 +37,7 @@ public abstract class Otimizador{
 	 * </p>
 	 * @param redec Lista de camadas densas da Rede Neural.
 	 */
-	public void atualizar(CamadaDensa[] redec){
+	public void atualizar(Densa[] redec){
 		throw new UnsupportedOperationException(
 			"Método de atualização do otimizador não foi implementado."
 		);

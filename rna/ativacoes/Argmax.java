@@ -1,6 +1,6 @@
 package rna.ativacoes;
 
-import rna.estrutura.CamadaDensa;
+import rna.estrutura.Densa;
 
 /**
  * Implementação da função de ativação Argmax para uso 
@@ -22,7 +22,7 @@ public class Argmax extends Ativacao{
    }
 
    @Override
-   public void calcular(CamadaDensa camada){
+   public void calcular(Densa camada){
       int indiceMaximo = 0;
       double valorMaximo = camada.somatorio.dado(0, 0);
 

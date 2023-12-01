@@ -1,6 +1,6 @@
 package rna.ativacoes;
 
-import rna.estrutura.CamadaDensa;
+import rna.estrutura.Densa;
 
 /**
  * Implementação da função de ativação Linear para uso dentro 
@@ -16,7 +16,7 @@ public class Linear extends Ativacao{
    }
 
    @Override
-   public void calcular(CamadaDensa camada){
+   public void calcular(Densa camada){
       int i, j;
       
       for(i = 0; i < camada.saida.lin; i++){
@@ -27,7 +27,7 @@ public class Linear extends Ativacao{
    }
 
    @Override
-   public void derivada(CamadaDensa camada){
+   public void derivada(Densa camada){
       int i, j;
       double grad;
 

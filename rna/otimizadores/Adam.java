@@ -1,7 +1,7 @@
 package rna.otimizadores;
 
 import rna.core.Mat;
-import rna.estrutura.CamadaDensa;
+import rna.estrutura.Densa;
 
 /**
  * Implementação do algoritmo de otimização Adam.
@@ -158,14 +158,14 @@ public class Adam extends Otimizador{
    }
 
    @Override
-   public void inicializar(CamadaDensa[] redec){
+   public void inicializar(Densa[] redec){
       this.m  = new Mat[redec.length];
       this.v  = new Mat[redec.length];
       this.mb = new Mat[redec.length];
       this.vb = new Mat[redec.length];
    
       for(int i = 0; i < redec.length; i++){
-         CamadaDensa camada = redec[i];
+         Densa camada = redec[i];
 
          this.m[i] = new Mat(camada.pesos.lin, camada.pesos.col);
          this.v[i] = new Mat(camada.pesos.lin, camada.pesos.col);
@@ -178,14 +178,14 @@ public class Adam extends Otimizador{
    }
 
    @Override
-   public void atualizar(CamadaDensa[] redec){
+   public void atualizar(Densa[] redec){
       interacoes++;
       double forcaB1 = Math.pow(beta1, interacoes);
       double forcaB2 = Math.pow(beta2, interacoes);
       double alfa = taxaAprendizagem * Math.sqrt(1 - forcaB2) / (1 - forcaB1);
    
       for(int i = 0; i < redec.length; i++){
-         CamadaDensa camada = redec[i];
+         Densa camada = redec[i];
          Mat pesos = camada.pesos;
          Mat grads = camada.gradPesos;
 

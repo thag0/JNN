@@ -385,4 +385,116 @@ public class OpMatriz{
          }
       }
    }
+
+   /**
+    * 
+    * @param m
+    */
+   public void rotacionar180(Mat m){
+      int lin = m.lin;
+      int col = m.col;
+      Mat rot = new Mat(lin, col);
+  
+      for(int i = 0; i < lin; i++){
+         for(int j = 0; j < col; j++){
+            rot.editar(i, j, m.dado(lin - 1 - i, col - 1 - j));
+         }
+      }
+      
+      m.copiar(rot);
+   } 
+
+   /**
+    * 
+    * @param m
+    * @return
+    */
+   public Mat rotacionar180R(Mat m){
+      int lin = m.lin;
+      int col = m.col;
+      Mat rot = new Mat(lin, col);
+  
+      for(int i = 0; i < lin; i++){
+         for(int j = 0; j < col; j++){
+            rot.editar(i, j, m.dado(lin - 1 - i, col - 1 - j));
+         }
+      }
+      
+      return rot;
+   } 
+
+   /**
+    * Realiza a operação de correlação cruzada entre a matriz de entrada e o filtro.
+    * Nela o filtro é sobreposto pela entrada e os valores contidos são multiplicados 
+    * e somados para o resultado final.
+    * @param a matriz de entrada para a operação de convolução.
+    * @param b filtro ou kernel aplicado na matriz de entrada.
+    * @param r resultado da convolução
+    */
+   public void correlacaoCruzada(Mat a, Mat b, Mat r){
+      if(r.lin != (a.lin - b.lin + 1)){
+         throw new IllegalArgumentException(
+            "Dimensões entre as linhas de A, B e R incompatíveis."
+         );
+      }
+      if(r.col != (a.col - b.col + 1)){
+         throw new IllegalArgumentException(
+            "Dimensões entre as colunas de A, B e R incompatíveis."
+         );
+      }
+
+      double res;
+      for(int i = 0; i < r.lin; i++){
+         for(int j = 0; j < r.col; j++){
+            
+            res = 0;
+            for(int k = 0; k < b.lin; k++){
+               for(int l = 0; l < b.col; l++){
+                  res += a.dado(i + k, j + l) * b.dado(k, l);
+               }
+            }
+
+            r.editar(i, j, res);
+         }
+      }
+   }
+
+   /**
+    * Realiza a operação convolucional entre a matriz de entrada e o filtro.
+    * <p>
+    *    O diferencial entre a convolução e a correlação cruazada, é que na convolução
+    *    o filtro aplicado é rotacionado 180°.
+    * </p>
+    * @param a matriz de entrada para a operação de convolução.
+    * @param b filtro ou kernel aplicado na matriz de entrada.
+    * @param r resultado da convolução
+    */
+   public void convolucao(Mat a, Mat b, Mat r){
+      if(r.lin != (a.lin - b.lin + 1)){
+         throw new IllegalArgumentException(
+            "Dimensões entre as linhas de A, B e R incompatíveis."
+         );
+      }
+      if(r.col != (a.col - b.col + 1)){
+         throw new IllegalArgumentException(
+            "Dimensões entre as colunas de A, B e R incompatíveis."
+         );
+      }
+      
+      double res;
+      Mat filtro = rotacionar180R(b);
+      for(int i = 0; i < r.lin; i++){
+         for(int j = 0; j < r.col; j++){
+            
+            res = 0;
+            for(int k = 0; k < filtro.lin; k++){
+               for(int l = 0; l < filtro.col; l++){
+                  res += a.dado(i + k, j + l) * filtro.dado(k, l);
+               }
+            }
+
+            r.editar(i, j, res/(filtro.col*filtro.lin));
+         }
+      }
+   }
 }

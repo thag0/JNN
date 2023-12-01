@@ -4,7 +4,7 @@ import java.util.Random;
 
 import rna.avaliacao.perda.Perda;
 import rna.core.OpMatriz;
-import rna.estrutura.CamadaDensa;
+import rna.estrutura.Densa;
 import rna.estrutura.RedeNeural;
 import rna.otimizadores.Otimizador;
 
@@ -56,7 +56,7 @@ public class Treino{
       double[] amostraEntrada = new double[entrada[0].length];
       double[] amostraSaida = new double[saida[0].length];
 
-      CamadaDensa[] camadas = rede.obterCamadas();
+      Densa[] camadas = rede.obterCamadas();
       Otimizador otimizador = rede.obterOtimizador();
       Perda perda = rede.obterPerda();
       
@@ -96,7 +96,7 @@ public class Treino{
     * @param perda função de perda configurada para a Rede Neural.
     * @param real saída real que será usada para calcular os erros e gradientes.
     */
-   public void backpropagation(CamadaDensa[] redec, Perda perda, double[] real){
+   public void backpropagation(Densa[] redec, Perda perda, double[] real){
       aux.backpropagation(redec, perda, real);
    }
 
@@ -107,9 +107,9 @@ public class Treino{
     * para as atualizações.
     */
    @Deprecated
-   public void atualizarPesos(CamadaDensa[] redec, double taxaAprendizagem){
+   public void atualizarPesos(Densa[] redec, double taxaAprendizagem){
       for(int i = 0; i < redec.length; i++){
-         CamadaDensa camada = redec[i];
+         Densa camada = redec[i];
 
          opmat.escalar(camada.gradPesos, taxaAprendizagem, camada.gradPesos);
          opmat.add(camada.pesos, camada.gradPesos, camada.pesos);

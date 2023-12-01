@@ -1,6 +1,6 @@
 package rna.ativacoes;
 
-import rna.estrutura.CamadaDensa;
+import rna.estrutura.Densa;
 
 /**
  * Implementação da função de ativação GELU para uso dentro 
@@ -19,7 +19,7 @@ public class GELU extends Ativacao{
    }
 
    @Override
-   public void calcular(CamadaDensa camada){
+   public void calcular(Densa camada){
       int i, j;
       double s;
 
@@ -32,7 +32,7 @@ public class GELU extends Ativacao{
    }
 
    @Override
-   public void derivada(CamadaDensa camada){
+   public void derivada(Densa camada){
       int i, j;
       double grad, d;
 

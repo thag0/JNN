@@ -3,7 +3,7 @@ package testes;
 import ged.Ged;
 import rna.ativacoes.Sigmoid;
 import rna.core.Mat;
-import rna.estrutura.CamadaDensa;
+import rna.estrutura.Densa;
 import rna.inicializadores.Xavier;
 
 public class TesteCamada{
@@ -20,7 +20,7 @@ public class TesteCamada{
       
       //simples teste unitário de uma camada densa
       //criada para se comportar como uma porta lógica OR.
-      CamadaDensa camada = new CamadaDensa(2, 1, true);
+      Densa camada = new Densa(2, 1, true);
       camada.inicializar(new Xavier(), 0);
       camada.configurarAtivacao(new Sigmoid());
 

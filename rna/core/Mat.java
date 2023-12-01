@@ -170,6 +170,11 @@ public class Mat implements Cloneable{
     * @param m matriz com os dados.
     */
    public void copiar(double[][] m){
+      if(m == null){
+         throw new IllegalArgumentException(
+            "Matriz fornecida é nula."
+         );
+      }
       if(this.lin != m.length || this.col != m[0].length){
          throw new IllegalArgumentException(
             "Dimensões incompatíveis."
@@ -334,6 +339,20 @@ public class Mat implements Cloneable{
       }
 
       return coluna;
+   }
+
+   /**
+    * Converte os dados da matriz num array bidimensional.
+    * @return array bidimensional do tipo double.
+    */
+   public double[][] paraDouble(){
+      double[][] m = new double[this.lin][this.col];
+
+      for(int i = 0; i < this.lin; i++){
+         m[i] = this.linha(i);
+      }
+
+      return m;
    }
 
    /**

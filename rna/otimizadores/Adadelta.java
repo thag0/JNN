@@ -1,7 +1,7 @@
 package rna.otimizadores;
 
 import rna.core.Mat;
-import rna.estrutura.CamadaDensa;
+import rna.estrutura.Densa;
 
 /**
  * Implementação do otimizador Adadelta.
@@ -110,7 +110,7 @@ public class Adadelta extends Otimizador{
    }
 
    @Override
-   public void inicializar(CamadaDensa[] redec){
+   public void inicializar(Densa[] redec){
       this.ac   = new Mat[redec.length];
       this.acAt = new Mat[redec.length];
 
@@ -118,7 +118,7 @@ public class Adadelta extends Otimizador{
       this.acAtb = new Mat[redec.length];
    
       for(int i = 0; i < redec.length; i++){
-         CamadaDensa camada = redec[i];
+         Densa camada = redec[i];
 
          this.ac[i]   = new Mat(camada.pesos.lin, camada.pesos.col);
          this.acAt[i] = new Mat(camada.pesos.lin, camada.pesos.col);
@@ -131,9 +131,9 @@ public class Adadelta extends Otimizador{
    }
 
    @Override
-   public void atualizar(CamadaDensa[] redec){
+   public void atualizar(Densa[] redec){
       for(int i = 0; i < redec.length; i++){
-         CamadaDensa camada = redec[i];
+         Densa camada = redec[i];
          Mat pesos = camada.pesos;
          Mat grads = camada.gradPesos;
 

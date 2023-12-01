@@ -4,7 +4,7 @@ import java.util.Random;
 
 import rna.avaliacao.perda.Perda;
 import rna.core.OpMatriz;
-import rna.estrutura.CamadaDensa;
+import rna.estrutura.Densa;
 import rna.estrutura.RedeNeural;
 import rna.otimizadores.Otimizador;
 
@@ -57,7 +57,7 @@ public class TreinoLote{
     * @param tamLote tamanho do lote.
     */
    public void treinar(RedeNeural rede, double[][] entradas, double[][] saidas, int epochs, int tamLote){      
-      CamadaDensa[] camadas = rede.obterCamadas();
+      Densa[] camadas = rede.obterCamadas();
       Otimizador otimizador = rede.obterOtimizador();
       Perda perda = rede.obterPerda();
 
@@ -108,10 +108,10 @@ public class TreinoLote{
     * @param perda função de perda configurada para a Rede Neural.
     * @param real saída real que será usada para calcular os erros e gradientes.
     */
-   void backpropagationLote(CamadaDensa[] redec, Perda perda, double[] real){
+   void backpropagationLote(Densa[] redec, Perda perda, double[] real){
       aux.backpropagation(redec, perda, real);
 
-      for(CamadaDensa camada : redec){
+      for(Densa camada : redec){
          opmat.add(camada.gradAcPesos, camada.gradPesos, camada.gradAcPesos);
          opmat.add(camada.gradAcBias, camada.gradBias, camada.gradAcBias);
       }
@@ -122,8 +122,8 @@ public class TreinoLote{
     * para iniciar o treinamento de um lote.
     * @param redec conjunto de camadas densas da Rede Neural.
     */
-   void zerarGradientesAcumulados(CamadaDensa[] redec){
-      for(CamadaDensa camada : redec){
+   void zerarGradientesAcumulados(Densa[] redec){
+      for(Densa camada : redec){
          opmat.preencher(camada.gradPesos, 0);
          opmat.preencher(camada.gradBias, 0);
          opmat.preencher(camada.gradAcPesos, 0);
@@ -137,8 +137,8 @@ public class TreinoLote{
     * @param tamLote tamanho do lote que foi usado para calcular os acumuladores
     * de gradiente das camadas.
     */
-   void calcularMediaGradientesLote(CamadaDensa[] redec, int tamLote){
-      for(CamadaDensa camada : redec){
+   void calcularMediaGradientesLote(Densa[] redec, int tamLote){
+      for(Densa camada : redec){
          
          for(int i = 0; i < camada.pesos.lin; i++){
             for(int j = 0; j < camada.pesos.col; j++){

@@ -2,7 +2,7 @@ package rna.ativacoes;
 
 import rna.core.Mat;
 import rna.core.OpMatriz;
-import rna.estrutura.CamadaDensa;
+import rna.estrutura.Densa;
 
 /**
  * Implementação da função de ativação Softmax para uso
@@ -29,7 +29,7 @@ public class Softmax extends Ativacao{
    }
 
    @Override
-   public void calcular(CamadaDensa camada){
+   public void calcular(Densa camada){
       double somaExp = 0;
 
       for(int i = 0; i < camada.somatorio.col; i++){
@@ -43,7 +43,7 @@ public class Softmax extends Ativacao{
    }
 
    @Override
-   public void derivada(CamadaDensa camada){
+   public void derivada(Densa camada){
       int n = camada.somatorio.col;
       Mat tmp = camada.saida.bloco(0, n);
       Mat ident = opm.identidade(n);

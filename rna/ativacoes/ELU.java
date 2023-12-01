@@ -1,6 +1,6 @@
 package rna.ativacoes;
 
-import rna.estrutura.CamadaDensa;
+import rna.estrutura.Densa;
 
 /**
  * Implementação da função de ativação ELU para uso dentro 
@@ -38,7 +38,7 @@ public class ELU extends Ativacao{
    }
 
    @Override
-   public void calcular(CamadaDensa camada){
+   public void calcular(Densa camada){
       int i, j;
       double s;
       for(i = 0; i < camada.saida.lin; i++){
@@ -50,7 +50,7 @@ public class ELU extends Ativacao{
    }
 
    @Override
-   public void derivada(CamadaDensa camada){
+   public void derivada(Densa camada){
       int i, j;
       double grad, d;
 

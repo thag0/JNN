@@ -18,7 +18,7 @@ public class RedeNeural implements Cloneable{
     *    Conjunto de camadas densas (ou fully connected) da Rede Neural.
     * </p>
     */
-   private CamadaDensa[] camadas;
+   private Densa[] camadas;
 
    /**
     * Array contendo a arquitetura de cada camada dentro da Rede Neural.
@@ -266,7 +266,7 @@ public class RedeNeural implements Cloneable{
    public void configurarAtivacao(Ativacao ativacao){
       this.verificarCompilacao();
       
-      for(CamadaDensa camada : this.camadas){
+      for(Densa camada : this.camadas){
          camada.configurarAtivacao(ativacao);
       }
    }
@@ -304,7 +304,7 @@ public class RedeNeural implements Cloneable{
    public void configurarAtivacao(String ativacao){
       this.verificarCompilacao();
       
-      for(CamadaDensa camada : this.camadas){
+      for(Densa camada : this.camadas){
          camada.configurarAtivacao(ativacao);
       }
    }
@@ -340,7 +340,7 @@ public class RedeNeural implements Cloneable{
     * @param ativacao instância da função de ativação.
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
-   public void configurarAtivacao(CamadaDensa camada, Ativacao ativacao){
+   public void configurarAtivacao(Densa camada, Ativacao ativacao){
       if(camada == null){
          throw new IllegalArgumentException(
             "A camada não pode ser nula."
@@ -381,7 +381,7 @@ public class RedeNeural implements Cloneable{
     * @param ativacao nome da função de ativação.
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
-   public void configurarAtivacao(CamadaDensa camada, String ativacao){
+   public void configurarAtivacao(Densa camada, String ativacao){
       if(camada == null){
          throw new IllegalArgumentException(
             "A camada não pode ser nula."
@@ -701,10 +701,10 @@ public class RedeNeural implements Cloneable{
          this.treinador.configurarSeed(seedInicial);
       }
 
-      this.camadas = new CamadaDensa[this.arquitetura.length-1];
-      this.camadas[0] = new CamadaDensa(this.arquitetura[0], this.arquitetura[1], this.bias);
+      this.camadas = new Densa[this.arquitetura.length-1];
+      this.camadas[0] = new Densa(this.arquitetura[0], this.arquitetura[1], this.bias);
       for(int i = 1; i < this.camadas.length; i++){
-         this.camadas[i] = new CamadaDensa(this.arquitetura[i], this.arquitetura[i+1], this.bias);
+         this.camadas[i] = new Densa(this.arquitetura[i], this.arquitetura[i+1], this.bias);
          this.camadas[i].inicializar(iniPesos, iniBias, this.alcancePeso);
          this.camadas[i].configurarId(i);
       }
@@ -966,7 +966,7 @@ public class RedeNeural implements Cloneable{
       for(int e = 0; e < epochs; e++){
 
          double custo = this.avaliador.erroMedioQuadrado(entradas, saidas);
-         for(CamadaDensa camada : this.camadas){   
+         for(Densa camada : this.camadas){   
             for(int i = 0; i < camada.pesos.lin; i++){
                for(int j = 0; j < camada.pesos.col; j++){
                   salvo = camada.pesos.dado(i, j);
@@ -987,7 +987,7 @@ public class RedeNeural implements Cloneable{
             }
          }
 
-         for(CamadaDensa camada : this.camadas){            
+         for(Densa camada : this.camadas){            
             for(int i = 0; i < camada.pesos.lin; i++){
                for(int j = 0; j < camada.pesos.col; j++){
                   camada.pesos.sub(i, j, (tA * camada.gradPesos.dado(i, j)));
@@ -1030,7 +1030,7 @@ public class RedeNeural implements Cloneable{
     * @throws IllegalArgumentException se o índice estiver fora do alcance do tamanho 
     * das camadas ocultas.
     */
-   public CamadaDensa obterCamada(int id){
+   public Densa obterCamada(int id){
       this.verificarCompilacao();
 
       if((id < 0) || (id >= this.camadas.length)){
@@ -1048,7 +1048,7 @@ public class RedeNeural implements Cloneable{
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     * @return conjunto de camadas da rede.
     */
-   public CamadaDensa[] obterCamadas(){
+   public Densa[] obterCamadas(){
       this.verificarCompilacao();
       return this.camadas;
    }
@@ -1058,7 +1058,7 @@ public class RedeNeural implements Cloneable{
     * @return camada de saída, ou ultima camada densa.
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
-   public CamadaDensa obterCamadaSaida(){
+   public Densa obterCamadaSaida(){
       this.verificarCompilacao();
       return this.camadas[this.camadas.length-1];
    }
@@ -1116,7 +1116,7 @@ public class RedeNeural implements Cloneable{
     */
    public int obterQuantidadeParametros(){
       int parametros = 0;
-      for(CamadaDensa camada : this.camadas){
+      for(Densa camada : this.camadas){
          parametros += camada.numParametros();
       }
       return parametros;
@@ -1254,7 +1254,7 @@ public class RedeNeural implements Cloneable{
          clone.otimizador = this.otimizador;
          clone.perda = this.perda;
 
-         clone.camadas = new CamadaDensa[this.camadas.length];
+         clone.camadas = new Densa[this.camadas.length];
          for(int i = 0; i < this.camadas.length; i++){
             clone.camadas[i] = this.camadas[i].clone();
          }

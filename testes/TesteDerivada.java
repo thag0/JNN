@@ -3,7 +3,7 @@ package testes;
 import ged.Ged;
 import rna.core.Mat;
 import rna.core.OpMatriz;
-import rna.estrutura.CamadaDensa;
+import rna.estrutura.Densa;
 
 class TesteDerivada{
    static Ged ged = new Ged();
@@ -18,7 +18,7 @@ class TesteDerivada{
          {7, 8, 9},
       });
 
-      CamadaDensa camada = new CamadaDensa(3, 3);
+      Densa camada = new Densa(3, 3);
       camada.configurarAtivacao("softmax");
 
       double[] entrada = {2, 3, 4};

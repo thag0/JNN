@@ -2,7 +2,7 @@ package rna.otimizadores;
 
 import rna.core.Mat;
 import rna.core.OpMatriz;
-import rna.estrutura.CamadaDensa;
+import rna.estrutura.Densa;
 
 /**
  * Implementa uma versão do algoritmo AdaGrad (Adaptive Gradient Algorithm).
@@ -88,13 +88,13 @@ public class AdaGrad extends Otimizador{
    }
 
    @Override
-   public void inicializar(CamadaDensa[] redec){
+   public void inicializar(Densa[] redec){
       this.ac  = new Mat[redec.length];
       this.acb = new Mat[redec.length];
       double valorInicial = 0.1;
 
       for(int i = 0; i < redec.length; i++){
-         CamadaDensa camada = redec[i];
+         Densa camada = redec[i];
 
          this.ac[i] = new Mat(camada.pesos.lin, camada.pesos.col);
          mat.preencher(this.ac[i], valorInicial);
@@ -107,9 +107,9 @@ public class AdaGrad extends Otimizador{
    }
 
    @Override
-   public void atualizar(CamadaDensa[] redec){
+   public void atualizar(Densa[] redec){
       for(int i = 0; i < redec.length; i++){
-         CamadaDensa camada = redec[i];
+         Densa camada = redec[i];
          Mat pesos = camada.pesos;
          Mat grads = camada.gradPesos;
 

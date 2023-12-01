@@ -1,6 +1,6 @@
 package rna.ativacoes;
 
-import rna.estrutura.CamadaDensa;
+import rna.estrutura.Densa;
 
 /**
  * Classe base para a implementação das funções de ativação.
@@ -17,7 +17,7 @@ public abstract class Ativacao{
     * </p>
     * @param camada camada densa usada.
     */
-   public void calcular(CamadaDensa camada){
+   public void calcular(Densa camada){
       throw new UnsupportedOperationException("Implementar ativação.");
    }
 
@@ -29,7 +29,7 @@ public abstract class Ativacao{
     * </p>
     * @param camada camada densa usada.
     */
-   public void derivada(CamadaDensa camada){
+   public void derivada(Densa camada){
       throw new UnsupportedOperationException("Implementar ativação derivada.");
    }
 }

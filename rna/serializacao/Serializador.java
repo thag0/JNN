@@ -6,7 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 
-import rna.estrutura.CamadaDensa;
+import rna.estrutura.Densa;
 import rna.estrutura.RedeNeural;
 
 /**
@@ -120,7 +120,7 @@ public class Serializador{
          writer.newLine();
 
          //funções de ativação
-         CamadaDensa[] camadas = rede.obterCamadas();
+         Densa[] camadas = rede.obterCamadas();
          for(int i = 0; i < camadas.length; i++){
             writer.write(camadas[i].obterAtivacao().getClass().getSimpleName());
             writer.write(" ");
@@ -128,7 +128,7 @@ public class Serializador{
          writer.newLine();
 
          //pesos dos neuronios
-         for(CamadaDensa camada : rede.obterCamadas()){
+         for(Densa camada : rede.obterCamadas()){
 
             for(int i = 0; i < camada.pesos.lin; i++){
                for(int j = 0; j < camada.pesos.col; j++){
@@ -245,7 +245,7 @@ public class Serializador{
 
          int cont = 1;
          try{
-            for(CamadaDensa camada : rede.obterCamadas()){
+            for(Densa camada : rede.obterCamadas()){
                for(int i = 0; i < camada.pesos.lin; i++){
                   for(int j = 0; j < camada.pesos.col; j++){
                      double d = Double.parseDouble(reader.readLine());

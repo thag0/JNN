@@ -1,7 +1,7 @@
 package rna.otimizadores;
 
 import rna.core.Mat;
-import rna.estrutura.CamadaDensa;
+import rna.estrutura.Densa;
 
 /**
  * Implementa o treino da rede neural usando o algoritmo RMSProp (Root Mean Square Propagation).
@@ -107,12 +107,12 @@ public class RMSProp extends Otimizador{
    }
 
    @Override
-   public void inicializar(CamadaDensa[] redec){
+   public void inicializar(Densa[] redec){
       this.ac  = new Mat[redec.length];
       this.acb = new Mat[redec.length];
 
       for(int i = 0; i < redec.length; i++){
-         CamadaDensa camada = redec[i];
+         Densa camada = redec[i];
 
          this.ac[i] = new Mat(camada.pesos.lin, camada.pesos.col);
          if(camada.temBias()){
@@ -122,9 +122,9 @@ public class RMSProp extends Otimizador{
    }
 
    @Override
-   public void atualizar(CamadaDensa[] redec){
+   public void atualizar(Densa[] redec){
       for(int i = 0; i < redec.length; i++){
-         CamadaDensa camada = redec[i];
+         Densa camada = redec[i];
          Mat pesos = camada.pesos;
          Mat grads = camada.gradPesos;
 

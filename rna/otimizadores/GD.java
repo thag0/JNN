@@ -1,7 +1,7 @@
 package rna.otimizadores;
 
 import rna.core.OpMatriz;
-import rna.estrutura.CamadaDensa;
+import rna.estrutura.Densa;
 
 /**
  * Classe que implementa o algoritmo de Descida do Gradiente para otimização de redes neurais.
@@ -55,13 +55,13 @@ public class GD extends Otimizador{
    }
 
    @Override
-   public void inicializar(CamadaDensa[] redec){
+   public void inicializar(Densa[] redec){
       
    }
 
    @Override
-   public void atualizar(CamadaDensa[] redec){
-      for(CamadaDensa camada : redec){
+   public void atualizar(Densa[] redec){
+      for(Densa camada : redec){
          mat.escalar(camada.gradPesos, taxaAprendizagem, camada.gradPesos);
          mat.add(camada.pesos, camada.gradPesos, camada.pesos);
 

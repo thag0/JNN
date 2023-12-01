@@ -1,11 +1,11 @@
 package rna.ativacoes;
 
-import rna.estrutura.CamadaDensa;
+import rna.estrutura.Densa;
 
 public class TanH extends Ativacao{
 
    @Override
-   public void calcular(CamadaDensa camada){
+   public void calcular(Densa camada){
       double s;
       int i, j;
 
@@ -19,7 +19,7 @@ public class TanH extends Ativacao{
    }
 
    @Override
-   public void derivada(CamadaDensa camada){
+   public void derivada(Densa camada){
       double grad, d;
       int i, j;
 
