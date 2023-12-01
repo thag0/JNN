@@ -1,5 +1,6 @@
 package rna.ativacoes;
 
+import rna.estrutura.Convolucional;
 import rna.estrutura.Densa;
 
 public class TanH extends Ativacao{
@@ -12,8 +13,7 @@ public class TanH extends Ativacao{
       for(i = 0; i < camada.saida.lin; i++){
          for(j = 0; j < camada.saida.col; j++){
             s = camada.somatorio.dado(i, j);
-            s = tanh(s);
-            camada.saida.editar(i, j, s);
+            camada.saida.editar(i, j, tanh(s));
          }
       }
    }
@@ -30,6 +30,21 @@ public class TanH extends Ativacao{
             d = 1 - (d * d);
             
             camada.derivada.editar(i, j, (d * grad));
+         }
+      }
+   }
+
+   @Override
+   public void calcular(Convolucional camada){
+      int i, j, k;
+      double s;
+
+      for(i = 0; i < camada.somatorio.length; i++){
+         for(j = 0; j < camada.somatorio[i].lin; j++){
+            for(k = 0; k < camada.somatorio[i].col; k++){
+               s = camada.somatorio[i].dado(j, k);
+               camada.saida[i].editar(j, k, tanh(s));
+            }
          }
       }
    }

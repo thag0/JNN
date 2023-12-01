@@ -493,7 +493,7 @@ public class OpMatriz{
                }
             }
 
-            r.editar(i, j, res/(filtro.col*filtro.lin));
+            r.editar(i, j, res);
          }
       }
    }

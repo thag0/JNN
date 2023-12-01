@@ -1,7 +1,12 @@
 package rna.estrutura;
 
+import rna.ativacoes.Ativacao;
+import rna.ativacoes.ReLU;
 import rna.core.Mat;
 import rna.core.OpMatriz;
+import rna.inicializadores.Constante;
+import rna.inicializadores.Inicializador;
+import rna.serializacao.DicionarioAtivacoes;
 
 /**
  * Implementação em andamento da camada convolucional.
@@ -44,7 +49,7 @@ public class Convolucional{
     *    O formato dos filtros é dado por:
     * </p>
     * <pre>
-    *filtros = [profundidadeEntrada][numFiltro]
+    *filtros = [numFiltro][profundidadeEntrada]
     *filtros[i][j] = [alturaFiltro][larguraFiltro]
     * </pre>
     */
@@ -62,6 +67,11 @@ public class Convolucional{
     * </pre>
     */
    public Mat[] bias;
+
+   /**
+    * Auxiliar na verificação de uso do bias.
+    */
+   private boolean usarBias;
 
    /**
     * Array de matrizes contendo valores de somatório para cada valor de 
@@ -89,6 +99,11 @@ public class Convolucional{
    public Mat[] saida;
 
    /**
+    * Função de ativação da camada.
+    */
+   Ativacao ativacao = new ReLU();
+
+   /**
     * Instancia uma camada convolucional de acordo com os formatos fornecidos.
     * <p>
     *    A disposição do formato de entrada deve ser da seguinte forma:
@@ -109,10 +124,11 @@ public class Convolucional{
     * @param formEntrada formato de entrada da camada.
     * @param formFiltro formato dos filtros da camada.
     * @param numFiltros quantidade de filtros.
+    * @param usarBias adicionar uso do bias para a camada.
     * @throws IllegalArgumentException se as dimensões fornecidas não correspondenrem
     * ao padrão desejado ou se o número de filtros for menor que 1.
     */
-   public Convolucional(int[] formEntrada, int[] formFiltro, int numFiltros){
+   public Convolucional(int[] formEntrada, int[] formFiltro, int numFiltros, boolean usarBias){
       if(formEntrada.length != 3){
          throw new IllegalArgumentException(
             "O formato de entrada deve conter 3 elementos (altura, largura, profundidade)" 
@@ -179,6 +195,124 @@ public class Convolucional{
    }
 
    /**
+    * Instancia uma camada convolucional de acordo com os formatos fornecidos.
+    * <p>
+    *    A disposição do formato de entrada deve ser da seguinte forma:
+    * </p>
+    * <pre>
+    *    formEntrada = (altura, largura, profundidade)
+    * </pre>
+    * Onde largura e altura devem corresponder as dimensões dos dados de entrada
+    * que serão processados pela camada e a profundidade diz respeito a quantidade
+    * de entradas que a camada deve processar.
+    * <p>
+    *    A disposição do formato do filtro deve ser da seguinte forma:
+    * </p>
+    * <pre>
+    *    formFiltro = (altura, largura)
+    * </pre>
+    * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
+    * @param formEntrada formato de entrada da camada.
+    * @param formFiltro formato dos filtros da camada.
+    * @param numFiltros quantidade de filtros.
+    * @throws IllegalArgumentException se as dimensões fornecidas não correspondenrem
+    * ao padrão desejado ou se o número de filtros for menor que 1.
+    */
+   public Convolucional(int[] formEntrada, int[] formFiltro, int numFiltros){
+      this(formEntrada, formFiltro, numFiltros, true);
+   }
+
+   /**
+    * Configura a função de ativação da camada através do nome fornecido, letras 
+    * maiúsculas e minúsculas não serão diferenciadas.
+    * <p>
+    *    Ativações disponíveis:
+    * </p>
+    * <ul>
+    *    <li> ReLU. </li>
+    *    <li> Sigmoid. </li>
+    *    <li> TanH. </li>
+    *    <li> Leaky ReLU. </li>
+    *    <li> ELU .</li>
+    *    <li> Swish. </li>
+    *    <li> GELU. </li>
+    *    <li> Linear. </li>
+    *    <li> Seno. </li>
+    *    <li> Argmax. </li>
+    *    <li> Softmax. </li>
+    *    <li> Softplus. </li>
+    *    <li> ArcTan. </li>
+    * </ul>
+    * @param ativacao nome da nova função de ativação.
+    * @throws IllegalArgumentException se o valor fornecido não corresponder a nenhuma 
+    * função de ativação suportada.
+    */
+   public void configurarAtivacao(String ativacao){
+      DicionarioAtivacoes dic = new DicionarioAtivacoes();
+      this.ativacao = dic.obterAtivacao(ativacao);
+   }
+
+   /**
+    * Configura a função de ativação da camada através de uma instância de 
+    * {@code FuncaoAtivacao} que será usada para ativar seus neurônios.
+    * <p>
+    *    Configurando a ativação da camada usando uma instância de função 
+    *    de ativação aumenta a liberdade de personalização dos hiperparâmetros
+    *    que algumas funções podem ter.
+    * </p>
+    * @param ativacao nova função de ativação.
+    * @throws IllegalArgumentException se a função de ativação fornecida for nula.
+    */
+   public void configurarAtivacao(Ativacao ativacao){
+      if(ativacao == null){
+         throw new IllegalArgumentException(
+            "A função de ativação não pode ser nula."
+         );
+      }
+
+      this.ativacao = ativacao;
+   }
+
+   /**
+    * Inicaliza os pesos e bias (caso tenha) da camada de acordo com o 
+    * inicializador configurado.
+    * @param iniFiltros inicializador de filtros.
+    * @param iniBias inicializador de bias.
+    * @param x valor usado pelos inicializadores, dependendo do que for usado
+    * pode servir de alcance na aleatorização, valor de constante, entre outros.
+    */
+   public void inicializar(Inicializador iniFiltros, Inicializador iniBias, double x){
+      if(iniFiltros == null){
+         throw new IllegalArgumentException(
+            "O inicializador não pode ser nulo."
+         );
+      }
+
+      for(int i = 0; i < numFiltros; i++){
+         for(int j = 0; j < profEntrada; j++){
+            iniFiltros.inicializar(this.filtros[i][j], x);
+         }
+      }
+      
+      if(this.usarBias){
+         for(Mat b : this.bias){
+            if(iniBias == null) new Constante().inicializar(b, 0);
+            else iniBias.inicializar(b, x);
+         }
+      }
+   }
+
+   /**
+    * Inicaliza os pesos da camada de acordo com o inicializador configurado.
+    * @param iniPesos inicializador de pesos.
+    * @param x valor usado pelos inicializadores, dependendo do que for usado
+    * pode servir de alcance na aleatorização, valor de constante, entre outros.
+    */
+   public void inicializar(Inicializador iniPesos, double x){
+      this.inicializar(iniPesos, null, x);
+   }
+
+   /**
     * Realiza a operação de correlação cruzada entre os valores de entrada
     * e os filtros da camada.
     * @param entrada array de matrizes contendo os valores de entrada.
@@ -221,9 +355,17 @@ public class Convolucional{
 
          opmat.add(this.saida[i], this.bias[i], this.saida[i]);
       }
+
+      //deixar os valores calculados no somatório pra saída 
+      //ficar com o resultado das ativações
+      for(int i = 0; i < this.saida.length; i++){
+         this.somatorio[i].copiar(this.saida[i]);
+      }
+
+      this.ativacao.calcular(this);
    }
 
-   public void calcularGradientes(){
+   public void calcularGradientes(double[][][] gradSeguinte){
       //TODO
    }
 
@@ -233,6 +375,31 @@ public class Convolucional{
     */
    public Mat[] obterSaida(){
       return this.saida;
+   }
+
+   /**
+    * Retorna as saídas da camada no formato de um array trimensional.
+    * @return saída da camada.
+    */
+   public double[][][] saidaParaDouble(){
+      double[][][] saida = new double[this.numFiltros][][];
+      for(int i = 0; i < saida.length; i++){
+         saida[i] = this.saida[i].paraDouble();
+      }
+
+      return saida;
+   }
+
+   /**
+    * Retorna um array contendo o formato da saída da camada que 
+    * é disposto do seguinte formato:
+    * <pre>
+    *    formato = (altura, largura, profundidade)
+    * </pre>
+    * @return array contendo as dimensões de saída da camada.
+    */
+   public int[] obterFormatoSaida(){
+      return new int[]{this.altSaida, this.largSaida, this.numFiltros};
    }
 
    /**
