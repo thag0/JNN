@@ -78,7 +78,7 @@ abstract class Metrica{
 
       double[] entrada = new double[entradas[0].length];
       double[] saida = new double[saidas[0].length];
-      double[] saidaRede = new double[rede.obterCamadaSaida().quantidadeNeuronios()];
+      double[] saidaRede = new double[rede.obterCamadaSaida().numNeuronios()];
 
       for(int i = 0; i < entradas.length; i++){
          System.arraycopy(entradas[i], 0, entrada, 0, entradas[i].length);

@@ -173,7 +173,7 @@ public class Nadam extends Otimizador{
          
          if(camada.temBias()){
             Mat bias = camada.bias;
-            Mat gradsB = camada.gradienteSaida;
+            Mat gradsB = camada.gradSaida;
             for(int j = 0; j < bias.lin; j++){
                for(int k = 0; k < bias.col; k++){
                   calcular(bias, gradsB, mb[i], vb[i], j, k, forcaB1, forcaB2);

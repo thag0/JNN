@@ -31,7 +31,7 @@ public class Seno extends Ativacao{
 
       for(i = 0; i < camada.derivada.lin; i++){
          for(j = 0; j < camada.derivada.col; j++){
-            grad = camada.gradienteSaida.dado(i, j);
+            grad = camada.gradSaida.dado(i, j);
             d = Math.cos(camada.somatorio.dado(i, j));
             camada.derivada.editar(i, j, (grad * d));
          }

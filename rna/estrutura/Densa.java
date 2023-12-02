@@ -113,7 +113,7 @@ public class Densa extends Camada implements Cloneable{
     * ]
     * </pre>
     */
-   public Mat gradienteSaida;
+   public Mat gradSaida;
 
    /**
     * Gradientes usados para retropropagar os erros para camadas anteriores.
@@ -123,7 +123,7 @@ public class Densa extends Camada implements Cloneable{
     * ]
     * </pre>
     */
-   public Mat gradienteEntrada;
+   public Mat gradEntrada;
 
    /**
     * Matriz contendo os valores dos gradientes para os pesos da camada.
@@ -225,10 +225,10 @@ public class Densa extends Camada implements Cloneable{
          this.gradAcBias = new Mat(this.bias.lin, this.bias.col);
       }
 
-      this.somatorio =        new Mat(this.saida.lin, this.saida.col);
-      this.derivada =         new Mat(this.saida.lin, this.saida.col);
-      this.gradienteSaida =   new Mat(this.saida.lin, this.saida.col);
-      this.gradienteEntrada = new Mat(this.entrada.lin, this.entrada.col);
+      this.somatorio =   new Mat(this.saida.lin, this.saida.col);
+      this.derivada =    new Mat(this.saida.lin, this.saida.col);
+      this.gradSaida =    new Mat(this.saida.lin, this.saida.col);
+      this.gradEntrada = new Mat(this.entrada.lin, this.entrada.col);
 
       this.gradPesos =   new Mat(this.pesos.lin, this.pesos.col);
       this.gradAcPesos = new Mat(this.pesos.lin, this.pesos.col);
@@ -353,14 +353,20 @@ public class Densa extends Camada implements Cloneable{
     * entrada, em seguida é adicionado o bias caso ele seja configurado 
     * no momento da inicialização.
     * <p>
-    *    Em resumo a expressão que define a saída é dada por:
+    *    A pressão que define a saída é dada por:
     * </p>
     * <pre>
     *somatorio = (pesos * entrada) + bias
+    *saida = ativacao(somatorio)
     * </pre>
     * Após a propagação dos dados, a função de ativação da camada é aplicada
     * ao resultado do somatório e o resultado é salvo da saída da camada.
-    * @param entrada dados de entrada que serão processados.
+    * @param entrada dados de entrada que serão processados, deve ser um array do
+    * tipo {@code double[]}.
+    * @throws IllegalArgumentException caso a entrada fornecida não seja suportada 
+    * pela camada.
+    * @throws IllegalArgumentException caso o tamanho dos dados de entrada seja diferente
+    * da capacidade de entrada da camada.
     */
    @Override
    public void calcularSaida(Object entrada){
@@ -393,7 +399,7 @@ public class Densa extends Camada implements Cloneable{
 
    /**
     * Calcula os gradientes da camada para os pesos e bias baseado nos
-    * gradientes da camada seguinte.
+    * gradientes fornecidos.
     * <p>
     *    Após calculdos, os gradientes em relação a entrada da camada são
     *    calculados e salvos em {@code gradienteEntrada} para serem retropropagados 
@@ -413,15 +419,18 @@ public class Densa extends Camada implements Cloneable{
       }
 
       double[] grads = (double[]) gradSeguinte;
-      if(grads.length != this.gradienteSaida.col){
+      if(grads.length != this.gradSaida.col){
          throw new IllegalArgumentException(
             "Dimensões incompatíveis entre o gradiente fornecido (" + grads.length + 
-            ") e o suportado pela camada (" + this.gradienteSaida.col + ")."
+            ") e o suportado pela camada (" + this.gradSaida.col + ")."
          );
       }
 
-      this.gradienteSaida.copiar(0, grads);
+      //transformação do array de gradientes para o objeto matricial
+      //usado pela biblioteca
+      this.gradSaida.copiar(0, grads);
 
+      //backward
       //derivada da função de ativação em relação ao gradiente de saída
       this.ativacao.derivada(this);
       
@@ -437,7 +446,7 @@ public class Densa extends Camada implements Cloneable{
 
       //derivada da saída em relação aos pesos para retropropagação.
       this.opmat.mult(
-         this.derivada, this.pesos.transpor(), this.gradienteEntrada
+         this.derivada, this.pesos.transpor(), this.gradEntrada
       );
    }
 
@@ -445,7 +454,7 @@ public class Densa extends Camada implements Cloneable{
     * Retorna a quantidade de neurônios presentes na camada.
     * @return quantidade de neurônios presentes na camada.
     */
-   public int quantidadeNeuronios(){
+   public int numNeuronios(){
       return this.pesos.col;
    }
 
@@ -506,7 +515,7 @@ public class Densa extends Camada implements Cloneable{
     * da quantidade de pesos suportada pelo neurônio.
     */
    public void configurarPesos(int id, double[] pesos){
-      if(id < 0 || id >= this.quantidadeNeuronios()){
+      if(id < 0 || id >= this.numNeuronios()){
          throw new IllegalArgumentException(
             "Índice fornecido (" + id +") inválido."
          );
@@ -530,7 +539,7 @@ public class Densa extends Camada implements Cloneable{
     * @throws IllegalArgumentException se o índice for inválido.
     */
    public void configurarBias(int id, double bias){
-      if(id < 0 || id >= this.quantidadeNeuronios()){
+      if(id < 0 || id >= this.numNeuronios()){
          throw new IllegalArgumentException(
             "Índice fornecido (" + id +") inválido."
          );
@@ -570,7 +579,7 @@ public class Densa extends Camada implements Cloneable{
       buffer += "\nInfo " + this.getClass().getSimpleName() + " " + this.id + " = [\n";
 
       buffer += espacamento + "Ativação: " + this.ativacao.getClass().getSimpleName() + "\n";
-      buffer += espacamento + "Quantidade neurônios: " + this.quantidadeNeuronios() + "\n";
+      buffer += espacamento + "Quantidade neurônios: " + this.numNeuronios() + "\n";
       buffer += "\n";
 
       buffer += espacamento + "Entrada: [" + this.entrada.lin + ", " + this.entrada.col + "]\n";
@@ -590,7 +599,7 @@ public class Densa extends Camada implements Cloneable{
     * mesmas características mas em outro espaço de memória.
     * @return clone da camada.
     */
-    @Override
+   @Override
    public Densa clone(){
       try{
          Densa clone = (Densa) super.clone();
@@ -608,7 +617,7 @@ public class Densa extends Camada implements Cloneable{
          clone.pesos = this.pesos.clone();
          clone.somatorio = this.somatorio.clone();
          clone.saida = this.saida.clone();
-         clone.gradienteSaida = this.gradienteSaida.clone();
+         clone.gradSaida = this.gradSaida.clone();
          clone.derivada = this.derivada.clone();
          clone.gradPesos = this.gradPesos.clone();
 

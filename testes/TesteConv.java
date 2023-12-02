@@ -38,15 +38,22 @@ public class TesteConv{
       camada.configurarAtivacao("relu");
       camada.calcularSaida(entrada);
 
-      for(int i = 0; i < camada.filtros.length; i++){
-         for(int j = 0; j < camada.filtros[i].length; j++){
-            camada.filtros[i][j].print("Filtro " + i + " entrada " + j);
+      double[][][] grad = {
+         {
+            {2, 3},
+            {4, 5},
+         }
+      };
+      camada.calcularGradiente(grad);
+
+      for(int i = 0; i < camada.gradFiltros.length; i++){
+         for(int j = 0; j < camada.gradFiltros[i].length; j++){
+            camada.gradFiltros[i][j].print("grad filtro " + i + "" + j);
          }
       }
 
-      System.out.println();
-      for(int i = 0; i < camada.saida.length; i++){
-         camada.saida[i].print("Saida " + i);
+      for(int i = 0; i < camada.gradEntrada.length; i++){
+         camada.gradEntrada[i].print("grad entrada " + i);
       }
    }
 }

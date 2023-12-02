@@ -37,7 +37,7 @@ class Auxiliar{
 
       saida.calcularGradiente(gradPrev);
       for(int i = redec.length-2; i >= 0; i--){
-         redec[i].calcularGradiente(redec[i+1].gradienteEntrada.linha(0));
+         redec[i].calcularGradiente(redec[i+1].gradEntrada.linha(0));
       }
    }
    

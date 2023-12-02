@@ -32,6 +32,6 @@ class TesteDerivada{
       camada.somatorio.print("Somatorio");
       camada.saida.print("Saida");
       camada.derivada.print("Derivada");
-      camada.gradienteEntrada.print("Grad Entrada");
+      camada.gradEntrada.print("Grad Entrada");
    }
 }

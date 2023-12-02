@@ -50,7 +50,7 @@ public class Softmax extends Ativacao{
       Mat transp = tmp.transpor();
 
       opm.mult(
-         camada.gradienteSaida, 
+         camada.gradSaida, 
          opm.hadamardR(tmp, opm.subR(ident, transp)), 
          camada.derivada
       );

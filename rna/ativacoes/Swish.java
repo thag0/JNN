@@ -35,7 +35,7 @@ public class Swish extends Ativacao{
 
       for(i = 0; i < camada.derivada.lin; i++){
          for(j = 0; j < camada.derivada.col; j++){
-            grad = camada.gradienteSaida.dado(i, j);
+            grad = camada.gradSaida.dado(i, j);
             d = derivada(camada.somatorio.dado(i, j));
             camada.derivada.editar(i, j, (grad * d));
          }

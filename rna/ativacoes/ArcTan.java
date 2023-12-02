@@ -27,7 +27,7 @@ public class ArcTan extends Ativacao{
          for(j = 0; j < camada.derivada.col; j++){
             d = camada.saida.dado(i, j);
             d = derivada(d);
-            grad = camada.gradienteSaida.dado(i, j);
+            grad = camada.gradSaida.dado(i, j);
             camada.derivada.editar(i, j, (grad * d));
          }
       }

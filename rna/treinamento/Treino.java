@@ -115,8 +115,8 @@ public class Treino{
          opmat.add(camada.pesos, camada.gradPesos, camada.pesos);
 
          if(camada.temBias()){
-            opmat.escalar(camada.gradienteSaida, taxaAprendizagem, camada.gradienteSaida);
-            opmat.add(camada.bias, camada.gradienteSaida, camada.bias);
+            opmat.escalar(camada.gradSaida, taxaAprendizagem, camada.gradSaida);
+            opmat.add(camada.bias, camada.gradSaida, camada.bias);
          }
       }
    }

@@ -11,7 +11,7 @@ import rna.serializacao.DicionarioAtivacoes;
 /**
  * Implementação em andamento da camada convolucional.
  */
-public class Convolucional extends Camada{
+public class Convolucional extends Camada implements Cloneable{
 
    /**
     * Operador matricial para a camada.
@@ -98,6 +98,12 @@ public class Convolucional extends Camada{
     */
    public Mat[] saida;
 
+   public Mat[] derivada;
+   public Mat[] gradEntrada;
+   public Mat[] gradSaida;
+   public Mat[][] gradFiltros;
+   public Mat[] gradBias;
+
    /**
     * Função de ativação da camada.
     */
@@ -170,33 +176,40 @@ public class Convolucional extends Camada{
       this.numFiltros = numFiltros;
       
       this.entrada = new Mat[profEntrada];
+      this.gradEntrada = new Mat[profEntrada];
       for(int i = 0; i < this.profEntrada; i++){
          this.entrada[i] = new Mat(this.altEntrada, this.largEntrada);
+         this.gradEntrada[i] = new Mat(this.altEntrada, this.largEntrada);
       }
       
       this.filtros = new Mat[numFiltros][this.profEntrada];
+      this.gradFiltros = new Mat[numFiltros][this.profEntrada];
       this.somatorio = new Mat[numFiltros];
       this.saida = new Mat[numFiltros];
+      this.gradSaida = new Mat[numFiltros];
 
       this.usarBias = usarBias;
       if(this.usarBias){
          this.bias = new Mat[numFiltros];
+         this.gradBias = new Mat[numFiltros];
       }
 
       this.altSaida = this.altEntrada - this.altFiltro + 1;
       this.largSaida = this.largEntrada - this.largFiltro + 1;
 
       for(int i = 0; i < this.numFiltros; i++){
-         this.filtros[i] = new Mat[this.profEntrada];
          for(int j = 0; j < this.profEntrada; j++){
             this.filtros[i][j] = new Mat(this.altFiltro, this.largFiltro);
+            this.gradFiltros[i][j] = new Mat(this.altFiltro, this.largFiltro);
          }
 
          this.somatorio[i] = new Mat(this.altSaida, this.largSaida);
          this.saida[i] = new Mat(this.altSaida, this.largSaida);
+         this.gradSaida[i] = new Mat(this.altSaida, this.largSaida);
 
          if(this.usarBias){
             this.bias[i] = new Mat(this.altSaida, this.largSaida);
+            this.gradBias[i] = new Mat(this.altSaida, this.largSaida);
          }
       }
    }
@@ -230,6 +243,45 @@ public class Convolucional extends Camada{
     */
    public Convolucional(int[] formEntrada, int[] formFiltro, int numFiltros){
       this(formEntrada, formFiltro, numFiltros, true);
+   }
+
+   /**
+    * Inicaliza os pesos e bias (caso tenha) da camada de acordo com o 
+    * inicializador configurado.
+    * @param iniFiltros inicializador de filtros.
+    * @param iniBias inicializador de bias.
+    * @param x valor usado pelos inicializadores, dependendo do que for usado
+    * pode servir de alcance na aleatorização, valor de constante, entre outros.
+    */
+   public void inicializar(Inicializador iniFiltros, Inicializador iniBias, double x){
+      if(iniFiltros == null){
+         throw new IllegalArgumentException(
+            "O inicializador não pode ser nulo."
+         );
+      }
+
+      for(int i = 0; i < numFiltros; i++){
+         for(int j = 0; j < profEntrada; j++){
+            iniFiltros.inicializar(this.filtros[i][j], x);
+         }
+      }
+      
+      if(this.usarBias){
+         for(Mat b : this.bias){
+            if(iniBias == null) new Constante().inicializar(b, 0);
+            else iniBias.inicializar(b, x);
+         }
+      }
+   }
+
+   /**
+    * Inicaliza os pesos da camada de acordo com o inicializador configurado.
+    * @param iniPesos inicializador de pesos.
+    * @param x valor usado pelos inicializadores, dependendo do que for usado
+    * pode servir de alcance na aleatorização, valor de constante, entre outros.
+    */
+   public void inicializar(Inicializador iniPesos, double x){
+      this.inicializar(iniPesos, null, x);
    }
 
    /**
@@ -284,48 +336,29 @@ public class Convolucional extends Camada{
    }
 
    /**
-    * Inicaliza os pesos e bias (caso tenha) da camada de acordo com o 
-    * inicializador configurado.
-    * @param iniFiltros inicializador de filtros.
-    * @param iniBias inicializador de bias.
-    * @param x valor usado pelos inicializadores, dependendo do que for usado
-    * pode servir de alcance na aleatorização, valor de constante, entre outros.
-    */
-   public void inicializar(Inicializador iniFiltros, Inicializador iniBias, double x){
-      if(iniFiltros == null){
-         throw new IllegalArgumentException(
-            "O inicializador não pode ser nulo."
-         );
-      }
-
-      for(int i = 0; i < numFiltros; i++){
-         for(int j = 0; j < profEntrada; j++){
-            iniFiltros.inicializar(this.filtros[i][j], x);
-         }
-      }
-      
-      if(this.usarBias){
-         for(Mat b : this.bias){
-            if(iniBias == null) new Constante().inicializar(b, 0);
-            else iniBias.inicializar(b, x);
-         }
-      }
-   }
-
-   /**
-    * Inicaliza os pesos da camada de acordo com o inicializador configurado.
-    * @param iniPesos inicializador de pesos.
-    * @param x valor usado pelos inicializadores, dependendo do que for usado
-    * pode servir de alcance na aleatorização, valor de constante, entre outros.
-    */
-   public void inicializar(Inicializador iniPesos, double x){
-      this.inicializar(iniPesos, null, x);
-   }
-
-   /**
-    * Realiza a operação de correlação cruzada entre os valores de entrada
-    * e os filtros da camada.
-    * @param entrada array de matrizes contendo os valores de entrada.
+    * Propagação direta dos dados de entrada através da camada convolucional.
+    * Realiza a correlação cruzada entre os filtros da camada e os dados de entrada,
+    * somando os resultados ponderados. Caso a camada tenha configurado o uso do bias, ele
+    * é adicionado após a operação. Por fim é aplicada a função de ativação aos resultados
+    * que serão salvos da saída da camada.
+    * <p>
+    *    A expressão que define a saída para cada filtro é dada por:
+    * </p>
+    * <pre>
+    *somatorio[i] = correlacaoCruzada(filtros[i][j], entrada[j]) + bias[i]
+    *saida[i] = ativacao(somatorio[i])
+    * </pre>
+    * onde {@code i} é o índice do filtro e {@code j} é o índice dos dados de entrada.
+    * <p>
+    *    Após a propagação dos dados, a função de ativação da camada é aplicada
+    *    ao resultado do somatório e o resultado é salvo da saída da camada.
+    * </p>
+    * @param entrada dados de entrada que serão processados, deve ser um array 
+    * tridimensional do tipo {@code double[][][]}.
+    * @throws IllegalArgumentException caso a entrada fornecida não seja suportada 
+    * pela camada.
+    * @throws IllegalArgumentException caso haja alguma incompatibilidade entre a entrada
+    * fornecida e a capacidade de entrada da camada.
     */
    @Override
    public void calcularSaida(Object entrada){
@@ -387,9 +420,88 @@ public class Convolucional extends Camada{
       this.ativacao.calcular(this);
    }
 
+   /**
+    * Calcula os gradientes da camada para os pesos e bias baseado nos
+    * gradientes fornecidos.
+    * <p>
+    *    Após calculdos, os gradientes em relação a entrada da camada são
+    *    calculados e salvos em {@code gradEntrada} para serem retropropagados 
+    *    para as camadas anteriores da Rede Neural em que a camada estiver.
+    * </p>
+    * Resultados calculados ficam salvos nas prorpiedades {@code camada.gradFiltros} e
+    * {@code camada.gradBias}.
+    * @param gradSeguinte gradiente da camada seguinte.
+    */
+   @Override
+   public void calcularGradiente(Object gradSeguinte){
+      if(gradSeguinte instanceof double[][][] == false){
+         throw new IllegalArgumentException(
+            "Os gradientes para a camada Convolucional devem ser " +
+            "do tipo \"double[][][]\", objeto recebido é do tipo \"" + 
+            gradSeguinte.getClass().getSimpleName() + "\""
+         );
+      }
 
-   public void calcularGradientes(Object gradSeguinte){
-      //TODO
+      //transformação do array de gradientes para o objeto matricial
+      //usado pela biblioteca
+      double[][][] g = (double[][][]) gradSeguinte;
+      for(int i = 0; i < g.length; i++){
+         this.gradSaida[i] = new Mat(g[i].length, g[i][0].length);
+         this.gradSaida[i].copiar(g[i]);
+      }
+
+      //backward
+      for(int i = 0; i < this.numFiltros; i++){
+         for(int j = 0; j < this.profEntrada; j++){
+            opmat.correlacaoCruzada(this.entrada[j], this.gradSaida[i], this.gradFiltros[i][j]);
+
+            Mat r = new Mat(this.gradEntrada[j].lin, this.gradEntrada[j].col);
+            opmat.convolucaoFull(gradSaida[i], this.filtros[i][j], r);
+            opmat.add(this.gradEntrada[j], r, this.gradEntrada[j]);
+         }
+
+         if(this.usarBias){
+            this.gradBias[i].copiar(gradSaida[i]);
+         }
+      }
+   }
+
+   /**
+    * Retorna a quantidade de filtros presentes na camada.
+    * @return quantiadde de filtros presentes na camada.
+    */
+   public int numFiltros(){
+      return this.numFiltros;
+   }
+
+   /**
+    * Retorna a instância da função de ativação configurada para a camada.
+    * @return função de ativação da camada.
+    */
+   public Ativacao obterAtivacao(){
+      return this.ativacao;
+   }
+
+   /**
+    * Verifica se a camada atual possui o bias configurado para seus neurônios.
+    * @return true caso possua bias configurado, false caso contrário.
+    */
+   public boolean temBias(){
+      return this.usarBias;
+   }
+
+   /**
+    * Retorda a quantidade de parâmetros totais da camada, em outras palavras, 
+    * retorna o somatório da quantidade de filtros e bias presentes na camada.
+    * @return a quantidade de parâmetros.
+    */
+   public int numParametros(){
+      int parametros = 0;
+
+      parametros += this.numFiltros * this.profEntrada * this.altFiltro * this.largFiltro;
+      parametros += this.bias.length * this.altSaida * this.altSaida;
+
+      return parametros;
    }
 
    /**
@@ -414,6 +526,38 @@ public class Convolucional extends Camada{
    }
 
    /**
+    * Clona a instância da camada, criando um novo objeto com as 
+    * mesmas características mas em outro espaço de memória.
+    * @return clone da camada.
+    */
+    @Override
+   public Convolucional clone(){
+      try{
+         Convolucional clone = (Convolucional) super.clone();
+
+         clone.ativacao = this.ativacao;
+
+         clone.usarBias = this.usarBias;
+         if(this.usarBias){
+            clone.bias = this.bias.clone();
+            clone.gradBias = this.gradBias.clone();
+         }
+
+         clone.entrada = this.entrada.clone();
+         clone.filtros = this.filtros.clone();
+         clone.somatorio = this.somatorio.clone();
+         clone.saida = this.saida.clone();
+         clone.gradSaida = this.gradSaida.clone();
+         clone.derivada = this.derivada.clone();
+         clone.gradFiltros = this.gradFiltros.clone();
+
+         return clone;
+      }catch(Exception e){
+         throw new RuntimeException(e);
+      }
+   }
+
+   /**
     * Retorna um array contendo o formato da saída da camada que 
     * é disposto do seguinte formato:
     * <pre>
@@ -423,20 +567,6 @@ public class Convolucional extends Camada{
     */
    public int[] obterFormatoSaida(){
       return new int[]{this.altSaida, this.largSaida, this.numFiltros};
-   }
-
-   /**
-    * Retorda a quantidade de parâmetros totais da camada, em outras palavras, 
-    * retorna o somatório da quantidade de filtros e bias presentes na camada.
-    * @return a quantidade de parâmetros.
-    */
-   public int numParametros(){
-      int parametros = 0;
-
-      parametros += this.numFiltros * this.profEntrada * this.largFiltro * this.altFiltro;
-      parametros += this.bias.length * this.altSaida * this.altSaida;
-
-      return parametros;
    }
 
    /**
@@ -462,7 +592,7 @@ public class Convolucional extends Camada{
      * <pre>
      *    formato = (saida.altura, saida.largura, saida.profundidade)
      * </pre>
-     * @return formato de saída da camada
+     * @return formato de saída da camada.
      */
     @Override
    public int[] formatoSaida(){

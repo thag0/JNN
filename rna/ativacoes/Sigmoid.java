@@ -26,7 +26,7 @@ public class Sigmoid extends Ativacao{
 
       for(i = 0; i < camada.saida.lin; i++){
          for(j = 0; j < camada.saida.col; j++){
-            grad = camada.gradienteSaida.dado(i, j);
+            grad = camada.gradSaida.dado(i, j);
             d = camada.saida.dado(i, j);
             d = d * (1 - d);
 
