@@ -424,12 +424,19 @@ public class OpMatriz{
    } 
 
    /**
-    * Realiza a operação de correlação cruzada entre a matriz de entrada e o filtro.
-    * Nela o filtro é sobreposto pela entrada e os valores contidos são multiplicados 
-    * e somados para o resultado final.
-    * @param a matriz de entrada para a operação de convolução.
+    * Realiza a operação de correlação cruzada (válida) entre a matriz de entrada 
+    * e o filtro. Expressada por:
+    * <pre>
+    *    R = A ⋆ B
+    * </pre>
+    * O resultado da correlação válida deve ser uma matriz com o seguinte formato:
+    * <pre>
+    *R.altura = A.altura - B.altura + 1
+    *R.largura = A.largura - B.largura + 1
+    * </pre>
+    * @param a matriz de entrada.
     * @param b filtro ou kernel aplicado na matriz de entrada.
-    * @param r resultado da convolução
+    * @param r resultado da correlação cruzada
     */
    public void correlacaoCruzada(Mat a, Mat b, Mat r){
       if(r.lin != (a.lin - b.lin + 1)){
@@ -460,11 +467,63 @@ public class OpMatriz{
    }
 
    /**
-    * Realiza a operação convolucional entre a matriz de entrada e o filtro.
-    * <p>
-    *    O diferencial entre a convolução e a correlação cruazada, é que na convolução
-    *    o filtro aplicado é rotacionado 180°.
-    * </p>
+    * Realiza a operação de correlação cruzada (completa) entre a matriz de entrada 
+    * e o filtro. Expressada por:
+    * <pre>
+    *    R = A ⋆ B
+    * </pre>
+    * O resultado da correlação completa deve ser uma matriz com o seguinte formato:
+    * <pre>
+    *R.altura = A.altura - B.altura + 1
+    *R.largura = A.largura - B.largura + 1
+    * </pre>
+    * @param a matriz de entrada.
+    * @param b filtro ou kernel aplicado na matriz de entrada.
+    * @param r resultado da correlação cruzada
+    */
+   public void correlacaoCruzadaFull(Mat a, Mat b, Mat r){
+      if(r.lin != (a.lin + b.lin - 1)){
+         throw new IllegalArgumentException(
+            "Dimensões entre as linhas de A, B e R incompatíveis."
+         );
+      }
+      if(r.col != (a.col + b.col - 1)){
+         throw new IllegalArgumentException(
+            "Dimensões entre as colunas de A, B e R incompatíveis."
+         );
+      }
+  
+      double res;
+      Mat filtro = rotacionar180R(b);
+      for(int i = 0; i < r.lin; i++){
+         for(int j = 0; j < r.col; j++){
+            res = 0;
+            for(int k = 0; k < filtro.lin; k++){
+               for (int l = 0; l < filtro.col; l++){
+                  int posX = i - k;
+                  int posY = j - l;
+  
+                  if(posX >= 0 && posX < a.lin && posY >= 0 && posY < a.col){
+                     res += a.dado(posX, posY) * filtro.dado(k, l);
+                  }
+               }
+            }
+            r.editar(i, j, res);
+         }
+      }
+   }   
+
+   /**
+    * Realiza a operação convolucional (válida) entre a matriz de entrada 
+    * e o filtro. Expressada por:
+    * <pre>
+    *    R = A ∗ B
+    * </pre>
+    * O resultado da convolução válida deve ser uma matriz com o seguinte formato:
+    * <pre>
+    *R.altura = A.altura - B.altura + 1
+    *R.largura = A.largura - B.largura + 1
+    * </pre>
     * @param a matriz de entrada para a operação de convolução.
     * @param b filtro ou kernel aplicado na matriz de entrada.
     * @param r resultado da convolução
@@ -492,9 +551,55 @@ public class OpMatriz{
                   res += a.dado(i + k, j + l) * filtro.dado(k, l);
                }
             }
-
             r.editar(i, j, res);
          }
       }
    }
+
+   /**
+    * Realiza a operação convolucional (comlpeta) entre a matriz de entrada 
+    * e o filtro. Expressada por:
+    * <pre>
+    *    R = A ∗ B
+    * </pre>
+    * O resultado da convolução completa deve ser uma matriz com o seguinte formato:
+    * <pre>
+    *R.altura = A.altura + B.altura - 1
+    *R.largura = A.largura + B.largura - 1
+    * </pre>
+    * @param a matriz de entrada para a operação de convolução.
+    * @param b filtro ou kernel aplicado na matriz de entrada.
+    * @param r resultado da convolução
+    */
+   public void convolucaoFull(Mat a, Mat b, Mat r){
+      if(r.lin != (a.lin + b.lin - 1)){
+         throw new IllegalArgumentException(
+            "Dimensões entre as linhas de A, B e R incompatíveis."
+         );
+      }
+      if(r.col != (a.col + b.col - 1)){
+         throw new IllegalArgumentException(
+            "Dimensões entre as colunas de A, B e R incompatíveis."
+         );
+      }
+  
+      double res;
+      for(int i = 0; i < r.lin; i++){
+         for(int j = 0; j < r.col; j++){
+            res = 0;
+            for(int k = 0; k < b.lin; k++){
+               for (int l = 0; l < b.col; l++){
+                  int posX = i - k;
+                  int posY = j - l;
+  
+                  if(posX >= 0 && posX < a.lin && posY >= 0 && posY < a.col){
+                     res += a.dado(posX, posY) * b.dado(k, l);
+                  }
+               }
+            }
+            r.editar(i, j, res);
+         }
+      }
+   }
+
 }

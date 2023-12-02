@@ -11,7 +11,7 @@ import rna.serializacao.DicionarioAtivacoes;
 /**
  * Implementação em andamento da camada convolucional.
  */
-public class Convolucional{
+public class Convolucional extends Camada{
 
    /**
     * Operador matricial para a camada.
@@ -173,14 +173,18 @@ public class Convolucional{
       for(int i = 0; i < this.profEntrada; i++){
          this.entrada[i] = new Mat(this.altEntrada, this.largEntrada);
       }
+      
+      this.filtros = new Mat[numFiltros][this.profEntrada];
+      this.somatorio = new Mat[numFiltros];
+      this.saida = new Mat[numFiltros];
+
+      this.usarBias = usarBias;
+      if(this.usarBias){
+         this.bias = new Mat[numFiltros];
+      }
 
       this.altSaida = this.altEntrada - this.altFiltro + 1;
       this.largSaida = this.largEntrada - this.largFiltro + 1;
-
-      this.filtros = new Mat[numFiltros][this.profEntrada];
-      this.bias = new Mat[numFiltros];
-      this.somatorio = new Mat[numFiltros];
-      this.saida = new Mat[numFiltros];
 
       for(int i = 0; i < this.numFiltros; i++){
          this.filtros[i] = new Mat[this.profEntrada];
@@ -188,9 +192,12 @@ public class Convolucional{
             this.filtros[i][j] = new Mat(this.altFiltro, this.largFiltro);
          }
 
-         this.bias[i] = new Mat(this.altSaida, this.largSaida);
          this.somatorio[i] = new Mat(this.altSaida, this.largSaida);
          this.saida[i] = new Mat(this.altSaida, this.largSaida);
+
+         if(this.usarBias){
+            this.bias[i] = new Mat(this.altSaida, this.largSaida);
+         }
       }
    }
 
@@ -212,6 +219,9 @@ public class Convolucional{
     *    formFiltro = (altura, largura)
     * </pre>
     * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
+    * <p>
+    *    O valor de uso do bias será usado como {@code true} por padrão.
+    * <p>
     * @param formEntrada formato de entrada da camada.
     * @param formFiltro formato dos filtros da camada.
     * @param numFiltros quantidade de filtros.
@@ -317,31 +327,41 @@ public class Convolucional{
     * e os filtros da camada.
     * @param entrada array de matrizes contendo os valores de entrada.
     */
-   public void calcularSaida(double[][][] entrada){
-      if(entrada.length != this.profEntrada){
+   @Override
+   public void calcularSaida(Object entrada){
+      if(entrada instanceof double[][][] == false){
          throw new IllegalArgumentException(
-            "A profundidade de entrada (" + entrada.length + 
+            "Os dados de entrada para a camada Convolucional devem ser " +
+            "do tipo \"double[][][]\", objeto recebido é do tipo \"" + 
+            entrada.getClass().getSimpleName() + "\""
+         );
+      }
+
+      double[][][] e = (double[][][]) entrada;
+      if(e.length != this.profEntrada){
+         throw new IllegalArgumentException(
+            "A profundidade de entrada (" + e.length + 
             ") dos dados fornecidos é diferente da profundidade " + 
             " de entrada da camada (" + this.profEntrada + ")."
          );
       }
-      if(entrada[0].length != this.largEntrada){
+      if(e[0].length != this.largEntrada){
          throw new IllegalArgumentException(
-            "A largura de entrada (" + entrada[0].length + 
+            "A largura de entrada (" + e[0].length + 
             ") dos dados fornecidos é diferente da largura " + 
             " de entrada da camada (" + this.largEntrada + ")."
          );
       }
-      if(entrada[0][0].length != this.altEntrada){
+      if(e[0][0].length != this.altEntrada){
          throw new IllegalArgumentException(
-            "A altura de entrada (" + entrada[0][0].length + 
+            "A altura de entrada (" + e[0][0].length + 
             ") dos dados fornecidos é diferente da altura " + 
             " de entrada da camada (" + this.altEntrada + ")."
          );
       }
 
       for(int i = 0; i < this.profEntrada; i++){
-         this.entrada[i].copiar(entrada[i]);
+         this.entrada[i].copiar(e[i]);
       }
 
       //feedforward
@@ -353,7 +373,9 @@ public class Convolucional{
             opmat.add(this.somatorio[i], this.saida[i], this.saida[i]);
          }
 
-         opmat.add(this.saida[i], this.bias[i], this.saida[i]);
+         if(this.usarBias){
+            opmat.add(this.saida[i], this.bias[i], this.saida[i]);
+         }
       }
 
       //deixar os valores calculados no somatório pra saída 
@@ -365,7 +387,8 @@ public class Convolucional{
       this.ativacao.calcular(this);
    }
 
-   public void calcularGradientes(double[][][] gradSeguinte){
+
+   public void calcularGradientes(Object gradSeguinte){
       //TODO
    }
 
@@ -414,5 +437,39 @@ public class Convolucional{
       parametros += this.bias.length * this.altSaida * this.altSaida;
 
       return parametros;
+   }
+
+   /**
+    * Calcula o formato de entrada da camada Densa, que é disposto da
+    * seguinte forma:
+    * <pre>
+    *    formato = (entrada.altura, entrada.largura, entrada.profundidade)
+    * </pre>
+    * @return formato de entrada da camada.
+    */
+   @Override
+   public int[] formatoEntrada(){
+      return new int[]{
+         this.entrada[0].lin, 
+         this.entrada[0].col, 
+         this.entrada.length
+      };
+   }
+ 
+    /**
+     * Calcula o formato de saída da camada Densa, que é disposto da
+     * seguinte forma:
+     * <pre>
+     *    formato = (saida.altura, saida.largura, saida.profundidade)
+     * </pre>
+     * @return formato de saída da camada
+     */
+    @Override
+   public int[] formatoSaida(){
+      return new int[]{
+         this.saida[0].lin, 
+         this.saida[0].col, 
+         this.saida.length
+      };
    }
 }

@@ -10,6 +10,35 @@ import rna.otimizadores.Otimizador;
 import rna.otimizadores.SGD;
 import rna.treinamento.Treinador;
 
+/**
+ * Modelo de Rede Neural {@code Multilayer Perceptron} criado do zero. Possui um conjunto de camadas 
+ * densas sequenciais que propagam os dados de entrada.
+ * <p>
+ *    O modelo pode ser usado tanto para problemas de {@code regressão e classificação}, contando com 
+ *    algoritmos de treino e otimizadores variados para ajudar na convergência e desempenho da rede para 
+ *    problemas diversos.
+ * </p>
+ * <p>
+ *    Possui opções de configuração para funções de ativação de camadas individuais, valor de alcance 
+ *    máximo e mínimo na aleatorização dos pesos iniciais, inicializadores de pesos e otimizadores que 
+ *    serão usados durante o treino. 
+ * </p>
+ * <p>
+ *    Após configurar as propriedades da rede, o modelo precisará ser {@code compilado} para efetivamente 
+ *    poder ser utilizado.
+ * </p>
+ * <p>
+ *    As predições do modelo são feitas usando o método de {@code calcularSaida()} onde é especificada
+ *    uma única amostra de dados ou uma seqûencia de amostras onde é retornado o resultado de predição
+ *    da rede.
+ * </p>
+ * <p>
+ *    Opções de avaliação e desempenho do modelo podem ser acessadas através do {@code avaliador} da
+ *    Rede Neural, que contém implementação de funções de perda e métricas para o modelo.
+ * </p>
+ * @author Thiago Barroso, acadêmico de Engenharia da Computação pela Universidade Federal do Pará, 
+ * Campus Tucuruí. Maio/2023.
+ */
 public class RedeNeural implements Cloneable{
    
    /**
@@ -703,8 +732,11 @@ public class RedeNeural implements Cloneable{
 
       this.camadas = new Densa[this.arquitetura.length-1];
       this.camadas[0] = new Densa(this.arquitetura[0], this.arquitetura[1], this.bias);
+
       for(int i = 1; i < this.camadas.length; i++){
-         this.camadas[i] = new Densa(this.arquitetura[i], this.arquitetura[i+1], this.bias);
+         this.camadas[i] = new Densa(
+            this.camadas[i-1].formatoSaida()[1], this.arquitetura[i+1], this.bias
+         );
          this.camadas[i].inicializar(iniPesos, iniBias, this.alcancePeso);
          this.camadas[i].configurarId(i);
       }

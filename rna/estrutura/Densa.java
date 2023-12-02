@@ -362,16 +362,25 @@ public class Densa extends Camada implements Cloneable{
     * ao resultado do somatório e o resultado é salvo da saída da camada.
     * @param entrada dados de entrada que serão processados.
     */
-   public void calcularSaida(double[] entrada){
-      if(entrada.length != this.tamanhoEntrada()){
+   @Override
+   public void calcularSaida(Object entrada){
+      if(entrada instanceof double[] == false){
          throw new IllegalArgumentException(
-            "Entradas (" + entrada.length + 
+            "Os dados de entrada para a camada Densa devem ser do tipo \"double[]\", " +
+            "objeto recebido é do tipo \"" + entrada.getClass().getSimpleName() + "\""
+         );
+      }
+
+      double[] e = (double[]) entrada;
+      if(e.length != this.tamanhoEntrada()){
+         throw new IllegalArgumentException(
+            "Entradas (" + e.length + 
             ") incompatíveis com a entrada da camada (" + this.tamanhoEntrada() + 
             ")."
          );
       }
 
-      this.entrada.copiar(0, entrada); 
+      this.entrada.copiar(0, e); 
 
       //feedforward
       this.opmat.mult(this.entrada, this.pesos, this.somatorio);
@@ -394,15 +403,24 @@ public class Densa extends Camada implements Cloneable{
     * {@code camada.gradBias}.
     * @param gradSeguinte gradiente da camada seguinte.
     */
-   public void calcularGradiente(double[] gradSeguinte){
-      if(gradSeguinte.length != this.gradienteSaida.col){
+   @Override
+   public void calcularGradiente(Object gradSeguinte){
+      if(gradSeguinte instanceof double[] == false){
          throw new IllegalArgumentException(
-            "Dimensões incompatíveis entre o gradiente fornecido (" + gradSeguinte.length + 
+            "O gradiente para a camada Densa deve ser do tipo \"double[]\", " +
+            "objeto recebido é do tipo \"" + gradSeguinte.getClass().getSimpleName() + "\""
+         );
+      }
+
+      double[] grads = (double[]) gradSeguinte;
+      if(grads.length != this.gradienteSaida.col){
+         throw new IllegalArgumentException(
+            "Dimensões incompatíveis entre o gradiente fornecido (" + grads.length + 
             ") e o suportado pela camada (" + this.gradienteSaida.col + ")."
          );
       }
 
-      this.gradienteSaida.copiar(0, gradSeguinte);
+      this.gradienteSaida.copiar(0, grads);
 
       //derivada da função de ativação em relação ao gradiente de saída
       this.ativacao.derivada(this);
@@ -598,5 +616,37 @@ public class Densa extends Camada implements Cloneable{
       }catch(Exception e){
          throw new RuntimeException(e);
       }
+   }
+
+   /**
+    * Calcula o formato de entrada da camada Densa, que é disposto da
+    * seguinte forma:
+    * <pre>
+    *    formato = (entrada.altura, entrada.largura)
+    * </pre>
+    * @return formato de entrada da camada.
+    */
+   @Override
+   public int[] formatoEntrada(){
+      return new int[]{
+         this.entrada.lin, 
+         this.entrada.col
+      };
+   }
+
+   /**
+    * Calcula o formato de saída da camada Densa, que é disposto da
+    * seguinte forma:
+    * <pre>
+    *    formato = (saida.altura, saida.largura)
+    * </pre>
+    * @return formato de saída da camada
+    */
+   @Override
+   public int[] formatoSaida(){
+      return new int[]{
+         this.saida.lin, 
+         this.saida.col
+      };
    }
 }

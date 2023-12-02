@@ -58,7 +58,7 @@ public class Main{
       RedeNeural rede = new RedeNeural(arq);
 
       Perda perda = new ErroMedioQuadrado();
-      Otimizador otm = new SGD(0.01, 0.9);
+      Otimizador otm = new SGD(0.001, 0.95);
       Inicializador ini = new Xavier();
 
       rede.configurarSeed(1234);

@@ -3,13 +3,14 @@ package testes;
 import ged.Ged;
 import rna.core.Mat;
 import rna.estrutura.Convolucional;
+import rna.inicializadores.Inicializador;
+import rna.inicializadores.Xavier;
 
 public class TesteConv{
    static Ged ged = new Ged();
 
    public static void main(String[] args){
       ged.limparConsole();
-
       
       double[][] e = {
          {1, 6, 2},
@@ -28,10 +29,22 @@ public class TesteConv{
       double[][][] entrada = new double[1][][];
       entrada[0] = e;
 
-      Convolucional camada = new Convolucional(formatoEntrada, formatoFiltro, 1);
+      Inicializador ini = new Xavier();
+      ini.configurarSeed(1234);
+
+      Convolucional camada = new Convolucional(formatoEntrada, formatoFiltro, 1, false);
+      camada.inicializar(ini, ini, 0);
       camada.filtros[0][0] = new Mat(f1);
+      camada.configurarAtivacao("relu");
       camada.calcularSaida(entrada);
 
+      for(int i = 0; i < camada.filtros.length; i++){
+         for(int j = 0; j < camada.filtros[i].length; j++){
+            camada.filtros[i][j].print("Filtro " + i + " entrada " + j);
+         }
+      }
+
+      System.out.println();
       for(int i = 0; i < camada.saida.length; i++){
          camada.saida[i].print("Saida " + i);
       }

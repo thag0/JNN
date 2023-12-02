@@ -1,28 +1,31 @@
 package rna.estrutura;
 
+/**
+ * Classe base para as camadas dentro dos modelos de Rede Neural.
+ */
 public abstract class Camada{
    
-   public void calcularSaida(double[] entrada){
+   public void calcularSaida(Object entrada){
       throw new IllegalArgumentException(
-         "Implementar cálculo de saída para double[]"
+         "Implementar cálculo de saída."
       );
    }
 
-   public void calcularSaida(double[][][] entrada){
+   public void calcularGradiente(Object gradSeguinte){
       throw new IllegalArgumentException(
-         "Implementar cálculo de saída para double[][][]"
+         "Implementar cálculo de gradientes."
+      );
+   }
+   
+   public int[] formatoEntrada(){
+      throw new IllegalArgumentException(
+         "Implementar formato de entrada."
       );
    }
 
-   public void calcularGradientes(double[] gradSeguinte){
+   public int[] formatoSaida(){
       throw new IllegalArgumentException(
-         "Implementar cálculo de gradientes para double[]"
-      );
-   }
-
-   public void calcularGradientes(double[][] gradSeguinte){
-      throw new IllegalArgumentException(
-         "Implementar cálculo de gradientes para double[][]"
+         "Implementar formato de saída."
       );
    }
 }

@@ -29,13 +29,13 @@ public class MatrizTeste{
 
       Mat entrada = new Mat(e);
       Mat filtro = new Mat(f);
-      Mat resCorr = new Mat(2, 2);
-      Mat resConv = new Mat(2, 2);
+      Mat resV = new Mat(2, 2);
+      Mat resF = new Mat(4, 4);
 
-      opmat.correlacaoCruzada(entrada, filtro, resCorr);
-      opmat.convolucao(entrada, filtro, resConv);
-      resCorr.print("Corr");
-      resConv.print("Conv");
+      opmat.convolucao(entrada, filtro, resV);
+      opmat.convolucaoFull(entrada, filtro, resF);
+      resV.print("res v");
+      resF.print("res f");
    }
 
    static void derivadaSoftmax(){

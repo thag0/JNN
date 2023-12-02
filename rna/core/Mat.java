@@ -219,14 +219,20 @@ public class Mat implements Cloneable{
       return t;
    }
 
+   /**
+    * TODO
+    * @param lin
+    * @param n
+    * @return
+    */
    public Mat bloco(int lin, int n){
-      Mat tile = new Mat(n, this.col);
+      Mat b = new Mat(n, this.col);
 
-      for(int i = 0; i < tile.lin; i++){
-         tile.copiar(i, this.linha(lin));
+      for(int i = 0; i < b.lin; i++){
+         b.copiar(i, this.linha(lin));
       }
 
-      return tile;
+      return b;
    }
 
    /**
@@ -358,22 +364,32 @@ public class Mat implements Cloneable{
    /**
     * Exibe o conteúdo contido na matriz.
     */
-   public void print(String nome){
+ public void print(String nome){
       if(nome == null || nome.isBlank() || nome.isEmpty()){
-         System.out.println(this.getClass().getSimpleName() + " = [");
-
+          System.out.println(this.getClass().getSimpleName() + " = [");
       }else{
          System.out.println(nome + " = [");
       }
 
+      int compMax = 0;
       for(int i = 0; i < this.lin; i++){
-         System.out.print("   ");
          for(int j = 0; j < this.col; j++){
-            System.out.print(this.dado(i, j) + "  ");
+            int compAtual = String.valueOf(this.dado(i, j)).length();
+            if(compAtual > compMax){
+               compMax = compAtual;
+            }
+         }
+      }
+  
+      for(int i = 0; i < this.lin; i++){
+         System.out.print(" ");
+         for(int j = 0; j < this.col; j++){
+            String element = String.format("%" + (compMax + 2) + "s", this.dado(i, j));
+            System.out.print(element);
          }
          System.out.println();
       }
-
+  
       System.out.println("]");
    }
 

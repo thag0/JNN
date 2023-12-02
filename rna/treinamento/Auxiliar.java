@@ -34,7 +34,7 @@ class Auxiliar{
       Densa saida = redec[redec.length-1];
       double[] previsto = saida.obterSaida().linha(0);
       double[] gradPrev = perda.derivada(previsto, real);
-      
+
       saida.calcularGradiente(gradPrev);
       for(int i = redec.length-2; i >= 0; i--){
          redec[i].calcularGradiente(redec[i+1].gradienteEntrada.linha(0));
