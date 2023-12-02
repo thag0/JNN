@@ -209,10 +209,10 @@ public class Adam extends Otimizador{
 
    private void calcular(Mat var, Mat grad, Mat m, Mat v, int lin, int col, double alfa, double fb1, double fb2){
       double g = grad.dado(lin, col);
-      double d1 = (1 - beta1) * (g - m.dado(lin, col));
-      double d2 = (1 - beta2) * ((g*g) - v.dado(lin, col)); 
-      m.add(lin, col, d1); 
-      v.add(lin, col, d2);
+      double m2 = (1 - beta1) * (g - m.dado(lin, col));
+      double v2 = (1 - beta2) * ((g*g) - v.dado(lin, col)); 
+      m.add(lin, col, m2); 
+      v.add(lin, col, v2);
 
       double att = (alfa * m.dado(lin, col)) / (Math.sqrt(v.dado(lin, col)) + this.epsilon);
       var.add(lin, col, att);

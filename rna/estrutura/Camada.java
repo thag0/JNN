@@ -13,11 +13,27 @@ public class Camada{
 
    }
 
-   public void configurarId(int id){
-
+   /**
+    * Inicaliza os pesos e bias (caso tenha) da camada de acordo com o 
+    * inicializador configurado.
+    * @param iniKernel inicializador para o kernel.
+    * @param iniBias inicializador de bias.
+    * @param x valor usado pelos inicializadores, dependendo do que for usado
+    * pode servir de alcance na aleatorização, valor de constante, entre outros.
+    */
+   public void inicializar(Inicializador iniKernel, Inicializador iniBias, double x){
+      throw new IllegalArgumentException(
+         "Implementar inicialização da camada."
+      );
    }
 
-   public void inicializar(Inicializador iniKernel, Inicializador iniBias, double x){
+   /**
+    * Inicaliza os pesos da camada de acordo com o inicializador configurado.
+    * @param iniKernel inicializador para o kernel.
+    * @param x valor usado pelos inicializadores, dependendo do que for usado
+    * pode servir de alcance na aleatorização, valor de constante, entre outros.
+    */
+   public void inicializar(Inicializador iniKernel, double x){
       throw new IllegalArgumentException(
          "Implementar inicialização da camada."
       );
@@ -68,6 +84,17 @@ public class Camada{
    public void configurarAtivacao(Ativacao ativacao){
       throw new IllegalArgumentException(
          "Implementar configuração da função de ativação da camada."
+      );
+   }
+
+   /**
+    * Configura o id da camada. O id deve indicar dentro da rede neural, em 
+    * qual posição a camada está localizada.
+    * @param id id da camada.
+    */
+   public void configurarId(int id){
+      throw new IllegalArgumentException(
+         "Implementar configuração de identificador."
       );
    }
 

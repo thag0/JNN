@@ -254,22 +254,15 @@ public class Densa extends Camada implements Cloneable{
       this(entrada, neuronios, true);
    }
 
-   /**
-    * Inicaliza os pesos e bias (caso tenha) da camada de acordo com o 
-    * inicializador configurado.
-    * @param iniPesos inicializador de pesos.
-    * @param iniBias inicializador de bias.
-    * @param x valor usado pelos inicializadores, dependendo do que for usado
-    * pode servir de alcance na aleatorização, valor de constante, entre outros.
-    */
-   public void inicializar(Inicializador iniPesos, Inicializador iniBias, double x){
-      if(iniPesos == null){
+   @Override
+   public void inicializar(Inicializador iniKernel, Inicializador iniBias, double x){
+      if(iniKernel == null){
          throw new IllegalArgumentException(
             "O inicializador não pode ser nulo."
          );
       }
 
-      iniPesos.inicializar(this.pesos, x);
+      iniKernel.inicializar(this.pesos, x);
       
       if(this.usarBias){
          if(iniBias == null) new Constante().inicializar(this.bias, 0);
@@ -277,12 +270,7 @@ public class Densa extends Camada implements Cloneable{
       }
    }
 
-   /**
-    * Inicaliza os pesos da camada de acordo com o inicializador configurado.
-    * @param iniPesos inicializador de pesos.
-    * @param x valor usado pelos inicializadores, dependendo do que for usado
-    * pode servir de alcance na aleatorização, valor de constante, entre outros.
-    */
+   @Override
    public void inicializar(Inicializador iniPesos, double x){
       this.inicializar(iniPesos, null, x);
    }
@@ -304,11 +292,6 @@ public class Densa extends Camada implements Cloneable{
       this.ativacao = ativacao;
    }
 
-   /**
-    * Configura o id da camada. O id deve indicar dentro da rede neural, em 
-    * qual posição a camada está localizada.
-    * @param id id da camada.
-    */
    @Override
    public void configurarId(int id){
       this.id = id;

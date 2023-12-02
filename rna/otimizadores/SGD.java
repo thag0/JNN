@@ -148,11 +148,11 @@ public class SGD extends Otimizador{
    }
 
    private void calcular(Mat var, Mat grad, Mat m, int lin, int col){
-      double att = (-grad.dado(lin, col) * this.taxaAprendizagem) + (m.dado(lin, col) * this.momentum);
+      double att = (m.dado(lin, col) * momentum) - (grad.dado(lin, col) * taxaAprendizagem);
       m.editar(lin, col, att);
 
       if(this.nesterov){
-         double nest = (grad.dado(lin, col) * this.taxaAprendizagem) + (this.momentum * m.dado(lin, col));
+         double nest = (m.dado(lin, col) * momentum) - (grad.dado(lin, col) * taxaAprendizagem);
          var.sub(lin, col, nest);
 
       }else{
