@@ -295,7 +295,7 @@ public class RedeNeural implements Cloneable{
    public void configurarAtivacao(Ativacao ativacao){
       this.verificarCompilacao();
       
-      for(Densa camada : this.camadas){
+      for(Camada camada : this.camadas){
          camada.configurarAtivacao(ativacao);
       }
    }
@@ -333,7 +333,7 @@ public class RedeNeural implements Cloneable{
    public void configurarAtivacao(String ativacao){
       this.verificarCompilacao();
       
-      for(Densa camada : this.camadas){
+      for(Camada camada : this.camadas){
          camada.configurarAtivacao(ativacao);
       }
    }

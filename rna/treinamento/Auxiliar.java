@@ -4,6 +4,7 @@ import java.util.Random;
 
 import rna.avaliacao.perda.Perda;
 import rna.core.Array;
+import rna.core.Mat;
 import rna.core.OpMatriz;
 import rna.estrutura.Densa;
 
@@ -35,9 +36,9 @@ class Auxiliar{
       double[] previsto = saida.obterSaida().linha(0);
       double[] gradPrev = perda.derivada(previsto, real);
 
-      saida.calcularGradiente(gradPrev);
+      saida.calcularGradiente(new Mat(gradPrev));
       for(int i = redec.length-2; i >= 0; i--){
-         redec[i].calcularGradiente(redec[i+1].gradEntrada.linha(0));
+         redec[i].calcularGradiente(redec[i+1].gradEntrada);
       }
    }
    

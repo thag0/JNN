@@ -287,47 +287,13 @@ public class Densa extends Camada implements Cloneable{
       this.inicializar(iniPesos, null, x);
    }
 
-   /**
-    * Configura a função de ativação da camada através do nome fornecido, letras maiúsculas 
-    * e minúsculas não serão diferenciadas.
-    * <p>
-    *    Ativações disponíveis:
-    * </p>
-    * <ul>
-    *    <li> ReLU. </li>
-    *    <li> Sigmoid. </li>
-    *    <li> TanH. </li>
-    *    <li> Leaky ReLU. </li>
-    *    <li> ELU .</li>
-    *    <li> Swish. </li>
-    *    <li> GELU. </li>
-    *    <li> Linear. </li>
-    *    <li> Seno. </li>
-    *    <li> Argmax. </li>
-    *    <li> Softmax. </li>
-    *    <li> Softplus. </li>
-    *    <li> ArcTan. </li>
-    * </ul>
-    * @param ativacao nome da nova função de ativação.
-    * @throws IllegalArgumentException se o valor fornecido não corresponder a nenhuma 
-    * função de ativação suportada.
-    */
+   @Override
    public void configurarAtivacao(String ativacao){
       DicionarioAtivacoes dicionario = new DicionarioAtivacoes();
       this.ativacao = dicionario.obterAtivacao(ativacao);
    }
-   
-   /**
-    * Configura a função de ativação da camada através de uma instância de 
-    * {@code FuncaoAtivacao} que será usada para ativar seus neurônios.
-    * <p>
-    *    Configurando a ativação da camada usando uma instância de função 
-    *    de ativação aumenta a liberdade de personalização dos hiperparâmetros
-    *    que algumas funções podem ter.
-    * </p>
-    * @param ativacao nova função de ativação.
-    * @throws IllegalArgumentException se a função de ativação fornecida for nula.
-    */
+
+   @Override
    public void configurarAtivacao(Ativacao ativacao){
       if(ativacao == null){
          throw new IllegalArgumentException(
@@ -343,6 +309,7 @@ public class Densa extends Camada implements Cloneable{
     * qual posição a camada está localizada.
     * @param id id da camada.
     */
+   @Override
    public void configurarId(int id){
       this.id = id;
    }
@@ -402,33 +369,33 @@ public class Densa extends Camada implements Cloneable{
     * gradientes fornecidos.
     * <p>
     *    Após calculdos, os gradientes em relação a entrada da camada são
-    *    calculados e salvos em {@code gradienteEntrada} para serem retropropagados 
+    *    calculados e salvos em {@code gradEntrada} para serem retropropagados 
     *    para as camadas anteriores da Rede Neural em que a camada estiver.
     * </p>
     * Resultados calculados ficam salvos nas prorpiedades {@code camada.gradPesos} e
     * {@code camada.gradBias}.
-    * @param gradSeguinte gradiente da camada seguinte.
+    * @param gradSeguinte gradiente da camada seguinte, deve ser um objeto do tipo {@code Mat}.
     */
    @Override
    public void calcularGradiente(Object gradSeguinte){
-      if(gradSeguinte instanceof double[] == false){
+      if(gradSeguinte instanceof Mat == false){
          throw new IllegalArgumentException(
-            "O gradiente para a camada Densa deve ser do tipo \"double[]\", " +
+            "O gradiente para a camada Densa deve ser do tipo \"Mat\", " +
             "objeto recebido é do tipo \"" + gradSeguinte.getClass().getSimpleName() + "\""
          );
       }
 
-      double[] grads = (double[]) gradSeguinte;
-      if(grads.length != this.gradSaida.col){
+      Mat grads = (Mat) gradSeguinte;
+      if(grads.col != this.gradSaida.col){
          throw new IllegalArgumentException(
-            "Dimensões incompatíveis entre o gradiente fornecido (" + grads.length + 
+            "Dimensões incompatíveis entre o gradiente fornecido (" + grads.col + 
             ") e o suportado pela camada (" + this.gradSaida.col + ")."
          );
       }
 
       //transformação do array de gradientes para o objeto matricial
       //usado pela biblioteca
-      this.gradSaida.copiar(0, grads);
+      this.gradSaida.copiar(grads);
 
       //backward
       //derivada da função de ativação em relação ao gradiente de saída

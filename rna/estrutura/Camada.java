@@ -1,5 +1,8 @@
 package rna.estrutura;
 
+import rna.ativacoes.Ativacao;
+import rna.inicializadores.Inicializador;
+
 /**
  * Classe base para as camadas dentro dos modelos de Rede Neural.
  * Novas camadas devem implementar os métodos padrões da classe Camada.
@@ -8,6 +11,64 @@ public class Camada{
 
    public Camada(){
 
+   }
+
+   public void configurarId(int id){
+
+   }
+
+   public void inicializar(Inicializador iniKernel, Inicializador iniBias, double x){
+      throw new IllegalArgumentException(
+         "Implementar inicialização da camada."
+      );
+   }
+
+   /**
+    * Configura a função de ativação da camada através do nome fornecido, letras maiúsculas 
+    * e minúsculas não serão diferenciadas.
+    * <p>
+    *    Ativações disponíveis:
+    * </p>
+    * <ul>
+    *    <li> ReLU. </li>
+    *    <li> Sigmoid. </li>
+    *    <li> TanH. </li>
+    *    <li> Leaky ReLU. </li>
+    *    <li> ELU .</li>
+    *    <li> Swish. </li>
+    *    <li> GELU. </li>
+    *    <li> Linear. </li>
+    *    <li> Seno. </li>
+    *    <li> Argmax. </li>
+    *    <li> Softmax. </li>
+    *    <li> Softplus. </li>
+    *    <li> ArcTan. </li>
+    * </ul>
+    * @param ativacao nome da nova função de ativação.
+    * @throws IllegalArgumentException se o valor fornecido não corresponder a nenhuma 
+    * função de ativação suportada.
+    */
+   public void configurarAtivacao(String ativacao){
+      throw new IllegalArgumentException(
+         "Implementar configuração da função de ativação da camada."
+      );
+   }
+
+   /**
+    * Configura a função de ativação da camada através de uma instância de 
+    * {@code FuncaoAtivacao} que será usada para ativar seus neurônios.
+    * <p>
+    *    Configurando a ativação da camada usando uma instância de função 
+    *    de ativação aumenta a liberdade de personalização dos hiperparâmetros
+    *    que algumas funções podem ter.
+    * </p>
+    * @param ativacao nova função de ativação.
+    * @throws IllegalArgumentException se a função de ativação fornecida for nula.
+    */
+   public void configurarAtivacao(Ativacao ativacao){
+      throw new IllegalArgumentException(
+         "Implementar configuração da função de ativação da camada."
+      );
    }
 
    /**

@@ -49,7 +49,7 @@ public class Mat implements Cloneable{
    }
 
    /**
-    * Inicializa uma nova matriz com seus dados vazios.
+    * Inicializa uma nova matriz baseada na matriz fornecida.
     * @param lin quantidade de linhas da matriz.
     * @param col quantidade de colunas da matriz.
     */
@@ -73,6 +73,24 @@ public class Mat implements Cloneable{
             this.dados[indice++] = m[i][j];
          }
       }
+   }
+
+   /**
+    * Inicializa uma nova matriz baseada no array fornecido.
+    * @param lin quantidade de linhas da matriz.
+    * @param col quantidade de colunas da matriz.
+    */
+   public Mat(double[] arr){
+      if(arr == null){
+         throw new IllegalArgumentException(
+            "Array fonecido é nulo."
+         );
+      }
+
+      this.lin = 1;
+      this.col = arr.length;
+      this.dados = new double[this.col];
+      System.arraycopy(arr, 0, this.dados, 0, this.dados.length);
    }
 
    /**
