@@ -26,7 +26,8 @@ public class ReLU extends Ativacao{
       for(i = 0; i < camada.derivada.lin; i++){
          for(j = 0; j < camada.derivada.col; j++){
             grad = camada.gradSaida.dado(i, j);
-            d = derivada(camada.somatorio.dado(i, j));
+            d = camada.somatorio.dado(i, j);
+            d = derivada(d);
             
             camada.derivada.editar(i, j, (grad * d));
          }

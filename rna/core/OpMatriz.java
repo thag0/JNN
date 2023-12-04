@@ -93,16 +93,7 @@ public class OpMatriz{
     * @return transposta da matriz alvo.
     */
    public Mat transpor(Mat m){
-      Mat t = new Mat(m.col, m.lin);
-
-      int i, j;
-      for(i = 0; i < t.lin; i++){
-         for(j = 0; j < t.col; j++){
-            t.editar(i, j, m.dado(j, i));
-         }
-      }
-
-      return t;
+      return m.transpor();
    }
 
    /**

@@ -245,16 +245,9 @@ public class Convolucional extends Camada implements Cloneable{
       this(formEntrada, formFiltro, numFiltros, true);
    }
 
-   /**
-    * Inicaliza os pesos e bias (caso tenha) da camada de acordo com o 
-    * inicializador configurado.
-    * @param iniFiltros inicializador de filtros.
-    * @param iniBias inicializador de bias.
-    * @param x valor usado pelos inicializadores, dependendo do que for usado
-    * pode servir de alcance na aleatorização, valor de constante, entre outros.
-    */
-   public void inicializar(Inicializador iniFiltros, Inicializador iniBias, double x){
-      if(iniFiltros == null){
+   @Override
+   public void inicializar(Inicializador iniKernel, Inicializador iniBias, double x){
+      if(iniKernel == null){
          throw new IllegalArgumentException(
             "O inicializador não pode ser nulo."
          );
@@ -262,7 +255,7 @@ public class Convolucional extends Camada implements Cloneable{
 
       for(int i = 0; i < numFiltros; i++){
          for(int j = 0; j < profEntrada; j++){
-            iniFiltros.inicializar(this.filtros[i][j], x);
+            iniKernel.inicializar(this.filtros[i][j], x);
          }
       }
       
@@ -274,57 +267,18 @@ public class Convolucional extends Camada implements Cloneable{
       }
    }
 
-   /**
-    * Inicaliza os pesos da camada de acordo com o inicializador configurado.
-    * @param iniPesos inicializador de pesos.
-    * @param x valor usado pelos inicializadores, dependendo do que for usado
-    * pode servir de alcance na aleatorização, valor de constante, entre outros.
-    */
-   public void inicializar(Inicializador iniPesos, double x){
-      this.inicializar(iniPesos, null, x);
+   @Override
+   public void inicializar(Inicializador iniKernel, double x){
+      this.inicializar(iniKernel, null, x);
    }
 
-   /**
-    * Configura a função de ativação da camada através do nome fornecido, letras 
-    * maiúsculas e minúsculas não serão diferenciadas.
-    * <p>
-    *    Ativações disponíveis:
-    * </p>
-    * <ul>
-    *    <li> ReLU. </li>
-    *    <li> Sigmoid. </li>
-    *    <li> TanH. </li>
-    *    <li> Leaky ReLU. </li>
-    *    <li> ELU .</li>
-    *    <li> Swish. </li>
-    *    <li> GELU. </li>
-    *    <li> Linear. </li>
-    *    <li> Seno. </li>
-    *    <li> Argmax. </li>
-    *    <li> Softmax. </li>
-    *    <li> Softplus. </li>
-    *    <li> ArcTan. </li>
-    * </ul>
-    * @param ativacao nome da nova função de ativação.
-    * @throws IllegalArgumentException se o valor fornecido não corresponder a nenhuma 
-    * função de ativação suportada.
-    */
+   @Override
    public void configurarAtivacao(String ativacao){
       DicionarioAtivacoes dic = new DicionarioAtivacoes();
       this.ativacao = dic.obterAtivacao(ativacao);
    }
 
-   /**
-    * Configura a função de ativação da camada através de uma instância de 
-    * {@code FuncaoAtivacao} que será usada para ativar seus neurônios.
-    * <p>
-    *    Configurando a ativação da camada usando uma instância de função 
-    *    de ativação aumenta a liberdade de personalização dos hiperparâmetros
-    *    que algumas funções podem ter.
-    * </p>
-    * @param ativacao nova função de ativação.
-    * @throws IllegalArgumentException se a função de ativação fornecida for nula.
-    */
+   @Override
    public void configurarAtivacao(Ativacao ativacao){
       if(ativacao == null){
          throw new IllegalArgumentException(
@@ -399,8 +353,6 @@ public class Convolucional extends Camada implements Cloneable{
 
       //feedforward
       for(int i = 0; i < this.numFiltros; i++){
-         this.saida[i].preencher(0);
-
          for(int j = 0; j < this.profEntrada; j++){
             opmat.correlacaoCruzada(this.entrada[j], this.filtros[i][j], this.somatorio[i]);
             opmat.add(this.somatorio[i], this.saida[i], this.saida[i]);

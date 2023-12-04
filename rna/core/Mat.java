@@ -160,7 +160,8 @@ public class Mat implements Cloneable{
     * @param valor novo valor que será colocado.
     */
    public void editar(int lin, int col, double valor){
-      this.dados[indice(lin, col)] = valor;
+      int id = indice(lin, col);
+      this.dados[id] = valor;
    }
 
    /**
@@ -377,6 +378,14 @@ public class Mat implements Cloneable{
       }
 
       return m;
+   }
+
+   /**
+    * 
+    * @return
+    */
+   public double[] paraArray(){
+      return this.dados;
    }
 
    /**

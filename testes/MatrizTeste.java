@@ -6,6 +6,7 @@ import rna.avaliacao.perda.EntropiaCruzada;
 import rna.core.Mat;
 import rna.core.OpMatriz;
 import rna.estrutura.Densa;
+import rna.estrutura.Flatten;
 import rna.inicializadores.Inicializador;
 import rna.inicializadores.Xavier;
 
@@ -26,16 +27,20 @@ public class MatrizTeste{
          {1, 2},
          {-1, 0},
       };
+      Mat mat1 = new Mat(new double[][]{
+         {1, 2},
+         {3, 4}
+      });
+      Mat mat2 = new Mat(new double[][]{
+         {5, 6},
+         {7, 8}
+      });
 
-      Mat entrada = new Mat(e);
-      Mat filtro = new Mat(f);
-      Mat resV = new Mat(2, 2);
-      Mat resF = new Mat(4, 4);
+      Mat[] matrizes = new Mat[]{mat1, mat2};
 
-      opmat.convolucao(entrada, filtro, resV);
-      opmat.convolucaoFull(entrada, filtro, resF);
-      resV.print("res v");
-      resF.print("res f");
+      Flatten flat = new Flatten();
+      flat.calcularSaida(matrizes);
+      ged.imprimirArray(flat.saida);
    }
 
    static void derivadaSoftmax(){

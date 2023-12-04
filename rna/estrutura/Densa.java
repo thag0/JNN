@@ -227,7 +227,7 @@ public class Densa extends Camada implements Cloneable{
 
       this.somatorio =   new Mat(this.saida.lin, this.saida.col);
       this.derivada =    new Mat(this.saida.lin, this.saida.col);
-      this.gradSaida =    new Mat(this.saida.lin, this.saida.col);
+      this.gradSaida =   new Mat(this.saida.lin, this.saida.col);
       this.gradEntrada = new Mat(this.entrada.lin, this.entrada.col);
 
       this.gradPesos =   new Mat(this.pesos.lin, this.pesos.col);
@@ -271,8 +271,8 @@ public class Densa extends Camada implements Cloneable{
    }
 
    @Override
-   public void inicializar(Inicializador iniPesos, double x){
-      this.inicializar(iniPesos, null, x);
+   public void inicializar(Inicializador iniKernel, double x){
+      this.inicializar(iniKernel, null, x);
    }
 
    @Override
@@ -363,8 +363,8 @@ public class Densa extends Camada implements Cloneable{
    public void calcularGradiente(Object gradSeguinte){
       if(gradSeguinte instanceof Mat == false){
          throw new IllegalArgumentException(
-            "O gradiente para a camada Densa deve ser do tipo \"Mat\", " +
-            "objeto recebido é do tipo \"" + gradSeguinte.getClass().getSimpleName() + "\""
+            "O gradiente para a camada Densa deve ser do tipo " + this.gradSaida.getClass() +
+            ", objeto recebido é do tipo \"" + gradSeguinte.getClass().getSimpleName() + "\""
          );
       }
 
