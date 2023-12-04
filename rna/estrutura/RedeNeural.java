@@ -833,7 +833,7 @@ public class RedeNeural implements Cloneable{
 
       this.camadas[0].calcularSaida(entrada);
       for(int i = 1; i < this.camadas.length; i++){
-         this.camadas[i].calcularSaida(this.camadas[i-1].obterSaida().linha(0));
+         this.camadas[i].calcularSaida(this.camadas[i-1].obterSaida());
       }
    }
 
@@ -1105,7 +1105,7 @@ public class RedeNeural implements Cloneable{
     */
    public double[] obterSaidas(){
       this.verificarCompilacao();
-      return this.obterCamadaSaida().obterSaida().linha(0);
+      return this.obterCamadaSaida().obterSaida();
    }
 
    /**

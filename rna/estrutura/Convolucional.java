@@ -434,19 +434,12 @@ public class Convolucional extends Camada implements Cloneable{
       return this.ativacao;
    }
 
-   /**
-    * Verifica se a camada atual possui o bias configurado para seus neurônios.
-    * @return true caso possua bias configurado, false caso contrário.
-    */
+   @Override
    public boolean temBias(){
       return this.usarBias;
    }
 
-   /**
-    * Retorda a quantidade de parâmetros totais da camada, em outras palavras, 
-    * retorna o somatório da quantidade de filtros e bias presentes na camada.
-    * @return a quantidade de parâmetros.
-    */
+   @Override
    public int numParametros(){
       int parametros = 0;
 
@@ -460,8 +453,28 @@ public class Convolucional extends Camada implements Cloneable{
     * Retorna o array de saídas da camada.
     * @return array de matrizes contendo as saídas da camada.
     */
-   public Mat[] obterSaida(){
+   public Mat[] saidaParaMat(){
       return this.saida;
+   }
+
+   @Override
+   public double[] obterSaida(){
+      int n = 0;
+      for(int i = 0; i < this.saida.length; i++){
+         n += this.saida[i].tamanho();
+      }
+
+      int id = 0;
+      double[] saida = new double[n];
+      for(int i = 0; i < this.saida.length; i++){
+         double[] s = this.saida[i].paraArray();
+         for(int j = 0; j < s.length; j++){
+            saida[id] = s[j];
+            id++;
+         }
+      }
+
+      return saida;
    }
 
    /**

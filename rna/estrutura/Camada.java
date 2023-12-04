@@ -173,6 +173,16 @@ public class Camada{
    }
 
    /**
+    * Retorna a saída da camada no formato de array.
+    * @return saída da camada.
+    */
+   public double[] obterSaida(){
+      throw new IllegalArgumentException(
+         "Implementar retorno de saída."
+      );   
+   }
+
+   /**
     * Retorna a quantidade de parâmetros treináveis da camada.
     * <p>
     *    Esses parâmetros podem incluir pesos, filtros, bias, entre outros.
@@ -210,6 +220,11 @@ public class Camada{
       );       
    }
 
+   /**
+    * Retorna um array contendo os elementos usados para armazenar o valor
+    * dos gradientes para os kernels da camada.
+    * @return gradientes para os kernels da camada.
+    */
    public double[] obterGradKernel(){
       throw new IllegalArgumentException(
          "Implementar retorno do gradiente para o kernel."
@@ -231,9 +246,20 @@ public class Camada{
       );        
    }
 
+   /**
+    * Retorna um array contendo os elementos usados para armazenar o valor
+    * dos gradientes para os bias da camada.
+    * @return gradientes para os bias da camada.
+    */
    public double[] obterGradBias(){
       throw new IllegalArgumentException(
          "Implementar retorno do gradiente para o bias."
       );        
+   }
+
+   public Object obterGradEntrada(){
+      throw new IllegalArgumentException(
+         "Implementar retorno do gradiente de entrada da camad."
+      );     
    }
 }

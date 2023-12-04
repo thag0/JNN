@@ -49,6 +49,24 @@ public class ReLU extends Ativacao{
       }
    }
 
+   @Override
+   public void derivada(Convolucional camada){
+      int i, j, k;
+      double grad, d;
+
+      for(i = 0; i < camada.somatorio.length; i++){
+         for(j = 0; j < camada.somatorio[i].lin; j++){
+            for(k = 0; k < camada.somatorio[i].col; k++){
+               grad = camada.gradSaida[i].dado(j, k);
+               d = camada.somatorio[i].dado(j, k);
+               d = derivada(d);
+
+               camada.saida[i].editar(j, k, (grad * d));
+            }
+         }
+      }
+   }
+
    private double relu(double x){
       return x > 0 ? x : 0;
    }

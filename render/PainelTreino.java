@@ -56,7 +56,7 @@ public class PainelTreino extends JPanel{
                entradaRede[1] = (double)y / this.altura;
                rede.calcularSaida(entradaRede);
 
-               double[] saida = rede.obterCamadaSaida().obterSaida().linha(0);
+               double[] saida = rede.obterCamadaSaida().obterSaida();
                int cinza = (int)(saida[0] * 255);
 
                r = cinza;
@@ -74,7 +74,7 @@ public class PainelTreino extends JPanel{
                entradaRede[1] = (double)y / this.altura;
                rede.calcularSaida(entradaRede);
 
-               double[] saida = rede.obterCamadaSaida().obterSaida().linha(0);
+               double[] saida = rede.obterCamadaSaida().obterSaida();
                r = (int)(saida[0] * 255);
                g = (int)(saida[1] * 255);
                b = (int)(saida[2] * 255);
@@ -167,7 +167,7 @@ public class PainelTreino extends JPanel{
 
             rede.calcularSaida(entrada);
             
-            saida = rede.obterCamadaSaida().obterSaida().linha(0);
+            saida = rede.obterCamadaSaida().obterSaida();
             cinza = (int)(saida[0] * 255);
             r = cinza;
             g = cinza;
@@ -191,7 +191,7 @@ public class PainelTreino extends JPanel{
             
             rede.calcularSaida(entrada);
 
-            saida = rede.obterCamadaSaida().obterSaida().linha(0);
+            saida = rede.obterCamadaSaida().obterSaida();
             r = (int) (saida[0] * 255);
             g = (int) (saida[1] * 255);
             b = (int) (saida[2] * 255);

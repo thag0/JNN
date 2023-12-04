@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
-import rna.estrutura.CamadaDensa;
+import rna.estrutura.Densa;
 import rna.estrutura.RedeNeural;
 
 public class PainelRede extends JPanel{
@@ -104,7 +104,7 @@ public class PainelRede extends JPanel{
       int xInicial = (largura/2) - (larguraTotal/2);
 
       x = xInicial;
-      for(CamadaDensa camada : rede.obterCamadas()){
+      for(Densa camada : rede.obterCamadas()){
          desenharCamada(camada);
          x += padCamadas;
          contadorCamadas++;
@@ -115,17 +115,17 @@ public class PainelRede extends JPanel{
       g2.dispose();
    }
     
-   private void desenharCamada(CamadaDensa camada){
+   private void desenharCamada(Densa camada){
       int alturaJanela = getHeight();
       //tirar altura o padding do ultimo neuronio porque não muda nada e descentraliza o desenho
-      int alturaCamada = (camada.quantidadeNeuronios() * (alturaDesenho + padNeuronios)) - padNeuronios;
+      int alturaCamada = (camada.numNeuronios() * (alturaDesenho + padNeuronios)) - padNeuronios;
       int yInicial = (alturaJanela - alturaCamada) / 2;
    
       int y = yInicial;
    
-      int neuronios = camada.quantidadeNeuronios();
+      int neuronios = camada.numNeuronios();
       for(int i = 0; i < neuronios; i++){
-         desenharNeuronio(g2, x, y, camada.obterSaida().linha(0)[i]);
+         desenharNeuronio(g2, x, y, camada.obterSaida()[i]);
          y += alturaDesenho + padNeuronios;
       }
    }

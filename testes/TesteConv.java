@@ -45,6 +45,7 @@ public class TesteConv{
          }
       };
       camada.calcularGradiente(grad);
+      ged.imprimirArray(camada.obterSaida(), "saida conv");
 
       for(int i = 0; i < camada.gradFiltros.length; i++){
          for(int j = 0; j < camada.gradFiltros[i].length; j++){
@@ -55,5 +56,6 @@ public class TesteConv{
       for(int i = 0; i < camada.gradEntrada.length; i++){
          camada.gradEntrada[i].print("grad entrada " + i);
       }
+
    }
 }

@@ -6,7 +6,7 @@ import rna.avaliacao.perda.Perda;
 import rna.core.Array;
 import rna.core.Mat;
 import rna.core.OpMatriz;
-import rna.estrutura.Densa;
+import rna.estrutura.Camada;
 
 class Auxiliar{
    Random random = new Random();
@@ -31,14 +31,14 @@ class Auxiliar{
     * @param perda função de perda configurada para a Rede Neural.
     * @param real saída real que será usada para calcular os erros e gradientes.
     */
-   public void backpropagation(Densa[] redec, Perda perda, double[] real){
-      Densa saida = redec[redec.length-1];
-      double[] previsto = saida.obterSaida().linha(0);
+   public void backpropagation(Camada[] redec, Perda perda, double[] real){
+      Camada saida = redec[redec.length-1];
+      double[] previsto = saida.obterSaida();
       double[] gradPrev = perda.derivada(previsto, real);
 
       saida.calcularGradiente(new Mat(gradPrev));
       for(int i = redec.length-2; i >= 0; i--){
-         redec[i].calcularGradiente(redec[i+1].gradEntrada);
+         redec[i].calcularGradiente(redec[i+1].obterGradEntrada());
       }
    }
    

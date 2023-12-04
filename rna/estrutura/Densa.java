@@ -491,6 +491,11 @@ public class Densa extends Camada implements Cloneable{
       this.bias.editar(0, id, bias);
    }
 
+
+   public double[] obterSaida(){
+      return this.saida.linha(0);
+   }
+
    /**
     * Retorna a matriz contendo as saídas da camada.
     * <p>
@@ -499,7 +504,7 @@ public class Densa extends Camada implements Cloneable{
     * </p>
     * @return matriz de saída da camada.
     */
-   public Mat obterSaida(){
+   public Mat saidaParaMat(){
       return this.saida;
    }
 
@@ -620,5 +625,10 @@ public class Densa extends Camada implements Cloneable{
    @Override
    public double[] obterGradBias(){
       return this.gradBias.paraArray();
+   }
+
+   @Override
+   public Object obterGradEntrada(){
+      return this.gradEntrada;
    }
 }
