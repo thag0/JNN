@@ -9,13 +9,19 @@ import rna.inicializadores.Inicializador;
  */
 public class Camada{
 
+   /**
+    * Instancia a camada base usada dentro dos modelos de Rede Neural.
+    * <p>
+    *    A camada base não possui implementação de métodos e é apenas usada
+    *    como molde de base para as outras camadas terem suas próprias implementações.
+    * </p>
+    */
    public Camada(){
 
    }
 
    /**
-    * Inicaliza os pesos e bias (caso tenha) da camada de acordo com o 
-    * inicializador configurado.
+    * Inicaliza os parâmetros treináveis da camada, 
     * @param iniKernel inicializador para o kernel.
     * @param iniBias inicializador de bias.
     * @param x valor usado pelos inicializadores, dependendo do que for usado
@@ -164,5 +170,70 @@ public class Camada{
       throw new IllegalArgumentException(
          "Implementar formato de saída."
       );
+   }
+
+   /**
+    * Retorna a quantidade de parâmetros treináveis da camada.
+    * <p>
+    *    Esses parâmetros podem incluir pesos, filtros, bias, entre outros.
+    * </p>
+    * O resultado deve ser a quantidade total desses elementos.
+    * @return número da parâmetros da camada.
+    */
+   public int numParametros(){
+      throw new IllegalArgumentException(
+         "Implementar númedo de parâmetros."
+      );  
+   }
+
+   /**
+    * Retorna o verificador de uso do bias dentro da camada.
+    * @return uso de bias na camada.
+    */
+   public boolean temBias(){
+      throw new IllegalArgumentException(
+         "Implementar uso do bias."
+      );  
+   }
+
+   /**
+    * Retorna um array contendo os elementos do kernel presente na camada.
+    * <p>
+    *    O kernel de uma camada inclui seus atributos mais importantes, como
+    *    os pesos de uma camada densa, ou os filtros de uma camada convolucional.
+    * </p>
+    * @return kernel da camada.
+    */
+   public double[] obterKernel(){
+      throw new IllegalArgumentException(
+         "Implementar retorno do kernel."
+      );       
+   }
+
+   public double[] obterGradKernel(){
+      throw new IllegalArgumentException(
+         "Implementar retorno do gradiente para o kernel."
+      );       
+   }
+
+   /**
+    * Retorna um array contendo os elementos dos bias presente na camada.
+    * <p>
+    *    É importante verificar se a camada foi configurada para suportar
+    *    os bias antes de usar os valores retornados por ela. Quando não
+    *    configurados, os bias da camada são nulos.
+    * </p>
+    * @return bias da camada.
+    */
+   public double[] obterBias(){
+      throw new IllegalArgumentException(
+         "Implementar retorno do bias."
+      );        
+   }
+
+   public double[] obterGradBias(){
+      throw new IllegalArgumentException(
+         "Implementar retorno do gradiente para o bias."
+      );        
    }
 }

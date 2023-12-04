@@ -1,7 +1,7 @@
 package rna.otimizadores;
 
-import rna.core.OpMatriz;
-import rna.estrutura.Densa;
+import rna.core.Array;
+import rna.estrutura.Camada;
 
 /**
  * Classe que implementa o algoritmo de Descida do Gradiente para otimização de redes neurais.
@@ -14,7 +14,7 @@ import rna.estrutura.Densa;
  * </pre>
  * Onde:
  * <p>
- *    {@code v} - variável que será otimizadada (peso ou bias).
+ *    {@code v} - variável que será otimizadada (kernel, bias).
  * </p>
  *    {@code g} - gradiente correspondente a variável que será otimizada.
  * </p>
@@ -25,9 +25,9 @@ import rna.estrutura.Densa;
 public class GD extends Otimizador{
 
    /**
-    * Operador matricial para o otimizador.
+    * Operador de arrays.
     */
-   OpMatriz mat = new OpMatriz();
+   Array opArr = new Array();
 
    /**
     * Valor de taxa de aprendizagem do otimizador.
@@ -51,23 +51,27 @@ public class GD extends Otimizador{
     * {@code taxaAprendizagem = 0.01}
     */
    public GD(){
-      this(0.01);
+      this(0.1);
    }
 
    @Override
-   public void inicializar(Densa[] redec){
+   public void inicializar(Camada[] redec){
       
    }
 
    @Override
-   public void atualizar(Densa[] redec){
-      for(Densa camada : redec){
-         mat.escalar(camada.gradPesos, taxaAprendizagem, camada.gradPesos);
-         mat.add(camada.pesos, camada.gradPesos, camada.pesos);
+   public void atualizar(Camada[] redec){
+      for(Camada camada : redec){
+         double[] pesos = camada.obterKernel();
+         double[] gradP = camada.obterGradKernel();
+         opArr.escalar(gradP, taxaAprendizagem, gradP);
+         opArr.add(pesos, gradP, pesos);
 
          if(camada.temBias()){
-            mat.escalar(camada.gradBias, taxaAprendizagem, camada.gradBias);
-            mat.add(camada.bias, camada.gradBias, camada.bias);
+            double[] bias = camada.obterBias();
+            double[] gradB = camada.obterGradBias();
+            opArr.escalar(gradB, taxaAprendizagem, gradB);
+            opArr.add(bias, gradB, bias);
          }
       } 
    }

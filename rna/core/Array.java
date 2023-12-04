@@ -2,13 +2,19 @@ package rna.core;
 
 public class Array{
 
+   public void preencher(double[] arr, double val){
+      for(int i = 0; i < arr.length; i++){
+         arr[i] = val;
+      }
+   }
+
    /**
     * 
     * @param a
     * @param b
     * @param r
     */
-   public static void add(double[] a, double[] b, double[] r){
+   public void add(double[] a, double[] b, double[] r){
       if(a.length != b.length){
          throw new IllegalArgumentException(
             "As dimensões de A (" + a.length + 
@@ -36,7 +42,7 @@ public class Array{
     * @param b
     * @param r
     */
-   public static void sub(double[] a, double[] b, double[] r){
+   public void sub(double[] a, double[] b, double[] r){
       if(a.length != b.length){
          throw new IllegalArgumentException(
             "As dimensões de A (" + a.length + 
@@ -64,7 +70,7 @@ public class Array{
     * @param b
     * @param r
     */
-   public static void mult(double[] a, double[] b, double[] r){
+   public void mult(double[] a, double[] b, double[] r){
       if(a.length != b.length){
          throw new IllegalArgumentException(
             "As dimensões de A (" + a.length + 
@@ -91,7 +97,7 @@ public class Array{
     * @param e
     * @param r
     */
-   public static void escalar(double[] a, double e, double[] r){
+   public void escalar(double[] a, double e, double[] r){
       if(a.length != r.length){
          throw new IllegalArgumentException(
             "As linhas de A (" + a.length + 
@@ -105,7 +111,7 @@ public class Array{
       }     
    }
 
-   public static double produtoEscalar(double[] a, double[] b){
+   public  double produtoEscalar(double[] a, double[] b){
       if(a.length != b.length){
          throw new IllegalArgumentException(
             "As linhas de A (" + a.length + 

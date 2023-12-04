@@ -1,7 +1,6 @@
 package rna.otimizadores;
 
-import rna.core.Mat;
-import rna.estrutura.Densa;
+import rna.estrutura.Camada;
 
 /**
  * Implementação do algoritmo de otimização AMSGrad, que é uma variação do 
@@ -18,7 +17,7 @@ import rna.estrutura.Densa;
  * </pre>
  * Onde:
  * <p>
- *    {@code p} - variável que será otimizada (peso ou bias).
+ *    {@code p} - variável que será otimizada (kernel, bias).
  * </p>
  * <p>
  *    {@code tA} - valor de taxa de aprendizagem.
@@ -59,7 +58,7 @@ import rna.estrutura.Densa;
  * </p>
  */
 public class AMSGrad extends Otimizador{
-	private static final double PADRAO_TA = 0.01;
+	private static final double PADRAO_TA = 0.001;
    private static final double PADRAO_BETA1 = 0.95;
    private static final double PADRAO_BETA2 = 0.999;
    private static final double PADRAO_EPS = 1e-7;
@@ -85,34 +84,34 @@ public class AMSGrad extends Otimizador{
 	private double beta2;
 
    /**
-    * Coeficientes de momentum.
+    * Coeficientes de momentum para os kernels.
     */
-	private Mat[] m;
+	private double[] m;
 
    /**
     * Coeficientes de momentum para os bias.
     */
-	private Mat[] mb;
+	private double[] mb;
 
 	/**
-	 * Coeficientes de momentum de segunda orgem.
+	 * Coeficientes de momentum de segunda orgem para os kernels.
 	 */
-	private Mat[] v;
+	private double[] v;
 
 	/**
 	 * Coeficientes de momentum de segunda orgem para os bias.
 	 */
-	private Mat[] vb;
+	private double[] vb;
 
 	/**
-	 * Coeficientes de momentum de segunda orgem corrigidos.
+	 * Coeficientes de momentum de segunda orgem corrigidos para os kernels.
 	 */
-	private Mat[] vc;
+	private double[] vc;
 
 	/**
 	 * Coeficientes de momentum de segunda orgem corrigidos para os bias.
 	 */
-	private Mat[] vcb;
+	private double[] vcb;
 
 	/**
 	 * Contador de iterações.
@@ -154,74 +153,69 @@ public class AMSGrad extends Otimizador{
 	}
 
 	@Override
-   public void inicializar(Densa[] redec){
-      this.m  = new Mat[redec.length];
-      this.v  = new Mat[redec.length];
-      this.vc = new Mat[redec.length];
+   public void inicializar(Camada[] redec){
+      int nKernel = 0;
+      int nBias = 0;
       
-		this.mb  = new Mat[redec.length];
-      this.vb  = new Mat[redec.length];
-      this.vcb = new Mat[redec.length];
-   
-      for(int i = 0; i < redec.length; i++){
-         Densa camada = redec[i];
+      for(Camada camada : redec){
+         nKernel += camada.obterKernel().length;
 
-         this.m[i]  = new Mat(camada.pesos.lin, camada.pesos.col);
-         this.v[i]  = new Mat(camada.pesos.lin, camada.pesos.col);
-         this.vc[i] = new Mat(camada.pesos.lin, camada.pesos.col);
-         
          if(camada.temBias()){
-            this.mb[i]  = new Mat(camada.bias.lin, camada.bias.col);
-            this.vb[i]  = new Mat(camada.bias.lin, camada.bias.col);
-            this.vcb[i] = new Mat(camada.bias.lin, camada.bias.col);
-         }
+            nBias += camada.obterBias().length;
+         }         
       }
+
+      this.m  = new double[nKernel];
+      this.v  = new double[nKernel];
+      this.vc  = new double[nKernel];
+      this.mb = new double[nBias];
+      this.vb = new double[nBias];
+      this.vcb = new double[nBias];
    }
 
 	@Override
-	public void atualizar(Densa[] redec){
+	public void atualizar(Camada[] redec){
+		int idKernel = 0, idBias = 0;
+		double g, mChapeu, vChapeu;
+
 		interacoes++;
 		double forcaB1 = (1 - Math.pow(beta1, interacoes));
 		double forcaB2 = (1 - Math.pow(beta2, interacoes));
 		
-		for(int i = 0; i < redec.length; i++){
-			Densa camada = redec[i];
-			Mat pesos = camada.pesos;
-			Mat grads = camada.gradPesos;
+		for(Camada camada : redec){
+			double[] kernel = camada.obterKernel();
+			double[] gradK = camada.obterGradKernel();
 
-			for(int j = 0; j < pesos.lin; j++){
-				for(int k = 0; k < pesos.col; k++){
-					calcular(pesos, grads, m[i], v[i], vc[i], j, k, forcaB1, forcaB2);
-				}			
+			for(int i = 0; i < kernel.length; i++){
+				g = gradK[i];
+				m[idKernel] = (beta1 * m[idKernel]) + ((1 - beta1) * g);
+				v[idKernel] = (beta2 * v[idKernel]) + ((1 - beta2) * (g*g));
+				vc[idKernel] = Math.max(vc[idKernel], v[idKernel]);
+
+				mChapeu = m[idKernel] / forcaB1;
+				vChapeu = v[idKernel] / forcaB2;
+				kernel[i] += (mChapeu * taxaAprendizagem) / (Math.sqrt(vChapeu) + epsilon);
+				idKernel++;
 			}
 
          if(camada.temBias()){
-				Mat bias = camada.bias;
-				Mat gradsB = camada.gradSaida;
+				double[] bias = camada.obterBias();
+				double[] gradB = camada.obterGradBias();
 
-            for(int j = 0; j < bias.lin; j++){
-               for(int k = 0; k < bias.col; k++){
-                  calcular(bias, gradsB, mb[i], vb[i], vcb[i], j, k, forcaB1, forcaB2);
-               }
-            }
+				for(int i = 0; i < bias.length; i++){
+					g = gradB[i];
+					mb[idBias] = (beta1 * mb[idBias]) + ((1 - beta1) * g);
+					vb[idBias] = (beta2 * vb[idBias]) + ((1 - beta2) * (g*g));
+					vcb[idBias] = Math.max(vcb[idBias], vb[idBias]);
+
+					mChapeu = mb[idBias] / forcaB1;
+					vChapeu = vb[idBias] / forcaB2;
+					bias[i] += (mChapeu * taxaAprendizagem) / (Math.sqrt(vChapeu) + epsilon);
+					idBias++;	
+				}
          } 
 		}
   	}
-
-	private void calcular(Mat var, Mat grad, Mat m, Mat v, Mat vc, int lin, int col, double fb1, double fb2){
-		double g = grad.dado(lin, col);
-
-		double m2 = (beta1 * m.dado(lin, col)) + ((1 - beta1) * g);
-		double v2 = (beta2 * v.dado(lin, col)) + ((1 - beta2) * (g*g));
-		m.editar(lin, col, m2);
-		v.editar(lin, col, v2);
-		vc.editar(lin, col, Math.max(v.dado(lin, col), v2));
-
-		double mChapeu = m.dado(lin, col) / fb1;
-		double vChapeu = vc.dado(lin, col) / fb2;
-		double att = (mChapeu * taxaAprendizagem) / (Math.sqrt(vChapeu) + epsilon);
-		var.add(lin, col, att);
-	}
 
 	@Override
 	public String info(){

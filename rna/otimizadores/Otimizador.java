@@ -1,6 +1,6 @@
 package rna.otimizadores;
 
-import rna.estrutura.Densa;
+import rna.estrutura.Camada;
 
 /**
  * Classe base para implementações de otimizadores do treino da Rede Neural.
@@ -21,35 +21,37 @@ import rna.estrutura.Densa;
 public abstract class Otimizador{
 
 	/**
-	 * Inicializa os parâmetros do otimizador para que possa ser usado.
-	 * @param redec Lista de camadas densas da Rede Neural.
+	 * Inicializa os parâmetros do otimizador para a as camadas da Rede Neural.
+	 * @param redec lista de camadas densas da Rede Neural.
 	 */
-	public void inicializar(Densa[] redec){
+	public void inicializar(Camada[] redec){
 		throw new UnsupportedOperationException(
 			"Inicialização do otimizador não implementada."
 		);
 	}
 
 	/**
-	 * Atualiza os pesos da Rede Neural de acordo com o otimizador configurado.
+	 * Atualiza os parâmetros treináveis da Rede Neural de acordo com o 
+	 * otimizador configurado.
 	 * <p>
-	 *		A atualização de pesos é feita uma única vez em todos os parâmetros da rede.
+	 *		A atualização de pesos é feita uma única vez em todos os 
+	 *		parâmetros da rede.
 	 * </p>
-	 * @param redec Lista de camadas densas da Rede Neural.
+	 * @param redec lista de camadas densas da Rede Neural.
 	 */
-	public void atualizar(Densa[] redec){
+	public void atualizar(Camada[] redec){
 		throw new UnsupportedOperationException(
-			"Método de atualização do otimizador não foi implementado."
+			"Implementar método de atualização do otimizador."
 		);
 	}
 
 	/**
- 	 * Mostra as opções de configurações do otimizador.
+ 	 * Exibe as opções de configurações do otimizador.
 	 * @return buffer formatado.
 	 */
 	public String info(){
 		throw new UnsupportedOperationException(
-			"Método de informações do otimizador não foi implementado."
+			"Implementar método de informações do otimizador."
 		);
 	}
 }

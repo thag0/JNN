@@ -1,7 +1,6 @@
 package rna.otimizadores;
 
-import rna.core.Mat;
-import rna.estrutura.Densa;
+import rna.estrutura.Camada;
 
 /**
  * Classe que implementa o otimizador Gradiente Descentente Estocástico com momentum.
@@ -16,7 +15,7 @@ import rna.estrutura.Densa;
  * </pre>
  * Onde:
  * <p>
- *    {@code v} - variável que será otimizada (peso ou bias).
+ *    {@code v} - variável que será otimizada (kernel, bias).
  * </p>
  * <p>
  *    {@code M} - valor de taxa de momentum (ou constante de momentum) 
@@ -51,14 +50,14 @@ public class SGD extends Otimizador{
    private boolean nesterov;
 
    /**
-    * Coeficientes de momentum para os pesos.
+    * Coeficientes de momentum para os kernels.
     */
-   public Mat[] m;
+   public double[] m;
    
    /**
     * Coeficientes de momentum para os bias.
     */
-   public Mat[] mb;
+   public double[] mb;
 
    /**
     * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient Descent (SGD) </strong> 
@@ -107,56 +106,56 @@ public class SGD extends Otimizador{
    }
 
    @Override
-   public void inicializar(Densa[] redec){
-      this.m  = new Mat[redec.length];
-      this.mb = new Mat[redec.length];
-
-      for(int i = 0; i < redec.length; i++){
-         Densa camada = redec[i];
-
-         this.m[i] = new Mat(camada.pesos.lin, camada.pesos.col);
+   public void inicializar(Camada[] redec){
+      int nKernel = 0;
+      int nBias = 0;
+      
+      for(Camada camada : redec){
+         nKernel += camada.obterKernel().length;
          if(camada.temBias()){
-            this.mb[i] = new Mat(camada.bias.lin, camada.bias.col);
-         }
+            nBias += camada.obterBias().length;
+         }         
       }
+
+      this.m  = new double[nKernel];
+      this.mb = new double[nBias];
    }
 
    @Override
-   public void atualizar(Densa[] redec){
-      int i, j, k;
-      for(i = 0; i < redec.length; i++){
-         Densa camada = redec[i];
-         Mat pesos = camada.pesos;
-         Mat gradP = camada.gradPesos;
+   public void atualizar(Camada[] redec){
+      int i,idKernel = 0, idBias = 0;
 
-         for(j = 0; j < pesos.lin; j++){
-            for(k = 0; k < pesos.col; k++){
-               calcular(pesos, gradP, m[i], j, k);
+      for(Camada camada : redec){
+         double[] kernel = camada.obterKernel();
+         double[] gradK = camada.obterGradKernel();
+
+         for(i = 0; i < kernel.length; i++){
+            m[idKernel] = (m[idKernel] * momentum) - (gradK[i] * taxaAprendizagem);
+
+            if(nesterov){
+               kernel[i] -= (m[idKernel] * momentum) - (gradK[i] * taxaAprendizagem);
+            }else{
+               kernel[i] -= m[idKernel];
             }
+
+            idKernel++;
          }
 
          if(camada.temBias()){
-            Mat bias = camada.bias;
-            Mat gradB = camada.gradBias;
-            for(j = 0; j < bias.lin; j++){
-               for(k = 0; k < bias.col; k++){
-                  calcular(bias, gradB, mb[i], j, k);
+            double[] bias = camada.obterBias();
+            double[] gradB = camada.obterGradBias();
+            for(i = 0; i < bias.length; i++){
+               mb[idBias] = (mb[idBias] * momentum) - (gradB[i] * taxaAprendizagem);
+
+               if(nesterov){
+                  bias[i] -= (mb[idBias] * momentum) - (gradB[i] * taxaAprendizagem);
+               }else{
+                  bias[i] -= mb[idBias];
                }
+
+               idBias++;
             }
          }
-      }
-   }
-
-   private void calcular(Mat var, Mat grad, Mat m, int lin, int col){
-      double att = (m.dado(lin, col) * momentum) - (grad.dado(lin, col) * taxaAprendizagem);
-      m.editar(lin, col, att);
-
-      if(this.nesterov){
-         double nest = (m.dado(lin, col) * momentum) - (grad.dado(lin, col) * taxaAprendizagem);
-         var.sub(lin, col, nest);
-
-      }else{
-         var.sub(lin, col, m.dado(lin, col));
       }
    }
 

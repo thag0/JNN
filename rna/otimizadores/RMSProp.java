@@ -1,14 +1,14 @@
 package rna.otimizadores;
 
-import rna.core.Mat;
-import rna.estrutura.Densa;
+import rna.estrutura.Camada;
 
 /**
  * Implementa o treino da rede neural usando o algoritmo RMSProp (Root Mean Square Propagation).
- *
- * Ele é uma adaptação do Gradiente Descendente Estocástico (SGD) que ajuda a lidar com a
- * oscilação do gradiente, permitindo que a taxa de aprendizado seja adaptada para cada parâmetro 
- * individualmente.
+ * <p>
+ *    Ele é uma adaptação do Gradiente Descendente Estocástico (SGD) que ajuda a lidar com a
+ *    oscilação do gradiente, permitindo que a taxa de aprendizado seja adaptada para cada 
+ *    parâmetro individualmente.
+ * </p>
  * <p>
  * 	Os hiperparâmetros do RMSProp podem ser ajustados para controlar 
  *    o comportamento do otimizador durante o treinamento.
@@ -21,7 +21,7 @@ import rna.estrutura.Densa;
  * </pre>
  * Onde:
  * <p>
- *    {@code v} - variável que será otimizada.
+ *    {@code v} - variável que será otimizada (kernel, bias).
  * </p>
  * <p>
  *    {@code g} - gradiente correspondente a variável
@@ -37,7 +37,7 @@ import rna.estrutura.Densa;
  */
 public class RMSProp extends Otimizador{
    private static final double PADRAO_TA  = 0.001;
-   private static final double PADRAO_RHO = 0.999;
+   private static final double PADRAO_RHO = 0.99;
    private static final double PADRAO_EPS = 1e-7;
 
    /**
@@ -56,14 +56,14 @@ public class RMSProp extends Otimizador{
    private double rho;
 
    /**
-    * Acumuladores para os pesos
+    * Acumuladores para os kernels
     */
-   private Mat[] ac;
+   private double[] ac;
 
    /**
     * Acumuladores para os bias.
     */
-   private Mat[] acb;
+   private double[] acb;
 
    /**
     * Inicializa uma nova instância de otimizador <strong> RMSProp </strong> 
@@ -107,53 +107,50 @@ public class RMSProp extends Otimizador{
    }
 
    @Override
-   public void inicializar(Densa[] redec){
-      this.ac  = new Mat[redec.length];
-      this.acb = new Mat[redec.length];
+   public void inicializar(Camada[] redec){
+      int nKernel = 0;
+      int nBias = 0;
+      
+      for(Camada camada : redec){
+         nKernel += camada.obterKernel().length;
 
-      for(int i = 0; i < redec.length; i++){
-         Densa camada = redec[i];
-
-         this.ac[i] = new Mat(camada.pesos.lin, camada.pesos.col);
          if(camada.temBias()){
-            this.acb[i] = new Mat(camada.bias.lin, camada.bias.col);
-         }
+            nBias += camada.obterBias().length;
+         }         
       }
+
+      this.ac  = new double[nKernel];
+      this.acb = new double[nBias];
    }
 
    @Override
-   public void atualizar(Densa[] redec){
-      for(int i = 0; i < redec.length; i++){
-         Densa camada = redec[i];
-         Mat pesos = camada.pesos;
-         Mat grads = camada.gradPesos;
+   public void atualizar(Camada[] redec){
+      int idKernel = 0, idBias = 0;
+      double g;
 
-         for(int j = 0; j < pesos.lin; j++){
-            for(int k = 0; k < pesos.col; k++){
-               calcular(pesos, grads, ac[i], j, k);
-            }
+      for(Camada camada : redec){
+         double[] kernel = camada.obterKernel();
+         double[] gradK = camada.obterGradKernel();
+
+         for(int i = 0; i < kernel.length; i++){
+            g = gradK[i];
+            ac[idKernel] = (rho * ac[idKernel]) + ((1 - rho) * (g*g));
+            kernel[i] += (g * taxaAprendizagem) / (Math.sqrt(ac[idKernel]) + epsilon);
+            idKernel++;
          }
 
          if(camada.temBias()){
-            Mat bias = camada.bias;
-            Mat gradsB = camada.gradSaida;
-            for(int j = 0; j < bias.lin; j++){
-               for(int k = 0; k < bias.col; k++){
-                  calcular(bias, gradsB, acb[i], j, k);
-               }
+            double[] bias = camada.obterBias();
+            double[] gradB = camada.obterGradBias();
+            
+            for(int i = 0; i < bias.length; i++){
+               g = gradB[i];
+               acb[idBias] = (rho * acb[idBias]) + ((1 - rho) * (g*g));
+               bias[i] += (g * taxaAprendizagem) / (Math.sqrt(acb[idBias]) + epsilon);
+               idBias++;
             }
          }
       }
-   }
-
-   private void calcular(Mat var, Mat grad, Mat ac, int lin, int col){
-      double g = grad.dado(lin, col);
-
-      double ac2 = (rho * ac.dado(lin, col)) + (1 - rho) * (g*g);
-      ac.editar(lin, col, ac2);
-      
-      double att = (g * this.taxaAprendizagem) / (Math.sqrt(ac2 + this.epsilon));
-      var.sub(lin, col, -att);
    }
 
    @Override

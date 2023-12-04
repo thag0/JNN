@@ -432,19 +432,12 @@ public class Densa extends Camada implements Cloneable{
       return this.saida.col;
    }
 
-   /**
-    * Verifica se a camada atual possui o bias configurado para seus neurônios.
-    * @return true caso possua bias configurado, false caso contrário.
-    */
+   @Override
    public boolean temBias(){
       return this.usarBias;
    }
 
-   /**
-    * Retorda a quantidade de parâmetros totais da camada, em outras palavras, 
-    * retorna o somatório da quantidade de pesos e bias presentes na camada.
-    * @return a quantidade de parâmetros.
-    */
+   @Override
    public int numParametros(){
       int parametros = 0;
       
@@ -607,5 +600,25 @@ public class Densa extends Camada implements Cloneable{
          this.saida.lin, 
          this.saida.col
       };
+   }
+
+   @Override
+   public double[] obterKernel(){
+      return this.pesos.paraArray();
+   }
+
+   @Override
+   public double[] obterGradKernel(){
+      return this.gradPesos.paraArray();
+   }
+
+   @Override
+   public double[] obterBias(){
+      return this.bias.paraArray();
+   }
+
+   @Override
+   public double[] obterGradBias(){
+      return this.gradBias.paraArray();
    }
 }

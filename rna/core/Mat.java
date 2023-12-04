@@ -381,11 +381,19 @@ public class Mat implements Cloneable{
    }
 
    /**
-    * 
-    * @return
+    * Retorna o conteúdo dos dados da matriz em forma vetorial.
+    * @return array contendo os elementos da matriz.
     */
    public double[] paraArray(){
       return this.dados;
+   }
+
+   /**
+    * Retorna o tamanho do conjunto de dados suportado pela matriz.
+    * @return número de elementos da matriz.
+    */
+   public int tamanho(){
+      return this.dados.length;      
    }
 
    /**

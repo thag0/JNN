@@ -877,7 +877,7 @@ public class RedeNeural implements Cloneable{
       int nAmostras = entradas.length;
       int tamEntrada = this.obterTamanhoEntrada();
       int tamSaida = this.obterTamanhoSaida();
-      double[][] resultados = new double[nAmostras][tamSaida];
+      double[][] previsoes = new double[nAmostras][tamSaida];
       double[] entradaRede = new double[tamEntrada];
       double[] saidaRede = new double[tamSaida];
 
@@ -885,10 +885,10 @@ public class RedeNeural implements Cloneable{
          System.arraycopy(entradas[i], 0, entradaRede, 0, entradas[i].length);
          this.calcularSaida(entradaRede);
          System.arraycopy(this.obterSaidas(), 0, saidaRede, 0, saidaRede.length);
-         System.arraycopy(saidaRede, 0, resultados[i], 0, saidaRede.length);
+         System.arraycopy(saidaRede, 0, previsoes[i], 0, saidaRede.length);
       }
 
-      return resultados;
+      return previsoes;
    }
 
    /**
@@ -1148,7 +1148,7 @@ public class RedeNeural implements Cloneable{
     */
    public int obterQuantidadeParametros(){
       int parametros = 0;
-      for(Densa camada : this.camadas){
+      for(Camada camada : this.camadas){
          parametros += camada.numParametros();
       }
       return parametros;

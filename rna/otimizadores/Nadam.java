@@ -1,7 +1,6 @@
 package rna.otimizadores;
 
-import rna.core.Mat;
-import rna.estrutura.Densa;
+import rna.estrutura.Camada;
 
 /**
  * Implementação do algoritmo de otimização Nadam.
@@ -19,7 +18,7 @@ import rna.estrutura.Densa;
  * </pre>
  * Onde:
  * <p>
- *    {@code v} - variável que será otimizada.
+ *    {@code v} - variável que será otimizada (kernel, bias).
  * </p>
  * <p>
  *    {@code tA} - valor de taxa de aprendizagem do otimizador.
@@ -78,22 +77,22 @@ public class Nadam extends Otimizador{
    /**
     * Coeficientes de momentum.
     */
-   private Mat[] m;
+   private double[] m;
    
    /**
     * Coeficientes de momentum.
     */
-   private Mat[] mb;
+   private double[] mb;
 
    /**
     * Coeficientes de momentum de segunda orgem.
     */
-   private Mat[] v;
+   private double[] v;
 
    /**
     * Coeficientes de momentum de segunda orgem.
     */
-   private Mat[] vb;
+   private double[] vb;
 
    /**
     * Contador de iterações.
@@ -135,68 +134,64 @@ public class Nadam extends Otimizador{
    }
 
    @Override
-   public void inicializar(Densa[] redec){
-      this.m  = new Mat[redec.length];
-      this.v  = new Mat[redec.length];
-      this.mb = new Mat[redec.length];
-      this.vb = new Mat[redec.length];
-   
-      for(int i = 0; i < redec.length; i++){
-         Densa camada = redec[i];
+   public void inicializar(Camada[] redec){
+      int nKernel = 0;
+      int nBias = 0;
+      
+      for(Camada camada : redec){
+         nKernel += camada.obterKernel().length;
 
-         this.m[i] = new Mat(camada.pesos.lin, camada.pesos.col);
-         this.v[i] = new Mat(camada.pesos.lin, camada.pesos.col);
-         
          if(camada.temBias()){
-            this.mb[i] = new Mat(camada.bias.lin, camada.bias.col);
-            this.vb[i] = new Mat(camada.bias.lin, camada.bias.col);
-         }
+            nBias += camada.obterBias().length;
+         }         
       }
+
+      this.m  = new double[nKernel];
+      this.v  = new double[nKernel];
+      this.mb = new double[nBias];
+      this.vb = new double[nBias];
    }
 
    @Override
-   public void atualizar(Densa[] redec){
-      interacoes++;
-      double forcaB1 = (1 - Math.pow(beta1, interacoes));
-      double forcaB2 = (1 - Math.pow(beta2, interacoes));
-   
-      for(int i = 0; i < redec.length; i++){
-         Densa camada = redec[i];
-         Mat pesos = camada.pesos;
-         Mat grads = camada.gradPesos;
+   public void atualizar(Camada[] redec){
+      int idKernel = 0, idBias = 0;
+      double g, mChapeu, vChapeu;
 
-         for(int j = 0; j < pesos.lin; j++){
-            for(int k = 0; k < pesos.col; k++){
-               calcular(pesos, grads, m[i], v[i], j, k, forcaB1, forcaB2);
-            }
+      interacoes++;
+      double forcaB1 = 1 - Math.pow(beta1, interacoes);
+      double forcaB2 = 1 - Math.pow(beta2, interacoes);
+   
+      for(Camada camada : redec){
+         double[] kernel = camada.obterKernel();
+         double[] gradK = camada.obterGradKernel();
+
+         for(int i = 0; i < kernel.length; i++){
+            g = gradK[i];
+            m[idKernel] = (beta1 * m[idKernel]) + ((1 - beta1) * g);
+            v[idKernel] = (beta2 * v[idKernel]) + ((1 - beta2) * (g*g));
+
+            mChapeu = (beta1 * m[idKernel]) + ((1 - beta1) * g) / forcaB1;
+            vChapeu = (beta2 * v[idKernel]) / forcaB2;
+            kernel[i] += (taxaAprendizagem * mChapeu) / (Math.sqrt(vChapeu) + epsilon);
+            idKernel++;
          }
          
          if(camada.temBias()){
-            Mat bias = camada.bias;
-            Mat gradsB = camada.gradSaida;
-            for(int j = 0; j < bias.lin; j++){
-               for(int k = 0; k < bias.col; k++){
-                  calcular(bias, gradsB, mb[i], vb[i], j, k, forcaB1, forcaB2);
-               }
+            double[] bias = camada.obterBias();
+            double[] gradB = camada.obterGradBias();
+
+            for(int i = 0; i < bias.length; i++){
+               g = gradB[i];
+               mb[idBias] = (beta1 * mb[idBias]) + ((1 - beta1) * g);
+               vb[idBias] = (beta2 * vb[idBias]) + ((1 - beta2) * (g*g));
+
+               mChapeu = (beta1 * mb[idBias]) + ((1 - beta1) * g) / forcaB1;
+               vChapeu = (beta2 * vb[idBias]) / forcaB2;
+               bias[i] += (taxaAprendizagem * mChapeu) / (Math.sqrt(vChapeu) + epsilon);
+               idBias++;
             }
          }     
       }
-   }
-
-   private void calcular(Mat var, Mat grad, Mat m, Mat v, int lin, int col, double fb1, double fb2){
-      double g = grad.dado(lin, col);
-
-      double m2 = (beta1 * m.dado(lin, col)) + ((1 - beta1) * g);
-      double v2 = (beta2 * v.dado(lin, col)) + ((1 - beta2) * (g*g));
-      m.editar(lin, col, m2);
-      v.editar(lin, col, v2);
-
-      //correções
-      double mChapeu = (beta1 * m.dado(lin, col) + ((1 - beta1) * g)) / fb1;
-      double vChapeu = (beta2 * v.dado(lin, col)) / fb2;
-      double att = (taxaAprendizagem * mChapeu) / (Math.sqrt(vChapeu) + epsilon);
-
-      var.add(lin, col, att);
    }
 
    @Override

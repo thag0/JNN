@@ -1,7 +1,6 @@
 package rna.otimizadores;
 
-import rna.core.Mat;
-import rna.estrutura.Densa;
+import rna.estrutura.Camada;
 
 /**
  * Implementação do algoritmo de otimização Adam.
@@ -21,7 +20,7 @@ import rna.estrutura.Densa;
  * </pre>
  * Onde:
  * <p>
- *    {@code var} - variável que será otimizada (peso ou bias).
+ *    {@code var} - variável que será otimizada (kernel, bias).
  * </p>
  * <p>
  *    {@code alfa} - correção aplicada a taxa de aprendizagem.
@@ -60,10 +59,10 @@ import rna.estrutura.Densa;
  * </p>
  */
 public class Adam extends Otimizador{
-   private static final double padraoTA = 0.001;
-   private static final double padraoBeta1 = 0.9;
-   private static final double padraoBeta2 = 0.999;
-   private static final double padraoEps = 1e-7; 
+   private static final double PADRAO_TA = 0.001;
+   private static final double PADRAO_BETA1 = 0.9;
+   private static final double PADRAO_BETA2 = 0.999;
+   private static final double PADRAO_EPS = 1e-7; 
 
    /**
     * Valor de taxa de aprendizagem do otimizador.
@@ -86,24 +85,24 @@ public class Adam extends Otimizador{
    private double epsilon;
 
    /**
-    * Coeficientes de momentum.
+    * Coeficientes de momentum para os kernels.
     */
-   private Mat[] m;
+   private double[] m;
 
    /**
     * Coeficientes de momentum para os bias.
     */
-   private Mat[] mb;
+   private double[] mb;
 
    /**
-    * Coeficientes de momentum de segunda ordem.
+    * Coeficientes de momentum de segunda ordem para os kernels.
     */
-   private Mat[] v;
+   private double[] v;
 
    /**
     * Coeficientes de momentum de segunda ordem para os bias.
     */
-   private Mat[] vb;
+   private double[] vb;
    
    /**
     * Contador de iterações.
@@ -131,7 +130,7 @@ public class Adam extends Otimizador{
     * @param tA taxa de aprendizagem do otimizador.
     */
    public Adam(double tA){
-      this(tA, padraoBeta1, padraoBeta2, padraoEps);
+      this(tA, PADRAO_BETA1, PADRAO_BETA2, PADRAO_EPS);
    }
 
    /**
@@ -154,68 +153,63 @@ public class Adam extends Otimizador{
     * </p>
     */
    public Adam(){
-      this(padraoTA, padraoBeta1, padraoBeta2, padraoEps);
+      this(PADRAO_TA, PADRAO_BETA1, PADRAO_BETA2, PADRAO_EPS);
    }
 
    @Override
-   public void inicializar(Densa[] redec){
-      this.m  = new Mat[redec.length];
-      this.v  = new Mat[redec.length];
-      this.mb = new Mat[redec.length];
-      this.vb = new Mat[redec.length];
-   
-      for(int i = 0; i < redec.length; i++){
-         Densa camada = redec[i];
+   public void inicializar(Camada[] redec){
+      int nKernel = 0;
+      int nBias = 0;
+      
+      for(Camada camada : redec){
+         nKernel += camada.obterKernel().length;
 
-         this.m[i] = new Mat(camada.pesos.lin, camada.pesos.col);
-         this.v[i] = new Mat(camada.pesos.lin, camada.pesos.col);
-         
          if(camada.temBias()){
-            this.mb[i] = new Mat(camada.bias.lin, camada.bias.col);
-            this.vb[i] = new Mat(camada.bias.lin, camada.bias.col);
-         }
+            nBias += camada.obterBias().length;
+         }         
       }
+
+      this.m  = new double[nKernel];
+      this.v  = new double[nKernel];
+      this.mb = new double[nBias];
+      this.vb = new double[nBias];
    }
 
    @Override
-   public void atualizar(Densa[] redec){
+   public void atualizar(Camada[] redec){
+      int idKernel = 0, idBias = 0;
+      double g;
+
       interacoes++;
       double forcaB1 = Math.pow(beta1, interacoes);
       double forcaB2 = Math.pow(beta2, interacoes);
       double alfa = taxaAprendizagem * Math.sqrt(1 - forcaB2) / (1 - forcaB1);
    
-      for(int i = 0; i < redec.length; i++){
-         Densa camada = redec[i];
-         Mat pesos = camada.pesos;
-         Mat grads = camada.gradPesos;
+      for(Camada camada : redec){
+         double[] kernel = camada.obterKernel();
+         double[] gradK = camada.obterGradKernel();
 
-         for(int j = 0; j < camada.pesos.lin; j++){
-            for(int k = 0; k < camada.pesos.col; k++){
-               calcular(pesos, grads, m[i], v[i], j, k, alfa, forcaB1, forcaB2);
-            }
+         for(int i = 0; i < kernel.length; i++){
+            g = gradK[i];
+            m[idKernel] += (1 - beta1) * (g     - m[idKernel]);
+            v[idKernel] += (1 - beta2) * ((g*g) - v[idKernel]);
+            kernel[i] += (alfa * m[idKernel]) / (Math.sqrt(v[idKernel]) + epsilon);
+            idKernel++;
          }
          
          if(camada.temBias()){
-            Mat bias = camada.bias;
-            Mat gradsB = camada.gradSaida;
-            for(int j = 0; j < bias.lin; j++){
-               for(int k = 0; k < bias.col; k++){
-                  calcular(bias, gradsB, mb[i], vb[i], j, k, alfa, forcaB1, forcaB2);
-               }
+            double[] bias = camada.obterBias();
+            double[] gradB = camada.obterGradBias();
+
+            for(int i = 0; i < bias.length; i++){
+               g = gradB[i];
+               mb[idBias] += (1 - beta1) * (g     - mb[idBias]);
+               vb[idBias] += (1 - beta2) * ((g*g) - vb[idBias]);
+               bias[i] += (alfa * mb[idBias]) / (Math.sqrt(vb[idBias]) + epsilon);
+               idBias++;
             }
          }     
       }
-   }
-
-   private void calcular(Mat var, Mat grad, Mat m, Mat v, int lin, int col, double alfa, double fb1, double fb2){
-      double g = grad.dado(lin, col);
-      double m2 = (1 - beta1) * (g - m.dado(lin, col));
-      double v2 = (1 - beta2) * ((g*g) - v.dado(lin, col)); 
-      m.add(lin, col, m2); 
-      v.add(lin, col, v2);
-
-      double att = (alfa * m.dado(lin, col)) / (Math.sqrt(v.dado(lin, col)) + this.epsilon);
-      var.add(lin, col, att);
    }
 
    @Override
