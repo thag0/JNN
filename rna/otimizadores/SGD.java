@@ -111,6 +111,8 @@ public class SGD extends Otimizador{
       int nBias = 0;
       
       for(Camada camada : redec){
+         if(camada.treinavel == false) continue;
+
          nKernel += camada.obterKernel().length;
          if(camada.temBias()){
             nBias += camada.obterBias().length;
@@ -126,6 +128,8 @@ public class SGD extends Otimizador{
       int i,idKernel = 0, idBias = 0;
 
       for(Camada camada : redec){
+         if(camada.treinavel == false) continue;
+
          double[] kernel = camada.obterKernel();
          double[] gradK = camada.obterGradKernel();
 
@@ -140,6 +144,7 @@ public class SGD extends Otimizador{
 
             idKernel++;
          }
+         camada.editarKernel(kernel);
 
          if(camada.temBias()){
             double[] bias = camada.obterBias();
@@ -155,6 +160,7 @@ public class SGD extends Otimizador{
 
                idBias++;
             }
+            camada.editarBias(bias);
          }
       }
    }

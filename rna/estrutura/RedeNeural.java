@@ -1296,6 +1296,4 @@ public class RedeNeural implements Cloneable{
          throw new RuntimeException(e);
       }
    }
-
-
 }

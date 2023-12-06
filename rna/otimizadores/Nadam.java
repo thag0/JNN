@@ -139,8 +139,9 @@ public class Nadam extends Otimizador{
       int nBias = 0;
       
       for(Camada camada : redec){
-         nKernel += camada.obterKernel().length;
+         if(camada.treinavel == false) continue;
 
+         nKernel += camada.obterKernel().length;
          if(camada.temBias()){
             nBias += camada.obterBias().length;
          }         
@@ -162,6 +163,8 @@ public class Nadam extends Otimizador{
       double forcaB2 = 1 - Math.pow(beta2, interacoes);
    
       for(Camada camada : redec){
+         if(camada.treinavel == false) continue;
+
          double[] kernel = camada.obterKernel();
          double[] gradK = camada.obterGradKernel();
 
@@ -175,6 +178,7 @@ public class Nadam extends Otimizador{
             kernel[i] += (taxaAprendizagem * mChapeu) / (Math.sqrt(vChapeu) + epsilon);
             idKernel++;
          }
+         camada.editarKernel(kernel);
          
          if(camada.temBias()){
             double[] bias = camada.obterBias();
@@ -190,6 +194,7 @@ public class Nadam extends Otimizador{
                bias[i] += (taxaAprendizagem * mChapeu) / (Math.sqrt(vChapeu) + epsilon);
                idBias++;
             }
+            camada.editarBias(bias);
          }     
       }
    }

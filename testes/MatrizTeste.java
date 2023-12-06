@@ -18,29 +18,32 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
 
-      double[][] e = {
+      double[][] e1 = {
          {1, 6, 2},
          {5, 3, 1},
          {7, 0, 4},
       };
-      double[][] f = {
+      double[][] f1 = {
          {1, 2},
          {-1, 0},
       };
-      Mat mat1 = new Mat(new double[][]{
+      
+      double[][] grad1 = {
+         {1, 2, 3},
+         {4, 5, 6},
+         {7, 8, 9}
+      };
+
+      double[][] filtro = {
          {1, 2},
          {3, 4}
-      });
-      Mat mat2 = new Mat(new double[][]{
-         {5, 6},
-         {7, 8}
-      });
+      };
 
-      Mat[] matrizes = new Mat[]{mat1, mat2};
-
-      Flatten flat = new Flatten();
-      flat.calcularSaida(matrizes);
-      ged.imprimirArray(flat.saida);
+      Mat g = new Mat(grad1);
+      Mat f = new Mat(filtro);
+      Mat res = new Mat(2, 2);
+      opmat.correlacaoCruzada(g, f, res);
+      res.print();
    }
 
    static void derivadaSoftmax(){

@@ -232,6 +232,8 @@ public class Densa extends Camada implements Cloneable{
 
       this.gradPesos =   new Mat(this.pesos.lin, this.pesos.col);
       this.gradAcPesos = new Mat(this.pesos.lin, this.pesos.col);
+
+      this.treinavel = true;
    }
 
    /**
@@ -491,7 +493,7 @@ public class Densa extends Camada implements Cloneable{
       this.bias.editar(0, id, bias);
    }
 
-
+   @Override
    public double[] obterSaida(){
       return this.saida.linha(0);
    }
@@ -630,5 +632,29 @@ public class Densa extends Camada implements Cloneable{
    @Override
    public Object obterGradEntrada(){
       return this.gradEntrada;
+   }
+
+   @Override
+   public void editarKernel(double[] kernel){
+      if(kernel.length != this.pesos.lin * this.pesos.col){
+         throw new IllegalArgumentException(
+            "A dimensão do kernel fornecido não é igual a quantidade de " +
+            " parâmetros para os kernels da camada."
+         );         
+      }
+
+      this.pesos.copiar(kernel);
+   }
+
+   @Override
+   public void editarBias(double[] bias){
+      if(bias.length != (this.bias.col)){
+         throw new IllegalArgumentException(
+            "A dimensão do bias fornecido não é igual a quantidade de " +
+            " parâmetros para os bias da camada."
+         );
+      }
+
+      this.bias.copiar(bias);
    }
 }

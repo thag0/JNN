@@ -62,16 +62,24 @@ public class GD extends Otimizador{
    @Override
    public void atualizar(Camada[] redec){
       for(Camada camada : redec){
-         double[] pesos = camada.obterKernel();
-         double[] gradP = camada.obterGradKernel();
-         opArr.escalar(gradP, taxaAprendizagem, gradP);
-         opArr.add(pesos, gradP, pesos);
+         if(camada.treinavel == false) continue;
+
+         double[] kernel = camada.obterKernel();
+         double[] gradK = camada.obterGradKernel();
+         
+         for(int i = 0; i < kernel.length; i++){
+            kernel[i] += gradK[i] * taxaAprendizagem;
+         }
+         camada.editarKernel(kernel);
 
          if(camada.temBias()){
             double[] bias = camada.obterBias();
             double[] gradB = camada.obterGradBias();
-            opArr.escalar(gradB, taxaAprendizagem, gradB);
-            opArr.add(bias, gradB, bias);
+            
+            for(int i = 0; i < bias.length; i++){
+               bias[i] += gradB[i] * taxaAprendizagem;
+            }
+            camada.editarBias(bias);
          }
       } 
    }

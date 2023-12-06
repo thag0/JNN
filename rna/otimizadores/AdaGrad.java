@@ -109,8 +109,9 @@ public class AdaGrad extends Otimizador{
       int nBias = 0;
       
       for(Camada camada : redec){
-         nKernel += camada.obterKernel().length;
+         if(camada.treinavel == false) continue;
 
+         nKernel += camada.obterKernel().length;
          if(camada.temBias()){
             nBias += camada.obterBias().length;
          }         
@@ -130,15 +131,18 @@ public class AdaGrad extends Otimizador{
       double g;
 
       for(Camada camada : redec){
-         double[] kernels = camada.obterKernel();
+         if(camada.treinavel == false) continue;
+
+         double[] kernel = camada.obterKernel();
          double[] gradP = camada.obterGradKernel();
 
-         for(i = 0; i < kernels.length; i++){
+         for(i = 0; i < kernel.length; i++){
             g = gradP[i];
             ac[idKernel] += g*g;
-            kernels[i] += (g * taxaAprendizagem) / (Math.sqrt(ac[idKernel] + epsilon));
+            kernel[i] += (g * taxaAprendizagem) / (Math.sqrt(ac[idKernel] + epsilon));
             idKernel++;
          }
+         camada.editarKernel(kernel);
          
          if(camada.temBias()){
             double[] bias = camada.obterBias();
@@ -150,6 +154,7 @@ public class AdaGrad extends Otimizador{
                bias[i] += (g * taxaAprendizagem) / (Math.sqrt(acb[idBias] + epsilon));
                idBias++;
             }
+            camada.editarBias(bias);
          }
       }
    }

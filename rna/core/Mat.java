@@ -213,12 +213,21 @@ public class Mat implements Cloneable{
     */
    public void copiar(int lin, double[] dados){
       int id = lin*this.col;
-      System.arraycopy(dados, 0, this.dados, id, dados.length);
+      System.arraycopy(dados, 0, this.dados, id, this.col);
 
       // for(int i = 0; i < this.col; i++){
       //    id = indice(lin, i);
       //    this.dados[id] = dados[i];
       // }
+   }
+
+   /**
+    * Copia todo o conteúdo do array fornecido para o array que representa o
+    * conjunto de dados da matriz.
+    * @param dados
+    */
+   public void copiar(double[] dados){
+      System.arraycopy(dados, 0, this.dados, 0, this.dados.length);
    }
 
    /**
@@ -239,12 +248,41 @@ public class Mat implements Cloneable{
    }
 
    /**
-    * TODO
-    * @param lin
-    * @param n
-    * @return
+    * Repete o conteúdo da linha indicada de acordo com o valor
+    * de repetições fornecido.
+    * <p>
+    *    Exemplo:
+    * </p>
+    * <pre>
+    *mat = [
+    *    1, 2, 3
+    *    4, 5, 6  
+    * ]
+    *
+    *b = mat.bloco(0, 3)
+    *
+    *b = [
+    *    1, 2, 3
+    *    1, 2, 3
+    *    1, 2, 3
+    * ]
+    * </pre>
+    * @param lin índice da linha desejada.
+    * @param n quantidade de vezes que a linha desejada será repetido.
+    * @return uma nova matriz contendo os valores do bloco.
     */
    public Mat bloco(int lin, int n){
+      if(lin < 0 || lin >= this.lin){
+         throw new IllegalArgumentException(
+            "Índice (" + lin + ") inválido ou fora de alcance."
+         );
+      }
+      if(n < 1){
+         throw new IllegalArgumentException(
+            "Número de repetições (" + lin + ") deve ser maior que zero."
+         );
+      }
+
       Mat b = new Mat(n, this.col);
 
       for(int i = 0; i < b.lin; i++){

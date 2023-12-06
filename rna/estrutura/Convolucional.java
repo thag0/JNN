@@ -8,6 +8,8 @@ import rna.inicializadores.Constante;
 import rna.inicializadores.Inicializador;
 import rna.serializacao.DicionarioAtivacoes;
 
+//TODO conseguir um jeito de editar os valores do kernel pelo otimizador
+
 /**
  * Implementação em andamento da camada convolucional.
  */
@@ -212,6 +214,8 @@ public class Convolucional extends Camada implements Cloneable{
             this.gradBias[i] = new Mat(this.altSaida, this.largSaida);
          }
       }
+
+      this.treinavel = true;
    }
 
    /**
@@ -566,5 +570,133 @@ public class Convolucional extends Camada implements Cloneable{
          this.saida[0].col, 
          this.saida.length
       };
+   }
+
+   @Override
+   public double[] obterKernel(){
+      int n = 0;
+      for(int i = 0; i < this.filtros.length; i++){
+         for(int j = 0; j < this.filtros[i].length; j++){
+            n += this.filtros[i][j].tamanho();
+         }
+      }
+
+      double[] kernel = new double[n];
+      int cont = 0;
+      for(int i = 0; i < this.filtros.length; i++){
+         for(int j = 0; j < this.filtros[i].length; j++){
+            double[] arr = this.filtros[i][j].paraArray();
+            for(int k = 0; k < arr.length; k++){
+               kernel[cont] = arr[k];
+               cont++;
+            }
+         }
+      }
+
+      return kernel;
+   }
+
+   @Override
+   public double[] obterGradKernel(){
+      int n = 0;
+      for(int i = 0; i < this.gradFiltros.length; i++){
+         for(int j = 0; j < this.gradFiltros[i].length; j++){
+            n += this.gradFiltros[i][j].tamanho();
+         }
+      }
+
+      double[] grad = new double[n];
+      int cont = 0;
+      for(int i = 0; i < this.gradFiltros.length; i++){
+         for(int j = 0; j < this.gradFiltros[i].length; j++){
+            double[] arr = this.gradFiltros[i][j].paraArray();
+            for(int k = 0; k < arr.length; k++){
+               grad[cont] = arr[k];
+               cont++;
+            }
+         }
+      }
+
+      return grad;
+   }
+
+   @Override
+   public double[] obterBias(){
+      int n = 0;
+      for(int i = 0; i < this.bias.length; i++){
+         n += this.bias[i].tamanho();
+      }
+
+      double[] bias = new double[n];
+      int cont = 0;
+      for(int i = 0; i < this.bias.length; i++){
+         double[] arr = this.bias[i].paraArray();
+         for(int j = 0; j < arr.length; j++){
+            bias[cont] = arr[j];
+            cont++;
+         }
+      }
+
+      return bias;
+   }
+
+   @Override
+   public double[] obterGradBias(){
+      int n = 0;
+      for(int i = 0; i < this.gradBias.length; i++){
+         n += this.gradBias[i].tamanho();
+      }
+
+      double[] grad = new double[n];
+      int cont = 0;
+      for(int i = 0; i < this.gradBias.length; i++){
+         double[] arr = this.gradBias[i].paraArray();
+         for(int j = 0; j < arr.length; j++){
+            grad[cont] = arr[j];
+            cont++;
+         }
+      }
+
+      return grad;
+   }
+
+   @Override
+   public void editarKernel(double[] kernel){
+      if(kernel.length != (this.altFiltro * this.largFiltro * this.numFiltros)){
+         throw new IllegalArgumentException(
+            "A dimensão do kernel fornecido não é igual a quantidade de " +
+            " parâmetros para os kernels da camada."
+         );
+      }
+         
+      int id = 0;
+      for(Mat[] filtro : this.filtros){
+         for(Mat camada : filtro){
+            for(int i = 0; i < camada.lin; i++){
+               for(int j = 0; j < camada.col; j++){
+                  camada.editar(i, j, kernel[id++]);
+               }
+            }
+         }
+      }
+   }
+
+   @Override
+   public void editarBias(double[] bias){
+      if(bias.length != (this.altSaida * this.largSaida * this.numFiltros)){
+         throw new IllegalArgumentException(
+            "A dimensão do bias fornecido não é igual a quantidade de " +
+            " parâmetros para os bias da camada."
+         );
+      }
+      
+      int id = 0;
+      for(Mat camada : this.bias){
+         for(int i = 0; i < camada.lin; i++){
+            for(int j = 0; j < camada.col; j++){
+               camada.editar(i, j, bias[id++]);
+            }
+         }
+      }
    }
 }

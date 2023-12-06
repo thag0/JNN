@@ -10,6 +10,11 @@ import rna.inicializadores.Inicializador;
 public class Camada{
 
    /**
+    * Controlador para uso dentro dos algoritmos de treino.
+    */
+   public boolean treinavel = false;
+
+   /**
     * Instancia a camada base usada dentro dos modelos de Rede Neural.
     * <p>
     *    A camada base não possui implementação de métodos e é apenas usada
@@ -257,9 +262,36 @@ public class Camada{
       );        
    }
 
+   /**
+    * Retorna o gradiente de entrada da camada, dependendo do tipo
+    * de camada, esse gradiente pode assumir diferentes tipos de objetos.
+    * @return gradiente de entrada da camada.
+    */
    public Object obterGradEntrada(){
       throw new IllegalArgumentException(
-         "Implementar retorno do gradiente de entrada da camad."
+         "Implementar retorno do gradiente de entrada da camada."
       );     
+   }
+
+   /**
+    * Ajusta os valores do kernel usando os valores contidos no array
+    * fornecido.
+    * @param kernel novos valores do kernel.
+    */
+   public void editarKernel(double[] kernel){
+      throw new IllegalArgumentException(
+         "Implementar edição do kernel."
+      );
+   }
+
+   /**
+    * Ajusta os valores do bias usando os valores contidos no array
+    * fornecido.
+    * @param bias novos valores do bias.
+    */
+   public void editarBias(double[] bias){
+      throw new IllegalArgumentException(
+         "Implementar edição do bias."
+      );
    }
 }
