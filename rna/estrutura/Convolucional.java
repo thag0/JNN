@@ -390,19 +390,16 @@ public class Convolucional extends Camada implements Cloneable{
     */
    @Override
    public void calcularGradiente(Object gradSeguinte){
-      if(gradSeguinte instanceof double[][][] == false){
+      if(gradSeguinte instanceof Mat[] == false){
          throw new IllegalArgumentException(
             "Os gradientes para a camada Convolucional devem ser " +
-            "do tipo \"double[][][]\", objeto recebido é do tipo \"" + 
-            gradSeguinte.getClass().getTypeName() + "\""
+            "do tipo \"" + this.gradSaida.getClass().getTypeName() + 
+            "\", objeto recebido é do tipo \"" + gradSeguinte.getClass().getTypeName() + "\""
          );
       }
 
-      //transformação do array de gradientes para o objeto matricial
-      //usado pela biblioteca
-      double[][][] g = (double[][][]) gradSeguinte;
+      Mat[] g = (Mat[]) gradSeguinte;
       for(int i = 0; i < g.length; i++){
-         this.gradSaida[i] = new Mat(g[i].length, g[i][0].length);
          this.gradSaida[i].copiar(g[i]);
       }
 

@@ -16,6 +16,12 @@ public class Flatten extends Camada{
       for(int i : formEntrada){
          tamanho *= i;
       }
+
+      this.entrada = new Mat[formEntrada[2]];
+      for(int i = 0; i < this.entrada.length; i++){
+         this.entrada[i] = new Mat(formEntrada[0], formEntrada[1]);
+      }
+
       this.saida = new double[tamanho];
    }
 
@@ -34,13 +40,22 @@ public class Flatten extends Camada{
 
    @Override
    public void calcularGradiente(Object gradSeguinte){
-      if(gradSeguinte instanceof double[] == false){
+      if(gradSeguinte instanceof double[]){
+         calcularGrad((double[]) gradSeguinte);
+      
+      }else if(gradSeguinte instanceof Mat){
+         calcularGrad((Mat) gradSeguinte);
+      
+      }else{
          throw new IllegalArgumentException(
-            "O gradiente seguinte para a camada Flatten deve ser do tipo \"double[]\""
+            "O gradiente seguinte para a camada Flatten deve ser do tipo \"double[]\" ou \"Mat\", " +
+            "Objeto recebido é do tipo " + gradSeguinte.getClass().getTypeName()
          );
       }
 
-      double[] grad = (double[]) gradSeguinte;
+   }
+
+   private void calcularGrad(double[] grad){
       int id = 0;
 
       double[][][] entrada = new double[this.entrada.length][this.entrada[0].lin][this.entrada[0].col];
@@ -57,8 +72,26 @@ public class Flatten extends Camada{
       }
    }
   
+   private void calcularGrad(Mat grad){
+      double[] g = grad.paraArray();
+
+      int id = 0;
+      for(Mat mat : this.entrada){
+         for(int i = 0; i < mat.lin; i++){
+            for(int j = 0; j < mat.col; j++){
+               mat.editar(i, j, g[id++]);
+            }
+         }
+      }
+   }
+
    @Override
    public double[] obterSaida(){
       return this.saida;
+   }
+
+   @Override
+   public Object obterGradEntrada(){
+      return this.entrada;
    }
 }
