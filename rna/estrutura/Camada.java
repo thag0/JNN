@@ -188,6 +188,16 @@ public class Camada{
    }
 
    /**
+    * Retorna a quantidade total de elementos presentes na saída da camada.
+    * @return tamanho de saída da camada.
+    */
+   public int tamanhoSaida(){
+      throw new IllegalArgumentException(
+         "Implementar retorno de tamanho da saída."
+      );        
+   }
+
+   /**
     * Retorna a quantidade de parâmetros treináveis da camada.
     * <p>
     *    Esses parâmetros podem incluir pesos, filtros, bias, entre outros.

@@ -5,68 +5,60 @@ import rna.core.Mat;
 public class Flatten extends Camada{
    int[] formEntrada;
    int[] formSaida;
-   public double[] saida;
 
-   public Flatten(){
+   public Mat[] entrada;
+   private double[] saida;
 
+   public Flatten(int[] formEntrada){
+      this.formEntrada = formEntrada;
+
+      int tamanho = 1;
+      for(int i : formEntrada){
+         tamanho *= i;
+      }
+      this.saida = new double[tamanho];
    }
 
    @Override
    public void calcularSaida(Object entrada){
-      if(entrada instanceof Mat[]){
-         saida((Mat[]) entrada);
+      if(entrada instanceof double[] == false){
+         throw new IllegalArgumentException(
+            "Os dados de entrada para a camada Flatten devem ser do tipo \"double[]\", " +
+            "objeto recebido é do tipo \"" + entrada.getClass().getTypeName() + "\""
+         );
       }
-      if(entrada instanceof Mat){
-         saida((Mat) entrada);
-      }
-      if(entrada instanceof double[][]){
-         saida((double[][]) entrada);
-      }
+
+      double[] e = (double[]) entrada;
+      System.arraycopy(e, 0, this.saida, 0, this.saida.length);
    }
 
    @Override
    public void calcularGradiente(Object gradSeguinte){
-      if(gradSeguinte instanceof double[]){
-         entrada((double[]) gradSeguinte);
+      if(gradSeguinte instanceof double[] == false){
+         throw new IllegalArgumentException(
+            "O gradiente seguinte para a camada Flatten deve ser do tipo \"double[]\""
+         );
       }
-   }
 
-   private void saida(double[][] entrada){
-      this.formEntrada = new int[]{entrada.length, entrada[0].length};
-      
+      double[] grad = (double[]) gradSeguinte;
       int id = 0;
-      this.saida = new double[entrada.length * entrada[0].length];
-      for(int i = 0; i < entrada.length; i++){
-         for(int j = 0; j < entrada[i].length; j++){
-            this.saida[id++] = entrada[i][j];
+
+      double[][][] entrada = new double[this.entrada.length][this.entrada[0].lin][this.entrada[0].col];
+      for(int i = 0; i < formEntrada[0]; i++){
+         for(int j = 0; j < formEntrada[1]; j++){
+            for(int k = 0; k < formEntrada[2]; k++){
+               entrada[i][j][k] = grad[id++];
+            }
          }
       }
 
-      this.formSaida = new int[]{1, this.saida.length};
-   }
-
-   private void saida(Mat entrada){
-      this.formEntrada = new int[]{entrada.lin, entrada.col};
-      this.saida = entrada.paraArray();
-      this.formSaida = new int[]{1, this.saida.length};
-   }
-
-   private void saida(Mat[] entrada){
-      int tamanho = entrada[0].lin * entrada[0].col;
-      int n = entrada.length;
-      this.formEntrada = new int[]{entrada[0].lin, entrada[0].col, n};
-      this.saida = new double[n * tamanho];
-
-      for(int i = 0; i < n; i++){
-         double[] arr = entrada[i].paraArray();
-         System.arraycopy(arr, 0, this.saida, i * tamanho, tamanho);
+      for(int i = 0; i < this.entrada.length; i++){
+         this.entrada[i].copiar(entrada[i]);
       }
-
-      this.formSaida = new int[]{1, this.saida.length};
-   }
-
-   private void entrada(double[] entrada){
-
    }
   
+   @Override
+   public double[] obterSaida(){
+      return this.saida;
+   }
 }

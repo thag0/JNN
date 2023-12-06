@@ -23,6 +23,22 @@ public class OpMatriz{
    }
 
    /**
+    * Checa se as linhas das matrizes fornecidas são iguais.
+    * @param a matriz A.
+    * @param b matriz B.
+    * @param c matriz C.
+    */
+   private void verificarLinhas(Mat a, Mat b, Mat c){
+      if(a.lin != b.lin && a.lin != c.lin){
+         throw new IllegalArgumentException(
+            "Linhas de A (" + a.lin + 
+            "), B (" + b.lin + 
+            ") e C (" + c.lin + ") são diferentes."
+         );
+      }
+   }
+
+   /**
     * Checa se as colunas das matrizes fornecidas são iguais.
     * @param a matriz A.
     * @param b matriz B.
@@ -31,6 +47,22 @@ public class OpMatriz{
       if(a.col != b.col){
          throw new IllegalArgumentException(
             "Colunas de A (" + a.col + ") e B (" + b.col + ") são diferentes."
+         );
+      }
+   }
+
+   /**
+    * Checa se as colunas das matrizes fornecidas são iguais.
+    * @param a matriz A.
+    * @param b matriz B.
+    * @param c matriz C.
+    */
+   private void verificarColunas(Mat a, Mat b, Mat c){
+      if(a.col != b.col && a.col != c.col){
+         throw new IllegalArgumentException(
+            "Colunas de A (" + a.col + 
+            "), B (" + b.col + 
+            ") e C (" + c.col + ") são diferentes."
          );
       }
    }
@@ -206,17 +238,13 @@ public class OpMatriz{
     * @param r matriz contendo o resultado da soma.
     */
    public void add(Mat a, Mat b, Mat r){
-      verificarLinhas(a, b);
-      verificarColunas(a, b);
-      verificarLinhas(a, r);
-      verificarColunas(a, r);
+      verificarLinhas(a, b, r);
+      verificarColunas(a, b, r);
 
       int i, j;
-      double d;
       for(i = 0; i < r.lin; i++){
          for(j = 0; j < r.col; j++){
-            d = a.dado(i, j) + b.dado(i, j);
-            r.editar(i, j, d);
+            r.editar(i, j, (a.dado(i, j) + b.dado(i, j)));
          }
       }
    }
@@ -237,11 +265,9 @@ public class OpMatriz{
       Mat r = new Mat(a.lin, a.col);
 
       int i, j;
-      double d;
       for(i = 0; i < r.lin; i++){
          for(j = 0; j < r.col; j++){
-            d = a.dado(i, j) + b.dado(i, j);
-            r.editar(i, j, d);
+            r.editar(i, j, (a.dado(i, j) + b.dado(i, j)));
          }
       }
 
@@ -259,17 +285,13 @@ public class OpMatriz{
     * @param r matriz contendo o resultado da subtração.
     */
    public void sub(Mat a, Mat b, Mat r){
-      verificarLinhas(a, b);
-      verificarColunas(a, b);
-      verificarLinhas(a, r);
-      verificarColunas(a, r);
+      verificarLinhas(a, b, r);
+      verificarColunas(a, b, r);
 
       int i, j;
-      double d;
       for(i = 0; i < r.lin; i++){
          for(j = 0; j < r.col; j++){
-            d = a.dado(i, j) - b.dado(i, j);
-            r.editar(i, j, d);
+            r.editar(i, j, (a.dado(i, j) - b.dado(i, j)));
          }
       }
    }
@@ -290,11 +312,9 @@ public class OpMatriz{
       Mat r = new Mat(a.lin, a.col);
 
       int i, j;
-      double d;
       for(i = 0; i < r.lin; i++){
          for(j = 0; j < r.col; j++){
-            d = a.dado(i, j) - b.dado(i, j);
-            r.editar(i, j, d);
+            r.editar(i, j, (a.dado(i, j) - b.dado(i, j)));
          }
       }
 
@@ -312,17 +332,13 @@ public class OpMatriz{
     * @param r matriz contendo o resultado do produto hadamard.
     */
    public void hadamard(Mat a, Mat b, Mat r){
-      verificarLinhas(a, b);
-      verificarColunas(a, b);
-      verificarLinhas(a, r);
-      verificarColunas(a, r);
+      verificarLinhas(a, b, r);
+      verificarColunas(a, b, r);
 
       int i, j;
-      double d;
       for(i = 0; i < r.lin; i++){
          for(j = 0; j < r.col; j++){
-            d = a.dado(i, j) * b.dado(i, j);
-            r.editar(i, j, d);
+            r.editar(i, j, (a.dado(i, j) * b.dado(i, j)));
          }
       }
    }
@@ -343,11 +359,9 @@ public class OpMatriz{
       Mat r = new Mat(a.lin, a.col);
 
       int i, j;
-      double d;
       for(i = 0; i < r.lin; i++){
          for(j = 0; j < r.col; j++){
-            d = a.dado(i, j) * b.dado(i, j);
-            r.editar(i, j, d);
+            r.editar(i, j, (a.dado(i, j) * b.dado(i, j)));
          }
       }
 

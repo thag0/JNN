@@ -214,11 +214,6 @@ public class Mat implements Cloneable{
    public void copiar(int lin, double[] dados){
       int id = lin*this.col;
       System.arraycopy(dados, 0, this.dados, id, this.col);
-
-      // for(int i = 0; i < this.col; i++){
-      //    id = indice(lin, i);
-      //    this.dados[id] = dados[i];
-      // }
    }
 
    /**

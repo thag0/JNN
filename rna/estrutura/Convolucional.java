@@ -324,7 +324,7 @@ public class Convolucional extends Camada implements Cloneable{
          throw new IllegalArgumentException(
             "Os dados de entrada para a camada Convolucional devem ser " +
             "do tipo \"double[][][]\", objeto recebido é do tipo \"" + 
-            entrada.getClass().getSimpleName() + "\""
+            entrada.getClass().getTypeName() + "\""
          );
       }
 
@@ -394,7 +394,7 @@ public class Convolucional extends Camada implements Cloneable{
          throw new IllegalArgumentException(
             "Os gradientes para a camada Convolucional devem ser " +
             "do tipo \"double[][][]\", objeto recebido é do tipo \"" + 
-            gradSeguinte.getClass().getSimpleName() + "\""
+            gradSeguinte.getClass().getTypeName() + "\""
          );
       }
 
@@ -479,6 +479,11 @@ public class Convolucional extends Camada implements Cloneable{
       }
 
       return saida;
+   }
+
+   @Override 
+   public int tamanhoSaida(){
+      return this.numFiltros * this.altSaida * this.largSaida;
    }
 
    /**

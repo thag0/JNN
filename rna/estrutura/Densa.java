@@ -325,15 +325,15 @@ public class Densa extends Camada implements Cloneable{
       if(entrada instanceof double[] == false){
          throw new IllegalArgumentException(
             "Os dados de entrada para a camada Densa devem ser do tipo \"double[]\", " +
-            "objeto recebido é do tipo \"" + entrada.getClass().getSimpleName() + "\""
+            "objeto recebido é do tipo \"" + entrada.getClass().getTypeName() + "\""
          );
       }
 
       double[] e = (double[]) entrada;
       if(e.length != this.tamanhoEntrada()){
          throw new IllegalArgumentException(
-            "Entradas (" + e.length + 
-            ") incompatíveis com a entrada da camada (" + this.tamanhoEntrada() + 
+            "Tamanho da entrada fornecida (" + e.length + 
+            ") incompatível com a entrada da camada (" + this.tamanhoEntrada() + 
             ")."
          );
       }
@@ -366,7 +366,7 @@ public class Densa extends Camada implements Cloneable{
       if(gradSeguinte instanceof Mat == false){
          throw new IllegalArgumentException(
             "O gradiente para a camada Densa deve ser do tipo " + this.gradSaida.getClass() +
-            ", objeto recebido é do tipo \"" + gradSeguinte.getClass().getSimpleName() + "\""
+            ", objeto recebido é do tipo \"" + gradSeguinte.getClass().getTypeName() + "\""
          );
       }
 
