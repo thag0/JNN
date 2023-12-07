@@ -18,8 +18,8 @@ import rna.serializacao.DicionarioAtivacoes;
  * <pre>
  *    somatorio = (pesos * entrada) + bias
  * </pre>
- * Após a propagação dos dados pela camada, a função de ativação da é aplicada
- * ao resultado do somatório, que por fim é salvo na saída da camada.
+ * Após a propagação dos dados, a função de ativação da camada é aplicada ao 
+ * resultado do somatório, que por fim é salvo na saída da camada.
  * <pre>
  *    saida = ativacao(somatorio)
  * </pre>

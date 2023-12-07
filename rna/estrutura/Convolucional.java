@@ -10,7 +10,27 @@ import rna.inicializadores.Inicializador;
 import rna.serializacao.DicionarioAtivacoes;
 
 /**
- * Implementação em andamento da camada convolucional.
+ * Camada Convolucional.
+ * <p>
+ *    A camada convolucional realiza operações de convolução sobre a entrada
+ *    utilizando filtros (kernels) para extrair características locais, dada 
+ *    pela expressão:.
+ * </p>
+ * <pre>
+ *    somatorio = convolucao(entrada, filtros) + bias
+ * </pre>
+ * Após a propagação dos dados, a função de ativação da camada é aplicada ao 
+ * resultado do somatório, que por fim é salvo na saída da camada.
+ * <pre>
+ *    saida = ativacao(somatorio)
+ * </pre>
+ * <p>
+ *    Detalhe adicional:
+ * </p>
+ * Na realidade a operação que é feita dentro da camada convolucional é chamada de
+ * correlação cruzada, é nela que aplicamos os kernels pela entrada recebida. A 
+ * verdadeira operação de convolução tem a peculiaridade de rotacionar o filtro 180° 
+ * antes de ser executada.
  */
 public class Convolucional extends Camada implements Cloneable{
 

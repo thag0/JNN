@@ -28,10 +28,8 @@ public class TesteConv{
       }
 
       Inicializador ini = new Xavier();
-      Convolucional conv1 = new Convolucional(formEntrada, formFiltro, 8, "sigmoid");
-      conv1.inicializar(ini, ini, 0);
-
-      Convolucional conv2 = new Convolucional(conv1.formatoSaida(), formFiltro, 8, "sigmoid");
+      Convolucional conv1 = new Convolucional(formEntrada, formFiltro, 8, "tanh");
+      Convolucional conv2 = new Convolucional(conv1.formatoSaida(), formFiltro, 8, "tanh");
       Flatten flat = new Flatten(conv2.formatoSaida());
       Densa densa1 = new Densa(flat.tamanhoSaida(), 20, "leakyrelu");
       Densa densa2 = new Densa(densa1.tamanhoSaida(), 10, "softmax");
@@ -49,7 +47,7 @@ public class TesteConv{
       Perda perda = new EntropiaCruzada();
       Otimizador otm = new SGD(0.001, 0.995);
 
-      cnn.treinar(entradas, saidas, 300, perda, otm, true);
+      cnn.treinar(entradas, saidas, 401, perda, otm, true);
 
       for(int i = 0; i < 10; i++){
          System.out.println("Real: " + i + ", Pred: " + testarImagem(cnn, entradas[i][0]));

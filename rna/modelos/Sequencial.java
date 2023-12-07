@@ -35,13 +35,7 @@ public class Sequencial{
    }
 
    public void inicializar(Inicializador ini){
-      if(this.camadas[0].inicializada == false){
-         throw new IllegalArgumentException(
-            "É necessário que a primeira camada seja inicializada manualmente."
-         );
-      }
-
-      for(int i = 1; i < this.camadas.length; i++){
+      for(int i = 0; i < this.camadas.length; i++){
          this.camadas[i].inicializar(ini, ini, 0);
          this.camadas[i].configurarId(i);
       }

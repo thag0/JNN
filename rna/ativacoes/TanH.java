@@ -49,6 +49,24 @@ public class TanH extends Ativacao{
       }
    }
 
+   @Override
+   public void derivada(Convolucional camada){
+      int i, j, k;
+      double grad, d;
+
+      for(i = 0; i < camada.somatorio.length; i++){
+         for(j = 0; j < camada.somatorio[i].lin; j++){
+            for(k = 0; k < camada.somatorio[i].col; k++){
+               grad = camada.gradSaida[i].dado(j, k);
+               d = camada.saida[i].dado(j, k);
+               d = 1 - (d * d);
+
+               camada.derivada[i].editar(j, k, (grad * d));
+            }
+         }
+      }
+   }
+
    private double tanh(double x){
       return 2 / (1 + Math.exp(-2 * x)) - 1;
    }
