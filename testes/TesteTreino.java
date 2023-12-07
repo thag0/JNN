@@ -2,8 +2,8 @@ package testes;
 
 import ged.Ged;
 import rna.avaliacao.perda.ErroMedioQuadrado;
-import rna.estrutura.RedeNeural;
 import rna.inicializadores.Xavier;
+import rna.modelos.RedeNeural;
 import rna.otimizadores.SGD;
 
 public class TesteTreino{

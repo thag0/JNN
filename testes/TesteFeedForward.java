@@ -1,6 +1,6 @@
 package testes;
 import ged.Ged;
-import rna.estrutura.RedeNeural;
+import rna.modelos.RedeNeural;
 
 public class TesteFeedForward {
    public static void main(String[] args){

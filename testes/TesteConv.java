@@ -1,69 +1,89 @@
 package testes;
 
+import java.awt.image.BufferedImage;
+
 import ged.Ged;
-import rna.avaliacao.perda.ErroMedioQuadrado;
-import rna.core.Mat;
+import geim.Geim;
+import rna.avaliacao.perda.*;
 import rna.estrutura.*;
-import rna.inicializadores.Inicializador;
-import rna.inicializadores.Xavier;
-import rna.otimizadores.Otimizador;
-import rna.otimizadores.SGD;
+import rna.inicializadores.*;
+import rna.modelos.Sequencial;
+import rna.otimizadores.*;
 
 public class TesteConv{
    static Ged ged = new Ged();
+   static Geim geim = new Geim();
 
    public static void main(String[] args){
       ged.limparConsole();
       
-      double[][] e = {
-         {1, 6, 2},
-         {5, 3, 1},
-         {7, 0, 4},
-      };
-      
-      double[][] f1 = {
-         {1, 2},
-         {-1, 0},
-      };
-      
-      int[] formatoEntrada = {e.length, e[0].length, 1};
-      int[] formatoFiltro = {f1.length, f1[0].length};
+      int[] formEntrada = {28, 28, 1};
+      int[] formFiltro = {3, 3};
 
-      double[][][] entrada = new double[1][][];
-      entrada[0] = e;
+      double[][][][] entradas = new double[10][formEntrada[2]][formEntrada[0]][formEntrada[1]];
+      double[][] saidas = new double[10][10];
+      for(int i = 0; i < 10; i++){
+         entradas[i][0] = imagemParaMatriz("/dados/mnist/" + i + ".png");
+         saidas[i][i] = 1;
+      }
 
-      // ---------------------------------------------------------
       Inicializador ini = new Xavier();
+      Convolucional conv1 = new Convolucional(formEntrada, formFiltro, 8, "sigmoid");
+      conv1.inicializar(ini, ini, 0);
 
-      Convolucional conv = new Convolucional(formatoEntrada, formatoFiltro, 2, false);
-      conv.inicializar(ini, ini, 0);
-      conv.filtros[0][0] = new Mat(f1);
+      Convolucional conv2 = new Convolucional(conv1.formatoSaida(), formFiltro, 8, "sigmoid");
+      Flatten flat = new Flatten(conv2.formatoSaida());
+      Densa densa1 = new Densa(flat.tamanhoSaida(), 20, "leakyrelu");
+      Densa densa2 = new Densa(densa1.tamanhoSaida(), 10, "softmax");
 
-      Flatten flat = new Flatten(conv.formatoSaida());
-      
-      Densa densa1 = new Densa(conv.tamanhoSaida(), 5);
-      densa1.configurarAtivacao("tanh");
-      densa1.inicializar(ini, ini, 0);
-      
-      Densa densa2 = new Densa(densa1.tamanhoSaida(), 3);
-      densa2.configurarAtivacao("sigmoid");
-      densa2.inicializar(ini, ini, 0);
+      Sequencial cnn = new Sequencial(new Camada[]{
+         conv1,
+         conv2,
+         flat,
+         densa1,
+         densa2,
+      });
 
-      ConvNet cnn = new ConvNet();
-      cnn.add(conv);
-      cnn.add(flat);
-      cnn.add(densa1);
-      cnn.add(densa2);
-
-      cnn.calcularSaida(entrada);
-      
-      double[] real = {0.0, 1.0, 0.0};
-      ErroMedioQuadrado emq = new ErroMedioQuadrado();
+      cnn.inicializar(ini);
+   
+      Perda perda = new EntropiaCruzada();
       Otimizador otm = new SGD(0.001, 0.995);
 
-      cnn.treinar(entrada, real, 3000, emq, otm);
-   
+      cnn.treinar(entradas, saidas, 300, perda, otm, true);
 
-      ged.imprimirArray(cnn.obterSaida(), "saida cnn");
+      for(int i = 0; i < 10; i++){
+         System.out.println("Real: " + i + ", Pred: " + testarImagem(cnn, entradas[i][0]));
+      }
+   }
+
+   public static double[][] imagemParaMatriz(String caminho){
+      BufferedImage img = geim.lerImagem(caminho);
+      double[][] imagem = new double[img.getHeight()][img.getWidth()];
+
+      int[][] cinza = geim.obterCinza(img);
+
+      for(int y = 0; y < imagem.length; y++){
+         for(int x = 0; x < imagem[y].length; x++){
+            imagem[y][x] = cinza[y][x];
+         }
+      }
+
+      return imagem;
+   }
+
+   public static int testarImagem(Sequencial cnn, double[][] entrada){
+      double[][][] e = new double[1][][];
+      e[0] = entrada;
+
+      cnn.calcularSaida(e);
+      double[] prev = cnn.obterSaida();
+
+      for(int i = 0; i < prev.length; i++){
+         if(prev[i] > 0.95){
+            return i;
+         }
+      }
+
+      return -1;
    }
 }

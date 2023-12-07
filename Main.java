@@ -6,20 +6,20 @@ import ged.*;
 import geim.Geim;
 import render.JanelaTreino;
 import rna.avaliacao.perda.*;
-import rna.estrutura.*;
 import rna.inicializadores.*;
+import rna.modelos.RedeNeural;
 import rna.otimizadores.*;
 
 public class Main{
    static final int epocas = 5*1000;
-   static final float escalaRender = 8f;
+   static final float escalaRender = 7f;
    static Ged ged = new Ged();
    static Geim geim = new Geim();
 
    public static void main(String[] args){
       
       ged.limparConsole();
-      BufferedImage imagem = geim.lerImagem("/dados/8.png");
+      BufferedImage imagem = geim.lerImagem("/dados/mnist/8.png");
       double[][] dados = geim.imagemParaDadosTreinoEscalaCinza(imagem);
 
       int tamEntrada = 2;
@@ -78,7 +78,7 @@ public class Main{
     * @param dadosSaida dados de saída relativos a entrada.
     */
    public static void treinoEmPainel(RedeNeural rede, BufferedImage imagem, double[][] dadosEntrada, double[][] dadosSaida){
-      final int fps = 6000;
+      final int fps = 600;
       int epocasPorFrame = 30;
 
       //acelerar o processo de desenho

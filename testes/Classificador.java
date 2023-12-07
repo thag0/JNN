@@ -2,8 +2,8 @@ package testes;
 
 import java.text.DecimalFormat;
 
-import rna.estrutura.RedeNeural;
 import rna.inicializadores.*;
+import rna.modelos.RedeNeural;
 import rna.avaliacao.perda.*;
 import rna.otimizadores.*;
 import ged.Dados;

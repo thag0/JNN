@@ -5,7 +5,7 @@ import java.io.Serializable;
 import ged.Dados;
 import ged.Ged;
 import rna.ativacoes.Sigmoid;
-import rna.estrutura.RedeNeural;
+import rna.modelos.RedeNeural;
 import rna.serializacao.Serializador;
 
 @SuppressWarnings("unused")
