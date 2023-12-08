@@ -131,6 +131,13 @@ public class Main{
       ged.exportarCsv(dados, "historico-perda");
    }
 
+   /**
+    * Formata o valor recebido para a quantidade de casas após o ponto
+    * flutuante.
+    * @param valor valor alvo.
+    * @param casas quantidade de casas após o ponto fluntuante.
+    * @return
+    */
    public static String formatarDecimal(double valor, int casas){
       String valorFormatado = "";
 

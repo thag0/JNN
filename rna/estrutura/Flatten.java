@@ -114,7 +114,7 @@ public class Flatten extends Camada{
    }
 
    @Override
-   public double[] obterSaida(){
+   public double[] saidaParaArray(){
       return this.saida;
    }
 

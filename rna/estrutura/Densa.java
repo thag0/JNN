@@ -552,7 +552,7 @@ public class Densa extends Camada implements Cloneable{
    }
 
    @Override
-   public double[] obterSaida(){
+   public double[] saidaParaArray(){
       return this.saida.linha(0);
    }
 

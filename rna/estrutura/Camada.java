@@ -191,7 +191,7 @@ public class Camada{
     * Retorna a saída da camada no formato de array.
     * @return saída da camada.
     */
-   public double[] obterSaida(){
+   public double[] saidaParaArray(){
       throw new IllegalArgumentException(
          "Implementar retorno de saída."
       );   

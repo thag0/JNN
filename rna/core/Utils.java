@@ -3,10 +3,10 @@ package rna.core;
 public class Utils{
 
    public void copiar(double[] arr, Mat[] dest){
-      int id = 0;
-      for(int i = 0; i < dest.length; i++){
-         for(int j = 0; j < dest[i].lin; j++){
-            for(int k = 0; k < dest[i].col; k++){
+      int id = 0, i, j, k;
+      for(i = 0; i < dest.length; i++){
+         for(j = 0; j < dest[i].lin; j++){
+            for(k = 0; k < dest[i].col; k++){
                dest[i].editar(j, k, arr[id++]);
             }
          }

@@ -33,7 +33,7 @@ class Auxiliar{
     */
    public void backpropagation(Camada[] redec, Perda perda, double[] real){
       Camada saida = redec[redec.length-1];
-      double[] previsto = saida.obterSaida();
+      double[] previsto = saida.saidaParaArray();
       double[] gradPrev = perda.derivada(previsto, real);
 
       saida.calcularGradiente(new Mat(gradPrev));

@@ -125,7 +125,7 @@ public class SGD extends Otimizador{
 
    @Override
    public void atualizar(Camada[] redec){
-      int i,idKernel = 0, idBias = 0;
+      int i, idKernel = 0, idBias = 0;
 
       for(Camada camada : redec){
          if(camada.treinavel == false) continue;

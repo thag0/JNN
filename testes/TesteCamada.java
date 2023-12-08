@@ -32,7 +32,7 @@ public class TesteCamada{
       for(int i = 0; i < entrada.length; i++){
          double[] amostra = entrada[i];
          camada.calcularSaida(amostra);
-         double saida = camada.obterSaida()[0];
+         double saida = camada.saidaParaArray()[0];
          System.out.println(amostra[0] + " - " + amostra[1] + " = " + saida);
       }
    }

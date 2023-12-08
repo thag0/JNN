@@ -97,12 +97,7 @@ public class OpMatriz{
     * @param val valor desejado para preenchimento.
     */
    public void preencher(Mat m, double val){
-      int i, j;
-      for(i = 0; i < m.lin; i++){
-         for(j = 0; j < m.col; j++){
-            m.editar(i, j, val);
-         }
-      }    
+      m.preencher(val);
    }
 
    /**
@@ -137,8 +132,9 @@ public class OpMatriz{
    public Mat identidade(int tamanho){
       Mat id = new Mat(tamanho, tamanho);
       
-      for(int i = 0; i < id.lin; i++){
-         for(int j = 0; j < id.col; j++){
+      int i, j;
+      for(i = 0; i < id.lin; i++){
+         for(j = 0; j < id.col; j++){
             id.editar(i, j, (i == j ? 1 : 0));
          }
       }
@@ -241,10 +237,11 @@ public class OpMatriz{
       verificarLinhas(a, b, r);
       verificarColunas(a, b, r);
 
+      r.copiar(a);
       int i, j;
       for(i = 0; i < r.lin; i++){
          for(j = 0; j < r.col; j++){
-            r.editar(i, j, (a.dado(i, j) + b.dado(i, j)));
+            r.add(i, j, b.dado(i, j));
          }
       }
    }
@@ -264,10 +261,11 @@ public class OpMatriz{
       verificarColunas(a, b);
       Mat r = new Mat(a.lin, a.col);
 
+      r.copiar(a);
       int i, j;
       for(i = 0; i < r.lin; i++){
          for(j = 0; j < r.col; j++){
-            r.editar(i, j, (a.dado(i, j) + b.dado(i, j)));
+            r.add(i, j, b.dado(i, j));
          }
       }
 
@@ -288,10 +286,11 @@ public class OpMatriz{
       verificarLinhas(a, b, r);
       verificarColunas(a, b, r);
 
+      r.copiar(a);
       int i, j;
       for(i = 0; i < r.lin; i++){
          for(j = 0; j < r.col; j++){
-            r.editar(i, j, (a.dado(i, j) - b.dado(i, j)));
+            r.sub(i, j, b.dado(i, j));
          }
       }
    }
@@ -311,10 +310,11 @@ public class OpMatriz{
       verificarColunas(a, b);
       Mat r = new Mat(a.lin, a.col);
 
+      r.copiar(a);
       int i, j;
       for(i = 0; i < r.lin; i++){
          for(j = 0; j < r.col; j++){
-            r.editar(i, j, (a.dado(i, j) - b.dado(i, j)));
+            r.sub(i, j, b.dado(i, j));
          }
       }
 
@@ -335,10 +335,11 @@ public class OpMatriz{
       verificarLinhas(a, b, r);
       verificarColunas(a, b, r);
 
+      r.copiar(a);
       int i, j;
       for(i = 0; i < r.lin; i++){
          for(j = 0; j < r.col; j++){
-            r.editar(i, j, (a.dado(i, j) * b.dado(i, j)));
+            r.mult(i, j, b.dado(i, j));
          }
       }
    }
@@ -358,10 +359,11 @@ public class OpMatriz{
       verificarColunas(a, b);
       Mat r = new Mat(a.lin, a.col);
 
+      r.copiar(a);
       int i, j;
       for(i = 0; i < r.lin; i++){
          for(j = 0; j < r.col; j++){
-            r.editar(i, j, (a.dado(i, j) * b.dado(i, j)));
+            r.mult(i, j, b.dado(i, j));
          }
       }
 
@@ -382,9 +384,9 @@ public class OpMatriz{
       verificarLinhas(a, r);
       verificarColunas(a, r);
 
+      r.copiar(a);
       int i, j;
       for(i = 0; i < r.lin; i++){
-         r.copiar(i, a.linha(i));
          for(j = 0; j < r.col; j++){
             r.mult(i, j, e);
          }
@@ -392,16 +394,17 @@ public class OpMatriz{
    }
 
    /**
-    * 
-    * @param m
+    * Rotaciona o conteúdo da matriz em 180°.
+    * @param m matriz.
     */
    public void rotacionar180(Mat m){
       int lin = m.lin;
       int col = m.col;
       Mat rot = new Mat(lin, col);
   
-      for(int i = 0; i < lin; i++){
-         for(int j = 0; j < col; j++){
+      int i, j;
+      for(i = 0; i < lin; i++){
+         for(j = 0; j < col; j++){
             rot.editar(i, j, m.dado(lin - 1 - i, col - 1 - j));
          }
       }
@@ -410,17 +413,18 @@ public class OpMatriz{
    } 
 
    /**
-    * 
-    * @param m
-    * @return
+    * Rotaciona o conteúdo da matriz em 180°.
+    * @param m matriz.
+    * @return nova matriz com o conteúdo rotacionado.
     */
    public Mat rotacionar180R(Mat m){
       int lin = m.lin;
       int col = m.col;
       Mat rot = new Mat(lin, col);
   
-      for(int i = 0; i < lin; i++){
-         for(int j = 0; j < col; j++){
+      int i, j;
+      for(i = 0; i < lin; i++){
+         for(j = 0; j < col; j++){
             rot.editar(i, j, m.dado(lin - 1 - i, col - 1 - j));
          }
       }
@@ -455,13 +459,14 @@ public class OpMatriz{
          );
       }
 
+      int i, j, k, l;
       double res;
-      for(int i = 0; i < r.lin; i++){
-         for(int j = 0; j < r.col; j++){
+      for(i = 0; i < r.lin; i++){
+         for(j = 0; j < r.col; j++){
             
             res = 0;
-            for(int k = 0; k < b.lin; k++){
-               for(int l = 0; l < b.col; l++){
+            for(k = 0; k < b.lin; k++){
+               for(l = 0; l < b.col; l++){
                   res += a.dado(i + k, j + l) * b.dado(k, l);
                }
             }
@@ -498,13 +503,14 @@ public class OpMatriz{
          );
       }
   
+      int i, j, k, l;
       double res;
       Mat filtro = rotacionar180R(b);
-      for(int i = 0; i < r.lin; i++){
-         for(int j = 0; j < r.col; j++){
+      for(i = 0; i < r.lin; i++){
+         for(j = 0; j < r.col; j++){
             res = 0;
-            for(int k = 0; k < filtro.lin; k++){
-               for (int l = 0; l < filtro.col; l++){
+            for(k = 0; k < filtro.lin; k++){
+               for (l = 0; l < filtro.col; l++){
                   int posX = i - k;
                   int posY = j - l;
   
@@ -545,14 +551,15 @@ public class OpMatriz{
          );
       }
       
+      int i, j, k, l;
       double res;
       Mat filtro = rotacionar180R(b);
-      for(int i = 0; i < r.lin; i++){
-         for(int j = 0; j < r.col; j++){
+      for(i = 0; i < r.lin; i++){
+         for(j = 0; j < r.col; j++){
             
             res = 0;
-            for(int k = 0; k < filtro.lin; k++){
-               for(int l = 0; l < filtro.col; l++){
+            for(k = 0; k < filtro.lin; k++){
+               for(l = 0; l < filtro.col; l++){
                   res += a.dado(i + k, j + l) * filtro.dado(k, l);
                }
             }
@@ -588,12 +595,13 @@ public class OpMatriz{
          );
       }
   
+      int i, j, k, l;
       double res;
-      for(int i = 0; i < r.lin; i++){
-         for(int j = 0; j < r.col; j++){
+      for(i = 0; i < r.lin; i++){
+         for(j = 0; j < r.col; j++){
             res = 0;
-            for(int k = 0; k < b.lin; k++){
-               for (int l = 0; l < b.col; l++){
+            for(k = 0; k < b.lin; k++){
+               for(l = 0; l < b.col; l++){
                   int posX = i - k;
                   int posY = j - l;
   

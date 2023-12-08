@@ -86,7 +86,7 @@ public class Convolucional extends Camada implements Cloneable{
     *    Um filtro 3x3x1 possui 9 parâmetros.
     * </p>
     */
-   private int numKernels;
+   private int numParamsKernel;
 
    /**
     * Altura da saída da camada.
@@ -403,10 +403,10 @@ public class Convolucional extends Camada implements Cloneable{
       }
 
       //auxiliar
-      this.numKernels = 0;
+      this.numParamsKernel = 0;
       for(Mat[] filtro : this.filtros){
          for(Mat camada : filtro){
-            this.numKernels += camada.tamanho();
+            this.numParamsKernel += camada.tamanho();
          }
       }
 
@@ -626,7 +626,9 @@ public class Convolucional extends Camada implements Cloneable{
       int parametros = 0;
 
       parametros += this.numFiltros * this.profEntrada * this.altFiltro * this.largFiltro;
-      parametros += this.bias.length * this.altSaida * this.altSaida;
+      if(this.usarBias){
+         parametros += this.bias.length * this.altSaida * this.altSaida;
+      }
 
       return parametros;
    }
@@ -640,14 +642,10 @@ public class Convolucional extends Camada implements Cloneable{
    }
 
    @Override
-   public double[] obterSaida(){
-      int n = 0;
-      for(int i = 0; i < this.saida.length; i++){
-         n += this.saida[i].tamanho();
-      }
-
+   public double[] saidaParaArray(){
       int id = 0;
-      double[] saida = new double[n];
+      double[] saida = new double[this.tamanhoSaida()];
+
       for(int i = 0; i < this.saida.length; i++){
          double[] s = this.saida[i].paraArray();
          for(int j = 0; j < s.length; j++){
@@ -721,7 +719,7 @@ public class Convolucional extends Camada implements Cloneable{
    }
 
    /**
-    * Calcula o formato de entrada da camada Densa, que é disposto da
+    * Calcula o formato de entrada da camada Convolucional, que é disposto da
     * seguinte forma:
     * <pre>
     *    formato = (entrada.altura, entrada.largura, entrada.profundidade)
@@ -738,7 +736,7 @@ public class Convolucional extends Camada implements Cloneable{
    }
  
     /**
-     * Calcula o formato de saída da camada Densa, que é disposto da
+     * Calcula o formato de saída da camada Convolucional, que é disposto da
      * seguinte forma:
      * <pre>
      *    formato = (saida.altura, saida.largura, saida.profundidade)
@@ -756,22 +754,13 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override
    public double[] obterKernel(){
-      int n = 0;
-      for(int i = 0; i < this.filtros.length; i++){
-         for(int j = 0; j < this.filtros[i].length; j++){
-            n += this.filtros[i][j].tamanho();
-         }
-      }
-
-      double[] kernel = new double[n];
       int cont = 0;
-      for(int i = 0; i < this.filtros.length; i++){
-         for(int j = 0; j < this.filtros[i].length; j++){
+      double[] kernel = new double[this.numParamsKernel];
+      for(int i = 0; i < numFiltros; i++){
+         for(int j = 0; j < this.profEntrada; j++){
             double[] arr = this.filtros[i][j].paraArray();
-            for(int k = 0; k < arr.length; k++){
-               kernel[cont] = arr[k];
-               cont++;
-            }
+            System.arraycopy(arr, 0, kernel, cont, arr.length);
+            cont += arr.length;
          }
       }
 
@@ -780,22 +769,14 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override
    public double[] obterGradKernel(){
-      int n = 0;
-      for(int i = 0; i < this.gradFiltros.length; i++){
-         for(int j = 0; j < this.gradFiltros[i].length; j++){
-            n += this.gradFiltros[i][j].tamanho();
-         }
-      }
-
-      double[] grad = new double[n];
-      int cont = 0;
-      for(int i = 0; i < this.gradFiltros.length; i++){
-         for(int j = 0; j < this.gradFiltros[i].length; j++){
+      int cont = 0, i, j;
+      double[] grad = new double[this.numParamsKernel];
+      
+      for(i = 0; i < numFiltros; i++){
+         for(j = 0; j < this.profEntrada; j++){
             double[] arr = this.gradFiltros[i][j].paraArray();
-            for(int k = 0; k < arr.length; k++){
-               grad[cont] = arr[k];
-               cont++;
-            }
+            System.arraycopy(arr, 0, grad, cont, arr.length);
+            cont += arr.length;
          }
       }
 
@@ -804,19 +785,13 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override
    public double[] obterBias(){
-      int n = 0;
-      for(int i = 0; i < this.bias.length; i++){
-         n += this.bias[i].tamanho();
-      }
-
-      double[] bias = new double[n];
+      double[] bias = new double[this.numFiltros * this.altEntrada * this.largEntrada];
       int cont = 0;
+
       for(int i = 0; i < this.bias.length; i++){
          double[] arr = this.bias[i].paraArray();
-         for(int j = 0; j < arr.length; j++){
-            bias[cont] = arr[j];
-            cont++;
-         }
+         System.arraycopy(arr, 0, bias, cont, arr.length);
+         cont += arr.length;
       }
 
       return bias;
@@ -824,19 +799,13 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override
    public double[] obterGradBias(){
-      int n = 0;
-      for(int i = 0; i < this.gradBias.length; i++){
-         n += this.gradBias[i].tamanho();
-      }
-
-      double[] grad = new double[n];
+      double[] grad = new double[this.numFiltros * this.altEntrada * this.largEntrada];
       int cont = 0;
+
       for(int i = 0; i < this.gradBias.length; i++){
          double[] arr = this.gradBias[i].paraArray();
-         for(int j = 0; j < arr.length; j++){
-            grad[cont] = arr[j];
-            cont++;
-         }
+         System.arraycopy(arr, 0, grad, cont, arr.length);
+         cont += arr.length;
       }
 
       return grad;
@@ -849,18 +818,18 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override
    public void editarKernel(double[] kernel){
-      if(kernel.length != this.numKernels){
+      if(kernel.length != this.numParamsKernel){
          throw new IllegalArgumentException(
             "A dimensão do kernel fornecido (" + kernel.length + ") não é igual a quantidade de " +
-            " parâmetros para os kernels da camada ("+ this.numKernels + ")."
+            " parâmetros para os kernels da camada ("+ this.numParamsKernel + ")."
          );
       }
          
-      int id = 0;
+      int id = 0, i, j;
       for(Mat[] filtro : this.filtros){
          for(Mat camada : filtro){
-            for(int i = 0; i < camada.lin; i++){
-               for(int j = 0; j < camada.col; j++){
+            for(i = 0; i < camada.lin; i++){
+               for(j = 0; j < camada.col; j++){
                   camada.editar(i, j, kernel[id++]);
                }
             }
@@ -878,10 +847,10 @@ public class Convolucional extends Camada implements Cloneable{
       }
       
       int id = 0;
-      for(Mat camada : this.bias){
-         for(int i = 0; i < camada.lin; i++){
-            for(int j = 0; j < camada.col; j++){
-               camada.editar(i, j, bias[id++]);
+      for(Mat b : this.bias){
+         for(int i = 0; i < b.lin; i++){
+            for(int j = 0; j < b.col; j++){
+               b.editar(i, j, bias[id++]);
             }
          }
       }

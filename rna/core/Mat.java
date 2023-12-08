@@ -149,7 +149,8 @@ public class Mat implements Cloneable{
     * @return valor baseado de acordo com os índices.
     */
    public double dado(int lin, int col){
-      return this.dados[indice(lin, col)];
+      int id = indice(lin, col);
+      return this.dados[id];
    }
 
    /**
@@ -285,7 +286,6 @@ public class Mat implements Cloneable{
       }
 
       Mat b = new Mat(n, this.col);
-
       for(int i = 0; i < b.lin; i++){
          b.copiar(i, this.linha(lin));
       }
