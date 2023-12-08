@@ -49,7 +49,7 @@ public class MainConv{
       for(int i = 0; i < 10; i++){
          System.out.println("Real: " + i + ", Pred: " + testarImagem(cnn, entradas[i][0]));
       }
-   }
+   } 
 
    public static Sequencial criarModelo(int[] formEntrada, int[] formFiltro){
       Inicializador ini = new Xavier();
