@@ -15,15 +15,12 @@ public class MainConv{
    public static void main(String[] args){
       ged.limparConsole();
       
-      int[] formEntrada = {28, 28, 1};
-      int[] formFiltro = {3, 3};
-      
       double[][][][] entradas = new double[100][10][][];
       double[][] saidas = new double[100][10];
       entradas = carregarDadosMNIST();
       saidas = carregarRotulosMNIST();
 
-      Sequencial cnn = criarModelo(formEntrada, formFiltro);
+      Sequencial cnn = criarModelo();
 
       //treinar e marcar tempo
       long t1, t2;
@@ -31,7 +28,7 @@ public class MainConv{
 
       t1 = System.nanoTime();
       System.out.println("Treinando.");
-      cnn.treinar(entradas, saidas, 401, true);
+      cnn.treinar(entradas, saidas, 501, true);
       t2 = System.nanoTime();
 
       long tempoDecorrido = t2 - t1;
@@ -51,25 +48,29 @@ public class MainConv{
       cnn.calcularSaida(teste);
       double[] previsao = cnn.obterSaida();
       for(int i = 0; i < previsao.length; i++){
-         System.out.println(i + ": " + (int)(previsao[i]*100));
+         System.out.println("Prob: " + i + ": " + (int)(previsao[i]*100) + "%");
       }
    } 
 
-   public static Sequencial criarModelo(int[] formEntrada, int[] formFiltro){
-      Inicializador ini = new Xavier();
-      Convolucional conv1 = new Convolucional(formEntrada, formFiltro, 30, "tanh");
-      Flatten flat = new Flatten(conv1.formatoSaida());
-      Densa densa1 = new Densa(flat.tamanhoSaida(), 60, "leakyrelu");
-      Densa densa2 = new Densa(densa1.tamanhoSaida(), 10, "softmax");
-
+   public static Sequencial criarModelo(){
+      int[] formEntrada = {28, 28, 1};
+      Convolucional conv1 = new Convolucional(formEntrada, new int[]{6, 6}, 15, "tanh");
+      Convolucional conv2 = new Convolucional(conv1.formatoSaida(), new int[]{4, 4}, 15, "tanh");
+      Flatten flat = new Flatten(conv2.formatoSaida());
+      Densa densa1 = new Densa(flat.tamanhoSaida(), 150, "leakyrelu");
+      Densa densa2 = new Densa(densa1.tamanhoSaida(), 30, "leakyrelu");
+      Densa densa3 = new Densa(densa2.tamanhoSaida(), 10, "softmax");
+      
       Sequencial cnn = new Sequencial(new Camada[]{
          conv1,
+         conv2,
          flat,
          densa1,
          densa2,
+         densa3,
       });
 
-      cnn.compilar(new SGD(0.01, 0.99), new EntropiaCruzada(), ini);
+      cnn.compilar(new SGD(0.001, 0.95), new EntropiaCruzada(), new Xavier());
 
       return cnn;
    } 
