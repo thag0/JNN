@@ -19,7 +19,7 @@ public class Main{
    public static void main(String[] args){
       
       ged.limparConsole();
-      BufferedImage imagem = geim.lerImagem("/dados/mnist/8.png");
+      BufferedImage imagem = geim.lerImagem("/dados/mnist/treino/8/img_1.jpg");
       double[][] dados = geim.imagemParaDadosTreinoEscalaCinza(imagem);
 
       int tamEntrada = 2;
@@ -59,7 +59,7 @@ public class Main{
 
       Perda perda = new ErroMedioQuadrado();
       Otimizador otm = new SGD(0.001, 0.95);
-      // Otimizador otm = new AdaGrad(0.999999);
+      // Otimizador otm = new AdaGrad(0.9999999);
       Inicializador ini = new Xavier();
 
       // rede.configurarHistoricoPerda(true);

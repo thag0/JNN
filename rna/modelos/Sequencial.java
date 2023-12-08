@@ -187,7 +187,7 @@ public class Sequencial{
 
             perdaEpoca /= entrada.length;
 
-            if(logs & (e % 100 == 0)){
+            if(logs & (e % 50 == 0)){
                System.out.println("Perda (" + e + "): " + perdaEpoca);
             }
          }
@@ -208,7 +208,7 @@ public class Sequencial{
 
             perdaEpoca /= entrada.length;
 
-            if(logs & (e % 100 == 0)){
+            if(logs & (e % 50 == 0)){
                System.out.println("Perda (" + e + "): " + perdaEpoca);
             }
          }
