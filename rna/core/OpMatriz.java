@@ -443,11 +443,15 @@ public class OpMatriz{
     *R.altura = A.altura - B.altura + 1
     *R.largura = A.largura - B.largura + 1
     * </pre>
+    * Essa operação zera os resultados de r anteriormente.
     * @param a matriz de entrada.
     * @param b filtro ou kernel aplicado na matriz de entrada.
-    * @param r resultado da correlação cruzada
+    * @param r resultado da correlação cruzada.
+    * @param add verificador para o resultado, se {@code verdadeiro} a matriz de resultados
+    * não será zerada antes da operação, se {@code verdadeiro} a matriz de resultados será
+    * zerada antes da operação.
     */
-   public void correlacaoCruzada(Mat a, Mat b, Mat r){
+   public void correlacaoCruzada(Mat a, Mat b, Mat r, boolean add){
       if(r.lin != (a.lin - b.lin + 1)){
          throw new IllegalArgumentException(
             "Dimensões entre as linhas de A, B e R incompatíveis."
@@ -457,6 +461,10 @@ public class OpMatriz{
          throw new IllegalArgumentException(
             "Dimensões entre as colunas de A, B e R incompatíveis."
          );
+      }
+
+      if(add == false){
+         r.preencher(0);
       }
 
       int i, j, k, l;
@@ -471,7 +479,7 @@ public class OpMatriz{
                }
             }
 
-            r.editar(i, j, res);
+            r.add(i, j, res);
          }
       }
    }
@@ -489,9 +497,12 @@ public class OpMatriz{
     * </pre>
     * @param a matriz de entrada.
     * @param b filtro ou kernel aplicado na matriz de entrada.
-    * @param r resultado da correlação cruzada
+    * @param r resultado da correlação cruzada.
+    * @param add verificador para o resultado, se {@code verdadeiro} a matriz de resultados
+    * não será zerada antes da operação, se {@code verdadeiro} a matriz de resultados será
+    * zerada antes da operação.
     */
-   public void correlacaoCruzadaFull(Mat a, Mat b, Mat r){
+   public void correlacaoCruzadaFull(Mat a, Mat b, Mat r, boolean add){
       if(r.lin != (a.lin + b.lin - 1)){
          throw new IllegalArgumentException(
             "Dimensões entre as linhas de A, B e R incompatíveis."
@@ -501,6 +512,10 @@ public class OpMatriz{
          throw new IllegalArgumentException(
             "Dimensões entre as colunas de A, B e R incompatíveis."
          );
+      }
+
+      if(add == false){
+         r.preencher(0);
       }
   
       int i, j, k, l;
@@ -519,7 +534,7 @@ public class OpMatriz{
                   }
                }
             }
-            r.editar(i, j, res);
+            r.add(i, j, res);
          }
       }
    }   
@@ -537,9 +552,12 @@ public class OpMatriz{
     * </pre>
     * @param a matriz de entrada para a operação de convolução.
     * @param b filtro ou kernel aplicado na matriz de entrada.
-    * @param r resultado da convolução
+    * @param r resultado da convolução.
+    * @param add verificador para o resultado, se {@code verdadeiro} a matriz de resultados
+    * não será zerada antes da operação, se {@code verdadeiro} a matriz de resultados será
+    * zerada antes da operação.
     */
-   public void convolucao(Mat a, Mat b, Mat r){
+   public void convolucao(Mat a, Mat b, Mat r, boolean add){
       if(r.lin != (a.lin - b.lin + 1)){
          throw new IllegalArgumentException(
             "Dimensões entre as linhas de A, B e R incompatíveis."
@@ -549,6 +567,10 @@ public class OpMatriz{
          throw new IllegalArgumentException(
             "Dimensões entre as colunas de A, B e R incompatíveis."
          );
+      }
+
+      if(add == false){
+         r.preencher(0);
       }
       
       int i, j, k, l;
@@ -563,7 +585,7 @@ public class OpMatriz{
                   res += a.dado(i + k, j + l) * filtro.dado(k, l);
                }
             }
-            r.editar(i, j, res);
+            r.add(i, j, res);
          }
       }
    }
@@ -581,9 +603,12 @@ public class OpMatriz{
     * </pre>
     * @param a matriz de entrada para a operação de convolução.
     * @param b filtro ou kernel aplicado na matriz de entrada.
-    * @param r resultado da convolução
+    * @param r resultado da convolução.
+    * @param add verificador para o resultado, se {@code verdadeiro} a matriz de resultados
+    * não será zerada antes da operação, se {@code verdadeiro} a matriz de resultados será
+    * zerada antes da operação.
     */
-   public void convolucaoFull(Mat a, Mat b, Mat r){
+   public void convolucaoFull(Mat a, Mat b, Mat r, boolean add){
       if(r.lin != (a.lin + b.lin - 1)){
          throw new IllegalArgumentException(
             "Dimensões entre as linhas de A, B e R incompatíveis."
@@ -593,6 +618,10 @@ public class OpMatriz{
          throw new IllegalArgumentException(
             "Dimensões entre as colunas de A, B e R incompatíveis."
          );
+      }
+
+      if(add == false){
+         r.preencher(0);
       }
   
       int i, j, k, l;
@@ -610,7 +639,7 @@ public class OpMatriz{
                   }
                }
             }
-            r.editar(i, j, res);
+            r.add(i, j, res);
          }
       }
    }

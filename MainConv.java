@@ -28,7 +28,7 @@ public class MainConv{
 
       t1 = System.nanoTime();
       System.out.println("Treinando.");
-      cnn.treinar(entradas, saidas, 501, true);
+      cnn.treinar(entradas, saidas, 151, true);
       t2 = System.nanoTime();
 
       long tempoDecorrido = t2 - t1;
@@ -54,26 +54,22 @@ public class MainConv{
 
    public static Sequencial criarModelo(){
       int[] formEntrada = {28, 28, 1};
-      Convolucional conv1 = new Convolucional(formEntrada, new int[]{6, 6}, 15, "tanh");
-      Convolucional conv2 = new Convolucional(conv1.formatoSaida(), new int[]{4, 4}, 15, "tanh");
-      Flatten flat = new Flatten(conv2.formatoSaida());
-      Densa densa1 = new Densa(flat.tamanhoSaida(), 150, "leakyrelu");
-      Densa densa2 = new Densa(densa1.tamanhoSaida(), 30, "leakyrelu");
-      Densa densa3 = new Densa(densa2.tamanhoSaida(), 10, "softmax");
+      Convolucional conv1 = new Convolucional(formEntrada, new int[]{5, 5}, 10, "tanh");
+      Flatten flat = new Flatten(conv1.formatoSaida());
+      Densa densa1 = new Densa(flat.tamanhoSaida(), 100, "leakyrelu");;
+      Densa densa2 = new Densa(densa1.tamanhoSaida(), 10, "softmax");
       
       Sequencial cnn = new Sequencial(new Camada[]{
          conv1,
-         conv2,
          flat,
          densa1,
          densa2,
-         densa3,
       });
 
       cnn.compilar(new SGD(0.001, 0.95), new EntropiaCruzada(), new Xavier());
 
       return cnn;
-   } 
+   }
 
    public static double[][] imagemParaMatriz(String caminho){
       BufferedImage img = geim.lerImagem(caminho);

@@ -27,22 +27,12 @@ public class MatrizTeste{
          {1, 2},
          {-1, 0},
       };
-      
-      double[][] grad1 = {
-         {1, 2, 3},
-         {4, 5, 6},
-         {7, 8, 9}
-      };
 
-      double[][] filtro = {
-         {1, 2},
-         {3, 4}
-      };
-
-      Mat g = new Mat(grad1);
-      Mat f = new Mat(filtro);
-      Mat res = new Mat(2, 2);
-      opmat.correlacaoCruzada(g, f, res);
+      Mat entrada = new Mat(e1);
+      Mat filtro = new Mat(f1);
+      Mat res = new Mat(4, 4);
+      opmat.correlacaoCruzadaFull(entrada, filtro, res, false);
+      opmat.correlacaoCruzadaFull(entrada, filtro, res, false);
       res.print();
    }
 
