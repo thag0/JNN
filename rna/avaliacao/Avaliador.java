@@ -46,7 +46,7 @@ public class Avaliador{
     * @return valor do erro médio quadrado da rede em relação ao dados fornecidos (custo/perda).
     */
    public double erroMedioQuadrado(double[][] entrada, double[][] saida){
-      double[][] previsoes = (double[][]) modelo.calcularSaida(entrada);
+      double[][] previsoes = (double[][]) modelo.calcularSaidas(entrada);
       double mse = 0;
 
       for(int i = 0; i < saida.length; i++){
@@ -79,7 +79,7 @@ public class Avaliador{
     * fornecidos (custo/perda).
     */
    public double erroMedioQuadradoLogaritmico(double[][] entrada, double[][] saida){
-      double[][] previsoes = (double[][]) modelo.calcularSaida(entrada);
+      double[][] previsoes = (double[][]) modelo.calcularSaidas(entrada);
       double msle = 0;
 
       for(int i = 0; i < saida.length; i++){
@@ -108,7 +108,7 @@ public class Avaliador{
     * @return valor do erro médio abosoluto da rede em relação ao dados fornecidos (custo/perda).
     */
    public double erroMedioAbsoluto(double[][] entrada, double[][] saida){
-      double[][] previsoes = (double[][]) modelo.calcularSaida(entrada);
+      double[][] previsoes = (double[][]) modelo.calcularSaidas(entrada);
       double mae = 0;
 
       for(int i = 0; i < saida.length; i++){
@@ -149,7 +149,7 @@ public class Avaliador{
     * @return entropia cruzada da rede em relação ao dados fornecidos (custo/perda).
     */
    public double entropiaCruzada(double[][] entrada, double[][] saida){  
-      double[][] previsoes = (double[][]) modelo.calcularSaida(entrada);
+      double[][] previsoes = (double[][]) modelo.calcularSaidas(entrada);
       double ec = 0;
 
       for(int i = 0; i < saida.length; i++){
@@ -180,7 +180,7 @@ public class Avaliador{
     * @return valor da entropia cruzada binária.
     */
    public double entropiaCruzadaBinaria(double[][] entrada, double[][] saida){
-      double[][] previsoes = (double[][]) modelo.calcularSaida(entrada);
+      double[][] previsoes = (double[][]) modelo.calcularSaidas(entrada);
       double res = 0;
 
       for(int i = 0; i < saida.length; i++){

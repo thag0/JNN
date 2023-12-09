@@ -707,7 +707,7 @@ public class Convolucional extends Camada implements Cloneable{
                "([" + this.profEntrada +"][" + this.altEntrada + "][" + this.largEntrada + "])"
             );
          }
-         utils.copiar((double[][][]) entrada, this.entrada);
+         utils.copiar(e, this.entrada);
       
       }else if(entrada instanceof Mat[]){
          utils.copiar((Mat[]) entrada, this.entrada);

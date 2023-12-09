@@ -240,7 +240,7 @@ public class Sequencial extends Modelo{
     * @param entradas entrada.
     */
    @Override
-   public Object[] calcularSaida(Object[] entradas){
+   public Object[] calcularSaidas(Object[] entradas){
       verificarCompilacao();
 
       double[][] previsoes = new double[entradas.length][];

@@ -818,7 +818,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     * @return matriz contendo os resultados das predições da rede.
     */
    @Override
-   public double[][] calcularSaida(Object[] entradas){
+   public double[][] calcularSaidas(Object[] entradas){
       this.verificarCompilacao();
       if(entradas instanceof double[][] == false){
          throw new IllegalArgumentException(

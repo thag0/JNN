@@ -40,7 +40,7 @@ public class Modelo{
       );
    }
 
-   public Object[] calcularSaida(Object[] entradas){
+   public Object[] calcularSaidas(Object[] entradas){
       throw new IllegalArgumentException(
          "Implementar calculo de saída do modelo para múltiplas entradas."
       );
