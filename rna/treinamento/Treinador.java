@@ -13,7 +13,7 @@ public class Treinador{
     */
    public boolean calcularHistorico = false;
    
-   Auxiliar aux;
+   AuxiliarTreino aux;
    Treino treino;
    TreinoLote treinoLote;
 
@@ -21,7 +21,7 @@ public class Treinador{
     * Responsável por organizar os tipos de treino da rede neural.
     */
    public Treinador(){
-      aux =        new Auxiliar();
+      aux =        new AuxiliarTreino();
       treino =     new Treino(calcularHistorico);
       treinoLote = new TreinoLote(calcularHistorico);
    }

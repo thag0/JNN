@@ -59,17 +59,17 @@ public class MainConv{
    public static Sequencial criarModelo(){
       int[] formEntrada = {28, 28, 1};
       
-      Sequencial cnn = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{4, 4}, 5, "tanh"),
-         new Convolucional(new int[]{3, 3}, 5, "tanh"),
+      Sequencial modelo = new Sequencial(new Camada[]{
+         new Convolucional(formEntrada, new int[]{5, 5}, 30, "tanh"),
+         new Convolucional(new int[]{3, 3}, 20, "tanh"),
          new Flatten(),
          new Densa(120, "leakyrelu"),
          new Densa(10, "softmax"),
       });
 
-      cnn.compilar(new SGD(0.1), new EntropiaCruzada(), new Xavier());
+      modelo.compilar(new SGD(0.1), new EntropiaCruzada(), new Xavier());
 
-      return cnn;
+      return modelo;
    }
 
    public static double[][] imagemParaMatriz(String caminho){

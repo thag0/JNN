@@ -4,16 +4,18 @@ import rna.avaliacao.perda.ErroMedioQuadrado;
 import rna.avaliacao.perda.Perda;
 import rna.core.Mat;
 import rna.estrutura.Camada;
-import rna.estrutura.Convolucional;
 import rna.estrutura.Densa;
 import rna.inicializadores.Inicializador;
 import rna.otimizadores.Otimizador;
 import rna.otimizadores.SGD;
+import rna.treinamento.AuxiliarTreino;
 
 /**
- * Modelo básico ainda.
+ * Modelo sequencial de camadas.
  */
 public class Sequencial{
+
+   AuxiliarTreino auxTreino = new AuxiliarTreino();
 
    /**
     * Lista de camadas do modelo.
@@ -29,6 +31,8 @@ public class Sequencial{
     * Otimizador do modelo.
     */
    public Otimizador otimizador = new SGD();
+
+   private boolean compilado = false;
 
    /**
     * Inicializa um modelo sequencial vazio.
@@ -47,10 +51,19 @@ public class Sequencial{
    }
 
    /**
-    * Adiciona novas camadas ao final da lista de camadas do modelo.
+    * Adiciona uma nova camada ao final da lista de camadas do modelo.
+    * <p>
+    *    Novas camadas não precisam estar construídas, a única excessão
+    *    é caso seja a primeira camada do modelo, ela deve ser construída
+    *    já que é necessário saber o formato de entrada do modelo.
+    * </p>
     * @param camada nova camada.
     */
    public void add(Camada camada){
+      if(camada == null){
+         throw new IllegalArgumentException("Camada fornecida é nula.");
+      }
+
       Camada[] c = this.camadas;
       this.camadas = new Camada[c.length+1];
 
@@ -142,29 +155,43 @@ public class Sequencial{
             "É necessário que a primeira camada seja construída."
          );
       }
-
-      for(int i = 1; i < this.camadas.length; i++){
-         this.camadas[i].construir(this.camadas[i-1].formatoSaida());
-      }
-
       if(iniKernel == null){
          throw new IllegalArgumentException(
             "O inicializador para o kernel não pode ser nulo."
          );
       }
+
+      for(int i = 1; i < this.camadas.length; i++){
+         this.camadas[i].construir(this.camadas[i-1].formatoSaida());
+      }
+
       for(int i = 0; i < this.camadas.length; i++){
          this.camadas[i].inicializar(iniKernel, iniBias, 0);
          this.camadas[i].configurarId(i);
       }
 
+      this.perda = perda;
+
       this.otimizador.inicializar(this.camadas);
+      this.compilado = true;
    }
 
    /**
-    * Feedforward
+    * Auxiliar na verificação da compilaçã do modelo.
+    */
+   private void verificarCompilacao(){
+      if(this.compilado == false){
+         throw new IllegalArgumentException("O modelo ainda não foi compilado.");
+      }
+   }
+
+   /**
+    * Propaga os dados de entrada pelo modelo.
     * @param entrada entrada.
     */
    public void calcularSaida(Object entrada){
+      verificarCompilacao();
+
       this.camadas[0].calcularSaida(entrada);
       for(int i = 1; i < this.camadas.length; i++){
          this.camadas[i].calcularSaida(this.camadas[i-1].saidaParaArray());
@@ -173,63 +200,31 @@ public class Sequencial{
 
    /**
     * 
-    * @param entrada
-    * @param saida
+    * @param entradas
+    * @param saidas
     * @param epochs
     * @param logs
     */
-   public void treinar(Object entradas, double[][] saida, int epochs, boolean logs){
-      if(entradas instanceof double[][][][] && this.camadas[0] instanceof Convolucional){
-         treinoConv((double[][][][]) entradas, saida, epochs, logs);
-         
-      }else if(entradas instanceof double[][] && this.camadas[0] instanceof Densa){
-         treinoDensa((double[][]) entradas, saida, epochs, logs);
+   public void treinar(Object[] entradas, Object[] saidas, int epochs, boolean logs){
+      verificarCompilacao();
 
-      }else{
-         throw new IllegalArgumentException("Formato de entrada não suportado");
-      }
-
-   }
-
-   private void treinoConv(double[][][][] entrada, double[][] saida, int epochs, boolean logs){
       for(int e = 0; e < epochs; e++){
+         auxTreino.embaralharDados(entradas, saidas);
+
          double perdaEpoca = 0;
-         for(int i = 0; i < entrada.length; i++){
-            this.calcularSaida(entrada[i]);
+         for(int i = 0; i < entradas.length; i++){
+            this.calcularSaida(entradas[i]);
             double[] previsao = this.obterSaida();
 
             if(logs){
-               perdaEpoca += this.perda.calcular(previsao, saida[i]);
+               perdaEpoca += this.perda.calcular(previsao, (double[]) saidas[i]);
             }
 
-            this.backpropagation(previsao, saida[i]);
+            this.backpropagation(previsao, saidas[i]);
             this.otimizador.atualizar(this.camadas);
          }
 
-         perdaEpoca /= entrada.length;
-
-         if(logs & (e % 20 == 0)){
-            System.out.println("Perda (" + e + "): " + perdaEpoca);
-         }
-      }
-   }
-
-   private void treinoDensa(double[][] entrada, double[][] saida, int epochs, boolean logs){
-      for(int e = 0; e < epochs; e++){
-         double perdaEpoca = 0;
-         for(int i = 0; i < entrada.length; i++){
-            this.calcularSaida(entrada[i]);
-            double[] previsao = this.obterSaida();
-
-            if(logs){
-               perdaEpoca += this.perda.calcular(previsao, saida[i]);
-            }
-
-            this.backpropagation(previsao, saida[i]);
-            this.otimizador.atualizar(this.camadas);
-         }
-
-         perdaEpoca /= entrada.length;
+         perdaEpoca /= entradas.length;
 
          if(logs & (e % 20 == 0)){
             System.out.println("Perda (" + e + "): " + perdaEpoca);
@@ -242,8 +237,14 @@ public class Sequencial{
     * @param previsto saídas previstas pelo modelo.
     * @param real rótulos reais.
     */
-   public void backpropagation(double[] previsto, double[] real){
-      double[] grads = this.perda.derivada(previsto, real);
+   private void backpropagation(Object previsto, Object real){
+      if(previsto instanceof double[] == false || real instanceof double[] == false){
+         throw new IllegalArgumentException(
+            "Os valores previstos e reais devem ser arrays do tipo double[]."
+         );
+      }
+
+      double[] grads = this.perda.derivada((double[]) previsto, (double[]) real);
       this.obterCamadaSaida().calcularGradiente(new Mat(grads));
       
       for(int i = this.camadas.length-2; i >= 0; i--){
@@ -259,6 +260,8 @@ public class Sequencial{
     * das camadas.
     */
    public Camada obterCamada(int id){
+      verificarCompilacao();
+   
       if((id < 0) || (id >= this.camadas.length)){
          throw new IllegalArgumentException(
             "O índice fornecido (" + id + 
@@ -274,6 +277,7 @@ public class Sequencial{
     * @return camada de saída.
     */
    public Camada obterCamadaSaida(){
+      verificarCompilacao();
       return this.camadas[this.camadas.length-1];
    }
 
@@ -282,7 +286,33 @@ public class Sequencial{
     * @return saída do modelo.
     */
    public double[] obterSaida(){
-      double[] saida = (double[]) this.camadas[this.camadas.length-1].saidaParaArray();
-      return  saida;
+      verificarCompilacao();
+      double[] saida = (double[]) this.obterCamadaSaida().saidaParaArray();
+      return saida;
+   }
+
+   public String info(){
+      verificarCompilacao();
+
+      String buffer = "";
+      String espacamento = "   ";
+
+      buffer += this.getClass().getSimpleName() + " = [\n";
+      
+      for(Camada camada : this.camadas){
+         int[] entrada = camada.formatoEntrada();
+         int[] saida = camada.formatoSaida();
+
+         if(camada instanceof Densa){
+            buffer += espacamento + " " + camada.getClass().getSimpleName() + ": ";
+            buffer += "Entrada = (" + entrada[0] + ", " + entrada[1] + ")";
+            buffer += " Saída = (" + saida[0] + ", " + saida[1] + ") ";
+            buffer += "Ativação = " + camada.obterAtivacao().getClass().getSimpleName() + "\n";
+         }
+      }
+      
+      buffer += "]\n";
+
+      return buffer;
    }
 }

@@ -169,6 +169,16 @@ public class Camada{
          "Implementar cálculo de gradientes."
       );
    }
+
+   /**
+    * Retorna a função de ativação configurada pela camada.
+    * @return função de ativação da camada.
+    */
+   public Ativacao obterAtivacao(){
+      throw new IllegalArgumentException(
+         "Implementar retorno da função de ativação."
+      );
+   }
    
    /**
     * Lógica para retornar o formato configurado de entrada da camada.

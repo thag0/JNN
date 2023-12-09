@@ -269,7 +269,7 @@ public class Densa extends Camada implements Cloneable{
       this.numNeuronios = n;
       this.usarBias = true;
       this.configurarAtivacao(ativacao);
-      this.construir(new int[]{1, tamEntrada});
+      this.construir(new int[]{1, e});
    }
 
    /**

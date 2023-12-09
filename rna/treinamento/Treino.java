@@ -10,7 +10,7 @@ import rna.otimizadores.Otimizador;
 
 public class Treino{
    OpMatriz opmat = new OpMatriz();
-   Auxiliar aux = new Auxiliar();
+   AuxiliarTreino aux = new AuxiliarTreino();
    Random random = new Random();
 
    public boolean calcularHistorico = false;
