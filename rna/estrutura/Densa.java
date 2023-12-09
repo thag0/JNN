@@ -221,9 +221,9 @@ public class Densa extends Camada implements Cloneable{
          );
       }
 
-      this.tamEntrada = e;
       this.numNeuronios = n;
       this.usarBias = usarBias;
+      this.construir(new int[]{1, e});
    }
 
    /**
@@ -263,17 +263,77 @@ public class Densa extends Camada implements Cloneable{
     * inicializados com o método {@code inicializar()}.
     * @param e quantidade de conexões de entrada.
     * @param n quantidade de neurônios.
-    * @param ativaaco função de ativação que será usada pela camada.
+    * @param ativacao função de ativação que será usada pela camada.
     */
    public Densa(int e, int n, String ativacao){
-      this.tamEntrada = e;
+      this.numNeuronios = n;
+      this.usarBias = true;
+      this.configurarAtivacao(ativacao);
+      this.construir(new int[]{1, tamEntrada});
+   }
+
+   /**
+    * Instancia uma nova camada densa de neurônios, inicializando seus atributos como:
+    * <ul>
+    *    <li> Pesos </li>
+    *    <li> Bias </li>
+    *    <li> Entrada </li>
+    *    <li> Somatório </li>
+    *    <li> Saída </li>
+    *    <li> Gradientes </li>
+    *    <li> Saída </li>
+    * </ul>
+    * Após a inicialização os pesos e bias da Camada estarão zerados e devem ser 
+    * inicializados com o método {@code inicializar()}.
+    * @param n quantidade de neurônios.
+    * @param ativacao função de ativação que será usada pela camada.
+    */
+   public Densa(int n, String ativacao){
       this.numNeuronios = n;
       this.usarBias = true;
       this.configurarAtivacao(ativacao);
    }
 
+   /**
+    * Inicializa os parâmetros necessários para a camada Densa.
+    * <p>
+    *    O formato de entrada deve ser um array contendo o tamanho de 
+    *    cada dimensão e entrada da camada, e deve estar no formato:
+    * </p>
+    * <pre>
+    *    entrada = (altura, largura)
+    * </pre>
+    * @param entrada formato de entrada para a camada.
+    */
    @Override
-   public void inicializar(Inicializador iniKernel, Inicializador iniBias, double x){
+   public void construir(Object entrada){
+      if(entrada instanceof int[] == false){
+         throw new IllegalArgumentException(
+            ""
+         );
+      }
+
+      int[] formatoEntrada = (int[]) entrada;
+      if(formatoEntrada.length < 2){
+         throw new IllegalArgumentException(
+            "O formato de entrada para a camada Densa deve conter pelo menos dois " + 
+            "elementos (altura, largura), objeto recebido possui " + formatoEntrada.length
+         );
+      }
+      if(formatoEntrada[1] == 0 || formatoEntrada[1] == 0){
+         throw new IllegalArgumentException(
+            "Os valores recebidos para o formato de entrada devem ser maiores que zero, " +
+            "recebido = [" + formatoEntrada[0] + ", " + formatoEntrada[1] + "]"
+         );
+      }
+
+      this.tamEntrada = formatoEntrada[1];
+      if(this.numNeuronios == 0){
+         throw new IllegalArgumentException(
+            "O número de neurônios para a camada Densa não foi definido."
+         );
+      }
+    
       this.entrada = new Mat(1, this.tamEntrada);
       this.saida =   new Mat(1, this.numNeuronios);
       this.pesos =   new Mat(this.tamEntrada, this.numNeuronios);
@@ -291,7 +351,13 @@ public class Densa extends Camada implements Cloneable{
 
       this.gradPesos =   new Mat(this.pesos.lin, this.pesos.col);
       this.gradAcPesos = new Mat(this.pesos.lin, this.pesos.col);
+      
+      this.treinavel = true;
+      this.construida = true;//camada pode ser usada.
+   }
 
+   @Override
+   public void inicializar(Inicializador iniKernel, Inicializador iniBias, double x){
       //inicialização do kernel e bias
       if(iniKernel == null){
          throw new IllegalArgumentException(
@@ -304,16 +370,13 @@ public class Densa extends Camada implements Cloneable{
          if(iniBias == null) new Constante().inicializar(this.bias, 0);
          else iniBias.inicializar(this.bias, x);
       }
-      
-      this.treinavel = true;
-      this.inicializada = true;//camada pode ser usada.
    }
 
    /**
     * Verificador de inicialização para evitar problemas de uso incorreto.
     */
    private void verificarInicializacao(){
-      if(this.inicializada == false){
+      if(this.construida == false){
          throw new IllegalArgumentException(
             "Camada Densa (" + this.id + ") não inicializada."
          );

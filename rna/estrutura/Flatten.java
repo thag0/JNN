@@ -7,11 +7,29 @@ import rna.inicializadores.Inicializador;
  * 
  */
 public class Flatten extends Camada{
+
+   /**
+    * Array contendo o formato de entrada da camada, de acordo com o formato:
+    * <pre>
+    * entrada = (altura, largura, profundidade)
+    * </pre>
+    */
    int[] formEntrada;
+
+   /**
+    * Array contendo o formato de saida da camada, de acordo com o formato:
+    * <pre>
+    * saida = (altura, largura)
+    * </pre>
+    */
    int[] formSaida;
 
    public Mat[] entrada;
    public double[] saida;
+
+   public Flatten(){
+
+   }
 
    /**
     * Inicializa uma camada Flatten, que irá achatar a entrada recebida
@@ -25,10 +43,56 @@ public class Flatten extends Camada{
     * @param formEntrada formato dos dados de entrada para a camada.
     */
    public Flatten(int[] formEntrada){
-      this.formEntrada = formEntrada;
+      this.construir(formEntrada);
+   }
+
+   /**
+    * Inicializa os parâmetros necessários para a camada Flatten.
+    * <p>
+    *    O formato de entrada deve ser um array contendo o tamanho de 
+    *    cada dimensão e entrada da camada, e deve estar no formato:
+    * </p>
+    * <pre>
+    *    entrada = (altura, largura, profundidade)
+    * </pre>
+    * @param entrada formato de entrada para a camada.
+    */
+   @Override
+   public void construir(Object entrada){
+      if(entrada == null){
+         throw new IllegalArgumentException(
+            "Formato de entrada fornecida para camada Flatten é nulo."
+         );
+      }
+      if(entrada instanceof int[] == false){
+         throw new IllegalArgumentException(
+            "Objeto esperado para entrada da camada Flatten é do tipo int[], " +
+            "objeto recebido é do tipo " + entrada.getClass().getTypeName()
+         );
+      }
+
+      int[] formatoEntrada = (int[]) entrada;
+      if(formatoEntrada.length != 3){
+         throw new IllegalArgumentException(
+            "O formato de entrada para a camada Flatten deve conter três " + 
+            "elementos (altura, largura, profundidade), objeto recebido possui " + formatoEntrada.length
+         );
+      }
+      if(formatoEntrada[0] == 0 || formatoEntrada[1] == 0 || formatoEntrada[2] == 0){
+         throw new IllegalArgumentException(
+            "Os valores recebidos para o formato de entrada devem ser maiores que zero, " +
+            "recebido = [" + formatoEntrada[0] + ", " + formatoEntrada[1] + ", " + formatoEntrada[2] + "]"
+         );
+      }
+
+      this.formEntrada = new int[]{
+         formatoEntrada[0],
+         formatoEntrada[1],
+         formatoEntrada[2]
+      };
 
       int tamanho = 1;
-      for(int i : formEntrada){
+      for(int i : this.formEntrada){
          tamanho *= i;
       }
 
@@ -38,6 +102,9 @@ public class Flatten extends Camada{
       }
 
       this.saida = new double[tamanho];
+      this.formSaida = new int[]{1, tamanho};
+
+      this.construida = true;//camada pode ser usada.
    }
 
    @Override
@@ -80,37 +147,22 @@ public class Flatten extends Camada{
             "Objeto recebido é do tipo " + gradSeguinte.getClass().getTypeName()
          );
       }
-
    }
 
    private void calcularGrad(double[] grad){
-      int id = 0;
-
-      double[][][] entrada = new double[this.entrada.length][this.entrada[0].lin][this.entrada[0].col];
-      for(int i = 0; i < formEntrada[0]; i++){
-         for(int j = 0; j < formEntrada[1]; j++){
-            for(int k = 0; k < formEntrada[2]; k++){
-               entrada[i][j][k] = grad[id++];
+      int id = 0, i, j, k;
+      for(i = 0; i < this.entrada.length; i++){
+         for(j = 0; j < this.entrada[i].lin; j++){
+            for(k = 0; k < this.entrada[i].col; k++){
+               this.entrada[i].editar(j, k, grad[id++]);
             }
          }
-      }
-
-      for(int i = 0; i < this.entrada.length; i++){
-         this.entrada[i].copiar(entrada[i]);
       }
    }
   
    private void calcularGrad(Mat grad){
       double[] g = grad.paraArray();
-
-      int id = 0;
-      for(Mat mat : this.entrada){
-         for(int i = 0; i < mat.lin; i++){
-            for(int j = 0; j < mat.col; j++){
-               mat.editar(i, j, g[id++]);
-            }
-         }
-      }
+      calcularGrad(g);
    }
 
    @Override
@@ -121,6 +173,27 @@ public class Flatten extends Camada{
    @Override
    public int tamanhoSaida(){
       return this.saida.length;
+   }
+   /**
+    * Calcula o formato de saída da camada Flatten, que é disposto da
+    * seguinte forma:
+    * <pre>
+    *    formato = (altura, largura)
+    * </pre>
+    * No caso da camada flatten, o formato também pode ser dito como:
+    * <pre>
+    *    formato = (1, elementosEntrada)
+    * </pre>
+    * Onde {@code elementosEntrada} é a quantidade total de elementos 
+    * contidos no formato de entrada da camada.
+    * @return formato de saída da camada
+    */
+    @Override
+   public int[] formatoSaida(){
+      return new int[]{
+         this.formSaida[0],
+         this.formSaida[1]
+      };
    }
 
    @Override

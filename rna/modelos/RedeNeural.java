@@ -734,14 +734,16 @@ public class RedeNeural implements Cloneable{
 
       this.camadas = new Densa[this.arquitetura.length-1];
       this.camadas[0] = new Densa(this.arquitetura[0], this.arquitetura[1], this.bias);
-      this.camadas[0].inicializar(iniPesos, iniBias, alcancePeso);
 
       for(int i = 1; i < this.camadas.length; i++){
          this.camadas[i] = new Densa(
             this.camadas[i-1].formatoSaida()[1], this.arquitetura[i+1], this.bias
          );
-         this.camadas[i].inicializar(iniPesos, iniBias, this.alcancePeso);
          this.camadas[i].configurarId(i);
+      }
+
+      for(Camada camada : this.camadas){
+         camada.inicializar(iniPesos, iniBias, alcancePeso);
       }
 
       this.perda = perda;

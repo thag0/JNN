@@ -248,26 +248,40 @@ public class Convolucional extends Camada implements Cloneable{
     *    formFiltro = (altura, largura)
     * </pre>
     * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-    * @param formEntrada formato de entrada da camada.
+    * @param formFiltro formato dos filtros da camada.
+    * @param filtros quantidade de filtros.
+    * @throws IllegalArgumentException se as dimensões fornecidas não correspondenrem
+    * ao padrão desejado ou se o número de filtros for menor que 1.
+    */
+   public Convolucional(int[] formFiltro, int filtros){
+      this(formFiltro, filtros, true);
+   }
+
+   /**
+    * Instancia uma camada convolucional de acordo com os formatos fornecidos.
+    * <p>
+    *    A disposição do formato de entrada deve ser da seguinte forma:
+    * </p>
+    * <pre>
+    *    formEntrada = (altura, largura, profundidade)
+    * </pre>
+    * Onde largura e altura devem corresponder as dimensões dos dados de entrada
+    * que serão processados pela camada e a profundidade diz respeito a quantidade
+    * de entradas que a camada deve processar.
+    * <p>
+    *    A disposição do formato do filtro deve ser da seguinte forma:
+    * </p>
+    * <pre>
+    *    formFiltro = (altura, largura)
+    * </pre>
+    * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
     * @param formFiltro formato dos filtros da camada.
     * @param filtros quantidade de filtros.
     * @param usarBias adicionar uso do bias para a camada.
     * @throws IllegalArgumentException se as dimensões fornecidas não correspondenrem
     * ao padrão desejado ou se o número de filtros for menor que 1.
     */
-   public Convolucional(int[] formEntrada, int[] formFiltro, int filtros, boolean usarBias){
-      if(formEntrada.length != 3){
-         throw new IllegalArgumentException(
-            "O formato de entrada deve conter 3 elementos (altura, largura, profundidade)" 
-         );
-      }
-      for(int i = 0; i < formEntrada.length; i++){
-         if(formEntrada[i] < 1){
-            throw new IllegalArgumentException(
-               "O formato de entrada deve conter valores maiores do que zero." 
-            ); 
-         }
-      }
+   public Convolucional(int[] formFiltro, int filtros, boolean usarBias){
       if(formFiltro.length != 2){
          throw new IllegalArgumentException(
             "O formato do filtro deve conter 2 elementos (altura, largura)" 
@@ -286,18 +300,84 @@ public class Convolucional extends Camada implements Cloneable{
          );
       }
 
-      //formato da entrada da camada
-      this.altEntrada  = formEntrada[0];
-      this.largEntrada = formEntrada[1];
-      this.profEntrada = formEntrada[2];
-
-      //formato dos filtros da camada
       this.altFiltro  = formFiltro[0];
       this.largFiltro = formFiltro[1];
       this.numFiltros = filtros;
+      this.usarBias = usarBias;
+   }
 
-      this.altSaida = this.altEntrada - this.altFiltro + 1;
-      this.largSaida = this.largEntrada - this.largFiltro + 1;
+   /**
+    * Instancia uma camada convolucional de acordo com os formatos fornecidos.
+    * <p>
+    *    A disposição do formato de entrada deve ser da seguinte forma:
+    * </p>
+    * <pre>
+    *    formEntrada = (altura, largura, profundidade)
+    * </pre>
+    * Onde largura e altura devem corresponder as dimensões dos dados de entrada
+    * que serão processados pela camada e a profundidade diz respeito a quantidade
+    * de entradas que a camada deve processar.
+    * <p>
+    *    A disposição do formato do filtro deve ser da seguinte forma:
+    * </p>
+    * <pre>
+    *    formFiltro = (altura, largura)
+    * </pre>
+    * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
+    * @param formFiltro formato dos filtros da camada.
+    * @param filtros quantidade de filtros.
+    * @param ativacao função de ativação para a camada.
+    */
+   public Convolucional(int[] formFiltro, int filtros, String ativacao){
+      this(formFiltro, filtros, true, ativacao);
+   }
+
+   /**
+    * Instancia uma camada convolucional de acordo com os formatos fornecidos.
+    * <p>
+    *    A disposição do formato de entrada deve ser da seguinte forma:
+    * </p>
+    * <pre>
+    *    formEntrada = (altura, largura, profundidade)
+    * </pre>
+    * Onde largura e altura devem corresponder as dimensões dos dados de entrada
+    * que serão processados pela camada e a profundidade diz respeito a quantidade
+    * de entradas que a camada deve processar.
+    * <p>
+    *    A disposição do formato do filtro deve ser da seguinte forma:
+    * </p>
+    * <pre>
+    *    formFiltro = (altura, largura)
+    * </pre>
+    * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
+    * @param formFiltro formato dos filtros da camada.
+    * @param filtros quantidade de filtros.
+    * @param usarBias adicionar uso do bias para a camada.
+    * @param ativacao função de ativação para a camada.
+    */
+   public Convolucional(int[] formFiltro, int filtros, boolean usarBias, String ativacao){
+      if(formFiltro.length != 2){
+         throw new IllegalArgumentException(
+            "O formato do filtro deve conter 2 elementos (altura, largura)" 
+         );
+      }
+      for(int i = 0; i < formFiltro.length; i++){
+         if(formFiltro[i] < 1){
+            throw new IllegalArgumentException(
+               "O formato do filtro deve conter valores maiores do que zero." 
+            ); 
+         }
+      }
+      if(filtros < 1){
+         throw new IllegalArgumentException(
+            "A camada deve conter ao menos 1 filtro."
+         );
+      }
+      this.altFiltro  = formFiltro[0];
+      this.largFiltro = formFiltro[1];
+      this.numFiltros = filtros;
+      this.usarBias = usarBias;
+      this.configurarAtivacao(ativacao);
    }
 
    /**
@@ -364,8 +444,118 @@ public class Convolucional extends Camada implements Cloneable{
       this.configurarAtivacao(ativacao);
    }
 
+   /**
+    * Instancia uma camada convolucional de acordo com os formatos fornecidos.
+    * <p>
+    *    A disposição do formato de entrada deve ser da seguinte forma:
+    * </p>
+    * <pre>
+    *    formEntrada = (altura, largura, profundidade)
+    * </pre>
+    * Onde largura e altura devem corresponder as dimensões dos dados de entrada
+    * que serão processados pela camada e a profundidade diz respeito a quantidade
+    * de entradas que a camada deve processar.
+    * <p>
+    *    A disposição do formato do filtro deve ser da seguinte forma:
+    * </p>
+    * <pre>
+    *    formFiltro = (altura, largura)
+    * </pre>
+    * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
+    * @param formEntrada formato de entrada da camada.
+    * @param formFiltro formato dos filtros da camada.
+    * @param filtros quantidade de filtros.
+    * @param usarBias adicionar uso do bias para a camada.
+    * @throws IllegalArgumentException se as dimensões fornecidas não correspondenrem
+    * ao padrão desejado ou se o número de filtros for menor que 1.
+    */
+   public Convolucional(int[] formEntrada, int[] formFiltro, int filtros, boolean usarBias){
+      if(formEntrada.length != 3){
+         throw new IllegalArgumentException(
+            "O formato de entrada deve conter 3 elementos (altura, largura, profundidade)" 
+         );
+      }
+      if(utils.contemApenasMaiorZero(formEntrada) == false){
+         throw new IllegalArgumentException(
+            "O formato de entrada deve conter valores maiores do que zero." 
+         );          
+      }
+      if(formFiltro.length != 2){
+         throw new IllegalArgumentException(
+            "O formato do filtro deve conter 2 elementos (altura, largura)" 
+         );
+      }
+      for(int i = 0; i < formFiltro.length; i++){
+         if(formFiltro[i] < 1){
+            throw new IllegalArgumentException(
+               "O formato do filtro deve conter valores maiores do que zero." 
+            ); 
+         }
+      }
+      if(filtros < 1){
+         throw new IllegalArgumentException(
+            "A camada deve conter ao menos 1 filtro."
+         );
+      }
+
+      //formato dos filtros da camada
+      this.altFiltro  = formFiltro[0];
+      this.largFiltro = formFiltro[1];
+      this.numFiltros = filtros;
+      this.usarBias = usarBias;
+
+      this.construir(formEntrada);
+   }
+   
+   /**
+    * Inicializa os parâmetros necessários para a camada Convolucional.
+    * <p>
+    *    O formato de entrada deve ser um array contendo o tamanho de 
+    *    cada dimensão e entrada da camada, e deve estar no formato:
+    * </p>
+    * <pre>
+    *    entrada = (altura, largura, profundidade)
+    * </pre>
+    * @param entrada formato de entrada para a camada.
+    */
    @Override
-   public void inicializar(Inicializador iniKernel, Inicializador iniBias, double x){
+   public void construir(Object entrada){
+      if(entrada == null){
+         throw new IllegalArgumentException(
+            "Formato de entrada fornecida para camada Convolucional é nulo."
+         );
+      }
+      if(entrada instanceof int[] == false){
+         throw new IllegalArgumentException(
+            "Objeto esperado para entrada da camada Convolucional é do tipo int[], " +
+            "objeto recebido é do tipo " + entrada.getClass().getTypeName()
+         );
+      }
+
+      int[] formEntrada = (int[]) entrada;
+      if(formEntrada.length != 3){
+         throw new IllegalArgumentException(
+            "O formato de entrada para a camada Convolucional deve conter três " + 
+            "elementos (altura, largura, profundidade), objeto recebido possui " + formEntrada.length
+         );
+      }
+
+      if(utils.contemApenasMaiorZero(formEntrada) == false){
+         throw new IllegalArgumentException(
+            "Os valores de dimensões de entrada para a camada Convolucional não " +
+            "podem conter valores menores que 1."
+         );
+      }
+
+      //inicialização da entrada
+      this.altEntrada  = formEntrada[0];
+      this.largEntrada = formEntrada[1];
+      this.profEntrada = formEntrada[2];
+
+      this.altSaida = this.altEntrada - this.altFiltro + 1;
+      this.largSaida = this.largEntrada - this.largFiltro + 1;
+
+      //inicialização dos parâmetros necessários
       this.entrada = new Mat[this.profEntrada];
       this.gradEntrada = new Mat[this.profEntrada];
       for(int i = 0; i < this.profEntrada; i++){
@@ -409,41 +599,44 @@ public class Convolucional extends Camada implements Cloneable{
             this.numParamsKernel += camada.tamanho();
          }
       }
-
-      //inicialização de kernel e bias
-      if(iniKernel == null){
-         throw new IllegalArgumentException(
-            "O inicializador não pode ser nulo."
-            );
-         }
-         
-         for(int i = 0; i < numFiltros; i++){
-            for(int j = 0; j < profEntrada; j++){
-               iniKernel.inicializar(this.filtros[i][j], x);
-            }
-         }
-         
-         if(this.usarBias){
-            for(Mat b : this.bias){
-               if(iniBias == null) new Constante().inicializar(b, 0);
-               else iniBias.inicializar(b, x);
-            }
-         }
-
-         this.treinavel = true;
-         this.inicializada = true;//camada pode ser usada.
-      }
+      
+      this.treinavel = true;
+      this.construida = true;//camada pode ser usada.
+   }
 
    @Override
    public void inicializar(Inicializador iniKernel, double x){
       this.inicializar(iniKernel, null, x);
    }
 
+   @Override
+   public void inicializar(Inicializador iniKernel, Inicializador iniBias, double x){
+      //inicialização de kernel e bias
+      if(iniKernel == null){
+         throw new IllegalArgumentException(
+         "O inicializador não pode ser nulo."
+         );
+      }
+         
+      for(int i = 0; i < numFiltros; i++){
+         for(int j = 0; j < profEntrada; j++){
+            iniKernel.inicializar(this.filtros[i][j], x);
+         }
+      }
+
+      if(this.usarBias){
+         for(Mat b : this.bias){
+            if(iniBias == null) new Constante().inicializar(b, 0);
+            else iniBias.inicializar(b, x);
+         }
+      }
+   }
+   
    /**
     * Verificador de inicialização para evitar problemas de uso incorreto.
     */
    private void verificarInicializacao(){
-      if(this.inicializada == false){
+      if(this.construida == false){
          throw new IllegalArgumentException(
             "Camada Convolucional (" + this.id + ") não inicializada."
          );
@@ -569,7 +762,7 @@ public class Convolucional extends Camada implements Cloneable{
       }
 
       Mat[] grads = (Mat[]) gradSeguinte;
-      for(int i = 0; i < this.gradSaida.length; i++){
+      for(int i = 0; i < this.numFiltros; i++){
          this.gradSaida[i].copiar(grads[i]);
       }
 
@@ -582,7 +775,10 @@ public class Convolucional extends Camada implements Cloneable{
             opmat.convolucaoFull(this.derivada[i], this.filtros[i][j], this.gradEntrada[j], true);
          }
 
-         if(this.usarBias){
+      }
+
+      if(this.usarBias){
+         for(int i = 0; i < this.numFiltros; i++){
             this.gradBias[i].copiar(this.derivada[i]);
          }
       }
@@ -695,18 +891,6 @@ public class Convolucional extends Camada implements Cloneable{
    }
 
    /**
-    * Retorna um array contendo o formato da saída da camada que 
-    * é disposto do seguinte formato:
-    * <pre>
-    *    formato = (altura, largura, profundidade)
-    * </pre>
-    * @return array contendo as dimensões de saída da camada.
-    */
-   public int[] obterFormatoSaida(){
-      return new int[]{this.altSaida, this.largSaida, this.numFiltros};
-   }
-
-   /**
     * Calcula o formato de entrada da camada Convolucional, que é disposto da
     * seguinte forma:
     * <pre>
@@ -727,12 +911,14 @@ public class Convolucional extends Camada implements Cloneable{
      * Calcula o formato de saída da camada Convolucional, que é disposto da
      * seguinte forma:
      * <pre>
-     *    formato = (saida.altura, saida.largura, saida.profundidade)
+     *    formato = (altura, largura, profundidade)
      * </pre>
      * @return formato de saída da camada.
      */
-    @Override
+   @Override
    public int[] formatoSaida(){
+      verificarInicializacao();
+
       return new int[]{
          this.altSaida,
          this.largSaida,
@@ -773,7 +959,7 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override
    public double[] obterBias(){
-      double[] bias = new double[this.numFiltros * this.altEntrada * this.largEntrada];
+      double[] bias = new double[this.numFiltros * this.altSaida * this.largSaida];
       int cont = 0;
 
       for(int i = 0; i < this.bias.length; i++){

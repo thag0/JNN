@@ -28,6 +28,11 @@ public class Mat implements Cloneable{
     * @param dados estrutura de dados contendo os elementos.
     */
    public Mat(int lin, int col, double[] dados){
+      if(lin < 1 || col < 1){
+         throw new IllegalArgumentException(
+            "Os valores de linhas e colunas devem ser maiores que zero."
+         );
+      }
       if(lin*col != dados.length){
          throw new IllegalArgumentException(
             "A quantidade de linhas e colunas não coincide com o " + 

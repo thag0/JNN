@@ -137,12 +137,21 @@ public class Sequencial{
     * @param iniBias inicializador para os bias.
     */
    public void compilar(Otimizador otimizador, Perda perda, Inicializador iniKernel, Inicializador iniBias){
+      if(this.camadas[0].construida == false){
+         throw new IllegalArgumentException(
+            "É necessário que a primeira camada seja construída."
+         );
+      }
+
+      for(int i = 1; i < this.camadas.length; i++){
+         this.camadas[i].construir(this.camadas[i-1].formatoSaida());
+      }
+
       if(iniKernel == null){
          throw new IllegalArgumentException(
             "O inicializador para o kernel não pode ser nulo."
          );
       }
-
       for(int i = 0; i < this.camadas.length; i++){
          this.camadas[i].inicializar(iniKernel, iniBias, 0);
          this.camadas[i].configurarId(i);
@@ -170,63 +179,108 @@ public class Sequencial{
     * @param logs
     */
    public void treinar(Object entradas, double[][] saida, int epochs, boolean logs){
-      //TODO arrumar melhor esses loops
       if(entradas instanceof double[][][][] && this.camadas[0] instanceof Convolucional){
-         double[][][][] entrada = (double[][][][]) entradas;
-         for(int e = 0; e < epochs; e++){
-            double perdaEpoca = 0;
-            for(int i = 0; i < entrada.length; i++){
-               this.calcularSaida(entrada[i]);
-               perdaEpoca += this.perda.calcular(this.obterSaida(), saida[i]);
-
-               double[] g = this.perda.derivada(this.obterSaida(), saida[i]);
-               Mat gradientes = new Mat(g);
-               this.calcularGradientes(gradientes);
-               this.otimizador.atualizar(this.camadas);
-            }
-
-            perdaEpoca /= entrada.length;
-
-            if(logs & (e % 50 == 0)){
-               System.out.println("Perda (" + e + "): " + perdaEpoca);
-            }
-         }
+         treinoConv((double[][][][]) entradas, saida, epochs, logs);
          
       }else if(entradas instanceof double[][] && this.camadas[0] instanceof Densa){
-         double[][] entrada = (double[][]) entradas;
-         for(int e = 0; e < epochs; e++){
-            double perdaEpoca = 0;
-            for(int i = 0; i < entrada.length; i++){
-               this.calcularSaida(entrada[i]);
-               perdaEpoca += this.perda.calcular(this.obterSaida(), saida[i]);
+         treinoDensa((double[][]) entradas, saida, epochs, logs);
 
-               double[] g = this.perda.derivada(this.obterSaida(), saida[i]);
-               Mat gradientes = new Mat(g);
-               this.calcularGradientes(gradientes);
-               this.otimizador.atualizar(this.camadas);
-            }
-
-            perdaEpoca /= entrada.length;
-
-            if(logs & (e % 50 == 0)){
-               System.out.println("Perda (" + e + "): " + perdaEpoca);
-            }
-         }
       }else{
          throw new IllegalArgumentException("Formato de entrada não suportado");
       }
 
    }
 
-   public void calcularGradientes(Object gradSeguinte){
-      Camada saida = this.camadas[this.camadas.length-1];
-      saida.calcularGradiente(gradSeguinte);
+   private void treinoConv(double[][][][] entrada, double[][] saida, int epochs, boolean logs){
+      for(int e = 0; e < epochs; e++){
+         double perdaEpoca = 0;
+         for(int i = 0; i < entrada.length; i++){
+            this.calcularSaida(entrada[i]);
+            double[] previsao = this.obterSaida();
 
+            if(logs){
+               perdaEpoca += this.perda.calcular(previsao, saida[i]);
+            }
+
+            this.backpropagation(previsao, saida[i]);
+            this.otimizador.atualizar(this.camadas);
+         }
+
+         perdaEpoca /= entrada.length;
+
+         if(logs & (e % 20 == 0)){
+            System.out.println("Perda (" + e + "): " + perdaEpoca);
+         }
+      }
+   }
+
+   private void treinoDensa(double[][] entrada, double[][] saida, int epochs, boolean logs){
+      for(int e = 0; e < epochs; e++){
+         double perdaEpoca = 0;
+         for(int i = 0; i < entrada.length; i++){
+            this.calcularSaida(entrada[i]);
+            double[] previsao = this.obterSaida();
+
+            if(logs){
+               perdaEpoca += this.perda.calcular(previsao, saida[i]);
+            }
+
+            this.backpropagation(previsao, saida[i]);
+            this.otimizador.atualizar(this.camadas);
+         }
+
+         perdaEpoca /= entrada.length;
+
+         if(logs & (e % 20 == 0)){
+            System.out.println("Perda (" + e + "): " + perdaEpoca);
+         }
+      }
+   }
+
+   /**
+    * Realiza a retroprogação dos gradientes para as camadas do modelo.
+    * @param previsto saídas previstas pelo modelo.
+    * @param real rótulos reais.
+    */
+   public void backpropagation(double[] previsto, double[] real){
+      double[] grads = this.perda.derivada(previsto, real);
+      this.obterCamadaSaida().calcularGradiente(new Mat(grads));
+      
       for(int i = this.camadas.length-2; i >= 0; i--){
          this.camadas[i].calcularGradiente(this.camadas[i+1].obterGradEntrada());
       }
    }
 
+   /**
+    * Retorna a {@code camada} do Modelo correspondente ao índice fornecido.
+    * @param id índice da busca.
+    * @return camada baseada na busca.
+    * @throws IllegalArgumentException se o índice estiver fora do alcance do tamanho 
+    * das camadas.
+    */
+   public Camada obterCamada(int id){
+      if((id < 0) || (id >= this.camadas.length)){
+         throw new IllegalArgumentException(
+            "O índice fornecido (" + id + 
+            ") é inválido ou fora de alcance."
+         );
+      }
+   
+      return this.camadas[id];
+   }
+
+   /**
+    * Retorna a {@code camada de saída} do modelo.
+    * @return camada de saída.
+    */
+   public Camada obterCamadaSaida(){
+      return this.camadas[this.camadas.length-1];
+   }
+
+   /**
+    * Retorna um array contendo a saída do modelo.
+    * @return saída do modelo.
+    */
    public double[] obterSaida(){
       double[] saida = (double[]) this.camadas[this.camadas.length-1].saidaParaArray();
       return  saida;

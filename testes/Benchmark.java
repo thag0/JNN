@@ -9,29 +9,21 @@ import rna.core.OpMatriz;
 public class Benchmark {
    public static void main(String[] args){
       Ged ged = new Ged();
-      OpMatriz mat = new OpMatriz();
+      OpMatriz opamt = new OpMatriz();
       ged.limparConsole();
-      
-      int lin = 1024;
-      // int lin = 10;
-      int col = lin;
-      Mat a = new Mat(lin, col);
-      Mat b = new Mat(lin, col);
-      Mat c = new Mat(lin, col);
-      for(int i = 0; i < a.lin; i++){
-         for(int j = 0; j < a.col; j++){
-            a.editar(i, j, ((i* a.lin) + j + 1));
-            
-            b.editar(i, j, ((i == j) ? 1 : 0));
-         }
-      }
+
+      Mat a = new Mat(28, 28);
+      Mat b = new Mat(5, 5);
+      Mat c = new Mat(24, 24);
 
       //treinar e marcar tempo
       long t1, t2;
       long minutos, segundos;
 
       t1 = System.nanoTime();
-      mat.mult(a, b, c);
+      for(int i = 0; i < 1000; i++){
+         opamt.correlacaoCruzada(a, b, c, true);
+      }
       t2 = System.nanoTime();
       
       long tempoDecorrido = t2 - t1;

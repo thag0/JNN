@@ -15,9 +15,9 @@ public class Camada{
    public boolean treinavel = false;
 
    /**
-    * Controlador de inicialização da camada.
+    * Controlador de construção da camada.
     */
-   public boolean inicializada = false;
+   public boolean construida = false;
 
    /**
     * Identificador único da camada.
@@ -33,6 +33,23 @@ public class Camada{
     */
    public Camada(){
 
+   }
+
+   /**
+    * Monta a estrutura da camada.
+    * <p>
+    *    A construção da camada envolve inicializar seus atributos como entrada,
+    *    kernels, bias, além de elementos auxiliares que são importantes para
+    *    o seu funcionamento correto.
+    * </p>
+    * @param entrada formato de entrada da camada, dependerá do formato de saída
+    * da camada anterior, no caso de ser a primeira camada, dependerá do formato
+    * dos dados de entrada.
+    */
+   public void construir(Object entrada){
+      throw new IllegalArgumentException(
+         "Implementar construção da camada."
+      );
    }
 
    /**

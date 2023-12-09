@@ -18,7 +18,9 @@ public class MainConv{
       double[][][][] entradas = new double[100][10][][];
       double[][] saidas = new double[100][10];
       entradas = carregarDadosMNIST();
+      System.out.println("Imagens carregadas.");
       saidas = carregarRotulosMNIST();
+      System.out.println("Rótulos carregados.");
 
       Sequencial cnn = criarModelo();
 
@@ -26,9 +28,9 @@ public class MainConv{
       long t1, t2;
       long horas, minutos, segundos;
 
-      t1 = System.nanoTime();
       System.out.println("Treinando.");
-      cnn.treinar(entradas, saidas, 151, true);
+      t1 = System.nanoTime();
+      cnn.treinar(entradas, saidas, 101, true);
       t2 = System.nanoTime();
 
       long tempoDecorrido = t2 - t1;
@@ -37,6 +39,8 @@ public class MainConv{
       minutos = (segundosTotais % 3600) / 60;
       segundos = segundosTotais % 60;
       System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
+
+      //-------------------------------------
 
       for(int i = 0; i < 10; i++){
          System.out.println("Real: " + i + ", Pred: " + testarImagem(cnn, entradas[i][0]));
@@ -54,19 +58,16 @@ public class MainConv{
 
    public static Sequencial criarModelo(){
       int[] formEntrada = {28, 28, 1};
-      Convolucional conv1 = new Convolucional(formEntrada, new int[]{5, 5}, 10, "tanh");
-      Flatten flat = new Flatten(conv1.formatoSaida());
-      Densa densa1 = new Densa(flat.tamanhoSaida(), 100, "leakyrelu");;
-      Densa densa2 = new Densa(densa1.tamanhoSaida(), 10, "softmax");
       
       Sequencial cnn = new Sequencial(new Camada[]{
-         conv1,
-         flat,
-         densa1,
-         densa2,
+         new Convolucional(formEntrada, new int[]{4, 4}, 5, "tanh"),
+         new Convolucional(new int[]{3, 3}, 5, "tanh"),
+         new Flatten(),
+         new Densa(120, "leakyrelu"),
+         new Densa(10, "softmax"),
       });
 
-      cnn.compilar(new SGD(0.001, 0.95), new EntropiaCruzada(), new Xavier());
+      cnn.compilar(new SGD(0.1), new EntropiaCruzada(), new Xavier());
 
       return cnn;
    }

@@ -2,6 +2,13 @@ package rna.core;
 
 public class Utils{
 
+   public boolean contemApenasMaiorZero(int[] arr){
+      for(int i : arr){
+         if(i < 1) return false;
+      }
+      return true;
+   }
+
    public void copiar(double[] arr, Mat[] dest){
       int id = 0, i, j, k;
       for(i = 0; i < dest.length; i++){

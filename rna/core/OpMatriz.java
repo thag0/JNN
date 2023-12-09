@@ -454,7 +454,10 @@ public class OpMatriz{
    public void correlacaoCruzada(Mat a, Mat b, Mat r, boolean add){
       if(r.lin != (a.lin - b.lin + 1)){
          throw new IllegalArgumentException(
-            "Dimensões entre as linhas de A, B e R incompatíveis."
+            "Dimensões entre as linhas de A (" + a.lin + 
+            "), B (" + b.lin + 
+            ") e R (" + r.lin + 
+            ") incompatíveis."
          );
       }
       if(r.col != (a.col - b.col + 1)){
@@ -518,7 +521,7 @@ public class OpMatriz{
          r.preencher(0);
       }
   
-      int i, j, k, l;
+      int i, j, k, l, posX, posY;
       double res;
       Mat filtro = rotacionar180R(b);
       for(i = 0; i < r.lin; i++){
@@ -526,8 +529,8 @@ public class OpMatriz{
             res = 0;
             for(k = 0; k < filtro.lin; k++){
                for (l = 0; l < filtro.col; l++){
-                  int posX = i - k;
-                  int posY = j - l;
+                  posX = i - k;
+                  posY = j - l;
   
                   if(posX >= 0 && posX < a.lin && posY >= 0 && posY < a.col){
                      res += a.dado(posX, posY) * filtro.dado(k, l);
@@ -624,15 +627,15 @@ public class OpMatriz{
          r.preencher(0);
       }
   
-      int i, j, k, l;
+      int i, j, k, l, posX, posY;
       double res;
       for(i = 0; i < r.lin; i++){
          for(j = 0; j < r.col; j++){
             res = 0;
             for(k = 0; k < b.lin; k++){
                for(l = 0; l < b.col; l++){
-                  int posX = i - k;
-                  int posY = j - l;
+                  posX = i - k;
+                  posY = j - l;
   
                   if(posX >= 0 && posX < a.lin && posY >= 0 && posY < a.col){
                      res += a.dado(posX, posY) * b.dado(k, l);
