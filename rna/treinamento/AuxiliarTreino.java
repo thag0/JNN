@@ -43,9 +43,9 @@ public class AuxiliarTreino{
    }
 
    /**
-    * 
-    * @param entradas
-    * @param saidas
+    * Embaralha os dados da matriz usando o algoritmo Fisher-Yates.
+    * @param entradas matriz com os dados de entrada.
+    * @param saidas matriz com os dados de saída.
     */
    public void embaralharDados(Object[] entradas, Object[] saidas){
       int linhas = entradas.length;
@@ -103,17 +103,16 @@ public class AuxiliarTreino{
     * @param fim índice final do lote.
     * @return lote contendo os dados de acordo com os índices fornecidos.
     */
-   double[][] obterSubMatriz(double[][] dados, int inicio, int fim){
+   Object[] obterSubMatriz(Object[] dados, int inicio, int fim){
       if(inicio < 0 || fim > dados.length || inicio >= fim){
          throw new IllegalArgumentException("Índices de início ou fim inválidos.");
       }
 
       int linhas = fim - inicio;
-      int colunas = dados[0].length;
-      double[][] subMatriz = new double[linhas][colunas];
+      Object[] subMatriz = new double[linhas][];
 
       for(int i = 0; i < linhas; i++){
-         copiarArray(dados[inicio+1], subMatriz[i]);
+         subMatriz[i] = dados[i];
       }
 
       return subMatriz;

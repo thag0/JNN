@@ -1,11 +1,11 @@
 package rna.avaliacao.metrica;
 
-import rna.modelos.RedeNeural;
+import rna.modelos.Modelo;
 
 public class Acuracia extends Metrica{
 
    @Override
-   public double calcular(RedeNeural rede, double[][] entrada, double[][] saida){
+   public double calcular(Modelo rede, double[][] entrada, double[][] saida){
       int numAmostras = entrada.length;
       int acertos = 0;
       double[] dadosEntrada = new double[entrada[0].length];
@@ -17,7 +17,7 @@ public class Acuracia extends Metrica{
 
          rede.calcularSaida(dadosEntrada);
 
-         int indiceCalculado = super.indiceMaiorValor(rede.obterSaidas());
+         int indiceCalculado = super.indiceMaiorValor(rede.saidaParaArray());
          int indiceEsperado = super.indiceMaiorValor(dadosSaida);
 
          if(indiceCalculado == indiceEsperado){

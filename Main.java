@@ -19,7 +19,7 @@ public class Main{
    public static void main(String[] args){
       
       ged.limparConsole();
-      BufferedImage imagem = geim.lerImagem("/dados/mnist/treino/8/img_1.jpg");
+      BufferedImage imagem = geim.lerImagem("/dados/mnist/treino/7/img_1.jpg");
       double[][] dados = geim.imagemParaDadosTreinoEscalaCinza(imagem);
 
       int tamEntrada = 2;

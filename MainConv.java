@@ -30,7 +30,7 @@ public class MainConv{
 
       System.out.println("Treinando.");
       t1 = System.nanoTime();
-      cnn.treinar(entradas, saidas, 501, true);
+      cnn.treinar(entradas, saidas, 501);
       t2 = System.nanoTime();
 
       long tempoDecorrido = t2 - t1;
@@ -39,6 +39,7 @@ public class MainConv{
       minutos = (segundosTotais % 3600) / 60;
       segundos = segundosTotais % 60;
       System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
+      testes.TesteSequencial.exportarHistoricoPerda(cnn);
 
       //-------------------------------------
 
@@ -50,7 +51,7 @@ public class MainConv{
       double[][][] teste = new double[1][][];
       teste[0] = imagemParaMatriz("/dados/mnist/teste/6_teste.png");
       cnn.calcularSaida(teste);
-      double[] previsao = cnn.obterSaida();
+      double[] previsao = cnn.saidaParaArray();
       for(int i = 0; i < previsao.length; i++){
          System.out.println("Prob: " + i + ": " + (int)(previsao[i]*100) + "%");
       }
@@ -66,7 +67,8 @@ public class MainConv{
          new Densa(10, "softmax"),
       });
 
-      modelo.compilar(new SGD(0.0001, 0.9), new EntropiaCruzada(), new LeCun());
+      modelo.compilar(new SGD(0.001, 0.9), new EntropiaCruzada(), new Xavier());
+      modelo.configurarHistorico(true);
 
       return modelo;
    }
@@ -91,7 +93,7 @@ public class MainConv{
       e[0] = entrada;
 
       modelo.calcularSaida(e);
-      double[] prev = modelo.obterSaida();
+      double[] prev = modelo.saidaParaArray();
 
       for(int i = 0; i < prev.length; i++){
          if(prev[i] > 0.66){

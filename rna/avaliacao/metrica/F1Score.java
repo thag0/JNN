@@ -1,11 +1,11 @@
 package rna.avaliacao.metrica;
 
-import rna.modelos.RedeNeural;
+import rna.modelos.Modelo;
 
 public class F1Score extends Metrica{
    
    @Override
-   public double calcular(RedeNeural rede, double[][] entrada, double[][] saida){
+   public double calcular(Modelo rede, double[][] entrada, double[][] saida){
       int[][] matrizConfusao = super.matrizConfusao(rede, entrada, saida);
       double f1score = f1score(matrizConfusao);
       return f1score;

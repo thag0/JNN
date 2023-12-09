@@ -5,6 +5,7 @@ import java.util.Random;
 import rna.avaliacao.perda.Perda;
 import rna.core.OpMatriz;
 import rna.estrutura.Densa;
+import rna.modelos.Modelo;
 import rna.modelos.RedeNeural;
 import rna.otimizadores.Otimizador;
 
@@ -47,7 +48,7 @@ public class TreinoLote{
    /**
     * Treina a rede neural calculando os erros dos neuronios, seus gradientes para cada peso e 
     * passando essas informações para o otimizador configurado ajustar os pesos.
-    * @param rede instância da rede.
+    * @param modelo instância da rede.
     * @param perda função de perda (ou custo) usada para calcular os erros da rede.
     * @param otimizador otimizador configurado da rede.
     * @param entradas dados de entrada para o treino.
@@ -56,10 +57,17 @@ public class TreinoLote{
     * @param embaralhar embaralhar dados de treino para cada época.
     * @param tamLote tamanho do lote.
     */
-   public void treinar(RedeNeural rede, double[][] entradas, double[][] saidas, int epochs, int tamLote){      
-      Densa[] camadas = rede.obterCamadas();
-      Otimizador otimizador = rede.obterOtimizador();
-      Perda perda = rede.obterPerda();
+   public void treinar(Modelo modelo, Object[] entradas, Object[] saidas, int epochs, int tamLote){
+      //temp
+      if(modelo instanceof RedeNeural == false){
+         throw new IllegalArgumentException(
+            "O treino em lotes por enquanto só está disponível para o modelo RedeNeural"
+         );
+      }  
+
+      Densa[] camadas = (Densa[]) modelo.obterCamadas();
+      Otimizador otimizador = modelo.obterOtimizador();
+      Perda perda = modelo.obterPerda();
 
       double perdaEpoca;
       for(int i = 0; i < epochs; i++){
@@ -68,21 +76,20 @@ public class TreinoLote{
 
          for(int j = 0; j < entradas.length; j += tamLote){
             int fimIndice = Math.min(j + tamLote, entradas.length);
-            double[][] entradaLote = aux.obterSubMatriz(entradas, j, fimIndice);
-            double[][] saidaLote = aux.obterSubMatriz(saidas, j, fimIndice);
+            Object[] entradaLote = aux.obterSubMatriz(entradas, j, fimIndice);
+            Object[] saidaLote = aux.obterSubMatriz(saidas, j, fimIndice);
 
             //reiniciar gradiente do lote
             zerarGradientesAcumulados(camadas);
             for(int k = 0; k < entradaLote.length; k++){
-               double[] entrada = entradaLote[k];
-               double[] saida = saidaLote[k];
+               double[] saidaAmostra = (double[]) saidaLote[k];
 
-               rede.calcularSaida(entrada);
+               modelo.calcularSaida(entradaLote[k]);
                if(this.calcularHistorico){
-                  perdaEpoca += perda.calcular(rede.obterSaidas(), saidaLote[k]);
+                  perdaEpoca += perda.calcular(modelo.saidaParaArray(), saidaAmostra);
                }
 
-               backpropagationLote(camadas, perda, saida);
+               backpropagationLote(camadas, perda, saidaAmostra);
             }
 
             //normalizar gradientes para enviar pro otimizador

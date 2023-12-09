@@ -1,44 +1,59 @@
 package rna.modelos;
 
+import rna.avaliacao.Avaliador;
 import rna.avaliacao.perda.ErroMedioQuadrado;
 import rna.avaliacao.perda.Perda;
-import rna.core.Mat;
 import rna.estrutura.Camada;
 import rna.estrutura.Densa;
 import rna.inicializadores.Inicializador;
 import rna.otimizadores.Otimizador;
 import rna.otimizadores.SGD;
-import rna.treinamento.AuxiliarTreino;
+import rna.treinamento.Treinador;
 
 /**
  * Modelo sequencial de camadas.
  */
-public class Sequencial{
+public class Sequencial extends Modelo{
 
-   AuxiliarTreino auxTreino = new AuxiliarTreino();
+   Treinador treinador = new Treinador();
 
    /**
     * Lista de camadas do modelo.
     */
-   public Camada[] camadas;
+   private Camada[] camadas;
 
    /**
     * Função de perda do modelo.
     */
-   public Perda perda = new ErroMedioQuadrado();
+   private Perda perda = new ErroMedioQuadrado();
    
    /**
     * Otimizador do modelo.
     */
-   public Otimizador otimizador = new SGD();
+   private Otimizador otimizador = new SGD();
 
+   /**
+    * 
+    */
+   public Avaliador avaliador = new Avaliador(this);
+
+   /**
+    * Auxiliar na verificação de compilação do modelo.
+    */
    private boolean compilado = false;
+
+   /**
+    * Auxiliar na verificação para o salvamento do histórico
+    * de perda do modelo durante o treinamento.
+    */
+   private boolean calcularHistorico = false;
 
    /**
     * Inicializa um modelo sequencial vazio.
     */
    public Sequencial(){
       this.camadas = new Camada[0];
+      this.compilado = false;
    }
 
    /**
@@ -48,6 +63,7 @@ public class Sequencial{
     */
    public Sequencial(Camada[] camadas){
       this.camadas = camadas;
+      this.compilado = false;
    }
 
    /**
@@ -71,17 +87,36 @@ public class Sequencial{
          this.camadas[i] = c[i];
       }
       this.camadas[this.camadas.length-1] = camada;
+
+      this.compilado = false;
    }
 
    /**
     * Apaga a última camada contida no modelo.
+    * @throws IllegalArgumentException caso o modelo já não possua nenhuma 
+    * camada disponível.
     */
    public void sub(){
+      if(this.camadas.length == 0){
+         throw new IllegalArgumentException(
+            "Não há camadas no modelo."
+         );
+      }
+
       Camada[] c = this.camadas;
       this.camadas = new Camada[this.camadas.length-1];
       for(int i = 0; i < this.camadas.length; i++){
          this.camadas[i] = c[i];
       }
+   }
+
+   /**
+    * 
+    * @param calcular
+    */
+   public void configurarHistorico(boolean calcular){
+      this.calcularHistorico = calcular;
+      this.treinador.configurarHistoricoCusto(calcular);
    }
 
    /**
@@ -144,8 +179,9 @@ public class Sequencial{
    /**
     * Inicializa os parâmetros necessários para cada camada do modelo,
     * além de aleatorizar os kernels e bias.
-    * @param otimizador
-    * @param perda
+    * @param otimizador otimizador usado durante o treinamento do modelo para
+    * ajustar seus parâmetros.
+    * @param perda função de perda usada para o treinamento do modelo.
     * @param iniKernel inicializador para os kernels.
     * @param iniBias inicializador para os bias.
     */
@@ -189,6 +225,7 @@ public class Sequencial{
     * Propaga os dados de entrada pelo modelo.
     * @param entrada entrada.
     */
+   @Override
    public void calcularSaida(Object entrada){
       verificarCompilacao();
 
@@ -199,57 +236,61 @@ public class Sequencial{
    }
 
    /**
-    * 
-    * @param entradas
-    * @param saidas
-    * @param epochs
-    * @param logs
+    * Propaga os dados de entrada pelo modelo.
+    * @param entradas entrada.
     */
-   public void treinar(Object[] entradas, Object[] saidas, int epochs, boolean logs){
+   @Override
+   public Object[] calcularSaida(Object[] entradas){
       verificarCompilacao();
 
-      for(int e = 0; e < epochs; e++){
-         auxTreino.embaralharDados(entradas, saidas);
+      double[][] previsoes = new double[entradas.length][];
 
-         double perdaEpoca = 0;
-         for(int i = 0; i < entradas.length; i++){
-            this.calcularSaida(entradas[i]);
-            double[] previsao = this.obterSaida();
-
-            if(logs){
-               perdaEpoca += this.perda.calcular(previsao, (double[]) saidas[i]);
-            }
-
-            this.backpropagation(previsao, saidas[i]);
-            this.otimizador.atualizar(this.camadas);
-         }
-
-         perdaEpoca /= entradas.length;
-
-         if(logs & (e % 20 == 0)){
-            System.out.println("Perda (" + e + "): " + perdaEpoca);
-         }
+      for(int i = 0; i < previsoes.length; i++){
+         this.calcularSaida(entradas[i]);
+         previsoes[i] = this.saidaParaArray();
       }
+
+      return previsoes;
    }
 
    /**
-    * Realiza a retroprogação dos gradientes para as camadas do modelo.
-    * @param previsto saídas previstas pelo modelo.
-    * @param real rótulos reais.
+    * Treina o modelo de acordo com as configurações predefinidas.
+    * <p>
+    *    Certifique-se de configurar adequadamente o modelo para obter os 
+    *    melhores resultados.
+    * </p>
+    * @param entradas dados de entrada do treino (features). Dependendo da entrada
+    * do modelo, pode assumir diferentes formatos, para camadas convolucionais é
+    * {@code double[][][][]}, para camadas densas é {@code double[][]}.
+    * @param saidas dados de saída correspondente a entrada (class).
+    * @param epochs quantidade de épocas de treinamento.
+    * @param logs .
+    * @throws IllegalArgumentException se o modelo não foi compilado previamente.
+    * @throws IllegalArgumentException se houver alguma inconsistência dos dados de entrada e saída para a operação.
+    * @throws IllegalArgumentException se o valor de épocas for menor que um.
     */
-   private void backpropagation(Object previsto, Object real){
-      if(previsto instanceof double[] == false || real instanceof double[] == false){
-         throw new IllegalArgumentException(
-            "Os valores previstos e reais devem ser arrays do tipo double[]."
-         );
-      }
+   @Override
+   public void treinar(Object[] entradas, Object[] saidas, int epochs){
+      verificarCompilacao();
+      treinador.treino(this, entradas, saidas, epochs);
+   }
 
-      double[] grads = this.perda.derivada((double[]) previsto, (double[]) real);
-      this.obterCamadaSaida().calcularGradiente(new Mat(grads));
-      
-      for(int i = this.camadas.length-2; i >= 0; i--){
-         this.camadas[i].calcularGradiente(this.camadas[i+1].obterGradEntrada());
-      }
+   /**
+    * 
+    * @return
+    */
+   @Override
+   public Otimizador obterOtimizador(){
+      return this.otimizador;
+   }
+
+   /**
+    * 
+    * @return
+    */
+   @Override
+   public Perda obterPerda(){
+      return this.perda;
    }
 
    /**
@@ -259,6 +300,7 @@ public class Sequencial{
     * @throws IllegalArgumentException se o índice estiver fora do alcance do tamanho 
     * das camadas.
     */
+   @Override
    public Camada obterCamada(int id){
       verificarCompilacao();
    
@@ -276,21 +318,55 @@ public class Sequencial{
     * Retorna a {@code camada de saída} do modelo.
     * @return camada de saída.
     */
+   @Override
    public Camada obterCamadaSaida(){
       verificarCompilacao();
       return this.camadas[this.camadas.length-1];
+   }
+
+   @Override
+   public Camada[] obterCamadas(){
+      verificarCompilacao();
+      return this.camadas;
    }
 
    /**
     * Retorna um array contendo a saída do modelo.
     * @return saída do modelo.
     */
-   public double[] obterSaida(){
+   @Override
+   public double[] saidaParaArray(){
       verificarCompilacao();
-      double[] saida = (double[]) this.obterCamadaSaida().saidaParaArray();
-      return saida;
+      return this.obterCamadaSaida().saidaParaArray();
    }
 
+   /**
+    * Disponibiliza o histórico da função de perda do modelo durante cada época
+    * de treinamento.
+    * <p>
+    *    O histórico será o do ultimo processo de treinamento usado, seja ele sequencial ou em
+    *    lotes. Sendo assim, por exemplo, caso o treino seja em sua maioria feito pelo modo sequencial
+    *    mas logo depois é usado o treino em lotes, o histórico retornado será o do treinamento em lote.
+    * </p>
+    * @return lista contendo o histórico de perdas durante o treinamento da rede.
+    * @throws IllegalArgumentException se não foi habilitado previamente o cálculo do 
+    * histórico de custos.
+    */
+    public double[] obterHistorico(){
+      if(this.calcularHistorico){
+         return this.treinador.obterHistorico();
+      
+      }else{
+         throw new UnsupportedOperationException(
+            "O histórico de treino do modelo deve ser configurado previamente."
+         );
+      }
+   }
+
+   /**
+    * 
+    * @return
+    */
    public String info(){
       verificarCompilacao();
 

@@ -2,10 +2,10 @@ package rna.avaliacao;
 
 import rna.avaliacao.metrica.*;
 import rna.avaliacao.perda.*;
-import rna.modelos.RedeNeural;
+import rna.modelos.Modelo;
 
 public class Avaliador{
-   private RedeNeural rede;
+   private Modelo modelo;
 
    EntropiaCruzada ecc = new EntropiaCruzada();
    EntropiaCruzadaBinaria ecb = new EntropiaCruzadaBinaria();
@@ -18,14 +18,14 @@ public class Avaliador{
 
    /**
     * Instancia um novo avaliador destinado a uma Rede Neural.
-    * @param rede rede neural para o avaliador.
+    * @param modelo rede neural para o avaliador.
     * @throws IllegalArgumentException se a rede fornecida for nula.
     */
-   public Avaliador(RedeNeural rede){
-      if(rede == null){
+   public Avaliador(Modelo modelo){
+      if(modelo == null){
          throw new IllegalArgumentException("A rede fornecida não pode ser nula.");
       }
-      this.rede = rede;
+      this.modelo = modelo;
    }
 
    /**
@@ -46,7 +46,7 @@ public class Avaliador{
     * @return valor do erro médio quadrado da rede em relação ao dados fornecidos (custo/perda).
     */
    public double erroMedioQuadrado(double[][] entrada, double[][] saida){
-      double[][] previsoes = rede.calcularSaida(entrada);
+      double[][] previsoes = (double[][]) modelo.calcularSaida(entrada);
       double mse = 0;
 
       for(int i = 0; i < saida.length; i++){
@@ -79,7 +79,7 @@ public class Avaliador{
     * fornecidos (custo/perda).
     */
    public double erroMedioQuadradoLogaritmico(double[][] entrada, double[][] saida){
-      double[][] previsoes = rede.calcularSaida(entrada);
+      double[][] previsoes = (double[][]) modelo.calcularSaida(entrada);
       double msle = 0;
 
       for(int i = 0; i < saida.length; i++){
@@ -108,7 +108,7 @@ public class Avaliador{
     * @return valor do erro médio abosoluto da rede em relação ao dados fornecidos (custo/perda).
     */
    public double erroMedioAbsoluto(double[][] entrada, double[][] saida){
-      double[][] previsoes = rede.calcularSaida(entrada);
+      double[][] previsoes = (double[][]) modelo.calcularSaida(entrada);
       double mae = 0;
 
       for(int i = 0; i < saida.length; i++){
@@ -127,7 +127,7 @@ public class Avaliador{
     * @return A acurácia da rede neural em forma de probabilidade.
     */
    public double acuracia(double[][] entrada, double[][] saida){
-      return acuracia.calcular(this.rede, entrada, saida);
+      return acuracia.calcular(this.modelo, entrada, saida);
    }
 
    /**
@@ -149,7 +149,7 @@ public class Avaliador{
     * @return entropia cruzada da rede em relação ao dados fornecidos (custo/perda).
     */
    public double entropiaCruzada(double[][] entrada, double[][] saida){  
-      double[][] previsoes = rede.calcularSaida(entrada);
+      double[][] previsoes = (double[][]) modelo.calcularSaida(entrada);
       double ec = 0;
 
       for(int i = 0; i < saida.length; i++){
@@ -180,7 +180,7 @@ public class Avaliador{
     * @return valor da entropia cruzada binária.
     */
    public double entropiaCruzadaBinaria(double[][] entrada, double[][] saida){
-      double[][] previsoes = rede.calcularSaida(entrada);
+      double[][] previsoes = (double[][]) modelo.calcularSaida(entrada);
       double res = 0;
 
       for(int i = 0; i < saida.length; i++){
@@ -205,7 +205,7 @@ public class Avaliador{
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
    public int[][] matrizConfusao(double[][] entradas, double[][] saidas){
-      return matrizConfusao.calcularMatriz(this.rede, entradas, saidas);
+      return matrizConfusao.calcularMatriz(this.modelo, entradas, saidas);
    }
 
    /**
@@ -221,6 +221,6 @@ public class Avaliador{
     * @return f1-score ponderado para o modelo em relação aos dados de entrada e saída.
     */
    public double f1Score(double[][] entradas, double[][] saidas){
-      return f1Score.calcular(this.rede, entradas, saidas);
+      return f1Score.calcular(this.modelo, entradas, saidas);
    }
 }

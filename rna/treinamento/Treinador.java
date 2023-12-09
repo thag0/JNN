@@ -1,6 +1,6 @@
 package rna.treinamento;
 
-import rna.modelos.RedeNeural;
+import rna.modelos.Modelo;
 
 /**
  * Disponibilzia uma interface para usar os métodos de treino e treino em
@@ -49,16 +49,16 @@ public class Treinador{
    /**
     * Treina a rede neural calculando os erros dos neuronios, seus gradientes para cada peso e 
     * passando essas informações para o otimizador configurado ajustar os pesos.
-    * @param rede rede neural que será treinada.
+    * @param modelo rede neural que será treinada.
     * @param entradas dados de entrada para o treino.
     * @param saidas dados de saída correspondente as entradas para o treino.
     * @param epochs quantidade de épocas de treinamento.
     */
-   public void treino(RedeNeural rede, double[][] entradas, double[][] saidas, int epochs){
+   public void treino(Modelo modelo, Object[] entradas, Object[] saidas, int epochs){
       treino.treinar(
-         rede,
-         clonarElementos(entradas), 
-         clonarElementos(saidas), 
+         modelo,
+         entradas, 
+         saidas, 
          epochs
       );
 
@@ -75,33 +75,17 @@ public class Treinador{
     * @param epochs quantidade de épocas de treinamento.
     * @param tamLote tamanho do lote.
     */
-   public void treino(RedeNeural rede, double[][] entradas, double[][] saidas, int epochs, int tamLote){
+   public void treino(Modelo rede, Object[] entradas, Object[] saidas, int epochs, int tamLote){
       treinoLote.treinar(
          rede,
-         clonarElementos(entradas), 
-         clonarElementos(saidas), 
+         entradas, 
+         saidas, 
          epochs, 
          tamLote
       );
 
       treinoLote.ultimoUsado = true;
       treino.ultimoUsado = false;
-   }
-
-   /**
-    * Copia elemento a elemento dos dados para evitar clones com mesmas referências
-    * e embaralhar os dados de treino usados.
-    * @param dados conjunto de dados base.
-    * @return novo conjunto de dados com os mesmo valores contidos no original.
-    */
-   private double[][] clonarElementos(double[][] dados){
-      double[][] clone = new double[dados.length][dados[0].length];
-
-      for(int i = 0; i < dados.length; i++){
-         aux.copiarArray(dados[i], clone[i]);         
-      }
-
-      return clone;
    }
 
    /**

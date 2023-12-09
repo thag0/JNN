@@ -4,7 +4,10 @@ import java.text.DecimalFormat;
 
 import rna.inicializadores.*;
 import rna.modelos.RedeNeural;
+import rna.modelos.Sequencial;
 import rna.avaliacao.perda.*;
+import rna.estrutura.Camada;
+import rna.estrutura.Densa;
 import rna.otimizadores.*;
 import ged.Dados;
 import ged.Ged;
@@ -41,27 +44,27 @@ public class Classificador{
       double[][] testeY = (double[][]) ged.separarDadosSaida(teste, qSaidas);
 
       //criando e configurando a rede neural
-      int[] arq = {qEntradas, 9, 9, qSaidas};
-      RedeNeural rede = new RedeNeural(arq);
+      Sequencial modelo = new Sequencial(new Camada[]{
+         new Densa(qEntradas, 9, "tanh"),
+         new Densa(9, "tanh"),
+         new Densa(qSaidas, "softmax")
+      });
 
       // Perda perda = new EntropiaCruzada();
       Perda perda = new EntropiaCruzada();
       Otimizador otimizador = new SGD(0.0001, 0.995);
       Inicializador inicializador = new Xavier();
-
-      // rede.configurarHistoricoPerda(true);
-      rede.compilar(perda, otimizador, inicializador);
-      rede.configurarAtivacao("tanh");
-      rede.configurarAtivacao(rede.obterCamadaSaida(), "softmax");
+      modelo.compilar(otimizador, perda, inicializador);
+      System.out.println(modelo.info());
       
       //treinando e avaliando os resultados
-      rede.treinar(treinoX, treinoY, 1_000);
-      double acurariaRede = rede.avaliador.acuracia(testeX, testeY);
-      double perdaRede = rede.avaliador.entropiaCruzada(testeX, testeY);
+      modelo.treinar(treinoX, treinoY, 2_000);
+      double acurariaRede = modelo.avaliador.acuracia(testeX, testeY);
+      double perdaRede = modelo.avaliador.entropiaCruzada(testeX, testeY);
       System.out.println("Acurácia = " + formatarDecimal(acurariaRede*100, 4) + "%");
       System.out.println("Perda = " + perdaRede);
 
-      int[][] matrizConfusao = rede.avaliador.matrizConfusao(testeX, testeY);
+      int[][] matrizConfusao = modelo.avaliador.matrizConfusao(testeX, testeY);
       Dados d = new Dados(matrizConfusao);
       d.editarNome("Matriz de confusão");
       d.imprimir();
@@ -86,7 +89,7 @@ public class Classificador{
          }
 
          rede.calcularSaida(entrada_rede);
-         saida_rede = rede.obterSaidas();
+         saida_rede = rede.saidaParaArray();
 
          //apenas formatação
          if(i < 10) System.out.print("Dado 00" + i + " |");

@@ -31,7 +31,7 @@ public class SalvandoRede{
          for(int j = 0; j < 2; j++){
             double[] e = {i, j};
             rede.calcularSaida(e);
-            System.out.println(i + " - " + j + " = " + rede.obterSaidas()[0]);
+            System.out.println(i + " - " + j + " = " + rede.saidaParaArray()[0]);
          }
       }
    }

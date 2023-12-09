@@ -4,8 +4,9 @@ import java.util.Random;
 
 import rna.avaliacao.perda.Perda;
 import rna.core.OpMatriz;
+import rna.estrutura.Camada;
 import rna.estrutura.Densa;
-import rna.modelos.RedeNeural;
+import rna.modelos.Modelo;
 import rna.otimizadores.Otimizador;
 
 public class Treino{
@@ -47,18 +48,15 @@ public class Treino{
    /**
     * Treina a rede neural calculando os erros dos neuronios, seus gradientes para cada peso e 
     * passando essas informações para o otimizador configurado ajustar os pesos.
-    * @param rede instância da rede.
+    * @param modelo instância da rede.
     * @param entrada dados de entrada para o treino.
     * @param saida dados de saída correspondente as entradas para o treino.
     * @param epochs quantidade de épocas de treinamento.
     */
-   public void treinar(RedeNeural rede, double[][] entrada, double[][] saida, int epochs){
-      double[] amostraEntrada = new double[entrada[0].length];
-      double[] amostraSaida = new double[saida[0].length];
-
-      Densa[] camadas = rede.obterCamadas();
-      Otimizador otimizador = rede.obterOtimizador();
-      Perda perda = rede.obterPerda();
+   public void treinar(Modelo modelo, Object[] entrada, Object[] saida, int epochs){
+      Camada[] camadas = modelo.obterCamadas();
+      Otimizador otimizador = modelo.obterOtimizador();
+      Perda perda = modelo.obterPerda();
       
       double perdaEpoca;
       for(int e = 0; e < epochs; e++){
@@ -66,13 +64,12 @@ public class Treino{
          perdaEpoca = 0;
          
          for(int i = 0; i < entrada.length; i++){
-            aux.copiarArray(entrada[i], amostraEntrada);
-            aux.copiarArray(saida[i], amostraSaida);
-            rede.calcularSaida(amostraEntrada);
+            double[] amostraSaida = (double[]) saida[i];
+            modelo.calcularSaida(entrada[i]);
 
             //feedback de avanço da rede
             if(this.calcularHistorico){
-               perdaEpoca += perda.calcular(rede.obterSaidas(), saida[i]);
+               perdaEpoca += perda.calcular(modelo.saidaParaArray(), amostraSaida);
             }
 
             backpropagation(camadas, perda, amostraSaida);  
@@ -96,7 +93,7 @@ public class Treino{
     * @param perda função de perda configurada para a Rede Neural.
     * @param real saída real que será usada para calcular os erros e gradientes.
     */
-   public void backpropagation(Densa[] redec, Perda perda, double[] real){
+   public void backpropagation(Camada[] redec, Perda perda, double[] real){
       aux.backpropagation(redec, perda, real);
    }
 

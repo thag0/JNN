@@ -41,7 +41,7 @@ import rna.treinamento.Treinador;
  * @author Thiago Barroso, acadêmico de Engenharia da Computação pela Universidade Federal do Pará, 
  * Campus Tucuruí. Maio/2023.
  */
-public class RedeNeural implements Cloneable{
+public class RedeNeural extends Modelo implements Cloneable{
    
    /**
     * Região crítica
@@ -716,6 +716,7 @@ public class RedeNeural implements Cloneable{
     * @param iniPesos inicializador de bias das camadas da Rede Neural.
     * @throws IllegalArgumentException se a perda, otimizador ou inicializador forem nulos.
     */
+   @Override
    public void compilar(Perda perda, Otimizador otimizador, Inicializador iniPesos, Inicializador iniBias){
       if(iniPesos == null){
          throw new IllegalArgumentException("O inicializador não pode ser nulo.");
@@ -766,53 +767,6 @@ public class RedeNeural implements Cloneable{
    }
 
    /**
-    * Verifica se os dados são apropriados para serem usados dentro da rede neural, incluindo:
-    * <ul>
-    *    <li>
-    *       Mesma quantidade de amostras nos dados de entrada e saída.
-    *    </li>
-    *    <li>
-    *       Dados de entrada possuem a mesma quantidade de exemplos que a capacidade da camada 
-    *       de entrada da rede.
-    *    </li>
-    *    <li>
-    *       Dados de saída possuem a mesma quantidade de exemplos que a quantidade de 
-    *       neurônios da camada de saída da rede.
-    *    </li>
-    * </ul>
-    * Caso os dados fornecidos atendam a essas condições, o fluxo de execução segue normalmente.
-    * @param entrada conjunto de dados de entrada.
-    * @param saida conjunto de dados de saída.
-    */
-   private void consistenciaDados(double[][] entrada, double[][] saida){
-      if(entrada.length != saida.length){
-         throw new IllegalArgumentException(
-            "Quantidade de amostras de dados de entrada (" + entrada.length +
-            ") e saída (" + saida.length + 
-            ") devem ser iguais."
-         );
-      }
-
-      int tamEntrada = this.obterTamanhoEntrada();
-      if(tamEntrada != entrada[0].length){
-         throw new IllegalArgumentException(
-         "Dimensões dos dados de entrada (" + entrada[0].length +
-         ") e capacidade de entrada da rede (" + tamEntrada + 
-         ") incompatíveis."
-         );
-      }
-
-      int tamSaida = this.obterTamanhoSaida();
-      if(tamSaida != saida[0].length){
-         throw new IllegalArgumentException(
-            "Dados de saída (" + saida[0].length +
-            ") e neurônios de saída da rede (" + tamSaida + 
-            ") incompatíveis."
-         );
-      }
-   }
-
-   /**
     * Alimenta os dados pela rede neural usando o método de feedforward através do conjunto
     * de dados fornecido. 
     * <p>
@@ -825,18 +779,24 @@ public class RedeNeural implements Cloneable{
     * @throws IllegalArgumentException se o tamanho dos dados de entrada for diferente da capacidade
     * de entrada da rede.
     */
-   public void calcularSaida(double[] entrada){
+   @Override
+   public void calcularSaida(Object entrada){
       this.verificarCompilacao();
-
-      if(entrada.length != this.obterTamanhoEntrada()){
+      if(entrada instanceof double[] == false){
          throw new IllegalArgumentException(
-            "Dimensões dos dados de entrada (" + entrada.length + 
+            "A entrada para o modelo RedeNeural deve ser um array do tipo double[]."
+         );
+      }
+      double[] e = (double[]) entrada;
+      if(e.length != this.obterTamanhoEntrada()){
+         throw new IllegalArgumentException(
+            "Dimensões dos dados de entrada (" + e.length + 
             ") com a camada de entrada (" + this.obterTamanhoEntrada() + 
             ") incompatíveis."
          );
       }
 
-      this.camadas[0].calcularSaida(entrada);
+      this.camadas[0].calcularSaida(e);
       for(int i = 1; i < this.camadas.length; i++){
          this.camadas[i].calcularSaida(this.camadas[i-1].saidaParaArray());
       }
@@ -857,12 +817,19 @@ public class RedeNeural implements Cloneable{
     * de entrada da rede.
     * @return matriz contendo os resultados das predições da rede.
     */
-   public double[][] calcularSaida(double[][] entradas){
+   @Override
+   public double[][] calcularSaida(Object[] entradas){
       this.verificarCompilacao();
-
-      int cols = entradas[0].length;
+      if(entradas instanceof double[][] == false){
+         throw new IllegalArgumentException(
+            "As entradas para o modelo RedeNeural devem ser uma matriz do tipo double[][]."
+         );
+      }        
+      
+      double[][] e = (double[][]) entradas;
+      int cols = e[0].length;
       for(int i = 1; i < entradas.length; i++){
-         if(entradas[i].length != cols){
+         if(e[i].length != cols){
             throw new IllegalArgumentException(
                "As dimensões dos dados de entrada possuem tamanhos diferentes."
             );
@@ -870,7 +837,7 @@ public class RedeNeural implements Cloneable{
       }
 
       int nEntrada = this.obterTamanhoEntrada();
-      if(entradas[0].length != nEntrada){
+      if(e[0].length != nEntrada){
          throw new IllegalArgumentException(
             "Dimensões dos dados de entrada (" + entradas.length +
             ") e capacidade de entrada da rede (" + nEntrada + 
@@ -887,9 +854,9 @@ public class RedeNeural implements Cloneable{
       double[] saidaRede = new double[tamSaida];
 
       for(int i = 0; i < nAmostras; i++){
-         System.arraycopy(entradas[i], 0, entradaRede, 0, entradas[i].length);
+         System.arraycopy(entradas[i], 0, entradaRede, 0, e[i].length);
          this.calcularSaida(entradaRede);
-         System.arraycopy(this.obterSaidas(), 0, saidaRede, 0, saidaRede.length);
+         System.arraycopy(this.saidaParaArray(), 0, saidaRede, 0, saidaRede.length);
          System.arraycopy(saidaRede, 0, previsoes[i], 0, saidaRede.length);
       }
 
@@ -909,9 +876,9 @@ public class RedeNeural implements Cloneable{
     * @throws IllegalArgumentException se houver alguma inconsistência dos dados de entrada e saída para a operação.
     * @throws IllegalArgumentException se o valor de épocas for menor que um.
     */
-   public void treinar(double[][] entradas, double[][] saidas, int epochs){
+   @Override
+   public void treinar(Object[] entradas, Object[] saidas, int epochs){
       this.verificarCompilacao();
-      consistenciaDados(entradas, saidas);
 
       if(epochs < 1){
          throw new IllegalArgumentException(
@@ -948,9 +915,9 @@ public class RedeNeural implements Cloneable{
     * @throws IllegalArgumentException se houver alguma inconsistência dos dados de entrada e saída para a operação.
     * @throws IllegalArgumentException se o valor de épocas for menor que um.
     */
-    public void treinar(double[][] entradas, double[][] saidas, int epochs, int tamLote){
+    @Override
+    public void treinar(Object[] entradas, Object[] saidas, int epochs, int tamLote){
       this.verificarCompilacao();
-      consistenciaDados(entradas, saidas);
 
       if(epochs < 1){
          throw new IllegalArgumentException(
@@ -1047,7 +1014,8 @@ public class RedeNeural implements Cloneable{
     * Retorna a função de perda configurada da Rede Neural.
     * @return função de perda atual da rede.
     */
-    public Perda obterPerda(){
+   @Override
+   public Perda obterPerda(){
       return this.perda;
    }
 
@@ -1055,6 +1023,7 @@ public class RedeNeural implements Cloneable{
     * Retorna o otimizador que está sendo usado para o treino da Rede Neural.
     * @return otimizador atual da rede.
     */
+   @Override
    public Otimizador obterOtimizador(){
       return this.otimizador;
    }
@@ -1067,6 +1036,7 @@ public class RedeNeural implements Cloneable{
     * @throws IllegalArgumentException se o índice estiver fora do alcance do tamanho 
     * das camadas ocultas.
     */
+   @Override
    public Densa obterCamada(int id){
       this.verificarCompilacao();
 
@@ -1085,6 +1055,7 @@ public class RedeNeural implements Cloneable{
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     * @return conjunto de camadas da rede.
     */
+   @Override
    public Densa[] obterCamadas(){
       this.verificarCompilacao();
       return this.camadas;
@@ -1095,6 +1066,7 @@ public class RedeNeural implements Cloneable{
     * @return camada de saída, ou ultima camada densa.
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
+   @Override
    public Densa obterCamadaSaida(){
       this.verificarCompilacao();
       return this.camadas[this.camadas.length-1];
@@ -1108,7 +1080,8 @@ public class RedeNeural implements Cloneable{
     * @return array com os dados das saídas da rede.
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
-   public double[] obterSaidas(){
+   @Override
+   public double[] saidaParaArray(){
       this.verificarCompilacao();
       return this.obterCamadaSaida().saidaParaArray();
    }
@@ -1139,6 +1112,7 @@ public class RedeNeural implements Cloneable{
     * Informa o nome configurado da Rede Neural.
     * @return nome específico da rede.
     */
+   @Override
    public String obterNome(){
       return this.nome;
    }
@@ -1151,6 +1125,7 @@ public class RedeNeural implements Cloneable{
     * </p>
     * @return quantiade de parâmetros total da rede.
     */
+   @Override
    public int obterQuantidadeParametros(){
       int parametros = 0;
       for(Camada camada : this.camadas){
@@ -1168,6 +1143,7 @@ public class RedeNeural implements Cloneable{
     * @return quantidade de camadas da Rede Neural.
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
+   @Override
    public int obterQuantidadeCamadas(){
       this.verificarCompilacao();
       return this.camadas.length;
@@ -1215,6 +1191,7 @@ public class RedeNeural implements Cloneable{
     * @throws IllegalArgumentException se não foi habilitado previamente o cálculo do 
     * histórico de custos.
     */
+   @Override
    public double[] obterHistorico(){
       if(this.treinador.calcularHistorico){
          return this.treinador.obterHistorico();   
@@ -1245,6 +1222,7 @@ public class RedeNeural implements Cloneable{
     * @return buffer formatado contendo as informações.
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
+   @Override
    public String info(){
       this.verificarCompilacao();
 
