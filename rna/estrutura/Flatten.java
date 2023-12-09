@@ -27,12 +27,19 @@ public class Flatten extends Camada{
    public Mat[] entrada;
    public double[] saida;
 
+   /**
+    * Inicializa uma camada Flatten, que irá achatar a entrada recebida
+    * no formato de um array unidimensional.
+    * <p>
+    *    É necessário construir a camada para que ela possa ser usada.
+    * </p>
+    */
    public Flatten(){
 
    }
 
    /**
-    * Inicializa uma camada Flatten, que irá achatar a entrada recebida
+    * Instancia uma camada Flatten, que irá achatar a entrada recebida
     * no formato de um array unidimensional.
     * <p>
     *    O formato de entrada da camada deve seguir o formato:
@@ -174,6 +181,7 @@ public class Flatten extends Camada{
    public int tamanhoSaida(){
       return this.saida.length;
    }
+
    /**
     * Calcula o formato de saída da camada Flatten, que é disposto da
     * seguinte forma:
