@@ -247,7 +247,7 @@ public class Sequencial extends Modelo{
 
       for(int i = 0; i < previsoes.length; i++){
          this.calcularSaida(entradas[i]);
-         previsoes[i] = this.saidaParaArray();
+         previsoes[i] = this.saidaParaArray().clone();
       }
 
       return previsoes;
@@ -276,21 +276,21 @@ public class Sequencial extends Modelo{
    }
 
    /**
-    * 
-    * @return
-    */
-   @Override
-   public Otimizador obterOtimizador(){
-      return this.otimizador;
-   }
-
-   /**
-    * 
-    * @return
+    * Retorna a função de perda configurada do modelo.
+    * @return função de perda atual do modelo.
     */
    @Override
    public Perda obterPerda(){
       return this.perda;
+   }
+ 
+    /**
+     * Retorna o otimizador que está sendo usado para o treino do modelo.
+     * @return otimizador atual do modelo.
+     */
+   @Override
+   public Otimizador obterOtimizador(){
+      return this.otimizador;
    }
 
    /**
@@ -315,19 +315,24 @@ public class Sequencial extends Modelo{
    }
 
    /**
+    * Retorna todo o conjunto de camadas presente no modelo.
+    * @throws IllegalArgumentException se o modelo não foi compilado previamente.
+    * @return conjunto de camadas do modelo.
+    */
+   @Override
+   public Camada[] obterCamadas(){
+      verificarCompilacao();
+      return this.camadas;
+   }
+
+   /**
     * Retorna a {@code camada de saída} do modelo.
     * @return camada de saída.
     */
    @Override
    public Camada obterCamadaSaida(){
-      verificarCompilacao();
+      this.verificarCompilacao();
       return this.camadas[this.camadas.length-1];
-   }
-
-   @Override
-   public Camada[] obterCamadas(){
-      verificarCompilacao();
-      return this.camadas;
    }
 
    /**
@@ -338,6 +343,42 @@ public class Sequencial extends Modelo{
    public double[] saidaParaArray(){
       verificarCompilacao();
       return this.obterCamadaSaida().saidaParaArray();
+   }
+
+   /**
+    * Informa o nome configurado da Rede Neural.
+    * @return nome específico da rede.
+    */
+   @Override
+   public String obterNome(){
+      return this.nome;
+   }
+
+   /**
+    * Retorna a quantidade total de parâmetros do modelo.
+    * <p>
+    *    isso inclui todos os kernels e bias (caso configurados).
+    * </p>
+    * @return quantiade de parâmetros total do modelo.
+    */
+   @Override
+   public int obterQuantidadeParametros(){
+      int parametros = 0;
+      for(Camada camada : this.camadas){
+         parametros += camada.numParametros();
+      }
+      return parametros;
+   }
+
+   /**
+    * Retorna a quantidade de camadas presente no modelo.
+    * @return quantidade de camadas do modelo.
+    * @throws IllegalArgumentException se o modelo não foi compilado previamente.
+    */
+   @Override
+   public int obterQuantidadeCamadas(){
+      this.verificarCompilacao();
+      return this.camadas.length;
    }
 
    /**

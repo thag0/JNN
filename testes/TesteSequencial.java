@@ -9,7 +9,6 @@ import rna.estrutura.Densa;
 import rna.inicializadores.Xavier;
 import rna.modelos.*;
 import rna.otimizadores.*;
-import rna.treinamento.AuxiliarTreino;
 
 public class TesteSequencial{
    static Ged ged = new Ged();
@@ -32,22 +31,32 @@ public class TesteSequencial{
          {0}
       };
 
-      Sequencial modelo = new Sequencial(new Camada[]{
+      Sequencial seq = new Sequencial(new Camada[]{
          new Densa(2, 3, "tanh"),
          new Densa(1, "sigmoid")
       });
-      modelo.compilar(new SGD(), new ErroMedioQuadrado(), new Xavier());
-
-      System.out.println(modelo.info());
-
-      modelo.treinar(e, s, 1000);
-
+      seq.compilar(new SGD(), new ErroMedioQuadrado(), new Xavier());
+      seq.treinar(e, s, 10_000);
+      System.out.println("Perda Seq: " + seq.avaliador.erroMedioQuadrado(e, s));
+      
+      RedeNeural rna = new RedeNeural(new int[]{2, 3, 1});
+      rna.compilar(new ErroMedioQuadrado(), new SGD(), new Xavier());
+      rna.configurarAtivacao("tanh");
+      rna.configurarAtivacao(rna.obterCamadaSaida(), "sigmoid");
+      rna.treinar(e, s, 10_000);
+      System.out.println("Perda Rna: " + rna.avaliador.erroMedioQuadrado(e, s));
+      
+      System.out.println();
       for(int i = 0; i < 2; i++){
          for(int j = 0; j < 2; j++){
             double[] amostra = {i, j};
-            modelo.calcularSaida(amostra);
-            double[] previsao = modelo.saidaParaArray();
-            System.out.println(i + " " + j + " = " + previsao[0]);
+
+            seq.calcularSaida(amostra);
+            rna.calcularSaida(amostra);
+
+            double[] prevSeq = seq.saidaParaArray();
+            double[] prevRna = rna.saidaParaArray();
+            System.out.println(i + " " + j + " - Rna: " + prevRna[0] + "\t  Seq: " + prevSeq[0]);
          }
       }
    }
