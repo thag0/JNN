@@ -2,14 +2,12 @@ package testes;
 
 import ged.Ged;
 import rna.avaliacao.perda.ErroMedioQuadrado;
-import rna.core.Mat;
 import rna.core.OpMatriz;
 import rna.estrutura.Camada;
 import rna.estrutura.Densa;
 import rna.inicializadores.Xavier;
 import rna.modelos.Sequencial;
 import rna.otimizadores.SGD;
-import rna.treinamento.AuxiliarTreino;
 
 class TesteSequencial{
    static Ged ged = new Ged();
@@ -33,10 +31,10 @@ class TesteSequencial{
       };
 
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Densa(2, 3, "sigmoid"),
+         new Densa(2, 3, "tanh"),
          new Densa(1, "sigmoid")
       });
-      modelo.compilar(new SGD(0.1), new ErroMedioQuadrado(), new Xavier());
+      modelo.compilar(new SGD(0.0001, 0.999), new ErroMedioQuadrado(), new Xavier());
 
       System.out.println(modelo.info());
 

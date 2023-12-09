@@ -30,7 +30,7 @@ public class MainConv{
 
       System.out.println("Treinando.");
       t1 = System.nanoTime();
-      cnn.treinar(entradas, saidas, 101, true);
+      cnn.treinar(entradas, saidas, 501, true);
       t2 = System.nanoTime();
 
       long tempoDecorrido = t2 - t1;
@@ -67,7 +67,7 @@ public class MainConv{
          new Densa(10, "softmax"),
       });
 
-      modelo.compilar(new SGD(0.1), new EntropiaCruzada(), new Xavier());
+      modelo.compilar(new SGD(0.001, 0.99), new EntropiaCruzada(), new Xavier());
 
       return modelo;
    }
