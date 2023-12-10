@@ -12,6 +12,8 @@ import rna.otimizadores.Otimizador;
 import rna.otimizadores.SGD;
 import rna.treinamento.Treinador;
 
+//TODO verificar problemas de convergência nos algoritmos de treino
+
 /**
  * Modelo sequencial de camadas.
  */

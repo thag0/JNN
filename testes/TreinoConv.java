@@ -4,7 +4,6 @@ import ged.Ged;
 import rna.core.Mat;
 import rna.core.OpMatriz;
 import rna.estrutura.*;
-import rna.otimizadores.*;
 
 public class TreinoConv{
    static Ged ged = new Ged();

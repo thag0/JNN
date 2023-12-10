@@ -729,7 +729,6 @@ public class Convolucional extends Camada implements Cloneable{
       
       for(int i = 0; i < this.numFiltros; i++){
          for(int j = 0; j < this.profEntrada; j++){
-            this.filtros[i][j].print("filtro " + i + " " + j);
             opmat.correlacaoCruzada(this.entrada[j], this.filtros[i][j], this.somatorio[i], true);
          }
       }
