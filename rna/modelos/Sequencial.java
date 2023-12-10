@@ -4,7 +4,9 @@ import rna.avaliacao.Avaliador;
 import rna.avaliacao.perda.ErroMedioQuadrado;
 import rna.avaliacao.perda.Perda;
 import rna.estrutura.Camada;
+import rna.estrutura.Convolucional;
 import rna.estrutura.Densa;
+import rna.estrutura.Flatten;
 import rna.inicializadores.Inicializador;
 import rna.otimizadores.Otimizador;
 import rna.otimizadores.SGD;
@@ -420,12 +422,23 @@ public class Sequencial extends Modelo{
          int[] entrada = camada.formatoEntrada();
          int[] saida = camada.formatoSaida();
 
+         buffer += espacamento + camada.id + ": " + camada.getClass().getSimpleName() + ": ";
          if(camada instanceof Densa){
-            buffer += espacamento + " " + camada.getClass().getSimpleName() + ": ";
-            buffer += "Entrada = (" + entrada[0] + ", " + entrada[1] + ")";
-            buffer += " Saída = (" + saida[0] + ", " + saida[1] + ") ";
-            buffer += "Ativação = " + camada.obterAtivacao().getClass().getSimpleName() + "\n";
+            buffer += "Entrada = (" + entrada[0] + ", " + entrada[1] + ") ";
+            buffer += "Saída = (" + saida[0] + ", " + saida[1] + ") ";
+            buffer += "Ativação = " + camada.obterAtivacao().getClass().getSimpleName();
+            
+         }else if(camada instanceof Convolucional){
+            buffer += "Entrada = (" + entrada[0] + ", " + entrada[1] + ", " + entrada[2] +  ") ";
+            buffer += "Saída = (" + saida[0] + ", " + saida[1] + ", " + saida[2] + ") ";
+            buffer += "Ativação = " + camada.obterAtivacao().getClass().getSimpleName();
+            
+         }if(camada instanceof Flatten){
+            buffer += "Entrada = (" + entrada[0] + ", " + entrada[1] + ") ";
+            buffer += "Saída = (" + saida[0] + ", " + saida[1] + ") ";
+
          }
+         buffer += " Treinavel:" + camada.treinavel + "\n";
       }
       
       buffer += "]\n";

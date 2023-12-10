@@ -76,6 +76,9 @@ public class Treino{
             otimizador.atualizar(camadas);
          }
 
+         // if(e % 20 == 0){
+         //    System.out.println("Perda (" + e + "): " + (double)(perdaEpoca/entrada.length));
+         // }
          //feedback de avanço da rede
          if(this.calcularHistorico){
             this.historico = aux.adicionarPerda(this.historico, perdaEpoca/entrada.length);

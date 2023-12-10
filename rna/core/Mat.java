@@ -317,6 +317,21 @@ public class Mat implements Cloneable{
    }
 
    /**
+    * Adiciona todo o conteúdo da matriz m localmente.
+    * @param m matriz com os dados.
+    */
+   public void add(Mat m){
+      if(this.tamanho() != m.tamanho()){
+         throw new IllegalArgumentException(
+            "A matriz fornecida deve conter o mesmo número de elementos."
+         );
+      }
+      for(int i = 0; i < this.dados.length; i++){
+         this.dados[i] += m.dados[i];
+      }
+   }
+
+   /**
     * Subtrai o valor fornecido ao que estiver contido no
     * conteúdo da matriz, de acordo com os índices dados.
     * <p>

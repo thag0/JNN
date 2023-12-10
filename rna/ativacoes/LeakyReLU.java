@@ -94,9 +94,9 @@ public class LeakyReLU extends Ativacao{
       int i, j, k;
       double grad, d;
 
-      for(i = 0; i < camada.somatorio.length; i++){
-         for(j = 0; j < camada.somatorio[i].lin; j++){
-            for(k = 0; k < camada.somatorio[i].col; k++){
+      for(i = 0; i < camada.gradSaida.length; i++){
+         for(j = 0; j < camada.gradSaida[i].lin; j++){
+            for(k = 0; k < camada.gradSaida[i].col; k++){
                grad = camada.gradSaida[i].dado(j, k);
                d = camada.somatorio[i].dado(j, k);
                d = derivada(d);

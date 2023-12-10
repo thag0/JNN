@@ -25,6 +25,7 @@ public class Flatten extends Camada{
    int[] formSaida;
 
    public Mat[] entrada;
+   public Mat[] gradEntrada;
    public double[] saida;
 
    /**
@@ -104,8 +105,10 @@ public class Flatten extends Camada{
       }
 
       this.entrada = new Mat[formEntrada[2]];
+      this.gradEntrada = new Mat[formEntrada[2]];
       for(int i = 0; i < this.entrada.length; i++){
          this.entrada[i] = new Mat(formEntrada[0], formEntrada[1]);
+         this.gradEntrada[i] = new Mat(formEntrada[0], formEntrada[1]);
       }
 
       this.saida = new double[tamanho];
@@ -158,10 +161,10 @@ public class Flatten extends Camada{
 
    private void calcularGrad(double[] grad){
       int id = 0, i, j, k;
-      for(i = 0; i < this.entrada.length; i++){
-         for(j = 0; j < this.entrada[i].lin; j++){
-            for(k = 0; k < this.entrada[i].col; k++){
-               this.entrada[i].editar(j, k, grad[id++]);
+      for(i = 0; i < this.gradEntrada.length; i++){
+         for(j = 0; j < this.gradEntrada[i].lin; j++){
+            for(k = 0; k < this.gradEntrada[i].col; k++){
+               this.gradEntrada[i].editar(j, k, grad[id++]);
             }
          }
       }
@@ -180,6 +183,11 @@ public class Flatten extends Camada{
    @Override
    public int tamanhoSaida(){
       return this.saida.length;
+   }
+
+   @Override
+   public int[] formatoEntrada(){
+      return this.formEntrada;
    }
 
    /**
@@ -206,7 +214,7 @@ public class Flatten extends Camada{
 
    @Override
    public Object obterGradEntrada(){
-      return this.entrada;
+      return this.gradEntrada;
    }
 
 }

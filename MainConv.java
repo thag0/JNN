@@ -14,12 +14,15 @@ public class MainConv{
 
    public static void main(String[] args){
       ged.limparConsole();
+
+      int amostras = 5;
+      int digitos = 2;
       
-      double[][][][] entradas = new double[100][10][][];
-      double[][] saidas = new double[100][10];
-      entradas = carregarDadosMNIST();
+      double[][][][] entradas = new double[amostras*digitos][digitos][][];
+      double[][] saidas = new double[amostras*digitos][digitos];
+      entradas = carregarDadosMNIST(amostras, digitos);
       System.out.println("Imagens carregadas.");
-      saidas = carregarRotulosMNIST();
+      saidas = carregarRotulosMNIST(amostras, digitos);
       System.out.println("Rótulos carregados.");
 
       Sequencial cnn = criarModelo();
@@ -30,7 +33,7 @@ public class MainConv{
 
       System.out.println("Treinando.");
       t1 = System.nanoTime();
-      cnn.treinar(entradas, saidas, 1);
+      cnn.treinar(entradas, saidas, 200);
       t2 = System.nanoTime();
 
       long tempoDecorrido = t2 - t1;
@@ -39,19 +42,29 @@ public class MainConv{
       minutos = (segundosTotais % 3600) / 60;
       segundos = segundosTotais % 60;
       System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
-      // testes.TesteSequencial.exportarHistoricoPerda(cnn);
+      testes.TesteSequencial.exportarHistoricoPerda(cnn);
+
+      System.out.println(cnn.info());
 
       //-------------------------------------
+      // for(int i = 0; i < 10; i++){
+      //    System.out.println("Real: " + i + ", Pred: " + testarImagem(cnn, entradas[i][0]));
+      // }
 
-      for(int i = 0; i < 10; i++){
-         System.out.println("Real: " + i + ", Pred: " + testarImagem(cnn, entradas[i][0]));
+      System.out.println("\nTeste 0");
+      double[][][] teste0 = new double[1][][];
+      teste0[0] = imagemParaMatriz("/dados/mnist/teste/0_teste.jpg");
+      cnn.calcularSaida(teste0);
+      double[] previsao = cnn.saidaParaArray();
+      for(int i = 0; i < previsao.length; i++){
+         System.out.println("Prob: " + i + ": " + (int)(previsao[i]*100) + "%");
       }
 
-      System.out.println("\nTeste 6");
-      double[][][] teste = new double[1][][];
-      teste[0] = imagemParaMatriz("/dados/mnist/teste/6_teste.png");
-      cnn.calcularSaida(teste);
-      double[] previsao = cnn.saidaParaArray();
+      System.out.println("\nTeste 1");
+      double[][][] teste1 = new double[1][][];
+      teste1[0] = imagemParaMatriz("/dados/mnist/teste/1_teste.jpg");
+      cnn.calcularSaida(teste1);
+      previsao = cnn.saidaParaArray();
       for(int i = 0; i < previsao.length; i++){
          System.out.println("Prob: " + i + ": " + (int)(previsao[i]*100) + "%");
       }
@@ -61,14 +74,15 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{5, 5}, 20, "tanh"),
+         new Convolucional(formEntrada, new int[]{4, 4}, 10, "tanh"),
+         new Convolucional(new int[]{3, 3}, 10, "tanh"),
          new Flatten(),
-         new Densa(40, "tanh"),
-         new Densa(10, "softmax"),
+         new Densa(100, "tanh"),
+         new Densa(2, "softmax"),
       });
 
-      modelo.compilar(new SGD(0.001, 0.9), new EntropiaCruzada(), new Xavier());
-      // modelo.configurarHistorico(true);
+      modelo.compilar(new SGD(0.001, 0.95), new EntropiaCruzada(), new Xavier());
+      modelo.configurarHistorico(true);
 
       return modelo;
    }
@@ -104,12 +118,11 @@ public class MainConv{
       return -1;
    }
 
-   public static double[][][][] carregarDadosMNIST(){
-      double[][][][] entradas = new double[100][1][][];
+   public static double[][][][] carregarDadosMNIST(int amostras, int digitos){
       String caminho = "/dados/mnist/treino/";
 
-      int amostras = 10;
-      for(int i = 0; i < 100; i++){
+      double[][][][] entradas = new double[digitos * amostras][1][][];
+      for(int i = 0; i < entradas.length; i++){
          for(int j = 0; j < amostras; j++){
             double[][] imagem = imagemParaMatriz(caminho + j + "/img_" + j + ".jpg");
             entradas[i][0] = imagem;
@@ -119,16 +132,12 @@ public class MainConv{
       return entradas;
    }
 
-   public static double[][] carregarRotulosMNIST(){
-      int totalNumeros = 10;
-      int rotulosPorNumero = 10;
-  
-      double[][] rotulos = new double[totalNumeros * rotulosPorNumero][totalNumeros];
-  
-      for (int numero = 0; numero < totalNumeros; numero++) {
-         for (int i = 0; i < rotulosPorNumero; i++) {
-         int indice = numero * rotulosPorNumero + i;
-         rotulos[indice][numero] = 1;
+   public static double[][] carregarRotulosMNIST(int amostras, int digitos){
+      double[][] rotulos = new double[digitos * amostras][digitos];
+      for(int numero = 0; numero < digitos; numero++){
+         for(int i = 0; i < amostras; i++){
+            int indice = numero * amostras + i;
+            rotulos[indice][numero] = 1;
          }
       }
   

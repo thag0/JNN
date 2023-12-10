@@ -2,51 +2,48 @@ package testes;
 
 import ged.Ged;
 import rna.core.Mat;
-import rna.estrutura.Camada;
-import rna.estrutura.Convolucional;
+import rna.core.OpMatriz;
+import rna.estrutura.*;
 import rna.otimizadores.*;
 
 public class TreinoConv{
    static Ged ged = new Ged();
+   static OpMatriz opmat = new OpMatriz();
    public static void main(String[] args){
       ged.limparConsole();
-
-      int[] formEntrada = {4, 4, 1};
-      int[] formFiltro =  {2, 2};
-      Convolucional camada = new Convolucional(formEntrada, formFiltro, 2);
-      camada.filtros[0][0] = new Mat(new double[][]{{1., 2.}, {3., 4.}});
-      camada.filtros[1][0] = new Mat(new double[][]{{5., 6.}, {7., 8.}});
-
-      double[][] grad1 = {
-         {1, 2, 3},
-         {4, 5, 6},
-         {7, 8, 9}
-      };
-      double[][] grad2 = {
-         {1, 2, 3},
-         {4, 5, 6},
-         {7, 8, 9}
-      };
-      double[][][] gradSaida = {grad1, grad2};
-
-      double[][] entrada1 = {
-         {2, 2, 2, 2},
-         {2, 2, 2, 2},
-         {2, 2, 2, 2},
-         {2, 2, 2, 2},
-      };
-
-      camada.entrada[0] = new Mat(entrada1);
-
-      Camada[] redec = {camada};
-      Otimizador otm = new SGD();
-      otm.inicializar(redec);
       
-      ged.imprimirArray(camada.obterKernel(), "kernel");
-      for(int i = 0; i < 100; i++){
-         camada.calcularGradiente(gradSaida);
-         otm.atualizar(redec);
+      double[][] e1 = {
+         {1, 6, 2},
+         {5, 3, 1},
+         {7, 0, 4},
+      };
+      double[][] e2 = {
+         {1, 6, 2},
+         {5, 3, 1},
+         {7, 0, 4},
+      };
+      
+      double[][] f1 = {
+         {1, 2},
+         {-1, 0}
+      };
+      double[][] f2 = {
+         {3, 5},
+         {7, 8}
+      };
+
+      double[][][] entrada = new double[2][][];
+      entrada[0] = e1;
+      entrada[1] = e2;
+
+      Convolucional camada = new Convolucional(new int[]{2, 2}, 1, "linear");
+      camada.construir(new int[]{3, 3, 2});
+      camada.filtros[0][0] = new Mat(f1);
+      camada.filtros[0][1] = new Mat(f2);
+
+      camada.calcularSaida(entrada);
+      for(int i = 0; i < camada.saida.length; i++){
+         camada.somatorio[i].print("saida " + i);
       }
-      ged.imprimirArray(camada.obterKernel(), "kernel");
    }
 }

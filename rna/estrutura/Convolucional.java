@@ -626,7 +626,7 @@ public class Convolucional extends Camada implements Cloneable{
 
       if(this.usarBias){
          for(Mat b : this.bias){
-            if(iniBias == null) new Constante().inicializar(b, 0);
+            if(iniBias == null) new Constante().inicializar(b, 0.1);
             else iniBias.inicializar(b, x);
          }
       }
@@ -702,9 +702,9 @@ public class Convolucional extends Camada implements Cloneable{
          if(e.length != this.profEntrada || e[0].length != this.largEntrada || e[0][0].length != this.altEntrada){
             throw new IllegalArgumentException(
                "As dimensões da entrada " + 
-               "([" + e.length + "][" + e[0].length + "][" + e[0][0].length + "]) " +
+               "(" + e.length + ", " + e[0].length + ", " + e[0][0].length + ") " +
                "não correspondem as dimensões de entrada da camada Convolucional " + 
-               "([" + this.profEntrada +"][" + this.altEntrada + "][" + this.largEntrada + "])"
+               "(" + this.profEntrada +", " + this.altEntrada + ", " + this.largEntrada + ")"
             );
          }
          utils.copiar(e, this.entrada);
@@ -722,16 +722,16 @@ public class Convolucional extends Camada implements Cloneable{
 
       //feedforward
       if(this.usarBias){
-         for(int i = 0; i < this.saida.length; i++){
+         for(int i = 0; i < this.somatorio.length; i++){
             this.somatorio[i].copiar(this.bias[i]);
          }
       }
       
       for(int i = 0; i < this.numFiltros; i++){
          for(int j = 0; j < this.profEntrada; j++){
+            this.filtros[i][j].print("filtro " + i + " " + j);
             opmat.correlacaoCruzada(this.entrada[j], this.filtros[i][j], this.somatorio[i], true);
          }
-
       }
 
       this.ativacao.calcular(this);
@@ -762,6 +762,12 @@ public class Convolucional extends Camada implements Cloneable{
       }
 
       Mat[] grads = (Mat[]) gradSeguinte;
+      if(grads.length != this.gradSaida.length){
+         throw new IllegalArgumentException(
+            "Incompatibilidade entre o número de gradientes fornecidos (" + grads.length + 
+            ") e o suportado pela camada (" + this.gradSaida.length + ")"
+         );
+      }
       for(int i = 0; i < this.numFiltros; i++){
          this.gradSaida[i].copiar(grads[i]);
       }
@@ -774,11 +780,10 @@ public class Convolucional extends Camada implements Cloneable{
             opmat.correlacaoCruzada(this.entrada[j], this.derivada[i], this.gradFiltros[i][j], false);
             opmat.convolucaoFull(this.derivada[i], this.filtros[i][j], this.gradEntrada[j], true);
          }
-
       }
 
       if(this.usarBias){
-         for(int i = 0; i < this.numFiltros; i++){
+         for(int i = 0; i < this.gradBias.length; i++){
             this.gradBias[i].copiar(this.derivada[i]);
          }
       }

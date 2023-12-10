@@ -3,6 +3,7 @@ package testes;
 import java.text.DecimalFormat;
 
 import rna.inicializadores.*;
+import rna.modelos.Modelo;
 import rna.modelos.RedeNeural;
 import rna.modelos.Sequencial;
 import rna.avaliacao.perda.*;
@@ -45,23 +46,24 @@ public class Classificador{
 
       //criando e configurando a rede neural
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Densa(qEntradas, 9, "tanh"),
-         new Densa(9, "tanh"),
+         new Densa(qEntradas, 10, "tanh"),
+         new Densa(10, "tanh"),
          new Densa(qSaidas, "softmax")
       });
+      // modelo.configurarHistorico(true);
 
       // Perda perda = new EntropiaCruzada();
       Perda perda = new EntropiaCruzada();
-      Otimizador otimizador = new SGD(0.0001, 0.995);
+      Otimizador otimizador = new SGD(0.001, 0.99);
       Inicializador inicializador = new Xavier();
       modelo.compilar(otimizador, perda, inicializador);
       System.out.println(modelo.info());
       
       //treinando e avaliando os resultados
-      modelo.treinar(treinoX, treinoY, 2_000);
-      double acurariaRede = modelo.avaliador.acuracia(testeX, testeY);
+      modelo.treinar(treinoX, treinoY, 3_000);
+      double acuraciaRede = modelo.avaliador.acuracia(testeX, testeY);
       double perdaRede = modelo.avaliador.entropiaCruzada(testeX, testeY);
-      System.out.println("Acurácia = " + formatarDecimal(acurariaRede*100, 4) + "%");
+      System.out.println("Acurácia = " + formatarDecimal(acuraciaRede*100, 4) + "%");
       System.out.println("Perda = " + perdaRede);
 
       int[][] matrizConfusao = modelo.avaliador.matrizConfusao(testeX, testeY);
@@ -69,7 +71,8 @@ public class Classificador{
       d.editarNome("Matriz de confusão");
       d.imprimir();
 
-      // exportarHistoricoPerda(rede, ged);
+
+      // exportarHistoricoPerda(modelo, ged);
       // compararSaidaRede(rede, testeX, testeY, "");
    }
 
@@ -123,7 +126,7 @@ public class Classificador{
       return valorFormatado;
    }
 
-   public static void exportarHistoricoPerda(RedeNeural rede, Ged ged){
+   public static void exportarHistoricoPerda(Modelo rede, Ged ged){
       System.out.println("Exportando histórico de perda");
       double[] perdas = rede.obterHistorico();
       double[][] dadosPerdas = new double[perdas.length][1];

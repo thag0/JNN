@@ -7,6 +7,7 @@ import rna.core.Mat;
 import rna.core.OpMatriz;
 import rna.estrutura.Densa;
 import rna.estrutura.Flatten;
+import rna.estrutura.MaxPooling;
 import rna.inicializadores.Inicializador;
 import rna.inicializadores.Xavier;
 
@@ -19,21 +20,25 @@ public class MatrizTeste{
       ged.limparConsole();
 
       double[][] e1 = {
-         {1, 6, 2},
-         {5, 3, 1},
-         {7, 0, 4},
+         {5, 2, 8, 1},
+         {1, 7, 3, 6},
+         {9, 8, 4, 1},
+         {3, 4, 2, 6}
       };
-      double[][] f1 = {
-         {1, 2},
-         {-1, 0},
+      double[][] e2 = {
+         {0.77, 0.00, 0.11, 0.33, 0.55, 0.00, 0.33},
+         {0.00, 1.00, 0.00, 0.33, 0.55, 0.11, 0.33},
+         {0.11, 0.00, 1.00, 0.00, 0.11, 0.00, 0.55},
+         {0.33, 0.33, 0.00, 0.55, 0.11, 0.33, 0.33},
+         {0.55, 0.00, 0.11, 0.00, 1.00, 0.00, 0.11},
+         {0.00, 0.11, 0.00, 0.33, 0.00, 1.00, 0.00},
+         {0.33, 0.00, 0.55, 0.33, 0.11, 0.00, 0.77}
       };
 
-      Mat entrada = new Mat(e1);
-      Mat filtro = new Mat(f1);
-      Mat res = new Mat(4, 4);
-      opmat.correlacaoCruzadaFull(entrada, filtro, res, false);
-      opmat.correlacaoCruzadaFull(entrada, filtro, res, false);
-      res.print();
+      Mat[] entradas = new Mat[1];
+      entradas[0] = new Mat(e2);
+      MaxPooling mp = new MaxPooling(new int[]{e2.length, e2[0].length, 1}, new int[]{2, 2}, 2);
+      mp.calcularSaida(entradas);
    }
 
    static void derivadaSoftmax(){

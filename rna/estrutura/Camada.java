@@ -48,7 +48,7 @@ public class Camada{
     */
    public void construir(Object entrada){
       throw new IllegalArgumentException(
-         "Implementar construção da camada."
+         "Implementar construção da camada " + this.getClass().getTypeName() + "."
       );
    }
 
@@ -61,7 +61,7 @@ public class Camada{
     */
    public void inicializar(Inicializador iniKernel, Inicializador iniBias, double x){
       throw new IllegalArgumentException(
-         "Implementar inicialização da camada."
+         "Implementar inicialização da camada " + this.getClass().getTypeName() + "."
       );
    }
 
@@ -73,7 +73,7 @@ public class Camada{
     */
    public void inicializar(Inicializador iniKernel, double x){
       throw new IllegalArgumentException(
-         "Implementar inicialização da camada."
+         "Implementar inicialização da camada " + this.getClass().getTypeName() + "."
       );
    }
 
@@ -104,7 +104,7 @@ public class Camada{
     */
    public void configurarAtivacao(String ativacao){
       throw new IllegalArgumentException(
-         "Implementar configuração da função de ativação da camada."
+         "Implementar configuração da função de ativação da camada " + this.getClass().getTypeName() + "."
       );
    }
 
@@ -121,7 +121,7 @@ public class Camada{
     */
    public void configurarAtivacao(Ativacao ativacao){
       throw new IllegalArgumentException(
-         "Implementar configuração da função de ativação da camada."
+         "Implementar configuração da função de ativação da camada " + this.getClass().getTypeName() + "."
       );
    }
 
@@ -132,7 +132,7 @@ public class Camada{
     */
    public void configurarId(int id){
       throw new IllegalArgumentException(
-         "Implementar configuração de identificador."
+         "Implementar configuração de identificador da camada " + this.getClass().getTypeName() + "."
       );
    }
 
@@ -148,7 +148,7 @@ public class Camada{
     */
    public void calcularSaida(Object entrada){
       throw new IllegalArgumentException(
-         "Implementar cálculo de saída."
+         "Implementar cálculo de saída da camada " + this.getClass().getTypeName() + "."
       );
    }
 
@@ -166,7 +166,7 @@ public class Camada{
     */
    public void calcularGradiente(Object gradSeguinte){
       throw new IllegalArgumentException(
-         "Implementar cálculo de gradientes."
+         "Implementar cálculo de gradientes da camada " + this.getClass().getTypeName() + "."
       );
    }
 
@@ -176,7 +176,7 @@ public class Camada{
     */
    public Ativacao obterAtivacao(){
       throw new IllegalArgumentException(
-         "Implementar retorno da função de ativação."
+         "Implementar retorno da função de ativação da camada " + this.getClass().getTypeName() + "."
       );
    }
    
@@ -193,7 +193,7 @@ public class Camada{
     */
    public int[] formatoEntrada(){
       throw new IllegalArgumentException(
-         "Implementar formato de entrada."
+         "Implementar formato de entrada da camada" + this.getClass().getTypeName() + "."
       );
    }
 
@@ -210,7 +210,7 @@ public class Camada{
     */
    public int[] formatoSaida(){
       throw new IllegalArgumentException(
-         "Implementar formato de saída."
+         "Implementar formato de saída da camada" + this.getClass().getTypeName() + "."
       );
    }
 
@@ -220,7 +220,7 @@ public class Camada{
     */
    public double[] saidaParaArray(){
       throw new IllegalArgumentException(
-         "Implementar retorno de saída."
+         "Implementar retorno de saída para array da camada" + this.getClass().getTypeName() + "."
       );   
    }
 
@@ -230,7 +230,7 @@ public class Camada{
     */
    public int tamanhoSaida(){
       throw new IllegalArgumentException(
-         "Implementar retorno de tamanho da saída."
+         "Implementar retorno de tamanho da saída da camada " + this.getClass().getTypeName() + "."
       );        
    }
 
@@ -244,7 +244,7 @@ public class Camada{
     */
    public int numParametros(){
       throw new IllegalArgumentException(
-         "Implementar númedo de parâmetros."
+         "Implementar número de parâmetros da camada " + this.getClass().getTypeName() + "."
       );  
    }
 
@@ -254,7 +254,7 @@ public class Camada{
     */
    public boolean temBias(){
       throw new IllegalArgumentException(
-         "Implementar uso do bias."
+         "Implementar uso do bias na camada " + this.getClass().getTypeName() + "."
       );  
    }
 
@@ -268,7 +268,7 @@ public class Camada{
     */
    public double[] obterKernel(){
       throw new IllegalArgumentException(
-         "Implementar retorno do kernel."
+         "Implementar retorno do kernel da camada " + this.getClass().getTypeName() + "."
       );       
    }
 
@@ -279,7 +279,7 @@ public class Camada{
     */
    public double[] obterGradKernel(){
       throw new IllegalArgumentException(
-         "Implementar retorno do gradiente para o kernel."
+         "Implementar retorno do gradiente para o kernel da camada" + this.getClass().getTypeName() + "."
       );       
    }
 
@@ -294,7 +294,7 @@ public class Camada{
     */
    public double[] obterBias(){
       throw new IllegalArgumentException(
-         "Implementar retorno do bias."
+         "Implementar retorno do bias da camada " + this.getClass().getTypeName() + "."
       );        
    }
 
@@ -305,7 +305,7 @@ public class Camada{
     */
    public double[] obterGradBias(){
       throw new IllegalArgumentException(
-         "Implementar retorno do gradiente para o bias."
+         "Implementar retorno do gradiente para o bias da camada" + this.getClass().getTypeName() + "."
       );        
    }
 
@@ -316,7 +316,7 @@ public class Camada{
     */
    public Object obterGradEntrada(){
       throw new IllegalArgumentException(
-         "Implementar retorno do gradiente de entrada da camada."
+         "Implementar retorno do gradiente de entrada da camada " + this.getClass().getTypeName() + "."
       );     
    }
 
@@ -327,7 +327,7 @@ public class Camada{
     */
    public void editarKernel(double[] kernel){
       throw new IllegalArgumentException(
-         "Implementar edição do kernel."
+         "Implementar edição do kernel para a camada " + this.getClass().getTypeName() + "."
       );
    }
 
@@ -338,7 +338,7 @@ public class Camada{
     */
    public void editarBias(double[] bias){
       throw new IllegalArgumentException(
-         "Implementar edição do bias."
+         "Implementar edição do bias para a camada " + this.getClass().getTypeName() + "."
       );
    }
 }

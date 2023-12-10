@@ -57,8 +57,8 @@ public class Treinador{
    public void treino(Modelo modelo, Object[] entradas, Object[] saidas, int epochs){
       treino.treinar(
          modelo,
-         entradas, 
-         saidas, 
+         entradas.clone(), 
+         saidas.clone(), 
          epochs
       );
 
