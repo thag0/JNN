@@ -1,7 +1,6 @@
 package rna.modelos;
 
 import rna.ativacoes.Ativacao;
-import rna.avaliacao.Avaliador;
 import rna.avaliacao.perda.ErroMedioQuadrado;
 import rna.avaliacao.perda.Perda;
 import rna.estrutura.Camada;
@@ -10,7 +9,6 @@ import rna.inicializadores.Aleatorio;
 import rna.inicializadores.Inicializador;
 import rna.otimizadores.Otimizador;
 import rna.otimizadores.SGD;
-import rna.treinamento.Treinador;
 
 /**
  * Modelo de Rede Neural {@code Multilayer Perceptron} criado do zero. Possui um conjunto de camadas 
@@ -77,54 +75,6 @@ public class RedeNeural extends Modelo implements Cloneable{
    private double alcancePeso = 0.5;
 
    /**
-    * Ponto inicial para os geradores aleatórios.
-    * <p>
-    *    0 não é considerado uma seed e ela só é configurada quando esse valor é
-    *    alterado.
-    * </p>
-    */
-   private long seedInicial = 0;
-
-   /**
-    * Auxiliar no controle da compilação da Rede Neural, ajuda a evitar uso 
-    * indevido caso a rede não tenha suas variáveis e dependências inicializadas 
-    * previamente.
-    */
-   private boolean compilado;
-
-   /**
-    * Função de perda usada durante o processo de treinamento.
-    */
-   private Perda perda;
-
-   /**
-    * Otimizador que será utilizado durante o processo de aprendizagem da
-    * da Rede Neural.
-    */
-   private Otimizador otimizador;
-
-   /**
-    * Nome específico da instância da Rede Neural.
-    */
-   private String nome = getClass().getSimpleName();
-
-   /**
-    * Gerenciador de treino da Rede Neural. contém implementações dos 
-    * algoritmos de treino.
-    */
-   private Treinador treinador = new Treinador();
-
-   /**
-    * Responsável pelo retorno de desempenho da Rede Neural.
-    * Contém implementações de métodos tanto para cálculo de perdas
-    * quanto de métricas.
-    * <p>
-    *    Cada instância de rede neural possui seu próprio avaliador.
-    * </p>
-    */
-   public Avaliador avaliador = new Avaliador(this);
-
-   /**
     * <p>
     *    Cria uma instância de rede neural artificial. A arquitetura da rede será baseada de acordo 
     *    com cada posição do array, cada valor contido nele representará a quantidade de neurônios da 
@@ -184,29 +134,6 @@ public class RedeNeural extends Modelo implements Cloneable{
    }
 
    /**
-    * <p>
-    *    Altera o nome da rede neural.
-    * </p>
-    * O nome é apenas estético e não influencia na performance ou na 
-    * usabilidade da rede neural.
-    * <p>
-    *    O nome padrão é o mesmo nome da classe (RedeNeural).
-    * </p>
-    * @param nome novo nome da rede.
-    * @throws IllegalArgumentException se o novo nome for uulo ou inválido.
-    */
-   public void configurarNome(String nome){
-      if(nome == null){
-         throw new IllegalArgumentException("O novo nome da rede neural não pode ser nulo.");
-      }
-      if(nome.isBlank() || nome.isEmpty()){
-         throw new IllegalArgumentException("O novo nome da rede neural não pode estar vazio.");
-      }
-
-      this.nome = nome;
-   }
-
-   /**
     * Define o valor máximo e mínimo na hora de aleatorizar os pesos iniciais da 
     * rede para a compilação, os novos valores não podem ser menores ou iguais a zero.
     * <p>
@@ -246,22 +173,6 @@ public class RedeNeural extends Modelo implements Cloneable{
     */
    public void configurarBias(boolean usarBias){
       this.bias = usarBias;
-   }
-
-   /**
-    * Configura a nova seed inicial para os geradores de números aleatórios utilizados 
-    * durante o processo de inicialização de pesos e treinamento da Rede Neural.
-    * <p>
-    *    Configurações personalizadas de seed permitem fazer testes com diferentes
-    *    parâmetros da Rede Neural, buscando encontrar um melhor ajuste para o modelo.
-    * </p>
-    * <p>
-    *    A configuração de seed deve ser feita antes da compilação do modelo.
-    * </p>
-    * @param seed nova seed.
-    */
-   public void configurarSeed(long seed){
-      this.seedInicial = seed;
    }
 
    /**
@@ -423,19 +334,6 @@ public class RedeNeural extends Modelo implements Cloneable{
    }
 
    /**
-    * Configura a função de perda que será utilizada durante o processo
-    * de treinamento da Rede Neural.
-    * @param perda nova função de perda.
-    */
-   public void configurarPerda(Perda perda){
-      if(perda == null){
-         throw new IllegalArgumentException("A função de perda não pode ser nula.");
-      }
-
-      this.perda = perda;
-   }
-
-   /**
     * Configura o novo otimizador da Rede Neural com base numa nova instância de otimizador.
     * <p>
     *    Configurando o otimizador passando diretamente uma nova instância permite configurar
@@ -498,23 +396,6 @@ public class RedeNeural extends Modelo implements Cloneable{
       }
 
       this.otimizador = otimizador;
-   }
-
-   /**
-    * Define se durante o processo de treinamento, a rede vai salvar dados relacionados a 
-    * função de custo/perda de cada época.
-    * <p>
-    *    Calcular a perda é uma operação que pode ser computacionalmente cara dependendo do 
-    *    tamanho da rede e do conjunto de dados, então deve ser bem avaliado querer habilitar 
-    *    ou não esse recurso.
-    * </p>
-    * <p>
-    *    {@code O valor padrão é false}
-    * </p>
-    * @param calcular se verdadeiro, a rede armazenará o histórico de custo de cada época.
-    */
-   public void configurarHistoricoPerda(boolean calcular){
-      this.treinador.configurarHistoricoCusto(calcular);
    }
 
    /**
@@ -1210,7 +1091,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     *       Otimizador atual e suas informações específicas.
     *    </li>
     *    <li>
-    *       Contém bias como neurônio adicional.
+    *       Contém bias adicionado nas camadas.
     *    </li>
     *    <li>
     *       Função de ativação de todas as camadas.

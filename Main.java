@@ -7,6 +7,7 @@ import geim.Geim;
 import render.JanelaTreino;
 import rna.avaliacao.perda.*;
 import rna.inicializadores.*;
+import rna.modelos.Modelo;
 import rna.modelos.RedeNeural;
 import rna.otimizadores.*;
 
@@ -118,7 +119,7 @@ public class Main{
     * @param rede rede neural.
     * @param ged gerenciador de dados.
     */
-   public static void exportarHistoricoPerda(RedeNeural rede, Ged ged){
+   public static void exportarHistoricoPerda(Modelo rede, Ged ged){
       System.out.println("Exportando histórico de perda");
       double[] perdas = rede.obterHistorico();
       double[][] dadosPerdas = new double[perdas.length][1];

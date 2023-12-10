@@ -182,7 +182,7 @@ public class Convolucional extends Camada implements Cloneable{
 
    /**
     * Array de matrizes contendo os valores dos gradientes usados para 
-    * a retropropagação dos gradientes.
+    * a retropropagação para camadas anteriores.
     */
    public Mat[] gradEntrada;
 

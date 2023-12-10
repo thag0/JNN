@@ -24,9 +24,29 @@ public class Flatten extends Camada{
     */
    int[] formSaida;
 
-   public Mat[] entrada;
+   /**
+    * Array de matrizes contendo os valores de entrada para a camada,
+    * que serão usados para o processo de feedforward.
+    * <p>
+    *    O formato da entrada é dado por:
+    * </p>
+    * <pre>
+    *entrada = [profundidade entrada]
+    *entrada[n] = [alturaEntrada][larguraEntrada]
+    * </pre>
+    */
+    public Mat[] entrada;
+   
+    /**
+    * Array de matrizes contendo os valores dos gradientes usados para 
+    * a retropropagação para camadas anteriores.
+    */
    public Mat[] gradEntrada;
-   public double[] saida;
+
+   /**
+    * Array contendo a saída achatada da camada.
+    */
+   private double[] saida;
 
    /**
     * Inicializa uma camada Flatten, que irá achatar a entrada recebida
@@ -210,6 +230,11 @@ public class Flatten extends Camada{
          this.formSaida[0],
          this.formSaida[1]
       };
+   }
+
+   @Override
+   public int numParametros(){
+      return 0;
    }
 
    @Override
