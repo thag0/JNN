@@ -63,7 +63,7 @@ public class Main{
       Inicializador ini = new Xavier();
 
       // rede.configurarHistoricoPerda(true);
-      rede.compilar(perda, otm, ini, ini);
+      rede.compilar(perda, otm, ini);
       rede.configurarAtivacao("tanh");
       rede.configurarAtivacao(rede.obterCamadaSaida(), "sigmoid");
 

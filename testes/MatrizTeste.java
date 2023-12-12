@@ -35,10 +35,31 @@ public class MatrizTeste{
          {0.33, 0.00, 0.55, 0.33, 0.11, 0.00, 0.77}
       };
 
+      double[][] g = {
+         {0.4, 0.5, 0.6},
+         {0.2, 0.7, 0.9},
+         {0.1, 0.4, 0.5}
+      };
+
       Mat[] entradas = new Mat[1];
       entradas[0] = new Mat(e2);
-      MaxPooling mp = new MaxPooling(new int[]{e2.length, e2[0].length, 1}, new int[]{2, 2}, 2);
+      entradas[0].print();
+      
+      MaxPooling mp = new MaxPooling(new int[]{e2.length, e2[0].length, 1}, new int[]{2, 2});
+      int[] formSaida = mp.formatoSaida();
       mp.calcularSaida(entradas);
+
+      double[] saidas = mp.saidaParaArray();
+      Mat saida = new Mat(formSaida[0], formSaida[1]);
+      saida.copiar(saidas);
+      saida.print("saída max pooling");
+
+      Mat[] grads = new Mat[1];
+      grads[0] = new Mat(g);
+      mp.calcularGradiente(grads);
+
+      Mat[] gE = mp.obterGradEntrada();
+      gE[0].print("grad entrada");
    }
 
    static void derivadaSoftmax(){

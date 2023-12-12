@@ -33,7 +33,7 @@ public class MainConv{
 
       System.out.println("Treinando.");
       t1 = System.nanoTime();
-      cnn.treinar(entradas, saidas, 201);
+      cnn.treinar(entradas, saidas, 301);
       t2 = System.nanoTime();
 
       long tempoDecorrido = t2 - t1;
@@ -57,10 +57,8 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{3, 3}, 20, "tanh"),
-         new MaxPooling(new int[]{4, 4}, 4),
-         new Convolucional(new int[]{3, 3}, 20, "tanh"),
-         new MaxPooling(new int[]{3, 3}, 3),
+         new Convolucional(formEntrada, new int[]{3, 3}, 10, "leakyrelu"),
+         new MaxPooling(new int[]{2, 2}),
          new Flatten(),
          new Densa(100, "leakyrelu"),
          new Densa(2, "softmax"),
@@ -85,8 +83,8 @@ public class MainConv{
 
       for(int y = 0; y < imagem.length; y++){
          for(int x = 0; x < imagem[y].length; x++){
-            // imagem[y][x] = (double)(cinza[y][x] / 255);
-            imagem[y][x] = cinza[y][x];
+            imagem[y][x] = (double)(cinza[y][x] / 255);
+            // imagem[y][x] = cinza[y][x];
          }
       }
 

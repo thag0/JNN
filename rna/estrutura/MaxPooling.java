@@ -13,19 +13,33 @@ public class MaxPooling extends Camada{
    private Mat[] gradEntrada;
 
    private int[] formFiltro;
-   private int stride;
+   private int strideAltura;
+   private int strideLargura;
 
    public MaxPooling(){
 
    }
 
-   public MaxPooling(int[] formFiltro, int stride){
-      this.stride = stride;
+   public MaxPooling(int[] formFiltro){
+      if(formFiltro[0] != formFiltro[1]){
+         throw new IllegalArgumentException(
+            "As dimensões do filtro devem ser igual para usar um stride padrão."
+         );
+      }
+      this.strideAltura = formFiltro[0];
+      this.strideLargura = formFiltro[0];
       this.formFiltro = (int[]) formFiltro;
    }
 
-   public MaxPooling(int[] formEntrada, int[] formFiltro, int stride){
-      this.stride = stride;
+   public MaxPooling(int[] formFiltro, int[] stride){
+      this.strideAltura = stride[0];
+      this.strideLargura = stride[1];
+      this.formFiltro = (int[]) formFiltro;
+   }
+
+   public MaxPooling(int[] formEntrada, int[] formFiltro, int[] stride){
+      this.strideAltura = stride[0];
+      this.strideLargura = stride[1];
       this.formFiltro = (int[]) formFiltro;
       this.construir(formEntrada);
    }
@@ -57,16 +71,18 @@ public class MaxPooling extends Camada{
       this.formEntrada = new int[]{e[0], e[1], e[2]};
 
       this.formSaida = new int[3];
-      formSaida[0] = (formEntrada[0] - formFiltro[0]) / stride + 1;
-      formSaida[1] = (formEntrada[1] - formFiltro[1]) / stride + 1;
+      formSaida[0] = (formEntrada[0] - formFiltro[0]) / this.strideAltura + 1;
+      formSaida[1] = (formEntrada[1] - formFiltro[1]) / this.strideLargura + 1;
       formSaida[2] = formEntrada[2];
       
       this.entrada = new Mat[formEntrada[2]];
+      this.gradEntrada = new Mat[formSaida[2]];
       this.saida = new Mat[formSaida[2]];
 
       for(int i = 0; i < formEntrada[2]; i++){
          this.entrada[i] = new Mat(this.formEntrada[0], this.formEntrada[1]);
          this.saida[i] = new Mat(this.formSaida[0], this.formSaida[1]);
+         this.gradEntrada[i] = new Mat(this.formEntrada[0], this.formEntrada[1]);
       }
    }
 
@@ -103,8 +119,8 @@ public class MaxPooling extends Camada{
    private void aplicarMaxPooling(Mat entrada, Mat saida){
       for(int i = 0; i < saida.lin; i++){
          for(int j = 0; j < saida.col; j++){
-            int linInicio = i * this.stride;
-            int colIincio = j * this.stride;
+            int linInicio = i * this.strideAltura;
+            int colIincio = j * this.strideLargura;
             int linFim = Math.min(linInicio + this.formFiltro[0], entrada.lin);
             int colFim = Math.min(colIincio + this.formFiltro[1], entrada.col);
             double maxValor = Double.MIN_VALUE;
@@ -123,45 +139,57 @@ public class MaxPooling extends Camada{
    }
 
    @Override
-   public void calcularGradiente(Object gradSeguinte) {
-       if (gradSeguinte instanceof Mat[]) {
-           Mat[] gradCamadaSeguinte = (Mat[]) gradSeguinte;
-   
-           gradEntrada = new Mat[formEntrada[2]];
-   
-           for (int i = 0; i < gradEntrada.length; i++) {
-               gradEntrada[i] = new Mat(formEntrada[0], formEntrada[1]);
-           }
-   
-           for (int i = 0; i < gradEntrada.length; i++) {
-               calcularGradienteMaxPooling(entrada[i], gradCamadaSeguinte[i], gradEntrada[i]);
-           }
-       }
+   public void calcularGradiente(Object gradSeguinte){
+      if(gradSeguinte instanceof Mat[]){
+         Mat[] gradCamadaSeguinte = (Mat[]) gradSeguinte;   
+         for(int i = 0; i < gradEntrada.length; i++){
+            calcularGradienteMaxPooling(this.entrada[i], gradCamadaSeguinte[i], this.gradEntrada[i]);
+         }
+      
+      }else{
+         throw new IllegalArgumentException(
+            "Formato de gradiente \" "+ gradSeguinte.getClass().getTypeName() +" \" não " +
+            "suportado para camada de MaxPooling."
+         );
+      }
    }
    
-   private void calcularGradienteMaxPooling(Mat entrada, Mat gradCamadaSeguinte, Mat gradEntrada) {
-       for (int i = 0; i < gradCamadaSeguinte.lin; i++) {
-           for (int j = 0; j < gradCamadaSeguinte.col; j++) {
-               int linInicio = i * this.stride;
-               int colIincio = j * this.stride;
-               int linFim = Math.min(linInicio + this.formFiltro[0], entrada.lin);
-               int colFim = Math.min(colIincio + this.formFiltro[1], entrada.col);
-   
-               for (int row = linInicio; row < linFim; row++) {
-                   for (int col = colIincio; col < colFim; col++) {
-                       double valorEntrada = entrada.dado(row, col);
-                       double valorGradSeguinte = gradCamadaSeguinte.dado(i, j);
-   
-                       // Se o valor na entrada foi o máximo, propague o gradiente
-                       if (valorEntrada == valorGradSeguinte) {
-                           gradEntrada.editar(row, col, valorGradSeguinte);
-                       }
-                   }
-               }
-           }
-       }
-   }
-   
+   private void calcularGradienteMaxPooling(Mat entrada, Mat gradSeguinte, Mat gradEntrada){
+      for(int i = 0; i < gradSeguinte.lin; i++){
+          for(int j = 0; j < gradSeguinte.col; j++){
+              int linInicio = i * this.strideAltura;
+              int colInicio = j * this.strideLargura;
+              int linFim = Math.min(linInicio + this.formFiltro[0], entrada.lin);
+              int colFim = Math.min(colInicio + this.formFiltro[1], entrada.col);
+  
+              int[] posicaoMaximo = posicaoMaxima(entrada, linInicio, colInicio, linFim, colFim);
+              int rowMaximo = posicaoMaximo[0];
+              int colMaximo = posicaoMaximo[1];
+  
+              double valorGradSeguinte = gradSeguinte.dado(i, j);
+              gradEntrada.editar(rowMaximo, colMaximo, valorGradSeguinte);
+          }
+      }
+  }
+  
+   private int[] posicaoMaxima(Mat matriz, int linInicio, int colInicio, int linFim, int colFim){
+      int[] posicaoMaximo = new int[]{linInicio, colInicio};
+      double valorMaximo = Double.NEGATIVE_INFINITY;
+  
+      for(int row = linInicio; row < linFim; row++){
+          for(int col = colInicio; col < colFim; col++){
+              double valorAtual = matriz.dado(row, col);
+              if(valorAtual > valorMaximo){
+                  valorMaximo = valorAtual;
+                  posicaoMaximo[0] = row;
+                  posicaoMaximo[1] = col;
+              }
+          }
+      }
+  
+      return posicaoMaximo;
+  }
+ 
    @Override
    public int[] formatoSaida(){
       return formSaida;

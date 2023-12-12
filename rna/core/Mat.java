@@ -500,10 +500,11 @@ public class Mat{
     */
  public void print(String nome){
       if(nome == null || nome.isBlank() || nome.isEmpty()){
-          System.out.println(this.getClass().getSimpleName() + " = [");
+          System.out.print(this.getClass().getSimpleName());
       }else{
-         System.out.println(nome + " = [");
+         System.out.print(nome);
       }
+      System.out.println(" (" + this.lin + ", " + this.col + ") = [");
 
       int compMax = 0;
       for(int i = 0; i < this.lin; i++){
