@@ -230,6 +230,14 @@ public class Sequencial extends Modelo{
             "É necessário que a primeira camada seja construída."
          );
       }
+
+      if(seedInicial != 0){
+         iniKernel.configurarSeed(seedInicial);
+         if(iniBias != null){
+            iniBias.configurarSeed(seedInicial);
+         } 
+         this.treinador.configurarSeed(seedInicial);
+      }
       
       for(int i = 1; i < this.camadas.length; i++){
          this.camadas[i].construir(this.camadas[i-1].formatoSaida());

@@ -100,23 +100,41 @@ public class Flatten extends Camada{
       }
 
       int[] formatoEntrada = (int[]) entrada;
-      if(formatoEntrada.length != 3){
+      int altura, largura, profundidade;
+      if(formatoEntrada.length == 2){
+         if(formatoEntrada[0] == 0 || formatoEntrada[1] == 0){
+            throw new IllegalArgumentException(
+               "Os valores recebidos para o formato de entrada devem ser maiores que zero, " +
+               "recebido = [" + formatoEntrada[0] + ", " + formatoEntrada[1] + "]"
+            );
+         }
+
+         altura = formatoEntrada[0];
+         largura = formatoEntrada[1];
+         profundidade = 1;
+      
+      }else if(formatoEntrada.length == 3){
+         if(formatoEntrada[0] == 0 || formatoEntrada[1] == 0 || formatoEntrada[2] == 0){
+            throw new IllegalArgumentException(
+               "Os valores recebidos para o formato de entrada devem ser maiores que zero, " +
+               "recebido = [" + formatoEntrada[0] + ", " + formatoEntrada[1] + ", " + formatoEntrada[2] + "]"
+            );
+         }
+         altura = formatoEntrada[0];
+         largura = formatoEntrada[1];
+         profundidade = formatoEntrada[2];
+      
+      }else{
          throw new IllegalArgumentException(
             "O formato de entrada para a camada Flatten deve conter três " + 
             "elementos (altura, largura, profundidade), objeto recebido possui " + formatoEntrada.length
          );
       }
-      if(formatoEntrada[0] == 0 || formatoEntrada[1] == 0 || formatoEntrada[2] == 0){
-         throw new IllegalArgumentException(
-            "Os valores recebidos para o formato de entrada devem ser maiores que zero, " +
-            "recebido = [" + formatoEntrada[0] + ", " + formatoEntrada[1] + ", " + formatoEntrada[2] + "]"
-         );
-      }
 
       this.formEntrada = new int[]{
-         formatoEntrada[0],
-         formatoEntrada[1],
-         formatoEntrada[2]
+         altura,
+         largura,
+         profundidade
       };
 
       int tamanho = 1;

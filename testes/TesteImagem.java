@@ -2,16 +2,17 @@ package testes;
 
 import java.awt.image.BufferedImage;
 
+import ged.Dados;
 import ged.Ged;
 import geim.Geim;
-import rna.avaliacao.perda.ErroMedioQuadrado;
+import rna.avaliacao.perda.*;
 import rna.estrutura.*;
-import rna.inicializadores.Xavier;
+import rna.inicializadores.*;
+import rna.otimizadores.*;
+import rna.modelos.Modelo;
 import rna.modelos.Sequencial;
-import rna.otimizadores.SGD;
 
 public class TesteImagem{
-   
    public static void main(String[] args){
       Ged ged = new Ged();
       Geim geim = new Geim();
@@ -36,14 +37,36 @@ public class TesteImagem{
          new Densa(13, "tanh"),
          new Densa(nSaida, "sigmoid"),
       });
-      modelo.compilar(new SGD(0.001, 0.99), new ErroMedioQuadrado(), new Xavier());
-      modelo.treinar(dadosEntrada, dadosSaida, 2_000);
+      modelo.configurarHistorico(true);
+      modelo.configurarSeed(1234);
+      Otimizador otm = new SGD(0.00001, 0.999);
+      modelo.compilar(otm, new ErroMedioQuadrado(), new Xavier());
+      modelo.treinar(dadosEntrada, dadosSaida, 1_500);
 
       //avaliando resultados
       double precisao = 1 - modelo.avaliador.erroMedioAbsoluto(dadosEntrada, dadosSaida);
       double perda = modelo.avaliador.erroMedioQuadrado(dadosEntrada, dadosSaida);
-      System.out.println(modelo.info());
       System.out.println("Precisão = " + (precisao * 100));
       System.out.println("Perda = " + perda);
+
+      exportarHistoricoPerda(modelo, ged);
+   }
+
+   /**
+    * Salva um arquivo csv com o historico de desempenho da rede.
+    * @param rede rede neural.
+    * @param ged gerenciador de dados.
+    */
+   public static void exportarHistoricoPerda(Modelo rede, Ged ged){
+      System.out.println("Exportando histórico de perda");
+      double[] perdas = rede.obterHistorico();
+      double[][] dadosPerdas = new double[perdas.length][1];
+
+      for(int i = 0; i < dadosPerdas.length; i++){
+         dadosPerdas[i][0] = perdas[i];
+      }
+
+      Dados dados = new Dados(dadosPerdas);
+      ged.exportarCsv(dados, "historico-perda");
    }
 }

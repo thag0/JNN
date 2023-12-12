@@ -435,23 +435,32 @@ public class Densa extends Camada implements Cloneable{
    public void calcularSaida(Object entrada){
       verificarInicializacao();
 
-      if(entrada instanceof double[] == false){
+      if(entrada instanceof Mat[]){
+         Mat[] en = (Mat[]) entrada;
+         if(en.length != 1){
+            throw new IllegalArgumentException(
+               "A camada densa suporta apenas arrays de matrizes com profundidade = 1."
+            );
+         }
+         this.entrada.copiar(0, en[0].linha(0));
+      
+      }else if(entrada instanceof double[]){
+         double[] en = (double[]) entrada;
+         if(en.length != this.tamanhoEntrada()){
+            throw new IllegalArgumentException(
+               "Tamanho da entrada fornecida (" + en.length + 
+               ") incompatível com a entrada da camada (" + this.tamanhoEntrada() + 
+               ")."
+            );
+         }
+         this.entrada.copiar(0, en); 
+
+      }else{
          throw new IllegalArgumentException(
-            "Os dados de entrada para a camada Densa devem ser do tipo \"double[]\", " +
+            "Os dados de entrada para a camada Densa devem ser do tipo \"double[]\" ou \"Mat[]\" com profundidade 1, " +
             "objeto recebido é do tipo \"" + entrada.getClass().getTypeName() + "\""
          );
       }
-
-      double[] e = (double[]) entrada;
-      if(e.length != this.tamanhoEntrada()){
-         throw new IllegalArgumentException(
-            "Tamanho da entrada fornecida (" + e.length + 
-            ") incompatível com a entrada da camada (" + this.tamanhoEntrada() + 
-            ")."
-         );
-      }
-
-      this.entrada.copiar(0, e); 
 
       //feedforward
       this.opmat.mult(this.entrada, this.pesos, this.somatorio);
@@ -478,24 +487,31 @@ public class Densa extends Camada implements Cloneable{
    public void calcularGradiente(Object gradSeguinte){
       verificarInicializacao();
 
-      if(gradSeguinte instanceof Mat == false){
+      if(gradSeguinte instanceof Mat[]){
+         Mat[] grads = (Mat[]) gradSeguinte;
+         if(grads.length != 1){
+            throw new IllegalArgumentException(
+               "A camada densa suporta apenas arrays de matrizes com profundidade = 1."
+            );
+         }
+         this.entrada.copiar(0, grads[0].linha(0));
+      
+      }else if(gradSeguinte instanceof Mat){
+         Mat grads = (Mat) gradSeguinte;
+         if(grads.col != this.gradSaida.col){
+            throw new IllegalArgumentException(
+               "Dimensões incompatíveis entre o gradiente fornecido (" + grads.col + 
+               ") e o suportado pela camada (" + this.gradSaida.col + ")."
+            );
+         }
+         this.gradSaida.copiar(grads);
+
+      }else{
          throw new IllegalArgumentException(
             "O gradiente para a camada Densa deve ser do tipo " + this.gradSaida.getClass() +
             ", objeto recebido é do tipo \"" + gradSeguinte.getClass().getTypeName() + "\""
          );
       }
-
-      Mat grads = (Mat) gradSeguinte;
-      if(grads.col != this.gradSaida.col){
-         throw new IllegalArgumentException(
-            "Dimensões incompatíveis entre o gradiente fornecido (" + grads.col + 
-            ") e o suportado pela camada (" + this.gradSaida.col + ")."
-         );
-      }
-
-      //transformação do array de gradientes para o objeto matricial
-      //usado pela biblioteca
-      this.gradSaida.copiar(grads);
 
       //backward
       //derivada da função de ativação em relação ao gradiente de saída

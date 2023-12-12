@@ -611,6 +611,9 @@ public class RedeNeural extends Modelo implements Cloneable{
 
       if(seedInicial != 0){
          iniPesos.configurarSeed(seedInicial);
+         if(iniBias != null){
+            iniBias.configurarSeed(seedInicial);
+         } 
          this.treinador.configurarSeed(seedInicial);
       }
 
