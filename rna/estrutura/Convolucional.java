@@ -626,7 +626,7 @@ public class Convolucional extends Camada implements Cloneable{
 
       if(this.usarBias){
          for(Mat b : this.bias){
-            if(iniBias == null) new Constante().inicializar(b, 0.1);
+            if(iniBias == null) new Constante().inicializar(b, 0);
             else iniBias.inicializar(b, x);
          }
       }
@@ -834,12 +834,19 @@ public class Convolucional extends Camada implements Cloneable{
       int id = 0;
       double[] saida = new double[this.tamanhoSaida()];
 
+      // for(int i = 0; i < this.saida.length; i++){
+      //    double[] s = this.saida[i].paraArray();
+      //    for(int j = 0; j < s.length; j++){
+      //       saida[id++] = s[j];
+      //    }
+      // }
+
       for(int i = 0; i < this.saida.length; i++){
          double[] s = this.saida[i].paraArray();
-         for(int j = 0; j < s.length; j++){
-            saida[id++] = s[j];
+         for(double valor : s){
+            saida[id++] = valor;
          }
-      }
+     }
 
       return saida;
    }

@@ -7,8 +7,7 @@ import geim.Geim;
 import render.JanelaTreino;
 import rna.avaliacao.perda.*;
 import rna.inicializadores.*;
-import rna.modelos.Modelo;
-import rna.modelos.RedeNeural;
+import rna.modelos.*;
 import rna.otimizadores.*;
 
 public class Main{
@@ -54,7 +53,7 @@ public class Main{
       // exportarHistoricoPerda(rede, ged);
    }
 
-   public static RedeNeural criarRede(int entradas, int saidas){
+   static RedeNeural criarRede(int entradas, int saidas){
       int[] arq = {entradas, 13, 13, saidas};//28x28
       RedeNeural rede = new RedeNeural(arq);
 
@@ -78,7 +77,7 @@ public class Main{
     * @param dadosEntrada dados de entrada para o treino.
     * @param dadosSaida dados de saída relativos a entrada.
     */
-   public static void treinoEmPainel(RedeNeural rede, BufferedImage imagem, double[][] dadosEntrada, double[][] dadosSaida){
+   static void treinoEmPainel(RedeNeural rede, BufferedImage imagem, double[][] dadosEntrada, double[][] dadosSaida){
       final int fps = 600;
       int epocasPorFrame = 30;
 
@@ -119,7 +118,7 @@ public class Main{
     * @param rede rede neural.
     * @param ged gerenciador de dados.
     */
-   public static void exportarHistoricoPerda(Modelo rede, Ged ged){
+   static void exportarHistoricoPerda(Modelo rede, Ged ged){
       System.out.println("Exportando histórico de perda");
       double[] perdas = rede.obterHistorico();
       double[][] dadosPerdas = new double[perdas.length][1];
@@ -139,7 +138,7 @@ public class Main{
     * @param casas quantidade de casas após o ponto fluntuante.
     * @return
     */
-   public static String formatarDecimal(double valor, int casas){
+   static String formatarDecimal(double valor, int casas){
       String valorFormatado = "";
 
       String formato = "#.";

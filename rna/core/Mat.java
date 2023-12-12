@@ -2,9 +2,9 @@ package rna.core;
 
 /**
  * Classe que representa uma matriz em forma de array com o objetivo
- * de acelerar as operações dentro da rede neural.
+ * de acelerar as operações dentro dos modelos.
  */
-public class Mat implements Cloneable{
+public class Mat{
 
    /**
     * Quantidade de linhas da matriz.
@@ -17,7 +17,7 @@ public class Mat implements Cloneable{
    public int col;
 
    /**
-    * Conjunto de dados.
+    * Conjunto de dados da matriz.
     */
    private double[] dados;
 
@@ -350,6 +350,21 @@ public class Mat implements Cloneable{
    }
 
    /**
+    * Subtrai todo o conteúdo da matriz m localmente.
+    * @param m matriz com os dados.
+    */
+   public void sub(Mat m){
+      if(this.tamanho() != m.tamanho()){
+         throw new IllegalArgumentException(
+            "A matriz fornecida deve conter o mesmo número de elementos."
+         );
+      }
+      for(int i = 0; i < this.dados.length; i++){
+         this.dados[i] -= m.dados[i];
+      }
+   }
+
+   /**
     * Multiplica o valor fornecido ao que estiver contido no
     * conteúdo da matriz, de acordo com os índices dados.
     * <p>
@@ -362,9 +377,24 @@ public class Mat implements Cloneable{
     * @param col índice da coluna.
     * @param valor dado que será multiplicado.
     */
-  public void mult(int lin, int col, double valor){
+   public void mult(int lin, int col, double valor){
       int id = indice(lin, col);
       this.dados[id] *= valor;
+   }
+
+   /**
+    * Multiplica todo o conteúdo da matriz m localmente.
+    * @param m matriz com os dados.
+    */
+   public void mult(Mat m){
+      if(this.tamanho() != m.tamanho()){
+         throw new IllegalArgumentException(
+            "A matriz fornecida deve conter o mesmo número de elementos."
+         );
+      }
+      for(int i = 0; i < this.dados.length; i++){
+         this.dados[i] *= m.dados[i];
+      }
    }
 
    /**
@@ -380,9 +410,19 @@ public class Mat implements Cloneable{
     * @param col índice da coluna.
     * @param valor dado que será divido.
     */
-  public void div(int lin, int col, double valor){
+   public void div(int lin, int col, double valor){
       int id = indice(lin, col);
       this.dados[id] /= valor;
+   }
+
+   /**
+    * Multiplica todo o conteúdo da matriz pelo valor fornecido.
+    * @param esc valor para multiplicação.
+    */
+   public void escalar(double esc){
+     for(int i = 0; i < this.dados.length; i++){
+         this.dados[i] *= esc;
+      }
    }
 
    /**

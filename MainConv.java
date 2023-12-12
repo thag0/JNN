@@ -15,7 +15,7 @@ public class MainConv{
    public static void main(String[] args){
       ged.limparConsole();
 
-      int amostras = 5;
+      int amostras = 10;
       int digitos = 2;
       
       double[][][][] entradas = new double[amostras*digitos][digitos][][];
@@ -33,7 +33,7 @@ public class MainConv{
 
       System.out.println("Treinando.");
       t1 = System.nanoTime();
-      cnn.treinar(entradas, saidas, 1);
+      cnn.treinar(entradas, saidas, 201);
       t2 = System.nanoTime();
 
       long tempoDecorrido = t2 - t1;
@@ -42,49 +42,41 @@ public class MainConv{
       minutos = (segundosTotais % 3600) / 60;
       segundos = segundosTotais % 60;
       System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
-      // testes.TesteSequencial.exportarHistoricoPerda(cnn);
+      testes.TesteSequencial.exportarHistoricoPerda(cnn);
 
       //-------------------------------------
       // for(int i = 0; i < 10; i++){
       //    System.out.println("Real: " + i + ", Pred: " + testarImagem(cnn, entradas[i][0]));
       // }
 
-      System.out.println("\nTeste 0");
-      double[][][] teste0 = new double[1][][];
-      teste0[0] = imagemParaMatriz("/dados/mnist/teste/0_teste.jpg");
-      cnn.calcularSaida(teste0);
-      double[] previsao = cnn.saidaParaArray();
-      for(int i = 0; i < previsao.length; i++){
-         System.out.println("Prob: " + i + ": " + (int)(previsao[i]*100) + "%");
-      }
-
-      System.out.println("\nTeste 1");
-      double[][][] teste1 = new double[1][][];
-      teste1[0] = imagemParaMatriz("/dados/mnist/teste/1_teste.jpg");
-      cnn.calcularSaida(teste1);
-      previsao = cnn.saidaParaArray();
-      for(int i = 0; i < previsao.length; i++){
-         System.out.println("Prob: " + i + ": " + (int)(previsao[i]*100) + "%");
-      }
+      testarPorbabilidade(cnn, "0_teste");
+      testarPorbabilidade(cnn, "1_teste");
    } 
 
    public static Sequencial criarModelo(){
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{4, 4}, 10, "tanh"),
-         new Convolucional(new int[]{3, 3}, 10, "tanh"),
+         new Convolucional(formEntrada, new int[]{3, 3}, 20, "tanh"),
+         new MaxPooling(new int[]{4, 4}, 4),
+         new Convolucional(new int[]{3, 3}, 20, "tanh"),
+         new MaxPooling(new int[]{3, 3}, 3),
          new Flatten(),
-         new Densa(100, "tanh"),
+         new Densa(100, "leakyrelu"),
          new Densa(2, "softmax"),
       });
 
-      modelo.compilar(new SGD(0.001, 0.95), new EntropiaCruzada(), new Xavier());
-      // modelo.configurarHistorico(true);
+      modelo.compilar(new SGD(0.001, 0.9), new EntropiaCruzada(), new Xavier(), new Xavier());
+      modelo.configurarHistorico(true);
 
       return modelo;
    }
 
+   /**
+    * 
+    * @param caminho
+    * @return
+    */
    public static double[][] imagemParaMatriz(String caminho){
       BufferedImage img = geim.lerImagem(caminho);
       double[][] imagem = new double[img.getHeight()][img.getWidth()];
@@ -93,6 +85,7 @@ public class MainConv{
 
       for(int y = 0; y < imagem.length; y++){
          for(int x = 0; x < imagem[y].length; x++){
+            // imagem[y][x] = (double)(cinza[y][x] / 255);
             imagem[y][x] = cinza[y][x];
          }
       }
@@ -114,6 +107,22 @@ public class MainConv{
       }
 
       return -1;
+   }
+
+   /**
+    * Testa as previsões do modelo no formato de probabilidade.
+    * @param modelo modelo sequencial de camadas.
+    * @param imagemTeste nome da imagem que deve estar no diretório /minst/teste/
+    */
+   public static void testarPorbabilidade(Sequencial modelo, String imagemTeste){
+      System.out.println("\nTeste " + imagemTeste);
+      double[][][] teste1 = new double[1][][];
+      teste1[0] = imagemParaMatriz("/dados/mnist/teste/" + imagemTeste + ".jpg");
+      modelo.calcularSaida(teste1);
+      double[] previsao = modelo.saidaParaArray();
+      for(int i = 0; i < previsao.length; i++){
+         System.out.println("Prob: " + i + ": " + (int)(previsao[i]*100) + "%");
+      }
    }
 
    public static double[][][][] carregarDadosMNIST(int amostras, int digitos){

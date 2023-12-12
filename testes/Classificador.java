@@ -28,7 +28,6 @@ public class Classificador{
       int ultimoIndice = shape[1]-1;
       ged.categorizar(iris, ultimoIndice);
       System.out.println("Tamanho dados = " + iris.shapeInfo());
-      ged.imprimirInicio(iris);
 
       //separando dados de treino e teste
       double[][] dados = ged.dadosParaDouble(iris);
@@ -56,6 +55,7 @@ public class Classificador{
       Otimizador otimizador = new SGD(0.001, 0.95);
       Inicializador inicializador = new Xavier();
       modelo.compilar(otimizador, perda, inicializador);
+      modelo.configurarHistorico(true);
       
       //treinando e avaliando os resultados
       modelo.treinar(treinoX, treinoY, 3_000);
@@ -70,7 +70,7 @@ public class Classificador{
       d.imprimir();
 
 
-      // exportarHistoricoPerda(modelo, ged);
+      exportarHistoricoPerda(modelo, ged);
       // compararSaidaRede(rede, testeX, testeY, "");
    }
 

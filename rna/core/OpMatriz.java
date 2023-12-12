@@ -1,9 +1,24 @@
 package rna.core;
 
+/**
+ * Impelementações de operações matriciais para uso dentro
+ * da biblioteca.
+ * <p>
+ *    As operações necessitam de objetos do tipo {@code Mat}, que é
+ *    um objeto que representa uma matriz bidimensional, mas alocando
+ *    os dados num array unidimensional para obter mais desempenho de
+ *    execução.
+ * </p>
+ * A matriz do tipo Mat é importada usando:
+ * <pre>
+ * import rna.core.Mat;
+ * </pre>
+ */
 public class OpMatriz{
 
    /**
-    * Impelementações de operações matriciais.
+    * Impelementações de operações matriciais para uso dentro
+    * da biblioteca.
     */
    public OpMatriz(){
 
@@ -238,12 +253,7 @@ public class OpMatriz{
       verificarColunas(a, b, r);
 
       r.copiar(a);
-      int i, j;
-      for(i = 0; i < r.lin; i++){
-         for(j = 0; j < r.col; j++){
-            r.add(i, j, b.dado(i, j));
-         }
-      }
+      r.add(b);
    }
 
    /**
@@ -259,15 +269,10 @@ public class OpMatriz{
    public Mat addR(Mat a, Mat b){
       verificarLinhas(a, b);
       verificarColunas(a, b);
+      
       Mat r = new Mat(a.lin, a.col);
-
       r.copiar(a);
-      int i, j;
-      for(i = 0; i < r.lin; i++){
-         for(j = 0; j < r.col; j++){
-            r.add(i, j, b.dado(i, j));
-         }
-      }
+      r.add(b);
 
       return r;
    }
@@ -287,12 +292,7 @@ public class OpMatriz{
       verificarColunas(a, b, r);
 
       r.copiar(a);
-      int i, j;
-      for(i = 0; i < r.lin; i++){
-         for(j = 0; j < r.col; j++){
-            r.sub(i, j, b.dado(i, j));
-         }
-      }
+      r.sub(b);
    }
 
    /**
@@ -308,15 +308,10 @@ public class OpMatriz{
    public Mat subR(Mat a, Mat b){
       verificarLinhas(a, b);
       verificarColunas(a, b);
+      
       Mat r = new Mat(a.lin, a.col);
-
       r.copiar(a);
-      int i, j;
-      for(i = 0; i < r.lin; i++){
-         for(j = 0; j < r.col; j++){
-            r.sub(i, j, b.dado(i, j));
-         }
-      }
+      r.sub(b);
 
       return r;
    }
@@ -336,12 +331,7 @@ public class OpMatriz{
       verificarColunas(a, b, r);
 
       r.copiar(a);
-      int i, j;
-      for(i = 0; i < r.lin; i++){
-         for(j = 0; j < r.col; j++){
-            r.mult(i, j, b.dado(i, j));
-         }
-      }
+      r.mult(b);
    }
 
    /**
@@ -357,15 +347,10 @@ public class OpMatriz{
    public Mat hadamardR(Mat a, Mat b){
       verificarLinhas(a, b);
       verificarColunas(a, b);
+      
       Mat r = new Mat(a.lin, a.col);
-
       r.copiar(a);
-      int i, j;
-      for(i = 0; i < r.lin; i++){
-         for(j = 0; j < r.col; j++){
-            r.mult(i, j, b.dado(i, j));
-         }
-      }
+      r.mult(b);
 
       return r;
    }
@@ -385,12 +370,7 @@ public class OpMatriz{
       verificarColunas(a, r);
 
       r.copiar(a);
-      int i, j;
-      for(i = 0; i < r.lin; i++){
-         for(j = 0; j < r.col; j++){
-            r.mult(i, j, e);
-         }
-      }
+      r.escalar(e);
    }
 
    /**
