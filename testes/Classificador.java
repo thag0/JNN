@@ -28,6 +28,7 @@ public class Classificador{
       int ultimoIndice = shape[1]-1;
       ged.categorizar(iris, ultimoIndice);
       System.out.println("Tamanho dados = " + iris.shapeInfo());
+      ged.imprimirInicio(iris);
 
       //separando dados de treino e teste
       double[][] dados = ged.dadosParaDouble(iris);
@@ -50,14 +51,11 @@ public class Classificador{
          new Densa(10, "tanh"),
          new Densa(qSaidas, "softmax")
       });
-      // modelo.configurarHistorico(true);
 
-      // Perda perda = new EntropiaCruzada();
       Perda perda = new EntropiaCruzada();
-      Otimizador otimizador = new SGD(0.001, 0.99);
+      Otimizador otimizador = new SGD(0.001, 0.95);
       Inicializador inicializador = new Xavier();
       modelo.compilar(otimizador, perda, inicializador);
-      System.out.println(modelo.info());
       
       //treinando e avaliando os resultados
       modelo.treinar(treinoX, treinoY, 3_000);

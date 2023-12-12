@@ -2,6 +2,7 @@ package testes;
 
 import ged.Dados;
 import ged.Ged;
+import rna.avaliacao.perda.EntropiaCruzada;
 import rna.avaliacao.perda.ErroMedioQuadrado;
 import rna.core.OpMatriz;
 import rna.estrutura.Camada;
@@ -25,26 +26,43 @@ public class TesteSequencial{
       };
 
       double[][] s = {
-         {0},
-         {1},
-         {1},
-         {0}
+      /*  1  0  */   
+         {0, 1},
+         {1, 0},
+         {1, 0},
+         {0, 1}
       };
 
+      int nEntradas = e[0].length;
+      int nSaidas = s[0].length;
+      int nOcultas = 10;
+      long seed = 12345;
+      int epocas = 1_000;
+
+      String atv1 = "tanh";
+      String atv2 = "softmax";
+
       Sequencial seq = new Sequencial(new Camada[]{
-         new Densa(2, 3, "tanh"),
-         new Densa(1, "sigmoid")
+         new Densa(nEntradas, nOcultas, atv1),
+         new Densa(nOcultas, atv1),
+         new Densa(nSaidas, atv2)
       });
-      seq.compilar(new SGD(), new ErroMedioQuadrado(), new Xavier());
-      seq.treinar(e, s, 10_000);
-      System.out.println("Perda Seq: " + seq.avaliador.erroMedioQuadrado(e, s));
+      seq.configurarSeed(seed);
+      seq.compilar(new SGD(), new EntropiaCruzada(), new Xavier());
+      seq.treinar(e, s, epocas);
+      double perdaSeq = seq.avaliador.entropiaCruzada(e, s);
       
-      RedeNeural rna = new RedeNeural(new int[]{2, 3, 1});
-      rna.compilar(new ErroMedioQuadrado(), new SGD(), new Xavier());
-      rna.configurarAtivacao("tanh");
-      rna.configurarAtivacao(rna.obterCamadaSaida(), "sigmoid");
-      rna.treinar(e, s, 10_000);
-      System.out.println("Perda Rna: " + rna.avaliador.erroMedioQuadrado(e, s));
+      RedeNeural rna = new RedeNeural(new int[]{nEntradas, nOcultas, nOcultas, nSaidas});
+      rna.configurarSeed(seed);
+      rna.compilar(new EntropiaCruzada(), new SGD(), new Xavier());
+      rna.configurarAtivacao(atv1);
+      rna.configurarAtivacao(rna.obterCamadaSaida(), atv2);
+      rna.treinar(e, s, epocas);
+      double perdaRna = rna.avaliador.entropiaCruzada(e, s);
+
+      System.out.println("Perda Seq: " + perdaSeq);
+      System.out.println("Perda Rna: " + perdaRna);
+      System.out.println("Diferença RNA - SEQ = " + (perdaRna - perdaSeq));
       
       System.out.println();
       for(int i = 0; i < 2; i++){
