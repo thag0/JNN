@@ -64,7 +64,12 @@ public class MainConv{
          new Densa(2, "softmax"),
       });
 
-      modelo.compilar(new SGD(0.001, 0.9), new EntropiaCruzada(), new Xavier(), new Xavier());
+      modelo.compilar(
+         new SGD(0.001, 0.9),
+         new EntropiaCruzada(),
+         new Xavier(),
+         new Xavier()
+      );
       modelo.configurarHistorico(true);
 
       return modelo;

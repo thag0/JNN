@@ -8,7 +8,7 @@ import rna.estrutura.Flatten;
 import rna.inicializadores.Inicializador;
 import rna.otimizadores.Otimizador;
 
-//TODO verificar problemas de convergência nos algoritmos de treino
+//TODO implementar serialização do modelo
 
 /**
  * Modelo sequencial de camadas.
@@ -64,7 +64,8 @@ import rna.otimizadores.Otimizador;
  * <p>
  *    Modelos sequenciais podem ser facilmente treinados usando o método {@code treinar},
  *    onde é apenas necessário informar os dados de entrada, saída e a quantidade de épocas 
- *    desejada para treinar.
+ *    desejada para treinar. A entrada pode variar dependendo da primeira camada que for 
+ *    adicionada ao modelo.
  * </p>
  * @author Thiago Barroso, acadêmico de Engenharia da Computação pela Universidade Federal do Pará, 
  * Campus Tucuruí. Dezembro/2023.

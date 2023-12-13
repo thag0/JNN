@@ -631,14 +631,14 @@ public class Convolucional extends Camada implements Cloneable{
          }
       }
    }
-   
+
    /**
-    * Verificador de inicialização para evitar problemas de uso incorreto.
+    * Verificador de inicialização para evitar problemas.
     */
-   private void verificarInicializacao(){
+    private void verificarConstrucao(){
       if(this.construida == false){
          throw new IllegalArgumentException(
-            "Camada Convolucional (" + this.id + ") não inicializada."
+            "Camada Convolucional (" + this.id + ") não foi construída."
          );
       }
    }
@@ -692,7 +692,7 @@ public class Convolucional extends Camada implements Cloneable{
     */
    @Override
    public void calcularSaida(Object entrada){
-      verificarInicializacao();
+      verificarConstrucao();
 
       if(entrada instanceof double[]){
          utils.copiar((double[]) entrada, this.entrada);
@@ -750,7 +750,7 @@ public class Convolucional extends Camada implements Cloneable{
     */
    @Override
    public void calcularGradiente(Object gradSeguinte){
-      verificarInicializacao();
+      verificarConstrucao();
 
       if(gradSeguinte instanceof Mat[] == false){
          throw new IllegalArgumentException(
@@ -928,7 +928,7 @@ public class Convolucional extends Camada implements Cloneable{
      */
    @Override
    public int[] formatoSaida(){
-      verificarInicializacao();
+      verificarConstrucao();
 
       return new int[]{
          this.altSaida,

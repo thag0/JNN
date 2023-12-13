@@ -20,9 +20,7 @@ public class OpMatriz{
     * Impelementações de operações matriciais para uso dentro
     * da biblioteca.
     */
-   public OpMatriz(){
-
-   }
+   public OpMatriz(){}
 
    /**
     * Checa se as linhas das matrizes fornecidas são iguais.

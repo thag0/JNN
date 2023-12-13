@@ -373,12 +373,12 @@ public class Densa extends Camada implements Cloneable{
    }
 
    /**
-    * Verificador de inicialização para evitar problemas de uso incorreto.
+    * Verificador de inicialização para evitar problemas.
     */
-   private void verificarInicializacao(){
+   private void verificarConstrucao(){
       if(this.construida == false){
          throw new IllegalArgumentException(
-            "Camada Densa (" + this.id + ") não inicializada."
+            "Camada Densa (" + this.id + ") não foi construída."
          );
       }
    }
@@ -433,7 +433,7 @@ public class Densa extends Camada implements Cloneable{
     */
    @Override
    public void calcularSaida(Object entrada){
-      verificarInicializacao();
+      verificarConstrucao();
 
       if(entrada instanceof Mat[]){
          Mat[] en = (Mat[]) entrada;
@@ -485,7 +485,7 @@ public class Densa extends Camada implements Cloneable{
     */
    @Override
    public void calcularGradiente(Object gradSeguinte){
-      verificarInicializacao();
+      verificarConstrucao();
 
       if(gradSeguinte instanceof Mat[]){
          Mat[] grads = (Mat[]) gradSeguinte;
@@ -494,7 +494,7 @@ public class Densa extends Camada implements Cloneable{
                "A camada densa suporta apenas arrays de matrizes com profundidade = 1."
             );
          }
-         this.entrada.copiar(0, grads[0].linha(0));
+         this.entrada.copiar(grads[0]);
       
       }else if(gradSeguinte instanceof Mat){
          Mat grads = (Mat) gradSeguinte;
@@ -538,15 +538,12 @@ public class Densa extends Camada implements Cloneable{
     * @return quantidade de neurônios presentes na camada.
     */
    public int numNeuronios(){
-      verificarInicializacao();
+      verificarConstrucao();
 
       return this.pesos.col;
    }
 
-   /**
-    * Retorna a instância da função de ativação configurada para a camada.
-    * @return função de ativação da camada.
-    */
+   @Override
    public Ativacao obterAtivacao(){
       return this.ativacao;
    }
@@ -556,7 +553,7 @@ public class Densa extends Camada implements Cloneable{
     * @return tamanho de entrada da camada.
     */
    public int tamanhoEntrada(){
-      verificarInicializacao();
+      verificarConstrucao();
 
       return this.entrada.col;
    }
@@ -576,13 +573,13 @@ public class Densa extends Camada implements Cloneable{
 
    @Override
    public int numParametros(){
-      verificarInicializacao();
+      verificarConstrucao();
 
       int parametros = 0;
       
-      parametros += this.pesos.lin * this.pesos.col;
+      parametros += this.pesos.tamanho();
       if(this.temBias()){
-         parametros += this.bias.lin * this.bias.col;
+         parametros += this.bias.tamanho();
       }
 
       return parametros;
@@ -650,7 +647,7 @@ public class Densa extends Camada implements Cloneable{
    /**
     * Indica algumas informações sobre a camada, como:
     * <ul>
-    *    <li>Id da camada dentro da Rede Neural em que foi criada.</li>
+    *    <li>Id da camada dentro do Modelo em que foi criada.</li>
     *    <li>Função de ativação.</li>
     *    <li>Quantidade de neurônios.</li>
     *    <li>Formato da entrada, pessos, bias e saída.</li>
@@ -660,7 +657,7 @@ public class Densa extends Camada implements Cloneable{
     * @return buffer formatado contendo as informações da camada.
     */
    public String info(){
-      verificarInicializacao();
+      verificarConstrucao();
 
       String buffer = "";
       String espacamento = "    ";
@@ -690,7 +687,7 @@ public class Densa extends Camada implements Cloneable{
     */
    @Override
    public Densa clone(){
-      verificarInicializacao();
+      verificarConstrucao();
 
       try{
          Densa clone = (Densa) super.clone();
@@ -740,7 +737,7 @@ public class Densa extends Camada implements Cloneable{
     * <pre>
     *    formato = (saida.altura, saida.largura)
     * </pre>
-    * No caso da camada densa, o formato também pode ser dito como:
+    * No caso da camada densa, o formato também pode ser descrito como:
     * <pre>
     *    formato = (1, numNeuronios)
     * </pre>

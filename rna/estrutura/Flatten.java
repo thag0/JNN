@@ -55,9 +55,7 @@ public class Flatten extends Camada{
     *    É necessário construir a camada para que ela possa ser usada.
     * </p>
     */
-   public Flatten(){
-
-   }
+   public Flatten(){}
 
    /**
     * Instancia uma camada Flatten, que irá achatar a entrada recebida
@@ -155,13 +153,22 @@ public class Flatten extends Camada{
       this.construida = true;//camada pode ser usada.
    }
 
-   @Override
-   public void inicializar(Inicializador iniKernel, Inicializador iniBias, double x){
+   /**
+    * Verificador de inicialização para evitar problemas.
+    */
+   private void verificarConstrucao(){
+      if(this.construida == false){
+         throw new IllegalArgumentException(
+            "Camada Densa (" + this.id + ") não foi construída."
+         );
+      }
    }
 
    @Override
-   public void inicializar(Inicializador iniKernel, double x){
-   }
+   public void inicializar(Inicializador iniKernel, Inicializador iniBias, double x){}
+
+   @Override
+   public void inicializar(Inicializador iniKernel, double x){}
 
    @Override
    public void configurarId(int id){
@@ -170,6 +177,8 @@ public class Flatten extends Camada{
 
    @Override
    public void calcularSaida(Object entrada){
+      verificarConstrucao();
+
       if(entrada instanceof double[] == false){
          throw new IllegalArgumentException(
             "Os dados de entrada para a camada Flatten devem ser do tipo \"double[]\", " +
@@ -183,6 +192,8 @@ public class Flatten extends Camada{
 
    @Override
    public void calcularGradiente(Object gradSeguinte){
+      verificarConstrucao();
+
       if(gradSeguinte instanceof double[]){
          calcularGrad((double[]) gradSeguinte);
       
@@ -215,16 +226,19 @@ public class Flatten extends Camada{
 
    @Override
    public double[] saidaParaArray(){
+      verificarConstrucao();
       return this.saida;
    }
 
    @Override
    public int tamanhoSaida(){
+      verificarConstrucao();
       return this.saida.length;
    }
 
    @Override
    public int[] formatoEntrada(){
+      verificarConstrucao();
       return this.formEntrada;
    }
 
@@ -244,6 +258,7 @@ public class Flatten extends Camada{
     */
     @Override
    public int[] formatoSaida(){
+      verificarConstrucao();
       return new int[]{
          this.formSaida[0],
          this.formSaida[1]
@@ -257,6 +272,7 @@ public class Flatten extends Camada{
 
    @Override
    public Object obterGradEntrada(){
+      verificarConstrucao();
       return this.gradEntrada;
    }
 

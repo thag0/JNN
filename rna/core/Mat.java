@@ -55,10 +55,32 @@ public class Mat{
 
    /**
     * Inicializa uma nova matriz baseada na matriz fornecida.
-    * @param lin quantidade de linhas da matriz.
-    * @param col quantidade de colunas da matriz.
+    * <p>
+    *    A matriz fornecida deve conter o mesmo número de colunas
+    *    para todas as suas linhas.
+    * </p>
+    * A nova matriz respeitará o formato da matriz fornecida.
+    * Exemplo:
+    * <pre>
+    *m = [
+    *   1, 2, 3 
+    *   4, 5, 6 
+    *]
+    *
+    *mat = [
+    *   1, 2, 3 
+    *   4, 5, 6 
+    *]
+    * </pre>
+    * @param m matriz base.
     */
    public Mat(double[][] m){
+      if(m == null){
+         throw new IllegalArgumentException(
+            "Matriz fonecida é nula."
+         );   
+      }
+
       int n = m[0].length;
       for(int i = 1; i < m.length; i++){
          if(n != m[i].length){
@@ -82,8 +104,19 @@ public class Mat{
 
    /**
     * Inicializa uma nova matriz baseada no array fornecido.
-    * @param lin quantidade de linhas da matriz.
-    * @param col quantidade de colunas da matriz.
+    * <p>
+    *    A nova matriz terá o número de colunas de acordo com 
+    *    o tamanho do array.
+    * </p>
+    * Exemplo:
+    * <pre>
+    *arr = [1, 2, 3, 4]
+    *
+    *mat = [
+    *   1, 2, 3, 4 
+    *]
+    * </pre>
+    * @param arr array base.
     */
    public Mat(double[] arr){
       if(arr == null){
@@ -183,7 +216,7 @@ public class Mat{
    /**
     * Copia todo o conteúdo da matriz fornecida para a instância 
     * que usar o método.
-    * @param m matriz com os dados.
+    * @param m matriz base.
     */
    public void copiar(Mat m){
       if(m.tamanho() != this.tamanho()){
@@ -198,7 +231,7 @@ public class Mat{
    /**
     * Copia todo o conteúdo da matriz fornecida para a instância 
     * que usar o método.
-    * @param m matriz com os dados.
+    * @param m matriz base.
     */
    public void copiar(double[][] m){
       if(m == null){
