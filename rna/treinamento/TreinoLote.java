@@ -70,21 +70,21 @@ public class TreinoLote{
       Perda perda = modelo.obterPerda();
 
       double perdaEpoca;
-      for(int i = 0; i < epochs; i++){
+      for(int e = 0; e < epochs; e++){
          aux.embaralharDados(entradas, saidas);
          perdaEpoca = 0;
 
-         for(int j = 0; j < entradas.length; j += tamLote){
-            int fimIndice = Math.min(j + tamLote, entradas.length);
-            Object[] entradaLote = aux.obterSubMatriz(entradas, j, fimIndice);
-            Object[] saidaLote = aux.obterSubMatriz(saidas, j, fimIndice);
+         for(int i = 0; i < entradas.length; i += tamLote){
+            int fimIndice = Math.min(i + tamLote, entradas.length);
+            Object[] entradaLote = aux.obterSubMatriz(entradas, i, fimIndice);
+            Object[] saidaLote = aux.obterSubMatriz(saidas, i, fimIndice);
 
             //reiniciar gradiente do lote
             zerarGradientesAcumulados(camadas);
-            for(int k = 0; k < entradaLote.length; k++){
-               double[] saidaAmostra = (double[]) saidaLote[k];
+            for(int j = 0; j < entradaLote.length; j++){
+               double[] saidaAmostra = (double[]) saidaLote[j];
 
-               modelo.calcularSaida(entradaLote[k]);
+               modelo.calcularSaida(entradaLote[j]);
                if(this.calcularHistorico){
                   perdaEpoca += perda.calcular(modelo.saidaParaArray(), saidaAmostra);
                }
@@ -145,24 +145,15 @@ public class TreinoLote{
     * de gradiente das camadas.
     */
    void calcularMediaGradientesLote(Densa[] redec, int tamLote){
+      double valor = (double)tamLote;
       for(Densa camada : redec){
-         
-         for(int i = 0; i < camada.pesos.lin; i++){
-            for(int j = 0; j < camada.pesos.col; j++){
-               camada.gradAcPesos.div(i, j, tamLote);
-            }
-         }
+         opmat.dividirEscalar(camada.gradAcPesos, valor, camada.gradAcPesos);
          opmat.copiar(camada.gradAcPesos, camada.gradPesos);
 
          if(camada.temBias()){
-            for(int i = 0; i < camada.bias.lin; i++){
-               for(int j = 0; j < camada.bias.col; j++){
-                  camada.gradAcBias.div(i, j, tamLote);
-               }
-            }
+            opmat.dividirEscalar(camada.gradAcBias, valor, camada.gradAcBias);
             opmat.copiar(camada.gradAcBias, camada.gradBias);
          }
-
       }
    }
 }

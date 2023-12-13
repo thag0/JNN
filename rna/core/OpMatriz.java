@@ -371,6 +371,18 @@ public class OpMatriz{
       r.escalar(e);
    }
 
+   public void dividirEscalar(Mat a, double e, Mat r){
+      verificarLinhas(a, r);
+      verificarColunas(a, r);
+
+      r.copiar(a);
+      for(int i = 0; i < r.lin; i++){
+         for(int j = 0; j < r.col; j++){
+            r.div(i, j, e);
+         }
+      }
+   }
+
    /**
     * Rotaciona o conteúdo da matriz em 180°.
     * @param m matriz.
