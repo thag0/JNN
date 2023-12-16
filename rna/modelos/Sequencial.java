@@ -98,6 +98,10 @@ public class Sequencial extends Modelo{
    /**
     * Inicializa um modelo sequencial a partir de um conjunto de camadas
     * definido
+    * <p>
+    *    É necessário especificar o formato de entrada da primeira camada
+    *    do modelo.
+    * </p>
     * @param camadas camadas que serão usadas pelo modelo.
     * @throws IllegalArgumentException caso o conjunto de camadas seja nulo
     * ou alguma camada contida seja.
@@ -280,10 +284,6 @@ public class Sequencial extends Modelo{
       }
    }
 
-   /**
-    * Propaga os dados de entrada pelo modelo.
-    * @param entrada entrada.
-    */
    @Override
    public void calcularSaida(Object entrada){
       verificarCompilacao();
@@ -294,10 +294,6 @@ public class Sequencial extends Modelo{
       }
    }
 
-   /**
-    * Propaga os dados de entrada pelo modelo.
-    * @param entradas entrada.
-    */
    @Override
    public Object[] calcularSaidas(Object[] entradas){
       verificarCompilacao();
@@ -312,53 +308,36 @@ public class Sequencial extends Modelo{
       return previsoes;
    }
 
-   /**
-    * Treina o modelo de acordo com as configurações predefinidas.
-    * <p>
-    *    Certifique-se de configurar adequadamente o modelo para obter os 
-    *    melhores resultados.
-    * </p>
-    * @param entradas dados de entrada do treino (features). Dependendo da entrada
-    * do modelo, pode assumir diferentes formatos, para camadas convolucionais é
-    * {@code double[][][][]}, para camadas densas é {@code double[][]}.
-    * @param saidas dados de saída correspondente a entrada (class).
-    * @param epochs quantidade de épocas de treinamento.
-    * @param logs .
-    * @throws IllegalArgumentException se o modelo não foi compilado previamente.
-    * @throws IllegalArgumentException se houver alguma inconsistência dos dados de entrada e saída para a operação.
-    * @throws IllegalArgumentException se o valor de épocas for menor que um.
-    */
    @Override
    public void treinar(Object[] entradas, Object[] saidas, int epochs){
       verificarCompilacao();
+      
+      if(entradas.length != saidas.length){
+         throw new IllegalArgumentException(
+            "Incompatibilidade na quantidade de amostras de entrada (" + entradas.length + ")" +
+            "e saídas (" + saidas.length + ")."
+         );
+      }
+
+      if(epochs < 1){
+         throw new IllegalArgumentException(
+            "O valor de épocas deve ser maior que zero, recebido = " + epochs
+         );
+      }
+
       treinador.treino(this, entradas, saidas, epochs);
    }
-
-   /**
-    * Retorna a função de perda configurada do modelo.
-    * @return função de perda atual do modelo.
-    */
-   @Override
-   public Perda obterPerda(){
-      return this.perda;
-   }
- 
-    /**
-     * Retorna o otimizador que está sendo usado para o treino do modelo.
-     * @return otimizador atual do modelo.
-     */
+   
    @Override
    public Otimizador obterOtimizador(){
       return this.otimizador;
    }
 
-   /**
-    * Retorna a {@code camada} do Modelo correspondente ao índice fornecido.
-    * @param id índice da busca.
-    * @return camada baseada na busca.
-    * @throws IllegalArgumentException se o índice estiver fora do alcance do tamanho 
-    * das camadas.
-    */
+   @Override
+   public Perda obterPerda(){
+      return this.perda;
+   }
+
    @Override
    public Camada obterCamada(int id){
       verificarCompilacao();
@@ -373,53 +352,29 @@ public class Sequencial extends Modelo{
       return this.camadas[id];
    }
 
-   /**
-    * Retorna todo o conjunto de camadas presente no modelo.
-    * @throws IllegalArgumentException se o modelo não foi compilado previamente.
-    * @return conjunto de camadas do modelo.
-    */
    @Override
    public Camada[] obterCamadas(){
       verificarCompilacao();
       return this.camadas;
    }
 
-   /**
-    * Retorna a {@code camada de saída} do modelo.
-    * @return camada de saída.
-    */
    @Override
    public Camada obterCamadaSaida(){
       this.verificarCompilacao();
       return this.camadas[this.camadas.length-1];
    }
 
-   /**
-    * Retorna um array contendo a saída do modelo.
-    * @return saída do modelo.
-    */
    @Override
    public double[] saidaParaArray(){
       verificarCompilacao();
       return this.obterCamadaSaida().saidaParaArray();
    }
 
-   /**
-    * Informa o nome configurado da Rede Neural.
-    * @return nome específico da rede.
-    */
    @Override
    public String obterNome(){
       return this.nome;
    }
 
-   /**
-    * Retorna a quantidade total de parâmetros do modelo.
-    * <p>
-    *    isso inclui todos os kernels e bias (caso configurados).
-    * </p>
-    * @return quantiade de parâmetros total do modelo.
-    */
    @Override
    public int obterQuantidadeParametros(){
       int parametros = 0;
@@ -429,30 +384,14 @@ public class Sequencial extends Modelo{
       return parametros;
    }
 
-   /**
-    * Retorna a quantidade de camadas presente no modelo.
-    * @return quantidade de camadas do modelo.
-    * @throws IllegalArgumentException se o modelo não foi compilado previamente.
-    */
    @Override
    public int obterQuantidadeCamadas(){
       this.verificarCompilacao();
       return this.camadas.length;
    }
 
-   /**
-    * Disponibiliza o histórico da função de perda do modelo durante cada época
-    * de treinamento.
-    * <p>
-    *    O histórico será o do ultimo processo de treinamento usado, seja ele sequencial ou em
-    *    lotes. Sendo assim, por exemplo, caso o treino seja em sua maioria feito pelo modo sequencial
-    *    mas logo depois é usado o treino em lotes, o histórico retornado será o do treinamento em lote.
-    * </p>
-    * @return lista contendo o histórico de perdas durante o treinamento da rede.
-    * @throws IllegalArgumentException se não foi habilitado previamente o cálculo do 
-    * histórico de custos.
-    */
-    public double[] obterHistorico(){
+   @Override
+   public double[] obterHistorico(){
       if(this.calcularHistorico){
          return this.treinador.obterHistorico();
       
@@ -463,10 +402,7 @@ public class Sequencial extends Modelo{
       }
    }
 
-   /**
-    * Informações sobre o modelo
-    * @return
-    */
+   @Override
    public String info(){
       verificarCompilacao();
 

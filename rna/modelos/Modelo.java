@@ -145,6 +145,18 @@ public class Modelo{
       );
    }
 
+   /**
+    * Treina o modelo de acordo com as configurações predefinidas.
+    * <p>
+    *    Certifique-se de configurar adequadamente o modelo para obter os 
+    *    melhores resultados.
+    * </p>
+    * @param entradas dados de entrada do treino (features). Dependendo da entrada
+    * do modelo, pode assumir diferentes formatos, para camadas convolucionais é
+    * {@code double[][][][]}, para camadas densas é {@code double[][]}.
+    * @param saidas dados de saída correspondente a entrada (class).
+    * @param epochs quantidade de épocas de treinamento.
+    */
    public void treinar(Object[] entradas, Object[] saidas, int epochs){
       throw new IllegalArgumentException(
          "Implementar treinamento para o modelo."
@@ -157,76 +169,139 @@ public class Modelo{
       );
    }
 
+   /**
+    * Propaga os dados de entrada pelo modelo.
+    * @param entrada entrada.
+    */
    public void calcularSaida(Object entrada){
       throw new IllegalArgumentException(
          "Implementar calculo de saída do modelo."
       );
    }
 
+   /**
+    * Propaga os dados de entrada pelo modelo.
+    * @param entradas array contendo multiplas entradas.
+    * @return array contendo as saídas correspondentes.
+    */
    public Object[] calcularSaidas(Object[] entradas){
       throw new IllegalArgumentException(
          "Implementar calculo de saída do modelo para múltiplas entradas."
       );
    }
 
+   /**
+    * Retorna o otimizador que está sendo usado para o treino do modelo.
+    * @return otimizador atual do modelo.
+    */
    public Otimizador obterOtimizador(){
      throw new IllegalArgumentException(
          "Implementar retorno do otimizador do modelo."
       );       
    }
 
+   /**
+    * Retorna a função de perda configurada do modelo.
+    * @return função de perda atual do modelo.
+    */
    public Perda obterPerda(){
      throw new IllegalArgumentException(
          "Implementar retorno da função de perda do modelo."
       );       
    }
 
+   /**
+    * Retorna a {@code camada} do Modelo correspondente ao índice fornecido.
+    * @param id índice da busca.
+    * @return camada baseada na busca.
+    */
    public Camada obterCamada(int id){
       throw new IllegalArgumentException(
          "Implementar retorno de camada baseado em índice do modelo."
       ); 
    }
 
-   public Camada obterCamadaSaida(){
-      throw new IllegalArgumentException(
-         "Implementar retorno da camada de saída do modelo."
-      ); 
-   }
-
+   /**
+    * Retorna todo o conjunto de camadas presente no modelo.
+    * @return conjunto de camadas do modelo.
+    */
    public Camada[] obterCamadas(){
       throw new IllegalArgumentException(
          "Implementar retorno das camadas do modelo."
       ); 
    }
+
+   /**
+    * Retorna a {@code camada de saída}, ou última camada, do modelo.
+    * @return camada de saída.
+    */
+   public Camada obterCamadaSaida(){
+      throw new IllegalArgumentException(
+         "Implementar retorno da camada de saída do modelo."
+      ); 
+   }
    
+   /**
+    * Retorna um array contendo a saída serializada do modelo.
+    * @return saída do modelo.
+    */
    public double[] saidaParaArray(){      
       throw new IllegalArgumentException(
          "Implementar retorno de saída para array do modelo."
       ); 
    }
 
+   /**
+    * Informa o nome configurado do modelo.
+    * @return nome do modelo.
+    */
    public String obterNome(){
       return this.nome;
    }
 
+   /**
+    * Retorna a quantidade total de parâmetros do modelo.
+    * <p>
+    *    isso inclui todos os kernels e bias (caso configurados).
+    * </p>
+    * @return quantiade de parâmetros total do modelo.
+    */
    public int obterQuantidadeParametros(){
       throw new IllegalArgumentException(
          "Implementar retorno da quantidade de parâmetros do modelo."
       );     
    }
 
+   /**
+    * Retorna a quantidade de camadas presente no modelo.
+    * @return quantidade de camadas do modelo.
+    */
    public int obterQuantidadeCamadas(){
       throw new IllegalArgumentException(
          "Implementar retorno da quantidade de camadas do modelo."
       ); 
    }
 
+   /**
+    * Disponibiliza o histórico da função de perda do modelo durante cada época
+    * de treinamento.
+    * <p>
+    *    O histórico será o do ultimo processo de treinamento usado, seja ele sequencial ou em
+    *    lotes. Sendo assim, por exemplo, caso o treino seja em sua maioria feito pelo modo sequencial
+    *    mas logo depois é usado o treino em lotes, o histórico retornado será o do treinamento em lote.
+    * </p>
+    * @return array contendo o valor de perda durante cada época de treinamento do modelo.
+    */
    public double[] obterHistorico(){
       throw new IllegalArgumentException(
          "Implementar retorno do histórico de perdas do modelo."
       ); 
    }
 
+   /**
+    * Mostra as informações sobre o modelo.
+    * @return buffer formatado contendo as informações do modelo.
+    */
    public String info(){
       return "Modelo base.";
    }
