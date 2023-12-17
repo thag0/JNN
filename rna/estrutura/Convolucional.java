@@ -7,7 +7,7 @@ import rna.core.OpMatriz;
 import rna.core.Utils;
 import rna.inicializadores.Constante;
 import rna.inicializadores.Inicializador;
-import rna.serializacao.DicionarioAtivacoes;
+import rna.serializacao.Dicionario;
 
 /**
  * Camada Convolucional.
@@ -645,7 +645,7 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override
    public void configurarAtivacao(String ativacao){
-      DicionarioAtivacoes dic = new DicionarioAtivacoes();
+      Dicionario dic = new Dicionario();
       this.ativacao = dic.obterAtivacao(ativacao);
    }
 

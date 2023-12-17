@@ -22,7 +22,7 @@ public class Modelo{
     * indevido caso ainda não tenha suas variáveis e dependências inicializadas 
     * previamente.
     */
-   protected boolean compilado;
+   public boolean compilado;
 
    /**
     * Função de perda usada durante o processo de treinamento.

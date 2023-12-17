@@ -6,7 +6,7 @@ import rna.core.Mat;
 import rna.core.OpMatriz;
 import rna.inicializadores.Constante;
 import rna.inicializadores.Inicializador;
-import rna.serializacao.DicionarioAtivacoes;
+import rna.serializacao.Dicionario;
 
 /**
  * Camada Densa ou fully-connected.
@@ -391,7 +391,7 @@ public class Densa extends Camada implements Cloneable{
 
    @Override
    public void configurarAtivacao(String ativacao){
-      DicionarioAtivacoes dicionario = new DicionarioAtivacoes();
+      Dicionario dicionario = new Dicionario();
       this.ativacao = dicionario.obterAtivacao(ativacao);
    }
 
@@ -409,6 +409,11 @@ public class Densa extends Camada implements Cloneable{
    @Override
    public void configurarId(int id){
       this.id = id;
+   }
+
+   @Override
+   public void configurarBias(boolean usarBias){
+      this.usarBias = usarBias;
    }
 
    /**

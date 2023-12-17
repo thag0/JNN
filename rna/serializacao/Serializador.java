@@ -6,10 +6,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 
+import rna.avaliacao.perda.Perda;
 import rna.estrutura.Camada;
 import rna.estrutura.Densa;
 import rna.modelos.RedeNeural;
 import rna.modelos.Sequencial;
+import rna.otimizadores.Otimizador;
 
 /**
  * Classe responsável por tratar da serialização/desserialização de objetos
@@ -201,7 +203,7 @@ public class Serializador{
     */
    public RedeNeural lerRedeNeural(String caminho){
       RedeNeural rede = null;
-      DicionarioAtivacoes dicionario = new DicionarioAtivacoes();
+      Dicionario dicionario = new Dicionario();
 
       try(BufferedReader br = new BufferedReader(new FileReader(caminho))){
          //arquitetura
@@ -257,10 +259,15 @@ public class Serializador{
 
    public Sequencial lerSequencial(String caminho){
       Sequencial modelo = new Sequencial();
+      Dicionario dic = new Dicionario();
 
       try(BufferedReader br = new BufferedReader(new FileReader(caminho))){
          int numCamadas = Integer.parseInt(br.readLine());
+         Otimizador otimizador = dic.obterOtimizador(br.readLine().trim());
+         Perda perda = dic.obterPerda(br.readLine().trim());
       
+         modelo.configurarOtimizador(otimizador);
+         modelo.configurarPerda(perda);
          for(int i = 0; i < numCamadas; i++){
             String nome = br.readLine();
             if(nome.equals("Densa")){
@@ -270,8 +277,10 @@ public class Serializador{
             }
          }
 
-      }catch(Exception e){
+         modelo.compilado = true;
 
+      }catch(Exception e){
+         throw new RuntimeException(e);
       }
 
       return modelo;

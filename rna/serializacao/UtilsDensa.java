@@ -16,14 +16,14 @@ class UtilsDensa{
          //formato de entrada
          int[] entrada = camada.formatoEntrada();
          for(int i = 0; i < entrada.length; i++){
-            bw.write(i + " ");
+            bw.write(entrada[i] + " ");
          }
          bw.newLine();
          
          //formato de saída
          int[] saida = camada.formatoSaida();
          for(int i = 0; i < saida.length; i++){
-            bw.write(i + " ");
+            bw.write(saida[i] + " ");
          }
          bw.newLine();
          
