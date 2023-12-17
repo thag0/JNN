@@ -1,5 +1,6 @@
 package rna.modelos;
 
+import rna.avaliacao.Avaliador;
 import rna.avaliacao.perda.Perda;
 import rna.estrutura.Camada;
 import rna.estrutura.Convolucional;
@@ -7,6 +8,8 @@ import rna.estrutura.Densa;
 import rna.estrutura.Flatten;
 import rna.inicializadores.Inicializador;
 import rna.otimizadores.Otimizador;
+import rna.serializacao.Dicionario;
+import rna.treinamento.Treinador;
 
 //TODO implementar serialização do modelo
 
@@ -70,7 +73,7 @@ import rna.otimizadores.Otimizador;
  * @author Thiago Barroso, acadêmico de Engenharia da Computação pela Universidade Federal do Pará, 
  * Campus Tucuruí. Dezembro/2023.
  */
-public class Sequencial extends Modelo{
+public class Sequencial extends Modelo implements Cloneable{
 
    /**
     * Lista de camadas do modelo.
@@ -237,7 +240,7 @@ public class Sequencial extends Modelo{
       
       for(int i = 1; i < this.camadas.length; i++){
          this.camadas[i].construir(this.camadas[i-1].formatoSaida());
-         this.camadas[i].inicializar(iniKernel, iniBias, 1);
+         this.camadas[i].inicializar(iniKernel, iniBias, 0);
          this.camadas[i].configurarId(i);
       }
 
@@ -421,5 +424,32 @@ public class Sequencial extends Modelo{
       buffer += "]\n";
 
       return buffer;
+   }
+
+   @Override
+   public Sequencial clonar(){
+      try{
+         Sequencial clone = (Sequencial) super.clone();
+
+         clone.avaliador = new Avaliador(this);
+         clone.calcularHistorico = this.calcularHistorico;
+         clone.nome = "Clone de " + this.nome;
+         
+         Dicionario dic = new Dicionario();
+         clone.otimizador = dic.obterOtimizador(this.otimizador.getClass().getSimpleName());
+         clone.perda = dic.obterPerda(this.perda.getClass().getSimpleName());
+         clone.seedInicial = this.seedInicial;
+         clone.treinador = new Treinador();
+         
+         clone.camadas = new Camada[this.numCamadas()];
+         for(int i = 0; i < this.camadas.length; i++){
+            clone.camadas[i] = this.camada(i).clonar();
+         }
+         clone.compilado = this.compilado;
+
+         return clone;
+      }catch(Exception e){
+         throw new RuntimeException(e);
+      }
    }
 }

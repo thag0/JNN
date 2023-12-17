@@ -354,4 +354,14 @@ public class Camada{
          "Implementar edição do bias para a camada " + this.getClass().getTypeName() + "."
       );
    }
+
+   /**
+    * Clona as características principais da camada.
+    * @return clone da camada.
+    */
+   public Camada clonar(){
+      throw new IllegalArgumentException(
+         "Implementar clonagem para a camada " + this.getClass().getTypeName() + "." 
+      );
+   }
 }

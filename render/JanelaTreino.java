@@ -6,7 +6,7 @@ import java.io.File;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
-import rna.modelos.RedeNeural;
+import rna.modelos.Modelo;
 
 public class JanelaTreino extends JFrame{
 
@@ -37,11 +37,11 @@ public class JanelaTreino extends JFrame{
    }
 
 
-   public void desenharTreino(RedeNeural rede, int epocasPorFrame){
+   public void desenharTreino(Modelo modelo, int epocasPorFrame){
       if(this.numThreads == 1){
-         painelTreino.desenhar(rede, epocasPorFrame);
+         painelTreino.desenhar(modelo, epocasPorFrame);
       }else{
-         painelTreino.desenharMultithread(rede, epocasPorFrame, this.numThreads);
+         painelTreino.desenharMultithread(modelo, epocasPorFrame, this.numThreads);
       }
    }
 }

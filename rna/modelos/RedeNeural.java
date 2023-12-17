@@ -1088,7 +1088,7 @@ public class RedeNeural extends Modelo implements Cloneable{
    }
 
    @Override
-   public RedeNeural clone(){
+   public RedeNeural clonar(){
       try{
          RedeNeural clone = (RedeNeural) super.clone();
 
@@ -1099,7 +1099,7 @@ public class RedeNeural extends Modelo implements Cloneable{
 
          clone.camadas = new Densa[this.camadas.length];
          for(int i = 0; i < this.camadas.length; i++){
-            clone.camadas[i] = this.camadas[i].clone();
+            clone.camadas[i] = this.camadas[i].clonar();
          }
 
          return clone;

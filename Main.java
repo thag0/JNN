@@ -6,8 +6,11 @@ import ged.*;
 import geim.Geim;
 import render.JanelaTreino;
 import rna.avaliacao.perda.*;
+import rna.estrutura.*;
 import rna.inicializadores.*;
-import rna.modelos.*;
+import rna.modelos.Modelo;
+import rna.modelos.RedeNeural;
+import rna.modelos.Sequencial;
 import rna.otimizadores.*;
 
 public class Main{
@@ -16,19 +19,23 @@ public class Main{
    static Ged ged = new Ged();
    static Geim geim = new Geim();
 
-   public static void main(String[] args){
-      
+   public static void main(String[] args){      
       ged.limparConsole();
-      BufferedImage imagem = geim.lerImagem("/dados/mnist/treino/7/img_1.jpg");
-      double[][] dados = geim.imagemParaDadosTreinoEscalaCinza(imagem);
 
       int tamEntrada = 2;
       int tamSaida = 1;
+      BufferedImage imagem = geim.lerImagem("/dados/mnist/treino/7/img_1.jpg");
+      
+      double[][] dados;
+      if(tamSaida == 1) dados = geim.imagemParaDadosTreinoEscalaCinza(imagem);
+      else if(tamSaida == 3) dados = geim.imagemParaDadosTreinoRGB(imagem);
+      else return;
+
       double[][] in  = (double[][]) ged.separarDadosEntrada(dados, tamEntrada);
       double[][] out = (double[][]) ged.separarDadosSaida(dados, tamSaida);
 
-      RedeNeural rede = criarRede(tamEntrada, tamSaida);
-      System.out.println(rede.info());
+      Modelo modelo = criarModelo(tamEntrada, tamSaida, false);
+      System.out.println(modelo.info());
 
       //treinar e marcar tempo
       long t1, t2;
@@ -36,7 +43,7 @@ public class Main{
 
       System.out.println("Treinando.");
       t1 = System.nanoTime();
-      treinoEmPainel(rede, imagem.getWidth(), imagem.getHeight(), in, out);
+      treinoEmPainel(modelo, imagem.getWidth(), imagem.getHeight(), in, out);
       t2 = System.nanoTime();
 
       long tempoDecorrido = t2 - t1;
@@ -45,40 +52,45 @@ public class Main{
       minutos = (segundosTotais % 3600) / 60;
       segundos = segundosTotais % 60;
 
-      double precisao = (1 - rede.avaliador.erroMedioAbsoluto(in, out))*100;
-      double perda = rede.avaliador.erroMedioQuadrado(in, out);
+      double precisao = (1 - modelo.avaliador.erroMedioAbsoluto(in, out))*100;
+      double perda = modelo.avaliador.erroMedioQuadrado(in, out);
       System.out.println("Precisão = " + formatarDecimal(precisao, 2) + "%");
       System.out.println("Perda = " + perda);
       System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
       // exportarHistoricoPerda(rede, ged);
    }
 
-   static RedeNeural criarRede(int entradas, int saidas){
-      int[] arq = {entradas, 13, 13, saidas};//28x28
-      RedeNeural rede = new RedeNeural(arq);
-
+   static Modelo criarModelo(int entradas, int saidas, boolean rna){
+      Otimizador otm = new SGD(0.0001, 0.999);
       Perda perda = new ErroMedioQuadrado();
-      Otimizador otm = new SGD(0.00001, 0.9995);
-      // Otimizador otm = new Adagrad(0.999999);
       Inicializador ini = new Xavier();
 
-      // rede.configurarHistorico(true);
-      rede.compilar(otm, perda, ini);
-      rede.configurarAtivacao("tanh");
-      rede.configurarAtivacao(rede.camadaSaida(), "sigmoid");
-
-      return rede;
+      if(rna){
+         int[] arq = {entradas, 13, 13, saidas};
+         RedeNeural modelo = new RedeNeural(arq);
+         modelo.compilar(otm, perda, ini);
+         modelo.configurarAtivacao("tanh");
+         modelo.configurarAtivacao(modelo.camadaSaida(), "sigmoid");
+         return modelo;
+      
+      }else{
+         Sequencial modelo = new Sequencial();
+         modelo.add(new Densa(entradas, 13, "tanh"));
+         modelo.add(new Densa(13, saidas, "sigmoid"));
+         modelo.compilar(otm, perda, ini);
+         return modelo;
+      }
    }
 
    /**
     * Treina e exibe o resultado da Rede Neural no painel.
-    * @param rede modelo de rede neural usado no treino.
+    * @param modelo modelo de rede neural usado no treino.
     * @param altura altura da janela renderizada.
     * @param largura largura da janela renderizada.
     * @param entradas dados de entrada para o treino.
     * @param saidas dados de saída relativos a entrada.
     */
-   static void treinoEmPainel(RedeNeural rede, int altura, int largura, double[][] entradas, double[][] saidas){
+   static void treinoEmPainel(Modelo modelo, int altura, int largura, double[][] entradas, double[][] saidas){
       final int fps = 600;
       int epocasPorFrame = 30;
 
@@ -88,7 +100,7 @@ public class Main{
       int numThreads = (n > 1) ? (int)(n * 0.5) : 1;
 
       JanelaTreino jt = new JanelaTreino(largura, altura, escalaRender, numThreads);
-      jt.desenharTreino(rede, 0);
+      jt.desenharTreino(modelo, 0);
       
       //trabalhar com o tempo de renderização baseado no fps
       double intervaloDesenho = 1000000000/fps;
@@ -97,8 +109,8 @@ public class Main{
       
       int i = 0;
       while(i < epocas && jt.isVisible()){
-         rede.treinar(entradas, saidas, epocasPorFrame);
-         jt.desenharTreino(rede, i);
+         modelo.treinar(entradas, saidas, epocasPorFrame);
+         jt.desenharTreino(modelo, i);
          i += epocasPorFrame;
 
          try{

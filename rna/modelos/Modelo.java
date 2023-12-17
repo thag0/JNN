@@ -346,4 +346,14 @@ public class Modelo{
    public String info(){
       return "Modelo base.";
    }
+
+   /**
+    * Clona as características principais do modelo.
+    * @return clone do modelo.
+    */
+   public Modelo clonar(){
+      throw new IllegalArgumentException(
+         "Implementar clonagem para o modelo " + this.getClass().getTypeName()
+      );
+   }
 }

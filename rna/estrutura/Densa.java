@@ -692,7 +692,7 @@ public class Densa extends Camada implements Cloneable{
     * @return clone da camada.
     */
    @Override
-   public Densa clone(){
+   public Densa clonar(){
       verificarConstrucao();
 
       try{
