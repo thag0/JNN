@@ -309,7 +309,8 @@ public class Densa extends Camada implements Cloneable{
    public void construir(Object entrada){
       if(entrada instanceof int[] == false){
          throw new IllegalArgumentException(
-            ""
+            "Objeto esperado para entrada da camada Densa é do tipo int[], " +
+            "objeto recebido é do tipo " + entrada.getClass().getTypeName()
          );
       }
 
