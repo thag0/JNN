@@ -221,6 +221,11 @@ public class Sequencial extends Modelo{
             "É necessário que a primeira camada seja construída."
          );
       }
+      if(iniKernel == null){
+         throw new IllegalArgumentException(
+            "O inicializador para o kernel não pode ser nulo."
+         );
+      }
 
       if(seedInicial != 0){
          iniKernel.configurarSeed(seedInicial);
@@ -232,14 +237,6 @@ public class Sequencial extends Modelo{
       
       for(int i = 1; i < this.camadas.length; i++){
          this.camadas[i].construir(this.camadas[i-1].formatoSaida());
-      }
-      
-      if(iniKernel == null){
-         throw new IllegalArgumentException(
-            "O inicializador para o kernel não pode ser nulo."
-         );
-      }
-      for(int i = 0; i < this.camadas.length; i++){
          this.camadas[i].inicializar(iniKernel, iniBias, 0);
          this.camadas[i].configurarId(i);
       }

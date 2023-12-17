@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 
+import rna.estrutura.Camada;
 import rna.estrutura.Densa;
 import rna.modelos.RedeNeural;
 import rna.modelos.Sequencial;
@@ -23,6 +24,10 @@ import rna.modelos.Sequencial;
  */
 public class Serializador{
 
+   private UtilsDensa auxDensa = new UtilsDensa();
+
+   public Serializador(){}
+
    /**
     * Salva as informações mais essenciais sobre a Rede Neural incluindo arquitetura,
     * funções de ativação de todas as camadas, bias configurado e o mais importante que
@@ -39,7 +44,7 @@ public class Serializador{
     * @param rede instância de uma Rede Neural.
     * @param caminho caminho onde o arquivo da rede será salvo.
     */
-   public static void salvar(RedeNeural rede, String caminho){
+   public void salvar(RedeNeural rede, String caminho){
       salvar(rede, caminho, Double.TYPE);
    }
 
@@ -61,7 +66,7 @@ public class Serializador{
     * pode ser um objeto do tipo {@code String} contendo o nome (por exemplo "float") ou uma
     * instância de objeto do tipo {@code Number}.
     */
-   public static void salvar(RedeNeural rede, String caminho, Object tipo){
+   public void salvar(RedeNeural rede, String caminho, Object tipo){
       if(tipo instanceof String){
          String t = (String) tipo;
          
@@ -102,7 +107,7 @@ public class Serializador{
     * @param caminho caminho onde o arquivo da rede será salvo.
     * @param tipo classe contendo tipo de valor que será usado para salvar os pesos da Rede Neural.
     */
-   public static void salvar(RedeNeural rede, String caminho, Class<?> tipo){
+   public void salvar(RedeNeural rede, String caminho, Class<?> tipo){
       File arquivo = new File(caminho);
       if(!arquivo.getName().toLowerCase().endsWith(".txt")){
          throw new IllegalArgumentException("O caminho especificado não é um arquivo de texto válido.");
@@ -130,55 +135,7 @@ public class Serializador{
 
          //pesos dos neuronios
          for(Densa camada : rede.camadas()){
-
-            for(int i = 0; i < camada.pesos.lin; i++){
-               for(int j = 0; j < camada.pesos.col; j++){
-                  double peso = camada.pesos.dado(i, j);
-                  
-                  if(tipo.equals(Double.TYPE)){
-                     writer.write(Double.toString(peso));
-                  
-                  }else if(tipo.equals(Float.TYPE)){
-                     writer.write(Float.toString((float)peso));
-                  
-                  }else if(tipo.equals(Integer.TYPE)){
-                     writer.write(Float.toString((int)peso));
-                     
-                  }else if(tipo.equals(Short.TYPE)){
-                     writer.write(Float.toString((short)peso));
-
-                  }else if(tipo.equals(Byte.TYPE)){
-                     writer.write(Float.toString((byte)peso));
-                  }
-
-                  writer.newLine();
-               }
-            }
-
-            if(camada.temBias()){
-               for(int i = 0; i < camada.bias.col; i++){
-                  double bias = camada.bias.dado(0, i);
-
-                  if(tipo.equals(Double.TYPE)){
-                     writer.write(Double.toString(bias));
-                  
-                  }else if(tipo.equals(Float.TYPE)){
-                     writer.write(Float.toString((float)bias));
-                  
-                  }else if(tipo.equals(Integer.TYPE)){
-                     writer.write(Float.toString((int)bias));
-                     
-                  }else if(tipo.equals(Short.TYPE)){
-                     writer.write(Float.toString((short)bias));
-
-                  }else if(tipo.equals(Byte.TYPE)){
-                     writer.write(Float.toString((byte)bias));
-                  }
-
-                  writer.newLine();
-               }
-            }
- 
+            auxDensa.serializar(camada, writer);
          }
 
       }catch(Exception e){
@@ -187,8 +144,38 @@ public class Serializador{
       }
    }
 
-   public static void salvar(Sequencial modelo, String caminho){
+   public void salvar(Sequencial modelo, String caminho){
+      File arquivo = new File(caminho);
+      if(!arquivo.getName().toLowerCase().endsWith(".txt")){
+         throw new IllegalArgumentException("O caminho especificado não é um arquivo de texto válido.");
+      }
+
+      try(BufferedWriter bw = new BufferedWriter(new FileWriter(arquivo))){
+         //quantidade de camadas
+         bw.write(String.valueOf(modelo.numCamadas()));
+         bw.newLine();
+
+         //otimizador usado
+         bw.write(modelo.otimizador().getClass().getSimpleName());
+         bw.newLine();
+
+         //
+         bw.write(modelo.perda().getClass().getSimpleName());
+         bw.newLine();
+
+         for(Camada camada : modelo.camadas()){
+            if(camada instanceof Densa){
+               auxDensa.serializar((Densa)camada, bw);
+            }else{
+               throw new IllegalArgumentException(
+                  "Tipo de camada \"" + camada.getClass().getTypeName() + "\" não suportado."
+               );
+            }
+         }
       
+      }catch(Exception e){
+         e.printStackTrace();
+      }
    }
 
    /**
@@ -212,13 +199,13 @@ public class Serializador{
     * @param caminho caminho onde está salvo o arquivo {@code .txt} da Rede Neural.
     * @return Instância de Rede Neural baseada nas configurações lidas pelo arquivo.
     */
-   public static RedeNeural ler(String caminho){
+   public RedeNeural lerRedeNeural(String caminho){
       RedeNeural rede = null;
       DicionarioAtivacoes dicionario = new DicionarioAtivacoes();
 
-      try(BufferedReader reader = new BufferedReader(new FileReader(caminho))){
+      try(BufferedReader br = new BufferedReader(new FileReader(caminho))){
          //arquitetura
-         String[] arqStr = reader.readLine().split(" ");
+         String[] arqStr = br.readLine().split(" ");
          int[] arq = new int[arqStr.length];
 
          try{
@@ -234,10 +221,10 @@ public class Serializador{
          }
 
          //bias
-         boolean bias = Boolean.parseBoolean(reader.readLine());
+         boolean bias = Boolean.parseBoolean(br.readLine());
 
          //funções de ativação
-         String[] ativacoesStr = reader.readLine().split(" ");
+         String[] ativacoesStr = br.readLine().split(" ");
 
          //inicialização e configurações da rede
          rede = new RedeNeural(arq);
@@ -248,29 +235,15 @@ public class Serializador{
             rede.configurarAtivacao(rede.camada(i), dicionario.obterAtivacao(ativacoesStr[i]));
          }
 
-         int cont = 1;
-         try{
-            for(Densa camada : rede.camadas()){
-               for(int i = 0; i < camada.pesos.lin; i++){
-                  for(int j = 0; j < camada.pesos.col; j++){
-                     double d = Double.parseDouble(reader.readLine());
-                     camada.pesos.editar(i, j, d);
-                     cont++;
-                  }
-               }
-
-               if(camada.temBias()){
-                  for(int i = 0; i < camada.bias.col; i++){
-                     double d = Double.parseDouble(reader.readLine());
-                     camada.bias.editar(0, i, d);
-                     cont++;
-                  }
-               }
+         for(int i = 0; i < rede.numCamadas(); i++){
+            String nome = br.readLine();
+            if(nome.equals("Densa")){
+               br.readLine();//entrada
+               br.readLine();//saida
+               rede.camada(i).configurarAtivacao(br.readLine());
+               rede.configurarBias(Boolean.valueOf(br.readLine()));
+               auxDensa.lerPesos(rede.camada(i), br);
             }
-         }catch(Exception e){
-            System.out.println("Ocorreu um erro ao ler o peso " + cont);
-            e.printStackTrace();
-            System.exit(0);
          }
 
       }catch(Exception e){
@@ -280,5 +253,27 @@ public class Serializador{
       }
 
       return rede;
+   }
+
+   public Sequencial lerSequencial(String caminho){
+      Sequencial modelo = new Sequencial();
+
+      try(BufferedReader br = new BufferedReader(new FileReader(caminho))){
+         int numCamadas = Integer.parseInt(br.readLine());
+      
+         for(int i = 0; i < numCamadas; i++){
+            String nome = br.readLine();
+            if(nome.equals("Densa")){
+               Densa densa = auxDensa.lerConfig(br);
+               auxDensa.lerPesos(densa, br);
+               modelo.add(densa);
+            }
+         }
+
+      }catch(Exception e){
+
+      }
+
+      return modelo;
    }
 }

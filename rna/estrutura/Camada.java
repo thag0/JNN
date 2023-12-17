@@ -137,6 +137,19 @@ public class Camada{
    }
 
    /**
+    * Configura o uso do bias para a camada.
+    * <p>
+    *    A configuração deve ser feita antes da construção da camada.
+    * </p>
+    * @param usarBias uso do bias.
+    */
+   public void configurarBias(boolean usarBias){
+      throw new IllegalArgumentException(
+         "Implementar configuração de bias da camada " + this.getClass().getTypeName() + "."
+      );     
+   }
+
+   /**
     * Lógica para o processamento dos dados recebidos pela camada.
     * <p>
     *    Aqui as classes devem propagar os dados recebidos para
