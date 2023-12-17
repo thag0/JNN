@@ -91,7 +91,6 @@ public class PainelTreino extends JPanel{
 
    public void desenharMultithread(RedeNeural rede, int epocasPorFrame, int numThreads){
       this.rede = rede;
-
       int nSaida = rede.obterTamanhoSaida();
 
       //organizar

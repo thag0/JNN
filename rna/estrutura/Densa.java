@@ -698,7 +698,9 @@ public class Densa extends Camada implements Cloneable{
       try{
          Densa clone = (Densa) super.clone();
 
-         clone.ativacao = this.ativacao;
+         clone.opmat = new OpMatriz();
+         clone.ativacao = new Dicionario().obterAtivacao(this.ativacao.getClass().getSimpleName());
+         clone.treinavel = this.treinavel;
 
          clone.usarBias = this.usarBias;
          if(this.usarBias){

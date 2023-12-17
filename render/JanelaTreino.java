@@ -11,8 +11,9 @@ import rna.modelos.RedeNeural;
 public class JanelaTreino extends JFrame{
 
    public PainelTreino painelTreino;
+   private int numThreads = 1;
 
-   public JanelaTreino(int larguraImagem, int alturaImagem, float escala){
+   public JanelaTreino(int larguraImagem, int alturaImagem, float escala, int numThreads){
       try{
          BufferedImage icone = ImageIO.read(new File("./render/rede-neural.png"));
          setIconImage(icone);
@@ -26,23 +27,21 @@ public class JanelaTreino extends JFrame{
       pack();
       setResizable(false);
       setLocationRelativeTo(null);
+
+      if(numThreads < 1){
+         throw new IllegalArgumentException(
+            "O número de threads deve ser maior que zero."
+         );
+      }
+      this.numThreads = numThreads;
    }
 
 
    public void desenharTreino(RedeNeural rede, int epocasPorFrame){
-      painelTreino.desenhar(rede, epocasPorFrame);
-   }
-
-
-   /**
-    * Acelera o processo de desenho do painel usando o número de threads fornecidas.
-    * @param rede
-    * @param epocasPorFrame
-    * @param numThreads
-    */
-   public void desenharTreino(RedeNeural rede, int epocasPorFrame, int numThreads){
-      if(numThreads <= 0) throw new IllegalArgumentException("O valor do número de threads deve ser maior que 1.");
-      
-      painelTreino.desenharMultithread(rede, epocasPorFrame, numThreads);
+      if(this.numThreads == 1){
+         painelTreino.desenhar(rede, epocasPorFrame);
+      }else{
+         painelTreino.desenharMultithread(rede, epocasPorFrame, this.numThreads);
+      }
    }
 }

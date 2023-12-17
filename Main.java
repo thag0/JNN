@@ -34,9 +34,9 @@ public class Main{
       long t1, t2;
       long horas, minutos, segundos;
 
-      t1 = System.nanoTime();
       System.out.println("Treinando.");
-      treinoEmPainel(rede, imagem, in, out);
+      t1 = System.nanoTime();
+      treinoEmPainel(rede, imagem.getWidth(), imagem.getHeight(), in, out);
       t2 = System.nanoTime();
 
       long tempoDecorrido = t2 - t1;
@@ -73,20 +73,22 @@ public class Main{
    /**
     * Treina e exibe o resultado da Rede Neural no painel.
     * @param rede modelo de rede neural usado no treino.
-    * @param imagem imagem que o modelo está aprendendo.
-    * @param dadosEntrada dados de entrada para o treino.
-    * @param dadosSaida dados de saída relativos a entrada.
+    * @param altura altura da janela renderizada.
+    * @param largura largura da janela renderizada.
+    * @param entradas dados de entrada para o treino.
+    * @param saidas dados de saída relativos a entrada.
     */
-   static void treinoEmPainel(RedeNeural rede, BufferedImage imagem, double[][] dadosEntrada, double[][] dadosSaida){
+   static void treinoEmPainel(RedeNeural rede, int altura, int largura, double[][] entradas, double[][] saidas){
       final int fps = 600;
       int epocasPorFrame = 30;
 
       //acelerar o processo de desenho
       //bom em situações de janelas muito grandes
-      int numThreads = (int)(Runtime.getRuntime().availableProcessors() * 0.5);
+      int n = Runtime.getRuntime().availableProcessors();
+      int numThreads = (n > 1) ? (int)(n * 0.5) : 1;
 
-      JanelaTreino jt = new JanelaTreino(imagem.getWidth(), imagem.getHeight(), escalaRender);
-      jt.desenharTreino(rede, 0, numThreads);
+      JanelaTreino jt = new JanelaTreino(largura, altura, escalaRender, numThreads);
+      jt.desenharTreino(rede, 0);
       
       //trabalhar com o tempo de renderização baseado no fps
       double intervaloDesenho = 1000000000/fps;
@@ -95,8 +97,8 @@ public class Main{
       
       int i = 0;
       while(i < epocas && jt.isVisible()){
-         rede.treinar(dadosEntrada, dadosSaida, epocasPorFrame);
-         jt.desenharTreino(rede, i, numThreads);
+         rede.treinar(entradas, saidas, epocasPorFrame);
+         jt.desenharTreino(rede, i);
          i += epocasPorFrame;
 
          try{
