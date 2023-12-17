@@ -54,9 +54,9 @@ public class Treino{
     * @param epochs quantidade de épocas de treinamento.
     */
    public void treinar(Modelo modelo, Object[] entrada, Object[] saida, int epochs){
-      Camada[] camadas = modelo.obterCamadas();
-      Otimizador otimizador = modelo.obterOtimizador();
-      Perda perda = modelo.obterPerda();
+      Camada[] camadas = modelo.camadas();
+      Otimizador otimizador = modelo.otimizador();
+      Perda perda = modelo.perda();
       
       double perdaEpoca;
       for(int e = 0; e < epochs; e++){

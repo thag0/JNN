@@ -65,9 +65,9 @@ public class TreinoLote{
          );
       }  
 
-      Densa[] camadas = (Densa[]) modelo.obterCamadas();
-      Otimizador otimizador = modelo.obterOtimizador();
-      Perda perda = modelo.obterPerda();
+      Densa[] camadas = (Densa[]) modelo.camadas();
+      Otimizador otimizador = modelo.otimizador();
+      Perda perda = modelo.perda();
 
       double perdaEpoca;
       for(int e = 0; e < epochs; e++){

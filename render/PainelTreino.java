@@ -155,7 +155,7 @@ public class PainelTreino extends JPanel{
 
    private void calcularParteImagemEscalaCinza(RedeNeural rede, int inicioY, int fimY){
       double[] entrada = new double[rede.obterTamanhoEntrada()];
-      double[] saida = new double[rede.obterCamadaSaida().tamanhoSaida()];
+      double[] saida = new double[rede.camadaSaida().tamanhoSaida()];
 
       int r, g, b, rgb, cinza;
       int x, y;
@@ -181,7 +181,7 @@ public class PainelTreino extends JPanel{
 
    private void calcularParteImagemRGB(RedeNeural rede, int inicioY, int fimY){
       double[] entrada = new double[rede.obterTamanhoEntrada()];
-      double[] saida = new double[rede.obterCamadaSaida().tamanhoSaida()];
+      double[] saida = new double[rede.camadaSaida().tamanhoSaida()];
       int r, g, b, rgb;
 
       for(int y = inicioY; y < fimY; y++){

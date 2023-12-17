@@ -315,17 +315,17 @@ public class Sequencial extends Modelo{
    }
    
    @Override
-   public Otimizador obterOtimizador(){
+   public Otimizador otimizador(){
       return this.otimizador;
    }
 
    @Override
-   public Perda obterPerda(){
+   public Perda perda(){
       return this.perda;
    }
 
    @Override
-   public Camada obterCamada(int id){
+   public Camada camada(int id){
       verificarCompilacao();
    
       if((id < 0) || (id >= this.camadas.length)){
@@ -339,13 +339,13 @@ public class Sequencial extends Modelo{
    }
 
    @Override
-   public Camada[] obterCamadas(){
+   public Camada[] camadas(){
       verificarCompilacao();
       return this.camadas;
    }
 
    @Override
-   public Camada obterCamadaSaida(){
+   public Camada camadaSaida(){
       this.verificarCompilacao();
       return this.camadas[this.camadas.length-1];
    }
@@ -353,16 +353,16 @@ public class Sequencial extends Modelo{
    @Override
    public double[] saidaParaArray(){
       verificarCompilacao();
-      return this.obterCamadaSaida().saidaParaArray();
+      return this.camadaSaida().saidaParaArray();
    }
 
    @Override
-   public String obterNome(){
+   public String nome(){
       return this.nome;
    }
 
    @Override
-   public int obterQuantidadeParametros(){
+   public int numParametros(){
       int parametros = 0;
       for(Camada camada : this.camadas){
          parametros += camada.numParametros();
@@ -371,13 +371,13 @@ public class Sequencial extends Modelo{
    }
 
    @Override
-   public int obterQuantidadeCamadas(){
+   public int numCamadas(){
       this.verificarCompilacao();
       return this.camadas.length;
    }
 
    @Override
-   public double[] obterHistorico(){
+   public double[] historico(){
       if(this.calcularHistorico){
          return this.treinador.obterHistorico();
       

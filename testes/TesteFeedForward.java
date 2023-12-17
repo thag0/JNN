@@ -33,20 +33,20 @@ public class TesteFeedForward {
       double[] pN3 = {14.662523120653429, -14.163951965348884};
       double   bN3 = 6.7686160132656585;
 
-      rede.obterCamada(0).configurarPesos(0, pN1);
-      rede.obterCamada(0).configurarBias(0, bN1);
-      rede.obterCamada(0).configurarPesos(1, pN2);
-      rede.obterCamada(0).configurarBias(1, bN2);
+      rede.camada(0).configurarPesos(0, pN1);
+      rede.camada(0).configurarBias(0, bN1);
+      rede.camada(0).configurarPesos(1, pN2);
+      rede.camada(0).configurarBias(1, bN2);
 
-      rede.obterCamada(1).configurarPesos(0, pN3);
-      rede.obterCamada(1).configurarBias(0, bN3);
+      rede.camada(1).configurarPesos(0, pN3);
+      rede.camada(1).configurarBias(0, bN3);
 
       for(int i = 0; i < entrada.length; i++){
          rede.calcularSaida(entrada[i]);
          System.out.println(
             entrada[i][0] + " - " + entrada[i][1] + 
             " R:" + saida[i][0] + 
-            " P:" + rede.obterCamada(1).saida.dado(0 ,0)
+            " P:" + rede.camada(1).saida.dado(0 ,0)
          );
       }
 

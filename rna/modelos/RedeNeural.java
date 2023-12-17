@@ -843,7 +843,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     * @return função de perda atual da rede.
     */
    @Override
-   public Perda obterPerda(){
+   public Perda perda(){
       return this.perda;
    }
 
@@ -852,7 +852,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     * @return otimizador atual da rede.
     */
    @Override
-   public Otimizador obterOtimizador(){
+   public Otimizador otimizador(){
       return this.otimizador;
    }
 
@@ -865,7 +865,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     * das camadas ocultas.
     */
    @Override
-   public Densa obterCamada(int id){
+   public Densa camada(int id){
       this.verificarCompilacao();
 
       if((id < 0) || (id >= this.camadas.length)){
@@ -884,7 +884,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     * @return conjunto de camadas da rede.
     */
    @Override
-   public Densa[] obterCamadas(){
+   public Densa[] camadas(){
       this.verificarCompilacao();
       return this.camadas;
    }
@@ -895,7 +895,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
    @Override
-   public Densa obterCamadaSaida(){
+   public Densa camadaSaida(){
       this.verificarCompilacao();
       return this.camadas[this.camadas.length-1];
    }
@@ -911,7 +911,7 @@ public class RedeNeural extends Modelo implements Cloneable{
    @Override
    public double[] saidaParaArray(){
       this.verificarCompilacao();
-      return this.obterCamadaSaida().saidaParaArray();
+      return this.camadaSaida().saidaParaArray();
    }
 
    /**
@@ -941,7 +941,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     * @return nome específico da rede.
     */
    @Override
-   public String obterNome(){
+   public String nome(){
       return this.nome;
    }
 
@@ -954,7 +954,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     * @return quantiade de parâmetros total da rede.
     */
    @Override
-   public int obterQuantidadeParametros(){
+   public int numParametros(){
       int parametros = 0;
       for(Camada camada : this.camadas){
          parametros += camada.numParametros();
@@ -972,7 +972,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
    @Override
-   public int obterQuantidadeCamadas(){
+   public int numCamadas(){
       this.verificarCompilacao();
       return this.camadas.length;
    }
@@ -1020,7 +1020,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     * histórico de custos.
     */
    @Override
-   public double[] obterHistorico(){
+   public double[] historico(){
       if(this.treinador.calcularHistorico){
          return this.treinador.obterHistorico();   
       

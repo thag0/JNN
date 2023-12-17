@@ -99,12 +99,12 @@ public class PainelRede extends JPanel{
       contadorCamadas = 0;
       
       //esse alinhamento ainda fica um pouco torto mas é o melhor que deu pra fazer
-      int numCamadas = rede.obterQuantidadeCamadas();
+      int numCamadas = rede.numCamadas();
       int larguraTotal = (numCamadas * larguraDesenho * 2);
       int xInicial = (largura/2) - (larguraTotal/2);
 
       x = xInicial;
-      for(Densa camada : rede.obterCamadas()){
+      for(Densa camada : rede.camadas()){
          desenharCamada(camada);
          x += padCamadas;
          contadorCamadas++;

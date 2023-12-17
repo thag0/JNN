@@ -235,7 +235,7 @@ public class Modelo{
     * Retorna o otimizador que está sendo usado para o treino do modelo.
     * @return otimizador atual do modelo.
     */
-   public Otimizador obterOtimizador(){
+   public Otimizador otimizador(){
      throw new IllegalArgumentException(
          "Implementar retorno do otimizador do modelo."
       );       
@@ -245,7 +245,7 @@ public class Modelo{
     * Retorna a função de perda configurada do modelo.
     * @return função de perda atual do modelo.
     */
-   public Perda obterPerda(){
+   public Perda perda(){
      throw new IllegalArgumentException(
          "Implementar retorno da função de perda do modelo."
       );       
@@ -256,7 +256,7 @@ public class Modelo{
     * @param id índice da busca.
     * @return camada baseada na busca.
     */
-   public Camada obterCamada(int id){
+   public Camada camada(int id){
       throw new IllegalArgumentException(
          "Implementar retorno de camada baseado em índice do modelo."
       ); 
@@ -266,7 +266,7 @@ public class Modelo{
     * Retorna todo o conjunto de camadas presente no modelo.
     * @return conjunto de camadas do modelo.
     */
-   public Camada[] obterCamadas(){
+   public Camada[] camadas(){
       throw new IllegalArgumentException(
          "Implementar retorno das camadas do modelo."
       ); 
@@ -276,7 +276,7 @@ public class Modelo{
     * Retorna a {@code camada de saída}, ou última camada, do modelo.
     * @return camada de saída.
     */
-   public Camada obterCamadaSaida(){
+   public Camada camadaSaida(){
       throw new IllegalArgumentException(
          "Implementar retorno da camada de saída do modelo."
       ); 
@@ -296,7 +296,7 @@ public class Modelo{
     * Informa o nome configurado do modelo.
     * @return nome do modelo.
     */
-   public String obterNome(){
+   public String nome(){
       return this.nome;
    }
 
@@ -307,7 +307,7 @@ public class Modelo{
     * </p>
     * @return quantiade de parâmetros total do modelo.
     */
-   public int obterQuantidadeParametros(){
+   public int numParametros(){
       throw new IllegalArgumentException(
          "Implementar retorno da quantidade de parâmetros do modelo."
       );     
@@ -317,7 +317,7 @@ public class Modelo{
     * Retorna a quantidade de camadas presente no modelo.
     * @return quantidade de camadas do modelo.
     */
-   public int obterQuantidadeCamadas(){
+   public int numCamadas(){
       throw new IllegalArgumentException(
          "Implementar retorno da quantidade de camadas do modelo."
       ); 
@@ -333,7 +333,7 @@ public class Modelo{
     * </p>
     * @return array contendo o valor de perda durante cada época de treinamento do modelo.
     */
-   public double[] obterHistorico(){
+   public double[] historico(){
       throw new IllegalArgumentException(
          "Implementar retorno do histórico de perdas do modelo."
       ); 

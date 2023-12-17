@@ -8,6 +8,7 @@ import java.io.FileWriter;
 
 import rna.estrutura.Densa;
 import rna.modelos.RedeNeural;
+import rna.modelos.Sequencial;
 
 /**
  * Classe responsável por tratar da serialização/desserialização de objetos
@@ -120,7 +121,7 @@ public class Serializador{
          writer.newLine();
 
          //funções de ativação
-         Densa[] camadas = rede.obterCamadas();
+         Densa[] camadas = rede.camadas();
          for(int i = 0; i < camadas.length; i++){
             writer.write(camadas[i].obterAtivacao().getClass().getSimpleName());
             writer.write(" ");
@@ -128,7 +129,7 @@ public class Serializador{
          writer.newLine();
 
          //pesos dos neuronios
-         for(Densa camada : rede.obterCamadas()){
+         for(Densa camada : rede.camadas()){
 
             for(int i = 0; i < camada.pesos.lin; i++){
                for(int j = 0; j < camada.pesos.col; j++){
@@ -186,6 +187,10 @@ public class Serializador{
       }
    }
 
+   public static void salvar(Sequencial modelo, String caminho){
+      
+   }
+
    /**
     * Lê o arquivo de uma {@code Rede Neural} serializada e converter numa
     * instância pré configurada.
@@ -239,13 +244,13 @@ public class Serializador{
          rede.configurarBias(bias);
          rede.compilar();
 
-         for(int i = 0; i < rede.obterQuantidadeCamadas(); i++){
-            rede.configurarAtivacao(rede.obterCamada(i), dicionario.obterAtivacao(ativacoesStr[i]));
+         for(int i = 0; i < rede.numCamadas(); i++){
+            rede.configurarAtivacao(rede.camada(i), dicionario.obterAtivacao(ativacoesStr[i]));
          }
 
          int cont = 1;
          try{
-            for(Densa camada : rede.obterCamadas()){
+            for(Densa camada : rede.camadas()){
                for(int i = 0; i < camada.pesos.lin; i++){
                   for(int j = 0; j < camada.pesos.col; j++){
                      double d = Double.parseDouble(reader.readLine());

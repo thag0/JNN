@@ -65,7 +65,7 @@ public class Main{
       // rede.configurarHistorico(true);
       rede.compilar(otm, perda, ini);
       rede.configurarAtivacao("tanh");
-      rede.configurarAtivacao(rede.obterCamadaSaida(), "sigmoid");
+      rede.configurarAtivacao(rede.camadaSaida(), "sigmoid");
 
       return rede;
    }
@@ -120,7 +120,7 @@ public class Main{
     */
    static void exportarHistoricoPerda(Modelo rede, Ged ged){
       System.out.println("Exportando histórico de perda");
-      double[] perdas = rede.obterHistorico();
+      double[] perdas = rede.historico();
       double[][] dadosPerdas = new double[perdas.length][1];
 
       for(int i = 0; i < dadosPerdas.length; i++){

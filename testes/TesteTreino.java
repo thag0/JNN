@@ -41,7 +41,7 @@ public class TesteTreino{
          System.out.println(
             entrada[i][0] + " - " + entrada[i][1] + 
             " R:" + saida[i][0] + 
-            " P:" + rede.obterCamada(1).saidaParaArray()[0]
+            " P:" + rede.camada(1).saidaParaArray()[0]
          );
       }
       

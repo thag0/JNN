@@ -59,7 +59,7 @@ public class TesteImagem{
     */
    public static void exportarHistoricoPerda(Modelo rede, Ged ged){
       System.out.println("Exportando histórico de perda");
-      double[] perdas = rede.obterHistorico();
+      double[] perdas = rede.historico();
       double[][] dadosPerdas = new double[perdas.length][1];
 
       for(int i = 0; i < dadosPerdas.length; i++){
