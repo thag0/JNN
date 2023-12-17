@@ -139,7 +139,35 @@ public class Modelo{
       this.perda = perda;
    }
 
-   public void compilar(Perda perda, Otimizador otimizador, Inicializador iniPesos, Inicializador iniBias){
+   /**
+    * Inicializa os parâmetros necessários para cada camada do modelo,
+    * além de gerar os valores iniciais para os kernels e bias.
+    * @param otimizador otimizador usando para ajustar os parâmetros treinavéis do modelo.
+    * @param perda função de perda usada para o treinamento do modelo.
+    * @param iniKernel inicializador para os kernels.
+    */
+   public void compilar(Otimizador otimizador, Perda perda, Inicializador iniKernel){
+      throw new IllegalArgumentException(
+         "Implementar compilação do modelo."
+      );
+   }
+
+   /**
+    * Inicializa os parâmetros necessários para cada camada do modelo,
+    * além de gerar os valores iniciais para os kernels e bias.
+    * <p>
+    *    Caso nenhuma configuração inicial seja feita, o modelo será inicializado com os argumentos padrões. 
+    * </p>
+    * <p>
+    *    Para treinar o modelo deve-se fazer uso da função função {@code treinar()} informando os 
+    *    dados necessários para a rede.
+    * </p>
+    * @param otimizador otimizador usando para ajustar os parâmetros treinavéis do modelo.
+    * @param perda função de perda usada para o treinamento do modelo.
+    * @param iniKernel inicializador para os kernels.
+    * @param iniBias inicializador para os bias.
+    */
+   public void compilar(Otimizador otimizador, Perda perda, Inicializador iniKernel, Inicializador iniBias){
       throw new IllegalArgumentException(
          "Implementar compilação do modelo."
       );
@@ -163,6 +191,19 @@ public class Modelo{
       );
    }
    
+   /**
+    * Treina o modelo de acordo com as configurações predefinidas.
+    * <p>
+    *    Certifique-se de configurar adequadamente o modelo para obter os 
+    *    melhores resultados.
+    * </p>
+    * @param entradas dados de entrada do treino (features). Dependendo da entrada
+    * do modelo, pode assumir diferentes formatos, para camadas convolucionais é
+    * {@code double[][][][]}, para camadas densas é {@code double[][]}.
+    * @param saidas dados de saída correspondente a entrada (class).
+    * @param epochs quantidade de épocas de treinamento.
+    * @param tamLote tamanho do lote de treinamento.
+    */
    public void treinar(Object[] entradas, Object[] saidas, int epochs, int tamLote){
       throw new IllegalArgumentException(
          "Implementar treinamento em lotes para o modelo."

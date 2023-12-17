@@ -209,26 +209,12 @@ public class Sequencial extends Modelo{
       this.otimizador = otimizador;
    }
 
-   /**
-    * Inicializa os parâmetros necessários para cada camada do modelo,
-    * além de aleatorizar os kernels e bias.
-    * @param otimizador otimizador usando para ajustar os parâmetros treinavéis do modelo.
-    * @param perda função de perda usada para o treinamento do modelo.
-    * @param iniKernel inicializador para os kernels.
-    */
+   @Override
    public void compilar(Otimizador otimizador, Perda perda, Inicializador iniKernel){
       this.compilar(otimizador, perda, iniKernel, null);
    }
 
-   /**
-    * Inicializa os parâmetros necessários para cada camada do modelo,
-    * além de aleatorizar os kernels e bias.
-    * @param otimizador otimizador usado durante o treinamento do modelo para
-    * ajustar seus parâmetros.
-    * @param perda função de perda usada para o treinamento do modelo.
-    * @param iniKernel inicializador para os kernels.
-    * @param iniBias inicializador para os bias.
-    */
+   @Override
    public void compilar(Otimizador otimizador, Perda perda, Inicializador iniKernel, Inicializador iniBias){
       if(this.camadas[0].construida == false){
          throw new IllegalArgumentException(

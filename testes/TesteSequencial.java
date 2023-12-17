@@ -53,7 +53,7 @@ public class TesteSequencial{
       
       RedeNeural rna = new RedeNeural(new int[]{nEntradas, nOcultas, nOcultas, nSaidas});
       rna.configurarSeed(seed);
-      rna.compilar(new EntropiaCruzada(), new SGD(), new Xavier());
+      rna.compilar(new SGD(), new EntropiaCruzada(), new Xavier());
       rna.configurarAtivacao(atv1);
       rna.configurarAtivacao(rna.obterCamadaSaida(), atv2);
       rna.treinar(e, s, epocas);

@@ -422,15 +422,9 @@ public class RedeNeural extends Modelo implements Cloneable{
     */
    public void compilar(){
       //usando valores de configuração prévia, se forem criados.
-      if(this.perda == null && this.otimizador == null){
-         this.compilar(new ErroMedioQuadrado(), new SGD(), new Aleatorio());
-         
-      }else if(this.perda == null){
-         this.compilar(new ErroMedioQuadrado(), this.otimizador, new Aleatorio());
-         
-      }else{
-         this.compilar(this.perda, this.otimizador, new Aleatorio());
-      }
+      Otimizador o = (this.otimizador == null) ? new SGD() : this.otimizador;
+      Perda p = (this.perda == null) ? new ErroMedioQuadrado() : this.perda;
+      this.compilar(o, p, new Aleatorio());
    }
 
    /**
@@ -462,13 +456,9 @@ public class RedeNeural extends Modelo implements Cloneable{
          throw new IllegalArgumentException("A função de perda não pode ser nula.");
       }
 
-      //usando valores de configuração prévia, se forem criados.
-      if(this.otimizador == null){
-         this.compilar(perda, new SGD(), new Aleatorio());
-
-      }else{
-         this.compilar(perda, this.otimizador, new Aleatorio());
-      }
+      //usando valores de configuração prévia, se forem criados
+      Otimizador o = (this.otimizador == null) ? new SGD() : this.otimizador;
+      this.compilar(o, perda, new Aleatorio());
    }
 
    /**
@@ -500,13 +490,9 @@ public class RedeNeural extends Modelo implements Cloneable{
          throw new IllegalArgumentException("O otimizador fornecido não pode ser nulo.");
       }
 
-      //usando valores de configuração prévia, se forem criados.
-      if(this.perda == null){
-         this.compilar(new ErroMedioQuadrado(), otimizador, new Aleatorio());
-
-      }else{
-         this.compilar(this.perda, otimizador, new Aleatorio());
-      }
+      //usando valores de configuração prévia, se forem criados
+      Perda p = (this.perda == null) ? new ErroMedioQuadrado() : this.perda;
+      this.compilar(otimizador, p, new Aleatorio());
    }
 
    /**
@@ -543,62 +529,20 @@ public class RedeNeural extends Modelo implements Cloneable{
 
       //usando valores de configuração prévia, se forem criados.
       if(this.perda == null){
-         this.compilar(new ErroMedioQuadrado(), otimizador, iniPesos);
+         this.compilar(otimizador, new ErroMedioQuadrado(), iniPesos);
 
       }else{
-         this.compilar(this.perda, otimizador, iniPesos);
+         this.compilar(otimizador, this.perda, iniPesos);
       }   
    }
 
-   /**
-    * Compila o modelo de Rede Neural inicializando as camadas, neurônios e pesos respectivos, 
-    * baseado nos valores fornecidos.
-    * <p>
-    *    Caso nenhuma configuração inicial seja feita, a rede será inicializada com os argumentos padrão. 
-    * </p>
-    * Após a compilação o modelo está pronto para ser usado, mas deverá ser treinado.
-    * <p>
-    *    Para treinar o modelo deve-se fazer uso da função função {@code treinar()} informando os 
-    *    dados necessários para a rede.
-    * </p>
-    * <p>
-    *    Para usar as predições da rede basta usar a função {@code calcularSaida()} informando os
-    *    dados necessários. Após a predição pode-se obter o resultado da rede por meio da função 
-    *    {@code obterSaidas()};
-    * </p>
-    * O inicializador dos bias será nulo e será gerenciado pela camada.
-    * @param otimizador otimizador que será usando para o treino da Rede Neural.
-    * @param iniPesos inicializador de pesos das camadas da Rede Neural.
-    * @throws IllegalArgumentException se o otimizador ou inicializador forem nulos.
-    */
-   public void compilar(Perda perda, Otimizador otimizador, Inicializador iniPesos){
-      this.compilar(perda, otimizador, iniPesos, null);
+   @Override
+   public void compilar(Otimizador otimizador, Perda perda, Inicializador iniPesos){
+      this.compilar(otimizador, perda, iniPesos, null);
    }
 
-   /**
-    * Compila o modelo de Rede Neural inicializando as camadas, neurônios e pesos respectivos, 
-    * baseado nos valores fornecidos.
-    * <p>
-    *    Caso nenhuma configuração inicial seja feita, a rede será inicializada com os argumentos padrão. 
-    * </p>
-    * Após a compilação o modelo está pronto para ser usado, mas deverá ser treinado.
-    * <p>
-    *    Para treinar o modelo deve-se fazer uso da função função {@code treinar()} informando os 
-    *    dados necessários para a rede.
-    * </p>
-    * <p>
-    *    Para usar as predições da rede basta usar a função {@code calcularSaida()} informando os
-    *    dados necessários. Após a predição pode-se obter o resultado da rede por meio da função 
-    *    {@code obterSaidas()};
-    * </p>
-    * @param perda função de perda da Rede Neural usada durante o treinamento.
-    * @param otimizador otimizador que será usando para o treino da Rede Neural.
-    * @param iniPesos inicializador de pesos das camadas da Rede Neural.
-    * @param iniPesos inicializador de bias das camadas da Rede Neural.
-    * @throws IllegalArgumentException se a perda, otimizador ou inicializador forem nulos.
-    */
    @Override
-   public void compilar(Perda perda, Otimizador otimizador, Inicializador iniPesos, Inicializador iniBias){
+   public void compilar(Otimizador otimizador, Perda perda, Inicializador iniPesos, Inicializador iniBias){
       if(iniPesos == null){
          throw new IllegalArgumentException("O inicializador não pode ser nulo.");
       }
