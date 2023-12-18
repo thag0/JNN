@@ -66,8 +66,7 @@ public class Main{
    }
 
    static Modelo criarModelo(int entradas, int saidas, boolean rna){
-      // Otimizador otm = new SGD(0.001, 0.995);
-      Otimizador otm = new RMSProp();
+      Otimizador otm = new SGD(0.001, 0.995);
       Perda perda = new ErroMedioQuadrado();
       Inicializador ini = new Xavier();
 
