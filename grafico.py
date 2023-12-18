@@ -11,7 +11,7 @@ if __name__ == '__main__':
    eixo_x = list(range(qtd_amostras))
 
    plt.plot(eixo_x, eixo_y)
+   plt.title('Perda por época')
    plt.xlabel('Épocas')
    plt.ylabel('Perda')
-   plt.title('Valor de perda em cada época')
    plt.show()

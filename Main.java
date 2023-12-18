@@ -14,17 +14,20 @@ import rna.modelos.Sequencial;
 import rna.otimizadores.*;
 
 public class Main{
-   static final int epocas = 5*1000;
+   static final int epocas = 100*1000;
    static final float escalaRender = 7f;
    static Ged ged = new Ged();
    static Geim geim = new Geim();
+   static boolean calcularHistorico = true;
+   // static final String caminhoImagem = "/dados/mnist/treino/7/img_1.jpg";
+   static final String caminhoImagem = "/dados/32x32/circulos.png";
 
    public static void main(String[] args){      
       ged.limparConsole();
 
       int tamEntrada = 2;
-      int tamSaida = 1;
-      BufferedImage imagem = geim.lerImagem("/dados/mnist/treino/7/img_1.jpg");
+      int tamSaida = 3;
+      BufferedImage imagem = geim.lerImagem(caminhoImagem);
       
       double[][] dados;
       if(tamSaida == 1) dados = geim.imagemParaDadosTreinoEscalaCinza(imagem);
@@ -57,11 +60,13 @@ public class Main{
       System.out.println("Precisão = " + formatarDecimal(precisao, 2) + "%");
       System.out.println("Perda = " + perda);
       System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
-      // exportarHistoricoPerda(rede, ged);
+
+      if(calcularHistorico) exportarHistoricoPerda(modelo, ged);
+      executarComando("python grafico.py");
    }
 
    static Modelo criarModelo(int entradas, int saidas, boolean rna){
-      Otimizador otm = new SGD(0.0001, 0.999);
+      Otimizador otm = new SGD(0.0001, 0.99);
       Perda perda = new ErroMedioQuadrado();
       Inicializador ini = new Xavier();
 
@@ -71,13 +76,17 @@ public class Main{
          modelo.compilar(otm, perda, ini);
          modelo.configurarAtivacao("tanh");
          modelo.configurarAtivacao(modelo.camadaSaida(), "sigmoid");
+         modelo.configurarHistorico(calcularHistorico);
          return modelo;
       
       }else{
          Sequencial modelo = new Sequencial();
-         modelo.add(new Densa(entradas, 13, "tanh"));
-         modelo.add(new Densa(13, saidas, "sigmoid"));
+         modelo.add(new Densa(entradas, 64, "leakyrelu"));
+         modelo.add(new Densa(42, "leakyrelu"));
+         modelo.add(new Densa(42, "leakyrelu"));
+         modelo.add(new Densa(saidas, "sigmoid"));
          modelo.compilar(otm, perda, ini);
+         modelo.configurarHistorico(calcularHistorico);
          return modelo;
       }
    }
@@ -92,12 +101,12 @@ public class Main{
     */
    static void treinoEmPainel(Modelo modelo, int altura, int largura, double[][] entradas, double[][] saidas){
       final int fps = 600;
-      int epocasPorFrame = 30;
+      int epocasPorFrame = 20;
 
       //acelerar o processo de desenho
       //bom em situações de janelas muito grandes
       int n = Runtime.getRuntime().availableProcessors();
-      int numThreads = (n > 1) ? (int)(n * 0.5) : 1;
+      int numThreads = (n > 1) ? (int)(n * 0.75) : 1;
 
       JanelaTreino jt = new JanelaTreino(largura, altura, escalaRender, numThreads);
       jt.desenharTreino(modelo, 0);
@@ -149,7 +158,7 @@ public class Main{
     * Formata o valor recebido para a quantidade de casas após o ponto
     * flutuante.
     * @param valor valor alvo.
-    * @param casas quantidade de casas após o ponto fluntuante.
+    * @param casas quantidade de casas após o ponto flutuante.
     * @return
     */
    static String formatarDecimal(double valor, int casas){
@@ -162,5 +171,17 @@ public class Main{
       valorFormatado = df.format(valor);
 
       return valorFormatado;
+   }
+
+   /**
+    * teste
+    * @param comando
+    */
+   static void executarComando(String comando){
+      try{
+         new ProcessBuilder("cmd", "/c", comando).inheritIO().start().waitFor();
+      }catch(Exception e){
+
+      }
    }
 }
