@@ -170,9 +170,10 @@ public class Adadelta extends Otimizador{
 
    @Override
    public String info(){
-      String buffer = "";
-
       String espacamento = "    ";
+      
+      String buffer = "";
+      buffer += espacamento + "Otimizador: " +  this.nome() + "\n";
       buffer += espacamento + "Rho: " + this.rho + "\n";
       buffer += espacamento + "Epsilon: " + this.epsilon + "\n";
 

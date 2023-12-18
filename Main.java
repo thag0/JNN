@@ -19,14 +19,14 @@ public class Main{
    static Ged ged = new Ged();
    static Geim geim = new Geim();
    static boolean calcularHistorico = true;
-   // static final String caminhoImagem = "/dados/mnist/treino/7/img_1.jpg";
-   static final String caminhoImagem = "/dados/32x32/circulos.png";
+   static final String caminhoImagem = "/dados/mnist/treino/7/img_1.jpg";
+   // static final String caminhoImagem = "/dados/32x32/circulos.png";
 
    public static void main(String[] args){      
       ged.limparConsole();
 
       int tamEntrada = 2;
-      int tamSaida = 3;
+      int tamSaida = 1;
       BufferedImage imagem = geim.lerImagem(caminhoImagem);
       
       double[][] dados;
@@ -66,7 +66,8 @@ public class Main{
    }
 
    static Modelo criarModelo(int entradas, int saidas, boolean rna){
-      Otimizador otm = new SGD(0.0001, 0.99);
+      // Otimizador otm = new SGD(0.001, 0.995);
+      Otimizador otm = new RMSProp();
       Perda perda = new ErroMedioQuadrado();
       Inicializador ini = new Xavier();
 
@@ -81,10 +82,12 @@ public class Main{
       
       }else{
          Sequencial modelo = new Sequencial();
-         modelo.add(new Densa(entradas, 64, "leakyrelu"));
-         modelo.add(new Densa(42, "leakyrelu"));
-         modelo.add(new Densa(42, "leakyrelu"));
-         modelo.add(new Densa(saidas, "sigmoid"));
+         // modelo.add(new Densa(entradas, 64, "leakyrelu"));
+         // modelo.add(new Densa(42, "leakyrelu"));
+         // modelo.add(new Densa(42, "leakyrelu"));
+         // modelo.add(new Densa(saidas, "sigmoid"));
+         modelo.add(new Densa(entradas, 13, "tanh"));
+         modelo.add(new Densa(13, saidas, "sigmoid"));
          modelo.compilar(otm, perda, ini);
          modelo.configurarHistorico(calcularHistorico);
          return modelo;

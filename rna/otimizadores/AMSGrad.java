@@ -224,9 +224,10 @@ public class AMSGrad extends Otimizador{
 
 	@Override
 	public String info(){
-		String buffer = "";
-
-		String espacamento = "    ";
+      String espacamento = "    ";
+      
+      String buffer = "";
+      buffer += espacamento + "Otimizador: " +  this.nome() + "\n";
 		buffer += espacamento + "TaxaAprendizagem: " + this.taxaAprendizagem + "\n";
 		buffer += espacamento + "Beta1: " + this.beta1 + "\n";
 		buffer += espacamento + "Beta2: " + this.beta2 + "\n";

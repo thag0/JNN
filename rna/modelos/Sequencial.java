@@ -3,9 +3,6 @@ package rna.modelos;
 import rna.avaliacao.Avaliador;
 import rna.avaliacao.perda.Perda;
 import rna.estrutura.Camada;
-import rna.estrutura.Convolucional;
-import rna.estrutura.Densa;
-import rna.estrutura.Flatten;
 import rna.inicializadores.Inicializador;
 import rna.otimizadores.Otimizador;
 import rna.serializacao.Dicionario;
@@ -389,38 +386,57 @@ public class Sequencial extends Modelo implements Cloneable{
    }
 
    @Override
-   public String info(){
+   public String info() {
       verificarCompilacao();
 
-      String buffer = "";
       String espacamento = "    ";
-      String espacamaentoDuplo = espacamento + espacamento;
-
+      String buffer = "";
       buffer += this.nome + " = [\n";
-      
+
+      buffer += otimizador.info();
+      buffer += "\n";
+
+      buffer += espacamento + "Perda: " + this.perda.nome();
+      buffer += "\n\n";
+
+      buffer += espacamento + String.format(
+         "%-23s%-23s%-23s%-23s\n", "Camada", "Formato de Entrada", "Formato de Saída", "Função de Ativação"
+      );
+
       for(Camada camada : this.camadas){
-         int[] entrada = camada.formatoEntrada();
-         int[] saida = camada.formatoSaida();
+         int[] e = camada.formatoEntrada();
+         int[] s = camada.formatoSaida();
+         
+         //nome
+         String nomeCamada = camada.id + " - " + camada.getClass().getSimpleName();
 
-         buffer += espacamento + camada.id + ": " + camada.getClass().getSimpleName() + " = [\n";
-         if(camada instanceof Densa){
-            buffer += espacamaentoDuplo + "Entrada (" + entrada[1] + ") Saída (" + saida[1] + ")\n";
-            buffer += espacamaentoDuplo + "Ativação = " + camada.obterAtivacao().getClass().getSimpleName() + "\n";
-            
-         }else if(camada instanceof Convolucional){
-            buffer += espacamaentoDuplo + "Entrada = (" + entrada[0] + ", " + entrada[1] + ", " + entrada[2] +  ") ";
-            buffer += "Saída = (" + saida[0] + ", " + saida[1] + ", " + saida[2] + ") \n";
-            buffer += espacamaentoDuplo + "Ativação = " + camada.obterAtivacao().getClass().getSimpleName() + "\n";
-            
-         }if(camada instanceof Flatten){
-            buffer += espacamaentoDuplo + "Entrada = (" + entrada[0] + ", " + entrada[1] + ", " + entrada[2] +") ";
-            buffer += "Saída = (" + saida[0] + ", " + saida[1] + ") \n";
-
+         //formato de entrada
+         String formEntrada = String.format("e(%d", e[0]);
+         for(int i = 1; i < e.length; i++){
+            formEntrada += String.format(", %d", e[i]);
          }
-         buffer += espacamaentoDuplo + "Parâmetros: " + camada.numParametros() + "\n";
-         buffer += espacamento + "]\n";
+         formEntrada += ")";
+
+         //formato de saída
+         String formSaida = String.format("s(%d", s[0]);
+         for(int i = 1; i < s.length; i++){
+            formSaida += String.format(", %d", s[i]);
+         }
+         formSaida += ")";
+
+         //função de ativação
+         String ativacao = "";
+         try{
+            ativacao = camada.obterAtivacao().nome();
+         }catch(Exception exception){
+            ativacao = "n/a";
+         }
+
+         buffer += espacamento + String.format(
+            "%-23s%-23s%-23s%-23s\n", nomeCamada, formEntrada, formSaida, "Ativação = " + ativacao
+         );
       }
-      
+
       buffer += "]\n";
 
       return buffer;

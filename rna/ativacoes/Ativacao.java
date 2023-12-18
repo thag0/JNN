@@ -65,4 +65,8 @@ public abstract class Ativacao{
          "Implementar derivada da ativação para camada convolucional."
       );
    }
+
+   public String nome(){
+      return getClass().getSimpleName();
+   }
 }

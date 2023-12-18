@@ -191,8 +191,13 @@ public class MaxPooling extends Camada{
   }
  
    @Override
+   public int[] formatoEntrada(){
+      return this.formEntrada;
+   }
+
+   @Override
    public int[] formatoSaida(){
-      return formSaida;
+      return this.formSaida;
    }
 
    @Override

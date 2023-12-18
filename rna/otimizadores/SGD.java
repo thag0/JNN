@@ -167,9 +167,10 @@ public class SGD extends Otimizador{
 
    @Override
    public String info(){
-      String buffer = "";
-
       String espacamento = "    ";
+      
+      String buffer = "";
+      buffer += espacamento + "Otimizador: " +  this.nome() + "\n";
       buffer += espacamento + "TaxaAprendizagem: " + this.taxaAprendizagem + "\n";
       buffer += espacamento + "Momentum: " + this.momentum + "\n";
       buffer += espacamento + "Nesterov: " + this.nesterov + "\n";

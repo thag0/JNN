@@ -15,7 +15,7 @@ public class MainConv{
    public static void main(String[] args){
       ged.limparConsole();
 
-      int amostras = 10;
+      int amostras = 5;
       int digitos = 2;
       
       double[][][][] entradas = new double[amostras*digitos][digitos][][];
@@ -25,7 +25,7 @@ public class MainConv{
       saidas = carregarRotulosMNIST(amostras, digitos);
       System.out.println("Rótulos carregados.");
 
-      Sequencial cnn = criarModelo();
+      Sequencial modelo = criarModelo();
 
       //treinar e marcar tempo
       long t1, t2;
@@ -33,7 +33,7 @@ public class MainConv{
 
       System.out.println("Treinando.");
       t1 = System.nanoTime();
-      cnn.treinar(entradas, saidas, 301);
+      modelo.treinar(entradas, saidas, 301);
       t2 = System.nanoTime();
 
       long tempoDecorrido = t2 - t1;
@@ -42,15 +42,15 @@ public class MainConv{
       minutos = (segundosTotais % 3600) / 60;
       segundos = segundosTotais % 60;
       System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
-      testes.TesteSequencial.exportarHistoricoPerda(cnn);
+      testes.TesteSequencial.exportarHistoricoPerda(modelo);
 
       //-------------------------------------
       // for(int i = 0; i < 10; i++){
       //    System.out.println("Real: " + i + ", Pred: " + testarImagem(cnn, entradas[i][0]));
       // }
 
-      testarPorbabilidade(cnn, "0_teste");
-      testarPorbabilidade(cnn, "1_teste");
+      testarPorbabilidade(modelo, "0_teste");
+      testarPorbabilidade(modelo, "1_teste");
    } 
 
    public static Sequencial criarModelo(){

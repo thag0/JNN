@@ -54,4 +54,12 @@ public abstract class Otimizador{
 			"Implementar método de informações do otimizador."
 		);
 	}
+
+	/**
+	 * Retorna o nome do otimizador.
+	 * @return nome do otimizador.
+	 */
+	public String nome(){
+		return getClass().getSimpleName();
+	}
 }

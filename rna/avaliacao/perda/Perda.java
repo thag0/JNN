@@ -41,4 +41,12 @@ public abstract class Perda{
          );
       }
    }
+
+   /**
+    * Retorna o nome da função de perda.
+    * @return nome da função de perda.
+    */
+   public String nome(){
+      return getClass().getSimpleName();
+   }
 }
