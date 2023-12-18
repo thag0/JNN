@@ -13,3 +13,7 @@ compatibilidade com os otimizadores, mas os resultados estão indo bem. Consegui
 pra ver se ela já conseguia pelo menos ter overfitting sobre os dados, e deu certo.
 
 Também estou tentando criar a api de um modelo sequencial para empilhar camadas dentro de um modelo, até o momento não estou tendo tantos problemas.
+
+# Implementação do modelo Sequencial
+
+![treino sequencial](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/7fe7881b-5f7c-4e69-a387-418705667b48)
