@@ -23,15 +23,10 @@ import rna.estrutura.Densa;
  * <pre>
  *public class ReLU extends Ativacao{
  *  public ReLU(){
- *    super.construir(this::fx, this::dx)
- *  }
- *
- *  public double fx(double x){//nome arbritário
- *    return (x > 0) ? x : 0;  
- *  }
- *
- *  public double dx(double x){//nome arbritário
- *    return (x > 0) ? 1 : 0;  
+ *    super.construir(
+ *       (x) -> { return x > 0 ? x : 0; },
+ *       (x) -> { return x > 0 ? 1 : 0; }
+ *    );
  *  }
  * 
  *  public void calcular(Densa camada){
@@ -66,16 +61,11 @@ public abstract class Ativacao{
     * @param saida resultado das ativações.
     */
    protected void aplicarFx(Mat entrada, Mat saida){
-      int linhas = entrada.lin();
-      int colunas = entrada.col();
-      int i, j;
-      double valor;
-      for(i = 0; i < linhas; i++){
-         for (j = 0; j < colunas; j++){
-            valor = fx.applyAsDouble(entrada.dado(i, j));
-            saida.editar(i, j, valor);
-         }
+      double[] e = entrada.paraArray();
+      for(int i = 0; i < e.length; i++){
+         e[i] = fx.applyAsDouble(e[i]);
       }
+      saida.copiar(e);
    }
 
    /**
@@ -86,17 +76,12 @@ public abstract class Ativacao{
     * @param saida resultado das derivadas.
     */
    protected void aplicarDx(Mat gradientes, Mat entrada, Mat saida){
-      int linhas = entrada.lin();
-      int colunas = entrada.col();
-      int i, j;
-      double grad, valor;
-      for(i = 0; i < linhas; i++){
-         for (j = 0; j < colunas; j++){
-            grad = gradientes.dado(i, j);
-            valor = dx.applyAsDouble(entrada.dado(i, j));
-            saida.editar(i, j, grad * valor);
-         }
+      double[] e = entrada.paraArray();
+      double[] g = gradientes.paraArray();
+      for(int i = 0; i < e.length; i++){
+         e[i] = g[i] * dx.applyAsDouble(e[i]);
       }
+      saida.copiar(e);
    }
 
    /**
