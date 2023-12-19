@@ -13,58 +13,38 @@ public class Linear extends Ativacao{
     * Instancia a função de ativação Linear.
     */
    public Linear(){
-
+      super.construir(this::linear, this::lineard);
    }
 
    @Override
    public void calcular(Densa camada){
-      int i, j;
-      
-      for(i = 0; i < camada.saida.lin(); i++){
-         for(j = 0; j < camada.saida.col(); j++){
-            camada.saida.editar(i, j, camada.somatorio.dado(i, j));
-         }
-      }
+      super.aplicarFuncao(camada.somatorio, camada.saida);
    }
 
    @Override
    public void derivada(Densa camada){
-      int i, j;
-      double grad;
-
-      for(i = 0; i < camada.derivada.lin(); i++){
-         for(j = 0; j < camada.derivada.col(); j++){
-            grad = camada.gradSaida.dado(i, j);
-            camada.derivada.editar(i, j, (1 * grad));
-         }
-      }
+         super.aplicarDerivada(camada.gradSaida, camada.somatorio, camada.derivada);
    }
 
    @Override
    public void calcular(Convolucional camada){
-      int i, j, k;
-    
-      for(i = 0; i < camada.saida.length; i++){
-         for(j = 0; j < camada.saida[i].lin(); j++){
-            for(k = 0; k < camada.saida[i].col(); k++){
-               camada.saida[i].editar(j, k, camada.somatorio[i].dado(j, k));
-            }
-         }
+      for(int i = 0; i < camada.saida.length; i++){
+         super.aplicarFuncao(camada.somatorio[i], camada.saida[i]);
       }
    }
 
    @Override
    public void derivada(Convolucional camada){
-      int i, j, k;
-      double grad;
-    
-      for(i = 0; i < camada.gradSaida.length; i++){
-         for(j = 0; j < camada.gradSaida[i].lin(); j++){
-            for(k = 0; k < camada.gradSaida[i].col(); k++){
-               grad = camada.gradSaida[i].dado(j, k);
-               camada.derivada[i].editar(j, k, grad);
-            }
-         }
+       for(int i = 0; i < camada.saida.length; i++){
+         super.aplicarDerivada(camada.gradSaida[i], camada.somatorio[i], camada.derivada[i]);
       }
+   }
+
+   private double linear(double x){
+      return x;
+   }
+
+   private double lineard(double x){
+      return 1;
    }
 }

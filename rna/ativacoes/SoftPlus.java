@@ -12,16 +12,16 @@ public class SoftPlus extends Ativacao{
     * Instancia a função de ativação SoftPlus.
     */
    public SoftPlus(){
-
+      super.construir(this::softplus, this::softplusd);
    }
    @Override
    public void calcular(Densa camada){
-      super.aplicarFuncao(camada.somatorio, this::softplus, camada.saida);
+      super.aplicarFuncao(camada.somatorio, camada.saida);
    }
 
    @Override
    public void derivada(Densa camada){
-      super.aplicarDerivada(camada.gradSaida, camada.somatorio, this::softplusd, camada.derivada);
+      super.aplicarDerivada(camada.gradSaida, camada.somatorio, camada.derivada);
    }
 
    private double softplus(double x){

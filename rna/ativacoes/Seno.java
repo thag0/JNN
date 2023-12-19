@@ -12,17 +12,17 @@ public class Seno extends Ativacao{
     * Instancia a função de ativação Seno.
     */
    public Seno(){
-
+      super.construir(this::seno, this::senod);
    }
 
    @Override
    public void calcular(Densa camada){
-      super.aplicarFuncao(camada.somatorio, this::seno, camada.saida);
+      super.aplicarFuncao(camada.somatorio, camada.saida);
    }
 
    @Override
    public void derivada(Densa camada){
-      super.aplicarDerivada(camada.gradSaida, camada.somatorio, this::senod, camada.derivada);
+      super.aplicarDerivada(camada.gradSaida, camada.somatorio, camada.derivada);
    }
 
    private double seno(double x){

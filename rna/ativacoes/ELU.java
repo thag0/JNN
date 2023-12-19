@@ -24,6 +24,7 @@ public class ELU extends Ativacao{
     */
    public ELU(double alfa){
       this.alfa = alfa;
+      super.construir(this::elu, this::elud);
    }
 
    /**
@@ -39,12 +40,12 @@ public class ELU extends Ativacao{
 
    @Override
    public void calcular(Densa camada){
-      super.aplicarFuncao(camada.somatorio, this::elu, camada.saida);
+      super.aplicarFuncao(camada.somatorio, camada.saida);
    }
 
    @Override
    public void derivada(Densa camada){
-      super.aplicarDerivada(camada.gradSaida, camada.somatorio, this::elud, camada.derivada);
+      super.aplicarDerivada(camada.gradSaida, camada.somatorio, camada.derivada);
    }
 
    private double elu(double x){

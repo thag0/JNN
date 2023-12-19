@@ -15,34 +15,17 @@ public class GELU extends Ativacao{
     * Intancia uma nova função de ativação GELU.
     */
    public GELU(){
-
+      super.construir(this::gelu, this::gelud);
    }
 
    @Override
    public void calcular(Densa camada){
-      int i, j;
-      double s;
-
-      for(i = 0; i < camada.saida.lin(); i++){
-         for(j = 0; j < camada.saida.col(); j++){
-            s = gelu(camada.somatorio.dado(i, j));
-            camada.saida.editar(i, j, s);
-         }
-      }
+      super.aplicarFuncao(camada.somatorio, camada.saida);
    }
 
    @Override
    public void derivada(Densa camada){
-      int i, j;
-      double grad, d;
-
-      for(i = 0; i < camada.derivada.lin(); i++){
-         for(j = 0; j < camada.derivada.col(); j++){
-            grad = camada.gradSaida.dado(i, j);
-            d = derivada(camada.somatorio.dado(i, j));
-            camada.derivada.editar(i, j, (grad * d));
-         }
-      }
+      super.aplicarDerivada(camada.gradSaida, camada.somatorio, camada.derivada);
    }
 
    private double gelu(double x){
@@ -51,7 +34,7 @@ public class GELU extends Ativacao{
       return 0.5 * x * (1.0 + tanh);
    }
 
-   private double derivada(double x){
+   private double gelud(double x){
       double xCubo = x * x * x;
       double tanh = Math.tanh(RAIZ_2_POR_PI * (x + ALFA * xCubo));
       double exp = Math.exp(-0.5 * x * x) / RAIZ_2_POR_PI;

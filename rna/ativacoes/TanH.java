@@ -5,9 +5,13 @@ import rna.estrutura.Densa;
 
 public class TanH extends Ativacao{
 
+   public TanH(){
+      super.construir(this::tanh, null);
+   }
+
    @Override
    public void calcular(Densa camada){
-      super.aplicarFuncao(camada.somatorio, this::tanh, camada.saida);
+      super.aplicarFuncao(camada.somatorio, camada.saida);
    }
 
    @Override
@@ -32,7 +36,7 @@ public class TanH extends Ativacao{
    @Override
    public void calcular(Convolucional camada){
       for(int i = 0; i < camada.somatorio.length; i++){
-         super.aplicarFuncao(camada.somatorio[i], this::tanh, camada.saida[i]);
+         super.aplicarFuncao(camada.somatorio[i], camada.saida[i]);
       }
    }
 

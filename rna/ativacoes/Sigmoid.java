@@ -5,11 +5,13 @@ import rna.estrutura.Densa;
 
 public class Sigmoid extends Ativacao{
 
-   public Sigmoid(){}
+   public Sigmoid(){
+      super.construir(this::sigmoid, null);
+   }
 
    @Override
    public void calcular(Densa camada){
-      super.aplicarFuncao(camada.somatorio, this::sigmoid, camada.saida);
+      super.aplicarFuncao(camada.somatorio, camada.saida);
    }
 
    @Override
@@ -33,7 +35,7 @@ public class Sigmoid extends Ativacao{
    @Override
    public void calcular(Convolucional camada){
       for(int i = 0; i < camada.somatorio.length; i++){
-         aplicarFuncao(camada.somatorio[i], this::sigmoid, camada.saida[i]);
+         aplicarFuncao(camada.somatorio[i], camada.saida[i]);
       }
    }
 

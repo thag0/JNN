@@ -15,19 +15,29 @@ import rna.estrutura.Densa;
 public abstract class Ativacao{
 
    /**
+    * Função de ativação.
+    */
+   private DoubleUnaryOperator fx;
+
+   /**
+    * Derivada da função de ativação.
+    */
+   private DoubleUnaryOperator dx;
+
+   /**
     * Executa a função de ativação para cada elemento da entrada.
     * @param entrada matriz com os dados de entrada.
-    * @param funcao função de ativação desejada.
+    * @param fx função de ativação desejada.
     * @param saida resultado das ativações.
     */
-   protected void aplicarFuncao(Mat entrada, DoubleUnaryOperator funcao, Mat saida){
+   protected void aplicarFuncao(Mat entrada, Mat saida){
       int linhas = entrada.lin();
       int colunas = entrada.col();
       int i, j;
       for(i = 0; i < linhas; i++){
          for (j = 0; j < colunas; j++){
             double valor = entrada.dado(i, j);
-            saida.editar(i, j, funcao.applyAsDouble(valor));
+            saida.editar(i, j, fx.applyAsDouble(valor));
          }
       }
    }
@@ -36,10 +46,10 @@ public abstract class Ativacao{
     * Executa a derivada da função de ativação para cada elemento da entrada.
     * @param entrada matriz com os valores de gradientes da camada.
     * @param entrada matriz com os dados de entrada.
-    * @param funcao derivada de função de ativação desejada.
+    * @param fx derivada de função de ativação desejada.
     * @param saida resultado das derivadas.
     */
-   protected void aplicarDerivada(Mat gradientes, Mat entrada, DoubleUnaryOperator derivada, Mat saida){
+   protected void aplicarDerivada(Mat gradientes, Mat entrada, Mat saida){
       int linhas = entrada.lin();
       int colunas = entrada.col();
       int i, j;
@@ -47,9 +57,19 @@ public abstract class Ativacao{
          for (j = 0; j < colunas; j++){
             double grad = gradientes.dado(i, j);
             double valor = entrada.dado(i, j);
-            saida.editar(i, j, grad * derivada.applyAsDouble(valor));
+            saida.editar(i, j, grad * dx.applyAsDouble(valor));
          }
       }
+   }
+
+   /**
+    * Configura a função de ativação e sua derivada para uso.
+    * @param fx função de ativação.
+    * @param dx deriviada da função de ativação
+    */
+   public void construir(DoubleUnaryOperator fx, DoubleUnaryOperator dx){
+      this.fx = fx;
+      this.dx = dx;
    }
 
    /**
@@ -107,6 +127,10 @@ public abstract class Ativacao{
       );
    }
 
+   /**
+    * Retorna o nome da função de atvação.
+    * @return nome da função de ativação.
+    */
    public String nome(){
       return getClass().getSimpleName();
    }

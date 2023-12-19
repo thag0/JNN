@@ -37,7 +37,7 @@ public class Main{
       double[][] in  = (double[][]) ged.separarDadosEntrada(dados, tamEntrada);
       double[][] out = (double[][]) ged.separarDadosSaida(dados, tamSaida);
 
-      Modelo modelo = criarModelo(tamEntrada, tamSaida, false);
+      Modelo modelo = criarSequencial(tamEntrada, tamSaida);
       System.out.println(modelo.info());
 
       //treinar e marcar tempo
@@ -65,31 +65,35 @@ public class Main{
       executarComando("python grafico.py");
    }
 
-   static Modelo criarModelo(int entradas, int saidas, boolean rna){
-      // Otimizador otm = new SGD(0.0001, 0.995);
-      Otimizador otm = new AdaGrad();
+   static Modelo criarRna(int entradas, int saidas){
+      Otimizador otm = new SGD(0.0001, 0.9995);
+      Perda perda = new ErroMedioQuadrado();
+      Inicializador ini = new Xavier();
+
+      int[] arq = {entradas, 13, 13, saidas};
+      RedeNeural modelo = new RedeNeural(arq);
+      modelo.compilar(otm, perda, ini);
+      modelo.configurarAtivacao("tanh");
+      modelo.configurarAtivacao(modelo.camadaSaida(), "sigmoid");
+      modelo.configurarHistorico(calcularHistorico);
+      
+      return modelo;
+   }
+
+   static Modelo criarSequencial(int entradas, int saidas){
+      Otimizador otm = new SGD(0.0001, 0.9995);
+      // Otimizador otm = new AdaGrad();
       Perda perda = new ErroMedioQuadrado();
       Inicializador ini = new Xavier();
       // ini.configurarSeed(1234);
 
-      if(rna){
-         int[] arq = {entradas, 13, 13, saidas};
-         RedeNeural modelo = new RedeNeural(arq);
-         modelo.compilar(otm, perda, ini);
-         modelo.configurarAtivacao("tanh");
-         modelo.configurarAtivacao(modelo.camadaSaida(), "sigmoid");
-         modelo.configurarHistorico(calcularHistorico);
-         return modelo;
+      Sequencial modelo = new Sequencial();
+      modelo.add(new Densa(entradas, 13, "tanh"));
+      modelo.add(new Densa(13, saidas, "sigmoid"));
+      modelo.compilar(otm, perda, ini);
+      modelo.configurarHistorico(calcularHistorico);
       
-      }else{
-         Sequencial modelo = new Sequencial();
-         // modelo.add(new Densa(entradas, 13, "tanh"));
-         modelo.add(new Densa(entradas, 13, "seno"));
-         modelo.add(new Densa(13, saidas, "sigmoid"));
-         modelo.compilar(otm, perda, ini);
-         modelo.configurarHistorico(calcularHistorico);
-         return modelo;
-      }
+      return modelo;
    }
 
    /**

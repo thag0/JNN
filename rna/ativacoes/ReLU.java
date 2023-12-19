@@ -5,14 +5,18 @@ import rna.estrutura.Densa;
 
 public class ReLU extends Ativacao{
 
+   public ReLU(){
+      super.construir(this::relu, this::relud);
+   }
+
    @Override
    public void calcular(Densa camada){
-      super.aplicarFuncao(camada.somatorio, this::relu, camada.saida);
+      super.aplicarFuncao(camada.somatorio, camada.saida);
    }
 
    @Override
    public void derivada(Densa camada){
-      super.aplicarDerivada(camada.gradSaida, camada.somatorio, this::relud, camada.derivada);
+      super.aplicarDerivada(camada.gradSaida, camada.somatorio, camada.derivada);
    }
 
    @Override

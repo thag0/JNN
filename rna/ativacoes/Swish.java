@@ -12,17 +12,17 @@ public class Swish extends Ativacao{
     * Instancia a função de ativação Swish.
     */
    public Swish(){
-
+      super.construir(this::swish, this::swishd);
    }
 
    @Override
    public void calcular(Densa camada){
-      super.aplicarFuncao(camada.somatorio, this::swish, camada.saida);
+      super.aplicarFuncao(camada.somatorio, camada.saida);
    }
 
    @Override
    public void derivada(Densa camada){
-      super.aplicarDerivada(camada.gradSaida, camada.somatorio, this::swishd, camada.derivada);
+      super.aplicarDerivada(camada.gradSaida, camada.somatorio, camada.derivada);
    }
 
    private double swish(double x){
