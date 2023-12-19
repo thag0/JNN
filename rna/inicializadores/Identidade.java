@@ -11,8 +11,8 @@ public class Identidade extends Inicializador{
     */
    @Override
    public void inicializar(Mat m, double x){
-      for(int i = 0; i < m.lin; i++){
-         for(int j = 0; j < m.col; j++){
+      for(int i = 0; i < m.lin(); i++){
+         for(int j = 0; j < m.col(); j++){
             m.editar(i, j, (i == j ? 1 : 0));
          }
       }

@@ -14,8 +14,8 @@ import rna.modelos.Sequencial;
 import rna.otimizadores.*;
 
 public class Main{
-   static final int epocas = 100*1000;
-   static final float escalaRender = 7f;
+   static final int epocas = 10*1000;
+   static final float escalaRender = 8f;
    static Ged ged = new Ged();
    static Geim geim = new Geim();
    static boolean calcularHistorico = true;
@@ -66,9 +66,10 @@ public class Main{
    }
 
    static Modelo criarModelo(int entradas, int saidas, boolean rna){
-      Otimizador otm = new SGD(0.001, 0.995);
+      Otimizador otm = new SGD(0.01, 0.95);
       Perda perda = new ErroMedioQuadrado();
       Inicializador ini = new Xavier();
+      ini.configurarSeed(1234);
 
       if(rna){
          int[] arq = {entradas, 13, 13, saidas};
@@ -85,8 +86,8 @@ public class Main{
          // modelo.add(new Densa(42, "leakyrelu"));
          // modelo.add(new Densa(42, "leakyrelu"));
          // modelo.add(new Densa(saidas, "sigmoid"));
-         modelo.add(new Densa(entradas, 13, "tanh"));
-         modelo.add(new Densa(13, saidas, "sigmoid"));
+         modelo.add(new Densa(entradas, 14, "tanh"));
+         modelo.add(new Densa(14, saidas, "sigmoid"));
          modelo.compilar(otm, perda, ini);
          modelo.configurarHistorico(calcularHistorico);
          return modelo;
@@ -108,7 +109,7 @@ public class Main{
       //acelerar o processo de desenho
       //bom em situações de janelas muito grandes
       int n = Runtime.getRuntime().availableProcessors();
-      int numThreads = (n > 1) ? (int)(n * 0.75) : 1;
+      int numThreads = (n > 1) ? (int)(n * 0.5) : 1;
 
       JanelaTreino jt = new JanelaTreino(largura, altura, escalaRender, numThreads);
       jt.desenharTreino(modelo, 0);

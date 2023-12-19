@@ -35,8 +35,8 @@ class UtilsDensa{
          bw.write(String.valueOf(camada.temBias()));
          bw.newLine();
          
-         for(int i = 0; i < camada.pesos.lin; i++){
-            for(int j = 0; j < camada.pesos.col; j++){
+         for(int i = 0; i < camada.pesos.lin(); i++){
+            for(int j = 0; j < camada.pesos.col(); j++){
                double peso = camada.pesos.dado(i, j);
                bw.write(String.valueOf(peso));
                bw.newLine();
@@ -44,8 +44,8 @@ class UtilsDensa{
          }
          
          if(camada.temBias()){
-            for(int i = 0; i < camada.bias.lin; i++){
-               for(int j = 0; j < camada.bias.col; j++){
+            for(int i = 0; i < camada.bias.lin(); i++){
+               for(int j = 0; j < camada.bias.col(); j++){
                   double bias = camada.bias.dado(i, j);
                   bw.write(String.valueOf(bias));
                   bw.newLine();
@@ -90,16 +90,16 @@ class UtilsDensa{
 
    public void lerPesos(Densa camada, BufferedReader br){
       try{         
-         for(int i = 0; i < camada.pesos.lin; i++){
-            for(int j = 0; j < camada.pesos.col; j++){
+         for(int i = 0; i < camada.pesos.lin(); i++){
+            for(int j = 0; j < camada.pesos.col(); j++){
                double p = Double.parseDouble(br.readLine());
                camada.pesos.editar(i, j, p);
             }
          }
          
          if(camada.temBias()){
-            for(int i = 0; i < camada.bias.lin; i++){
-               for(int j = 0; j < camada.bias.col; j++){
+            for(int i = 0; i < camada.bias.lin(); i++){
+               for(int j = 0; j < camada.bias.col(); j++){
                   double b = Double.parseDouble(br.readLine());
                   camada.bias.editar(i, j, b);
                }

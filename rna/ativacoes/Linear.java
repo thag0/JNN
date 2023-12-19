@@ -20,8 +20,8 @@ public class Linear extends Ativacao{
    public void calcular(Densa camada){
       int i, j;
       
-      for(i = 0; i < camada.saida.lin; i++){
-         for(j = 0; j < camada.saida.col; j++){
+      for(i = 0; i < camada.saida.lin(); i++){
+         for(j = 0; j < camada.saida.col(); j++){
             camada.saida.editar(i, j, camada.somatorio.dado(i, j));
          }
       }
@@ -32,8 +32,8 @@ public class Linear extends Ativacao{
       int i, j;
       double grad;
 
-      for(i = 0; i < camada.derivada.lin; i++){
-         for(j = 0; j < camada.derivada.col; j++){
+      for(i = 0; i < camada.derivada.lin(); i++){
+         for(j = 0; j < camada.derivada.col(); j++){
             grad = camada.gradSaida.dado(i, j);
             camada.derivada.editar(i, j, (1 * grad));
          }
@@ -45,8 +45,8 @@ public class Linear extends Ativacao{
       int i, j, k;
     
       for(i = 0; i < camada.saida.length; i++){
-         for(j = 0; j < camada.saida[i].lin; j++){
-            for(k = 0; k < camada.saida[i].col; k++){
+         for(j = 0; j < camada.saida[i].lin(); j++){
+            for(k = 0; k < camada.saida[i].col(); k++){
                camada.saida[i].editar(j, k, camada.somatorio[i].dado(j, k));
             }
          }
@@ -59,8 +59,8 @@ public class Linear extends Ativacao{
       double grad;
     
       for(i = 0; i < camada.gradSaida.length; i++){
-         for(j = 0; j < camada.gradSaida[i].lin; j++){
-            for(k = 0; k < camada.gradSaida[i].col; k++){
+         for(j = 0; j < camada.gradSaida[i].lin(); j++){
+            for(k = 0; k < camada.gradSaida[i].col(); k++){
                grad = camada.gradSaida[i].dado(j, k);
                camada.derivada[i].editar(j, k, grad);
             }

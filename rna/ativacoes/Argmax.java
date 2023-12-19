@@ -26,14 +26,14 @@ public class Argmax extends Ativacao{
       int indiceMaximo = 0;
       double valorMaximo = camada.somatorio.dado(0, 0);
 
-      for(int i = 1; i < camada.somatorio.col; i++){
+      for(int i = 1; i < camada.somatorio.col(); i++){
          if(camada.somatorio.dado(0, i) > valorMaximo){
             indiceMaximo = i;
             valorMaximo = camada.somatorio.dado(0, i);
          }
       }
 
-      for(int i = 0; i < camada.somatorio.col; i++){
+      for(int i = 0; i < camada.somatorio.col(); i++){
          camada.saida.editar(0, i, ((i == indiceMaximo) ? 1 : 0));
       }
    }

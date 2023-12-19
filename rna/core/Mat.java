@@ -9,12 +9,12 @@ public class Mat{
    /**
     * Quantidade de linhas da matriz.
     */
-   public int lin;
+   private int lin;
 
    /**
     * Quantidade de colunas da matriz.
     */
-   public int col;
+   private int col;
 
    /**
     * Conjunto de dados da matriz.
@@ -526,6 +526,22 @@ public class Mat{
     */
    public int tamanho(){
       return this.dados.length;      
+   }
+
+   /**
+    * Retorna a quantidade de linhas presente na matriz.
+    * @return linhas da matriz;
+    */
+   public int lin(){
+      return this.lin;
+   }
+
+   /**
+    * Retorna a quantidade de colunas presente na matriz.
+    * @return colunas da matriz;
+    */
+   public int col(){
+      return this.col;
    }
 
    /**

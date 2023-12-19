@@ -69,7 +69,7 @@ public class MatrizTeste{
       Mat s = new Mat(1, 4, saida);
       Mat g = new Mat(1, 4, grad);
       
-      int n = s.col;
+      int n = s.col();
       Mat tmp = s.bloco(0, n);
       Mat ident = opmat.identidade(n);
       Mat trans = tmp.transpor();

@@ -28,9 +28,9 @@ public class OpMatriz{
     * @param b matriz B.
     */
    private void verificarLinhas(Mat a, Mat b){
-      if(a.lin != b.lin){
+      if(a.lin() != b.lin()){
          throw new IllegalArgumentException(
-            "Linhas de A (" + a.lin + ") e B (" + b.lin + ") são diferentes."
+            "Linhas de A (" + a.lin() + ") e B (" + b.lin() + ") são diferentes."
          );
       }
    }
@@ -42,11 +42,11 @@ public class OpMatriz{
     * @param c matriz C.
     */
    private void verificarLinhas(Mat a, Mat b, Mat c){
-      if(a.lin != b.lin && a.lin != c.lin){
+      if(a.lin() != b.lin() && a.lin() != c.lin()){
          throw new IllegalArgumentException(
-            "Linhas de A (" + a.lin + 
-            "), B (" + b.lin + 
-            ") e C (" + c.lin + ") são diferentes."
+            "Linhas de A (" + a.lin() + 
+            "), B (" + b.lin() + 
+            ") e C (" + c.lin() + ") são diferentes."
          );
       }
    }
@@ -57,9 +57,9 @@ public class OpMatriz{
     * @param b matriz B.
     */
    private void verificarColunas(Mat a, Mat b){
-      if(a.col != b.col){
+      if(a.col() != b.col()){
          throw new IllegalArgumentException(
-            "Colunas de A (" + a.col + ") e B (" + b.col + ") são diferentes."
+            "Colunas de A (" + a.col() + ") e B (" + b.col() + ") são diferentes."
          );
       }
    }
@@ -71,11 +71,11 @@ public class OpMatriz{
     * @param c matriz C.
     */
    private void verificarColunas(Mat a, Mat b, Mat c){
-      if(a.col != b.col && a.col != c.col){
+      if(a.col() != b.col() && a.col() != c.col()){
          throw new IllegalArgumentException(
-            "Colunas de A (" + a.col + 
-            "), B (" + b.col + 
-            ") e C (" + c.col + ") são diferentes."
+            "Colunas de A (" + a.col() + 
+            "), B (" + b.col() + 
+            ") e C (" + c.col() + ") são diferentes."
          );
       }
    }
@@ -86,17 +86,17 @@ public class OpMatriz{
     * @param r matriz de destino da cópia.
     */
    public void copiar(Mat m, Mat r){
-      if(m.lin != r.lin){
+      if(m.lin() != r.lin()){
          throw new IllegalArgumentException(
-            "As linhas de M (" + m.lin + 
-            ") e R (" + r.lin + 
+            "As linhas de M (" + m.lin() + 
+            ") e R (" + r.lin() + 
             ") devem ser iguais"
          );
       }
-      if(m.col != r.col){
+      if(m.col() != r.col()){
          throw new IllegalArgumentException(
-            "As colunas de M (" + m.col + 
-            ") e R (" + r.col + 
+            "As colunas de M (" + m.col() + 
+            ") e R (" + r.col() + 
             ") devem ser iguais"
          );
       }
@@ -146,8 +146,8 @@ public class OpMatriz{
       Mat id = new Mat(tamanho, tamanho);
       
       int i, j;
-      for(i = 0; i < id.lin; i++){
-         for(j = 0; j < id.col; j++){
+      for(i = 0; i < id.lin(); i++){
+         for(j = 0; j < id.col(); j++){
             id.editar(i, j, (i == j ? 1 : 0));
          }
       }
@@ -165,7 +165,7 @@ public class OpMatriz{
     * @param r matriz contendo o resultado.
     */
    public void mult(Mat a, Mat b, Mat r){
-      if(a.col != b.lin){
+      if(a.col() != b.lin()){
          throw new IllegalArgumentException("Dimensões de A e B incompatíveis");
       }
       verificarLinhas(a, r);
@@ -173,10 +173,10 @@ public class OpMatriz{
 
       int i, j, k;
       double res;
-      for(i = 0; i < r.lin; i++){
-         for(j = 0; j < r.col; j++){
+      for(i = 0; i < r.lin(); i++){
+         for(j = 0; j < r.col(); j++){
             res = 0;
-            for(k = 0; k < a.col; k++){
+            for(k = 0; k < a.col(); k++){
                res += a.dado(i, k) * b.dado(k, j);
             }
             r.editar(i, j, res);    
@@ -194,13 +194,13 @@ public class OpMatriz{
     * @param r matriz contendo o resultado.
     */
    public void multT(Mat a, Mat b, Mat r, int nThreads){
-      if(a.col != b.lin){
+      if(a.col() != b.lin()){
          throw new IllegalArgumentException("Dimensões de A e B incompatíveis");
       }
       verificarLinhas(a, r);
       verificarColunas(r, b);
 
-      int linPorThread = a.lin / nThreads;
+      int linPorThread = a.lin() / nThreads;
       Thread[] threads = new Thread[nThreads];
 
       for(int t = 0; t < nThreads; t++){
@@ -208,14 +208,14 @@ public class OpMatriz{
 
          threads[t] = new Thread(() -> {
             int inicio = id * linPorThread;
-            int fim = (id == nThreads - 1) ? a.lin : (id + 1) * linPorThread;
+            int fim = (id == nThreads - 1) ? a.lin() : (id + 1) * linPorThread;
             double res;
             int i, j, k;
 
             for(i = inicio; i < fim; i++){
-               for(j = 0; j < r.col; j++){
+               for(j = 0; j < r.col(); j++){
                   res = 0;
-                  for(k = 0; k < a.col; k++){
+                  for(k = 0; k < a.col(); k++){
                      res += a.dado(i, k) * b.dado(k, j);
                   }
                   r.editar(i, j, res);
@@ -268,7 +268,7 @@ public class OpMatriz{
       verificarLinhas(a, b);
       verificarColunas(a, b);
       
-      Mat r = new Mat(a.lin, a.col);
+      Mat r = new Mat(a.lin(), a.col());
       r.copiar(a);
       r.add(b);
 
@@ -307,7 +307,7 @@ public class OpMatriz{
       verificarLinhas(a, b);
       verificarColunas(a, b);
       
-      Mat r = new Mat(a.lin, a.col);
+      Mat r = new Mat(a.lin(), a.col());
       r.copiar(a);
       r.sub(b);
 
@@ -346,7 +346,7 @@ public class OpMatriz{
       verificarLinhas(a, b);
       verificarColunas(a, b);
       
-      Mat r = new Mat(a.lin, a.col);
+      Mat r = new Mat(a.lin(), a.col());
       r.copiar(a);
       r.mult(b);
 
@@ -376,8 +376,8 @@ public class OpMatriz{
       verificarColunas(a, r);
 
       r.copiar(a);
-      for(int i = 0; i < r.lin; i++){
-         for(int j = 0; j < r.col; j++){
+      for(int i = 0; i < r.lin(); i++){
+         for(int j = 0; j < r.col(); j++){
             r.div(i, j, e);
          }
       }
@@ -388,8 +388,8 @@ public class OpMatriz{
     * @param m matriz.
     */
    public void rotacionar180(Mat m){
-      int lin = m.lin;
-      int col = m.col;
+      int lin = m.lin();
+      int col = m.col();
       Mat rot = new Mat(lin, col);
   
       int i, j;
@@ -408,8 +408,8 @@ public class OpMatriz{
     * @return nova matriz com o conteúdo rotacionado.
     */
    public Mat rotacionar180R(Mat m){
-      int lin = m.lin;
-      int col = m.col;
+      int lin = m.lin();
+      int col = m.col();
       Mat rot = new Mat(lin, col);
   
       int i, j;
@@ -442,15 +442,15 @@ public class OpMatriz{
     * zerada antes da operação.
     */
    public void correlacaoCruzada(Mat a, Mat b, Mat r, boolean add){
-      if(r.lin != (a.lin - b.lin + 1)){
+      if(r.lin() != (a.lin() - b.lin() + 1)){
          throw new IllegalArgumentException(
-            "Dimensões entre as linhas de A (" + a.lin + 
-            "), B (" + b.lin + 
-            ") e R (" + r.lin + 
+            "Dimensões entre as linhas de A (" + a.lin() + 
+            "), B (" + b.lin() + 
+            ") e R (" + r.lin() + 
             ") incompatíveis."
          );
       }
-      if(r.col != (a.col - b.col + 1)){
+      if(r.col() != (a.col() - b.col() + 1)){
          throw new IllegalArgumentException(
             "Dimensões entre as colunas de A, B e R incompatíveis."
          );
@@ -462,12 +462,12 @@ public class OpMatriz{
 
       int i, j, k, l;
       double res;
-      for(i = 0; i < r.lin; i++){
-         for(j = 0; j < r.col; j++){
+      for(i = 0; i < r.lin(); i++){
+         for(j = 0; j < r.col(); j++){
             
             res = 0;
-            for(k = 0; k < b.lin; k++){
-               for(l = 0; l < b.col; l++){
+            for(k = 0; k < b.lin(); k++){
+               for(l = 0; l < b.col(); l++){
                   res += a.dado(i + k, j + l) * b.dado(k, l);
                }
             }
@@ -496,12 +496,12 @@ public class OpMatriz{
     * zerada antes da operação.
     */
    public void correlacaoCruzadaFull(Mat a, Mat b, Mat r, boolean add){
-      if(r.lin != (a.lin + b.lin - 1)){
+      if(r.lin() != (a.lin() + b.lin() - 1)){
          throw new IllegalArgumentException(
             "Dimensões entre as linhas de A, B e R incompatíveis."
          );
       }
-      if(r.col != (a.col + b.col - 1)){
+      if(r.col() != (a.col() + b.col() - 1)){
          throw new IllegalArgumentException(
             "Dimensões entre as colunas de A, B e R incompatíveis."
          );
@@ -514,15 +514,15 @@ public class OpMatriz{
       int i, j, k, l, posX, posY;
       double res;
       Mat filtro = rotacionar180R(b);
-      for(i = 0; i < r.lin; i++){
-         for(j = 0; j < r.col; j++){
+      for(i = 0; i < r.lin(); i++){
+         for(j = 0; j < r.col(); j++){
             res = 0;
-            for(k = 0; k < filtro.lin; k++){
-               for (l = 0; l < filtro.col; l++){
+            for(k = 0; k < filtro.lin(); k++){
+               for (l = 0; l < filtro.col(); l++){
                   posX = i - k;
                   posY = j - l;
   
-                  if(posX >= 0 && posX < a.lin && posY >= 0 && posY < a.col){
+                  if(posX >= 0 && posX < a.lin() && posY >= 0 && posY < a.col()){
                      res += a.dado(posX, posY) * filtro.dado(k, l);
                   }
                }
@@ -551,12 +551,12 @@ public class OpMatriz{
     * zerada antes da operação.
     */
    public void convolucao(Mat a, Mat b, Mat r, boolean add){
-      if(r.lin != (a.lin - b.lin + 1)){
+      if(r.lin() != (a.lin() - b.lin() + 1)){
          throw new IllegalArgumentException(
             "Dimensões entre as linhas de A, B e R incompatíveis."
          );
       }
-      if(r.col != (a.col - b.col + 1)){
+      if(r.col() != (a.col() - b.col() + 1)){
          throw new IllegalArgumentException(
             "Dimensões entre as colunas de A, B e R incompatíveis."
          );
@@ -569,12 +569,12 @@ public class OpMatriz{
       int i, j, k, l;
       double res;
       Mat filtro = rotacionar180R(b);
-      for(i = 0; i < r.lin; i++){
-         for(j = 0; j < r.col; j++){
+      for(i = 0; i < r.lin(); i++){
+         for(j = 0; j < r.col(); j++){
             
             res = 0;
-            for(k = 0; k < filtro.lin; k++){
-               for(l = 0; l < filtro.col; l++){
+            for(k = 0; k < filtro.lin(); k++){
+               for(l = 0; l < filtro.col(); l++){
                   res += a.dado(i + k, j + l) * filtro.dado(k, l);
                }
             }
@@ -602,12 +602,12 @@ public class OpMatriz{
     * zerada antes da operação.
     */
    public void convolucaoFull(Mat a, Mat b, Mat r, boolean add){
-      if(r.lin != (a.lin + b.lin - 1)){
+      if(r.lin() != (a.lin() + b.lin() - 1)){
          throw new IllegalArgumentException(
             "Dimensões entre as linhas de A, B e R incompatíveis."
          );
       }
-      if(r.col != (a.col + b.col - 1)){
+      if(r.col() != (a.col() + b.col() - 1)){
          throw new IllegalArgumentException(
             "Dimensões entre as colunas de A, B e R incompatíveis."
          );
@@ -619,15 +619,15 @@ public class OpMatriz{
   
       int i, j, k, l, posX, posY;
       double res;
-      for(i = 0; i < r.lin; i++){
-         for(j = 0; j < r.col; j++){
+      for(i = 0; i < r.lin(); i++){
+         for(j = 0; j < r.col(); j++){
             res = 0;
-            for(k = 0; k < b.lin; k++){
-               for(l = 0; l < b.col; l++){
+            for(k = 0; k < b.lin(); k++){
+               for(l = 0; l < b.col(); l++){
                   posX = i - k;
                   posY = j - l;
   
-                  if(posX >= 0 && posX < a.lin && posY >= 0 && posY < a.col){
+                  if(posX >= 0 && posX < a.lin() && posY >= 0 && posY < a.col()){
                      res += a.dado(posX, posY) * b.dado(k, l);
                   }
                }

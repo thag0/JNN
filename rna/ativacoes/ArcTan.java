@@ -9,8 +9,8 @@ public class ArcTan extends Ativacao{
       int i, j;
       double s;
 
-      for(i = 0; i < camada.saida.lin; i++) {
-         for(j = 0; j < camada.saida.col; j++){
+      for(i = 0; i < camada.saida.lin(); i++) {
+         for(j = 0; j < camada.saida.col(); j++){
             s = camada.somatorio.dado(i, j);
             s = arctan(s);
             camada.saida.editar(i, j, s);
@@ -23,8 +23,8 @@ public class ArcTan extends Ativacao{
       int i, j;
       double d, grad;
 
-      for(i = 0; i < camada.derivada.lin; i++){
-         for(j = 0; j < camada.derivada.col; j++){
+      for(i = 0; i < camada.derivada.lin(); i++){
+         for(j = 0; j < camada.derivada.col(); j++){
             d = camada.saida.dado(i, j);
             d = derivada(d);
             grad = camada.gradSaida.dado(i, j);

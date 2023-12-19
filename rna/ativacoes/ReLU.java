@@ -10,8 +10,8 @@ public class ReLU extends Ativacao{
       int i, j;
       double s;
 
-      for(i = 0; i < camada.saida.lin; i++){
-         for(j = 0; j < camada.saida.col; j++){
+      for(i = 0; i < camada.saida.lin(); i++){
+         for(j = 0; j < camada.saida.col(); j++){
             s = relu(camada.somatorio.dado(i, j));
             camada.saida.editar(i, j, s);
          }
@@ -23,8 +23,8 @@ public class ReLU extends Ativacao{
       int i, j;
       double grad, d;
 
-      for(i = 0; i < camada.derivada.lin; i++){
-         for(j = 0; j < camada.derivada.col; j++){
+      for(i = 0; i < camada.derivada.lin(); i++){
+         for(j = 0; j < camada.derivada.col(); j++){
             grad = camada.gradSaida.dado(i, j);
             d = camada.somatorio.dado(i, j);
             d = derivada(d);
@@ -40,8 +40,8 @@ public class ReLU extends Ativacao{
       double s;
 
       for(i = 0; i < camada.saida.length; i++){
-         for(j = 0; j < camada.saida[i].lin; j++){
-            for(k = 0; k < camada.saida[i].col; k++){
+         for(j = 0; j < camada.saida[i].lin(); j++){
+            for(k = 0; k < camada.saida[i].col(); k++){
                s = camada.somatorio[i].dado(j, k);
                camada.saida[i].editar(j, k, relu(s));
             }
@@ -55,8 +55,8 @@ public class ReLU extends Ativacao{
       double grad, d;
 
       for(i = 0; i < camada.saida.length; i++){
-         for(j = 0; j < camada.saida[i].lin; j++){
-            for(k = 0; k < camada.saida[i].col; k++){
+         for(j = 0; j < camada.saida[i].lin(); j++){
+            for(k = 0; k < camada.saida[i].col(); k++){
                grad = camada.gradSaida[i].dado(j, k);
                d = camada.somatorio[i].dado(j, k);
                d = derivada(d);

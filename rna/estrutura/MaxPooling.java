@@ -87,14 +87,10 @@ public class MaxPooling extends Camada{
    }
 
    @Override
-   public void inicializar(Inicializador iniKernel, Inicializador iniBias, double x){
-      
-   }
+   public void inicializar(Inicializador iniKernel, Inicializador iniBias, double x){}
 
    @Override
-   public void inicializar(Inicializador iniKernel, double x){
-
-   }
+   public void inicializar(Inicializador iniKernel, double x){}
 
    @Override
    public void configurarId(int id){
@@ -117,12 +113,12 @@ public class MaxPooling extends Camada{
    }
 
    private void aplicarMaxPooling(Mat entrada, Mat saida){
-      for(int i = 0; i < saida.lin; i++){
-         for(int j = 0; j < saida.col; j++){
+      for(int i = 0; i < saida.lin(); i++){
+         for(int j = 0; j < saida.col(); j++){
             int linInicio = i * this.strideAltura;
             int colIincio = j * this.strideLargura;
-            int linFim = Math.min(linInicio + this.formFiltro[0], entrada.lin);
-            int colFim = Math.min(colIincio + this.formFiltro[1], entrada.col);
+            int linFim = Math.min(linInicio + this.formFiltro[0], entrada.lin());
+            int colFim = Math.min(colIincio + this.formFiltro[1], entrada.col());
             double maxValor = Double.MIN_VALUE;
             for(int row = linInicio; row < linFim; row++){
                for(int col = colIincio; col < colFim; col++){
@@ -155,12 +151,12 @@ public class MaxPooling extends Camada{
    }
    
    private void calcularGradienteMaxPooling(Mat entrada, Mat gradSeguinte, Mat gradEntrada){
-      for(int i = 0; i < gradSeguinte.lin; i++){
-          for(int j = 0; j < gradSeguinte.col; j++){
+      for(int i = 0; i < gradSeguinte.lin(); i++){
+          for(int j = 0; j < gradSeguinte.col(); j++){
               int linInicio = i * this.strideAltura;
               int colInicio = j * this.strideLargura;
-              int linFim = Math.min(linInicio + this.formFiltro[0], entrada.lin);
-              int colFim = Math.min(colInicio + this.formFiltro[1], entrada.col);
+              int linFim = Math.min(linInicio + this.formFiltro[0], entrada.lin());
+              int colFim = Math.min(colInicio + this.formFiltro[1], entrada.col());
   
               int[] posicaoMaximo = posicaoMaxima(entrada, linInicio, colInicio, linFim, colFim);
               int rowMaximo = posicaoMaximo[0];
@@ -202,7 +198,7 @@ public class MaxPooling extends Camada{
 
    @Override
    public int tamanhoSaida(){
-      return this.saida.length * this.saida[0].lin * this.saida[0].col;
+      return this.saida.length * this.saida[0].lin() * this.saida[0].col();
    }
 
    @Override

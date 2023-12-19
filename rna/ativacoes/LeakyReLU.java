@@ -51,8 +51,8 @@ public class LeakyReLU extends Ativacao{
       int i, j;
       double s;
 
-      for(i = 0; i < camada.saida.lin; i++){
-         for(j = 0; j < camada.saida.col; j++){
+      for(i = 0; i < camada.saida.lin(); i++){
+         for(j = 0; j < camada.saida.col(); j++){
             s = leakyRelu(camada.somatorio.dado(i, j));
             camada.saida.editar(i, j, s);
          }
@@ -64,8 +64,8 @@ public class LeakyReLU extends Ativacao{
       int i, j;
       double grad, d;
 
-      for(i = 0; i < camada.derivada.lin; i++){
-         for(j = 0; j < camada.derivada.col; j++){
+      for(i = 0; i < camada.derivada.lin(); i++){
+         for(j = 0; j < camada.derivada.col(); j++){
             grad = camada.gradSaida.dado(i, j);
             d = derivada(camada.somatorio.dado(i, j));
             camada.derivada.editar(i, j, (grad * d));
@@ -79,8 +79,8 @@ public class LeakyReLU extends Ativacao{
       double s;
 
       for(i = 0; i < camada.somatorio.length; i++){
-         for(j = 0; j < camada.somatorio[i].lin; j++){
-            for(k = 0; k < camada.somatorio[i].col; k++){
+         for(j = 0; j < camada.somatorio[i].lin(); j++){
+            for(k = 0; k < camada.somatorio[i].col(); k++){
                s = camada.somatorio[i].dado(j, k);
                camada.saida[i].editar(j, k, leakyRelu(s));
             }
@@ -95,8 +95,8 @@ public class LeakyReLU extends Ativacao{
       double grad, d;
 
       for(i = 0; i < camada.gradSaida.length; i++){
-         for(j = 0; j < camada.gradSaida[i].lin; j++){
-            for(k = 0; k < camada.gradSaida[i].col; k++){
+         for(j = 0; j < camada.gradSaida[i].lin(); j++){
+            for(k = 0; k < camada.gradSaida[i].col(); k++){
                grad = camada.gradSaida[i].dado(j, k);
                d = camada.somatorio[i].dado(j, k);
                d = derivada(d);

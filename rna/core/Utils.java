@@ -12,8 +12,8 @@ public class Utils{
    public void copiar(double[] arr, Mat[] dest){
       int id = 0, i, j, k;
       for(i = 0; i < dest.length; i++){
-         for(j = 0; j < dest[i].lin; j++){
-            for(k = 0; k < dest[i].col; k++){
+         for(j = 0; j < dest[i].lin(); j++){
+            for(k = 0; k < dest[i].col(); k++){
                dest[i].editar(j, k, arr[id++]);
             }
          }

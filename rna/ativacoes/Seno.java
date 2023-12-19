@@ -17,8 +17,8 @@ public class Seno extends Ativacao{
 
    @Override
    public void calcular(Densa camada){
-      for(int i = 0; i < camada.saida.lin; i++){
-         for(int j = 0; j < camada.saida.col; j++){
+      for(int i = 0; i < camada.saida.lin(); i++){
+         for(int j = 0; j < camada.saida.col(); j++){
             camada.saida.editar(i, j, Math.sin(camada.somatorio.dado(i, j)));
          }
       }
@@ -29,8 +29,8 @@ public class Seno extends Ativacao{
       int i, j;
       double grad, d;
 
-      for(i = 0; i < camada.derivada.lin; i++){
-         for(j = 0; j < camada.derivada.col; j++){
+      for(i = 0; i < camada.derivada.lin(); i++){
+         for(j = 0; j < camada.derivada.col(); j++){
             grad = camada.gradSaida.dado(i, j);
             d = Math.cos(camada.somatorio.dado(i, j));
             camada.derivada.editar(i, j, (grad * d));

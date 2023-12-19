@@ -10,8 +10,8 @@ public class TanH extends Ativacao{
       double s;
       int i, j;
 
-      for(i = 0; i < camada.saida.lin; i++){
-         for(j = 0; j < camada.saida.col; j++){
+      for(i = 0; i < camada.saida.lin(); i++){
+         for(j = 0; j < camada.saida.col(); j++){
             s = camada.somatorio.dado(i, j);
             camada.saida.editar(i, j, tanh(s));
          }
@@ -23,8 +23,8 @@ public class TanH extends Ativacao{
       double grad, d;
       int i, j;
 
-      for(i = 0; i < camada.saida.lin; i++){
-         for(j = 0; j < camada.saida.col; j++){
+      for(i = 0; i < camada.saida.lin(); i++){
+         for(j = 0; j < camada.saida.col(); j++){
             grad = camada.gradSaida.dado(i, j);
             d = camada.saida.dado(i, j);
             d = 1 - (d * d);
@@ -40,8 +40,8 @@ public class TanH extends Ativacao{
       double s;
 
       for(i = 0; i < camada.somatorio.length; i++){
-         for(j = 0; j < camada.somatorio[i].lin; j++){
-            for(k = 0; k < camada.somatorio[i].col; k++){
+         for(j = 0; j < camada.somatorio[i].lin(); j++){
+            for(k = 0; k < camada.somatorio[i].col(); k++){
                s = camada.somatorio[i].dado(j, k);
                camada.saida[i].editar(j, k, tanh(s));
             }
@@ -55,8 +55,8 @@ public class TanH extends Ativacao{
       double grad, d;
 
       for(i = 0; i < camada.somatorio.length; i++){
-         for(j = 0; j < camada.somatorio[i].lin; j++){
-            for(k = 0; k < camada.somatorio[i].col; k++){
+         for(j = 0; j < camada.somatorio[i].lin(); j++){
+            for(k = 0; k < camada.somatorio[i].col(); k++){
                grad = camada.gradSaida[i].dado(j, k);
                d = camada.saida[i].dado(j, k);
                d = 1 - (d * d);

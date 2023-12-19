@@ -912,8 +912,8 @@ public class Convolucional extends Camada implements Cloneable{
    @Override
    public int[] formatoEntrada(){
       return new int[]{
-         this.entrada[0].lin, 
-         this.entrada[0].col, 
+         this.entrada[0].lin(), 
+         this.entrada[0].col(), 
          this.entrada.length
       };
    }
@@ -1013,8 +1013,8 @@ public class Convolucional extends Camada implements Cloneable{
       int id = 0, i, j;
       for(Mat[] filtro : this.filtros){
          for(Mat camada : filtro){
-            for(i = 0; i < camada.lin; i++){
-               for(j = 0; j < camada.col; j++){
+            for(i = 0; i < camada.lin(); i++){
+               for(j = 0; j < camada.col(); j++){
                   camada.editar(i, j, kernel[id++]);
                }
             }
@@ -1033,8 +1033,8 @@ public class Convolucional extends Camada implements Cloneable{
       
       int id = 0;
       for(Mat b : this.bias){
-         for(int i = 0; i < b.lin; i++){
-            for(int j = 0; j < b.col; j++){
+         for(int i = 0; i < b.lin(); i++){
+            for(int j = 0; j < b.col(); j++){
                b.editar(i, j, bias[id++]);
             }
          }

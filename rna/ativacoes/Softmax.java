@@ -32,11 +32,11 @@ public class Softmax extends Ativacao{
    public void calcular(Densa camada){
       double somaExp = 0;
 
-      for(int i = 0; i < camada.somatorio.col; i++){
+      for(int i = 0; i < camada.somatorio.col(); i++){
          somaExp += Math.exp(camada.somatorio.dado(0, i));
       }
 
-      for(int i = 0; i < camada.saida.col; i++){
+      for(int i = 0; i < camada.saida.col(); i++){
          double s = Math.exp(camada.somatorio.dado(0, i)) / somaExp;
          camada.saida.editar(0, i, s);
       }
@@ -44,7 +44,7 @@ public class Softmax extends Ativacao{
 
    @Override
    public void derivada(Densa camada){
-      int n = camada.somatorio.col;
+      int n = camada.somatorio.col();
       Mat tmp = camada.saida.bloco(0, n);
       Mat ident = opm.identidade(n);
       Mat transp = tmp.transpor();

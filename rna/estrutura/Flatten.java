@@ -211,8 +211,8 @@ public class Flatten extends Camada{
    private void calcularGrad(double[] grad){
       int id = 0, i, j, k;
       for(i = 0; i < this.gradEntrada.length; i++){
-         for(j = 0; j < this.gradEntrada[i].lin; j++){
-            for(k = 0; k < this.gradEntrada[i].col; k++){
+         for(j = 0; j < this.gradEntrada[i].lin(); j++){
+            for(k = 0; k < this.gradEntrada[i].col(); k++){
                this.gradEntrada[i].editar(j, k, grad[id++]);
             }
          }

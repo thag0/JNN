@@ -340,18 +340,18 @@ public class Densa extends Camada implements Cloneable{
       this.pesos =   new Mat(this.tamEntrada, this.numNeuronios);
 
       if(usarBias){
-         this.bias =       new Mat(this.saida.lin, this.saida.col);
-         this.gradBias =   new Mat(this.bias.lin, this.bias.col);
-         this.gradAcBias = new Mat(this.bias.lin, this.bias.col);
+         this.bias =       new Mat(this.saida.lin(), this.saida.col());
+         this.gradBias =   new Mat(this.bias.lin(), this.bias.col());
+         this.gradAcBias = new Mat(this.bias.lin(), this.bias.col());
       }
 
-      this.somatorio =   new Mat(this.saida.lin, this.saida.col);
-      this.derivada =    new Mat(this.saida.lin, this.saida.col);
-      this.gradSaida =   new Mat(this.saida.lin, this.saida.col);
-      this.gradEntrada = new Mat(this.entrada.lin, this.entrada.col);
+      this.somatorio =   new Mat(this.saida.lin(), this.saida.col());
+      this.derivada =    new Mat(this.saida.lin(), this.saida.col());
+      this.gradSaida =   new Mat(this.saida.lin(), this.saida.col());
+      this.gradEntrada = new Mat(this.entrada.lin(), this.entrada.col());
 
-      this.gradPesos =   new Mat(this.pesos.lin, this.pesos.col);
-      this.gradAcPesos = new Mat(this.pesos.lin, this.pesos.col);
+      this.gradPesos =   new Mat(this.pesos.lin(), this.pesos.col());
+      this.gradAcPesos = new Mat(this.pesos.lin(), this.pesos.col());
       
       this.treinavel = true;
       this.construida = true;//camada pode ser usada.
@@ -504,10 +504,10 @@ public class Densa extends Camada implements Cloneable{
       
       }else if(gradSeguinte instanceof Mat){
          Mat grads = (Mat) gradSeguinte;
-         if(grads.col != this.gradSaida.col){
+         if(grads.col() != this.gradSaida.col()){
             throw new IllegalArgumentException(
-               "Dimensões incompatíveis entre o gradiente fornecido (" + grads.col + 
-               ") e o suportado pela camada (" + this.gradSaida.col + ")."
+               "Dimensões incompatíveis entre o gradiente fornecido (" + grads.col() + 
+               ") e o suportado pela camada (" + this.gradSaida.col() + ")."
             );
          }
          this.gradSaida.copiar(grads);
@@ -546,7 +546,7 @@ public class Densa extends Camada implements Cloneable{
    public int numNeuronios(){
       verificarConstrucao();
 
-      return this.pesos.col;
+      return this.pesos.col();
    }
 
    @Override
@@ -561,7 +561,7 @@ public class Densa extends Camada implements Cloneable{
    public int tamanhoEntrada(){
       verificarConstrucao();
 
-      return this.entrada.col;
+      return this.entrada.col();
    }
 
    /**
@@ -605,13 +605,13 @@ public class Densa extends Camada implements Cloneable{
             "Índice fornecido (" + id +") inválido."
          );
       }
-      if(this.pesos.lin != pesos.length){
+      if(this.pesos.lin() != pesos.length){
          throw new IllegalArgumentException(
             "Dimensões de pesos diferente da capacidade do neurônio."
          );
       }
 
-      for(int i = 0; i < this.pesos.lin; i++){
+      for(int i = 0; i < this.pesos.lin(); i++){
          this.pesos.editar(i, id, pesos[i]);
       }
 
@@ -674,12 +674,12 @@ public class Densa extends Camada implements Cloneable{
       buffer += espacamento + "Quantidade neurônios: " + this.numNeuronios() + "\n";
       buffer += "\n";
 
-      buffer += espacamento + "Entrada: [" + this.entrada.lin + ", " + this.entrada.col + "]\n";
-      buffer += espacamento + "Pesos:   [" + this.pesos.lin + ", "   + this.pesos.col + "]\n";
+      buffer += espacamento + "Entrada: [" + this.entrada.lin() + ", " + this.entrada.col() + "]\n";
+      buffer += espacamento + "Pesos:   [" + this.pesos.lin() + ", "   + this.pesos.col() + "]\n";
       if(this.temBias()){
-         buffer += espacamento + "Bias:    [" + this.bias.lin + ", "   + this.bias.col + "]\n";
+         buffer += espacamento + "Bias:    [" + this.bias.lin() + ", "   + this.bias.col() + "]\n";
       }
-      buffer += espacamento + "Saida:   [" + this.saida.lin + ", "   + this.saida.col + "]\n";
+      buffer += espacamento + "Saida:   [" + this.saida.lin() + ", "   + this.saida.col() + "]\n";
 
       buffer += "]\n";
 
@@ -734,8 +734,8 @@ public class Densa extends Camada implements Cloneable{
    @Override
    public int[] formatoEntrada(){
       return new int[]{
-         this.entrada.lin, 
-         this.entrada.col
+         this.entrada.lin(), 
+         this.entrada.col()
       };
    }
 
@@ -754,8 +754,8 @@ public class Densa extends Camada implements Cloneable{
    @Override
    public int[] formatoSaida(){
       return new int[]{
-         this.saida.lin, 
-         this.saida.col
+         this.saida.lin(), 
+         this.saida.col()
       };
    }
 
@@ -798,7 +798,7 @@ public class Densa extends Camada implements Cloneable{
 
    @Override
    public void editarBias(double[] bias){
-      if(bias.length != (this.bias.col)){
+      if(bias.length != (this.bias.col())){
          throw new IllegalArgumentException(
             "A dimensão do bias fornecido não é igual a quantidade de " +
             " parâmetros para os bias da camada."

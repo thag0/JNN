@@ -799,8 +799,8 @@ public class RedeNeural extends Modelo implements Cloneable{
 
          double custo = this.avaliador.erroMedioQuadrado(entradas, saidas);
          for(Densa camada : this.camadas){   
-            for(int i = 0; i < camada.pesos.lin; i++){
-               for(int j = 0; j < camada.pesos.col; j++){
+            for(int i = 0; i < camada.pesos.lin(); i++){
+               for(int j = 0; j < camada.pesos.col(); j++){
                   salvo = camada.pesos.dado(i, j);
                   camada.pesos.add(i, j, eps);
                   double d = (this.avaliador.erroMedioQuadrado(entradas, saidas) - custo) / eps;
@@ -808,8 +808,8 @@ public class RedeNeural extends Modelo implements Cloneable{
                   camada.pesos.editar(i, j, salvo);
                }
             }
-            for(int i = 0; i < camada.bias.lin; i++){
-               for(int j = 0; j < camada.bias.col; j++){
+            for(int i = 0; i < camada.bias.lin(); i++){
+               for(int j = 0; j < camada.bias.col(); j++){
                   salvo = camada.bias.dado(i, j);
                   camada.bias.add(i, j, eps);
                   double d = (this.avaliador.erroMedioQuadrado(entradas, saidas) - custo) / eps;
@@ -820,15 +820,15 @@ public class RedeNeural extends Modelo implements Cloneable{
          }
 
          for(Densa camada : this.camadas){            
-            for(int i = 0; i < camada.pesos.lin; i++){
-               for(int j = 0; j < camada.pesos.col; j++){
+            for(int i = 0; i < camada.pesos.lin(); i++){
+               for(int j = 0; j < camada.pesos.col(); j++){
                   camada.pesos.sub(i, j, (tA * camada.gradPesos.dado(i, j)));
                }
             }
 
             if(camada.temBias()){
-               for(int i = 0; i < camada.bias.lin; i++){
-                  for(int j = 0; j < camada.bias.col; j++){
+               for(int i = 0; i < camada.bias.lin(); i++){
+                  for(int j = 0; j < camada.bias.col(); j++){
                      camada.bias.sub(i, j, (tA * camada.gradSaida.dado(i, j)));
                   }
                }

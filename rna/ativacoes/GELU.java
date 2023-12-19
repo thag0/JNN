@@ -23,8 +23,8 @@ public class GELU extends Ativacao{
       int i, j;
       double s;
 
-      for(i = 0; i < camada.saida.lin; i++){
-         for(j = 0; j < camada.saida.col; j++){
+      for(i = 0; i < camada.saida.lin(); i++){
+         for(j = 0; j < camada.saida.col(); j++){
             s = gelu(camada.somatorio.dado(i, j));
             camada.saida.editar(i, j, s);
          }
@@ -36,8 +36,8 @@ public class GELU extends Ativacao{
       int i, j;
       double grad, d;
 
-      for(i = 0; i < camada.derivada.lin; i++){
-         for(j = 0; j < camada.derivada.col; j++){
+      for(i = 0; i < camada.derivada.lin(); i++){
+         for(j = 0; j < camada.derivada.col(); j++){
             grad = camada.gradSaida.dado(i, j);
             d = derivada(camada.somatorio.dado(i, j));
             camada.derivada.editar(i, j, (grad * d));
