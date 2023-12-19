@@ -187,8 +187,7 @@ public class Mat{
     * @return valor baseado de acordo com os índices.
     */
    public double dado(int lin, int col){
-      int id = indice(lin, col);
-      return this.dados[id];
+      return this.dados[indice(lin, col)];
    }
 
    /**
@@ -199,8 +198,7 @@ public class Mat{
     * @param valor novo valor que será colocado.
     */
    public void editar(int lin, int col, double valor){
-      int id = indice(lin, col);
-      this.dados[id] = valor;
+      this.dados[indice(lin, col)] = valor;
    }
 
    /**
@@ -345,8 +343,7 @@ public class Mat{
     * @param valor dado que será adicionado.
     */
    public void add(int lin, int col, double valor){
-      int id = indice(lin, col);
-      this.dados[id] += valor;
+      this.dados[indice(lin, col)] += valor;
    }
 
    /**
@@ -359,6 +356,7 @@ public class Mat{
             "A matriz fornecida deve conter o mesmo número de elementos."
          );
       }
+
       for(int i = 0; i < this.dados.length; i++){
          this.dados[i] += m.dados[i];
       }
@@ -378,8 +376,7 @@ public class Mat{
     * @param valor dado que será subtraído.
     */
    public void sub(int lin, int col, double valor){
-      int id = indice(lin, col);
-      this.dados[id] -= valor;
+      this.dados[indice(lin, col)] -= valor;
    }
 
    /**
@@ -411,8 +408,7 @@ public class Mat{
     * @param valor dado que será multiplicado.
     */
    public void mult(int lin, int col, double valor){
-      int id = indice(lin, col);
-      this.dados[id] *= valor;
+      this.dados[indice(lin, col)] *= valor;
    }
 
    /**
@@ -444,8 +440,7 @@ public class Mat{
     * @param valor dado que será divido.
     */
    public void div(int lin, int col, double valor){
-      int id = indice(lin, col);
-      this.dados[id] /= valor;
+      this.dados[indice(lin, col)] /= valor;
    }
 
    /**
@@ -547,7 +542,7 @@ public class Mat{
    /**
     * Exibe o conteúdo contido na matriz.
     */
- public void print(String nome){
+   public void print(String nome){
       if(nome == null || nome.isBlank() || nome.isEmpty()){
           System.out.print(this.getClass().getSimpleName());
       }else{

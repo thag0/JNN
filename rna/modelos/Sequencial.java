@@ -312,6 +312,30 @@ public class Sequencial extends Modelo implements Cloneable{
    }
    
    @Override
+   public void treinar(Object[] entradas, Object[] saidas, int epochs, int tamLote){
+     this.verificarCompilacao();
+
+     if(epochs < 1){
+        throw new IllegalArgumentException(
+           "O valor de epochs (" + epochs + ") não pode ser menor que um"
+        );
+     }
+     if(tamLote <= 0 || tamLote > entradas.length){
+        throw new IllegalArgumentException(
+           "O valor de tamanho do lote (" + tamLote + ") é inválido."
+        );
+     }
+
+     this.treinador.treino(
+        this,
+        entradas,
+        saidas,
+        epochs,
+        tamLote
+     );
+  }
+
+   @Override
    public Otimizador otimizador(){
       return this.otimizador;
    }

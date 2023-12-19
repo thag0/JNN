@@ -3,7 +3,7 @@ package rna.treinamento;
 import java.util.Random;
 
 import rna.avaliacao.perda.Perda;
-import rna.core.Array;
+import rna.core.OpArray;
 import rna.core.Mat;
 import rna.core.OpMatriz;
 import rna.estrutura.Camada;
@@ -11,7 +11,7 @@ import rna.estrutura.Camada;
 public class AuxiliarTreino{
    Random random = new Random();
    OpMatriz mat = new OpMatriz();
-   Array arr = new Array();
+   OpArray arr = new OpArray();
 
    /**
     * Configura a seed inicial do gerador de números aleatórios.

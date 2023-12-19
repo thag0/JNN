@@ -743,8 +743,8 @@ public class RedeNeural extends Modelo implements Cloneable{
     * @throws IllegalArgumentException se houver alguma inconsistência dos dados de entrada e saída para a operação.
     * @throws IllegalArgumentException se o valor de épocas for menor que um.
     */
-    @Override
-    public void treinar(Object[] entradas, Object[] saidas, int epochs, int tamLote){
+   @Override
+   public void treinar(Object[] entradas, Object[] saidas, int epochs, int tamLote){
       this.verificarCompilacao();
 
       if(epochs < 1){

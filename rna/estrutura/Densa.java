@@ -770,6 +770,11 @@ public class Densa extends Camada implements Cloneable{
    }
 
    @Override
+   public double[] obterAcGradKernel(){
+      return this.gradAcPesos.paraArray();    
+   }
+
+   @Override
    public double[] obterBias(){
       return this.bias.paraArray();
    }
@@ -780,8 +785,33 @@ public class Densa extends Camada implements Cloneable{
    }
 
    @Override
+   public double[] obterAcGradBias(){
+      return this.gradAcBias.paraArray();       
+   }
+
+   @Override
    public Object obterGradEntrada(){
       return this.gradEntrada;
+   }
+
+   @Override
+   public void editarGradienteKernel(double[] grads){
+      this.gradPesos.copiar(grads);
+   }
+
+   @Override
+   public void editarGradienteBias(double[] grads){
+      this.gradBias.copiar(grads);
+   }
+
+   @Override
+   public void editarAcGradKernel(double[] acumulador){
+      this.gradAcPesos.copiar(acumulador);
+   }
+
+   @Override
+   public void editarAcGradBias(double[] acumulador){
+      this.gradAcBias.copiar(acumulador);
    }
 
    @Override

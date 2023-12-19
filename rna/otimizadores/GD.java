@@ -1,6 +1,6 @@
 package rna.otimizadores;
 
-import rna.core.Array;
+import rna.core.OpArray;
 import rna.estrutura.Camada;
 
 /**
@@ -27,7 +27,7 @@ public class GD extends Otimizador{
    /**
     * Operador de arrays.
     */
-   Array opArr = new Array();
+   OpArray opArr = new OpArray();
 
    /**
     * Valor de taxa de aprendizagem do otimizador.

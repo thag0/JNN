@@ -4,13 +4,14 @@ import java.util.Random;
 
 import rna.avaliacao.perda.Perda;
 import rna.core.OpMatriz;
-import rna.estrutura.Densa;
+import rna.core.OpArray;
+import rna.estrutura.Camada;
 import rna.modelos.Modelo;
-import rna.modelos.RedeNeural;
 import rna.otimizadores.Otimizador;
 
 public class TreinoLote{
    OpMatriz opmat = new OpMatriz();
+   OpArray oparr = new OpArray();
    AuxiliarTreino aux = new AuxiliarTreino();
    Random random = new Random();
 
@@ -58,14 +59,7 @@ public class TreinoLote{
     * @param tamLote tamanho do lote.
     */
    public void treinar(Modelo modelo, Object[] entradas, Object[] saidas, int epochs, int tamLote){
-      //temp
-      if(modelo instanceof RedeNeural == false){
-         throw new IllegalArgumentException(
-            "O treino em lotes por enquanto só está disponível para o modelo RedeNeural"
-         );
-      }  
-
-      Densa[] camadas = (Densa[]) modelo.camadas();
+      Camada[] camadas = modelo.camadas();
       Otimizador otimizador = modelo.otimizador();
       Perda perda = modelo.perda();
 
@@ -115,12 +109,21 @@ public class TreinoLote{
     * @param perda função de perda configurada para a Rede Neural.
     * @param real saída real que será usada para calcular os erros e gradientes.
     */
-   void backpropagationLote(Densa[] redec, Perda perda, double[] real){
+   void backpropagationLote(Camada[] redec, Perda perda, double[] real){
       aux.backpropagation(redec, perda, real);
 
-      for(Densa camada : redec){
-         opmat.add(camada.gradAcPesos, camada.gradPesos, camada.gradAcPesos);
-         opmat.add(camada.gradAcBias, camada.gradBias, camada.gradAcBias);
+      for(Camada camada : redec){
+         double[] gradKernel = camada.obterGradKernel();
+         double[] acKernel = camada.obterAcGradKernel();
+         oparr.add(acKernel, gradKernel, acKernel);
+         camada.editarAcGradKernel(acKernel);
+
+         if(camada.temBias()){
+            double[] gradBias = camada.obterGradBias();
+            double[] acBias = camada.obterAcGradBias();
+            oparr.add(acBias, gradBias, acBias);
+            camada.editarAcGradBias(acBias);
+         }     
       }
    }
 
@@ -129,12 +132,17 @@ public class TreinoLote{
     * para iniciar o treinamento de um lote.
     * @param redec conjunto de camadas densas da Rede Neural.
     */
-   void zerarGradientesAcumulados(Densa[] redec){
-      for(Densa camada : redec){
-         opmat.preencher(camada.gradPesos, 0);
-         opmat.preencher(camada.gradBias, 0);
-         opmat.preencher(camada.gradAcPesos, 0);
-         opmat.preencher(camada.gradAcBias, 0);
+   void zerarGradientesAcumulados(Camada[] redec){
+      for(Camada camada : redec){
+         double[] acKernel = camada.obterAcGradKernel();
+         oparr.preencher(acKernel, 0);
+         camada.editarAcGradKernel(acKernel);
+
+         if(camada.temBias()){
+            double[] acBias = camada.obterAcGradBias();
+            oparr.preencher(acBias, 0);
+            camada.editarAcGradBias(acBias);
+         }
       }
    }
 
@@ -144,15 +152,18 @@ public class TreinoLote{
     * @param tamLote tamanho do lote que foi usado para calcular os acumuladores
     * de gradiente das camadas.
     */
-   void calcularMediaGradientesLote(Densa[] redec, int tamLote){
+   void calcularMediaGradientesLote(Camada[] redec, int tamLote){
       double valor = (double)tamLote;
-      for(Densa camada : redec){
-         opmat.dividirEscalar(camada.gradAcPesos, valor, camada.gradAcPesos);
-         opmat.copiar(camada.gradAcPesos, camada.gradPesos);
+
+      for(Camada camada : redec){
+         double[] acKernel = camada.obterAcGradKernel();
+         oparr.dividirEscalar(acKernel, valor, acKernel);
+         camada.editarGradienteKernel(acKernel);
 
          if(camada.temBias()){
-            opmat.dividirEscalar(camada.gradAcBias, valor, camada.gradAcBias);
-            opmat.copiar(camada.gradAcBias, camada.gradBias);
+            double[] acBias = camada.obterAcGradBias();
+            oparr.dividirEscalar(acBias, valor, acBias);
+            camada.editarGradienteBias(acBias);
          }
       }
    }

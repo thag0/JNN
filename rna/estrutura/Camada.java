@@ -297,6 +297,21 @@ public class Camada{
    }
 
    /**
+    * Retorna um array contendo os elementos acumuladores para o kernel presente na camada.
+    * <p>
+    *    O kernel de uma camada inclui seus atributos mais importantes, como
+    *    os pesos de uma camada densa, ou os filtros de uma camada convolucional.
+    * </p>
+    * Necessário para o treino em lotes.
+    * @return acumulador para o kernel da camada.
+    */
+   public double[] obterAcGradKernel(){
+      throw new IllegalArgumentException(
+         "Implementar retorno do acumulador para o kernel da camada " + this.getClass().getTypeName() + "."
+      );       
+   }
+
+   /**
     * Retorna um array contendo os elementos dos bias presente na camada.
     * <p>
     *    É importante verificar se a camada foi configurada para suportar
@@ -323,6 +338,17 @@ public class Camada{
    }
 
    /**
+    * Retorna um array contendo os elementos usados para armazenar o valor
+    * dos acumuladores para os bias da camada.
+    * @return acumuladores para os bias da camada.
+    */
+   public double[] obterAcGradBias(){
+      throw new IllegalArgumentException(
+         "Implementar retorno do acumulador para o bias da camada" + this.getClass().getTypeName() + "."
+      );        
+   }
+
+   /**
     * Retorna o gradiente de entrada da camada, dependendo do tipo
     * de camada, esse gradiente pode assumir diferentes tipos de objetos.
     * @return gradiente de entrada da camada.
@@ -331,6 +357,17 @@ public class Camada{
       throw new IllegalArgumentException(
          "Implementar retorno do gradiente de entrada da camada " + this.getClass().getTypeName() + "."
       );     
+   }
+
+   /**
+    * Ajusta os valores dos gradientes para o kernel usando os valores 
+    * contidos no array fornecido.
+    * @param grads novos valores de gradientes.
+    */
+   public void editarGradienteKernel(double[] grads){
+      throw new IllegalArgumentException(
+         "Implementar edição do gradiente para o kernel para a camada " + this.getClass().getTypeName() + "."
+      );
    }
 
    /**
@@ -345,6 +382,28 @@ public class Camada{
    }
 
    /**
+    * Ajusta os valores do acumulador do kernel usando os valores contidos no array
+    * fornecido.
+    * @param acumulador novos valores do acumulador.
+    */
+   public void editarAcGradKernel(double[] acumulador){
+      throw new IllegalArgumentException(
+         "Implementar edição do acumulador do kernel para a camada " + this.getClass().getTypeName() + "."
+      );      
+   }
+
+   /**
+    * Ajusta os valores dos gradientes para o bias usando os valores 
+    * contidos no array fornecido.
+    * @param grads novos valores de gradientes.
+    */
+   public void editarGradienteBias(double[] grads){
+      throw new IllegalArgumentException(
+         "Implementar edição do gradiente para o bias para a camada " + this.getClass().getTypeName() + "."
+      );
+   }
+
+   /**
     * Ajusta os valores do bias usando os valores contidos no array
     * fornecido.
     * @param bias novos valores do bias.
@@ -353,6 +412,17 @@ public class Camada{
       throw new IllegalArgumentException(
          "Implementar edição do bias para a camada " + this.getClass().getTypeName() + "."
       );
+   }
+
+   /**
+    * Ajusta os valores do acumulador do bias usando os valores contidos no array
+    * fornecido.
+    * @param  acumulador valores do acumulador.
+    */
+   public void editarAcGradBias(double[] acumulador){
+      throw new IllegalArgumentException(
+         "Implementar edição do acumulador do bias para a camada " + this.getClass().getTypeName() + "."
+      );      
    }
 
    /**
