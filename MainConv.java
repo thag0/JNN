@@ -42,7 +42,7 @@ public class MainConv{
       minutos = (segundosTotais % 3600) / 60;
       segundos = segundosTotais % 60;
       System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
-      testes.TesteSequencial.exportarHistoricoPerda(modelo);
+      testes.TesteModelos.exportarHistoricoPerda(modelo);
 
       //-------------------------------------
       // for(int i = 0; i < 10; i++){

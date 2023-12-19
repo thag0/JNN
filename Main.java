@@ -14,7 +14,7 @@ import rna.modelos.Sequencial;
 import rna.otimizadores.*;
 
 public class Main{
-   static final int epocas = 5*1000;
+   static final int epocas = 10*1000;
    static final float escalaRender = 7f;
    static Ged ged = new Ged();
    static Geim geim = new Geim();
@@ -81,15 +81,15 @@ public class Main{
    }
 
    static Modelo criarSequencial(int entradas, int saidas){
-      Otimizador otm = new SGD(0.001);
-      // Otimizador otm = new AdaGrad();
+      // Otimizador otm = new SGD(0.001);
+      Otimizador otm = new AdaGrad(0.99999999);
       Perda perda = new ErroMedioQuadrado();
       Inicializador ini = new Xavier();
       
       Sequencial modelo = new Sequencial();
       modelo.add(new Densa(entradas, 13, "tanh"));
       modelo.add(new Densa(13, saidas, "sigmoid"));
-      modelo.configurarSeed(1234);
+      // modelo.configurarSeed(1234);
       modelo.compilar(otm, perda, ini);
       modelo.configurarHistorico(calcularHistorico);
 
@@ -123,7 +123,7 @@ public class Main{
       
       int i = 0;
       while(i < epocas && jt.isVisible()){
-         modelo.treinar(entradas, saidas, epocasPorFrame, 1);
+         modelo.treinar(entradas, saidas, epocasPorFrame);
          jt.desenharTreino(modelo, i);
          i += epocasPorFrame;
 

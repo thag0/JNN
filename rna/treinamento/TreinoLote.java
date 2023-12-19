@@ -9,6 +9,9 @@ import rna.estrutura.Camada;
 import rna.modelos.Modelo;
 import rna.otimizadores.Otimizador;
 
+/**
+ * Em testes ainda.
+ */
 public class TreinoLote{
    OpMatriz opmat = new OpMatriz();
    OpArray oparr = new OpArray();
@@ -113,16 +116,16 @@ public class TreinoLote{
       aux.backpropagation(redec, perda, real);
 
       for(Camada camada : redec){
-         double[] gradKernel = camada.obterGradKernel();
-         double[] acKernel = camada.obterAcGradKernel();
-         oparr.add(acKernel, gradKernel, acKernel);
-         camada.editarAcGradKernel(acKernel);
+         double[] gradK = camada.obterGradKernel();
+         double[] acK = camada.obterAcGradKernel();
+         oparr.add(acK, gradK, acK);
+         camada.editarAcGradKernel(acK);
 
          if(camada.temBias()){
-            double[] gradBias = camada.obterGradBias();
-            double[] acBias = camada.obterAcGradBias();
-            oparr.add(acBias, gradBias, acBias);
-            camada.editarAcGradBias(acBias);
+            double[] gradB = camada.obterGradBias();
+            double[] acB = camada.obterAcGradBias();
+            oparr.add(acB, gradB, acB);
+            camada.editarAcGradBias(acB);
          }     
       }
    }
@@ -153,16 +156,16 @@ public class TreinoLote{
     * de gradiente das camadas.
     */
    void calcularMediaGradientesLote(Camada[] redec, int tamLote){
-      double valor = (double)tamLote;
+      double tamanho = (double)tamLote;
 
       for(Camada camada : redec){
          double[] acKernel = camada.obterAcGradKernel();
-         oparr.dividirEscalar(acKernel, valor, acKernel);
+         oparr.dividirEscalar(acKernel, tamanho, acKernel);
          camada.editarGradienteKernel(acKernel);
 
          if(camada.temBias()){
             double[] acBias = camada.obterAcGradBias();
-            oparr.dividirEscalar(acBias, valor, acBias);
+            oparr.dividirEscalar(acBias, tamanho, acBias);
             camada.editarGradienteBias(acBias);
          }
       }
