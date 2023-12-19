@@ -19,6 +19,7 @@ public class Sigmoid extends Ativacao{
 
    @Override
    public void derivada(Densa camada){
+      //forma manual pra aproveitar os valores pre calculados
       double grad, d;
       int i, j;
       int linhas = camada.saida.lin();
@@ -44,6 +45,7 @@ public class Sigmoid extends Ativacao{
 
    @Override
    public void derivada(Convolucional camada){
+      //forma manual pra aproveitar os valores pre calculados
       int i, j, k;
       double grad, d;
 
