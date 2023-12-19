@@ -1,5 +1,6 @@
 package rna.ativacoes;
 
+import rna.estrutura.Convolucional;
 import rna.estrutura.Densa;
 
 /**
@@ -12,7 +13,17 @@ public class Swish extends Ativacao{
     * Instancia a função de ativação Swish.
     */
    public Swish(){
-      super.construir(this::swish, this::swishd);
+      super.construir(
+         (x) -> { return x * sigmoid(x); }, 
+         (x) -> {
+            double sig = sigmoid(x);
+            return sig + (x * sig * (1 - sig));
+         }
+      );
+   }
+
+   private double sigmoid(double x){
+      return 1 / (1 + Math.exp(-x));
    }
 
    @Override
@@ -25,16 +36,17 @@ public class Swish extends Ativacao{
       super.aplicarDx(camada.gradSaida, camada.somatorio, camada.derivada);
    }
 
-   private double swish(double x){
-      return x * sigmoid(x);
+   @Override
+   public void calcular(Convolucional camada){
+      for(int i = 0; i < camada.somatorio.length; i++){
+         super.aplicarFx(camada.somatorio[i], camada.saida[i]);
+      }
    }
 
-   private double swishd(double x){
-      double sig = sigmoid(x);
-      return sig + (x * sig * (1 - sig));
-   }
-
-   private double sigmoid(double x){
-      return 1 / (1 + Math.exp(-x));
+   @Override
+   public void derivada(Convolucional camada){
+      for(int i = 0; i < camada.somatorio.length; i++){
+         super.aplicarDx(camada.gradSaida[i], camada.somatorio[i], camada.derivada[i]);
+      }
    }
 }

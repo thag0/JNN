@@ -1,5 +1,6 @@
 package rna.ativacoes;
 
+import rna.estrutura.Convolucional;
 import rna.estrutura.Densa;
 
 /**
@@ -18,16 +19,6 @@ public class GELU extends Ativacao{
       super.construir(this::gelu, this::gelud);
    }
 
-   @Override
-   public void calcular(Densa camada){
-      super.aplicarFx(camada.somatorio, camada.saida);
-   }
-
-   @Override
-   public void derivada(Densa camada){
-      super.aplicarDx(camada.gradSaida, camada.somatorio, camada.derivada);
-   }
-
    private double gelu(double x){
       double xCubo = x * x * x;
       double tanh = Math.tanh(RAIZ_2_POR_PI * (x + ALFA * xCubo));
@@ -39,5 +30,29 @@ public class GELU extends Ativacao{
       double tanh = Math.tanh(RAIZ_2_POR_PI * (x + ALFA * xCubo));
       double exp = Math.exp(-0.5 * x * x) / RAIZ_2_POR_PI;
       return 0.5 * (1.0 + tanh + x * exp);
+   }
+
+   @Override
+   public void calcular(Densa camada){
+      super.aplicarFx(camada.somatorio, camada.saida);
+   }
+
+   @Override
+   public void derivada(Densa camada){
+      super.aplicarDx(camada.gradSaida, camada.somatorio, camada.derivada);
+   }
+
+   @Override
+   public void calcular(Convolucional camada){
+      for(int i = 0; i < camada.somatorio.length; i++){
+         super.aplicarFx(camada.somatorio[i], camada.saida[i]);
+      }
+   }
+
+   @Override
+   public void derivada(Convolucional camada){
+      for(int i = 0; i < camada.somatorio.length; i++){
+         super.aplicarDx(camada.gradSaida[i], camada.somatorio[i], camada.derivada[i]);
+      }
    }
 }

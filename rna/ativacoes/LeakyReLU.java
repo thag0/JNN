@@ -14,11 +14,6 @@ import rna.estrutura.Densa;
 public class LeakyReLU extends Ativacao{
 
    /**
-    * Valor alfa da função LeakyReLU.
-    */
-   private double alfa;
-
-   /**
     * Instancia a função de ativação LeakyReLU com seu valor de alfa configurável.
     * <p>
     *    A ativação LeakyReLU funciona semelhante a função ReLU, retornando o próprio 
@@ -28,8 +23,10 @@ public class LeakyReLU extends Ativacao{
     * @param alfa novo valor alfa.
     */
    public LeakyReLU(double alfa){
-      this.alfa = alfa;
-      super.construir(this::leakyRelu, this::leakyRelud);
+      super.construir(
+         (x)-> { return (x > 0) ? x : x*alfa; }, 
+         (x)-> { return (x > 0) ? 1 : alfa; }   
+      );
    }
 
    /**
@@ -60,22 +57,14 @@ public class LeakyReLU extends Ativacao{
    @Override
    public void calcular(Convolucional camada){
       for(int i = 0; i < camada.somatorio.length; i++){
-         aplicarFx(camada.somatorio[i], camada.saida[i]);
+         super.aplicarFx(camada.somatorio[i], camada.saida[i]);
       }
    }
 
    @Override
    public void derivada(Convolucional camada){
       for(int i = 0; i < camada.somatorio.length; i++){
-         aplicarDx(camada.gradSaida[i], camada.somatorio[i], camada.derivada[i]);
+         super.aplicarDx(camada.gradSaida[i], camada.somatorio[i], camada.derivada[i]);
       }
-   }
-
-   private double leakyRelu(double x){
-      return x > 0 ? x : alfa * x;
-   }
-
-   private double leakyRelud(double x){
-      return x > 0 ? 1 : alfa;
    }
 }

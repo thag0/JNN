@@ -13,7 +13,10 @@ public class Linear extends Ativacao{
     * Instancia a função de ativação Linear.
     */
    public Linear(){
-      super.construir(this::linear, this::lineard);
+      super.construir(
+         (x) -> { return x; },
+         (x) -> { return 1; }
+      );
    }
 
    @Override
@@ -38,13 +41,5 @@ public class Linear extends Ativacao{
        for(int i = 0; i < camada.saida.length; i++){
          super.aplicarDx(camada.gradSaida[i], camada.somatorio[i], camada.derivada[i]);
       }
-   }
-
-   private double linear(double x){
-      return x;
-   }
-
-   private double lineard(double x){
-      return 1;
    }
 }

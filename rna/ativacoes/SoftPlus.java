@@ -1,5 +1,6 @@
 package rna.ativacoes;
 
+import rna.estrutura.Convolucional;
 import rna.estrutura.Densa;
 
 /**
@@ -12,8 +13,15 @@ public class SoftPlus extends Ativacao{
     * Instancia a função de ativação SoftPlus.
     */
    public SoftPlus(){
-      super.construir(this::softplus, this::softplusd);
+      super.construir(
+         (x) -> { return Math.log(1 + Math.exp(x)); },
+         (x) -> { 
+            double exp = Math.exp(x);
+            return (exp / (1 + exp));
+         }
+      );
    }
+
    @Override
    public void calcular(Densa camada){
       super.aplicarFx(camada.somatorio, camada.saida);
@@ -24,12 +32,17 @@ public class SoftPlus extends Ativacao{
       super.aplicarDx(camada.gradSaida, camada.somatorio, camada.derivada);
    }
 
-   private double softplus(double x){
-      return Math.log(1 + Math.exp(x));
+   @Override
+   public void calcular(Convolucional camada){
+      for(int i = 0; i < camada.somatorio.length; i++){
+         super.aplicarFx(camada.somatorio[i], camada.saida[i]);
+      }
    }
 
-   private double softplusd(double x){
-      double exp = Math.exp(x);
-      return (exp / (1 + exp));
+   @Override
+   public void derivada(Convolucional camada){
+      for(int i = 0; i < camada.somatorio.length; i++){
+         super.aplicarDx(camada.gradSaida[i], camada.somatorio[i], camada.derivada[i]);
+      }
    }
 }

@@ -1,5 +1,6 @@
 package rna.ativacoes;
 
+import rna.estrutura.Convolucional;
 import rna.estrutura.Densa;
 
 /**
@@ -11,11 +12,6 @@ import rna.estrutura.Densa;
  * </p>
  */
 public class ELU extends Ativacao{
-   
-   /**
-    * Valor alfa da função ELU.
-    */
-   private double alfa;
 
    /**
     * Instancia a função de ativação ELU com 
@@ -23,8 +19,10 @@ public class ELU extends Ativacao{
     * @param alfa novo valor alfa.
     */
    public ELU(double alfa){
-      this.alfa = alfa;
-      super.construir(this::elu, this::elud);
+      super.construir(
+         (x) -> { return (x > 0) ? x : alfa * (Math.exp(x) - 1); },
+         (x) -> { return (x > 0) ? 1 : alfa * Math.exp(x); }
+      );
    }
 
    /**
@@ -48,11 +46,17 @@ public class ELU extends Ativacao{
       super.aplicarDx(camada.gradSaida, camada.somatorio, camada.derivada);
    }
 
-   private double elu(double x){
-      return x > 0 ? x : alfa * (Math.exp(x) - 1);
+   @Override
+   public void calcular(Convolucional camada){
+      for(int i = 0; i < camada.somatorio.length; i++){
+         super.aplicarFx(camada.somatorio[i], camada.saida[i]);
+      }
    }
 
-   private double elud(double x){
-      return x > 0 ? 1 : alfa * Math.exp(x);
+   @Override
+   public void derivada(Convolucional camada){
+      for(int i = 0; i < camada.somatorio.length; i++){
+         super.aplicarDx(camada.gradSaida[i], camada.somatorio[i], camada.derivada[i]);
+      }
    }
 }

@@ -6,7 +6,10 @@ import rna.estrutura.Densa;
 public class Sigmoid extends Ativacao{
 
    public Sigmoid(){
-      super.construir(this::sigmoid, null);
+      super.construir(
+         (x) -> { return 1 / (1 + Math.exp(-x)); },
+         null
+      );
    }
 
    @Override
@@ -55,9 +58,5 @@ public class Sigmoid extends Ativacao{
             }
          }
       }
-   }
-
-   private double sigmoid(double x){
-      return 1 / (1 + Math.exp(-x));
    }
 }

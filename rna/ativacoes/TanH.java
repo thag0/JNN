@@ -6,7 +6,10 @@ import rna.estrutura.Densa;
 public class TanH extends Ativacao{
 
    public TanH(){
-      super.construir(this::tanh, null);
+      super.construir(
+         (x) -> { return 2 / (1 + Math.exp(-2 * x)) - 1; }, 
+         null
+      );
    }
 
    @Override
@@ -42,6 +45,7 @@ public class TanH extends Ativacao{
 
    @Override
    public void derivada(Convolucional camada){
+      //forma manual pra aproveitar os valores pre calculados
       int i, j, k;
       double grad, d;
       int linhas, colunas;
@@ -59,9 +63,5 @@ public class TanH extends Ativacao{
             }
          }
       }
-   }
-
-   private double tanh(double x){
-      return 2 / (1 + Math.exp(-2 * x)) - 1;
    }
 }

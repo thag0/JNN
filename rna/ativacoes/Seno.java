@@ -1,5 +1,6 @@
 package rna.ativacoes;
 
+import rna.estrutura.Convolucional;
 import rna.estrutura.Densa;
 
 /**
@@ -12,7 +13,10 @@ public class Seno extends Ativacao{
     * Instancia a função de ativação Seno.
     */
    public Seno(){
-      super.construir(this::seno, this::senod);
+      super.construir(
+         (x) -> { return Math.sin(x); }, 
+         (x) -> { return Math.cos(x); }
+      );
    }
 
    @Override
@@ -25,12 +29,17 @@ public class Seno extends Ativacao{
       super.aplicarDx(camada.gradSaida, camada.somatorio, camada.derivada);
    }
 
-   private double seno(double x){
-      return Math.sin(x);
+   @Override
+   public void calcular(Convolucional camada){
+      for(int i = 0; i < camada.somatorio.length; i++){
+         super.aplicarFx(camada.somatorio[i], camada.saida[i]);
+      }
    }
 
-   private double senod(double x){
-      return Math.cos(x);
-   }
-   
+   @Override
+   public void derivada(Convolucional camada){
+      for(int i = 0; i < camada.somatorio.length; i++){
+         super.aplicarDx(camada.gradSaida[i], camada.somatorio[i], camada.derivada[i]);
+      }
+   }  
 }
