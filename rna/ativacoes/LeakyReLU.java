@@ -49,25 +49,25 @@ public class LeakyReLU extends Ativacao{
   
    @Override
    public void calcular(Densa camada){
-      super.aplicarFuncao(camada.somatorio, camada.saida);
+      super.aplicarFx(camada.somatorio, camada.saida);
    }
 
    @Override
    public void derivada(Densa camada){
-      super.aplicarDerivada(camada.gradSaida, camada.somatorio, camada.derivada);
+      super.aplicarDx(camada.gradSaida, camada.somatorio, camada.derivada);
    }
 
    @Override
    public void calcular(Convolucional camada){
       for(int i = 0; i < camada.somatorio.length; i++){
-         aplicarFuncao(camada.somatorio[i], camada.saida[i]);
+         aplicarFx(camada.somatorio[i], camada.saida[i]);
       }
    }
 
    @Override
    public void derivada(Convolucional camada){
       for(int i = 0; i < camada.somatorio.length; i++){
-         aplicarDerivada(camada.gradSaida[i], camada.somatorio[i], camada.derivada[i]);
+         aplicarDx(camada.gradSaida[i], camada.somatorio[i], camada.derivada[i]);
       }
    }
 

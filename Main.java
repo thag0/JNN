@@ -105,8 +105,8 @@ public class Main{
     * @param saidas dados de saída relativos a entrada.
     */
    static void treinoEmPainel(Modelo modelo, int altura, int largura, double[][] entradas, double[][] saidas){
-      final int fps = 600;
-      int epocasPorFrame = 20;
+      final int fps = 6000;
+      int epocasPorFrame = 30;
 
       //acelerar o processo de desenho
       //bom em situações de janelas muito grandes

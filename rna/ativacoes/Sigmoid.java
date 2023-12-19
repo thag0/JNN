@@ -11,7 +11,7 @@ public class Sigmoid extends Ativacao{
 
    @Override
    public void calcular(Densa camada){
-      super.aplicarFuncao(camada.somatorio, camada.saida);
+      super.aplicarFx(camada.somatorio, camada.saida);
    }
 
    @Override
@@ -35,7 +35,7 @@ public class Sigmoid extends Ativacao{
    @Override
    public void calcular(Convolucional camada){
       for(int i = 0; i < camada.somatorio.length; i++){
-         aplicarFuncao(camada.somatorio[i], camada.saida[i]);
+         aplicarFx(camada.somatorio[i], camada.saida[i]);
       }
    }
 

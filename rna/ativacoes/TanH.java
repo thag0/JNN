@@ -11,7 +11,7 @@ public class TanH extends Ativacao{
 
    @Override
    public void calcular(Densa camada){
-      super.aplicarFuncao(camada.somatorio, camada.saida);
+      super.aplicarFx(camada.somatorio, camada.saida);
    }
 
    @Override
@@ -36,7 +36,7 @@ public class TanH extends Ativacao{
    @Override
    public void calcular(Convolucional camada){
       for(int i = 0; i < camada.somatorio.length; i++){
-         super.aplicarFuncao(camada.somatorio[i], camada.saida[i]);
+         super.aplicarFx(camada.somatorio[i], camada.saida[i]);
       }
    }
 

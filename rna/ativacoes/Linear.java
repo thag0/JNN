@@ -18,25 +18,25 @@ public class Linear extends Ativacao{
 
    @Override
    public void calcular(Densa camada){
-      super.aplicarFuncao(camada.somatorio, camada.saida);
+      super.aplicarFx(camada.somatorio, camada.saida);
    }
 
    @Override
    public void derivada(Densa camada){
-         super.aplicarDerivada(camada.gradSaida, camada.somatorio, camada.derivada);
+         super.aplicarDx(camada.gradSaida, camada.somatorio, camada.derivada);
    }
 
    @Override
    public void calcular(Convolucional camada){
       for(int i = 0; i < camada.saida.length; i++){
-         super.aplicarFuncao(camada.somatorio[i], camada.saida[i]);
+         super.aplicarFx(camada.somatorio[i], camada.saida[i]);
       }
    }
 
    @Override
    public void derivada(Convolucional camada){
        for(int i = 0; i < camada.saida.length; i++){
-         super.aplicarDerivada(camada.gradSaida[i], camada.somatorio[i], camada.derivada[i]);
+         super.aplicarDx(camada.gradSaida[i], camada.somatorio[i], camada.derivada[i]);
       }
    }
 

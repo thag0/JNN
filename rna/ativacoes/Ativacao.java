@@ -9,6 +9,41 @@ import rna.estrutura.Densa;
 /**
  * Classe base para a implementação das funções de ativação.
  * <p>
+ *    As funções de ativação percorres todos os elementos contendo os
+ *    resultados de cada operação dos kernels das camadas, e aplica sua
+ *    operação correspondente nas suas saídas.
+ * </p>
+ * <p>
+ *    Funções de ativação podem fazer uso dos métodos {@code aplicarFx()} e 
+ *    {@code aplicarDx()}, sendo necessário informar nos seus constritures 
+ *    uma interface funcional que fará o cálculo da saída de acordo com uma
+ *    entrada redebida.
+ * </p>
+ * Exemplo com a função ReLU:
+ * <pre>
+ *public class ReLU extends Ativacao{
+ *  public ReLU(){
+ *    super.construir(this::fx, this::dx)
+ *  }
+ *
+ *  public double fx(double x){//nome arbritário
+ *    return (x > 0) ? x : 0;  
+ *  }
+ *
+ *  public double dx(double x){//nome arbritário
+ *    return (x > 0) ? 1 : 0;  
+ *  }
+ * 
+ *  public void calcular(Densa camada){
+ *    super.aplicarFx(camada.somatorio, camada.saida) 
+ *  }
+ * 
+ *  public void derivada(Densa camada){
+ *    super.aplicarDx(camada.gradSaida, camada.somatorio, camada.derivada) 
+ *  }
+ *}
+ * </pre>
+ * <p>
  *    Novas funções de ativações devem sobrescrever os métodos existentes {@code ativar()} e {@code derivada()}.
  * </p>
  */
@@ -30,14 +65,15 @@ public abstract class Ativacao{
     * @param fx função de ativação desejada.
     * @param saida resultado das ativações.
     */
-   protected void aplicarFuncao(Mat entrada, Mat saida){
+   protected void aplicarFx(Mat entrada, Mat saida){
       int linhas = entrada.lin();
       int colunas = entrada.col();
       int i, j;
+      double valor;
       for(i = 0; i < linhas; i++){
          for (j = 0; j < colunas; j++){
-            double valor = entrada.dado(i, j);
-            saida.editar(i, j, fx.applyAsDouble(valor));
+            valor = fx.applyAsDouble(entrada.dado(i, j));
+            saida.editar(i, j, valor);
          }
       }
    }
@@ -49,15 +85,16 @@ public abstract class Ativacao{
     * @param fx derivada de função de ativação desejada.
     * @param saida resultado das derivadas.
     */
-   protected void aplicarDerivada(Mat gradientes, Mat entrada, Mat saida){
+   protected void aplicarDx(Mat gradientes, Mat entrada, Mat saida){
       int linhas = entrada.lin();
       int colunas = entrada.col();
       int i, j;
+      double grad, valor;
       for(i = 0; i < linhas; i++){
          for (j = 0; j < colunas; j++){
-            double grad = gradientes.dado(i, j);
-            double valor = entrada.dado(i, j);
-            saida.editar(i, j, grad * dx.applyAsDouble(valor));
+            grad = gradientes.dado(i, j);
+            valor = dx.applyAsDouble(entrada.dado(i, j));
+            saida.editar(i, j, grad * valor);
          }
       }
    }
@@ -68,6 +105,11 @@ public abstract class Ativacao{
     * @param dx deriviada da função de ativação
     */
    public void construir(DoubleUnaryOperator fx, DoubleUnaryOperator dx){
+      if(fx == null){
+         throw new IllegalArgumentException(
+            "É necessário que ao menos a função de ativação seja configurada, recebido null."
+         );
+      }
       this.fx = fx;
       this.dx = dx;
    }
