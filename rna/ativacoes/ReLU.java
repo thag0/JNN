@@ -7,31 +7,12 @@ public class ReLU extends Ativacao{
 
    @Override
    public void calcular(Densa camada){
-      int i, j;
-      double s;
-
-      for(i = 0; i < camada.saida.lin(); i++){
-         for(j = 0; j < camada.saida.col(); j++){
-            s = relu(camada.somatorio.dado(i, j));
-            camada.saida.editar(i, j, s);
-         }
-      }
+      super.aplicarFuncao(camada.somatorio, this::relu, camada.saida);
    }
 
    @Override
    public void derivada(Densa camada){
-      int i, j;
-      double grad, d;
-
-      for(i = 0; i < camada.derivada.lin(); i++){
-         for(j = 0; j < camada.derivada.col(); j++){
-            grad = camada.gradSaida.dado(i, j);
-            d = camada.somatorio.dado(i, j);
-            d = derivada(d);
-            
-            camada.derivada.editar(i, j, (grad * d));
-         }
-      }
+      super.aplicarDerivada(camada.gradSaida, camada.somatorio, this::relud, camada.derivada);
    }
 
    @Override
@@ -59,7 +40,7 @@ public class ReLU extends Ativacao{
             for(k = 0; k < camada.saida[i].col(); k++){
                grad = camada.gradSaida[i].dado(j, k);
                d = camada.somatorio[i].dado(j, k);
-               d = derivada(d);
+               d = relud(d);
 
                camada.derivada[i].editar(j, k, (grad * d));
             }
@@ -71,7 +52,7 @@ public class ReLU extends Ativacao{
       return x > 0 ? x : 0;
    }
 
-   private double derivada(double x){
+   private double relud(double x){
       return x > 0 ? 1 : 0;
    }
 }

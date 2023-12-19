@@ -16,36 +16,19 @@ public class SoftPlus extends Ativacao{
    }
    @Override
    public void calcular(Densa camada){
-      int i, j;
-      double s;
-
-      for(i = 0; i < camada.saida.lin(); i++){
-         for(j = 0; j < camada.saida.col(); j++){
-            s = softplus(camada.somatorio.dado(i, j));
-            camada.saida.editar(i, j, s);
-         }
-      }
+      super.aplicarFuncao(camada.somatorio, this::softplus, camada.saida);
    }
 
    @Override
    public void derivada(Densa camada){
-      int i, j;
-      double grad, d;
-
-      for(i = 0; i < camada.derivada.lin(); i++){
-         for(j = 0; j < camada.derivada.col(); j++){
-            grad = camada.gradSaida.dado(i, j);
-            d = derivada(camada.somatorio.dado(i, j));
-            camada.derivada.editar(i, j, (grad * d));
-         }
-      }
+      super.aplicarDerivada(camada.gradSaida, camada.somatorio, this::softplusd, camada.derivada);
    }
 
    private double softplus(double x){
       return Math.log(1 + Math.exp(x));
    }
 
-   private double derivada(double x){
+   private double softplusd(double x){
       double exp = Math.exp(x);
       return (exp / (1 + exp));
    }

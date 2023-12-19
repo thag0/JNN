@@ -17,36 +17,19 @@ public class Swish extends Ativacao{
 
    @Override
    public void calcular(Densa camada){
-      int i, j;
-      double s;
-
-      for(i = 0; i < camada.saida.lin(); i++){
-         for(j = 0; j < camada.saida.col(); j++){
-            s = swish(camada.somatorio.dado(i, j));
-            camada.saida.editar(i, j, s);
-         }
-      }
+      super.aplicarFuncao(camada.somatorio, this::swish, camada.saida);
    }
 
    @Override
    public void derivada(Densa camada){
-      int i, j;
-      double grad, d;
-
-      for(i = 0; i < camada.derivada.lin(); i++){
-         for(j = 0; j < camada.derivada.col(); j++){
-            grad = camada.gradSaida.dado(i, j);
-            d = derivada(camada.somatorio.dado(i, j));
-            camada.derivada.editar(i, j, (grad * d));
-         }
-      }
+      super.aplicarDerivada(camada.gradSaida, camada.somatorio, this::swishd, camada.derivada);
    }
 
    private double swish(double x){
       return x * sigmoid(x);
    }
 
-   private double derivada(double x){
+   private double swishd(double x){
       double sig = sigmoid(x);
       return sig + (x * sig * (1 - sig));
    }

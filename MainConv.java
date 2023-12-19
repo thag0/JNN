@@ -51,14 +51,16 @@ public class MainConv{
 
       testarPorbabilidade(modelo, "0_teste");
       testarPorbabilidade(modelo, "1_teste");
+
+      Main.executarComando("python grafico.py");
    } 
 
    public static Sequencial criarModelo(){
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{3, 3}, 10, "leakyrelu"),
-         new MaxPooling(new int[]{2, 2}),
+         new Convolucional(formEntrada, new int[]{4, 4}, 15, "leakyrelu"),
+         new Convolucional(new int[]{4, 4}, 15, "leakyrelu"),
          new Flatten(),
          new Densa(100, "leakyrelu"),
          new Densa(2, "softmax"),
@@ -68,7 +70,7 @@ public class MainConv{
          new SGD(0.001, 0.9),
          new EntropiaCruzada(),
          new Xavier(),
-         new Xavier()
+         new Zeros()
       );
       modelo.configurarHistorico(true);
 

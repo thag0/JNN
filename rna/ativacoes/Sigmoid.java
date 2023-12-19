@@ -5,27 +5,22 @@ import rna.estrutura.Densa;
 
 public class Sigmoid extends Ativacao{
 
+   public Sigmoid(){}
+
    @Override
    public void calcular(Densa camada){
-      double sig;
-      int i, j;
-
-      for(i = 0; i < camada.saida.lin(); i++){
-         for(j = 0; j < camada.saida.col(); j++){
-            sig = camada.somatorio.dado(i, j);
-            sig = sigmoid(sig);
-            camada.saida.editar(i, j, sig);
-         }
-      }
+      super.aplicarFuncao(camada.somatorio, this::sigmoid, camada.saida);
    }
 
    @Override
    public void derivada(Densa camada){
       double grad, d;
       int i, j;
+      int linhas = camada.saida.lin();
+      int colunas = camada.saida.col();
 
-      for(i = 0; i < camada.saida.lin(); i++){
-         for(j = 0; j < camada.saida.col(); j++){
+      for(i = 0; i < linhas; i++){
+         for(j = 0; j < colunas; j++){
             grad = camada.gradSaida.dado(i, j);
             d = camada.saida.dado(i, j);
             d = d * (1 - d);
@@ -37,16 +32,8 @@ public class Sigmoid extends Ativacao{
 
    @Override
    public void calcular(Convolucional camada){
-      int i, j, k;
-      double s;
-
-      for(i = 0; i < camada.somatorio.length; i++){
-         for(j = 0; j < camada.somatorio[i].lin(); j++){
-            for(k = 0; k < camada.somatorio[i].col(); k++){
-               s = camada.somatorio[i].dado(j, k);
-               camada.saida[i].editar(j, k, sigmoid(s));
-            }
-         }
+      for(int i = 0; i < camada.somatorio.length; i++){
+         aplicarFuncao(camada.somatorio[i], this::sigmoid, camada.saida[i]);
       }
    }
 

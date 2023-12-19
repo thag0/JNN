@@ -7,24 +7,19 @@ public class TanH extends Ativacao{
 
    @Override
    public void calcular(Densa camada){
-      double s;
-      int i, j;
-
-      for(i = 0; i < camada.saida.lin(); i++){
-         for(j = 0; j < camada.saida.col(); j++){
-            s = camada.somatorio.dado(i, j);
-            camada.saida.editar(i, j, tanh(s));
-         }
-      }
+      super.aplicarFuncao(camada.somatorio, this::tanh, camada.saida);
    }
 
    @Override
    public void derivada(Densa camada){
+      //forma manual pra aproveitar os valores pre calculados
       double grad, d;
       int i, j;
+      int linhas = camada.saida.lin();
+      int colunas = camada.saida.col();
 
-      for(i = 0; i < camada.saida.lin(); i++){
-         for(j = 0; j < camada.saida.col(); j++){
+      for(i = 0; i < linhas; i++){
+         for(j = 0; j < colunas; j++){
             grad = camada.gradSaida.dado(i, j);
             d = camada.saida.dado(i, j);
             d = 1 - (d * d);
@@ -36,16 +31,8 @@ public class TanH extends Ativacao{
 
    @Override
    public void calcular(Convolucional camada){
-      int i, j, k;
-      double s;
-
-      for(i = 0; i < camada.somatorio.length; i++){
-         for(j = 0; j < camada.somatorio[i].lin(); j++){
-            for(k = 0; k < camada.somatorio[i].col(); k++){
-               s = camada.somatorio[i].dado(j, k);
-               camada.saida[i].editar(j, k, tanh(s));
-            }
-         }
+      for(int i = 0; i < camada.somatorio.length; i++){
+         super.aplicarFuncao(camada.somatorio[i], this::tanh, camada.saida[i]);
       }
    }
 
@@ -53,10 +40,13 @@ public class TanH extends Ativacao{
    public void derivada(Convolucional camada){
       int i, j, k;
       double grad, d;
+      int linhas, colunas;
 
       for(i = 0; i < camada.somatorio.length; i++){
-         for(j = 0; j < camada.somatorio[i].lin(); j++){
-            for(k = 0; k < camada.somatorio[i].col(); k++){
+         linhas = camada.somatorio[i].lin();
+         colunas = camada.somatorio[i].col();
+         for(j = 0; j < linhas; j++){
+            for(k = 0; k < colunas; k++){
                grad = camada.gradSaida[i].dado(j, k);
                d = camada.saida[i].dado(j, k);
                d = 1 - (d * d);
