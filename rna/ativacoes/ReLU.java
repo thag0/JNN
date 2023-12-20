@@ -7,8 +7,8 @@ public class ReLU extends Ativacao{
 
    public ReLU(){
       super.construir(
-         (x) -> { return x > 0 ? x : 0; },
-         (x) -> { return x > 0 ? 1 : 0; }
+         (x) -> { return (x > 0) ? x : 0; },
+         (x) -> { return (x > 0) ? 1 : 0; }
       );
    }
 
