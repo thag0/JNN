@@ -30,3 +30,20 @@ Seguindo a ideia de generalização, os otimizadores também sofreram algumas mu
 Até o momento o modelo sequencial está lidando perfeitamente bem com os métodos já criados na primeira api "RedeNeural" as generalizações estão funcionando bem. 
 
 As dificuldades no momento estão sendo lidar com modelos convolucionais, principalmente na questão de treinamento, já que eles não estão aprendendo e parecem ficar presos em mínimos locais rapidamente.
+
+# Dificuldades com o treinamento de modelos convolucionais
+
+![problema conv](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/d0778aba-604d-43e6-a70c-343455f67f0a)
+
+Atualmente o que to tentando entender e corrigir é o problema de treinamento nos modelos convolucionais.
+
+Fiz o teste usando o dataset do mnist (que está no projeto) e percebo que o modelo não tem capacidade de reconhecer e aprender as características das imagens, já testei coisas como:
+ - Leitura correta dos arquivos de imagens;
+ - Transformação correta dos dados de imagem em dados de treinamento;
+ - Testes com diferentes funções de ativação;
+ - Testes com diferentes parâmetros de arquitetura (tamanho de filtros, número de filtro, tamanho de máscara de pooling, número neurônios);
+ - Diferentes arquiteturas (pilha de camadas convolucionais, camada convolucional seguida de pooling, várias camadas densas)
+
+Ainda não consegui chegar ao resultado do que pode estar causando esses problemas, mas de certeza já tenho que as camadas Densa e Flatten estão funcionado corretamente e trazendo os resultados esperados. A camada de pooling ainda foi pouco testada mas em cenários mais controlados já vi que ela entrega os resultados esperados.
+
+Minhas suspeitas estão mesmo na camada Convolucional, tanto na arquitetura dela quando nas operações que ela faz, como a convolução e a correlação cruzada, mas não consegui chegar num resultado certo ainda.
