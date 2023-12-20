@@ -15,11 +15,11 @@ import rna.otimizadores.*;
 
 public class Main{
    static final int epocas = 10*1000;
-   static final float escalaRender = 7f;
+   static final float escalaRender = 8f;
    static Ged ged = new Ged();
    static Geim geim = new Geim();
    static boolean calcularHistorico = true;
-   static final String caminhoImagem = "/dados/mnist/treino/7/img_1.jpg";
+   static final String caminhoImagem = "/dados/mnist/treino/8/img_0.jpg";
    // static final String caminhoImagem = "/dados/32x32/circulos.png";
 
    public static void main(String[] args){      
@@ -61,8 +61,10 @@ public class Main{
       System.out.println("Perda = " + perda);
       System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
 
-      if(calcularHistorico) exportarHistoricoPerda(modelo, ged);
-      executarComando("python grafico.py");
+      if(calcularHistorico){
+         exportarHistoricoPerda(modelo, ged);
+         executarComando("python grafico.py");
+      }
    }
 
    static Modelo criarRna(int entradas, int saidas){
@@ -81,14 +83,13 @@ public class Main{
    }
 
    static Modelo criarSequencial(int entradas, int saidas){
-      Otimizador otm = new SGD(0.0001, 0.999);
+      Otimizador otm = new SGD(0.001, 0.99);
       // Otimizador otm = new AdaGrad(0.99999999);
       Perda perda = new ErroMedioQuadrado();
       Inicializador ini = new Xavier();
       
       Sequencial modelo = new Sequencial();
-      modelo.add(new Densa(entradas, 13, "leakyrelu"));
-      modelo.add(new Densa( 13, "leakyrelu"));
+      modelo.add(new Densa(entradas, 13, "tanh"));
       modelo.add(new Densa(13, saidas, "sigmoid"));
       // modelo.configurarSeed(1234);
       modelo.compilar(otm, perda, ini, ini);
