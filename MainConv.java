@@ -15,7 +15,7 @@ public class MainConv{
    public static void main(String[] args){
       ged.limparConsole();
 
-      int amostras = 5;
+      int amostras = 10;
       int digitos = 2;
       
       double[][][][] entradas = new double[amostras*digitos][digitos][][];
@@ -34,7 +34,7 @@ public class MainConv{
 
       System.out.println("Treinando.");
       t1 = System.nanoTime();
-      modelo.treinar(entradas, saidas, 301);
+      modelo.treinar(entradas, saidas, 400);
       t2 = System.nanoTime();
 
       long tempoDecorrido = t2 - t1;
@@ -60,14 +60,17 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{3, 3}, 15, "leakyrelu"),
+         new Convolucional(formEntrada, new int[]{5, 5}, 30, "leakyrelu"),
+         new MaxPooling(new int[]{2, 2}),
+         new Convolucional(new int[]{3, 3}, 20, "leakyrelu"),
+         new MaxPooling(new int[]{2, 2}),
          new Flatten(),
          new Densa(100, "leakyrelu"),
          new Densa(2, "softmax"),
       });
 
       modelo.compilar(
-         new SGD(0.001, 0.99),
+         new SGD(0.0001, 0.99),
          new EntropiaCruzada(),
          new Xavier(),
          new Zeros()

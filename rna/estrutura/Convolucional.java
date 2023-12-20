@@ -767,9 +767,7 @@ public class Convolucional extends Camada implements Cloneable{
             ") e o suportado pela camada (" + this.gradSaida.length + ")"
          );
       }
-      for(int i = 0; i < this.numFiltros; i++){
-         this.gradSaida[i].copiar(grads[i]);
-      }
+      utils.copiar(grads, this.gradSaida);
 
       this.ativacao.derivada(this);
 
