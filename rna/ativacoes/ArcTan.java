@@ -8,8 +8,4 @@ public class ArcTan extends Ativacao{
          (x) -> { return 1.0 / (1.0 + (x * x)); }
       );
    }
-
-   public double tanh(double x){
-      return (2 / (1 + Math.exp(-2*x))) - 1;
-   }
 }

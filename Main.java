@@ -14,12 +14,13 @@ import rna.modelos.Sequencial;
 import rna.otimizadores.*;
 
 public class Main{
-   static final int epocas = 10*1000;
+   static final int epocas = 5*1000;
    static final float escalaRender = 8f;
    static Ged ged = new Ged();
    static Geim geim = new Geim();
    static boolean calcularHistorico = true;
    static final String caminhoImagem = "/dados/mnist/treino/8/img_0.jpg";
+   // static final String caminhoImagem = "/dados/mnist/treino/7/img_1.jpg";
    // static final String caminhoImagem = "/dados/32x32/circulos.png";
 
    public static void main(String[] args){      
@@ -89,7 +90,7 @@ public class Main{
       Inicializador ini = new Xavier();
       
       Sequencial modelo = new Sequencial();
-      modelo.add(new Densa(entradas, 13, "arctan"));
+      modelo.add(new Densa(entradas, 13, "tanh"));
       modelo.add(new Densa(13, saidas, "sigmoid"));
       // modelo.configurarSeed(1234);
       modelo.compilar(otm, perda, ini, ini);
