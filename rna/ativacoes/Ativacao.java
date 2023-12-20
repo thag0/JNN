@@ -61,11 +61,13 @@ public abstract class Ativacao{
     * @param saida resultado das ativações.
     */
    protected void aplicarFx(Mat entrada, Mat saida){
-      double[] e = entrada.paraArray();
-      for(int i = 0; i < e.length; i++){
-         e[i] = fx.applyAsDouble(e[i]);
+      int lin = entrada.lin();
+      int col = entrada.col();
+      for(int i = 0; i < lin; i++){
+         for(int j = 0; j < col; j++){
+            saida.editar(i, j, fx.applyAsDouble(entrada.dado(i, j)));
+         }
       }
-      saida.copiar(e);
    }
 
    /**

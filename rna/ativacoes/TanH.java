@@ -7,7 +7,7 @@ public class TanH extends Ativacao{
 
    public TanH(){
       super.construir(
-         (x) -> { return 2 / (1 + Math.exp(-2 * x)) - 1; }, 
+         (x) -> { return (2 / (1 + Math.exp(-2*x))) - 1; }, 
          null
       );
    }

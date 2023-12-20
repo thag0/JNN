@@ -81,16 +81,17 @@ public class Main{
    }
 
    static Modelo criarSequencial(int entradas, int saidas){
-      // Otimizador otm = new SGD(0.001);
-      Otimizador otm = new AdaGrad(0.99999999);
+      Otimizador otm = new SGD(0.0001, 0.999);
+      // Otimizador otm = new AdaGrad(0.99999999);
       Perda perda = new ErroMedioQuadrado();
       Inicializador ini = new Xavier();
       
       Sequencial modelo = new Sequencial();
-      modelo.add(new Densa(entradas, 13, "tanh"));
+      modelo.add(new Densa(entradas, 13, "leakyrelu"));
+      modelo.add(new Densa( 13, "leakyrelu"));
       modelo.add(new Densa(13, saidas, "sigmoid"));
       // modelo.configurarSeed(1234);
-      modelo.compilar(otm, perda, ini);
+      modelo.compilar(otm, perda, ini, ini);
       modelo.configurarHistorico(calcularHistorico);
 
       return modelo;

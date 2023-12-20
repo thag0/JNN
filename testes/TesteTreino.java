@@ -30,7 +30,7 @@ public class TesteTreino{
       rede.add(new Densa(1, "sigmoid"));
       
       rede.compilar(
-         new SGD(0.01, 0.95),
+         new SGD(0.1),
          new ErroMedioQuadrado(),
          new Xavier()
       );
@@ -41,7 +41,7 @@ public class TesteTreino{
          System.out.println(
             entrada[i][0] + " - " + entrada[i][1] + 
             " R:" + saida[i][0] + 
-            " P:" + rede.camada(1).saidaParaArray()[0]
+            " P:" + rede.saidaParaArray()[0]
          );
       }
       
