@@ -13,11 +13,6 @@ public class TanH extends Ativacao{
    }
 
    @Override
-   public void calcular(Densa camada){
-      super.aplicarFx(camada.somatorio, camada.saida);
-   }
-
-   @Override
    public void derivada(Densa camada){
       //forma manual pra aproveitar os valores pre calculados
       double grad, d;
@@ -33,13 +28,6 @@ public class TanH extends Ativacao{
             
             camada.derivada.editar(i, j, (d * grad));
          }
-      }
-   }
-
-   @Override
-   public void calcular(Convolucional camada){
-      for(int i = 0; i < camada.somatorio.length; i++){
-         super.aplicarFx(camada.somatorio[i], camada.saida[i]);
       }
    }
 

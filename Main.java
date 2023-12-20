@@ -89,7 +89,7 @@ public class Main{
       Inicializador ini = new Xavier();
       
       Sequencial modelo = new Sequencial();
-      modelo.add(new Densa(entradas, 13, "tanh"));
+      modelo.add(new Densa(entradas, 13, "arctan"));
       modelo.add(new Densa(13, saidas, "sigmoid"));
       // modelo.configurarSeed(1234);
       modelo.compilar(otm, perda, ini, ini);

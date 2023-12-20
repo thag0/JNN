@@ -1,11 +1,8 @@
 package rna.ativacoes;
 
-import rna.estrutura.Convolucional;
-import rna.estrutura.Densa;
-
 /**
  * Implementação da função de ativação LeakyReLU para uso dentro 
- * da {@code Rede Neural}.
+ * dos modelos.
  * <p>
  *    É possível configurar o valor de {@code alfa} para obter
  *    melhores resultados.
@@ -42,29 +39,5 @@ public class LeakyReLU extends Ativacao{
     */
    public LeakyReLU(){
       this(0.01);
-   }
-  
-   @Override
-   public void calcular(Densa camada){
-      super.aplicarFx(camada.somatorio, camada.saida);
-   }
-
-   @Override
-   public void derivada(Densa camada){
-      super.aplicarDx(camada.gradSaida, camada.somatorio, camada.derivada);
-   }
-
-   @Override
-   public void calcular(Convolucional camada){
-      for(int i = 0; i < camada.somatorio.length; i++){
-         super.aplicarFx(camada.somatorio[i], camada.saida[i]);
-      }
-   }
-
-   @Override
-   public void derivada(Convolucional camada){
-      for(int i = 0; i < camada.somatorio.length; i++){
-         super.aplicarDx(camada.gradSaida[i], camada.somatorio[i], camada.derivada[i]);
-      }
    }
 }

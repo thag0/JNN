@@ -109,9 +109,7 @@ public abstract class Ativacao{
     * @param camada camada densa usada.
     */
    public void calcular(Densa camada){
-      throw new UnsupportedOperationException(
-         "Implementar ativação para camada densa."
-      );
+      this.aplicarFx(camada.somatorio, camada.saida);
    }
 
    /**
@@ -123,9 +121,7 @@ public abstract class Ativacao{
     * @param camada camada densa usada.
     */
    public void derivada(Densa camada){
-      throw new UnsupportedOperationException(
-         "Implementar derivada da ativação para camada densa."
-      );
+      this.aplicarDx(camada.gradSaida, camada.somatorio, camada.derivada);
    }
 
 
@@ -137,9 +133,9 @@ public abstract class Ativacao{
     * @param camada camada convolucional usada.
     */
    public void calcular(Convolucional camada){
-      throw new UnsupportedOperationException(
-         "Implementar ativação para camada convolucional."
-      );
+      for(int i = 0; i < camada.somatorio.length; i++){
+         this.aplicarFx(camada.somatorio[i], camada.saida[i]);
+      }
    }
 
    /**
@@ -151,9 +147,9 @@ public abstract class Ativacao{
     * @param camada camada convolucional usada.
     */
    public void derivada(Convolucional camada){
-      throw new UnsupportedOperationException(
-         "Implementar derivada da ativação para camada convolucional."
-      );
+      for(int i = 0; i < camada.somatorio.length; i++){
+         this.aplicarDx(camada.gradSaida[i], camada.somatorio[i], camada.derivada[i]);
+      }
    }
 
    /**

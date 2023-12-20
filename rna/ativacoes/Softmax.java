@@ -6,7 +6,7 @@ import rna.estrutura.Densa;
 
 /**
  * Implementação da função de ativação Softmax para uso
- * dentro da {@code Rede Neural}.
+ * dentro dos modelos.
  */
 public class Softmax extends Ativacao{
 

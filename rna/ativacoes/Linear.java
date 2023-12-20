@@ -1,11 +1,14 @@
 package rna.ativacoes;
 
-import rna.estrutura.Convolucional;
-import rna.estrutura.Densa;
-
 /**
  * Implementação da função de ativação Linear para uso dentro 
- * da {@code Rede Neural}.
+ * dos modelos.
+ * <p>
+ *    A função Linear apenas retorna o próprio valor de entrada
+ *    para sua saída e não é indicada pra uso. Ela é boa para 
+ *    fazer testes nas camadas que se seus resultados não alteram
+ *    os valores recebidos.
+ * </p>
  */
 public class Linear extends Ativacao{
 
@@ -17,29 +20,5 @@ public class Linear extends Ativacao{
          (x) -> { return x; },
          (x) -> { return 1; }
       );
-   }
-
-   @Override
-   public void calcular(Densa camada){
-      super.aplicarFx(camada.somatorio, camada.saida);
-   }
-
-   @Override
-   public void derivada(Densa camada){
-         super.aplicarDx(camada.gradSaida, camada.somatorio, camada.derivada);
-   }
-
-   @Override
-   public void calcular(Convolucional camada){
-      for(int i = 0; i < camada.saida.length; i++){
-         super.aplicarFx(camada.somatorio[i], camada.saida[i]);
-      }
-   }
-
-   @Override
-   public void derivada(Convolucional camada){
-       for(int i = 0; i < camada.saida.length; i++){
-         super.aplicarDx(camada.gradSaida[i], camada.somatorio[i], camada.derivada[i]);
-      }
    }
 }

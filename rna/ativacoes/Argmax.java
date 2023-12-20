@@ -4,7 +4,7 @@ import rna.estrutura.Densa;
 
 /**
  * Implementação da função de ativação Argmax para uso 
- * dentro da {@code Rede Neural}.
+ * dentro dos modelos.
  */
 public class Argmax extends Ativacao{
 

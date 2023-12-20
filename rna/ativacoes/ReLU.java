@@ -1,38 +1,22 @@
 package rna.ativacoes;
 
-import rna.estrutura.Convolucional;
-import rna.estrutura.Densa;
-
+/**
+ * Implementação da função de ativação ReLU para uso dentro 
+ * dos modelos.
+ * <p>
+ *    A função ReLU (Rectified Linear Unit) retorna o próprio valor
+ *    recebido caso ele seja maior que zero, e zero caso contrário.
+ * </p>
+ */
 public class ReLU extends Ativacao{
 
+   /**
+    * Instancia a função de ativação ReLU.
+    */
    public ReLU(){
       super.construir(
          (x) -> { return (x > 0) ? x : 0; },
          (x) -> { return (x > 0) ? 1 : 0; }
       );
-   }
-
-   @Override
-   public void calcular(Densa camada){
-      super.aplicarFx(camada.somatorio, camada.saida);
-   }
-
-   @Override
-   public void derivada(Densa camada){
-      super.aplicarDx(camada.gradSaida, camada.somatorio, camada.derivada);
-   }
-
-   @Override
-   public void calcular(Convolucional camada){
-      for(int i = 0; i < camada.saida.length; i++){
-         super.aplicarFx(camada.somatorio[i], camada.saida[i]);
-      }
-   }
-
-   @Override
-   public void derivada(Convolucional camada){
-      for(int i = 0; i < camada.saida.length; i++){
-         super.aplicarDx(camada.gradSaida[i], camada.somatorio[i], camada.derivada[i]);
-      }
    }
 }
