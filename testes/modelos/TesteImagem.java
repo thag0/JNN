@@ -1,4 +1,4 @@
-package testes;
+package testes.modelos;
 
 import java.awt.image.BufferedImage;
 

@@ -1,4 +1,4 @@
-package testes;
+package testes.modelos;
 
 import ged.Dados;
 import ged.Ged;

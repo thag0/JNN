@@ -14,7 +14,7 @@ import rna.modelos.Sequencial;
 import rna.otimizadores.*;
 
 public class Main{
-   static final int epocas = 5*1000;
+   static final int epocas = 10*1000;
    static final float escalaRender = 8f;
    static Ged ged = new Ged();
    static Geim geim = new Geim();

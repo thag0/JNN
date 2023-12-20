@@ -1,5 +1,7 @@
 package rna.core;
 
+import java.util.function.DoubleUnaryOperator;
+
 /**
  * Classe que representa uma matriz em forma de array com o objetivo
  * de acelerar as operações dentro dos modelos.
@@ -327,6 +329,51 @@ public class Mat{
       }
 
       return b;
+   }
+
+   /**
+    * Executa a função fornecida elemento a elemento na matriz.
+    * <p>
+    *    Exemplo
+    * </p>
+    * <pre>
+    *m = [
+    *    1, 2, 3
+    *    4, 5, 6
+    *    7, 8, 9
+    * ]
+    *
+    *m.aplicarFuncao((x) -> {x*2})
+    *
+    *m = [
+    *     2,  4,  6
+    *     8, 10, 12
+    *    14, 16, 18
+    * ]
+    * </pre>
+    * @param f expressão lambda que atuará na matriz.
+    */
+   public void aplicarFuncao(DoubleUnaryOperator f){
+      for(int i = 0; i < this.dados.length; i++){
+         this.dados[i] = f.applyAsDouble(this.dados[i]);
+      }
+   }
+
+   /**
+    * 
+    * @param m
+    * @param f
+    */
+   public void aplicarFuncao(Mat m, DoubleUnaryOperator f){
+      if(this.tamanho() != m.tamanho()){
+         throw new IllegalArgumentException(
+            "A matriz fornecida deve possuir o mesmo tamanho."
+         );
+      }
+
+      for(int i = 0; i < this.dados.length; i++){
+         this.dados[i] = f.applyAsDouble(m.dados[i]);
+      }
    }
 
    /**
