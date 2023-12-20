@@ -8,7 +8,7 @@ import rna.otimizadores.Otimizador;
 import rna.serializacao.Dicionario;
 import rna.treinamento.Treinador;
 
-//TODO implementar serialização do modelo
+//implementar serialização do modelo
 
 /**
  * Modelo sequencial de camadas.

@@ -20,46 +20,38 @@ public class MatrizTeste{
       ged.limparConsole();
 
       double[][] e1 = {
-         {5, 2, 8, 1},
-         {1, 7, 3, 6},
-         {9, 8, 4, 1},
-         {3, 4, 2, 6}
+         {1, 2, 3, 4},
+         {5, 6, 7, 8},
+         {4, 3, 2, 1},
+         {8, 7, 6, 5}
       };
-      double[][] e2 = {
-         {0.77, 0.00, 0.11, 0.33, 0.55, 0.00, 0.33},
-         {0.00, 1.00, 0.00, 0.33, 0.55, 0.11, 0.33},
-         {0.11, 0.00, 1.00, 0.00, 0.11, 0.00, 0.55},
-         {0.33, 0.33, 0.00, 0.55, 0.11, 0.33, 0.33},
-         {0.55, 0.00, 0.11, 0.00, 1.00, 0.00, 0.11},
-         {0.00, 0.11, 0.00, 0.33, 0.00, 1.00, 0.00},
-         {0.33, 0.00, 0.55, 0.33, 0.11, 0.00, 0.77}
-      };
-
-      double[][] g = {
-         {0.4, 0.5, 0.6},
-         {0.2, 0.7, 0.9},
-         {0.1, 0.4, 0.5}
-      };
-
-      Mat[] entradas = new Mat[1];
-      entradas[0] = new Mat(e2);
-      entradas[0].print();
       
-      MaxPooling mp = new MaxPooling(new int[]{e2.length, e2[0].length, 1}, new int[]{2, 2});
-      int[] formSaida = mp.formatoSaida();
-      mp.calcularSaida(entradas);
+      double[][] f1 = {
+         {3, 2, 1},
+         {1, 2, 3},
+         {4, 5, 6}
+      };
 
-      double[] saidas = mp.saidaParaArray();
-      Mat saida = new Mat(formSaida[0], formSaida[1]);
-      saida.copiar(saidas);
-      saida.print("saída max pooling");
+      double[][] g1 = {
+         {9, 8, 7},
+         {3, 2, 1},
+         {3, 4, 6}
+      };
 
-      Mat[] grads = new Mat[1];
-      grads[0] = new Mat(g);
-      mp.calcularGradiente(grads);
+      Mat entrada = new Mat(e1);
+      Mat filtro = new Mat(f1);
+      Mat gradiente = new Mat(g1);
 
-      Mat[] gE = mp.obterGradEntrada();
-      gE[0].print("grad entrada");
+      Mat saida = new Mat(2, 2);
+      Mat gradK = new Mat(2, 2);
+      Mat gradE = new Mat(5, 5);
+
+      opmat.correlacaoCruzada(entrada, filtro, saida, false);
+      opmat.correlacaoCruzada(entrada, gradiente, gradK, false);
+      opmat.convolucaoFull(gradiente, filtro, gradE, false);
+      saida.print("saida");
+      gradK.print("gradk");
+      gradE.print("gradE");
    }
 
    static void derivadaSoftmax(){

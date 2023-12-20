@@ -702,9 +702,9 @@ public class Convolucional extends Camada implements Cloneable{
          if(e.length != this.profEntrada || e[0].length != this.largEntrada || e[0][0].length != this.altEntrada){
             throw new IllegalArgumentException(
                "As dimensões da entrada " + 
-               "(" + e.length + ", " + e[0].length + ", " + e[0][0].length + ") " +
+               "(" + e[0].length + ", " + e[0][0].length + ", " + e.length + ") " +
                "não correspondem as dimensões de entrada da camada Convolucional " + 
-               "(" + this.profEntrada +", " + this.altEntrada + ", " + this.largEntrada + ")"
+               "(" + this.altEntrada +", " + this.largEntrada + ", " + this.profEntrada + ")"
             );
          }
          utils.copiar(e, this.entrada);

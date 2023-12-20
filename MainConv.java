@@ -26,6 +26,7 @@ public class MainConv{
       System.out.println("Rótulos carregados.");
 
       Sequencial modelo = criarModelo();
+      System.out.println(modelo.info());
 
       //treinar e marcar tempo
       long t1, t2;
@@ -59,15 +60,14 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{4, 4}, 15, "leakyrelu"),
-         new Convolucional(new int[]{4, 4}, 15, "leakyrelu"),
+         new Convolucional(formEntrada, new int[]{3, 3}, 15, "leakyrelu"),
          new Flatten(),
          new Densa(100, "leakyrelu"),
          new Densa(2, "softmax"),
       });
 
       modelo.compilar(
-         new SGD(0.001, 0.9),
+         new SGD(0.001, 0.99),
          new EntropiaCruzada(),
          new Xavier(),
          new Zeros()
