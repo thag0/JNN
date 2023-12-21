@@ -1,12 +1,18 @@
 package rna.estrutura;
 
 import rna.core.Mat;
+import rna.core.Utils;
 import rna.inicializadores.Inicializador;
 
 /**
  * 
  */
 public class Flatten extends Camada{
+
+   /**
+    * Utilitário.
+    */
+   Utils utils = new Utils();
 
    /**
     * Array contendo o formato de entrada da camada, de acordo com o formato:
@@ -186,15 +192,7 @@ public class Flatten extends Camada{
          );
       }
       double[] e = (double[]) entrada;
-
-      int id = 0;
-      for(int i = 0; i < this.entrada.length; i++){
-         for(int j = 0; j < this.entrada[i].lin(); j++){
-            for(int k = 0; k < this.entrada[i].col(); k++){
-               this.entrada[i].editar(j, k, e[id++]);
-            }
-         }
-      }
+      utils.copiar(e, this.entrada);
 
       System.arraycopy(e, 0, this.saida, 0, this.saida.length);
    }
@@ -204,7 +202,7 @@ public class Flatten extends Camada{
       verificarConstrucao();
 
       if(gradSeguinte instanceof double[]){
-         calcularGrad((double[]) gradSeguinte);
+         utils.copiar((double[]) gradSeguinte, this.gradEntrada);
       
       }else if(gradSeguinte instanceof Mat){
          calcularGrad((Mat) gradSeguinte);
@@ -218,14 +216,7 @@ public class Flatten extends Camada{
    }
 
    private void calcularGrad(double[] grad){
-      int id = 0, i, j, k;
-      for(i = 0; i < this.gradEntrada.length; i++){
-         for(j = 0; j < this.gradEntrada[i].lin(); j++){
-            for(k = 0; k < this.gradEntrada[i].col(); k++){
-               this.gradEntrada[i].editar(j, k, grad[id++]);
-            }
-         }
-      }
+      utils.copiar(grad, this.gradEntrada);
    }
   
    private void calcularGrad(Mat grad){

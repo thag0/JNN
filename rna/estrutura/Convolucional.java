@@ -475,7 +475,7 @@ public class Convolucional extends Camada implements Cloneable{
             "O formato de entrada deve conter 3 elementos (altura, largura, profundidade)" 
          );
       }
-      if(utils.contemApenasMaiorZero(formEntrada) == false){
+      if(utils.apenasMaiorZero(formEntrada) == false){
          throw new IllegalArgumentException(
             "O formato de entrada deve conter valores maiores do que zero." 
          );          
@@ -540,7 +540,7 @@ public class Convolucional extends Camada implements Cloneable{
          );
       }
 
-      if(utils.contemApenasMaiorZero(formEntrada) == false){
+      if(utils.apenasMaiorZero(formEntrada) == false){
          throw new IllegalArgumentException(
             "Os valores de dimensões de entrada para a camada Convolucional não " +
             "podem conter valores menores que 1."
@@ -1009,16 +1009,7 @@ public class Convolucional extends Camada implements Cloneable{
          );
       }
          
-      int id = 0, i, j;
-      for(Mat[] filtro : this.filtros){
-         for(Mat camada : filtro){
-            for(i = 0; i < camada.lin(); i++){
-               for(j = 0; j < camada.col(); j++){
-                  camada.editar(i, j, kernel[id++]);
-               }
-            }
-         }
-      }
+      utils.copiar(kernel, this.filtros);
    }
 
    @Override
@@ -1030,14 +1021,7 @@ public class Convolucional extends Camada implements Cloneable{
          );
       }
       
-      int id = 0;
-      for(Mat b : this.bias){
-         for(int i = 0; i < b.lin(); i++){
-            for(int j = 0; j < b.col(); j++){
-               b.editar(i, j, bias[id++]);
-            }
-         }
-      }
+      utils.copiar(bias, this.bias);
    }
 
 }
