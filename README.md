@@ -43,7 +43,7 @@ Fiz o teste usando o dataset do mnist (que está no projeto) e percebo que o mod
  - Testes com diferentes funções de ativação;
  - Testes com diferentes parâmetros de arquitetura (tamanho de filtros, número de filtro, tamanho de máscara de pooling, número neurônios);
  - Diferentes arquiteturas (pilha de camadas convolucionais, camada convolucional seguida de pooling, várias camadas densas)
+ - Testes nos resultados internos das operações dentro da camada convolucional, como operação de correlação cruzada e convolução full;
+ - Análise nas transformações dos dados entre camadas, como saída da camada Convolucional para entrada da camada Flatten e Saída da camada Flatten para a camada Densa;
 
-Ainda não consegui chegar ao resultado do que pode estar causando esses problemas, mas de certeza já tenho que as camadas Densa e Flatten estão funcionado corretamente e trazendo os resultados esperados. A camada de pooling ainda foi pouco testada mas em cenários mais controlados já vi que ela entrega os resultados esperados.
-
-Minhas suspeitas estão mesmo na camada Convolucional, tanto na arquitetura dela quando nas operações que ela faz, como a convolução e a correlação cruzada, mas não consegui chegar num resultado certo ainda.
+Ainda não consegui chegar ao resultado do que pode estar causando esses problemas, mas de certeza já tenho que as camadas Densa e Flatten estão funcionado corretamente e trazendo os resultados esperados. A camada de pooling ainda foi pouco testada mas em cenários mais controlados já vi que ela entrega os resultados esperados, mas não consegui chegar num resultado certo ainda.
