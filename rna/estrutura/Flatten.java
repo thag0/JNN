@@ -35,7 +35,7 @@ public class Flatten extends Camada{
     *entrada[n] = [alturaEntrada][larguraEntrada]
     * </pre>
     */
-    public Mat[] entrada;
+   public Mat[] entrada;
    
     /**
     * Array de matrizes contendo os valores dos gradientes usados para 
@@ -46,7 +46,7 @@ public class Flatten extends Camada{
    /**
     * Array contendo a saída achatada da camada.
     */
-   private double[] saida;
+   public double[] saida;
 
    /**
     * Inicializa uma camada Flatten, que irá achatar a entrada recebida
@@ -185,8 +185,17 @@ public class Flatten extends Camada{
             "objeto recebido é do tipo \"" + entrada.getClass().getTypeName() + "\""
          );
       }
-
       double[] e = (double[]) entrada;
+
+      int id = 0;
+      for(int i = 0; i < this.entrada.length; i++){
+         for(int j = 0; j < this.entrada[i].lin(); j++){
+            for(int k = 0; k < this.entrada[i].col(); k++){
+               this.entrada[i].editar(j, k, e[id++]);
+            }
+         }
+      }
+
       System.arraycopy(e, 0, this.saida, 0, this.saida.length);
    }
 

@@ -33,7 +33,7 @@ As dificuldades no momento estão sendo lidar com modelos convolucionais, princi
 
 # Dificuldades com o treinamento de modelos convolucionais
 
-![problema conv](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/d0778aba-604d-43e6-a70c-343455f67f0a)
+![problema conv](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/f0cde31f-fd5b-4690-b477-913e04d436ed)
 
 Atualmente o que to tentando entender e corrigir é o problema de treinamento nos modelos convolucionais.
 

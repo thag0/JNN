@@ -3,6 +3,7 @@ import java.util.concurrent.TimeUnit;
 import ged.Ged;
 import geim.Geim;
 import rna.avaliacao.perda.*;
+import rna.core.Mat;
 import rna.estrutura.*;
 import rna.inicializadores.*;
 import rna.modelos.Sequencial;
@@ -15,7 +16,7 @@ public class MainConv{
    public static void main(String[] args){
       ged.limparConsole();
 
-      int amostras = 10;
+      int amostras = 5;
       int digitos = 2;
       
       double[][][][] entradas = new double[amostras*digitos][digitos][][];
@@ -34,9 +35,9 @@ public class MainConv{
 
       System.out.println("Treinando.");
       t1 = System.nanoTime();
-      modelo.treinar(entradas, saidas, 500);
+      modelo.treinar(entradas, saidas, 1000);
       t2 = System.nanoTime();
-
+      
       long tempoDecorrido = t2 - t1;
       long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempoDecorrido);
       horas = segundosTotais / 3600;
@@ -54,21 +55,23 @@ public class MainConv{
       testarPorbabilidade(modelo, "1_teste");
 
       Main.executarComando("python grafico.py");
-   } 
+   }
 
    public static Sequencial criarModelo(){
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{5, 5}, 30, "sigmoid"),
+         new Convolucional(formEntrada, new int[]{5, 5}, 50, "tanh"),
+         new MaxPooling(new int[]{2, 2}),
+         new Convolucional(new int[]{3, 3}, 50, "tanh"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(200, "sigmoid"),
+         new Densa(200, "tanh"),
          new Densa(2, "softmax"),
       });
 
       modelo.compilar(
-         new SGD(0.0001, 0.99),
+         new SGD(0.1),
          new EntropiaCruzada(),
          new Xavier(),
          new Zeros()
@@ -155,5 +158,14 @@ public class MainConv{
       }
   
       return rotulos;
+   }
+
+   static boolean compararMatrizes(Mat a, Mat b){
+      for(int i = 0; i < a.lin(); i++){
+         for(int j = 0; j < a.col(); j++){
+            if(a.dado(i, j) != b.dado(i, j)) return false;
+         }
+      }
+      return true;
    }
 }

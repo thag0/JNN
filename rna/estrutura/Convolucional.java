@@ -845,7 +845,7 @@ public class Convolucional extends Camada implements Cloneable{
          for(double valor : s){
             saida[id++] = valor;
          }
-     }
+      }
 
       return saida;
    }
