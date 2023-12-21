@@ -1,9 +1,13 @@
 package testes.modelos;
 
 import ged.Ged;
+import rna.avaliacao.perda.ErroMedioQuadrado;
 import rna.core.Mat;
 import rna.core.OpMatriz;
 import rna.estrutura.*;
+import rna.inicializadores.Xavier;
+import rna.modelos.Sequencial;
+import rna.otimizadores.SGD;
 
 public class TreinoConv{
    static Ged ged = new Ged();
@@ -33,20 +37,15 @@ public class TreinoConv{
       Convolucional camada = new Convolucional(new int[]{2, 2}, 1, "linear");
       camada.construir(new int[]{3, 3, 1});
       camada.filtros[0][0] = new Mat(f1);
+      camada.bias[0] = new Mat(2, 2);
 
       camada.calcularSaida(entrada);
       camada.calcularGradiente(new Mat[]{new Mat(g1)});
 
-      //gradient descent "manual"
-      double lr = 1;
-      opmat.escalar(camada.gradFiltros[0][0], lr, camada.gradFiltros[0][0]);
-      opmat.escalar(camada.gradBias[0], lr, camada.gradBias[0]);
-
-      camada.gradFiltros[0][0].print("grad kernel");
-      camada.gradBias[0].print("grad bias");
-      camada.gradEntrada[0].print("grad entrada");
-      
-      opmat.sub(camada.filtros[0][0], camada.gradFiltros[0][0], camada.filtros[0][0]);
-      opmat.sub(camada.bias[0], camada.gradBias[0], camada.bias[0]);
+      //valores de saída e gradientes da camada convolucional estão corretos
+      //provavelmente problema com inicialização dos otimizadores
+      Sequencial modelo = new Sequencial(new Camada[]{camada});
+      modelo.compilar(new SGD(), new ErroMedioQuadrado(), new Xavier());
+      System.out.println(modelo.info());//resultados esperados para tamanho de parâmetros
    }
 }

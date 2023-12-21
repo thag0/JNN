@@ -171,6 +171,7 @@ public class SGD extends Otimizador{
       
       String buffer = "";
       buffer += espacamento + "Otimizador: " +  this.nome() + "\n";
+      buffer += espacamento + "Parâmetros: " +  (this.m.length + this.mb.length) + "\n";
       buffer += espacamento + "TaxaAprendizagem: " + this.taxaAprendizagem + "\n";
       buffer += espacamento + "Momentum: " + this.momentum + "\n";
       buffer += espacamento + "Nesterov: " + this.nesterov + "\n";

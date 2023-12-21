@@ -722,9 +722,7 @@ public class Convolucional extends Camada implements Cloneable{
 
       //feedforward
       if(this.usarBias){
-         for(int i = 0; i < this.somatorio.length; i++){
-            this.somatorio[i].copiar(this.bias[i]);
-         }
+         utils.copiar(this.bias, this.somatorio);
       }
       
       for(int i = 0; i < this.numFiltros; i++){
@@ -770,6 +768,9 @@ public class Convolucional extends Camada implements Cloneable{
       utils.copiar(grads, this.gradSaida);
 
       this.ativacao.derivada(this);
+      for(Mat gradE : this.gradEntrada){
+         gradE.preencher(0);
+      }
 
       //backward
       for(int i = 0; i < this.numFiltros; i++){
