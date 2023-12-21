@@ -461,6 +461,8 @@ public class Sequencial extends Modelo implements Cloneable{
          );
       }
 
+      buffer += "\n" + espacamento + "Parâmetros treináveis: " + this.numParametros() + "\n";
+
       buffer += "]\n";
 
       return buffer;

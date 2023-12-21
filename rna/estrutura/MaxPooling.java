@@ -202,6 +202,11 @@ public class MaxPooling extends Camada{
    }
 
    @Override
+   public int numParametros(){
+      return 0;
+   }
+
+   @Override
    public double[] saidaParaArray(){
       int id = 0;
       double[] saida = new double[this.tamanhoSaida()];

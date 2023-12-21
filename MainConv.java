@@ -34,7 +34,7 @@ public class MainConv{
 
       System.out.println("Treinando.");
       t1 = System.nanoTime();
-      modelo.treinar(entradas, saidas, 400);
+      modelo.treinar(entradas, saidas, 500);
       t2 = System.nanoTime();
 
       long tempoDecorrido = t2 - t1;
@@ -60,12 +60,10 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{5, 5}, 30, "leakyrelu"),
-         new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{3, 3}, 20, "leakyrelu"),
+         new Convolucional(formEntrada, new int[]{5, 5}, 30, "sigmoid"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(100, "leakyrelu"),
+         new Densa(200, "sigmoid"),
          new Densa(2, "softmax"),
       });
 
