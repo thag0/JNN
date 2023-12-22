@@ -15,20 +15,15 @@ public class Sigmoid extends Ativacao{
    @Override
    public void derivada(Densa camada){
       //forma manual pra aproveitar os valores pre calculados
-      double grad, d;
-      int i, j;
-      int linhas = camada.saida.lin();
+      double grads[] = camada.gradSaida.paraArray();
+      double deriv[] = camada.saida.paraArray();
       int colunas = camada.saida.col();
 
-      for(i = 0; i < linhas; i++){
-         for(j = 0; j < colunas; j++){
-            grad = camada.gradSaida.dado(i, j);
-            d = camada.saida.dado(i, j);
-            d = d * (1 - d);
-
-            camada.derivada.editar(i, j, (grad * d));
-         }
+      for(int i = 0; i < colunas; i++){
+         deriv[i] = deriv[i] * (1 - deriv[i]);
+         deriv[i] *= grads[i];
       }
+      camada.derivada.copiar(0, deriv);
    }
 
    @Override
