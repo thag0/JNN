@@ -35,7 +35,7 @@ public class Avaliador{
     * @return valor do erro médio quadrado da rede em relação ao dados fornecidos (custo/perda).
     */
    public double erroMedioQuadrado(double[] previsto, double[] real){
-      return emq.calcular(previsto, real);
+      return ema.calcular(previsto, real);
    }
 
    /**
@@ -45,17 +45,23 @@ public class Avaliador{
     * @param saida matriz com os dados de saída (classes).
     * @return valor do erro médio quadrado da rede em relação ao dados fornecidos (custo/perda).
     */
-   public double erroMedioQuadrado(double[][] entrada, double[][] saida){
+   public double erroMedioQuadrado(Object[] entrada, Object[] saida){
       double[][] previsoes = (double[][]) modelo.calcularSaidas(entrada);
-      double mse = 0;
+      if(saida instanceof double[][] == false){
+         throw new IllegalArgumentException(
+            "O formato de saída deve ser uma matriz do tipo double[][]."
+         );
+      }
+      double[][] s = (double[][]) saida;
 
+      double res = 0;
       for(int i = 0; i < saida.length; i++){
-         mse += emq.calcular(previsoes[i], saida[i]);
+         res += ema.calcular(previsoes[i], s[i]);
       }
 
-      mse /= saida.length;
+      res /= saida.length;
 
-      return mse;
+      return res;
    }
 
    /**
@@ -78,17 +84,23 @@ public class Avaliador{
     * @return valor do erro médio quadrado logarítimico da rede em relação ao dados 
     * fornecidos (custo/perda).
     */
-   public double erroMedioQuadradoLogaritmico(double[][] entrada, double[][] saida){
+   public double erroMedioQuadradoLogaritmico(Object[] entrada, Object[] saida){
       double[][] previsoes = (double[][]) modelo.calcularSaidas(entrada);
-      double msle = 0;
+      if(saida instanceof double[][] == false){
+         throw new IllegalArgumentException(
+            "O formato de saída deve ser uma matriz do tipo double[][]."
+         );
+      }
+      double[][] s = (double[][]) saida;
 
+      double res = 0;
       for(int i = 0; i < saida.length; i++){
-         msle += emql.calcular(previsoes[i], saida[i]);
+         res += emql.calcular(previsoes[i], s[i]);
       }
 
-      msle /= saida.length;
+      res /= saida.length;
 
-      return msle; 
+      return res; 
    }
 
    /**
@@ -107,17 +119,23 @@ public class Avaliador{
     * @param saida dados de saída contendo os resultados respectivos para as entradas.
     * @return valor do erro médio abosoluto da rede em relação ao dados fornecidos (custo/perda).
     */
-   public double erroMedioAbsoluto(double[][] entrada, double[][] saida){
+   public double erroMedioAbsoluto(Object[] entrada, Object[] saida){
       double[][] previsoes = (double[][]) modelo.calcularSaidas(entrada);
-      double mae = 0;
+      if(saida instanceof double[][] == false){
+         throw new IllegalArgumentException(
+            "O formato de saída deve ser uma matriz do tipo double[][]."
+         );
+      }
+      double[][] s = (double[][]) saida;
 
+      double res = 0;
       for(int i = 0; i < saida.length; i++){
-         mae += emq.calcular(previsoes[i], saida[i]);
+         res += ema.calcular(previsoes[i], s[i]);
       }
 
-      mae /= saida.length;
+      res /= saida.length;
 
-      return mae;
+      return res;
    }
 
    /**
@@ -148,17 +166,23 @@ public class Avaliador{
     * @param saida dados de saída contendo os resultados respectivos para as entradas.
     * @return entropia cruzada da rede em relação ao dados fornecidos (custo/perda).
     */
-   public double entropiaCruzada(double[][] entrada, double[][] saida){  
+   public double entropiaCruzada(Object[] entrada, Object[] saida){  
       double[][] previsoes = (double[][]) modelo.calcularSaidas(entrada);
-      double ec = 0;
+      if(saida instanceof double[][] == false){
+         throw new IllegalArgumentException(
+            "O formato de saída deve ser uma matriz do tipo double[][]."
+         );
+      }
+      double[][] s = (double[][]) saida;
 
+      double res = 0;
       for(int i = 0; i < saida.length; i++){
-         ec += ecc.calcular(previsoes[i], saida[i]);
+         res += ecc.calcular(previsoes[i], s[i]);
       }
 
-      ec /= saida.length;
+      res /= saida.length;
 
-      return ec;
+      return res;
    }
 
    /**
@@ -179,12 +203,18 @@ public class Avaliador{
     * @param saida As saídas reais correspondentes aos dados de entrada.
     * @return valor da entropia cruzada binária.
     */
-   public double entropiaCruzadaBinaria(double[][] entrada, double[][] saida){
+   public double entropiaCruzadaBinaria(Object[] entrada, Object[] saida){
       double[][] previsoes = (double[][]) modelo.calcularSaidas(entrada);
-      double res = 0;
+      if(saida instanceof double[][] == false){
+         throw new IllegalArgumentException(
+            "O formato de saída deve ser uma matriz do tipo double[][]."
+         );
+      }
+      double[][] s = (double[][]) saida;
 
+      double res = 0;
       for(int i = 0; i < saida.length; i++){
-         res += ecb.calcular(previsoes[i], saida[i]);
+         res += ecb.calcular(previsoes[i], s[i]);
       }
 
       res /= saida.length;
