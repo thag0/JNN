@@ -20,7 +20,7 @@ public class SalvandoRede{
    public static void main(String[] args){
       Ged ged = new Ged();
       ged.limparConsole();
-      String caminho = "./modelo-teste.txt";
+      String caminho = "./modelo-convolucional.txt";
       Serializador serializador = new Serializador();
 
       // Sequencial modelo = new Sequencial(new Camada[]{
@@ -31,13 +31,6 @@ public class SalvandoRede{
       // serializador.salvar(modelo, caminho);
 
       Sequencial modelo = serializador.lerSequencial(caminho);
-      Convolucional camada = (Convolucional) modelo.camada(0);
-
-      for(int i = 0; i < camada.numFiltros(); i++){
-         camada.filtros[i][0].print("filtro " + i);
-      }
-      for(int i = 0; i < camada.bias.length; i++){
-         camada.bias[i].print("bias " + i);
-      }
+      System.out.println(modelo.info());
    }
 }

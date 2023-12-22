@@ -10,6 +10,7 @@ import rna.avaliacao.perda.Perda;
 import rna.estrutura.Camada;
 import rna.estrutura.Convolucional;
 import rna.estrutura.Densa;
+import rna.estrutura.Flatten;
 import rna.modelos.RedeNeural;
 import rna.modelos.Sequencial;
 import rna.otimizadores.Otimizador;
@@ -27,8 +28,9 @@ import rna.otimizadores.Otimizador;
  */
 public class Serializador{
 
-   private UtilsDensa auxDensa = new UtilsDensa();
-   private UtilsConv auxConv = new UtilsConv();
+   private SerialDensa auxDensa = new SerialDensa();
+   private SerialConv auxConv = new SerialConv();
+   private SerialFlatten auxFlat = new SerialFlatten();
 
    public Serializador(){}
 
@@ -173,7 +175,11 @@ public class Serializador{
 
             }else if(camada instanceof Convolucional){
                auxConv.serializar((Convolucional) camada, bw);
-            }else{
+            
+            }else if(camada instanceof Flatten){
+               auxFlat.serializar((Flatten) camada, bw);
+            }
+            else{
                throw new IllegalArgumentException(
                   "Tipo de camada \"" + camada.getClass().getTypeName() + "\" não suportado."
                );
@@ -285,6 +291,10 @@ public class Serializador{
                Convolucional convolucional = auxConv.lerConfig(br);
                auxConv.lerPesos(convolucional, br);
                modelo.add(convolucional);
+            
+            }else if(nome.equalsIgnoreCase("flatten")){
+               Flatten flat = auxFlat.lerConfig(br);
+               modelo.add(flat);
             }
          }
 
