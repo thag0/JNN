@@ -31,19 +31,8 @@ Até o momento o modelo sequencial está lidando perfeitamente bem com os métod
 
 As dificuldades no momento estão sendo lidar com modelos convolucionais, principalmente na questão de treinamento, já que eles não estão aprendendo e parecem ficar presos em mínimos locais rapidamente.
 
-# Dificuldades com o treinamento de modelos convolucionais
+# Treinamento de modelos Convolucionais
 
-![problema conv](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/f0cde31f-fd5b-4690-b477-913e04d436ed)
+![treino conv](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/088b40d8-bf53-491e-897f-7138f1c5ea88)
 
-Atualmente o que to tentando entender e corrigir é o problema de treinamento nos modelos convolucionais.
-
-Fiz o teste usando o dataset do mnist (que está no projeto) e percebo que o modelo não tem capacidade de reconhecer e aprender as características das imagens, já testei coisas como:
- - Leitura correta dos arquivos de imagens;
- - Transformação correta dos dados de imagem em dados de treinamento;
- - Testes com diferentes funções de ativação;
- - Testes com diferentes parâmetros de arquitetura (tamanho de filtros, número de filtro, tamanho de máscara de pooling, número neurônios);
- - Diferentes arquiteturas (pilha de camadas convolucionais, camada convolucional seguida de pooling, várias camadas densas)
- - Testes nos resultados internos das operações dentro da camada convolucional, como operação de correlação cruzada e convolução full;
- - Análise nas transformações dos dados entre camadas, como saída da camada Convolucional para entrada da camada Flatten e Saída da camada Flatten para a camada Densa;
-
-Ainda não consegui chegar ao resultado do que pode estar causando esses problemas, mas de certeza já tenho que as camadas Densa e Flatten estão funcionado corretamente e trazendo os resultados esperados. A camada de pooling ainda foi pouco testada mas em cenários mais controlados já vi que ela entrega os resultados esperados, mas não consegui chegar num resultado certo ainda.
+Estou iniciando os teste com modelos convolucionais e já obtive ótimos resultados usando um pequeno conjunto de dados do mnist pra treinar um modelo simples.
