@@ -8,6 +8,7 @@ import java.io.FileWriter;
 
 import rna.avaliacao.perda.Perda;
 import rna.estrutura.Camada;
+import rna.estrutura.Convolucional;
 import rna.estrutura.Densa;
 import rna.modelos.RedeNeural;
 import rna.modelos.Sequencial;
@@ -27,6 +28,7 @@ import rna.otimizadores.Otimizador;
 public class Serializador{
 
    private UtilsDensa auxDensa = new UtilsDensa();
+   private UtilsConv auxConv = new UtilsConv();
 
    public Serializador(){}
 
@@ -167,7 +169,10 @@ public class Serializador{
 
          for(Camada camada : modelo.camadas()){
             if(camada instanceof Densa){
-               auxDensa.serializar((Densa)camada, bw);
+               auxDensa.serializar((Densa) camada, bw);
+
+            }else if(camada instanceof Convolucional){
+               auxConv.serializar((Convolucional) camada, bw);
             }else{
                throw new IllegalArgumentException(
                   "Tipo de camada \"" + camada.getClass().getTypeName() + "\" não suportado."
@@ -270,10 +275,16 @@ public class Serializador{
          modelo.configurarPerda(perda);
          for(int i = 0; i < numCamadas; i++){
             String nome = br.readLine();
-            if(nome.equals("Densa")){
+            
+            if(nome.equalsIgnoreCase("densa")){
                Densa densa = auxDensa.lerConfig(br);
                auxDensa.lerPesos(densa, br);
                modelo.add(densa);
+
+            }else if(nome.equalsIgnoreCase("convolucional")){
+               Convolucional convolucional = auxConv.lerConfig(br);
+               auxConv.lerPesos(convolucional, br);
+               modelo.add(convolucional);
             }
          }
 

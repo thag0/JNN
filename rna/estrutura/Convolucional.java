@@ -665,6 +665,11 @@ public class Convolucional extends Camada implements Cloneable{
       this.id = id;
    }
 
+   @Override
+   public void configurarBias(boolean usarBias){
+      this.usarBias = usarBias;
+   }
+
    /**
     * Propagação direta dos dados de entrada através da camada convolucional.
     * Realiza a correlação cruzada entre os filtros da camada e os dados de entrada,
@@ -795,10 +800,7 @@ public class Convolucional extends Camada implements Cloneable{
       return this.numFiltros;
    }
 
-   /**
-    * Retorna a instância da função de ativação configurada para a camada.
-    * @return função de ativação da camada.
-    */
+   @Override
    public Ativacao obterAtivacao(){
       return this.ativacao;
    }
@@ -868,13 +870,8 @@ public class Convolucional extends Camada implements Cloneable{
       return saida;
    }
 
-   /**
-    * Clona a instância da camada, criando um novo objeto com as 
-    * mesmas características mas em outro espaço de memória.
-    * @return clone da camada.
-    */
-    @Override
-   public Convolucional clone(){
+   @Override
+   public Convolucional clonar(){
       try{
          Convolucional clone = (Convolucional) super.clone();
 

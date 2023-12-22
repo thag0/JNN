@@ -8,6 +8,7 @@ import rna.estrutura.*;
 import rna.inicializadores.*;
 import rna.modelos.Sequencial;
 import rna.otimizadores.*;
+import rna.serializacao.Serializador;
 
 public class MainConv{
    static Ged ged = new Ged();
@@ -48,6 +49,8 @@ public class MainConv{
 
       testarPorbabilidade(modelo, "0_teste_1");
       testarPorbabilidade(modelo, "1_teste_1");
+
+      // salvarSequencial(modelo, "./modelo-convolucional.txt");
 
       Main.executarComando("python grafico.py");
    }
@@ -160,5 +163,10 @@ public class MainConv{
          }
       }
       return true;
+   }
+
+   static void salvarSequencial(Sequencial modelo, String caminho){
+      Serializador s = new Serializador();
+      s.salvar(modelo, caminho);
    }
 }
