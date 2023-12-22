@@ -60,7 +60,8 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{4, 4}, 5, "leakyrelu"),
+         new Convolucional(formEntrada, new int[]{4, 4}, 3, "leakyrelu"),
+         new Convolucional(new int[]{3, 3}, 2, "leakyrelu"),
          new Flatten(),
          new Densa(100, "leakyrelu"),
          new Densa(NUM_DIGITOS, "softmax"),
@@ -167,6 +168,7 @@ public class MainConv{
    }
 
    static void salvarSequencial(Sequencial modelo, String caminho){
+      System.out.println("Salvando modelo.");
       Serializador s = new Serializador();
       s.salvar(modelo, caminho);
    }
