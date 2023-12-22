@@ -351,7 +351,7 @@ public class Mat{
     *    14, 16, 18
     * ]
     * </pre>
-    * @param f expressão lambda que atuará na matriz.
+    * @param f expressão lambda que atuará em cada elemento da matriz.
     */
    public void aplicarFuncao(DoubleUnaryOperator f){
       for(int i = 0; i < this.dados.length; i++){
@@ -360,9 +360,28 @@ public class Mat{
    }
 
    /**
-    * 
-    * @param m
-    * @param f
+    * Executa a função fornecida elemento a elemento na matriz e salva o resultado
+    * na intância que foi usada.
+    * <p>
+    *    Exemplo
+    * </p>
+    * <pre>
+    *a = [
+    *    1, 2, 3
+    *    4, 5, 6
+    *    7, 8, 9
+    * ]
+    *
+    *m.aplicarFuncao(a, (x) -> {x*2})
+    *
+    *m = [
+    *     2,  4,  6
+    *     8, 10, 12
+    *    14, 16, 18
+    * ]
+    * </pre>
+    * @param m matriz com os dados de entrada
+    * @param f expressão lambda que atuará em cada elemento da matriz.
     */
    public void aplicarFuncao(Mat m, DoubleUnaryOperator f){
       if(this.tamanho() != m.tamanho()){

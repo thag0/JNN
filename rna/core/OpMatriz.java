@@ -173,10 +173,11 @@ public class OpMatriz{
 
       int i, j, k;
       double res;
-      for(i = 0; i < r.lin(); i++){
-         for(j = 0; j < r.col(); j++){
+      int lin = r.lin(), col = r.col(), acol = a.col();
+      for(i = 0; i < lin; i++){
+         for(j = 0; j < col; j++){
             res = 0;
-            for(k = 0; k < a.col(); k++){
+            for(k = 0; k < acol; k++){
                res += a.dado(i, k) * b.dado(k, j);
             }
             r.editar(i, j, res);    

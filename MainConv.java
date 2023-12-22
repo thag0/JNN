@@ -23,7 +23,7 @@ public class MainConv{
       double[][][][] entradas = new double[NUM_AMOSTRAS * NUM_DIGITOS][NUM_DIGITOS][][];
       double[][] saidas = new double[NUM_AMOSTRAS * NUM_DIGITOS][NUM_DIGITOS];
       entradas = carregarDadosMNIST(NUM_AMOSTRAS, NUM_DIGITOS);
-      System.out.println("Imagens carregadas.");
+      System.out.println("Imagens carregadas. (" + entradas.length + ")");
       saidas = carregarRotulosMNIST(NUM_AMOSTRAS, NUM_DIGITOS);
       System.out.println("Rótulos carregados.");
 
@@ -47,11 +47,11 @@ public class MainConv{
       System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
       testes.modelos.TesteModelos.exportarHistoricoPerda(modelo);
 
-      testarPorbabilidade(modelo, "0_teste_1");
-      testarPorbabilidade(modelo, "1_teste_1");
+      for(int i = 0; i < NUM_DIGITOS; i++){
+         testarPorbabilidade(modelo, (i + "_teste_1"));
+      }
 
       // salvarSequencial(modelo, "./modelo-convolucional.txt");
-
       Main.executarComando("python grafico.py");
    }
 
@@ -59,14 +59,14 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{3, 3}, 8, "leakyrelu"),
+         new Convolucional(formEntrada, new int[]{4, 4}, 5, "leakyrelu"),
          new Flatten(),
          new Densa(100, "leakyrelu"),
          new Densa(NUM_DIGITOS, "softmax"),
       });
 
       modelo.compilar(
-         new SGD(0.1),
+         new SGD(0.001, 0.99),
          new EntropiaCruzada(),
          new Xavier(),
          new Zeros()
