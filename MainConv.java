@@ -13,17 +13,17 @@ public class MainConv{
    static Ged ged = new Ged();
    static Geim geim = new Geim();
 
+   static final int NUM_DIGITOS = 2;
+   static final int NUM_AMOSTRAS = 10;
+
    public static void main(String[] args){
       ged.limparConsole();
-
-      int amostras = 5;
-      int digitos = 2;
       
-      double[][][][] entradas = new double[amostras*digitos][digitos][][];
-      double[][] saidas = new double[amostras*digitos][digitos];
-      entradas = carregarDadosMNIST(amostras, digitos);
+      double[][][][] entradas = new double[NUM_AMOSTRAS * NUM_DIGITOS][NUM_DIGITOS][][];
+      double[][] saidas = new double[NUM_AMOSTRAS * NUM_DIGITOS][NUM_DIGITOS];
+      entradas = carregarDadosMNIST(NUM_AMOSTRAS, NUM_DIGITOS);
       System.out.println("Imagens carregadas.");
-      saidas = carregarRotulosMNIST(amostras, digitos);
+      saidas = carregarRotulosMNIST(NUM_AMOSTRAS, NUM_DIGITOS);
       System.out.println("Rótulos carregados.");
 
       Sequencial modelo = criarModelo();
@@ -35,7 +35,7 @@ public class MainConv{
 
       System.out.println("Treinando.");
       t1 = System.nanoTime();
-      modelo.treinar(entradas, saidas, 300);
+      modelo.treinar(entradas, saidas, 40);
       t2 = System.nanoTime();
       
       long tempoDecorrido = t2 - t1;
@@ -46,13 +46,8 @@ public class MainConv{
       System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
       testes.modelos.TesteModelos.exportarHistoricoPerda(modelo);
 
-      //-------------------------------------
-      // for(int i = 0; i < 10; i++){
-      //    System.out.println("Real: " + i + ", Pred: " + testarImagem(cnn, entradas[i][0]));
-      // }
-
-      testarPorbabilidade(modelo, "0_teste");
-      testarPorbabilidade(modelo, "1_teste");
+      testarPorbabilidade(modelo, "0_teste_1");
+      testarPorbabilidade(modelo, "1_teste_1");
 
       Main.executarComando("python grafico.py");
    }
@@ -61,11 +56,10 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{5, 5}, 15, "tanh"),
-         new MaxPooling(new int[]{3, 3}),
+         new Convolucional(formEntrada, new int[]{3, 3}, 8, "leakyrelu"),
          new Flatten(),
-         new Densa(200, "tanh"),
-         new Densa(2, "softmax"),
+         new Densa(100, "leakyrelu"),
+         new Densa(NUM_DIGITOS, "softmax"),
       });
 
       modelo.compilar(
@@ -92,28 +86,10 @@ public class MainConv{
 
       for(int y = 0; y < imagem.length; y++){
          for(int x = 0; x < imagem[y].length; x++){
-            imagem[y][x] = (double)(cinza[y][x] / 255);
-            // imagem[y][x] = cinza[y][x];
+            imagem[y][x] = (double)cinza[y][x] / 255;
          }
       }
-
       return imagem;
-   }
-
-   public static int testarImagem(Sequencial modelo, double[][] entrada){
-      double[][][] e = new double[1][][];
-      e[0] = entrada;
-
-      modelo.calcularSaida(e);
-      double[] prev = modelo.saidaParaArray();
-
-      for(int i = 0; i < prev.length; i++){
-         if(prev[i] > 0.66){
-            return i;
-         }
-      }
-
-      return -1;
    }
 
    /**
@@ -122,7 +98,7 @@ public class MainConv{
     * @param imagemTeste nome da imagem que deve estar no diretório /minst/teste/
     */
    public static void testarPorbabilidade(Sequencial modelo, String imagemTeste){
-      System.out.println("\nTeste " + imagemTeste);
+      System.out.println("\nTestando: " + imagemTeste);
       double[][][] teste1 = new double[1][][];
       teste1[0] = imagemParaMatriz("/dados/mnist/teste/" + imagemTeste + ".jpg");
       modelo.calcularSaida(teste1);
@@ -132,14 +108,22 @@ public class MainConv{
       }
    }
 
+   /**
+    * 
+    * @param amostras quantidade de amostras por dígito
+    * @param digitos quantidade de dígitos, iniciando do dígito 0.
+    * @return
+    */
    public static double[][][][] carregarDadosMNIST(int amostras, int digitos){
       String caminho = "/dados/mnist/treino/";
-
       double[][][][] entradas = new double[digitos * amostras][1][][];
-      for(int i = 0; i < entradas.length; i++){
+
+      int id = 0;
+      for(int i = 0; i < digitos; i++){
          for(int j = 0; j < amostras; j++){
-            double[][] imagem = imagemParaMatriz(caminho + j + "/img_" + j + ".jpg");
-            entradas[i][0] = imagem;
+            String caminhoCompleto = caminho + i + "/img_" + j + ".jpg";
+            double[][] imagem = imagemParaMatriz(caminhoCompleto);
+            entradas[id++][0] = imagem;
          }
       }
 
@@ -156,6 +140,17 @@ public class MainConv{
       }
   
       return rotulos;
+   }
+
+   static void printImagemMNIST(double[][] sample){
+      for(int y = 0; y < sample.length; y++){
+         for(int x = 0; x < sample[y].length; x++){
+            double v = sample[y][x];
+            if(v < 0.5) System.out.print("    ");
+            else System.out.print((int)(v*100) + " ");
+         }
+         System.out.println();
+      }
    }
 
    static boolean compararMatrizes(Mat a, Mat b){
