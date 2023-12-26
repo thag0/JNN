@@ -2,6 +2,7 @@ package rna.serializacao;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
 
 import rna.estrutura.Convolucional;
 
@@ -27,7 +28,7 @@ class SerialConv{
     * @param camada camada convolucional que será serializada.
     * @param bw escritor de buffer usado para salvar os dados da camada.
     */
-   public void serializar(Convolucional camada, BufferedWriter bw){
+   public void serializar(Convolucional camada, BufferedWriter bw, String tipo){
       try{
          //nome da camada pra facilitar
          bw.write(camada.getClass().getSimpleName());
@@ -60,8 +61,7 @@ class SerialConv{
             for(int j = 0; j < camada.filtros[i].length; j++){
                for(int k = 0; k < camada.filtros[i][j].lin(); k++){
                   for(int l = 0; l < camada.filtros[i][j].col(); l++){
-                     double peso = camada.filtros[i][j].dado(k, l);
-                     bw.write(String.valueOf(peso));
+                     escreverDado(camada.filtros[i][j].dado(k, l), tipo, bw);
                      bw.newLine();
                   }
                }
@@ -72,8 +72,7 @@ class SerialConv{
             for(int i = 0; i < camada.bias.length; i++){
                for(int j = 0; j < camada.bias[i].lin(); j++){
                   for(int k = 0; k < camada.bias[i].col(); k++){
-                     double bias = camada.bias[i].dado(j, k);
-                     bw.write(String.valueOf(bias));
+                     escreverDado(camada.bias[i].dado(j, k), tipo, bw);
                      bw.newLine();
                   }
                }
@@ -81,6 +80,29 @@ class SerialConv{
          }
       }catch(Exception e){
          e.printStackTrace();
+      }
+   }
+
+   /**
+    * 
+    * @param valor
+    * @param tipo
+    * @param bw
+    * @throws IOException
+    */
+   private void escreverDado(double valor, String tipo, BufferedWriter bw) throws IOException{
+      tipo = tipo.toLowerCase();
+      switch(tipo){
+         case "float":
+            bw.write(String.valueOf((float) valor));
+         break;
+
+         case "double":
+            bw.write(String.valueOf(valor));
+         break;
+            
+         default:
+            throw new IllegalArgumentException("Tipo de dado (" + tipo + ") não suportado");
       }
    }
 

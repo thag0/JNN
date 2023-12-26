@@ -28,73 +28,28 @@ import rna.otimizadores.Otimizador;
  */
 public class Serializador{
 
+   /**
+    * Auxiliar na serialização de camadas densas.
+    */
    private SerialDensa auxDensa = new SerialDensa();
+   
+   /**
+    * Auxiliar na serialização de camadas convolucionais.
+    */
    private SerialConv auxConv = new SerialConv();
+
+   /**
+    * Auxiliar na serialização de camadas flatten.
+    */
    private SerialFlatten auxFlat = new SerialFlatten();
 
+   /**
+    * Serializador e desserializador de modelos.
+    */
    public Serializador(){}
 
-   /**
-    * Salva as informações mais essenciais sobre a Rede Neural incluindo arquitetura,
-    * funções de ativação de todas as camadas, bias configurado e o mais importante que
-    * são os pesos de cada neurônio da rede.
-    * <p>
-    *    <strong> Reforçando</strong>: as informações sobre o otimizador e todas suas 
-    *    configurações, treino, nome e outras pequenas coisas que não afetam diretamente 
-    *    o funcionamento da rede serão perdidas.
-    * </p>
-    * <p>
-    *    O arquivo deve ser salvo no formato {@code .txt}
-    * </p>
-    * O tipo de dado para salvar os pesos será o tipo padrão {@code Double}.
-    * @param rede instância de uma Rede Neural.
-    * @param caminho caminho onde o arquivo da rede será salvo.
-    */
    public void salvar(RedeNeural rede, String caminho){
-      salvar(rede, caminho, Double.TYPE);
-   }
-
-   /**
-    * Salva as informações mais essenciais sobre a Rede Neural incluindo arquitetura,
-    * funções de ativação de todas as camadas, bias configurado e o mais importante que
-    * são os pesos de cada neurônio da rede.
-    * <p>
-    *    <strong> Reforçando</strong>: as informações sobre o otimizador e todas suas 
-    *    configurações, treino, nome e outras pequenas coisas que não afetam diretamente 
-    *    o funcionamento da rede serão perdidas.
-    * </p>
-    * <p>
-    *    O arquivo deve ser salvo no formato {@code .txt}
-    * </p>
-    * @param rede instância de uma Rede Neural.
-    * @param caminho caminho onde o arquivo da rede será salvo.
-    * @param tipo tipo de valor que será usado para salvar os pesos da Rede Neural. O tipo 
-    * pode ser um objeto do tipo {@code String} contendo o nome (por exemplo "float") ou uma
-    * instância de objeto do tipo {@code Number}.
-    */
-   public void salvar(RedeNeural rede, String caminho, Object tipo){
-      if(tipo instanceof String){
-         String t = (String) tipo;
-         
-         if(t.toLowerCase().equals("double")){
-            salvar(rede, caminho, Double.TYPE);
-
-         }else if(t.toLowerCase().endsWith("float")){
-            salvar(rede, caminho, Float.TYPE);
-         
-         }else if(t.toLowerCase().endsWith("int") || t.toLowerCase().endsWith("integer")){
-            salvar(rede, caminho, Integer.TYPE);
-         
-         }else if(t.toLowerCase().endsWith("short")){
-            salvar(rede, caminho, Short.TYPE);
-         
-         }else if(t.toLowerCase().endsWith("byte")){
-            salvar(rede, caminho, Byte.TYPE);
-         }
-      
-      }else{
-         throw new IllegalArgumentException("Tipo \"" + tipo.getClass().getSimpleName() + "\" não suportado.");
-      }
+      salvar(rede, caminho, "double");
    }
 
    /**
@@ -113,7 +68,7 @@ public class Serializador{
     * @param caminho caminho onde o arquivo da rede será salvo.
     * @param tipo classe contendo tipo de valor que será usado para salvar os pesos da Rede Neural.
     */
-   public void salvar(RedeNeural rede, String caminho, Class<?> tipo){
+   public void salvar(RedeNeural rede, String caminho, String tipo){
       File arquivo = new File(caminho);
       if(!arquivo.getName().toLowerCase().endsWith(".txt")){
          throw new IllegalArgumentException("O caminho especificado não é um arquivo de texto válido.");
@@ -141,7 +96,7 @@ public class Serializador{
 
          //pesos dos neuronios
          for(Densa camada : rede.camadas()){
-            auxDensa.serializar(camada, writer);
+            auxDensa.serializar(camada, writer, tipo);
          }
 
       }catch(Exception e){
@@ -150,10 +105,36 @@ public class Serializador{
       }
    }
 
+   /**
+    * Salva um modelo Sequencial em um arquivo de texto no caminho especificado 
+    * serializando as informações mais importantes do modelo, incluindo o número de 
+    * camadas, otimizador usado, função de perda e os detalhes de cada camada no arquivo.
+    * <p>
+    *    Os valores salvos estarão no formato double.
+    * </p>
+    * @param modelo instância de um modelo sequencial.
+    * @param caminho caminho com nome e extensão do arquivo {@code .txt}.
+    * @throws IllegalArgumentException Se o caminho não termina com a extensão ".txt".
+    */
    public void salvar(Sequencial modelo, String caminho){
+      salvar(modelo, caminho, "double");
+   }
+
+   /**
+    * Salva um modelo Sequencial em um arquivo de texto no caminho especificado 
+    * serializando as informações mais importantes do modelo, incluindo o número de 
+    * camadas, otimizador usado, função de perda e os detalhes de cada camada no arquivo.
+    * @param modelo instância de um modelo sequencial.
+    * @param caminho caminho com nome e extensão do arquivo (.txt).
+    * @param tipo tipo de valor usado na serialização, exemplo: float ou double.
+    * @throws IllegalArgumentException Se o caminho não termina com a extensão ".txt".
+    */
+   public void salvar(Sequencial modelo, String caminho, String tipo){
       File arquivo = new File(caminho);
       if(!arquivo.getName().toLowerCase().endsWith(".txt")){
-         throw new IllegalArgumentException("O caminho especificado não é um arquivo de texto válido.");
+         throw new IllegalArgumentException(
+            "O caminho especificado não é um arquivo de texto válido."
+         );
       }
 
       try(BufferedWriter bw = new BufferedWriter(new FileWriter(arquivo))){
@@ -165,21 +146,21 @@ public class Serializador{
          bw.write(modelo.otimizador().getClass().getSimpleName());
          bw.newLine();
 
-         //
+         //função de perda
          bw.write(modelo.perda().getClass().getSimpleName());
          bw.newLine();
 
          for(Camada camada : modelo.camadas()){
             if(camada instanceof Densa){
-               auxDensa.serializar((Densa) camada, bw);
+               auxDensa.serializar((Densa) camada, bw, tipo);
 
             }else if(camada instanceof Convolucional){
-               auxConv.serializar((Convolucional) camada, bw);
+               auxConv.serializar((Convolucional) camada, bw, tipo);
             
             }else if(camada instanceof Flatten){
                auxFlat.serializar((Flatten) camada, bw);
-            }
-            else{
+            
+            }else{
                throw new IllegalArgumentException(
                   "Tipo de camada \"" + camada.getClass().getTypeName() + "\" não suportado."
                );

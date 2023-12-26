@@ -2,6 +2,7 @@ package rna.serializacao;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
 
 import rna.estrutura.Densa;
 
@@ -22,7 +23,7 @@ class SerialDensa{
     * @param camada camada densa que será serializada.
     * @param bw escritor de buffer usado para salvar os dados da camada.
     */
-   public void serializar(Densa camada, BufferedWriter bw){
+   public void serializar(Densa camada, BufferedWriter bw, String tipo){
       try{
          //nome da camada pra facilitar
          bw.write(camada.getClass().getSimpleName());
@@ -52,8 +53,7 @@ class SerialDensa{
          
          for(int i = 0; i < camada.pesos.lin(); i++){
             for(int j = 0; j < camada.pesos.col(); j++){
-               double peso = camada.pesos.dado(i, j);
-               bw.write(String.valueOf(peso));
+               escreverDado(camada.pesos.dado(i, j), tipo, bw);
                bw.newLine();
             }
          }
@@ -61,14 +61,36 @@ class SerialDensa{
          if(camada.temBias()){
             for(int i = 0; i < camada.bias.lin(); i++){
                for(int j = 0; j < camada.bias.col(); j++){
-                  double bias = camada.bias.dado(i, j);
-                  bw.write(String.valueOf(bias));
+                  escreverDado(camada.bias.dado(i, j), tipo, bw);
                   bw.newLine();
                }
             }
          }
       }catch(Exception e){
          e.printStackTrace();
+      }
+   }
+
+   /**
+    * 
+    * @param valor
+    * @param tipo
+    * @param bw
+    * @throws IOException
+    */
+    private void escreverDado(double valor, String tipo, BufferedWriter bw) throws IOException{
+      tipo = tipo.toLowerCase();
+      switch(tipo){
+         case "float":
+            bw.write(String.valueOf((float) valor));
+         break;
+
+         case "double":
+            bw.write(String.valueOf(valor));
+         break;
+            
+         default:
+            throw new IllegalArgumentException("Tipo de dado (" + tipo + ") não suportado");
       }
    }
 
