@@ -84,7 +84,7 @@ public class Main{
    }
 
    static Modelo criarSequencial(int entradas, int saidas){
-      Otimizador otm = new SGD(0.0001, 0.999);
+      Otimizador otm = new SGD(0.01, 0.9);
       // Otimizador otm = new AdaGrad(1);
       Perda perda = new ErroMedioQuadrado();
       Inicializador ini = new Xavier();

@@ -156,6 +156,18 @@ public class Mat{
    }
 
    /**
+    * Verifica a compatibilidade de dimensões entre a instância local e a matriz fornecida.
+    * @param m matriz que será usada.
+    */
+   private void verificarDimensoes(Mat m){
+      if(this.lin != m.lin || this.col != m.col){
+         throw new IllegalArgumentException(
+            "Dimensões incompatíveis."
+         );   
+      }
+   }
+
+   /**
     * Retorna o índice correspondente dentro do array de 
     * elementos da matriz.
     * @param lin índice da linha.
@@ -390,6 +402,8 @@ public class Mat{
          );
       }
 
+      verificarDimensoes(m);
+
       for(int i = 0; i < this.dados.length; i++){
          this.dados[i] = f.applyAsDouble(m.dados[i]);
       }
@@ -423,6 +437,8 @@ public class Mat{
          );
       }
 
+      verificarDimensoes(m);
+
       for(int i = 0; i < this.dados.length; i++){
          this.dados[i] += m.dados[i];
       }
@@ -455,6 +471,9 @@ public class Mat{
             "A matriz fornecida deve conter o mesmo número de elementos."
          );
       }
+
+      verificarDimensoes(m);
+
       for(int i = 0; i < this.dados.length; i++){
          this.dados[i] -= m.dados[i];
       }
@@ -487,6 +506,9 @@ public class Mat{
             "A matriz fornecida deve conter o mesmo número de elementos."
          );
       }
+      
+      verificarDimensoes(m);
+
       for(int i = 0; i < this.dados.length; i++){
          this.dados[i] *= m.dados[i];
       }
