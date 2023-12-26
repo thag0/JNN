@@ -36,7 +36,7 @@ public class MainConv{
 
       System.out.println("Treinando.");
       t1 = System.nanoTime();
-      modelo.treinar(entradas, saidas, 40);
+      modelo.treinar(entradas, saidas, 50);
       t2 = System.nanoTime();
       
       long tempoDecorrido = t2 - t1;
@@ -50,6 +50,7 @@ public class MainConv{
 
       for(int i = 0; i < NUM_DIGITOS; i++){
          testarPorbabilidade(modelo, (i + "_teste_1"));
+         testarPorbabilidade(modelo, (i + "_teste_2"));
       }
 
       // salvarSequencial(modelo, "./modelo-convolucional.txt");
@@ -60,16 +61,16 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{4, 4}, 2, "leakyrelu"),
+         new Convolucional(formEntrada, new int[]{4, 4}, 5, "leakyrelu"),
          new Flatten(),
-         new Densa(30, "leakyrelu"),
+         new Densa(150, "leakyrelu"),
          new Densa(NUM_DIGITOS, "softmax"),
       });
 
       modelo.compilar(
          new SGD(0.001, 0.99),
          new EntropiaCruzada(),
-         new Xavier(),
+         new LeCun(),
          new Zeros()
       );
       modelo.configurarHistorico(true);

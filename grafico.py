@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-import numpy as np
 
 if __name__ == '__main__':
    caminho = './historico-perda.csv'
@@ -15,4 +14,5 @@ if __name__ == '__main__':
    plt.title(f'Perda por época (min = {min_y:.8f})')
    plt.xlabel('Épocas')
    plt.ylabel('Perda')
+   plt.ylim(bottom=0)
    plt.show()
