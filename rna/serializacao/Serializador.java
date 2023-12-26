@@ -11,6 +11,7 @@ import rna.estrutura.Camada;
 import rna.estrutura.Convolucional;
 import rna.estrutura.Densa;
 import rna.estrutura.Flatten;
+import rna.estrutura.MaxPooling;
 import rna.modelos.RedeNeural;
 import rna.modelos.Sequencial;
 import rna.otimizadores.Otimizador;
@@ -42,6 +43,11 @@ public class Serializador{
     * Auxiliar na serialização de camadas flatten.
     */
    private SerialFlatten auxFlat = new SerialFlatten();
+
+   /**
+    * Auxiliar na serialização de camadas max pooling.
+    */
+   private SerialMaxPool auxMaxPool = new SerialMaxPool();
 
    /**
     * Serializador e desserializador de modelos.
@@ -160,6 +166,9 @@ public class Serializador{
             }else if(camada instanceof Flatten){
                auxFlat.serializar((Flatten) camada, bw);
             
+            }else if(camada instanceof MaxPooling){
+               auxMaxPool.serializar((MaxPooling) camada, bw);
+
             }else{
                throw new IllegalArgumentException(
                   "Tipo de camada \"" + camada.getClass().getTypeName() + "\" não suportado."
@@ -276,6 +285,15 @@ public class Serializador{
             }else if(nome.equalsIgnoreCase("flatten")){
                Flatten flat = auxFlat.lerConfig(br);
                modelo.add(flat);
+            
+            }else if(nome.equalsIgnoreCase("maxpooling")){
+               MaxPooling maxPooling = auxMaxPool.lerConfig(br);
+               modelo.add(maxPooling);
+            
+            }else{
+               throw new IllegalArgumentException(
+                  "Tipo de camada \""+ nome +"\" não suportado."
+               );
             }
          }
 

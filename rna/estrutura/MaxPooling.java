@@ -1,9 +1,15 @@
 package rna.estrutura;
 
 import rna.core.Mat;
+import rna.core.Utils;
 import rna.inicializadores.Inicializador;
 
 public class MaxPooling extends Camada{
+
+   /**
+    * Utilitario.
+    */
+   Utils utils = new Utils();
 
    private int[] formEntrada;
    private int[] formSaida;
@@ -101,14 +107,21 @@ public class MaxPooling extends Camada{
    public void calcularSaida(Object entrada){
       if(entrada instanceof Mat[]){
          Mat[] e = (Mat[]) entrada;
-
-         for(int i = 0; i < this.entrada.length; i++){
-            this.entrada[i].copiar(e[i]);
-         }
-
+         utils.copiar(e, this.entrada);
          for(int i = 0; i < this.entrada.length; i++){
             aplicarMaxPooling(this.entrada[i], this.saida[i]);
          }
+         
+      }else if(entrada instanceof double[]){
+         utils.copiar((double[]) entrada, this.entrada);
+         for(int i = 0; i < this.entrada.length; i++){
+            aplicarMaxPooling(this.entrada[i], this.saida[i]);
+         }
+
+      }else{
+         throw new IllegalArgumentException(
+            "Tipo de entrada \"" + entrada.getClass().getTypeName() + "\" não suportada."
+         );
       }
    }
 
@@ -199,6 +212,14 @@ public class MaxPooling extends Camada{
    @Override
    public int tamanhoSaida(){
       return this.saida.length * this.saida[0].lin() * this.saida[0].col();
+   }
+
+   public int[] formatoFiltro(){
+      return this.formFiltro;
+   }
+
+   public int[] formatoStride(){
+      return new int[]{strideLargura, strideAltura};
    }
 
    @Override

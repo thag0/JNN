@@ -914,14 +914,14 @@ public class Convolucional extends Camada implements Cloneable{
       };
    }
  
-    /**
-     * Calcula o formato de saída da camada Convolucional, que é disposto da
-     * seguinte forma:
-     * <pre>
-     *    formato = (altura, largura, profundidade)
-     * </pre>
-     * @return formato de saída da camada.
-     */
+   /**
+    * Calcula o formato de saída da camada Convolucional, que é disposto da
+    * seguinte forma:
+    * <pre>
+    *    formato = (altura, largura, profundidade)
+    * </pre>
+    * @return formato de saída da camada.
+    */
    @Override
    public int[] formatoSaida(){
       verificarConstrucao();
@@ -930,6 +930,17 @@ public class Convolucional extends Camada implements Cloneable{
          this.altSaida,
          this.largSaida,
          this.numFiltros
+      };
+   }
+
+   /**
+    * Retorna o formato dos filtros contidos na camada.
+    * @return formato de cada filtro (altura, largura).
+    */
+   public int[] formatoFiltro(){
+      return new int[]{
+         this.altFiltro,
+         this.largFiltro
       };
    }
 

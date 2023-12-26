@@ -48,6 +48,13 @@ class SerialConv{
          }
          bw.newLine();
          
+         //formato dos filtros
+         int[] filtros = camada.formatoFiltro();
+         for(int i = 0; i < filtros.length; i++){
+            bw.write(filtros[i] + " ");
+         }
+         bw.newLine();
+         
          //função de ativação
          bw.write(String.valueOf(camada.obterAtivacao().getClass().getSimpleName()));
          bw.newLine();
@@ -127,6 +134,13 @@ class SerialConv{
          for(int i = 0; i < sSaida.length; i++){
             saida[i] = Integer.parseInt(sSaida[i]);
          }
+
+         //formato dos filtros
+         String[] sFiltros = br.readLine().split(" ");
+         int[] formFiltro = new int[sFiltros.length];
+         for(int i = 0; i < sFiltros.length; i++){
+            formFiltro[i] = Integer.parseInt(sFiltros[i]);
+         }
          
          //função de ativação
          String ativacao = br.readLine();
@@ -134,13 +148,14 @@ class SerialConv{
          //bias
          boolean bias = Boolean.valueOf(br.readLine());
          
-         //inicialização da camada
-         int[] formFiltro = {saida[0], saida[1]};
+
          int numFiltros = saida[2];
 
-         Convolucional camada = new Convolucional(formFiltro, numFiltros, ativacao);
+         Convolucional camada = new Convolucional(formFiltro, numFiltros);
+         camada.configurarAtivacao(ativacao);
          camada.configurarBias(bias);
          camada.construir(entrada);
+
          return camada;
       }catch(Exception e){
          throw new RuntimeException(e);

@@ -15,7 +15,7 @@ public class MainConv{
    static Geim geim = new Geim();
 
    static final int NUM_DIGITOS = 2;
-   static final int NUM_AMOSTRAS = 10;
+   static final int NUM_AMOSTRAS = 20;
 
    public static void main(String[] args){
       ged.limparConsole();
@@ -30,7 +30,7 @@ public class MainConv{
       Sequencial modelo = criarModelo();
       System.out.println(modelo.info());
 
-      //treinar e marcar tempo
+      // treinar e marcar tempo
       long t1, t2;
       long horas, minutos, segundos;
 
@@ -61,9 +61,10 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{4, 4}, 5, "leakyrelu"),
+         new Convolucional(formEntrada, new int[]{3, 3}, 15, "leakyrelu"),
+         new MaxPooling(new int[]{3, 3}),
          new Flatten(),
-         new Densa(150, "leakyrelu"),
+         new Densa(100, "leakyrelu"),
          new Densa(NUM_DIGITOS, "softmax"),
       });
 
@@ -170,6 +171,6 @@ public class MainConv{
    static void salvarSequencial(Sequencial modelo, String caminho){
       System.out.println("Salvando modelo.");
       Serializador s = new Serializador();
-      s.salvar(modelo, caminho, "float");
+      s.salvar(modelo, caminho);
    }
 }
