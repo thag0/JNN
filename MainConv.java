@@ -53,7 +53,7 @@ public class MainConv{
          testarPorbabilidade(modelo, (i + "_teste_2"));
       }
 
-      // salvarSequencial(modelo, "./modelo-convolucional.txt");
+      salvarSequencial(modelo, "./modelo-convolucional.txt");
       Main.executarComando("python grafico.py");
    }
 
@@ -61,10 +61,10 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{3, 3}, 15, "leakyrelu"),
+         new Convolucional(formEntrada, new int[]{3, 3}, 16, "leakyrelu"),
          new MaxPooling(new int[]{3, 3}),
          new Flatten(),
-         new Densa(100, "leakyrelu"),
+         new Densa(120, "leakyrelu"),
          new Densa(NUM_DIGITOS, "softmax"),
       });
 
@@ -171,6 +171,6 @@ public class MainConv{
    static void salvarSequencial(Sequencial modelo, String caminho){
       System.out.println("Salvando modelo.");
       Serializador s = new Serializador();
-      s.salvar(modelo, caminho);
+      s.salvar(modelo, caminho, "float");
    }
 }

@@ -107,7 +107,7 @@ public class Dicionario{
       switch(nome){
          case "erromedioquadrado"      : return new ErroMedioQuadrado();
          case "erromedioabsoluto"      : return new ErroMedioAbsoluto();
-         case "erromediologaritmico"   : return new ErroMedioQuadradoLogaritmico();
+         case "erromedioquadradologaritmico"   : return new ErroMedioQuadradoLogaritmico();
          case "entropiacruzada"        : return new EntropiaCruzada();
          case "entropiacruzadabinaria" : return new EntropiaCruzadaBinaria();
 
