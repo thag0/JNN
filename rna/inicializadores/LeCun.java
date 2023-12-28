@@ -15,7 +15,8 @@ public class LeCun extends Inicializador{
 
       for(int i = 0; i < m.lin(); i++){
          for(int j = 0; j < m.col(); j++){
-            m.editar(i, j, super.random.nextDouble(-a, a));
+            // m.editar(i, j, super.random.nextDouble(-a, a));
+            m.editar(i, j, (a * super.random.nextGaussian()));
          }
       }
    }

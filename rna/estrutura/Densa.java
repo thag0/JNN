@@ -358,6 +358,11 @@ public class Densa extends Camada implements Cloneable{
    }
 
    @Override
+   public void inicializar(Inicializador iniKernel, double x){
+      this.inicializar(iniKernel, null, x);
+   }
+
+   @Override
    public void inicializar(Inicializador iniKernel, Inicializador iniBias, double x){
       //inicialização do kernel e bias
       if(iniKernel == null){
@@ -382,11 +387,6 @@ public class Densa extends Camada implements Cloneable{
             "Camada Densa (" + this.id + ") não foi construída."
          );
       }
-   }
-
-   @Override
-   public void inicializar(Inicializador iniKernel, double x){
-      this.inicializar(iniKernel, null, x);
    }
 
    @Override
@@ -430,8 +430,8 @@ public class Densa extends Camada implements Cloneable{
     * </pre>
     * Após a propagação dos dados, a função de ativação da camada é aplicada
     * ao resultado do somatório e o resultado é salvo da saída da camada.
-    * @param entrada dados de entrada que serão processados, deve ser um array do
-    * tipo {@code double[]}.
+    * @param entrada dados de entrada que serão processados, objetos aceitos incluem:
+    * {@code Mat[]}, {@code Mat} ou {@code double[]}.
     * @throws IllegalArgumentException caso a entrada fornecida não seja suportada 
     * pela camada.
     * @throws IllegalArgumentException caso o tamanho dos dados de entrada seja diferente
@@ -450,6 +450,9 @@ public class Densa extends Camada implements Cloneable{
          }
          this.entrada.copiar(0, en[0].linha(0));
       
+      }else if(entrada instanceof Mat){
+         this.entrada.copiar((Mat) entrada);
+
       }else if(entrada instanceof double[]){
          double[] en = (double[]) entrada;
          if(en.length != this.tamanhoEntrada()){
@@ -463,7 +466,7 @@ public class Densa extends Camada implements Cloneable{
 
       }else{
          throw new IllegalArgumentException(
-            "Os dados de entrada para a camada Densa devem ser do tipo \"double[]\" ou \"Mat[]\" com profundidade 1, " +
+            "Os dados de entrada para a camada Densa devem ser do tipo \"Mat[]\" ou \"Mat\" ou \"double[]\", " +
             "objeto recebido é do tipo \"" + entrada.getClass().getTypeName() + "\""
          );
       }
@@ -537,6 +540,11 @@ public class Densa extends Camada implements Cloneable{
       this.opmat.mult(
          this.derivada, this.pesos.transpor(), this.gradEntrada
       );
+   }
+
+   @Override
+   public Mat saida(){
+      return this.saida;
    }
 
    /**
@@ -636,18 +644,6 @@ public class Densa extends Camada implements Cloneable{
    @Override
    public double[] saidaParaArray(){
       return this.saida.paraArray();
-   }
-
-   /**
-    * Retorna a matriz contendo as saídas da camada.
-    * <p>
-    *    A saída da camada é uma matriz com uma única linha contendo
-    *    os seus resultados de saída.
-    * </p>
-    * @return matriz de saída da camada.
-    */
-   public Mat saidaParaMat(){
-      return this.saida;
    }
 
    /**

@@ -56,14 +56,14 @@ public class Main{
       minutos = (segundosTotais % 3600) / 60;
       segundos = segundosTotais % 60;
 
-      double precisao = (1 - modelo.avaliador.erroMedioAbsoluto(in, out))*100;
+      double precisao = (1 - modelo.avaliador.erroMedioQuadrado(in, out))*100;
       double perda = modelo.avaliador.erroMedioQuadrado(in, out);
       System.out.println("Precisão = " + formatarDecimal(precisao, 2) + "%");
       System.out.println("Perda = " + perda);
       System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
 
       if(calcularHistorico){
-         exportarHistoricoPerda(modelo, ged);
+         exportarHistoricoPerda(modelo);
          executarComando("python grafico.py");
       }
    }
@@ -149,7 +149,7 @@ public class Main{
     * @param rede rede neural.
     * @param ged gerenciador de dados.
     */
-   static void exportarHistoricoPerda(Modelo rede, Ged ged){
+   static void exportarHistoricoPerda(Modelo rede){
       System.out.println("Exportando histórico de perda");
       double[] perdas = rede.historico();
       double[][] dadosPerdas = new double[perdas.length][1];

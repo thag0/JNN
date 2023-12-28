@@ -806,6 +806,11 @@ public class Convolucional extends Camada implements Cloneable{
    }
 
    @Override
+   public Mat[] saida(){
+      return this.saida;
+   }
+
+   @Override
    public boolean temBias(){
       return this.usarBias;
    }
@@ -822,25 +827,10 @@ public class Convolucional extends Camada implements Cloneable{
       return parametros;
    }
 
-   /**
-    * Retorna o array de saídas da camada.
-    * @return array de matrizes contendo as saídas da camada.
-    */
-   public Mat[] saidaParaMat(){
-      return this.saida;
-   }
-
    @Override
    public double[] saidaParaArray(){
       int id = 0;
       double[] saida = new double[this.tamanhoSaida()];
-
-      // for(int i = 0; i < this.saida.length; i++){
-      //    double[] s = this.saida[i].paraArray();
-      //    for(int j = 0; j < s.length; j++){
-      //       saida[id++] = s[j];
-      //    }
-      // }
 
       for(int i = 0; i < this.saida.length; i++){
          double[] s = this.saida[i].paraArray();

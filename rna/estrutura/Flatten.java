@@ -185,16 +185,30 @@ public class Flatten extends Camada{
    public void calcularSaida(Object entrada){
       verificarConstrucao();
 
-      if(entrada instanceof double[] == false){
+      if(entrada instanceof Mat[]){
+         Mat[] e = (Mat[]) entrada;
+
+         for(int i = 0; i < this.entrada.length; i++){
+            this.entrada[i].copiar(e[i]);
+         }
+      
+      }else if(entrada instanceof double[]){
+         double[] e = (double[]) entrada;
+         utils.copiar(e, this.entrada);
+      
+      }else{
          throw new IllegalArgumentException(
-            "Os dados de entrada para a camada Flatten devem ser do tipo \"double[]\", " +
+            "Os dados de entrada para a camada Flatten devem ser do tipo \"Mat[]\" ou \"double[]\", " +
             "objeto recebido é do tipo \"" + entrada.getClass().getTypeName() + "\""
          );
       }
-      double[] e = (double[]) entrada;
-      utils.copiar(e, this.entrada);
 
-      System.arraycopy(e, 0, this.saida, 0, this.saida.length);
+      int id = 0;
+      for(int i = 0; i < this.entrada.length; i++){
+         double[] arr = this.entrada[i].paraArray();
+         System.arraycopy(arr, 0, this.saida, id, arr.length);
+         id += arr.length;
+      }
    }
 
    @Override
@@ -222,6 +236,11 @@ public class Flatten extends Camada{
    private void calcularGrad(Mat grad){
       double[] g = grad.paraArray();
       calcularGrad(g);
+   }
+
+   @Override
+   public double[] saida(){
+      return this.saida;
    }
 
    @Override

@@ -64,7 +64,7 @@ public class MainConv{
          new Convolucional(formEntrada, new int[]{3, 3}, 16, "leakyrelu"),
          new MaxPooling(new int[]{3, 3}),
          new Flatten(),
-         new Densa(120, "leakyrelu"),
+         new Densa(130, "leakyrelu"),
          new Densa(NUM_DIGITOS, "softmax"),
       });
 

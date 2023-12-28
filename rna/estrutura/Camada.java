@@ -184,6 +184,16 @@ public class Camada{
    }
 
    /**
+    * Retorna a saída da camada.
+    * @return saída da camada.
+    */
+   public Object saida(){
+      throw new IllegalArgumentException(
+         "Implementar retorno de saída da camada " + this.getClass().getTypeName() + "."
+      );
+   }
+
+   /**
     * Retorna a função de ativação configurada pela camada.
     * @return função de ativação da camada.
     */

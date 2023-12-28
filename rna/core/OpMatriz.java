@@ -439,7 +439,7 @@ public class OpMatriz{
     * @param b filtro ou kernel aplicado na matriz de entrada.
     * @param r resultado da correlação cruzada.
     * @param add verificador para o resultado, se {@code verdadeiro} a matriz de resultados
-    * não será zerada antes da operação, se {@code verdadeiro} a matriz de resultados será
+    * não será zerada antes da operação, se {@code falso} a matriz de resultados será
     * zerada antes da operação.
     */
    public void correlacaoCruzada(Mat a, Mat b, Mat r, boolean add){
@@ -493,7 +493,7 @@ public class OpMatriz{
     * @param b filtro ou kernel aplicado na matriz de entrada.
     * @param r resultado da correlação cruzada.
     * @param add verificador para o resultado, se {@code verdadeiro} a matriz de resultados
-    * não será zerada antes da operação, se {@code verdadeiro} a matriz de resultados será
+    * não será zerada antes da operação, se {@code falso} a matriz de resultados será
     * zerada antes da operação.
     */
    public void correlacaoCruzadaFull(Mat a, Mat b, Mat r, boolean add){
@@ -548,7 +548,7 @@ public class OpMatriz{
     * @param b filtro ou kernel aplicado na matriz de entrada.
     * @param r resultado da convolução.
     * @param add verificador para o resultado, se {@code verdadeiro} a matriz de resultados
-    * não será zerada antes da operação, se {@code verdadeiro} a matriz de resultados será
+    * não será zerada antes da operação, se {@code falso} a matriz de resultados será
     * zerada antes da operação.
     */
    public void convolucao(Mat a, Mat b, Mat r, boolean add){
@@ -599,7 +599,7 @@ public class OpMatriz{
     * @param b filtro ou kernel aplicado na matriz de entrada.
     * @param r resultado da convolução.
     * @param add verificador para o resultado, se {@code verdadeiro} a matriz de resultados
-    * não será zerada antes da operação, se {@code verdadeiro} a matriz de resultados será
+    * não será zerada antes da operação, se {@code falso} a matriz de resultados será
     * zerada antes da operação.
     */
    public void convolucaoFull(Mat a, Mat b, Mat r, boolean add){

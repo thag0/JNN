@@ -228,6 +228,11 @@ public class MaxPooling extends Camada{
    }
 
    @Override
+   public Mat[] saida(){
+      return this.saida;
+   }
+
+   @Override
    public double[] saidaParaArray(){
       int id = 0;
       double[] saida = new double[this.tamanhoSaida()];
