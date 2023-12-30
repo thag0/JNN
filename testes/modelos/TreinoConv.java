@@ -1,47 +1,48 @@
 package testes.modelos;
 
+import java.awt.image.BufferedImage;
+
 import ged.Ged;
-import rna.core.Mat;
+import geim.Geim;
 import rna.core.OpMatriz;
-import rna.estrutura.*;
+import rna.modelos.Sequencial;
+import rna.serializacao.Serializador;
 
 public class TreinoConv{
    static Ged ged = new Ged();
+   static Geim geim = new Geim();
    static OpMatriz opmat = new OpMatriz();
+   static Serializador serializador = new Serializador();
+   
    public static void main(String[] args){
       ged.limparConsole();
       
-      double[][] e1 = {
-         {1, 6, 2},
-         {5, 3, 1},
-         {7, 0, 4},
-      };
-      
-      double[][] f1 = {
-         { 1, 2},
-         {-1, 0}
-      };
+      Sequencial modelo = serializador.lerSequencial("./modelo-convolucional.txt");
+      testarPorbabilidade(modelo, "1_teste_3");
+   }
 
-      double[][] g1 = {
-         {2, 3},
-         {4, 5},
-      };
+   static void testarPorbabilidade(Sequencial modelo, String imagemTeste){
+      System.out.println("\nTestando: " + imagemTeste);
+      double[][][] teste1 = new double[1][][];
+      teste1[0] = imagemParaMatriz("/dados/mnist/teste/" + imagemTeste + ".jpg");
+      modelo.calcularSaida(teste1);
+      double[] previsao = modelo.saidaParaArray();
+      for(int i = 0; i < previsao.length; i++){
+         System.out.println("Prob: " + i + ": " + (int)(previsao[i]*100) + "%");
+      }
+   }
 
-      double[][][] entrada = new double[1][][];
-      entrada[0] = e1;
+   static double[][] imagemParaMatriz(String caminho){
+      BufferedImage img = geim.lerImagem(caminho);
+      double[][] imagem = new double[img.getHeight()][img.getWidth()];
 
-      Convolucional camada = new Convolucional(new int[]{2, 2}, 1, "linear");
-      camada.construir(new int[]{3, 3, 1});
-      camada.filtros[0][0] = new Mat(f1);
-      camada.bias[0] = new Mat(new double[][]{
-         {1, 2},
-         {3, 4}
-      });
+      int[][] cinza = geim.obterCinza(img);
 
-      camada.calcularSaida(entrada);
-      camada.calcularGradiente(new Mat[]{new Mat(g1)});
-
-      //valores de saída e gradientes da camada convolucional estão corretos
-      //parâmetros dos inicializadores corretos
+      for(int y = 0; y < imagem.length; y++){
+         for(int x = 0; x < imagem[y].length; x++){
+            imagem[y][x] = (double)cinza[y][x] / 255;
+         }
+      }
+      return imagem;
    }
 }

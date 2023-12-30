@@ -259,7 +259,7 @@ public class Sequencial extends Modelo implements Cloneable{
    }
 
    /**
-    * Auxiliar na verificação da compilaçã do modelo.
+    * Auxiliar na verificação da compilação do modelo.
     */
    private void verificarCompilacao(){
       if(this.compilado == false){

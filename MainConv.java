@@ -14,7 +14,7 @@ public class MainConv{
    static Ged ged = new Ged();
    static Geim geim = new Geim();
 
-   static final int NUM_DIGITOS = 2;
+   static final int NUM_DIGITOS = 3;
    static final int NUM_AMOSTRAS = 20;
 
    public static void main(String[] args){
@@ -36,7 +36,7 @@ public class MainConv{
 
       System.out.println("Treinando.");
       t1 = System.nanoTime();
-      modelo.treinar(entradas, saidas, 50);
+      modelo.treinar(entradas, saidas, 60);
       t2 = System.nanoTime();
       
       long tempoDecorrido = t2 - t1;
@@ -50,7 +50,6 @@ public class MainConv{
 
       for(int i = 0; i < NUM_DIGITOS; i++){
          testarPorbabilidade(modelo, (i + "_teste_1"));
-         testarPorbabilidade(modelo, (i + "_teste_2"));
       }
 
       salvarSequencial(modelo, "./modelo-convolucional.txt");
@@ -61,10 +60,11 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{3, 3}, 16, "leakyrelu"),
-         new MaxPooling(new int[]{3, 3}),
+         new Convolucional(formEntrada, new int[]{4, 4}, 26, "leakyrelu"),
+         new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(130, "leakyrelu"),
+         new Densa(160, "leakyrelu"),
+         new Densa(140, "leakyrelu"),
          new Densa(NUM_DIGITOS, "softmax"),
       });
 

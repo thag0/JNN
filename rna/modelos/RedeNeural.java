@@ -626,7 +626,7 @@ public class RedeNeural extends Modelo implements Cloneable{
 
       this.camadas[0].calcularSaida(e);
       for(int i = 1; i < this.camadas.length; i++){
-         this.camadas[i].calcularSaida(this.camadas[i-1].saidaParaArray());
+         this.camadas[i].calcularSaida(this.camadas[i-1].saida());
       }
    }
 
@@ -1062,7 +1062,6 @@ public class RedeNeural extends Modelo implements Cloneable{
       buffer += espacamento + "Perda: " + this.perda.getClass().getSimpleName() + "\n\n";
 
       //otimizador
-      buffer += espacamento + "Otimizador: " + this.otimizador.getClass().getSimpleName() + "\n";
       buffer += this.otimizador.info();
 
       //bias

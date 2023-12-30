@@ -17,12 +17,12 @@ public class Sigmoid extends Ativacao{
       //forma manual pra aproveitar os valores pre calculados
       double grads[] = camada.gradSaida.paraArray();
       double deriv[] = camada.saida.paraArray();
-      int colunas = camada.saida.col();
 
-      for(int i = 0; i < colunas; i++){
+      for(int i = 0; i < camada.saida.col(); i++){
          deriv[i] = deriv[i] * (1 - deriv[i]);
          deriv[i] *= grads[i];
       }
+      
       camada.derivada.copiar(0, deriv);
    }
 
