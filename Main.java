@@ -2,8 +2,8 @@ import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
 
-import ged.*;
-import geim.Geim;
+import lib.ged.*;
+import lib.geim.Geim;
 import render.JanelaTreino;
 import rna.avaliacao.perda.*;
 import rna.estrutura.*;

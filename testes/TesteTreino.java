@@ -1,6 +1,6 @@
 package testes;
 
-import ged.Ged;
+import lib.ged.Ged;
 import rna.avaliacao.perda.ErroMedioQuadrado;
 import rna.inicializadores.Xavier;
 import rna.estrutura.*;

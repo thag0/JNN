@@ -1,6 +1,6 @@
 package testes.modelos;
 
-import ged.Ged;
+import lib.ged.Ged;
 import rna.ativacoes.Sigmoid;
 import rna.estrutura.Densa;
 import rna.inicializadores.Xavier;

@@ -1,7 +1,7 @@
 package testes;
 
-import ged.Dados;
-import ged.Ged;
+import lib.ged.Dados;
+import lib.ged.Ged;
 import rna.avaliacao.perda.EntropiaCruzada;
 import rna.core.Mat;
 import rna.core.OpMatriz;

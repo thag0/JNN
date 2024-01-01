@@ -2,9 +2,9 @@ package testes.modelos;
 
 import java.awt.image.BufferedImage;
 
-import ged.Dados;
-import ged.Ged;
-import geim.Geim;
+import lib.ged.Dados;
+import lib.ged.Ged;
+import lib.geim.Geim;
 import rna.avaliacao.perda.*;
 import rna.estrutura.*;
 import rna.inicializadores.*;

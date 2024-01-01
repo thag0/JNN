@@ -2,6 +2,16 @@ package rna.core;
 
 public class OpArray{
 
+   /**
+    * Interface para execução de operação utilizando arrays.
+    */
+   public OpArray(){}
+
+   /**
+    * Preenche todo o conteúdo do array com o valor fornecido.
+    * @param arr array.
+    * @param val valor desejado.
+    */
    public void preencher(double[] arr, double val){
       for(int i = 0; i < arr.length; i++){
          arr[i] = val;
@@ -9,10 +19,14 @@ public class OpArray{
    }
 
    /**
-    * 
-    * @param a
-    * @param b
-    * @param r
+    * Adiciona o conteúdo resultante da soma entre A e B no array R de acordo
+    * com a expressão:
+    * <pre>
+    * R = A + B
+    * </pre>
+    * @param a primeiro array.
+    * @param b segundo array.
+    * @param r array contendo o resultado da soma.
     */
    public void add(double[] a, double[] b, double[] r){
       if(a.length != b.length){
@@ -37,10 +51,14 @@ public class OpArray{
    }
 
    /**
-    * 
-    * @param a
-    * @param b
-    * @param r
+    * Adiciona o conteúdo resultante da subtração entre A e B no array R de acordo
+    * com a expressão:
+    * <pre>
+    * R = A - B
+    * </pre>
+    * @param a primeiro array.
+    * @param b segundo array.
+    * @param r array contendo o resultado da subtração.
     */
    public void sub(double[] a, double[] b, double[] r){
       if(a.length != b.length){
@@ -65,10 +83,14 @@ public class OpArray{
    }
 
    /**
-    * 
-    * @param a
-    * @param b
-    * @param r
+    * Adiciona o conteúdo resultante da multiplicação entre A e B no array R de acordo
+    * com a expressão:
+    * <pre>
+    * R = A * B
+    * </pre>
+    * @param a primeiro array.
+    * @param b segundo array.
+    * @param r array contendo o resultado da multiplicação.
     */
    public void mult(double[] a, double[] b, double[] r){
       if(a.length != b.length){
@@ -92,10 +114,14 @@ public class OpArray{
    }
 
    /**
-    * 
-    * @param a
-    * @param e
-    * @param r
+    * Aidiciona o conteúdo resultado da divisão de cada elemento do array A pelo
+    * valor escalar fornecido, de acordo com a expressão:
+    * <pre>
+    * R = A / e
+    * </pre>
+    * @param a array base.
+    * @param e valor usado para dividir os elementos dos array.
+    * @param r array contendo o resultado da divisão.
     */
    public void dividirEscalar(double[] a, double e, double[] r){
       if(a.length != r.length){
@@ -111,12 +137,16 @@ public class OpArray{
    }
 
    /**
-    * 
-    * @param a
-    * @param e
-    * @param r
+    * Aidiciona o conteúdo resultado da multiplicação de cada elemento do array A pelo
+    * valor escalar fornecido, de acordo com a expressão:
+    * <pre>
+    * R = A * e
+    * </pre>
+    * @param a array base.
+    * @param e valor usado para multiplicar os elementos dos array.
+    * @param r array contendo o resultado da divisão.
     */
-   public void escalar(double[] a, double e, double[] r){
+   public void multiplicarEscalar(double[] a, double e, double[] r){
       if(a.length != r.length){
          throw new IllegalArgumentException(
             "As linhas de A (" + a.length + 
@@ -130,7 +160,13 @@ public class OpArray{
       }     
    }
 
-   public  double produtoEscalar(double[] a, double[] b){
+   /**
+    * Calcula o resultado do produto escalar entre os arrays A e B.
+    * @param a primeiro array.
+    * @param b segundo array.
+    * @return resultado do produto escalar entre A e B.
+    */
+   public double produtoEscalar(double[] a, double[] b){
       if(a.length != b.length){
          throw new IllegalArgumentException(
             "As linhas de A (" + a.length + 

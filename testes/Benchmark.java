@@ -2,7 +2,7 @@ package testes;
 
 import java.util.concurrent.TimeUnit;
 
-import ged.Ged;
+import lib.ged.Ged;
 import rna.core.Mat;
 import rna.core.OpMatriz;
 

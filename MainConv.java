@@ -1,7 +1,7 @@
 import java.awt.image.BufferedImage;
 import java.util.concurrent.TimeUnit;
-import ged.Ged;
-import geim.Geim;
+import lib.ged.Ged;
+import lib.geim.Geim;
 import rna.avaliacao.perda.*;
 import rna.core.Mat;
 import rna.estrutura.*;

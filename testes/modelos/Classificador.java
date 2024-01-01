@@ -10,8 +10,8 @@ import rna.avaliacao.perda.*;
 import rna.estrutura.Camada;
 import rna.estrutura.Densa;
 import rna.otimizadores.*;
-import ged.Dados;
-import ged.Ged;
+import lib.ged.Dados;
+import lib.ged.Ged;
 
 public class Classificador{
    

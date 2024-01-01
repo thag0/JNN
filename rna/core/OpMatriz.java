@@ -160,7 +160,7 @@ public class OpMatriz{
     * <pre>
     * R = A * B
     * </pre>
-    * @param a primeita matriz.
+    * @param a primeira matriz.
     * @param b segunda matriz.
     * @param r matriz contendo o resultado.
     */
@@ -190,7 +190,7 @@ public class OpMatriz{
     * <pre>
     * R = A * B
     * </pre>
-    * @param a primeita matriz.
+    * @param a primeira matriz.
     * @param b segunda matriz.
     * @param r matriz contendo o resultado.
     */
@@ -243,7 +243,7 @@ public class OpMatriz{
     * <pre>
     * R = A + B
     * </pre>
-    * @param a primeita matriz.
+    * @param a primeira matriz.
     * @param b segunda matriz.
     * @param r matriz contendo o resultado da soma.
     */
@@ -261,7 +261,7 @@ public class OpMatriz{
     * <pre>
     * R = A + B
     * </pre>
-    * @param a primeita matriz.
+    * @param a primeira matriz.
     * @param b segunda matriz.
     * @return matriz contendo o resultado da soma.
     */
@@ -282,7 +282,7 @@ public class OpMatriz{
     * <pre>
     * R = A - B
     * </pre>
-    * @param a primeita matriz.
+    * @param a primeira matriz.
     * @param b segunda matriz.
     * @param r matriz contendo o resultado da subtração.
     */
@@ -300,7 +300,7 @@ public class OpMatriz{
     * <pre>
     * R = A - B
     * </pre>
-    * @param a primeita matriz.
+    * @param a primeira matriz.
     * @param b segunda matriz.
     * @return r matriz contendo o resultado da subtração.
     */
@@ -321,7 +321,7 @@ public class OpMatriz{
     * <pre>
     * R = A ⊙ B
     * </pre>
-    * @param a primeita matriz.
+    * @param a primeira matriz.
     * @param b segunda matriz.
     * @param r matriz contendo o resultado do produto hadamard.
     */
@@ -339,7 +339,7 @@ public class OpMatriz{
     * <pre>
     * R = A ⊙ B
     * </pre>
-    * @param a primeita matriz.
+    * @param a primeira matriz.
     * @param b segunda matriz.
     * @return matriz contendo o resultado do produto hadamard.
     */

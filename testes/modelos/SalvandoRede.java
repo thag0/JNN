@@ -2,8 +2,8 @@ package testes.modelos;
 
 import java.io.Serializable;
 
-import ged.Dados;
-import ged.Ged;
+import lib.ged.Dados;
+import lib.ged.Ged;
 import rna.ativacoes.Sigmoid;
 import rna.avaliacao.perda.ErroMedioQuadrado;
 import rna.estrutura.Camada;

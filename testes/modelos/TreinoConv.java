@@ -2,8 +2,8 @@ package testes.modelos;
 
 import java.awt.image.BufferedImage;
 
-import ged.Ged;
-import geim.Geim;
+import lib.ged.Ged;
+import lib.geim.Geim;
 import rna.core.OpMatriz;
 import rna.modelos.Sequencial;
 import rna.serializacao.Serializador;

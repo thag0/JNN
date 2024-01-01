@@ -1,7 +1,7 @@
 package testes.modelos;
 
-import ged.Dados;
-import ged.Ged;
+import lib.ged.Dados;
+import lib.ged.Ged;
 import rna.avaliacao.perda.ErroMedioQuadrado;
 import rna.core.OpMatriz;
 import rna.estrutura.Camada;

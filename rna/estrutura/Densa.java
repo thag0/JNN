@@ -448,7 +448,7 @@ public class Densa extends Camada implements Cloneable{
                "A camada densa suporta apenas arrays de matrizes com profundidade = 1."
             );
          }
-         this.entrada.copiar(0, en[0].linha(0));
+         this.entrada.copiar(en[0]);
       
       }else if(entrada instanceof Mat){
          this.entrada.copiar((Mat) entrada);
@@ -466,8 +466,7 @@ public class Densa extends Camada implements Cloneable{
 
       }else{
          throw new IllegalArgumentException(
-            "Os dados de entrada para a camada Densa devem ser do tipo \"Mat[]\" ou \"Mat\" ou \"double[]\", " +
-            "objeto recebido é do tipo \"" + entrada.getClass().getTypeName() + "\""
+            "A camada Densa não suporta entradas do tipo \"" + entrada.getClass().getTypeName() + "\"."
          );
       }
 

@@ -133,15 +133,15 @@ public class MaxPooling extends Camada{
             int linFim = Math.min(linInicio + this.formFiltro[0], entrada.lin());
             int colFim = Math.min(colIincio + this.formFiltro[1], entrada.col());
             double maxValor = Double.MIN_VALUE;
-            for(int row = linInicio; row < linFim; row++){
+            
+            for(int lin = linInicio; lin < linFim; lin++){
                for(int col = colIincio; col < colFim; col++){
-                  double valor = entrada.dado(row, col);
+                  double valor = entrada.dado(lin, col);
                   if (valor > maxValor){
                      maxValor = valor;
                   }
                }
             }
-            
             saida.editar(i, j, maxValor);
          }
       }
@@ -150,9 +150,9 @@ public class MaxPooling extends Camada{
    @Override
    public void calcularGradiente(Object gradSeguinte){
       if(gradSeguinte instanceof Mat[]){
-         Mat[] gradCamadaSeguinte = (Mat[]) gradSeguinte;   
+         Mat[] grad = (Mat[]) gradSeguinte;   
          for(int i = 0; i < gradEntrada.length; i++){
-            calcularGradienteMaxPooling(this.entrada[i], gradCamadaSeguinte[i], this.gradEntrada[i]);
+            calcularGradienteMaxPooling(this.entrada[i], grad[i], this.gradEntrada[i]);
          }
       
       }else{
@@ -165,39 +165,39 @@ public class MaxPooling extends Camada{
    
    private void calcularGradienteMaxPooling(Mat entrada, Mat gradSeguinte, Mat gradEntrada){
       for(int i = 0; i < gradSeguinte.lin(); i++){
-          for(int j = 0; j < gradSeguinte.col(); j++){
-              int linInicio = i * this.strideAltura;
-              int colInicio = j * this.strideLargura;
-              int linFim = Math.min(linInicio + this.formFiltro[0], entrada.lin());
-              int colFim = Math.min(colInicio + this.formFiltro[1], entrada.col());
-  
-              int[] posicaoMaximo = posicaoMaxima(entrada, linInicio, colInicio, linFim, colFim);
-              int rowMaximo = posicaoMaximo[0];
-              int colMaximo = posicaoMaximo[1];
-  
-              double valorGradSeguinte = gradSeguinte.dado(i, j);
-              gradEntrada.editar(rowMaximo, colMaximo, valorGradSeguinte);
-          }
+         for(int j = 0; j < gradSeguinte.col(); j++){
+            int linInicio = i * this.strideAltura;
+            int colInicio = j * this.strideLargura;
+            int linFim = Math.min(linInicio + this.formFiltro[0], entrada.lin());
+            int colFim = Math.min(colInicio + this.formFiltro[1], entrada.col());
+
+            int[] posicaoMaximo = posicaoMaxima(entrada, linInicio, colInicio, linFim, colFim);
+            int linMaximo = posicaoMaximo[0];
+            int colMaximo = posicaoMaximo[1];
+
+            double valorGradSeguinte = gradSeguinte.dado(i, j);
+            gradEntrada.editar(linMaximo, colMaximo, valorGradSeguinte);
+         }
       }
-  }
+   }
   
-   private int[] posicaoMaxima(Mat matriz, int linInicio, int colInicio, int linFim, int colFim){
-      int[] posicaoMaximo = new int[]{linInicio, colInicio};
-      double valorMaximo = Double.NEGATIVE_INFINITY;
+   private int[] posicaoMaxima(Mat m, int linInicio, int colInicio, int linFim, int colFim){
+      int[] posMaximo = new int[]{linInicio, colInicio};
+      double valMaximo = Double.NEGATIVE_INFINITY;
   
-      for(int row = linInicio; row < linFim; row++){
-          for(int col = colInicio; col < colFim; col++){
-              double valorAtual = matriz.dado(row, col);
-              if(valorAtual > valorMaximo){
-                  valorMaximo = valorAtual;
-                  posicaoMaximo[0] = row;
-                  posicaoMaximo[1] = col;
-              }
-          }
+      for(int lin = linInicio; lin < linFim; lin++){
+         for(int col = colInicio; col < colFim; col++){
+            double valorAtual = m.dado(lin, col);
+            if(valorAtual > valMaximo){
+               valMaximo = valorAtual;
+               posMaximo[0] = lin;
+               posMaximo[1] = col;
+            }
+         }
       }
   
-      return posicaoMaximo;
-  }
+      return posMaximo;
+   }
  
    @Override
    public int[] formatoEntrada(){
@@ -219,7 +219,10 @@ public class MaxPooling extends Camada{
    }
 
    public int[] formatoStride(){
-      return new int[]{strideLargura, strideAltura};
+      return new int[]{
+         strideLargura, 
+         strideAltura
+      };
    }
 
    @Override

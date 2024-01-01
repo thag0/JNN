@@ -181,6 +181,13 @@ public class Flatten extends Camada{
       this.id = id;
    }
 
+   /**
+    * Achata os dados de entrada num array unidimensional.
+    * @param entrada dados de entrada que serão processados, objetos aceitos incluem:
+    * {@code Mat[]}, {@code Mat} ou {@code double[]}.
+    * @throws IllegalArgumentException caso a entrada fornecida não seja suportada 
+    * pela camada.
+    */
    @Override
    public void calcularSaida(Object entrada){
       verificarConstrucao();
@@ -192,14 +199,16 @@ public class Flatten extends Camada{
             this.entrada[i].copiar(e[i]);
          }
       
+      }else if(entrada instanceof Mat){
+         this.entrada[0].copiar((Mat) entrada);
+
       }else if(entrada instanceof double[]){
          double[] e = (double[]) entrada;
          utils.copiar(e, this.entrada);
       
       }else{
          throw new IllegalArgumentException(
-            "Os dados de entrada para a camada Flatten devem ser do tipo \"Mat[]\" ou \"double[]\", " +
-            "objeto recebido é do tipo \"" + entrada.getClass().getTypeName() + "\""
+            "A camada Flatten não suporta entradas do tipo \"" + entrada.getClass().getTypeName() + "\"."
          );
       }
 

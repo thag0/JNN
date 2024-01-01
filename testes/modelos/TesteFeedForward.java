@@ -1,5 +1,5 @@
 package testes.modelos;
-import ged.Ged;
+import lib.ged.Ged;
 import rna.modelos.RedeNeural;
 
 public class TesteFeedForward {
