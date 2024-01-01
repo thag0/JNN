@@ -18,7 +18,12 @@ public class TreinoConv{
       ged.limparConsole();
       
       Sequencial modelo = serializador.lerSequencial("./modelo-convolucional.txt");
-      testarPorbabilidade(modelo, "1_teste_3");
+      testarPorbabilidade(modelo, "0_teste_1");
+      testarPorbabilidade(modelo, "0_teste_2");
+      testarPorbabilidade(modelo, "1_teste_1");
+      testarPorbabilidade(modelo, "1_teste_2");
+      testarPorbabilidade(modelo, "2_teste_1");
+      testarPorbabilidade(modelo, "2_teste_2");
    }
 
    static void testarPorbabilidade(Sequencial modelo, String imagemTeste){
