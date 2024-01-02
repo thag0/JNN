@@ -50,9 +50,9 @@ public class Flatten extends Camada{
    public Mat[] gradEntrada;
 
    /**
-    * Array contendo a saída achatada da camada.
+    * Matriz contendo a saída achatada da camada.
     */
-   public double[] saida;
+   public Mat saida;
 
    /**
     * Inicializa uma camada Flatten, que irá achatar a entrada recebida
@@ -153,7 +153,7 @@ public class Flatten extends Camada{
          this.gradEntrada[i] = new Mat(formEntrada[0], formEntrada[1]);
       }
 
-      this.saida = new double[tamanho];
+      this.saida = new Mat(1, (this.entrada.length * this.entrada[0].lin() * this.entrada[0].col()));
       this.formSaida = new int[]{1, tamanho};
 
       this.construida = true;//camada pode ser usada.
@@ -215,8 +215,9 @@ public class Flatten extends Camada{
       int id = 0;
       for(int i = 0; i < this.entrada.length; i++){
          double[] arr = this.entrada[i].paraArray();
-         System.arraycopy(arr, 0, this.saida, id, arr.length);
-         id += arr.length;
+         for(int j = 0; j < arr.length; j++){
+            this.saida.editar(0, id++, arr[j]);
+         }
       }
    }
 
@@ -248,20 +249,20 @@ public class Flatten extends Camada{
    }
 
    @Override
-   public double[] saida(){
+   public Mat saida(){
       return this.saida;
    }
 
    @Override
    public double[] saidaParaArray(){
       verificarConstrucao();
-      return this.saida;
+      return this.saida.paraArray();
    }
 
    @Override
    public int tamanhoSaida(){
       verificarConstrucao();
-      return this.saida.length;
+      return this.saida.col();
    }
 
    @Override

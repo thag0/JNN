@@ -3,7 +3,6 @@ import java.util.concurrent.TimeUnit;
 import lib.ged.Ged;
 import lib.geim.Geim;
 import rna.avaliacao.perda.*;
-import rna.core.Mat;
 import rna.estrutura.*;
 import rna.inicializadores.*;
 import rna.modelos.Sequencial;
@@ -14,7 +13,7 @@ public class MainConv{
    static Ged ged = new Ged();
    static Geim geim = new Geim();
 
-   static final int NUM_DIGITOS = 3;
+   static final int NUM_DIGITOS = 10;
    static final int NUM_AMOSTRAS = 20;
 
    public static void main(String[] args){
@@ -23,9 +22,7 @@ public class MainConv{
       double[][][][] entradas = new double[NUM_AMOSTRAS * NUM_DIGITOS][NUM_DIGITOS][][];
       double[][] saidas = new double[NUM_AMOSTRAS * NUM_DIGITOS][NUM_DIGITOS];
       entradas = carregarDadosMNIST("/dados/mnist/treino/", NUM_AMOSTRAS, NUM_DIGITOS);
-      System.out.println("Imagens carregadas. (" + entradas.length + ")");
       saidas = criarRotulosMNIST(NUM_AMOSTRAS, NUM_DIGITOS);
-      System.out.println("Rótulos carregados.");
 
       Sequencial modelo = criarModelo();
       System.out.println(modelo.info());
@@ -36,7 +33,7 @@ public class MainConv{
 
       System.out.println("Treinando.");
       t1 = System.nanoTime();
-      modelo.treinar(entradas, saidas, 70);
+      modelo.treinar(entradas, saidas, 50);
       t2 = System.nanoTime();
       
       long tempoDecorrido = t2 - t1;
@@ -48,11 +45,12 @@ public class MainConv{
       System.out.println("Perda: " + modelo.avaliador.entropiaCruzada(entradas, saidas));
       testes.modelos.TesteModelos.exportarHistoricoPerda(modelo);
 
+      salvarSequencial(modelo, "./modelo-convolucional.txt");
+
       for(int i = 0; i < NUM_DIGITOS; i++){
          testarPorbabilidade(modelo, (i + "_teste_1"));
       }
 
-      salvarSequencial(modelo, "./modelo-convolucional.txt");
       Main.executarComando("python grafico.py");
    }
 
@@ -60,18 +58,19 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{3, 3}, 42, "leakyrelu"),
+         new Convolucional(formEntrada, new int[]{5, 5}, 64, "leakyrelu"),
          new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{3, 3}, 36, "leakyrelu"),
+         new Convolucional(new int[]{3, 3}, 64, "leakyrelu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(280, "tanh"),
-         new Densa(60, "tanh"),
+         new Densa(460, "leakyrelu"),
+         new Densa(140, "leakyrelu"),
+         new Densa(60, "leakyrelu"),
          new Densa(NUM_DIGITOS, "softmax"),
       });
 
       modelo.compilar(
-         new SGD(0.01, 0.9),
+         new SGD(0.001, 0.95),
          new EntropiaCruzada(),
          new LeCun(),
          new Zeros()
@@ -134,6 +133,7 @@ public class MainConv{
          }
       }
 
+      System.out.println("Imagens carregadas. (" + entradas.length + ")");
       return entradas;
    }
 
@@ -145,7 +145,8 @@ public class MainConv{
             rotulos[indice][numero] = 1;
          }
       }
-  
+      
+      System.out.println("Rótulos gerados.");
       return rotulos;
    }
 
@@ -158,15 +159,6 @@ public class MainConv{
          }
          System.out.println();
       }
-   }
-
-   static boolean compararMatrizes(Mat a, Mat b){
-      for(int i = 0; i < a.lin(); i++){
-         for(int j = 0; j < a.col(); j++){
-            if(a.dado(i, j) != b.dado(i, j)) return false;
-         }
-      }
-      return true;
    }
 
    static void salvarSequencial(Sequencial modelo, String caminho){

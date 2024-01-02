@@ -19,18 +19,19 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
 
-      double[][] e = {
-         {1, 2, 3},
-         {4, 5, 6},
-         {7, 8, 9},
+      double[][] e1 = {
+         {1, 2},
+         {3, 4},
+      };
+      double[][] e2 = {
+         {5, 6},
+         {7, 8},
       };
 
-      Mat[] entrada = new Mat[]{new Mat(e)};
-      MaxPooling mp = new MaxPooling(new int[]{2, 2});
-      mp.construir(new int[]{3, 3, 1});
-      mp.calcularSaida(entrada);
-
-      ged.imprimirArray(mp.saidaParaArray(), "saida mp");
+      Mat[] entrada = {new Mat(e1), new Mat(e2)};
+      Flatten flat = new Flatten(new int[]{2, 2, 2});
+      flat.calcularSaida(entrada);
+      flat.saida.print("saida flat");
    }
 
    static void derivadaSoftmax(){

@@ -12,8 +12,8 @@ public class Benchmark {
       OpMatriz opamt = new OpMatriz();
       ged.limparConsole();
 
-      int lin = 11000;
-      int col = 11000;
+      int lin = 1024;
+      int col = 1024;
 
       Mat a = new Mat(lin, col);
       a.preencher(1);
@@ -26,7 +26,7 @@ public class Benchmark {
       long minutos, segundos;
 
       t1 = System.nanoTime();
-      opamt.add(a, b, r);
+      opamt.multT(a, b, r, 4);
       t2 = System.nanoTime();
       
       long tempoDecorrido = t2 - t1;

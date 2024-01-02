@@ -26,7 +26,7 @@ public class TesteTreino{
       };
 
       Sequencial rede = new Sequencial();
-      rede.add(new Densa(2, 3, "tanh"));
+      rede.add(new Densa(2, 3, "sigmoid"));
       rede.add(new Densa(1, "sigmoid"));
       
       rede.compilar(
