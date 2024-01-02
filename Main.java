@@ -86,7 +86,7 @@ public class Main{
    static Modelo criarSequencial(int entradas, int saidas){
       Otimizador otm = new SGD(0.01, 0.9);
       Perda perda = new ErroMedioQuadrado();
-      Inicializador ini = new LeCun();
+      Inicializador ini = new Xavier();
       
       Sequencial modelo = new Sequencial();
       modelo.add(new Densa(entradas, 13, "tanh"));

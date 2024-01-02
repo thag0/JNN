@@ -378,6 +378,21 @@ public class Sequencial extends Modelo implements Cloneable{
    }
 
    @Override
+   public void copiarDaSaida(double[] arr){
+      double[] saida = this.saidaParaArray();
+      if(saida.length != arr.length){
+         throw new IllegalArgumentException(
+            "Incompatibilidade de dimensões entre o array fornecido (" + arr.length + 
+            ") e o array gerado pela saída da última camada (" + saida.length + ")."
+         );
+      }
+
+      for(int i = 0; i < saida.length; i++){
+         arr[i] = saida[i];
+      }
+   }
+
+   @Override
    public String nome(){
       return this.nome;
    }

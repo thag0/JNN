@@ -22,9 +22,9 @@ public class MainConv{
       
       double[][][][] entradas = new double[NUM_AMOSTRAS * NUM_DIGITOS][NUM_DIGITOS][][];
       double[][] saidas = new double[NUM_AMOSTRAS * NUM_DIGITOS][NUM_DIGITOS];
-      entradas = carregarDadosMNIST(NUM_AMOSTRAS, NUM_DIGITOS);
+      entradas = carregarDadosMNIST("/dados/mnist/treino/", NUM_AMOSTRAS, NUM_DIGITOS);
       System.out.println("Imagens carregadas. (" + entradas.length + ")");
-      saidas = carregarRotulosMNIST(NUM_AMOSTRAS, NUM_DIGITOS);
+      saidas = criarRotulosMNIST(NUM_AMOSTRAS, NUM_DIGITOS);
       System.out.println("Rótulos carregados.");
 
       Sequencial modelo = criarModelo();
@@ -60,17 +60,18 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{5, 5}, 32, "leakyrelu"),
+         new Convolucional(formEntrada, new int[]{3, 3}, 42, "leakyrelu"),
          new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{3, 3}, 32, "leakyrelu"),
+         new Convolucional(new int[]{3, 3}, 36, "leakyrelu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(200, "tanh"),
+         new Densa(280, "tanh"),
+         new Densa(60, "tanh"),
          new Densa(NUM_DIGITOS, "softmax"),
       });
 
       modelo.compilar(
-         new SGD(0.001, 0.99),
+         new SGD(0.01, 0.9),
          new EntropiaCruzada(),
          new LeCun(),
          new Zeros()
@@ -81,9 +82,9 @@ public class MainConv{
    }
 
    /**
-    * 
-    * @param caminho
-    * @return
+    * Converte uma imagem numa matriz contendo seus valores de brilho entre 0 e 1.
+    * @param caminho caminho da imagem.
+    * @return matriz contendo os valores de brilho da imagem.
     */
    public static double[][] imagemParaMatriz(String caminho){
       BufferedImage img = geim.lerImagem(caminho);
@@ -121,8 +122,7 @@ public class MainConv{
     * @param digitos quantidade de dígitos, iniciando do dígito 0.
     * @return
     */
-   public static double[][][][] carregarDadosMNIST(int amostras, int digitos){
-      String caminho = "/dados/mnist/treino/";
+   public static double[][][][] carregarDadosMNIST(String caminho, int amostras, int digitos){
       double[][][][] entradas = new double[digitos * amostras][1][][];
 
       int id = 0;
@@ -137,7 +137,7 @@ public class MainConv{
       return entradas;
    }
 
-   public static double[][] carregarRotulosMNIST(int amostras, int digitos){
+   public static double[][] criarRotulosMNIST(int amostras, int digitos){
       double[][] rotulos = new double[digitos * amostras][digitos];
       for(int numero = 0; numero < digitos; numero++){
          for(int i = 0; i < amostras; i++){

@@ -293,6 +293,19 @@ public class Modelo{
    }
 
    /**
+    * Copia os dados de saída da última camada do modelo para o array.
+    * <p>
+    *    Esse método considera que as camadas finais dos modelos são camadas densas.
+    * </p>
+    * @param arr array para cópia.
+    */
+   public void copiarDaSaida(double[] arr){
+      throw new IllegalArgumentException(
+         "Implementar cópia das saídas do modelo."
+      ); 
+   }
+
+   /**
     * Informa o nome configurado do modelo.
     * @return nome do modelo.
     */

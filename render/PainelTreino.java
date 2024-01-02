@@ -128,7 +128,7 @@ public class PainelTreino extends JPanel{
 
    private void calcularParteImagemEscalaCinza(Modelo modelo, int inicioY, int fimY){
       double[] entrada = new double[2];
-      double[] saida = new double[modelo.camadaSaida().tamanhoSaida()];
+      double[] saida = new double[1];
 
       int r, g, b, rgb, cinza;
       int x, y;
@@ -139,8 +139,8 @@ public class PainelTreino extends JPanel{
             entrada[1] = (double) y / this.altura;
 
             modelo.calcularSaida(entrada);
+            modelo.copiarDaSaida(saida);
             
-            saida = modelo.saidaParaArray();
             cinza = (int)(saida[0] * 255);
             r = cinza;
             g = cinza;
@@ -153,7 +153,7 @@ public class PainelTreino extends JPanel{
 
    private void calcularParteImagemRGB(Modelo modelo, int inicioY, int fimY){
       double[] entrada = new double[2];
-      double[] saida = new double[modelo.camadaSaida().tamanhoSaida()];
+      double[] saida = new double[3];
       int r, g, b, rgb;
 
       for(int y = inicioY; y < fimY; y++){
@@ -162,8 +162,8 @@ public class PainelTreino extends JPanel{
             entrada[1] = (double) y / this.altura;
             
             modelo.calcularSaida(entrada);
+            modelo.copiarDaSaida(saida);
 
-            saida = modelo.saidaParaArray();
             r = (int) (saida[0] * 255);
             g = (int) (saida[1] * 255);
             b = (int) (saida[2] * 255);
