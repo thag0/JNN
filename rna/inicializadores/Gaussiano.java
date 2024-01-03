@@ -13,7 +13,7 @@ public class Gaussiano extends Inicializador{
    public void inicializar(Mat m, double x){
       for(int i = 0; i < m.lin(); i++){
          for(int j = 0; j < m.col(); j++){
-            m.editar(i, j, super.random.nextGaussian(-x, x));
+            m.editar(i, j, (2 * x * super.random.nextGaussian()));
          }
       }
    }
