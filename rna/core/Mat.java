@@ -256,10 +256,9 @@ public class Mat{
             "Dimensões incompatíveis."
          );
       }
+
       for(int i = 0; i < this.lin; i++){
-         for(int j = 0; j < this.col; j++){
-            this.dados[indice(i, j)] = m[i][j];
-         }
+         this.copiar(i, m[i]);
       }
    }
 

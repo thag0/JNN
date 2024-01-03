@@ -32,7 +32,7 @@ public class MainConv{
       System.out.println("Treinando.");
       t1 = System.nanoTime();
       //dedicar uma thread pra executar em segundo plano
-      rodarTreino(modelo, entradas, saidas, 60);
+      rodarTreino(modelo, entradas, saidas, 20);
       t2 = System.nanoTime();
       
       long tempoDecorrido = t2 - t1;
@@ -44,11 +44,10 @@ public class MainConv{
       System.out.println("Perda: " + modelo.avaliador.entropiaCruzada(entradas, saidas));
       testes.modelos.TesteModelos.exportarHistoricoPerda(modelo);
 
-      salvarSequencial(modelo, "./modelo-convolucional.txt");
-
-      for(int i = 0; i < NUM_DIGITOS; i++){
-         testarPorbabilidade(modelo, (i + "_teste_1"));
-      }
+      // salvarSequencial(modelo, "./modelo-convolucional.txt");
+      // for(int i = 0; i < NUM_DIGITOS; i++){
+      //    testarPorbabilidade(modelo, (i + "_teste_1"));
+      // }
 
       Main.executarComando("python grafico.py");
    }
@@ -76,9 +75,9 @@ public class MainConv{
       });
 
       modelo.compilar(
-         new SGD(0.0001, 0.999),
+         new SGD(0.001, 0.99),
          new EntropiaCruzada(),
-         new Xavier(),
+         new He(),
          new Zeros()
       );
       modelo.configurarHistorico(true);

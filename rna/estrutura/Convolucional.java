@@ -936,10 +936,10 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override
    public double[] obterKernel(){
-      int cont = 0;
+      int cont = 0, i, j;
       double[] kernel = new double[this.numParamsKernel];
-      for(int i = 0; i < numFiltros; i++){
-         for(int j = 0; j < this.profEntrada; j++){
+      for(i = 0; i < numFiltros; i++){
+         for(j = 0; j < this.profEntrada; j++){
             double[] arr = this.filtros[i][j].paraArray();
             System.arraycopy(arr, 0, kernel, cont, arr.length);
             cont += arr.length;
