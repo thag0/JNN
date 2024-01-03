@@ -32,7 +32,7 @@ public class MainConv{
       System.out.println("Treinando.");
       t1 = System.nanoTime();
       //dedicar uma thread pra executar em segundo plano
-      rodarTreino(modelo, entradas, saidas, 20);
+      rodarTreino(modelo, entradas, saidas, 70);
       t2 = System.nanoTime();
       
       long tempoDecorrido = t2 - t1;
@@ -44,10 +44,10 @@ public class MainConv{
       System.out.println("Perda: " + modelo.avaliador.entropiaCruzada(entradas, saidas));
       testes.modelos.TesteModelos.exportarHistoricoPerda(modelo);
 
-      // salvarSequencial(modelo, "./modelo-convolucional.txt");
-      // for(int i = 0; i < NUM_DIGITOS; i++){
-      //    testarPorbabilidade(modelo, (i + "_teste_1"));
-      // }
+      salvarSequencial(modelo, "./modelo-convolucional.txt");
+      for(int i = 0; i < NUM_DIGITOS; i++){
+         testarPorbabilidade(modelo, (i + "_teste_1"));
+      }
 
       Main.executarComando("python grafico.py");
    }
@@ -67,10 +67,10 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{4, 4}, 36, "leakyrelu"),
+         new Convolucional(formEntrada, new int[]{4, 4}, 42, "leakyrelu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(120, "tanh"),
+         new Densa(132, "tanh"),
          new Densa(NUM_DIGITOS, "softmax"),
       });
 

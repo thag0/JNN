@@ -17,7 +17,7 @@ public class TreinoConv{
    public static void main(String[] args){
       ged.limparConsole();
       
-      Sequencial modelo = serializador.lerSequencial("./conv-mnist-0-9.txt");
+      Sequencial modelo = serializador.lerSequencial("./conv-mnist-2.txt");
       testarPorbabilidade(modelo, "0_teste_1");
       testarPorbabilidade(modelo, "0_teste_2");
       testarPorbabilidade(modelo, "1_teste_1");
@@ -40,10 +40,11 @@ public class TreinoConv{
       double[] previsao = modelo.saidaParaArray();
 
       System.out.println("\nTestando: " + imagemTeste);
-      System.out.println("Prev: " + maiorIndice(previsao));
-      // for(int i = 0; i < previsao.length; i++){
-         //    System.out.println("Prob: " + i + ": " + (int)(previsao[i]*100) + "%");
-         // }
+      // System.out.println("Prev: " + maiorIndice(previsao));
+      for(int i = 0; i < previsao.length; i++){
+         System.out.println("Prob: " + i + ": " + (int)(previsao[i]*100) + "%");
+         // System.out.printf("Prob: %d: %.2f\n", i, (float)(previsao[i]*100));
+      }
    }
 
    static int maiorIndice(double[] arr){
