@@ -54,12 +54,13 @@ public class Treinador{
     * @param saidas dados de saída correspondente as entradas para o treino.
     * @param epochs quantidade de épocas de treinamento.
     */
-   public void treino(Modelo modelo, Object[] entradas, Object[] saidas, int epochs){
+   public void treino(Modelo modelo, Object[] entradas, Object[] saidas, int epochs, boolean logs){
       treino.treinar(
          modelo,
          entradas.clone(), 
          saidas.clone(), 
-         epochs
+         epochs,
+         logs
       );
 
       treino.ultimoUsado = true;

@@ -57,8 +57,8 @@ public class TesteModelos{
       rna.configurarAtivacao(atv1);
       rna.configurarAtivacao(rna.camadaSaida(), atv2);
       
-      seq.treinar(entrada, saida, epocas);
-      rna.treinar(entrada, saida, epocas);
+      seq.treinar(entrada, saida, epocas, false);
+      rna.treinar(entrada, saida, epocas, false);
 
       double perdaSeq = seq.avaliador.erroMedioQuadrado(entrada, saida);
       double perdaRna = rna.avaliador.erroMedioQuadrado(entrada, saida);

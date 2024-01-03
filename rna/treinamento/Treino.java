@@ -53,7 +53,7 @@ public class Treino{
     * @param saida dados de saída correspondente as entradas para o treino.
     * @param epochs quantidade de épocas de treinamento.
     */
-   public void treinar(Modelo modelo, Object[] entrada, Object[] saida, int epochs){
+   public void treinar(Modelo modelo, Object[] entrada, Object[] saida, int epochs, boolean logs){
       Camada[] camadas = modelo.camadas();
       Otimizador otimizador = modelo.otimizador();
       Perda perda = modelo.perda();
@@ -76,9 +76,9 @@ public class Treino{
             otimizador.atualizar(camadas);
          }
 
-         // if(e % 25 == 0){
-         //    System.out.println("Perda (" + e + "): " + (double)(perdaEpoca/entrada.length));
-         // }
+         if(logs & (e % 5 == 0)){
+            System.out.println("Perda (" + e + "): " + (double)(perdaEpoca/entrada.length));
+         }
 
          //feedback de avanço da rede
          if(this.calcularHistorico){

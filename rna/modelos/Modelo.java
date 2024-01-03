@@ -184,8 +184,9 @@ public class Modelo{
     * {@code double[][][][]}, para camadas densas é {@code double[][]}.
     * @param saidas dados de saída correspondente a entrada (class).
     * @param epochs quantidade de épocas de treinamento.
+    * @param logs logs para perda durante as épocas de treinamento.
     */
-   public void treinar(Object[] entradas, Object[] saidas, int epochs){
+   public void treinar(Object[] entradas, Object[] saidas, int epochs, boolean logs){
       throw new IllegalArgumentException(
          "Implementar treinamento para o modelo."
       );

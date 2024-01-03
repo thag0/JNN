@@ -5,7 +5,7 @@ import rna.modelos.Modelo;
 public class F1Score extends Metrica{
    
    @Override
-   public double calcular(Modelo rede, double[][] entrada, double[][] saida){
+   public double calcular(Modelo rede, Object[] entrada, Object[] saida){
       int[][] matrizConfusao = super.matrizConfusao(rede, entrada, saida);
       double f1score = f1score(matrizConfusao);
       return f1score;

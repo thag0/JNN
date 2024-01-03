@@ -1,6 +1,7 @@
 package testes.modelos;
 
 import java.awt.image.BufferedImage;
+import java.util.concurrent.TimeUnit;
 
 import lib.ged.Ged;
 import lib.geim.Geim;
@@ -18,19 +19,25 @@ public class TreinoConv{
       ged.limparConsole();
       
       Sequencial modelo = serializador.lerSequencial("./conv-mnist-2.txt");
+
+      double[][][][] entrada = new double[1][1][][];
+      double[][] saida = {{1, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+      entrada[0][0] = imagemParaMatriz("/dados/mnist/teste/0_teste_1.jpg");
       testarPorbabilidade(modelo, "0_teste_1");
-      testarPorbabilidade(modelo, "0_teste_2");
-      testarPorbabilidade(modelo, "1_teste_1");
-      testarPorbabilidade(modelo, "1_teste_2");
-      testarPorbabilidade(modelo, "2_teste_1");
-      testarPorbabilidade(modelo, "2_teste_2");
-      testarPorbabilidade(modelo, "3_teste_1");
-      testarPorbabilidade(modelo, "4_teste_1");
-      testarPorbabilidade(modelo, "5_teste_1");
-      testarPorbabilidade(modelo, "6_teste_1");
-      testarPorbabilidade(modelo, "7_teste_1");
-      testarPorbabilidade(modelo, "8_teste_1");
-      testarPorbabilidade(modelo, "9_teste_1");
+
+      long tempo;
+      tempo = marcarTempo(() -> modelo.calcularSaida(entrada[0]));
+      System.out.println("Tempo forward: " + TimeUnit.NANOSECONDS.toMillis(tempo) + " ms");
+      
+      tempo = marcarTempo(() -> modelo.treinar(entrada, saida, 1, false));
+      System.out.println("Tempo backward: " + TimeUnit.NANOSECONDS.toMillis(tempo) + " ms");
+   }
+
+   static long marcarTempo(Runnable funcao){
+      long t1 = System.nanoTime();
+      funcao.run();
+      long t2 = System.nanoTime();
+      return t2 - t1;
    }
 
    static void testarPorbabilidade(Sequencial modelo, String imagemTeste){
@@ -40,11 +47,11 @@ public class TreinoConv{
       double[] previsao = modelo.saidaParaArray();
 
       System.out.println("\nTestando: " + imagemTeste);
-      // System.out.println("Prev: " + maiorIndice(previsao));
-      for(int i = 0; i < previsao.length; i++){
-         System.out.println("Prob: " + i + ": " + (int)(previsao[i]*100) + "%");
+      System.out.println("Prev: " + maiorIndice(previsao));
+      // for(int i = 0; i < previsao.length; i++){
+         // System.out.println("Prob: " + i + ": " + (int)(previsao[i]*100) + "%");
          // System.out.printf("Prob: %d: %.2f\n", i, (float)(previsao[i]*100));
-      }
+      // }
    }
 
    static int maiorIndice(double[] arr){

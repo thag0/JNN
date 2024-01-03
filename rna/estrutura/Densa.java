@@ -502,7 +502,7 @@ public class Densa extends Camada implements Cloneable{
                "A camada densa suporta apenas arrays de matrizes com profundidade = 1."
             );
          }
-         this.entrada.copiar(grads[0]);
+         this.gradSaida.copiar(grads[0]);
       
       }else if(gradSeguinte instanceof Mat){
          Mat grads = (Mat) gradSeguinte;

@@ -41,7 +41,7 @@ public class TesteImagem{
       modelo.configurarSeed(1234);
       Otimizador otm = new SGD(0.00001, 0.999);
       modelo.compilar(otm, new ErroMedioQuadrado(), new Xavier());
-      modelo.treinar(dadosEntrada, dadosSaida, 1_500);
+      modelo.treinar(dadosEntrada, dadosSaida, 1_500, false);
 
       //avaliando resultados
       double precisao = 1 - modelo.avaliador.erroMedioAbsoluto(dadosEntrada, dadosSaida);

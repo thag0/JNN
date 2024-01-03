@@ -144,7 +144,7 @@ public class Avaliador{
     * @param saida dados de saída contendo os resultados respectivos para as entradas.
     * @return A acurácia da rede neural em forma de probabilidade.
     */
-   public double acuracia(double[][] entrada, double[][] saida){
+   public double acuracia(Object[] entrada, Object[] saida){
       return acuracia.calcular(this.modelo, entrada, saida);
    }
 

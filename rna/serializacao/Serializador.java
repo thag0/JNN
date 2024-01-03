@@ -298,6 +298,7 @@ public class Serializador{
          }
 
          modelo.compilado = true;
+         otimizador.inicializar(modelo.camadas());
 
       }catch(Exception e){
          throw new RuntimeException(e);

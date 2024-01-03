@@ -52,15 +52,14 @@ public class Classificador{
       });
 
       Perda perda = new EntropiaCruzada();
-      // Otimizador otimizador = new SGD(0.001, 0.95);
-      Otimizador otimizador = new AdaGrad();
+      Otimizador otimizador = new SGD(0.001, 0.95);
       Inicializador inicializador = new Xavier();
       modelo.compilar(otimizador, perda, inicializador);
       modelo.configurarHistorico(true);
       System.out.println(modelo.info());
       
       //treinando e avaliando os resultados
-      modelo.treinar(treinoX, treinoY, 3_000);
+      modelo.treinar(treinoX, treinoY, 3_000, false);
       double acuraciaRede = modelo.avaliador.acuracia(testeX, testeY);
       double perdaRede = modelo.avaliador.entropiaCruzada(testeX, testeY);
       System.out.println("Acurácia = " + formatarDecimal(acuraciaRede*100, 4) + "%");

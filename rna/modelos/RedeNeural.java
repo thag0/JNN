@@ -705,7 +705,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     * @throws IllegalArgumentException se o valor de épocas for menor que um.
     */
    @Override
-   public void treinar(Object[] entradas, Object[] saidas, int epochs){
+   public void treinar(Object[] entradas, Object[] saidas, int epochs, boolean logs){
       this.verificarCompilacao();
 
       if(epochs < 1){
@@ -718,7 +718,8 @@ public class RedeNeural extends Modelo implements Cloneable{
          this,
          entradas,
          saidas,
-         epochs
+         epochs,
+         logs
       );
    }
 

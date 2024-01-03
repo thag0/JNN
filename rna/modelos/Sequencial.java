@@ -292,7 +292,7 @@ public class Sequencial extends Modelo implements Cloneable{
    }
 
    @Override
-   public void treinar(Object[] entradas, Object[] saidas, int epochs){
+   public void treinar(Object[] entradas, Object[] saidas, int epochs, boolean logs){
       verificarCompilacao();
       
       if(entradas.length != saidas.length){
@@ -308,7 +308,7 @@ public class Sequencial extends Modelo implements Cloneable{
          );
       }
 
-      treinador.treino(this, entradas, saidas, epochs);
+      treinador.treino(this, entradas, saidas, epochs, logs);
    }
    
    @Override

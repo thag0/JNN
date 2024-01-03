@@ -34,7 +34,7 @@ public class TesteTreino{
          new ErroMedioQuadrado(),
          new Xavier()
       );
-      rede.treinar(entrada, saida, 10_000);
+      rede.treinar(entrada, saida, 10_000, false);
 
       for(int i = 0; i < entrada.length; i++){
          rede.calcularSaida(entrada[i]);

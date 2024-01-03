@@ -32,7 +32,7 @@ public class MainConv{
       System.out.println("Treinando.");
       t1 = System.nanoTime();
       //dedicar uma thread pra executar em segundo plano
-      rodarTreino(modelo, entradas, saidas, 70);
+      rodarTreino(modelo, entradas, saidas, 50);
       t2 = System.nanoTime();
       
       long tempoDecorrido = t2 - t1;
@@ -42,6 +42,7 @@ public class MainConv{
       segundos = segundosTotais % 60;
       System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
       System.out.println("Perda: " + modelo.avaliador.entropiaCruzada(entradas, saidas));
+      System.out.println("Acurárcia: " + modelo.avaliador.acuracia(entradas, saidas));
       testes.modelos.TesteModelos.exportarHistoricoPerda(modelo);
 
       salvarSequencial(modelo, "./modelo-convolucional.txt");
@@ -53,8 +54,7 @@ public class MainConv{
    }
 
    static void rodarTreino(Sequencial modelo, double[][][][] entradas, double[][] saidas, int epochs){
-      Thread t = new Thread(() -> modelo.treinar(entradas, saidas, epochs));
-      t.setPriority(Thread.MAX_PRIORITY);
+      Thread t = new Thread(() -> modelo.treinar(entradas, saidas, epochs, true));
       t.start();
       try{
          t.join();
@@ -67,15 +67,17 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{4, 4}, 42, "leakyrelu"),
+         new Convolucional(formEntrada, new int[]{3, 3}, 32, "leakyrelu"),
+         new MaxPooling(new int[]{2, 2}),
+         new Convolucional(new int[]{3, 3}, 32, "leakyrelu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(132, "tanh"),
+         new Densa(162, "tanh"),
          new Densa(NUM_DIGITOS, "softmax"),
       });
 
       modelo.compilar(
-         new SGD(0.001, 0.99),
+         new SGD(0.01, 0.9),
          new EntropiaCruzada(),
          new He(),
          new Zeros()
@@ -151,7 +153,7 @@ public class MainConv{
          }
       }
       
-      System.out.println("Rótulos gerados.");
+      System.out.println("Rótulos gerados de 0 a " + (digitos-1) + ".");
       return rotulos;
    }
 

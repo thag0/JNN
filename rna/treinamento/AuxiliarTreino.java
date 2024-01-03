@@ -36,7 +36,8 @@ public class AuxiliarTreino{
       double[] previsto = saida.saidaParaArray();
       double[] gradPrev = perda.derivada(previsto, real);
 
-      saida.calcularGradiente(new Mat(gradPrev));
+      Mat g = new Mat(gradPrev);
+      saida.calcularGradiente(g);
       for(int i = redec.length-2; i >= 0; i--){
          redec[i].calcularGradiente(redec[i+1].obterGradEntrada());
       }

@@ -17,7 +17,7 @@ abstract class Metrica{
     * @param saida dados de saída relativos a entrada.
     * @return valor de avaliação de acordo com a métrica configurada
     */
-   public double calcular(Modelo rede, double[][] entrada, double[][] saida){
+   public double calcular(Modelo rede, Object[] entrada, Object[] saida){
       throw new UnsupportedOperationException(
          "É necessário implementar a métrica de avaliação da rede."
       );
@@ -71,22 +71,24 @@ abstract class Metrica{
     * @param saidas
     * @return
     */
-   protected int[][] matrizConfusao(Modelo rede, double[][] entradas, double[][] saidas){
-      int nClasses = saidas[0].length;
-      int[][] matriz = new int[nClasses][nClasses];
+   protected int[][] matrizConfusao(Modelo rede, Object[] entradas, Object[] saidas){
+      if(saidas instanceof double[][] == false){
+         throw new IllegalArgumentException(
+            "Objeto esperado para saída é double[][], recebido " + saidas.getClass().getTypeName()
+         );
+      }
 
-      double[] entrada = new double[entradas[0].length];
-      double[] saida = new double[saidas[0].length];
+      double[][] s = (double[][]) saidas;
+
+      int nClasses = s[0].length;
+      int[][] matriz = new int[nClasses][nClasses];
       double[] saidaRede = new double[rede.camadaSaida().tamanhoSaida()];
 
       for(int i = 0; i < entradas.length; i++){
-         System.arraycopy(entradas[i], 0, entrada, 0, entradas[i].length);
-         System.arraycopy(saidas[i], 0, saida, 0, saidas[i].length);
-
-         rede.calcularSaida(entrada);
+         rede.calcularSaida(entradas[i]);
          saidaRede = rede.saidaParaArray();
 
-         int real = this.indiceMaiorValor(saida);
+         int real = this.indiceMaiorValor(s[i]);
          int previsto = this.indiceMaiorValor(saidaRede);
 
          matriz[real][previsto]++;
