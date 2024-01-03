@@ -161,13 +161,11 @@ public class AdaGrad extends Otimizador{
 
    @Override
    public String info(){
-      String espacamento = "    ";
+      super.construirInfo();
       
-      String buffer = "";
-      buffer += espacamento + "Otimizador: " +  this.nome() + "\n";
-      buffer += espacamento + "TaxaAprendizagem: " + this.taxaAprendizagem + "\n";
-      buffer += espacamento + "Epsilon: " + this.epsilon + "\n";
+      super.addInfo("TaxaAprendizagem: " + this.taxaAprendizagem);
+      super.addInfo("Epsilon: " + this.epsilon);
 
-      return buffer;
+      return super.info();
    }
 }

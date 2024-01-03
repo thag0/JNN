@@ -22,7 +22,7 @@ public class Classificador{
       //carregando dados e tratando
       //removendo linha com nomes das categorias
       //tranformando a ultima coluna em categorização binária
-      Dados iris = ged.lerCsv("./dados/iris.csv");
+      Dados iris = ged.lerCsv("./dados/csv/iris.csv");
       ged.removerLinha(iris, 0);
       int[] shape = ged.shapeDados(iris);
       int ultimoIndice = shape[1]-1;
@@ -52,10 +52,12 @@ public class Classificador{
       });
 
       Perda perda = new EntropiaCruzada();
-      Otimizador otimizador = new SGD(0.001, 0.95);
+      // Otimizador otimizador = new SGD(0.001, 0.95);
+      Otimizador otimizador = new AdaGrad();
       Inicializador inicializador = new Xavier();
       modelo.compilar(otimizador, perda, inicializador);
       modelo.configurarHistorico(true);
+      System.out.println(modelo.info());
       
       //treinando e avaliando os resultados
       modelo.treinar(treinoX, treinoY, 3_000);

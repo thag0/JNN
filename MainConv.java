@@ -68,7 +68,7 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{4, 4}, 32, "leakyrelu"),
+         new Convolucional(formEntrada, new int[]{4, 4}, 36, "leakyrelu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
          new Densa(120, "tanh"),
@@ -76,7 +76,7 @@ public class MainConv{
       });
 
       modelo.compilar(
-         new SGD(0.001, 0.99),
+         new SGD(0.0001, 0.999),
          new EntropiaCruzada(),
          new Xavier(),
          new Zeros()

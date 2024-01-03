@@ -21,6 +21,16 @@ import rna.estrutura.Camada;
 public abstract class Otimizador{
 
 	/**
+	 * Informações sobre o otimizador.
+	 */
+	String info;
+
+	/**
+	 * Espaçamento para uma melhor formatação das informações do otimizador
+	 */
+	String pad = " ".repeat(4);
+
+	/**
 	 * Inicializa os parâmetros do otimizador para a as camadas da Rede Neural.
 	 * @param redec lista de camadas densas da Rede Neural.
 	 */
@@ -50,9 +60,24 @@ public abstract class Otimizador{
 	 * @return buffer formatado.
 	 */
 	public String info(){
-		throw new UnsupportedOperationException(
-			"Implementar método de informações do otimizador."
-		);
+		return this.info;
+	}
+
+	/**
+	 * Inicializa o valor padrão para informações do otimizador, informando
+	 * seu nome.
+	 */
+	protected void construirInfo(){
+		this.info = "";
+		this.info += this.pad +  "Otimizador: " + this.nome() + "\n";
+	}
+
+	/**
+	 * Adiciona uma nova linha de informação do otimizador.
+	 * @param info informação adicional do otimizador
+	 */
+	protected void addInfo(String info){
+		this.info += this.pad + info + "\n";
 	}
 
 	/**

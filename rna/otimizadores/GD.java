@@ -86,13 +86,11 @@ public class GD extends Otimizador{
 
    @Override
    public String info(){
-      String espacamento = "    ";
+      super.construirInfo();
       
-      String buffer = "";
-      buffer += espacamento + "Otimizador: " +  this.nome() + "\n";
-      buffer += espacamento + "TaxaAprendizagem: " + this.taxaAprendizagem + "\n";
+      super.addInfo("TaxaAprendizagem: " + this.taxaAprendizagem);
 
-      return buffer;
+      return super.info();
    }
    
 }
