@@ -19,10 +19,8 @@ public class MainConv{
    public static void main(String[] args){
       ged.limparConsole();
       
-      double[][][][] entradas = new double[NUM_AMOSTRAS * NUM_DIGITOS][NUM_DIGITOS][][];
-      double[][] saidas = new double[NUM_AMOSTRAS * NUM_DIGITOS][NUM_DIGITOS];
-      entradas = carregarDadosMNIST("/dados/mnist/treino/", NUM_AMOSTRAS, NUM_DIGITOS);
-      saidas = criarRotulosMNIST(NUM_AMOSTRAS, NUM_DIGITOS);
+      final var entradas = carregarDadosMNIST("/dados/mnist/treino/", NUM_AMOSTRAS, NUM_DIGITOS);
+      final var saidas = criarRotulosMNIST(NUM_AMOSTRAS, NUM_DIGITOS);
 
       Sequencial modelo = criarModelo();
       System.out.println(modelo.info());
@@ -33,7 +31,8 @@ public class MainConv{
 
       System.out.println("Treinando.");
       t1 = System.nanoTime();
-      modelo.treinar(entradas, saidas, 50);
+      //dedicar uma thread pra executar em segundo plano
+      rodarTreino(modelo, entradas, saidas, 60);
       t2 = System.nanoTime();
       
       long tempoDecorrido = t2 - t1;
@@ -54,25 +53,32 @@ public class MainConv{
       Main.executarComando("python grafico.py");
    }
 
+   static void rodarTreino(Sequencial modelo, double[][][][] entradas, double[][] saidas, int epochs){
+      Thread t = new Thread(() -> modelo.treinar(entradas, saidas, epochs));
+      t.setPriority(Thread.MAX_PRIORITY);
+      t.start();
+      try{
+         t.join();
+      }catch(Exception e){
+         e.printStackTrace();
+      }
+   }
+
    public static Sequencial criarModelo(){
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{5, 5}, 64, "leakyrelu"),
-         new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{3, 3}, 64, "leakyrelu"),
+         new Convolucional(formEntrada, new int[]{4, 4}, 36, "leakyrelu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(460, "leakyrelu"),
-         new Densa(140, "leakyrelu"),
-         new Densa(60, "leakyrelu"),
+         new Densa(132, "tanh"),
          new Densa(NUM_DIGITOS, "softmax"),
       });
 
       modelo.compilar(
-         new SGD(0.001, 0.95),
+         new SGD(0.001, 0.99),
          new EntropiaCruzada(),
-         new LeCun(),
+         new Xavier(),
          new Zeros()
       );
       modelo.configurarHistorico(true);

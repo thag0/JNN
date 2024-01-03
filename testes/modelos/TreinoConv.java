@@ -17,24 +17,47 @@ public class TreinoConv{
    public static void main(String[] args){
       ged.limparConsole();
       
-      Sequencial modelo = serializador.lerSequencial("./modelo-convolucional.txt");
+      Sequencial modelo = serializador.lerSequencial("./conv-mnist-0-9.txt");
       testarPorbabilidade(modelo, "0_teste_1");
       testarPorbabilidade(modelo, "0_teste_2");
       testarPorbabilidade(modelo, "1_teste_1");
       testarPorbabilidade(modelo, "1_teste_2");
       testarPorbabilidade(modelo, "2_teste_1");
       testarPorbabilidade(modelo, "2_teste_2");
+      testarPorbabilidade(modelo, "3_teste_1");
+      testarPorbabilidade(modelo, "4_teste_1");
+      testarPorbabilidade(modelo, "5_teste_1");
+      testarPorbabilidade(modelo, "6_teste_1");
+      testarPorbabilidade(modelo, "7_teste_1");
+      testarPorbabilidade(modelo, "8_teste_1");
+      testarPorbabilidade(modelo, "9_teste_1");
    }
 
    static void testarPorbabilidade(Sequencial modelo, String imagemTeste){
-      System.out.println("\nTestando: " + imagemTeste);
       double[][][] teste1 = new double[1][][];
       teste1[0] = imagemParaMatriz("/dados/mnist/teste/" + imagemTeste + ".jpg");
       modelo.calcularSaida(teste1);
       double[] previsao = modelo.saidaParaArray();
-      for(int i = 0; i < previsao.length; i++){
-         System.out.println("Prob: " + i + ": " + (int)(previsao[i]*100) + "%");
+
+      System.out.println("\nTestando: " + imagemTeste);
+      System.out.println("Prev: " + maiorIndice(previsao));
+      // for(int i = 0; i < previsao.length; i++){
+         //    System.out.println("Prob: " + i + ": " + (int)(previsao[i]*100) + "%");
+         // }
+   }
+
+   static int maiorIndice(double[] arr){
+      int id = 0;
+      double maior = arr[0];
+
+      for(int i = 1; i < arr.length; i++){
+         if(arr[i] > maior){
+            id = i;
+            maior = arr[i];
+         }
       }
+
+      return id;
    }
 
    static double[][] imagemParaMatriz(String caminho){
