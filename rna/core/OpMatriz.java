@@ -171,13 +171,13 @@ public class OpMatriz{
       verificarLinhas(a, r);
       verificarColunas(r, b);
 
-      int i, j, k;
-      double res;
       int lin = r.lin(), col = r.col(), acol = a.col();
-      for(i = 0; i < lin; i++){
-         for(j = 0; j < col; j++){
+      double res = 0;
+
+      for(int i = 0; i < lin; i++){
+         for(int j = 0; j < col; j++){
             res = 0;
-            for(k = 0; k < acol; k++){
+            for(int k = 0; k < acol; k++){
                res += a.dado(i, k) * b.dado(k, j);
             }
             r.editar(i, j, res);    
@@ -265,7 +265,7 @@ public class OpMatriz{
     * @param b segunda matriz.
     * @return matriz contendo o resultado da soma.
     */
-   public Mat addR(Mat a, Mat b){
+   public Mat add(Mat a, Mat b){
       verificarLinhas(a, b);
       verificarColunas(a, b);
       
@@ -304,7 +304,7 @@ public class OpMatriz{
     * @param b segunda matriz.
     * @return r matriz contendo o resultado da subtração.
     */
-   public Mat subR(Mat a, Mat b){
+   public Mat sub(Mat a, Mat b){
       verificarLinhas(a, b);
       verificarColunas(a, b);
       
@@ -343,7 +343,7 @@ public class OpMatriz{
     * @param b segunda matriz.
     * @return matriz contendo o resultado do produto hadamard.
     */
-   public Mat hadamardR(Mat a, Mat b){
+   public Mat hadamard(Mat a, Mat b){
       verificarLinhas(a, b);
       verificarColunas(a, b);
       
@@ -361,27 +361,33 @@ public class OpMatriz{
     * R = A * esc
     * </pre>
     * @param a matriz alvo.
-    * @param e escalar utilizado para a multiplicação.
+    * @param e escalar usado.
     * @param r matriz que terá o resultado.
     */
-   public void escalar(Mat a, double e, Mat r){
+   public void multEscalar(Mat a, double e, Mat r){
       verificarLinhas(a, r);
       verificarColunas(a, r);
 
       r.copiar(a);
-      r.escalar(e);
+      r.aplicarFuncao((x) -> x * e);
    }
 
-   public void dividirEscalar(Mat a, double e, Mat r){
+   /**
+    * Adiciona o conteúdo resultante da divisão elemento a elemento do conteúdo da matriz
+    * A por um valor escalar de acordo com a expressão:
+    * <pre>
+    * R = A / esc
+    * </pre>
+    * @param a matriz alvo.
+    * @param e escalar usado.
+    * @param r matriz que terá o resultado.
+    */
+   public void divEscalar(Mat a, double e, Mat r){
       verificarLinhas(a, r);
       verificarColunas(a, r);
 
       r.copiar(a);
-      for(int i = 0; i < r.lin(); i++){
-         for(int j = 0; j < r.col(); j++){
-            r.div(i, j, e);
-         }
-      }
+      r.aplicarFuncao((x) -> x / e);
    }
 
    /**

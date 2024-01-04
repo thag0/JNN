@@ -51,7 +51,7 @@ public class Softmax extends Ativacao{
 
       opm.mult(
          camada.gradSaida, 
-         opm.hadamardR(tmp, opm.subR(ident, transp)), 
+         opm.hadamard(tmp, opm.sub(ident, transp)), 
          camada.derivada
       );
    }

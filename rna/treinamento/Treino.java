@@ -112,11 +112,11 @@ public class Treino{
       for(int i = 0; i < redec.length; i++){
          Densa camada = redec[i];
 
-         opmat.escalar(camada.gradPesos, taxaAprendizagem, camada.gradPesos);
+         opmat.multEscalar(camada.gradPesos, taxaAprendizagem, camada.gradPesos);
          opmat.add(camada.pesos, camada.gradPesos, camada.pesos);
 
          if(camada.temBias()){
-            opmat.escalar(camada.gradSaida, taxaAprendizagem, camada.gradSaida);
+            opmat.multEscalar(camada.gradSaida, taxaAprendizagem, camada.gradSaida);
             opmat.add(camada.bias, camada.gradSaida, camada.bias);
          }
       }

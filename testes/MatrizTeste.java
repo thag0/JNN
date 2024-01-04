@@ -19,19 +19,14 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
 
-      double[][] e1 = {
-         {1, 2},
-         {3, 4},
-      };
-      double[][] e2 = {
-         {5, 6},
-         {7, 8},
+      double[][] e = {
+         {2, 4},
+         {6, 8},
       };
 
-      Mat[] entrada = {new Mat(e1), new Mat(e2)};
-      Flatten flat = new Flatten(new int[]{2, 2, 2});
-      flat.calcularSaida(entrada);
-      flat.saida.print("saida flat");
+      Mat m = new Mat(e);
+      opmat.multEscalar(m, 2, m);
+      m.print();
    }
 
    static void derivadaSoftmax(){
