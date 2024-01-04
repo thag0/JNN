@@ -31,10 +31,10 @@ Até o momento o modelo sequencial está lidando perfeitamente bem com os métod
 
 # Treinamento de modelos Convolucionais
 
-![treino conv](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/088b40d8-bf53-491e-897f-7138f1c5ea88)
+Estou testando os modelos convolucionais no conjunto de dados do MNIST, atualmente estou usando todos os 10 dítigos para treino, onde cada dígito possui 20 amostras cada.
 
-Estou iniciando os teste com modelos convolucionais e já obtive ótimos resultados usando um pequeno conjunto de dados do mnist pra treinar um modelo simples.
+Esse é o modelo que até agora teve a maior acurárcia entre os testes (84%)
 
-Nesses testes estou usando o conjunto de dados do MNIST para ensinar o modelo a aprender os padrões das imagens de 0 e 1 por enquanto, nos pequenos testes que fiz o modelo consegue aprender muito bem e muito rapidamente os padrões das imagens.
+![caracteristicas-modelo-convolucional](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/f34357d7-8d8e-450d-9811-5f9addaf6004)
 
-Minha dificuldade agora é ajustar a camada pooling pra ajudar a acelerar o treinamento da rede, diminuindo as dimensões de saída das camadas convolucional, mas a arquitetura dessa camada ainda não está funcionando corretamente e provavelmente deve ser pelo método de cálculo de gradientes, que é onde o modelo de fato aprende.
+Já estou bem satisfeito de ter conseguido esses resultados com o modelo convolucional, mas sempre há espaço para melhorias e quero continuar trabalhando nisso.
