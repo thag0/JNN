@@ -31,7 +31,7 @@ Até o momento o modelo sequencial está lidando perfeitamente bem com os métod
 
 # Treinamento de modelos Convolucionais
 
-Estou testando os modelos convolucionais no ocnjunto de dados do MNIST, atualmente estou usando todos os 10 dítigos para treino, onde cada dígito possui 20 amostras cada.
+Estou testando os modelos convolucionais no conjunto de dados do MNIST, atualmente estou usando todos os 10 dítigos para treino, onde cada dígito possui 20 amostras cada.
 
 Esse é o modelo que até agora teve a maior acurárcia entre os testes (84%)
 
