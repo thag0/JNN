@@ -1,4 +1,4 @@
-package testes.modelos;
+package testes;
 
 import java.awt.image.BufferedImage;
 
@@ -17,10 +17,10 @@ public class TreinoConv{
    public static void main(String[] args){
       ged.limparConsole();
       
-      Sequencial modelo = serializador.lerSequencial("./conv-mnist-2.txt");
+      Sequencial modelo = serializador.lerSequencial("./conv-mnist-5.txt");
 
       int digitos = 10;
-      int amostras = 1;
+      int amostras = 10;
       var testeX = carregarDadosMNIST("/dados/mnist/teste/", amostras, digitos);
       var testeY = criarRotulosMNIST(amostras, digitos);
 

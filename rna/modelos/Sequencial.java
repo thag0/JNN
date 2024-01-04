@@ -425,7 +425,7 @@ public class Sequencial extends Modelo implements Cloneable{
    }
 
    @Override
-   public String info() {
+   public String info(){
       verificarCompilacao();
 
       String espacamento = "    ";
@@ -450,14 +450,14 @@ public class Sequencial extends Modelo implements Cloneable{
          String nomeCamada = camada.id + " - " + camada.getClass().getSimpleName();
 
          //formato de entrada
-         String formEntrada = String.format("e(%d", e[0]);
+         String formEntrada = String.format("(%d", e[0]);
          for(int i = 1; i < e.length; i++){
             formEntrada += String.format(", %d", e[i]);
          }
          formEntrada += ")";
 
          //formato de saída
-         String formSaida = String.format("s(%d", s[0]);
+         String formSaida = String.format("(%d", s[0]);
          for(int i = 1; i < s.length; i++){
             formSaida += String.format(", %d", s[i]);
          }

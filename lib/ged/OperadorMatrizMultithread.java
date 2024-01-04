@@ -1,8 +1,6 @@
 package lib.ged;
 
 class OperadorMatrizMultithread{
-
-   //TODO implementar generaliação de uso usando Objetc igual com o OperadorMatriz
    
    private int nThreads = 2;
 

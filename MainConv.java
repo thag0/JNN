@@ -16,7 +16,7 @@ public class MainConv{
    static final int NUM_DIGITOS_TREINO = 10;
    static final int NUM_AMOSTRAS_TREINO = 20;
    static final int NUM_DIGITOS_TESTE = 10;
-   static final int NUM_AMOSTRAS_TESTE = 1;
+   static final int NUM_AMOSTRAS_TESTE = 10;
 
    public static void main(String[] args){
       ged.limparConsole();
@@ -52,9 +52,9 @@ public class MainConv{
       testes.modelos.TesteModelos.exportarHistoricoPerda(modelo);
 
       salvarSequencial(modelo, "./modelo-convolucional.txt");
-      for(int i = 0; i < NUM_DIGITOS_TREINO; i++){
-         testarPorbabilidade(modelo, (i + "_teste_1"));
-      }
+      // for(int i = 0; i < NUM_DIGITOS_TREINO; i++){
+      //    testarPorbabilidade(modelo, (i + "_teste_1"));
+      // }
 
       Main.executarComando("python grafico.py");
    }
@@ -73,17 +73,17 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{3, 3}, 32, "leakyrelu"),
+         new Convolucional(formEntrada, new int[]{3, 3}, 34, "leakyrelu"),
          new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{3, 3}, 32, "leakyrelu"),
+         new Convolucional(new int[]{3, 3}, 34, "leakyrelu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(162, "tanh"),
+         new Densa(136, "sigmoid"),
          new Densa(NUM_DIGITOS_TREINO, "softmax"),
       });
 
       modelo.compilar(
-         new SGD(0.01, 0.9),
+         new SGD(0.0001, 0.999),
          new EntropiaCruzada(),
          new He(),
          new Zeros()
