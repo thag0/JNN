@@ -1,7 +1,6 @@
 package testes.modelos;
 
 import java.awt.image.BufferedImage;
-import java.util.concurrent.TimeUnit;
 
 import lib.ged.Ged;
 import lib.geim.Geim;
@@ -20,17 +19,15 @@ public class TreinoConv{
       
       Sequencial modelo = serializador.lerSequencial("./conv-mnist-2.txt");
 
-      double[][][][] entrada = new double[1][1][][];
-      double[][] saida = {{1, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
-      entrada[0][0] = imagemParaMatriz("/dados/mnist/teste/0_teste_1.jpg");
-      testarPorbabilidade(modelo, "0_teste_1");
+      int digitos = 10;
+      int amostras = 1;
+      var testeX = carregarDadosMNIST("/dados/mnist/teste/", amostras, digitos);
+      var testeY = criarRotulosMNIST(amostras, digitos);
 
-      long tempo;
-      tempo = marcarTempo(() -> modelo.calcularSaida(entrada[0]));
-      System.out.println("Tempo forward: " + TimeUnit.NANOSECONDS.toMillis(tempo) + " ms");
-      
-      tempo = marcarTempo(() -> modelo.treinar(entrada, saida, 1, false));
-      System.out.println("Tempo backward: " + TimeUnit.NANOSECONDS.toMillis(tempo) + " ms");
+      double perda = modelo.avaliador.entropiaCruzada(testeX, testeY);
+      double acuraria = modelo.avaliador.acuracia(testeX, testeY);
+      System.out.println("Perda: " + perda);
+      System.out.println("Acurácia: " + acuraria);
    }
 
    static long marcarTempo(Runnable funcao){
@@ -80,5 +77,34 @@ public class TreinoConv{
          }
       }
       return imagem;
+   }
+
+   public static double[][][][] carregarDadosMNIST(String caminho, int amostras, int digitos){
+      double[][][][] entradas = new double[digitos * amostras][1][][];
+
+      int id = 0;
+      for(int i = 0; i < digitos; i++){
+         for(int j = 0; j < amostras; j++){
+            String caminhoCompleto = caminho + i + "/img_" + j + ".jpg";
+            double[][] imagem = imagemParaMatriz(caminhoCompleto);
+            entradas[id++][0] = imagem;
+         }
+      }
+
+      System.out.println("Imagens carregadas. (" + entradas.length + ")");
+      return entradas;
+   }
+
+   public static double[][] criarRotulosMNIST(int amostras, int digitos){
+      double[][] rotulos = new double[digitos * amostras][digitos];
+      for(int numero = 0; numero < digitos; numero++){
+         for(int i = 0; i < amostras; i++){
+            int indice = numero * amostras + i;
+            rotulos[indice][numero] = 1;
+         }
+      }
+      
+      System.out.println("Rótulos gerados de 0 a " + (digitos-1) + ".");
+      return rotulos;
    }
 }

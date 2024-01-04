@@ -13,14 +13,19 @@ public class MainConv{
    static Ged ged = new Ged();
    static Geim geim = new Geim();
 
-   static final int NUM_DIGITOS = 10;
-   static final int NUM_AMOSTRAS = 20;
+   static final int NUM_DIGITOS_TREINO = 10;
+   static final int NUM_AMOSTRAS_TREINO = 20;
+   static final int NUM_DIGITOS_TESTE = 10;
+   static final int NUM_AMOSTRAS_TESTE = 1;
 
    public static void main(String[] args){
       ged.limparConsole();
       
-      final var entradas = carregarDadosMNIST("/dados/mnist/treino/", NUM_AMOSTRAS, NUM_DIGITOS);
-      final var saidas = criarRotulosMNIST(NUM_AMOSTRAS, NUM_DIGITOS);
+      final var treinoX = carregarDadosMNIST("/dados/mnist/treino/", NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO);
+      final var treinoY = criarRotulosMNIST(NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO);
+      
+      final var testeX = carregarDadosMNIST("/dados/mnist/teste/", NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
+      final var testeY = criarRotulosMNIST(NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
 
       Sequencial modelo = criarModelo();
       System.out.println(modelo.info());
@@ -32,7 +37,7 @@ public class MainConv{
       System.out.println("Treinando.");
       t1 = System.nanoTime();
       //dedicar uma thread pra executar em segundo plano
-      rodarTreino(modelo, entradas, saidas, 50);
+      rodarTreino(modelo, treinoX, treinoY, 50);
       t2 = System.nanoTime();
       
       long tempoDecorrido = t2 - t1;
@@ -41,12 +46,13 @@ public class MainConv{
       minutos = (segundosTotais % 3600) / 60;
       segundos = segundosTotais % 60;
       System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
-      System.out.println("Perda: " + modelo.avaliador.entropiaCruzada(entradas, saidas));
-      System.out.println("Acurárcia: " + modelo.avaliador.acuracia(entradas, saidas));
+      System.out.println("Perda: " + modelo.avaliador.entropiaCruzada(treinoX, treinoY));
+      System.out.println("Acurárcia treino: " + modelo.avaliador.acuracia(treinoX, treinoY));
+      System.out.println("Acurárcia teste: " + modelo.avaliador.acuracia(testeX, testeY));
       testes.modelos.TesteModelos.exportarHistoricoPerda(modelo);
 
       salvarSequencial(modelo, "./modelo-convolucional.txt");
-      for(int i = 0; i < NUM_DIGITOS; i++){
+      for(int i = 0; i < NUM_DIGITOS_TREINO; i++){
          testarPorbabilidade(modelo, (i + "_teste_1"));
       }
 
@@ -73,7 +79,7 @@ public class MainConv{
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
          new Densa(162, "tanh"),
-         new Densa(NUM_DIGITOS, "softmax"),
+         new Densa(NUM_DIGITOS_TREINO, "softmax"),
       });
 
       modelo.compilar(
