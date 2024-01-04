@@ -14,7 +14,7 @@ public class MainConv{
    static Geim geim = new Geim();
 
    static final int NUM_DIGITOS_TREINO = 10;
-   static final int NUM_AMOSTRAS_TREINO = 20;
+   static final int NUM_AMOSTRAS_TREINO = 30;
    static final int NUM_DIGITOS_TESTE = 10;
    static final int NUM_AMOSTRAS_TESTE = 10;
 
@@ -66,7 +66,7 @@ public class MainConv{
       }
    }
 
-   public static Sequencial criarModelo(){
+   static Sequencial criarModelo(){
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
@@ -75,7 +75,7 @@ public class MainConv{
          new Convolucional(new int[]{3, 3}, 38, "leakyrelu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(146, "sigmoid"),
+         new Densa(148, "sigmoid"),
          new Densa(NUM_DIGITOS_TREINO, "softmax"),
       });
 
@@ -172,6 +172,6 @@ public class MainConv{
    static void salvarSequencial(Sequencial modelo, String caminho){
       System.out.println("Salvando modelo.");
       Serializador s = new Serializador();
-      s.salvar(modelo, caminho, "float");
+      s.salvar(modelo, caminho, "double");
    }
 }

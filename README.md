@@ -31,10 +31,10 @@ Até o momento o modelo sequencial está lidando perfeitamente bem com os métod
 
 # Treinamento de modelos Convolucionais
 
-Estou testando os modelos convolucionais no conjunto de dados do MNIST, atualmente estou usando todos os 10 dítigos para treino, onde cada dígito possui 20 amostras cada.
+Estou testando os modelos convolucionais no conjunto de dados do MNIST, atualmente estou usando todos os 10 dítigos para treino, onde cada dígito possui 30 amostras cada.
 
-Esse é o modelo que até agora teve a maior acurárcia entre os testes (84%)
+Esse é o modelo que até agora teve a maior acurárcia entre os testes (87%)
 
-![caracteristicas-modelo-convolucional](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/f34357d7-8d8e-450d-9811-5f9addaf6004)
+![caracteristicas-modelo-convolucional](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/9f0c8938-4ba0-47c8-8d4a-d7a3ba6fe989)
 
 Já estou bem satisfeito de ter conseguido esses resultados com o modelo convolucional, mas sempre há espaço para melhorias e quero continuar trabalhando nisso.
