@@ -28,6 +28,7 @@ public class MainConv{
       final var testeY = criarRotulosMNIST(NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
 
       Sequencial modelo = criarModelo();
+      modelo.configurarHistorico(true);
       System.out.println(modelo.info());
 
       // treinar e marcar tempo
@@ -81,10 +82,8 @@ public class MainConv{
       modelo.compilar(
          new SGD(0.0001, 0.999),
          new EntropiaCruzada(),
-         new He(),
-         new Zeros()
+         new He()
       );
-      modelo.configurarHistorico(true);
 
       return modelo;
    }
