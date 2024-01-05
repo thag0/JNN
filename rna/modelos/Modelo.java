@@ -8,12 +8,16 @@ import rna.otimizadores.Otimizador;
 import rna.treinamento.Treinador;
 
 /**
- * Base para os modelos dentro da biblioteca.
+ * <h3>
+ *    Basa para crianção de modelos dentro da biblioteca.
+ * </h3>
+ * Contém a inteface para os métodos necessários que são usados
+ * para implementação de modelos.
  */
-public class Modelo{
+public abstract class Modelo{
 
    /**
-    * Nome personalizado do modelo.
+    * Nome da instância do modelo.
     */
    protected String nome = this.getClass().getSimpleName();
 
@@ -66,9 +70,7 @@ public class Modelo{
     *    Para modelos mais completos, use {@code RedeNeural} ou {@code Sequencial}.
     * </p>
     */
-   public Modelo(){
-
-   }
+   protected Modelo(){}
 
    /**
     * <p>
@@ -146,11 +148,7 @@ public class Modelo{
     * @param perda função de perda usada para o treinamento do modelo.
     * @param iniKernel inicializador para os kernels.
     */
-   public void compilar(Otimizador otimizador, Perda perda, Inicializador iniKernel){
-      throw new IllegalArgumentException(
-         "Implementar compilação do modelo."
-      );
-   }
+   public abstract void compilar(Otimizador otimizador, Perda perda, Inicializador iniKernel);
 
    /**
     * Inicializa os parâmetros necessários para cada camada do modelo,
@@ -167,11 +165,7 @@ public class Modelo{
     * @param iniKernel inicializador para os kernels.
     * @param iniBias inicializador para os bias.
     */
-   public void compilar(Otimizador otimizador, Perda perda, Inicializador iniKernel, Inicializador iniBias){
-      throw new IllegalArgumentException(
-         "Implementar compilação do modelo."
-      );
-   }
+   public abstract void compilar(Otimizador otimizador, Perda perda, Inicializador iniKernel, Inicializador iniBias);
 
    /**
     * Treina o modelo de acordo com as configurações predefinidas.
@@ -186,11 +180,7 @@ public class Modelo{
     * @param epochs quantidade de épocas de treinamento.
     * @param logs logs para perda durante as épocas de treinamento.
     */
-   public void treinar(Object[] entradas, Object[] saidas, int epochs, boolean logs){
-      throw new IllegalArgumentException(
-         "Implementar treinamento para o modelo."
-      );
-   }
+   public abstract void treinar(Object[] entradas, Object[] saidas, int epochs, boolean logs);
    
    /**
     * Treina o modelo de acordo com as configurações predefinidas.
@@ -205,73 +195,45 @@ public class Modelo{
     * @param epochs quantidade de épocas de treinamento.
     * @param tamLote tamanho do lote de treinamento.
     */
-   public void treinar(Object[] entradas, Object[] saidas, int epochs, int tamLote){
-      throw new IllegalArgumentException(
-         "Implementar treinamento em lotes para o modelo."
-      );
-   }
+   public abstract void treinar(Object[] entradas, Object[] saidas, int epochs, int tamLote);
 
    /**
     * Propaga os dados de entrada pelo modelo.
     * @param entrada entrada.
     */
-   public void calcularSaida(Object entrada){
-      throw new IllegalArgumentException(
-         "Implementar calculo de saída do modelo."
-      );
-   }
+   public abstract void calcularSaida(Object entrada);
 
    /**
     * Propaga os dados de entrada pelo modelo.
     * @param entradas array contendo multiplas entradas.
     * @return array contendo as saídas correspondentes.
     */
-   public Object[] calcularSaidas(Object[] entradas){
-      throw new IllegalArgumentException(
-         "Implementar calculo de saída do modelo para múltiplas entradas."
-      );
-   }
+   public abstract Object[] calcularSaidas(Object[] entradas);
 
    /**
     * Retorna o otimizador que está sendo usado para o treino do modelo.
     * @return otimizador atual do modelo.
     */
-   public Otimizador otimizador(){
-     throw new IllegalArgumentException(
-         "Implementar retorno do otimizador do modelo."
-      );       
-   }
+   public abstract Otimizador otimizador();
 
    /**
     * Retorna a função de perda configurada do modelo.
     * @return função de perda atual do modelo.
     */
-   public Perda perda(){
-     throw new IllegalArgumentException(
-         "Implementar retorno da função de perda do modelo."
-      );       
-   }
+   public abstract Perda perda();
 
    /**
     * Retorna a {@code camada} do Modelo correspondente ao índice fornecido.
     * @param id índice da busca.
     * @return camada baseada na busca.
     */
-   public Camada camada(int id){
-      throw new IllegalArgumentException(
-         "Implementar retorno de camada baseado em índice do modelo."
-      ); 
-   }
+   public abstract Camada camada(int id);
 
    /**
     * Retorna todo o conjunto de camadas presente no modelo.
     * @return conjunto de camadas do modelo.
     */
-   public Camada[] camadas(){
-      throw new IllegalArgumentException(
-         "Implementar retorno das camadas do modelo."
-      ); 
-   }
+   public abstract Camada[] camadas();
 
    /**
     * Retorna a {@code camada de saída}, ou última camada, do modelo.
@@ -321,11 +283,7 @@ public class Modelo{
     * </p>
     * @return quantiade de parâmetros total do modelo.
     */
-   public int numParametros(){
-      throw new IllegalArgumentException(
-         "Implementar retorno da quantidade de parâmetros do modelo."
-      );     
-   }
+   public abstract int numParametros();
 
    /**
     * Retorna a quantidade de camadas presente no modelo.
@@ -347,11 +305,7 @@ public class Modelo{
     * </p>
     * @return array contendo o valor de perda durante cada época de treinamento do modelo.
     */
-   public double[] historico(){
-      throw new IllegalArgumentException(
-         "Implementar retorno do histórico de perdas do modelo."
-      ); 
-   }
+   public abstract double[] historico();
 
    /**
     * Mostra as informações sobre o modelo.

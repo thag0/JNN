@@ -18,13 +18,16 @@ public class MainConv{
    static final int NUM_DIGITOS_TESTE = 10;
    static final int NUM_AMOSTRAS_TESTE = 10;
 
+   static final String caminhoTreino = "/dados/mnist/treino/";
+   static final String caminhoTeste = "/dados/mnist/teste/";
+
    public static void main(String[] args){
       ged.limparConsole();
       
-      final var treinoX = carregarDadosMNIST("/dados/mnist/treino/", NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO);
+      final var treinoX = carregarDadosMNIST(caminhoTreino, NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO);
       final var treinoY = criarRotulosMNIST(NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO);
       
-      final var testeX = carregarDadosMNIST("/dados/mnist/teste/", NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
+      final var testeX = carregarDadosMNIST(caminhoTeste, NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
       final var testeY = criarRotulosMNIST(NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
 
       Sequencial modelo = criarModelo();
@@ -37,7 +40,6 @@ public class MainConv{
 
       System.out.println("Treinando.");
       t1 = System.nanoTime();
-      //dedicar uma thread pra executar em segundo plano
       rodarTreino(modelo, treinoX, treinoY, 50);
       t2 = System.nanoTime();
       
@@ -52,20 +54,32 @@ public class MainConv{
       System.out.println("Acurárcia teste: " + modelo.avaliador.acuracia(testeX, testeY));
       testes.modelos.TesteModelos.exportarHistoricoPerda(modelo);
 
-      salvarSequencial(modelo, "./modelo-convolucional.txt");
+      salvarModelo(modelo, "./modelo-convolucional.txt");
       Main.executarComando("python grafico.py");
    }
 
+   /**
+    * 
+    * @param modelo
+    * @param entradas
+    * @param saidas
+    * @param epochs
+    */
    static void rodarTreino(Sequencial modelo, double[][][][] entradas, double[][] saidas, int epochs){
-      Thread t = new Thread(() -> modelo.treinar(entradas, saidas, epochs, true));
-      t.start();
       try{
+         Thread t = new Thread(() -> {
+            modelo.treinar(entradas, saidas, epochs, true);
+         });
+         t.start();
          t.join();
       }catch(Exception e){
          e.printStackTrace();
       }
    }
 
+   /*
+    * Criação de modelos para testes.
+    */
    static Sequencial criarModelo(){
       int[] formEntrada = {28, 28, 1};
       
@@ -89,11 +103,22 @@ public class MainConv{
    }
 
    /**
+    * 
+    * @param modelo
+    * @param caminho
+    */
+   static void salvarModelo(Sequencial modelo, String caminho){
+      System.out.println("Salvando modelo.");
+      Serializador s = new Serializador();
+      s.salvar(modelo, caminho, "double");
+   }
+
+   /**
     * Converte uma imagem numa matriz contendo seus valores de brilho entre 0 e 1.
     * @param caminho caminho da imagem.
     * @return matriz contendo os valores de brilho da imagem.
     */
-   public static double[][] imagemParaMatriz(String caminho){
+   static double[][] imagemParaMatriz(String caminho){
       BufferedImage img = geim.lerImagem(caminho);
       double[][] imagem = new double[img.getHeight()][img.getWidth()];
 
@@ -112,7 +137,7 @@ public class MainConv{
     * @param modelo modelo sequencial de camadas.
     * @param imagemTeste nome da imagem que deve estar no diretório /minst/teste/
     */
-   public static void testarPorbabilidade(Sequencial modelo, String imagemTeste){
+   static void testarPorbabilidade(Sequencial modelo, String imagemTeste){
       System.out.println("\nTestando: " + imagemTeste);
       double[][][] teste1 = new double[1][][];
       teste1[0] = imagemParaMatriz("/dados/mnist/teste/" + imagemTeste + ".jpg");
@@ -129,7 +154,7 @@ public class MainConv{
     * @param digitos quantidade de dígitos, iniciando do dígito 0.
     * @return
     */
-   public static double[][][][] carregarDadosMNIST(String caminho, int amostras, int digitos){
+   static double[][][][] carregarDadosMNIST(String caminho, int amostras, int digitos){
       double[][][][] entradas = new double[digitos * amostras][1][][];
 
       int id = 0;
@@ -145,7 +170,13 @@ public class MainConv{
       return entradas;
    }
 
-   public static double[][] criarRotulosMNIST(int amostras, int digitos){
+   /**
+    * 
+    * @param amostras
+    * @param digitos
+    * @return
+    */
+   static double[][] criarRotulosMNIST(int amostras, int digitos){
       double[][] rotulos = new double[digitos * amostras][digitos];
       for(int numero = 0; numero < digitos; numero++){
          for(int i = 0; i < amostras; i++){
@@ -167,11 +198,5 @@ public class MainConv{
          }
          System.out.println();
       }
-   }
-
-   static void salvarSequencial(Sequencial modelo, String caminho){
-      System.out.println("Salvando modelo.");
-      Serializador s = new Serializador();
-      s.salvar(modelo, caminho, "double");
    }
 }

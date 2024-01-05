@@ -11,8 +11,10 @@ import rna.otimizadores.Otimizador;
 import rna.otimizadores.SGD;
 
 /**
- * Modelo de Rede Neural {@code Multilayer Perceptron} criado do zero. Possui um conjunto de camadas 
- * densas sequenciais que propagam os dados de entrada.
+ * <h3>
+ *    Modelo de Rede Neural {@code Multilayer Perceptron} criado do zero
+ * </h3>
+ *  Possui um conjunto de camadas densas sequenciais que propagam os dados de entrada.
  * <p>
  *    O modelo pode ser usado tanto para problemas de {@code regressão e classificação}, contando com 
  *    algoritmos de treino e otimizadores variados para ajudar na convergência e desempenho da rede para 

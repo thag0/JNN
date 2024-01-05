@@ -11,7 +11,9 @@ import rna.treinamento.Treinador;
 //implementar serialização do modelo
 
 /**
- * Modelo sequencial de camadas.
+ * <h3>
+ *    Modelo sequencial de camadas.
+ * </h3>
  * <p>
  *    Funciona usando empilhamento de camadas para dar mais flexibilidade
  *    na construção de modelos.
