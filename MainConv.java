@@ -20,6 +20,7 @@ public class MainConv{
 
    static final String caminhoTreino = "/dados/mnist/treino/";
    static final String caminhoTeste = "/dados/mnist/teste/";
+   static final String caminhoSaidaModelo = "./dados/modelosMNIST/modelo-convolucional.txt";
 
    public static void main(String[] args){
       ged.limparConsole();
@@ -54,7 +55,7 @@ public class MainConv{
       System.out.println("Acurárcia teste: " + modelo.avaliador.acuracia(testeX, testeY));
       testes.modelos.TesteModelos.exportarHistoricoPerda(modelo);
 
-      salvarModelo(modelo, "./modelo-convolucional.txt");
+      salvarModelo(modelo, caminhoSaidaModelo);
       Main.executarComando("python grafico.py");
    }
 

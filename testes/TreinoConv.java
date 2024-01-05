@@ -17,7 +17,7 @@ public class TreinoConv{
    public static void main(String[] args){
       ged.limparConsole();
       
-      Sequencial modelo = serializador.lerSequencial("./conv-mnist-87.txt");
+      Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/conv-mnist-87.txt");
       System.out.println(modelo.info());
 
       int digitos = 10;
@@ -28,7 +28,7 @@ public class TreinoConv{
       double perda = modelo.avaliador.entropiaCruzada(testeX, testeY);
       double acuraria = modelo.avaliador.acuracia(testeX, testeY);
       System.out.println("Perda: " + perda);
-      System.out.println("Acurácia: " + acuraria);
+      System.out.println("Acurácia: " + acuraria + "%");
    }
 
    static long marcarTempo(Runnable funcao){
