@@ -4,10 +4,50 @@ import rna.ativacoes.Ativacao;
 import rna.inicializadores.Inicializador;
 
 /**
- * Classe base para as camadas dentro dos modelos de Rede Neural.
- * Novas camadas devem implementar os métodos padrões da classe Camada.
+ * <h3>
+ *    Modelo base para a representação de uma Camada individual
+ *    dentro da biblioteca.
+ * </h3>
+ * <p>
+ *    A classe camada serve apenas de molde para criação de novas
+ *    camadas e não pode ser especificamente instanciada nem utilizada.
+ * </p>
+ * <p>
+ *    As partes mais importantes de uma camada são {@code calcularSaida()} e 
+ *    {@code calcularGradiente()} onde são implementados os métodos básicos 
+ *    também conhecidos como "forward" e "backward". 
+ * </p>
+ * <p>
+ *    Para a parte de propagação direta (calcular saída ou forward) os dados
+ *    recebidos de entrada são processados de acordo com cada regra individual
+ *    de cada camada e ao final os resultados são salvos em sua saída.
+ * </p>
+ * <p>
+ *    Na propagação reversa (calcular gradiente ou backward) são recebidos os 
+ *    gradientes da camada anterior e cada camada irá fazer seu processamento 
+ *    para calcular os próprios gradientes para seus atributos treináveis. Aqui 
+ *    cada camada tem o adicional de calcular os gradientes em relação as suas 
+ *    entradas para retropropagar para camadas anteriores usadas pelos modelos.
+ * </p>
+ * <h3>
+ * Existem dois detalhes importantes na implementação das camadas.
+ * </h3>
+ * <ul>
+ *    <li>
+ *       Primeiramente que os elementos das camadas devem ser pré inicializados 
+ *       para evitar alocações dinâmicas durante a execução dos modelos e isso 
+ *       se dá por dois motivos: ter controle das dimensões dos objetos criandos 
+ *       durante toda a execução dos algoritmos e também criar uma espécie de cache 
+ *       para evitar muitas instanciações em runtime.
+ *    </li>
+ *    <li>
+ *       Segundo, que as funções de ativação não são camadas independentes e sim 
+ *       funções que atuam sobre os elementos das camadas, especialmente nos elementos 
+ *       chamados "somatório" e guardam os resultados na saída da camada.
+ *    </li>
+ * </ul>
  */
-public class Camada{
+public abstract class Camada{
 
    /**
     * Controlador para uso dentro dos algoritmos de treino.
@@ -31,9 +71,7 @@ public class Camada{
     *    como molde de base para as outras camadas terem suas próprias implementações.
     * </p>
     */
-   public Camada(){
-
-   }
+   protected Camada(){}
 
    /**
     * Monta a estrutura da camada.
@@ -46,11 +84,7 @@ public class Camada{
     * da camada anterior, no caso de ser a primeira camada, dependerá do formato
     * dos dados de entrada.
     */
-   public void construir(Object entrada){
-      throw new IllegalArgumentException(
-         "Implementar construção da camada " + this.getClass().getTypeName() + "."
-      );
-   }
+   public abstract void construir(Object entrada);
 
    /**
     * Inicaliza os parâmetros treináveis da camada, 
@@ -59,11 +93,7 @@ public class Camada{
     * @param x valor usado pelos inicializadores, dependendo do que for usado
     * pode servir de alcance na aleatorização, valor de constante, entre outros.
     */
-   public void inicializar(Inicializador iniKernel, Inicializador iniBias, double x){
-      throw new IllegalArgumentException(
-         "Implementar inicialização da camada " + this.getClass().getTypeName() + "."
-      );
-   }
+   public abstract void inicializar(Inicializador iniKernel, Inicializador iniBias, double x);
 
    /**
     * Inicaliza os pesos da camada de acordo com o inicializador configurado.
@@ -71,11 +101,7 @@ public class Camada{
     * @param x valor usado pelos inicializadores, dependendo do que for usado
     * pode servir de alcance na aleatorização, valor de constante, entre outros.
     */
-   public void inicializar(Inicializador iniKernel, double x){
-      throw new IllegalArgumentException(
-         "Implementar inicialização da camada " + this.getClass().getTypeName() + "."
-      );
-   }
+   public abstract void inicializar(Inicializador iniKernel, double x);
 
    /**
     * Configura a função de ativação da camada através do nome fornecido, letras maiúsculas 
@@ -130,11 +156,7 @@ public class Camada{
     * qual posição a camada está localizada.
     * @param id id da camada.
     */
-   public void configurarId(int id){
-      throw new IllegalArgumentException(
-         "Implementar configuração de identificador da camada " + this.getClass().getTypeName() + "."
-      );
-   }
+   public abstract void configurarId(int id);
 
    /**
     * Configura o uso do bias para a camada.
@@ -159,11 +181,7 @@ public class Camada{
     * diretamente no seu processo de propagação.
     * @param entrada dados de entrada que poderão ser processados pela camada.
     */
-   public void calcularSaida(Object entrada){
-      throw new IllegalArgumentException(
-         "Implementar cálculo de saída da camada " + this.getClass().getTypeName() + "."
-      );
-   }
+   public abstract void calcularSaida(Object entrada);
 
    /**
     * Lógica para o cálculos dos gradientes de parâmetros treináveis dentro
@@ -177,21 +195,13 @@ public class Camada{
     * diretamente no seu processo de retropropagação.
     * @param gradSeguinte
     */
-   public void calcularGradiente(Object gradSeguinte){
-      throw new IllegalArgumentException(
-         "Implementar cálculo de gradientes da camada " + this.getClass().getTypeName() + "."
-      );
-   }
+   public abstract void calcularGradiente(Object gradSeguinte);
 
    /**
     * Retorna a saída da camada.
     * @return saída da camada.
     */
-   public Object saida(){
-      throw new IllegalArgumentException(
-         "Implementar retorno de saída da camada " + this.getClass().getTypeName() + "."
-      );
-   }
+   public abstract Object saida();
 
    /**
     * Retorna a função de ativação configurada pela camada.
@@ -231,11 +241,7 @@ public class Camada{
     * </pre>
     * @return array contendo os valores das dimensões de saída da camada.
     */
-   public int[] formatoSaida(){
-      throw new IllegalArgumentException(
-         "Implementar formato de saída da camada" + this.getClass().getTypeName() + "."
-      );
-   }
+   public abstract int[] formatoSaida();
 
    /**
     * Retorna a saída da camada no formato de array.
