@@ -168,6 +168,15 @@ public abstract class Modelo{
    public abstract void compilar(Otimizador otimizador, Perda perda, Inicializador iniKernel, Inicializador iniBias);
 
    /**
+    * Auxiliar na verificação da compilação do modelo.
+    */
+   protected void verificarCompilacao(){
+      if(this.compilado == false){
+         throw new IllegalArgumentException("O modelo ainda não foi compilado.");
+      }
+   }
+
+   /**
     * Treina o modelo de acordo com as configurações predefinidas.
     * <p>
     *    Certifique-se de configurar adequadamente o modelo para obter os 

@@ -154,22 +154,26 @@ public class Sequencial extends Modelo implements Cloneable{
    }
 
    /**
-    * Apaga a última camada contida no modelo.
+    * Apaga a última camada contida na lista de camadas do modelo.
+    * @return camada removida.
     * @throws IllegalArgumentException caso o modelo já não possua nenhuma 
     * camada disponível.
     */
-   public void sub(){
+   public Camada sub(){
       if(this.camadas.length == 0){
          throw new IllegalArgumentException(
             "Não há camadas no modelo."
          );
       }
+      Camada ultima = this.camadaSaida();
 
       Camada[] c = this.camadas;
       this.camadas = new Camada[this.camadas.length-1];
       for(int i = 0; i < this.camadas.length; i++){
          this.camadas[i] = c[i];
       }
+
+      return ultima;
    }
 
    @Override
@@ -260,18 +264,9 @@ public class Sequencial extends Modelo implements Cloneable{
       this.compilado = true;
    }
 
-   /**
-    * Auxiliar na verificação da compilação do modelo.
-    */
-   private void verificarCompilacao(){
-      if(this.compilado == false){
-         throw new IllegalArgumentException("O modelo ainda não foi compilado.");
-      }
-   }
-
    @Override
    public void calcularSaida(Object entrada){
-      verificarCompilacao();
+      super.verificarCompilacao();
 
       this.camadas[0].calcularSaida(entrada);
       for(int i = 1; i < this.camadas.length; i++){
@@ -281,7 +276,7 @@ public class Sequencial extends Modelo implements Cloneable{
 
    @Override
    public Object[] calcularSaidas(Object[] entradas){
-      verificarCompilacao();
+      super.verificarCompilacao();
 
       double[][] previsoes = new double[entradas.length][];
 
@@ -295,7 +290,7 @@ public class Sequencial extends Modelo implements Cloneable{
 
    @Override
    public void treinar(Object[] entradas, Object[] saidas, int epochs, boolean logs){
-      verificarCompilacao();
+      super.verificarCompilacao();
       
       if(entradas.length != saidas.length){
          throw new IllegalArgumentException(
@@ -315,7 +310,7 @@ public class Sequencial extends Modelo implements Cloneable{
    
    @Override
    public void treinar(Object[] entradas, Object[] saidas, int epochs, int tamLote){
-     this.verificarCompilacao();
+     super.verificarCompilacao();
 
      if(epochs < 1){
         throw new IllegalArgumentException(
@@ -349,7 +344,7 @@ public class Sequencial extends Modelo implements Cloneable{
 
    @Override
    public Camada camada(int id){
-      verificarCompilacao();
+      super.verificarCompilacao();
    
       if((id < 0) || (id >= this.camadas.length)){
          throw new IllegalArgumentException(
@@ -363,19 +358,19 @@ public class Sequencial extends Modelo implements Cloneable{
 
    @Override
    public Camada[] camadas(){
-      verificarCompilacao();
+      super.verificarCompilacao();
       return this.camadas;
    }
 
    @Override
    public Camada camadaSaida(){
-      this.verificarCompilacao();
+      super.verificarCompilacao();
       return this.camadas[this.camadas.length-1];
    }
 
    @Override
    public double[] saidaParaArray(){
-      verificarCompilacao();
+      super.verificarCompilacao();
       return this.camadaSaida().saidaParaArray();
    }
 
@@ -410,7 +405,7 @@ public class Sequencial extends Modelo implements Cloneable{
 
    @Override
    public int numCamadas(){
-      this.verificarCompilacao();
+      super.verificarCompilacao();
       return this.camadas.length;
    }
 
@@ -428,7 +423,7 @@ public class Sequencial extends Modelo implements Cloneable{
 
    @Override
    public String info(){
-      verificarCompilacao();
+      super.verificarCompilacao();
 
       String espacamento = "    ";
       String buffer = "";

@@ -208,7 +208,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
    public void configurarAtivacao(Ativacao ativacao){
-      this.verificarCompilacao();
+      super.verificarCompilacao();
       
       for(Camada camada : this.camadas){
          camada.configurarAtivacao(ativacao);
@@ -246,7 +246,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
    public void configurarAtivacao(String ativacao){
-      this.verificarCompilacao();
+      super.verificarCompilacao();
       
       for(Camada camada : this.camadas){
          camada.configurarAtivacao(ativacao);
@@ -586,17 +586,6 @@ public class RedeNeural extends Modelo implements Cloneable{
    }
 
    /**
-    * Verifica se o modelo já foi compilado para evitar problemas de uso indevido, 
-    * bem como componentes nulos.
-    * @throws IllegalArgumentException se o modelo não foi compilado.
-    */
-   private void verificarCompilacao(){
-      if(!this.compilado){
-         throw new IllegalArgumentException("O modelo ainda não foi compilado");
-      }
-   }
-
-   /**
     * Alimenta os dados pela rede neural usando o método de feedforward através do conjunto
     * de dados fornecido. 
     * <p>
@@ -611,7 +600,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     */
    @Override
    public void calcularSaida(Object entrada){
-      this.verificarCompilacao();
+      super.verificarCompilacao();
       if(entrada instanceof double[] == false){
          throw new IllegalArgumentException(
             "A entrada para o modelo RedeNeural deve ser um array do tipo double[]."
@@ -649,7 +638,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     */
    @Override
    public double[][] calcularSaidas(Object[] entradas){
-      this.verificarCompilacao();
+      super.verificarCompilacao();
       if(entradas instanceof double[][] == false){
          throw new IllegalArgumentException(
             "As entradas para o modelo RedeNeural devem ser uma matriz do tipo double[][]."
@@ -708,7 +697,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     */
    @Override
    public void treinar(Object[] entradas, Object[] saidas, int epochs, boolean logs){
-      this.verificarCompilacao();
+      super.verificarCompilacao();
 
       if(epochs < 1){
          throw new IllegalArgumentException(
@@ -748,7 +737,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     */
    @Override
    public void treinar(Object[] entradas, Object[] saidas, int epochs, int tamLote){
-      this.verificarCompilacao();
+      super.verificarCompilacao();
 
       if(epochs < 1){
          throw new IllegalArgumentException(
@@ -869,7 +858,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     */
    @Override
    public Densa camada(int id){
-      this.verificarCompilacao();
+      super.verificarCompilacao();
 
       if((id < 0) || (id >= this.camadas.length)){
          throw new IllegalArgumentException(
@@ -888,7 +877,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     */
    @Override
    public Densa[] camadas(){
-      this.verificarCompilacao();
+      super.verificarCompilacao();
       return this.camadas;
    }
 
@@ -899,7 +888,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     */
    @Override
    public Densa camadaSaida(){
-      this.verificarCompilacao();
+      super.verificarCompilacao();
       return this.camadas[this.camadas.length-1];
    }
 
@@ -913,7 +902,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     */
    @Override
    public double[] saidaParaArray(){
-      this.verificarCompilacao();
+      super.verificarCompilacao();
       return this.camadaSaida().saidaParaArray();
    }
 
@@ -935,7 +924,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
    public int[] obterArquitetura(){
-      this.verificarCompilacao();
+      super.verificarCompilacao();
       return this.arquitetura;
    }
 
@@ -976,7 +965,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     */
    @Override
    public int numCamadas(){
-      this.verificarCompilacao();
+      super.verificarCompilacao();
       return this.camadas.length;
    }
 
@@ -987,7 +976,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
    public int obterTamanhoEntrada(){
-      this.verificarCompilacao();
+      super.verificarCompilacao();
       return this.arquitetura[0];
    }
 
@@ -998,7 +987,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
    public int obterTamanhoSaida(){
-      this.verificarCompilacao();
+      super.verificarCompilacao();
       return this.arquitetura[this.arquitetura.length-1];
    }
 
@@ -1055,7 +1044,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     */
    @Override
    public String info(){
-      this.verificarCompilacao();
+      super.verificarCompilacao();
 
       String buffer = "";
       String espacamento = "    ";
