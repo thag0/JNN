@@ -60,8 +60,9 @@ public class TreinoLote{
     * @param epochs quantidade de épocas de treinamento.
     * @param embaralhar embaralhar dados de treino para cada época.
     * @param tamLote tamanho do lote.
+    * @param logs logs para perda durante as épocas de treinamento.
     */
-   public void treinar(Modelo modelo, Object[] entradas, Object[] saidas, int epochs, int tamLote){
+   public void treinar(Modelo modelo, Object[] entradas, Object[] saidas, int epochs, int tamLote, boolean logs){
       Camada[] camadas = modelo.camadas();
       Otimizador otimizador = modelo.otimizador();
       Perda perda = modelo.perda();
@@ -116,6 +117,8 @@ public class TreinoLote{
       aux.backpropagation(redec, perda, real);
 
       for(Camada camada : redec){
+         if(camada.treinavel == false) continue;
+
          double[] gradK = camada.obterGradKernel();
          double[] acK = camada.obterAcGradKernel();
          oparr.add(acK, gradK, acK);
@@ -137,6 +140,8 @@ public class TreinoLote{
     */
    void zerarGradientesAcumulados(Camada[] redec){
       for(Camada camada : redec){
+         if(camada.treinavel == false) continue;
+
          double[] acKernel = camada.obterAcGradKernel();
          oparr.preencher(acKernel, 0);
          camada.editarAcGradKernel(acKernel);
@@ -159,6 +164,8 @@ public class TreinoLote{
       double tamanho = (double)tamLote;
 
       for(Camada camada : redec){
+         if(camada.treinavel == false) continue;
+         
          double[] acKernel = camada.obterAcGradKernel();
          oparr.dividirEscalar(acKernel, tamanho, acKernel);
          camada.editarGradienteKernel(acKernel);

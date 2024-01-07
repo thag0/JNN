@@ -309,7 +309,7 @@ public class Sequencial extends Modelo implements Cloneable{
    }
    
    @Override
-   public void treinar(Object[] entradas, Object[] saidas, int epochs, int tamLote){
+   public void treinar(Object[] entradas, Object[] saidas, int epochs, int tamLote, boolean logs){
      super.verificarCompilacao();
 
      if(epochs < 1){
@@ -328,7 +328,8 @@ public class Sequencial extends Modelo implements Cloneable{
         entradas,
         saidas,
         epochs,
-        tamLote
+        tamLote,
+        logs
      );
   }
 

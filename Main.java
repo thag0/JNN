@@ -84,7 +84,8 @@ public class Main{
    }
 
    static Modelo criarSequencial(int entradas, int saidas){
-      Otimizador otm = new SGD(0.01, 0.9);
+      // Otimizador otm = new SGD(0.01, 0.9);
+      Otimizador otm = new AdaGrad(1);
       Perda perda = new ErroMedioQuadrado();
       Inicializador ini = new Xavier();
       
@@ -125,7 +126,7 @@ public class Main{
       
       int i = 0;
       while(i < epocas && jt.isVisible()){
-         modelo.treinar(entradas, saidas, epocasPorFrame, false);
+         modelo.treinar(entradas, saidas, epocasPorFrame, 64, false);
          jt.desenharTreino(modelo, i);
          i += epocasPorFrame;
 

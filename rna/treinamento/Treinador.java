@@ -75,14 +75,16 @@ public class Treinador{
     * @param saidas dados de saída correspondente as entradas para o treino.
     * @param epochs quantidade de épocas de treinamento.
     * @param tamLote tamanho do lote.
+    * @param logs logs para perda durante as épocas de treinamento.
     */
-   public void treino(Modelo rede, Object[] entradas, Object[] saidas, int epochs, int tamLote){
+   public void treino(Modelo rede, Object[] entradas, Object[] saidas, int epochs, int tamLote, boolean logs){
       treinoLote.treinar(
          rede,
          entradas, 
          saidas, 
          epochs, 
-         tamLote
+         tamLote,
+         logs
       );
 
       treinoLote.ultimoUsado = true;

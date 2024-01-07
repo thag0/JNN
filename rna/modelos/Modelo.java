@@ -203,8 +203,9 @@ public abstract class Modelo{
     * @param saidas dados de saída correspondente a entrada (class).
     * @param epochs quantidade de épocas de treinamento.
     * @param tamLote tamanho do lote de treinamento.
+    * @param logs logs para perda durante as épocas de treinamento.
     */
-   public abstract void treinar(Object[] entradas, Object[] saidas, int epochs, int tamLote);
+   public abstract void treinar(Object[] entradas, Object[] saidas, int epochs, int tamLote, boolean logs);
 
    /**
     * Propaga os dados de entrada pelo modelo.

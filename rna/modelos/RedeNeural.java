@@ -691,6 +691,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     * @param entradas dados de entrada do treino (features).
     * @param saidas dados de saída correspondente a entrada (class).
     * @param epochs quantidade de épocas de treinamento.
+    * @param logs logs para perda durante as épocas de treinamento.
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     * @throws IllegalArgumentException se houver alguma inconsistência dos dados de entrada e saída para a operação.
     * @throws IllegalArgumentException se o valor de épocas for menor que um.
@@ -731,12 +732,13 @@ public class RedeNeural extends Modelo implements Cloneable{
     * @param saidas dados de saída correspondente a entrada (class).
     * @param epochs quantidade de épocas de treinamento.
     * @param tamLote tamanho que o lote vai assumir durante o treino.
+    * @param logs logs para perda durante as épocas de treinamento.
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     * @throws IllegalArgumentException se houver alguma inconsistência dos dados de entrada e saída para a operação.
     * @throws IllegalArgumentException se o valor de épocas for menor que um.
     */
    @Override
-   public void treinar(Object[] entradas, Object[] saidas, int epochs, int tamLote){
+   public void treinar(Object[] entradas, Object[] saidas, int epochs, int tamLote, boolean logs){
       super.verificarCompilacao();
 
       if(epochs < 1){
@@ -755,7 +757,8 @@ public class RedeNeural extends Modelo implements Cloneable{
          entradas,
          saidas,
          epochs,
-         tamLote
+         tamLote,
+         logs
       );
    }
 
