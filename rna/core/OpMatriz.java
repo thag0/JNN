@@ -165,24 +165,7 @@ public class OpMatriz{
     * @param r matriz contendo o resultado.
     */
    public void mult(Mat a, Mat b, Mat r){
-      if(a.col() != b.lin()){
-         throw new IllegalArgumentException("Dimensões de A e B incompatíveis");
-      }
-      verificarLinhas(a, r);
-      verificarColunas(r, b);
-
-      int lin = r.lin(), col = r.col(), acol = a.col();
-      double res = 0;
-
-      for(int i = 0; i < lin; i++){
-         for(int j = 0; j < col; j++){
-            res = 0;
-            for(int k = 0; k < acol; k++){
-               res += a.dado(i, k) * b.dado(k, j);
-            }
-            r.editar(i, j, res);    
-         }
-      }
+      r.mult(a, b);
    }
 
    /**
@@ -248,11 +231,7 @@ public class OpMatriz{
     * @param r matriz contendo o resultado da soma.
     */
    public void add(Mat a, Mat b, Mat r){
-      verificarLinhas(a, b, r);
-      verificarColunas(a, b, r);
-
-      r.copiar(a);
-      r.add(b);
+      r.add(a, b);
    }
 
    /**
@@ -270,8 +249,7 @@ public class OpMatriz{
       verificarColunas(a, b);
       
       Mat r = new Mat(a.lin(), a.col());
-      r.copiar(a);
-      r.add(b);
+      r.add(a, b);
 
       return r;
    }
@@ -287,11 +265,7 @@ public class OpMatriz{
     * @param r matriz contendo o resultado da subtração.
     */
    public void sub(Mat a, Mat b, Mat r){
-      verificarLinhas(a, b, r);
-      verificarColunas(a, b, r);
-
-      r.copiar(a);
-      r.sub(b);
+      r.sub(a, b);
    }
 
    /**
@@ -309,8 +283,7 @@ public class OpMatriz{
       verificarColunas(a, b);
       
       Mat r = new Mat(a.lin(), a.col());
-      r.copiar(a);
-      r.sub(b);
+      r.sub(a, b);
 
       return r;
    }

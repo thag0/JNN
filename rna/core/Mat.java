@@ -156,7 +156,8 @@ public class Mat{
    }
 
    /**
-    * Verifica a compatibilidade de dimensões entre a instância local e a matriz fornecida.
+    * Verifica a compatibilidade de dimensões entre a instância local e a 
+    * matriz fornecida.
     * @param m matriz que será usada.
     */
    private void verificarDimensoes(Mat m){
@@ -164,6 +165,28 @@ public class Mat{
          throw new IllegalArgumentException(
             "Dimensões incompatíveis."
          );   
+      }
+   }
+
+   /**
+    * Verifica a compatibilidade de dimensões entre a instância local e as 
+    * matrizes fornecidas.
+    * @param a matriz A.
+    * @param b matriz B.
+    */
+   private void verificarDimensoes(Mat a, Mat b){
+      if(a.lin != b.lin || a.col != b.col){
+         throw new IllegalArgumentException(
+            "As dimensões de A (" + a.lin + ", " + a.col + 
+            ") e B (" + b.lin + ", " + b.col + ") são incompatíveis."
+         );
+      }
+      
+      if(this.lin != a.lin || this.col != a.col){
+         throw new IllegalArgumentException(
+            "As dimensões de resultado (" + this.lin + ", " + this.col + 
+            " incompatível com o esperado (" + a.lin + "," + a.col + ")."
+         );
       }
    }
 
@@ -444,6 +467,23 @@ public class Mat{
    }
 
    /**
+    * Salva o conteúdo de resultante da soma elemento a elemento
+    * entre os valores das matrizes A e B de acordo com a expressão.
+    * <pre>
+    * this = A + B
+    * </pre>
+    * @param a matriz A.
+    * @param b matriz B.
+    */
+   public void add(Mat a, Mat b){
+      verificarDimensoes(a, b);
+      
+      for(int i = 0; i < this.dados.length; i++){
+         this.dados[i] = a.dados[i] + b.dados[i];
+      }
+   }
+
+   /**
     * Subtrai o valor fornecido ao que estiver contido no
     * conteúdo da matriz, de acordo com os índices dados.
     * <p>
@@ -479,6 +519,23 @@ public class Mat{
    }
 
    /**
+    * Salva o conteúdo de resultante da subtração elemento a elemento
+    * entre os valores das matrizes A e B de acordo com a expressão.
+    * <pre>
+    * this = A - B
+    * </pre>
+    * @param a matriz A.
+    * @param b matriz B.
+    */
+   public void sub(Mat a, Mat b){
+      verificarDimensoes(a, b);
+      
+      for(int i = 0; i < this.dados.length; i++){
+         this.dados[i] = a.dados[i] - b.dados[i];
+      }
+   }
+
+   /**
     * Multiplica o valor fornecido ao que estiver contido no
     * conteúdo da matriz, de acordo com os índices dados.
     * <p>
@@ -510,6 +567,45 @@ public class Mat{
 
       for(int i = 0; i < this.dados.length; i++){
          this.dados[i] *= m.dados[i];
+      }
+   }
+
+   /**
+    * Salva o conteúdo de resultante da multiplicação matricial
+    * entre os valores das matrizes A e B de acordo com a expressão.
+    * <pre>
+    * this = A * B
+    * </pre>
+    * @param a matriz A.
+    * @param b matriz B.
+    */
+   public void mult(Mat a, Mat b){
+      if(a.col() != b.lin()){
+         throw new IllegalArgumentException("Dimensões de A e B incompatíveis");
+      }
+      if(this.lin != a.lin){
+         throw new IllegalArgumentException(
+            "Incompatibilidade entre as linhas locais (" + this.lin + ") e " +
+            "a matriz A (" + a.lin + ")."
+         );
+      }
+      if(this.col != b.col){
+         throw new IllegalArgumentException(
+            "Incompatibilidade entre as colunas locais (" + this.col + ") e " +
+            "a matriz B (" + b.col + ")."
+         );  
+      }
+
+      int i, j, k, acol = a.col();
+      double res = 0;
+      for(i = 0; i < this.lin; i++){
+         for(j = 0; j < this.col; j++){
+            res = 0;
+            for(k = 0; k < acol; k++){
+               res += a.dado(i, k) * b.dado(k, j);
+            }
+            this.editar(i, j, res);    
+         }
       }
    }
 
