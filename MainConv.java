@@ -85,12 +85,12 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{3, 3}, 38, "leakyrelu"),
+         new Convolucional(formEntrada, new int[]{3, 3}, 40, "leakyrelu"),
          new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{3, 3}, 38, "leakyrelu"),
+         new Convolucional(new int[]{3, 3}, 40, "leakyrelu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(148, "sigmoid"),
+         new Densa(156, "sigmoid"),
          new Densa(NUM_DIGITOS_TREINO, "softmax"),
       });
 

@@ -17,7 +17,7 @@ public class TreinoConv{
    public static void main(String[] args){
       ged.limparConsole();
       
-      Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/conv-mnist-87.txt");
+      Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/conv-mnist-89.txt");
       System.out.println(modelo.info());
 
       int digitos = 10;
