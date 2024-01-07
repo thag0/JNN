@@ -14,7 +14,7 @@ public class MainConv{
    static Geim geim = new Geim();
 
    static final int NUM_DIGITOS_TREINO = 10;
-   static final int NUM_AMOSTRAS_TREINO = 30;
+   static final int NUM_AMOSTRAS_TREINO = 40;
    static final int NUM_DIGITOS_TESTE = 10;
    static final int NUM_AMOSTRAS_TESTE = 10;
 
@@ -85,9 +85,9 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{3, 3}, 36, "leakyrelu"),
+         new Convolucional(formEntrada, new int[]{3, 3}, 38, "leakyrelu"),
          new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{3, 3}, 36, "leakyrelu"),
+         new Convolucional(new int[]{3, 3}, 38, "leakyrelu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
          new Densa(148, "sigmoid"),
@@ -95,7 +95,7 @@ public class MainConv{
       });
 
       modelo.compilar(
-         new SGD(0.001, 0.99),
+         new SGD(0.0001, 0.999),
          new EntropiaCruzada(),
          new He()
       );
