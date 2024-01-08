@@ -393,11 +393,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     * @throws IllegalArgumentException se o novo otimizador for nulo.
     */
    public void configurarOtimizador(Otimizador otimizador){
-      if(otimizador == null){
-         throw new IllegalArgumentException("O novo otimizador não pode ser nulo.");
-      }
-
-      this.otimizador = otimizador;
+      super.configurarOtimizador(otimizador);
    }
 
    /**
@@ -580,7 +576,7 @@ public class RedeNeural extends Modelo implements Cloneable{
       this.perda = perda;
 
       this.otimizador = otimizador;
-      this.otimizador.inicializar(this.camadas);
+      this.otimizador.construir(this.camadas);
 
       this.compilado = true;
    }
@@ -833,22 +829,14 @@ public class RedeNeural extends Modelo implements Cloneable{
 
    }
 
-   /**
-    * Retorna a função de perda configurada da Rede Neural.
-    * @return função de perda atual da rede.
-    */
-   @Override
-   public Perda perda(){
-      return this.perda;
-   }
-
-   /**
-    * Retorna o otimizador que está sendo usado para o treino da Rede Neural.
-    * @return otimizador atual da rede.
-    */
    @Override
    public Otimizador otimizador(){
       return this.otimizador;
+   }
+
+   @Override
+   public Perda perda(){
+      return this.perda;
    }
 
    /**
@@ -907,6 +895,19 @@ public class RedeNeural extends Modelo implements Cloneable{
    public double[] saidaParaArray(){
       super.verificarCompilacao();
       return this.camadaSaida().saidaParaArray();
+   }
+
+   @Override
+   public void copiarDaSaida(double[] arr){
+      double[] saida = this.saidaParaArray();
+      if(saida.length != arr.length){
+         throw new IllegalArgumentException(
+            "Incompatibilidade de dimensões entre o array fornecido (" + arr.length + 
+            ") e o array gerado pela saída da última camada (" + saida.length + ")."
+         );
+      }
+
+      System.arraycopy(saida, 0, arr, 0, saida.length);
    }
 
    /**

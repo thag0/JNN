@@ -9,7 +9,6 @@ import rna.core.OpMatriz;
 import rna.modelos.Sequencial;
 import rna.serializacao.Serializador;
 import rna.treinamento.AuxiliarTreino;
-import rna.treinamento.Treinador;
 
 public class TreinoConv{
    static Ged ged = new Ged();

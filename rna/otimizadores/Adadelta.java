@@ -109,11 +109,11 @@ public class Adadelta extends Otimizador{
    }
 
    @Override
-   public void inicializar(Camada[] redec){
+   public void construir(Camada[] camadas){
       int nKernel = 0;
       int nBias = 0;
       
-      for(Camada camada : redec){
+      for(Camada camada : camadas){
          if(camada.treinavel == false) continue;
 
          nKernel += camada.obterKernel().length;
@@ -126,14 +126,16 @@ public class Adadelta extends Otimizador{
       this.acAt  = new double[nKernel];
       this.acb = new double[nBias];
       this.acAtb = new double[nBias];
+      this.construido = true;//otimizador pode ser usado
    }
 
    @Override
-   public void atualizar(Camada[] redec){
+   public void atualizar(Camada[] camadas){
+      super.verificarConstrucao();
       int idKernel = 0, idBias = 0;
       double g, delta;
 
-      for(Camada camada : redec){
+      for(Camada camada : camadas){
          if(camada.treinavel == false) continue;
 
          double[] kernel = camada.obterKernel();
@@ -170,6 +172,7 @@ public class Adadelta extends Otimizador{
 
    @Override
    public String info(){
+      super.verificarConstrucao();
       super.construirInfo();
 
       super.addInfo("Rho: " + this.rho);

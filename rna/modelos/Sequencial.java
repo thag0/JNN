@@ -37,6 +37,9 @@ import rna.treinamento.Treinador;
  *    new Densa(2))
  *});
  * </pre>
+ * <h3>
+ *    Compilação
+ * </h3>
  * <p>
  *    Para poder usar o modelo é necessário compilá-lo, informando parâmetros 
  *    função de perda, otimizador e inicializador para os kernels (inicializador
@@ -47,8 +50,7 @@ import rna.treinamento.Treinador;
  * modelo.compilar(new SGD(), new ErroMedioQuadrado(), new Xavier());
  * </pre>
  * O modelo sequencial não é limitado apenas a camadas densas, modelos 
- * de camadas convolucionais e de achatamento (flatten) também são suportados 
- * (mas ainda estão em testes).
+ * de camadas convolucionais e de achatamento (flatten) também são suportados.
  * <p>
  *    Exemplo:
  * </p>
@@ -78,12 +80,6 @@ public class Sequencial extends Modelo implements Cloneable{
     * Lista de camadas do modelo.
     */
    private Camada[] camadas;
-
-   /**
-    * Auxiliar na verificação para o salvamento do histórico
-    * de perda do modelo durante o treinamento.
-    */
-   private boolean calcularHistorico = false;
 
    /**
     * Inicializa um modelo sequencial vazio.
@@ -177,20 +173,6 @@ public class Sequencial extends Modelo implements Cloneable{
    }
 
    @Override
-   public void configurarHistorico(boolean calcular){
-      this.calcularHistorico = calcular;
-      this.treinador.configurarHistoricoCusto(calcular);
-   }
-
-   @Override
-   public void configurarOtimizador(Otimizador otimizador){
-      if(otimizador == null){
-         throw new IllegalArgumentException("O novo otimizador não pode ser nulo.");
-      }
-      this.otimizador = otimizador;
-   }
-
-   @Override
    public void compilar(Otimizador otimizador, Perda perda, Inicializador iniKernel){
       this.compilar(otimizador, perda, iniKernel, null);
    }
@@ -235,7 +217,7 @@ public class Sequencial extends Modelo implements Cloneable{
          );
       }
       this.otimizador = otimizador;
-      this.otimizador.inicializar(this.camadas);
+      this.otimizador.construir(this.camadas);
       this.compilado = true;
    }
 
@@ -244,7 +226,7 @@ public class Sequencial extends Modelo implements Cloneable{
       super.verificarCompilacao();
 
       this.camadas[0].calcularSaida(entrada);
-      for(int i = 1; i < this.camadas.length; i++){
+      for(int i = 1; i < this.numCamadas(); i++){
          this.camadas[i].calcularSaida(this.camadas[i-1].saida());
       }
    }
@@ -360,9 +342,7 @@ public class Sequencial extends Modelo implements Cloneable{
          );
       }
 
-      for(int i = 0; i < saida.length; i++){
-         arr[i] = saida[i];
-      }
+      System.arraycopy(saida, 0, arr, 0, saida.length);
    }
 
    @Override
@@ -383,18 +363,6 @@ public class Sequencial extends Modelo implements Cloneable{
    public int numCamadas(){
       super.verificarCompilacao();
       return this.camadas.length;
-   }
-
-   @Override
-   public double[] historico(){
-      if(this.calcularHistorico){
-         return this.treinador.obterHistorico();
-      
-      }else{
-         throw new UnsupportedOperationException(
-            "O histórico de treino do modelo deve ser configurado previamente."
-         );
-      }
    }
 
    @Override

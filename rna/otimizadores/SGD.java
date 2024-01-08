@@ -106,7 +106,7 @@ public class SGD extends Otimizador{
    }
 
    @Override
-   public void inicializar(Camada[] redec){
+   public void construir(Camada[] redec){
       int nKernel = 0;
       int nBias = 0;
       
@@ -121,10 +121,13 @@ public class SGD extends Otimizador{
 
       this.m  = new double[nKernel];
       this.mb = new double[nBias];
+      this.construido = true;//otimizador pode ser usado
    }
 
    @Override
    public void atualizar(Camada[] redec){
+      super.verificarConstrucao();
+
       int i, idKernel = 0, idBias = 0;
 
       for(Camada camada : redec){
@@ -167,6 +170,7 @@ public class SGD extends Otimizador{
 
    @Override
    public String info(){
+      super.verificarConstrucao();
       super.construirInfo();
       
       super.addInfo("TaxaAprendizagem: " + this.taxaAprendizagem);

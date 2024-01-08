@@ -134,11 +134,11 @@ public class Nadam extends Otimizador{
    }
 
    @Override
-   public void inicializar(Camada[] redec){
+   public void construir(Camada[] camadas){
       int nKernel = 0;
       int nBias = 0;
       
-      for(Camada camada : redec){
+      for(Camada camada : camadas){
          if(camada.treinavel == false) continue;
 
          nKernel += camada.obterKernel().length;
@@ -151,10 +151,12 @@ public class Nadam extends Otimizador{
       this.v  = new double[nKernel];
       this.mb = new double[nBias];
       this.vb = new double[nBias];
+      this.construido = true;//otimizador pode ser usado
    }
 
    @Override
-   public void atualizar(Camada[] redec){
+   public void atualizar(Camada[] camadas){
+      super.verificarConstrucao();
       int idKernel = 0, idBias = 0;
       double g, mChapeu, vChapeu;
 
@@ -162,7 +164,7 @@ public class Nadam extends Otimizador{
       double forcaB1 = 1 - Math.pow(beta1, interacoes);
       double forcaB2 = 1 - Math.pow(beta2, interacoes);
    
-      for(Camada camada : redec){
+      for(Camada camada : camadas){
          if(camada.treinavel == false) continue;
 
          double[] kernel = camada.obterKernel();
@@ -201,6 +203,7 @@ public class Nadam extends Otimizador{
 
    @Override
    public String info(){
+      super.verificarConstrucao();
       super.construirInfo();
       
       super.addInfo("TaxaAprendizagem: " + this.taxaAprendizagem);

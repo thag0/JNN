@@ -14,7 +14,7 @@ import rna.estrutura.Camada;
  *		treino da Rede Neural.
  * </p>
  * <p>
- *		O método {@code inicialziar()} é útil para aqueles otimizadores que possuem atributos 
+ *		O método {@code inicializar()} é útil para aqueles otimizadores que possuem atributos 
  *		especiais, como o coeficiente de momentum por exemplo.
  * </p>
  */
@@ -31,29 +31,37 @@ public abstract class Otimizador{
 	String pad = " ".repeat(4);
 
 	/**
-	 * Inicializa os parâmetros do otimizador para a as camadas da Rede Neural.
-	 * @param redec lista de camadas densas da Rede Neural.
+	 * Auxiliar para o controle de inicialização do otimizador.
 	 */
-	public void inicializar(Camada[] redec){
-		throw new UnsupportedOperationException(
-			"Inicialização do otimizador não implementada."
-		);
+	protected boolean construido = false;
+
+	/**
+	 * Verifica se o otimizador pode ser utilizado.
+	 */
+	protected void verificarConstrucao(){
+		if(this.construido == false){
+			throw new IllegalStateException(
+				"O otimizador deve ser construído para poder ser usado."
+			);
+		}
 	}
 
 	/**
-	 * Atualiza os parâmetros treináveis da Rede Neural de acordo com o 
-	 * otimizador configurado.
-	 * <p>
-	 *		A atualização de pesos é feita uma única vez em todos os 
-	 *		parâmetros da rede.
-	 * </p>
-	 * @param redec lista de camadas densas da Rede Neural.
+	 * Inicializa os parâmetros do otimizador para as camadas do modelo especificado.
+	 * @param camadas array de camadas do modelo.
 	 */
-	public void atualizar(Camada[] redec){
-		throw new UnsupportedOperationException(
-			"Implementar método de atualização do otimizador."
-		);
-	}
+	public abstract void construir(Camada[] camadas);
+
+	/**
+	 * Atualiza os parâmetros treináveis do modelo de acordo com o 
+	 * otimizador especificado.
+	 * <p>
+	 *		A atualização de parâmetros é feita uma única vez em todas
+	 *		as camadas do modelo.
+	 * </p>
+	 * @param camadas array de camadas do modelo.
+	 */
+	public abstract void atualizar(Camada[] camadas);
 
 	/**
  	 * Exibe as opções de configurações do otimizador.
@@ -65,7 +73,7 @@ public abstract class Otimizador{
 
 	/**
 	 * Inicializa o valor padrão para informações do otimizador, informando
-	 * seu nome.
+	 * seu nome como informação inicial.
 	 */
 	protected void construirInfo(){
 		this.info = "";

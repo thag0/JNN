@@ -55,13 +55,15 @@ public class GD extends Otimizador{
    }
 
    @Override
-   public void inicializar(Camada[] redec){
-      
+   public void construir(Camada[] camadas){
+      //esse otimizador não precisa de parâmetros adicionais
+      this.construido = true;//otimizador pode ser usado
    }
 
    @Override
-   public void atualizar(Camada[] redec){
-      for(Camada camada : redec){
+   public void atualizar(Camada[] camadas){
+      super.verificarConstrucao();
+      for(Camada camada : camadas){
          if(camada.treinavel == false) continue;
 
          double[] kernel = camada.obterKernel();
@@ -86,6 +88,7 @@ public class GD extends Otimizador{
 
    @Override
    public String info(){
+      super.verificarConstrucao();
       super.construirInfo();
       
       super.addInfo("TaxaAprendizagem: " + this.taxaAprendizagem);

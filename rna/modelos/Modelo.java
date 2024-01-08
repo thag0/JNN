@@ -55,6 +55,12 @@ public abstract class Modelo{
    protected Treinador treinador = new Treinador();
 
    /**
+    * Auxiliar na verificação para o salvamento do histórico
+    * de perda do modelo durante o treinamento.
+    */
+   protected boolean calcularHistorico = false;
+
+   /**
     * Responsável pelo retorno de desempenho da Rede Neural.
     * Contém implementações de métodos tanto para cálculo de perdas
     * quanto de métricas.
@@ -125,6 +131,7 @@ public abstract class Modelo{
     * @param calcular se verdadeiro, o modelo armazenará o histórico de perda durante cada época.
     */
    public void configurarHistorico(boolean calcular){
+      this.calcularHistorico = calcular;
       this.treinador.configurarHistoricoCusto(calcular);
    }
 
@@ -157,16 +164,16 @@ public abstract class Modelo{
     *    <li> Adam  </li>
     *    <li> Nadam </li>
     *    <li> AMSGrad </li>
-    *    <li> Adamax  </li>
-    *    <li> Lion   </li>
     *    <li> Adadelta </li>
     * </ol>
-    * <p>
-    *    {@code O otimizador padrão é o SGD}
-    * </p>
     * @param otimizador novo otimizador.
     */
-   public abstract void configurarOtimizador(Otimizador otimizador);
+   public void configurarOtimizador(Otimizador otimizador){
+      if(otimizador == null){
+         throw new IllegalArgumentException("O novo otimizador não pode ser nulo.");
+      }
+      this.otimizador = otimizador;
+   }
 
    /**
     * Inicializa os parâmetros necessários para cada camada do modelo,
@@ -235,13 +242,14 @@ public abstract class Modelo{
    public abstract void treinar(Object[] entradas, Object[] saidas, int epochs, int tamLote, boolean logs);
 
    /**
-    * Propaga os dados de entrada pelo modelo.
-    * @param entrada entrada.
+    * Propaga os dados de entrada através das camadas do modelo.
+    * @param entrada dados de entrada que serão processados, o tipo
+    * de dado depende do tipo da camada inicial do modelo.
     */
    public abstract void calcularSaida(Object entrada);
 
    /**
-    * Propaga os dados de entrada pelo modelo.
+    * Propaga os dados de entrada através das camadas do modelo.
     * @param entradas array contendo multiplas entradas.
     * @return array contendo as saídas correspondentes.
     */
@@ -291,11 +299,7 @@ public abstract class Modelo{
     * </p>
     * @param arr array para cópia.
     */
-   public void copiarDaSaida(double[] arr){
-      throw new IllegalArgumentException(
-         "Implementar cópia das saídas do modelo."
-      ); 
-   }
+   public abstract void copiarDaSaida(double[] arr);
 
    /**
     * Informa o nome configurado do modelo.
@@ -330,7 +334,16 @@ public abstract class Modelo{
     * </p>
     * @return array contendo o valor de perda durante cada época de treinamento do modelo.
     */
-   public abstract double[] historico();
+   public double[] historico(){
+      if(this.calcularHistorico){
+         return this.treinador.obterHistorico();
+      
+      }else{
+         throw new UnsupportedOperationException(
+            "O histórico de treino do modelo deve ser configurado previamente."
+         );
+      }
+   }
 
    /**
     * Mostra as informações sobre o modelo.
@@ -342,9 +355,5 @@ public abstract class Modelo{
     * Clona as características principais do modelo.
     * @return clone do modelo.
     */
-   public Modelo clonar(){
-      throw new IllegalArgumentException(
-         "Implementar clonagem para o modelo " + this.getClass().getTypeName()
-      );
-   }
+   public abstract Modelo clonar();
 }

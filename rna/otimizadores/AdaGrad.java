@@ -104,11 +104,11 @@ public class AdaGrad extends Otimizador{
    }
 
    @Override
-   public void inicializar(Camada[] redec){
+   public void construir(Camada[] camadas){
       int nKernel = 0;
       int nBias = 0;
       
-      for(Camada camada : redec){
+      for(Camada camada : camadas){
          if(camada.treinavel == false) continue;
 
          nKernel += camada.obterKernel().length;
@@ -123,14 +123,16 @@ public class AdaGrad extends Otimizador{
 
       opArr.preencher(ac, valorInicial);
       opArr.preencher(acb, valorInicial);
+      this.construido = true;//otimizador pode ser usado
    }
 
    @Override
-   public void atualizar(Camada[] redec){
+   public void atualizar(Camada[] camadas){
+      super.verificarConstrucao();
       int i, idKernel = 0, idBias = 0;
       double g;
 
-      for(Camada camada : redec){
+      for(Camada camada : camadas){
          if(camada.treinavel == false) continue;
 
          double[] kernel = camada.obterKernel();
@@ -161,6 +163,7 @@ public class AdaGrad extends Otimizador{
 
    @Override
    public String info(){
+      super.verificarConstrucao();
       super.construirInfo();
       
       super.addInfo("TaxaAprendizagem: " + this.taxaAprendizagem);

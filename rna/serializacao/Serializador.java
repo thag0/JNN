@@ -301,7 +301,7 @@ public class Serializador{
          for(int i = 0; i < modelo.numCamadas(); i++){
             modelo.camada(i).configurarId(i);
          }
-         otimizador.inicializar(modelo.camadas());
+         otimizador.construir(modelo.camadas());
 
       }catch(Exception e){
          throw new RuntimeException(e);
