@@ -66,12 +66,12 @@ public class Treino{
          for(int i = 0; i < entrada.length; i++){
             double[] amostraSaida = (double[]) saida[i];
             modelo.calcularSaida(entrada[i]);
-
+            
             //feedback de avanço da rede
             if(this.calcularHistorico){
                perdaEpoca += perda.calcular(modelo.saidaParaArray(), amostraSaida);
             }
-
+            
             backpropagation(camadas, perda, amostraSaida);  
             otimizador.atualizar(camadas);
          }

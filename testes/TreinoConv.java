@@ -1,12 +1,15 @@
 package testes;
 
 import java.awt.image.BufferedImage;
+import java.util.concurrent.TimeUnit;
 
 import lib.ged.Ged;
 import lib.geim.Geim;
 import rna.core.OpMatriz;
 import rna.modelos.Sequencial;
 import rna.serializacao.Serializador;
+import rna.treinamento.AuxiliarTreino;
+import rna.treinamento.Treinador;
 
 public class TreinoConv{
    static Ged ged = new Ged();
@@ -18,17 +21,38 @@ public class TreinoConv{
       ged.limparConsole();
       
       Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/conv-mnist-89.txt");
-      modelo.info();
+      // modelo.info();
 
       int digitos = 10;
       int amostras = 10;
       var testeX = carregarDadosMNIST("/dados/mnist/teste/", amostras, digitos);
       var testeY = criarRotulosMNIST(amostras, digitos);
 
+      long t;
+      t = medirTempo(() -> modelo.calcularSaida(testeX[0]));
+      System.out.println("Tempo forward: " + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
+      
+      t = medirTempo(() -> modelo.otimizador().atualizar(modelo.camadas()));
+      System.out.println("Tempo otimizador: " + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
+      
+      AuxiliarTreino aux = new AuxiliarTreino();
+      t = medirTempo(() -> {
+         aux.backpropagation(modelo.camadas(), modelo.perda(), new double[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 1});
+      });
+      System.out.println("Tempo backprop: " + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
+
+      System.exit(0);
+
       double perda = modelo.avaliador.entropiaCruzada(testeX, testeY);
       double acuraria = modelo.avaliador.acuracia(testeX, testeY);
       System.out.println("Perda: " + perda);
       System.out.println("Acurácia: " + acuraria + "%");
+   }
+
+   static long medirTempo(Runnable func){
+      long t1 = System.nanoTime();
+      func.run();
+      return System.nanoTime() - t1;
    }
 
    static void testarPorbabilidade(Sequencial modelo, String imagemTeste){
