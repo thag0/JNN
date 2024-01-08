@@ -71,6 +71,7 @@ public class MainConv{
          Thread t = new Thread(() -> {
             modelo.treinar(entradas, saidas, epochs, true);
          });
+         t.setPriority(Thread.MAX_PRIORITY);
          t.start();
          t.join();
       }catch(Exception e){
@@ -85,17 +86,18 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{3, 3}, 40, "leakyrelu"),
+         new Convolucional(formEntrada, new int[]{3, 3}, 420, "leakyrelu"),
          new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{3, 3}, 40, "leakyrelu"),
+         new Convolucional(new int[]{3, 3}, 42, "leakyrelu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(156, "sigmoid"),
+         new Densa(162, "sigmoid"),
+         new Densa(80, "sigmoid"),
          new Densa(NUM_DIGITOS_TREINO, "softmax"),
       });
 
       modelo.compilar(
-         new SGD(0.0001, 0.999),
+         new SGD(0.001, 0.99),
          new EntropiaCruzada(),
          new He()
       );

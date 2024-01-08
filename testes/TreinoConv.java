@@ -1,14 +1,12 @@
 package testes;
 
 import java.awt.image.BufferedImage;
-import java.util.concurrent.TimeUnit;
 
 import lib.ged.Ged;
 import lib.geim.Geim;
 import rna.core.OpMatriz;
 import rna.modelos.Sequencial;
 import rna.serializacao.Serializador;
-import rna.treinamento.AuxiliarTreino;
 
 public class TreinoConv{
    static Ged ged = new Ged();
@@ -20,32 +18,10 @@ public class TreinoConv{
       ged.limparConsole();
       
       Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/conv-mnist-89.txt");
-      // modelo.info();
 
       int digitos = 10;
       int amostras = 10;
-      var testeX = carregarDadosMNIST("/dados/mnist/teste/", amostras, digitos);
-      var testeY = criarRotulosMNIST(amostras, digitos);
-
-      long t;
-      t = medirTempo(() -> modelo.calcularSaida(testeX[0]));
-      System.out.println("Tempo forward: " + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
-      
-      t = medirTempo(() -> modelo.otimizador().atualizar(modelo.camadas()));
-      System.out.println("Tempo otimizador: " + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
-      
-      AuxiliarTreino aux = new AuxiliarTreino();
-      t = medirTempo(() -> {
-         aux.backpropagation(modelo.camadas(), modelo.perda(), new double[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 1});
-      });
-      System.out.println("Tempo backprop: " + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
-
-      System.exit(0);
-
-      double perda = modelo.avaliador.entropiaCruzada(testeX, testeY);
-      double acuraria = modelo.avaliador.acuracia(testeX, testeY);
-      System.out.println("Perda: " + perda);
-      System.out.println("Acurácia: " + acuraria + "%");
+      testarModelo(modelo, digitos, amostras);
    }
 
    static long medirTempo(Runnable func){
@@ -54,18 +30,33 @@ public class TreinoConv{
       return System.nanoTime() - t1;
    }
 
-   static void testarPorbabilidade(Sequencial modelo, String imagemTeste){
+   static void testarModelo(Sequencial modelo, int digitos, int amostras){
+      var testeX = carregarDadosMNIST("/dados/mnist/teste/", amostras, digitos);
+      var testeY = criarRotulosMNIST(amostras, digitos);
+
+      double perda = modelo.avaliador.entropiaCruzada(testeX, testeY);
+      double acuraria = modelo.avaliador.acuracia(testeX, testeY);
+      System.out.println("Perda: " + perda);
+      System.out.println("Acurácia: " + acuraria + "%");
+   }
+
+   static void testarPrevisao(Sequencial modelo, String imagemTeste, boolean prob){
       double[][][] teste1 = new double[1][][];
-      teste1[0] = imagemParaMatriz("/dados/mnist/teste/" + imagemTeste + ".jpg");
+      String extensao = ".png";
+      teste1[0] = imagemParaMatriz("/dados/mnist/teste/" + imagemTeste + extensao);
       modelo.calcularSaida(teste1);
       double[] previsao = modelo.saidaParaArray();
+      
+      System.out.print("\nTestando: " + imagemTeste + extensao);
+      if(prob){
+         System.out.println();
+         for(int i = 0; i < previsao.length; i++){
+            System.out.println("Prob: " + i + ": " + (int)(previsao[i]*100) + "%");
+         }
+      }else{
+         System.out.print(" -> Prev: " + maiorIndice(previsao));
+      }
 
-      System.out.println("\nTestando: " + imagemTeste);
-      System.out.println("Prev: " + maiorIndice(previsao));
-      // for(int i = 0; i < previsao.length; i++){
-         // System.out.println("Prob: " + i + ": " + (int)(previsao[i]*100) + "%");
-         // System.out.printf("Prob: %d: %.2f\n", i, (float)(previsao[i]*100));
-      // }
    }
 
    static int maiorIndice(double[] arr){
