@@ -38,8 +38,8 @@ public class TanH extends Ativacao{
          colunas = camada.somatorio[i].col();
          for(j = 0; j < linhas; j++){
             for(k = 0; k < colunas; k++){
-               grad = camada.gradSaida[i].dado(j, k);
-               d = camada.saida[i].dado(j, k);
+               grad = camada.gradSaida[i].elemento(j, k);
+               d = camada.saida[i].elemento(j, k);
                d = 1 - (d * d);
 
                camada.derivada[i].editar(j, k, (grad * d));

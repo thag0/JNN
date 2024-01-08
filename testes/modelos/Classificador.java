@@ -51,15 +51,16 @@ public class Classificador{
          new Densa(qSaidas, "softmax")
       });
 
-      Perda perda = new EntropiaCruzada();
-      Otimizador otimizador = new SGD(0.001, 0.95);
-      Inicializador inicializador = new Xavier();
-      modelo.compilar(otimizador, perda, inicializador);
+      modelo.compilar(
+         new SGD(0.001, 0.95),
+         new EntropiaCruzada(),
+         new Xavier()
+      );
       modelo.configurarHistorico(true);
-      System.out.println(modelo.info());
+      modelo.info();
       
       //treinando e avaliando os resultados
-      modelo.treinar(treinoX, treinoY, 3_000, false);
+      modelo.treinar(treinoX, treinoY, 2_000, false);
       double acuraciaRede = modelo.avaliador.acuracia(testeX, testeY);
       double perdaRede = modelo.avaliador.entropiaCruzada(testeX, testeY);
       System.out.println("Acurácia = " + formatarDecimal(acuraciaRede*100, 4) + "%");
@@ -79,26 +80,26 @@ public class Classificador{
       int nEntrada = rede.obterTamanhoEntrada();
       int nSaida = rede.camadaSaida().numNeuronios();
 
-      double[] entrada_rede = new double[nEntrada];
-      double[] saida_rede = new double[nSaida];
+      double[] entradaRede = new double[nEntrada];
+      double[] saidaRede = new double[nSaida];
 
       System.out.println("\n" + texto);
 
       //mostrar saída da rede comparada aos dados
       for(int i = 0; i < dadosEntrada.length; i++){
          for(int j = 0; j < dadosEntrada[0].length; j++){
-            entrada_rede[j] = dadosEntrada[i][j];
+            entradaRede[j] = dadosEntrada[i][j];
          }
 
-         rede.calcularSaida(entrada_rede);
-         saida_rede = rede.saidaParaArray();
+         rede.calcularSaida(entradaRede);
+         saidaRede = rede.saidaParaArray();
 
          //apenas formatação
          if(i < 10) System.out.print("Dado 00" + i + " |");
          else if(i < 100) System.out.print("Dado 0" + i + " |");
          else System.out.print("Dado " + i + " |");
-         for(int j = 0; j < entrada_rede.length; j++){
-            System.out.print(" " + entrada_rede[j] + " ");
+         for(int j = 0; j < entradaRede.length; j++){
+            System.out.print(" " + entradaRede[j] + " ");
          }
 
          System.out.print(" - ");
@@ -107,7 +108,7 @@ public class Classificador{
          }
          System.out.print(" | Rede ->");
          for(int j = 0; j < nSaida; j++){
-            System.out.print("  " + formatarDecimal(saida_rede[j], 4));
+            System.out.print("  " + formatarDecimal(saidaRede[j], 4));
          }
          System.out.println();
       }

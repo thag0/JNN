@@ -223,7 +223,7 @@ public class Mat{
     * @param col índice da coluna do elemento.
     * @return valor baseado de acordo com os índices.
     */
-   public double dado(int lin, int col){
+   public double elemento(int lin, int col){
       return this.dados[indice(lin, col)];
    }
 
@@ -314,7 +314,7 @@ public class Mat{
       int i, j;
       for(i = 0; i < t.lin; i++){
          for(j = 0; j < t.col; j++){
-            t.editar(i, j, this.dado(j, i));
+            t.editar(i, j, this.elemento(j, i));
          }
       }
 
@@ -602,7 +602,7 @@ public class Mat{
          for(j = 0; j < this.col; j++){
             res = 0;
             for(k = 0; k < acol; k++){
-               res += a.dado(i, k) * b.dado(k, j);
+               res += a.elemento(i, k) * b.elemento(k, j);
             }
             this.editar(i, j, res);    
          }
@@ -670,7 +670,7 @@ public class Mat{
 
       double[] coluna = new double[this.lin];
       for(int i = 0; i < this.lin; i++){
-         coluna[i] = this.dado(i, col);
+         coluna[i] = this.elemento(i, col);
       }
 
       return coluna;
@@ -736,7 +736,7 @@ public class Mat{
       int compMax = 0;
       for(int i = 0; i < this.lin; i++){
          for(int j = 0; j < this.col; j++){
-            int compAtual = String.valueOf(this.dado(i, j)).length();
+            int compAtual = String.valueOf(this.elemento(i, j)).length();
             if(compAtual > compMax){
                compMax = compAtual;
             }
@@ -746,7 +746,7 @@ public class Mat{
       for(int i = 0; i < this.lin; i++){
          System.out.print(" ");
          for(int j = 0; j < this.col; j++){
-            String element = String.format("%" + (compMax + 2) + "s", this.dado(i, j));
+            String element = String.format("%" + (compMax + 2) + "s", this.elemento(i, j));
             System.out.print(element);
          }
          System.out.println();

@@ -796,7 +796,7 @@ public class RedeNeural extends Modelo implements Cloneable{
          for(Densa camada : this.camadas){   
             for(int i = 0; i < camada.pesos.lin(); i++){
                for(int j = 0; j < camada.pesos.col(); j++){
-                  salvo = camada.pesos.dado(i, j);
+                  salvo = camada.pesos.elemento(i, j);
                   camada.pesos.add(i, j, eps);
                   double d = (this.avaliador.erroMedioQuadrado(entradas, saidas) - custo) / eps;
                   camada.gradPesos.editar(i, j, d);
@@ -805,7 +805,7 @@ public class RedeNeural extends Modelo implements Cloneable{
             }
             for(int i = 0; i < camada.bias.lin(); i++){
                for(int j = 0; j < camada.bias.col(); j++){
-                  salvo = camada.bias.dado(i, j);
+                  salvo = camada.bias.elemento(i, j);
                   camada.bias.add(i, j, eps);
                   double d = (this.avaliador.erroMedioQuadrado(entradas, saidas) - custo) / eps;
                   camada.gradSaida.editar(i, j, d);
@@ -817,14 +817,14 @@ public class RedeNeural extends Modelo implements Cloneable{
          for(Densa camada : this.camadas){            
             for(int i = 0; i < camada.pesos.lin(); i++){
                for(int j = 0; j < camada.pesos.col(); j++){
-                  camada.pesos.sub(i, j, (tA * camada.gradPesos.dado(i, j)));
+                  camada.pesos.sub(i, j, (tA * camada.gradPesos.elemento(i, j)));
                }
             }
 
             if(camada.temBias()){
                for(int i = 0; i < camada.bias.lin(); i++){
                   for(int j = 0; j < camada.bias.col(); j++){
-                     camada.bias.sub(i, j, (tA * camada.gradSaida.dado(i, j)));
+                     camada.bias.sub(i, j, (tA * camada.gradSaida.elemento(i, j)));
                   }
                }
             }
@@ -1046,39 +1046,41 @@ public class RedeNeural extends Modelo implements Cloneable{
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
    @Override
-   public String info(){
+   public void info(){
       super.verificarCompilacao();
 
-      String buffer = "";
+      StringBuilder sb = new StringBuilder();
       String espacamento = "    ";
       System.out.println("\nInformações " + this.nome + " = [");
 
       //perda
-      buffer += espacamento + "Perda: " + this.perda.getClass().getSimpleName() + "\n\n";
+      sb.append(espacamento + "Perda: " + this.perda.getClass().getSimpleName() + "\n\n");
 
       //otimizador
-      buffer += this.otimizador.info();
+      sb.append(this.otimizador.info());
 
       //bias
-      buffer += "\n" + espacamento + "Bias = " + this.bias;
-      buffer += "\n\n";
+      sb.append("\n" + espacamento + "Bias = " + this.bias);
+      sb.append("\n\n");
 
       //ativações
       for(int i = 0; i < this.camadas.length; i++){
-         buffer += espacamento + "Ativação camada " + i + ": " + 
-         this.camadas[i].obterAtivacao().getClass().getSimpleName() + "\n";
+         sb.append(
+            espacamento + "Ativação camada " + i + ": " + 
+            this.camadas[i].obterAtivacao().getClass().getSimpleName() + "\n"
+         );
       }
 
       //arquitetura
-      buffer += "\n" + espacamento + "arquitetura = [(" + this.arquitetura[0] + ")";
+      sb.append("\n" + espacamento + "arquitetura = [(" + this.arquitetura[0] + ")");
       for(int i = 1; i < this.arquitetura.length; i++){
-         buffer += ", " + this.arquitetura[i];
+         sb.append(", " + this.arquitetura[i]);
       }
-      buffer += "]";
+      sb.append("]");
 
-      buffer += "\n]\n";
+      sb.append("\n]\n");
 
-      return buffer;
+      System.out.println(sb.toString());
    }
 
    @Override

@@ -18,7 +18,7 @@ public class TreinoConv{
       ged.limparConsole();
       
       Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/conv-mnist-89.txt");
-      System.out.println(modelo.info());
+      modelo.info();
 
       int digitos = 10;
       int amostras = 10;
@@ -29,13 +29,6 @@ public class TreinoConv{
       double acuraria = modelo.avaliador.acuracia(testeX, testeY);
       System.out.println("Perda: " + perda);
       System.out.println("Acurácia: " + acuraria + "%");
-   }
-
-   static long marcarTempo(Runnable funcao){
-      long t1 = System.nanoTime();
-      funcao.run();
-      long t2 = System.nanoTime();
-      return t2 - t1;
    }
 
    static void testarPorbabilidade(Sequencial modelo, String imagemTeste){

@@ -20,7 +20,7 @@ public class SalvandoRede{
    public static void main(String[] args){
       Ged ged = new Ged();
       ged.limparConsole();
-      String caminho = "./modelo-convolucional.txt";
+      String caminho = "./dados/modelosMNIST/conv-mnist-89.txt";
       Serializador serializador = new Serializador();
 
       // Sequencial modelo = new Sequencial(new Camada[]{
@@ -31,6 +31,6 @@ public class SalvandoRede{
       // serializador.salvar(modelo, caminho);
 
       Sequencial modelo = serializador.lerSequencial(caminho);
-      System.out.println(modelo.info());
+      modelo.info();
    }
 }

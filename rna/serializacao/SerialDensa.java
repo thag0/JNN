@@ -53,7 +53,7 @@ class SerialDensa{
          
          for(int i = 0; i < camada.pesos.lin(); i++){
             for(int j = 0; j < camada.pesos.col(); j++){
-               escreverDado(camada.pesos.dado(i, j), tipo, bw);
+               escreverDado(camada.pesos.elemento(i, j), tipo, bw);
                bw.newLine();
             }
          }
@@ -61,7 +61,7 @@ class SerialDensa{
          if(camada.temBias()){
             for(int i = 0; i < camada.bias.lin(); i++){
                for(int j = 0; j < camada.bias.col(); j++){
-                  escreverDado(camada.bias.dado(i, j), tipo, bw);
+                  escreverDado(camada.bias.elemento(i, j), tipo, bw);
                   bw.newLine();
                }
             }

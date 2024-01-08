@@ -200,7 +200,7 @@ public class OpMatriz{
                for(j = 0; j < r.col(); j++){
                   res = 0;
                   for(k = 0; k < a.col(); k++){
-                     res += a.dado(i, k) * b.dado(k, j);
+                     res += a.elemento(i, k) * b.elemento(k, j);
                   }
                   r.editar(i, j, res);
                }
@@ -375,7 +375,7 @@ public class OpMatriz{
       int i, j;
       for(i = 0; i < lin; i++){
          for(j = 0; j < col; j++){
-            rot.editar(i, j, m.dado(lin - 1 - i, col - 1 - j));
+            rot.editar(i, j, m.elemento(lin - 1 - i, col - 1 - j));
          }
       }
       
@@ -395,7 +395,7 @@ public class OpMatriz{
       int i, j;
       for(i = 0; i < lin; i++){
          for(j = 0; j < col; j++){
-            rot.editar(i, j, m.dado(lin - 1 - i, col - 1 - j));
+            rot.editar(i, j, m.elemento(lin - 1 - i, col - 1 - j));
          }
       }
       
@@ -448,7 +448,7 @@ public class OpMatriz{
             res = 0;
             for(k = 0; k < b.lin(); k++){
                for(l = 0; l < b.col(); l++){
-                  res += a.dado(i + k, j + l) * b.dado(k, l);
+                  res += a.elemento(i + k, j + l) * b.elemento(k, l);
                }
             }
 
@@ -503,7 +503,7 @@ public class OpMatriz{
                   posY = j - l;
   
                   if(posX >= 0 && posX < a.lin() && posY >= 0 && posY < a.col()){
-                     res += a.dado(posX, posY) * filtro.dado(k, l);
+                     res += a.elemento(posX, posY) * filtro.elemento(k, l);
                   }
                }
             }
@@ -555,7 +555,7 @@ public class OpMatriz{
             res = 0;
             for(k = 0; k < filtro.lin(); k++){
                for(l = 0; l < filtro.col(); l++){
-                  res += a.dado(i + k, j + l) * filtro.dado(k, l);
+                  res += a.elemento(i + k, j + l) * filtro.elemento(k, l);
                }
             }
             r.add(i, j, res);
@@ -608,7 +608,7 @@ public class OpMatriz{
                   posY = j - l;
   
                   if(posX >= 0 && posX < a.lin() && posY >= 0 && posY < a.col()){
-                     res += a.dado(posX, posY) * b.dado(k, l);
+                     res += a.elemento(posX, posY) * b.elemento(k, l);
                   }
                }
             }

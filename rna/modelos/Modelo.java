@@ -142,6 +142,33 @@ public abstract class Modelo{
    }
 
    /**
+    * Configura o novo otimizador do Modelo com base numa nova instância de otimizador.
+    * <p>
+    *    Configurando o otimizador passando diretamente uma nova instância permite configurar
+    *    os hiperparâmetros do otimizador fora dos valores padrão, o que pode ajudar a
+    *    melhorar o desempenho de aprendizado do modelo em cenários específicos.
+    * </p>
+    * Otimizadores disponíveis.
+    * <ol>
+    *    <li> GradientDescent  </li>
+    *    <li> SGD (Gradiente Descendente Estocástico) </li>
+    *    <li> AdaGrad </li>
+    *    <li> RMSProp </li>
+    *    <li> Adam  </li>
+    *    <li> Nadam </li>
+    *    <li> AMSGrad </li>
+    *    <li> Adamax  </li>
+    *    <li> Lion   </li>
+    *    <li> Adadelta </li>
+    * </ol>
+    * <p>
+    *    {@code O otimizador padrão é o SGD}
+    * </p>
+    * @param otimizador novo otimizador.
+    */
+   public abstract void configurarOtimizador(Otimizador otimizador);
+
+   /**
     * Inicializa os parâmetros necessários para cada camada do modelo,
     * além de gerar os valores iniciais para os kernels e bias.
     * @param otimizador otimizador usando para ajustar os parâmetros treinavéis do modelo.
@@ -249,21 +276,13 @@ public abstract class Modelo{
     * Retorna a {@code camada de saída}, ou última camada, do modelo.
     * @return camada de saída.
     */
-   public Camada camadaSaida(){
-      throw new IllegalArgumentException(
-         "Implementar retorno da camada de saída do modelo."
-      ); 
-   }
+   public abstract Camada camadaSaida();
    
    /**
     * Retorna um array contendo a saída serializada do modelo.
     * @return saída do modelo.
     */
-   public double[] saidaParaArray(){      
-      throw new IllegalArgumentException(
-         "Implementar retorno de saída para array do modelo."
-      ); 
-   }
+   public abstract double[] saidaParaArray();
 
    /**
     * Copia os dados de saída da última camada do modelo para o array.
@@ -299,11 +318,7 @@ public abstract class Modelo{
     * Retorna a quantidade de camadas presente no modelo.
     * @return quantidade de camadas do modelo.
     */
-   public int numCamadas(){
-      throw new IllegalArgumentException(
-         "Implementar retorno da quantidade de camadas do modelo."
-      ); 
-   }
+   public abstract int numCamadas();
 
    /**
     * Disponibiliza o histórico da função de perda do modelo durante cada época
@@ -321,9 +336,7 @@ public abstract class Modelo{
     * Mostra as informações sobre o modelo.
     * @return buffer formatado contendo as informações do modelo.
     */
-   public String info(){
-      return "Modelo base.";
-   }
+   public abstract void info();
 
    /**
     * Clona as características principais do modelo.

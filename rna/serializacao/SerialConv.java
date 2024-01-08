@@ -68,7 +68,7 @@ class SerialConv{
             for(int j = 0; j < camada.filtros[i].length; j++){
                for(int k = 0; k < camada.filtros[i][j].lin(); k++){
                   for(int l = 0; l < camada.filtros[i][j].col(); l++){
-                     escreverDado(camada.filtros[i][j].dado(k, l), tipo, bw);
+                     escreverDado(camada.filtros[i][j].elemento(k, l), tipo, bw);
                      bw.newLine();
                   }
                }
@@ -79,7 +79,7 @@ class SerialConv{
             for(int i = 0; i < camada.bias.length; i++){
                for(int j = 0; j < camada.bias[i].lin(); j++){
                   for(int k = 0; k < camada.bias[i].col(); k++){
-                     escreverDado(camada.bias[i].dado(j, k), tipo, bw);
+                     escreverDado(camada.bias[i].elemento(j, k), tipo, bw);
                      bw.newLine();
                   }
                }

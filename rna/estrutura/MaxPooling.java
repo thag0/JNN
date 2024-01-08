@@ -136,7 +136,7 @@ public class MaxPooling extends Camada{
             
             for(int lin = linInicio; lin < linFim; lin++){
                for(int col = colIincio; col < colFim; col++){
-                  double valor = entrada.dado(lin, col);
+                  double valor = entrada.elemento(lin, col);
                   if (valor > maxValor){
                      maxValor = valor;
                   }
@@ -175,7 +175,7 @@ public class MaxPooling extends Camada{
             int linMaximo = posicaoMaximo[0];
             int colMaximo = posicaoMaximo[1];
 
-            double valorGradSeguinte = gradSeguinte.dado(i, j);
+            double valorGradSeguinte = gradSeguinte.elemento(i, j);
             gradEntrada.editar(linMaximo, colMaximo, valorGradSeguinte);
          }
       }
@@ -187,7 +187,7 @@ public class MaxPooling extends Camada{
   
       for(int lin = linInicio; lin < linFim; lin++){
          for(int col = colInicio; col < colFim; col++){
-            double valorAtual = m.dado(lin, col);
+            double valorAtual = m.elemento(lin, col);
             if(valorAtual > valMaximo){
                valMaximo = valorAtual;
                posMaximo[0] = lin;

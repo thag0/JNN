@@ -46,7 +46,7 @@ public class TesteFeedForward {
          System.out.println(
             entrada[i][0] + " - " + entrada[i][1] + 
             " R:" + saida[i][0] + 
-            " P:" + rede.camada(1).saida.dado(0 ,0)
+            " P:" + rede.camada(1).saida.elemento(0 ,0)
          );
       }
 

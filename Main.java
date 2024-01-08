@@ -39,7 +39,7 @@ public class Main{
       double[][] out = (double[][]) ged.separarDadosSaida(dados, tamSaida);
 
       Modelo modelo = criarSequencial(tamEntrada, tamSaida);
-      System.out.println(modelo.info());
+      modelo.info();
 
       //treinar e marcar tempo
       long t1, t2;
@@ -84,8 +84,7 @@ public class Main{
    }
 
    static Modelo criarSequencial(int entradas, int saidas){
-      // Otimizador otm = new SGD(0.01, 0.9);
-      Otimizador otm = new AdaGrad(1);
+      Otimizador otm = new SGD(0.001, 0.99);
       Perda perda = new ErroMedioQuadrado();
       Inicializador ini = new Xavier();
       

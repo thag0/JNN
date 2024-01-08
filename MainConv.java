@@ -33,7 +33,7 @@ public class MainConv{
 
       Sequencial modelo = criarModelo();
       modelo.configurarHistorico(true);
-      System.out.println(modelo.info());
+      modelo.info();
 
       // treinar e marcar tempo
       long t1, t2;

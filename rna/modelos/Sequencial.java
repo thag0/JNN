@@ -182,32 +182,7 @@ public class Sequencial extends Modelo implements Cloneable{
       this.treinador.configurarHistoricoCusto(calcular);
    }
 
-   /**
-    * Configura o novo otimizador da Rede Neural com base numa nova instância de otimizador.
-    * <p>
-    *    Configurando o otimizador passando diretamente uma nova instância permite configurar
-    *    os hiperparâmetros do otimizador fora dos valores padrão, o que pode ajudar a
-    *    melhorar o desempenho de aprendizado da Rede Neural em cenário específicos.
-    * </p>
-    * Otimizadores disponíveis.
-    * <ol>
-    *    <li> GradientDescent  </li>
-    *    <li> SGD (Gradiente Descendente Estocástico) </li>
-    *    <li> AdaGrad </li>
-    *    <li> RMSProp </li>
-    *    <li> Adam  </li>
-    *    <li> Nadam </li>
-    *    <li> AMSGrad </li>
-    *    <li> Adamax  </li>
-    *    <li> Lion   </li>
-    *    <li> Adadelta </li>
-    * </ol>
-    * <p>
-    *    {@code O otimizador padrão é o SGD}
-    * </p>
-    * @param otimizador novo otimizador.
-    * @throws IllegalArgumentException se o novo otimizador for nulo.
-    */
+   @Override
    public void configurarOtimizador(Otimizador otimizador){
       if(otimizador == null){
          throw new IllegalArgumentException("O novo otimizador não pode ser nulo.");
@@ -423,21 +398,26 @@ public class Sequencial extends Modelo implements Cloneable{
    }
 
    @Override
-   public String info(){
+   public void info(){
       super.verificarCompilacao();
 
-      String espacamento = "    ";
-      String buffer = "";
-      buffer += this.nome + " = [\n";
+      String espacamento = " ".repeat(4);
+      StringBuilder sb = new StringBuilder();
+      sb.append(this.nome + " = [\n");
 
-      buffer += otimizador.info();
-      buffer += "\n";
+      //otimizador
+      sb.append(otimizador.info());
+      sb.append("\n");
 
-      buffer += espacamento + "Perda: " + this.perda.nome();
-      buffer += "\n\n";
+      //função de perda
+      sb.append(espacamento + "Perda: " + this.perda.nome());
+      sb.append("\n\n");
 
-      buffer += espacamento + String.format(
-         "%-23s%-23s%-23s%-23s\n", "Camada", "Formato de Entrada", "Formato de Saída", "Função de Ativação"
+      //camadas
+      sb.append(
+         espacamento + String.format(
+         "%-23s%-23s%-23s%-23s\n", "Camada", "Formato de Entrada", "Formato de Saída", "Ativação"
+         )
       );
 
       for(Camada camada : this.camadas){
@@ -469,16 +449,17 @@ public class Sequencial extends Modelo implements Cloneable{
             ativacao = "n/a";
          }
 
-         buffer += espacamento + String.format(
-            "%-23s%-23s%-23s%-23s\n", nomeCamada, formEntrada, formSaida, "Ativação = " + ativacao
+         sb.append(
+            espacamento + String.format(
+               "%-23s%-23s%-23s%-23s\n", nomeCamada, formEntrada, formSaida, ativacao
+            )
          );
       }
 
-      buffer += "\n" + espacamento + "Parâmetros treináveis: " + this.numParametros() + "\n";
+      sb.append("\n" + espacamento + "Parâmetros treináveis: " + this.numParametros() + "\n");
+      sb.append("]\n");
 
-      buffer += "]\n";
-
-      return buffer;
+      System.out.println(sb.toString());
    }
 
    @Override
