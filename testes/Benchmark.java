@@ -12,21 +12,21 @@ public class Benchmark {
       OpMatriz opamt = new OpMatriz();
       ged.limparConsole();
 
-      int lin = 28;
-      int col = 28;
+      int lin = 1024;
+      int col = 1024;
 
       Mat a = new Mat(lin, col);
       a.preencher(1);
-      Mat b = new Mat(4, 4);
+      Mat b = new Mat(lin, col);
       b.preencher(2);
-      Mat r = new Mat(lin-b.lin()+1, col-b.col()+1);
+      Mat r = new Mat(lin, col);
 
       //treinar e marcar tempo
       long t1, t2;
       long minutos, segundos;
 
       t1 = System.nanoTime();
-      opamt.correlacaoCruzada(a, b, r, false);
+      opamt.mult(a, b, r);
       t2 = System.nanoTime();
       
       long tempoDecorrido = t2 - t1;
@@ -34,7 +34,7 @@ public class Benchmark {
       minutos = (segundosTotais % 3600) / 60;
       segundos = segundosTotais % 60;
       System.out.println("Concluído em: " + minutos + "m " + segundos + "s " + (t2-t1) + "ms");
-      // c.print();
+      // r.print();
    }
 
 }

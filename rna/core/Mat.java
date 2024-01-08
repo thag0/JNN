@@ -478,7 +478,8 @@ public class Mat{
    public void add(Mat a, Mat b){
       verificarDimensoes(a, b);
       
-      for(int i = 0; i < this.dados.length; i++){
+      int n = this.tamanho();
+      for(int i = 0; i < n; i++){
          this.dados[i] = a.dados[i] + b.dados[i];
       }
    }
@@ -596,15 +597,16 @@ public class Mat{
          );  
       }
 
-      int i, j, k, acol = a.col();
-      double res = 0;
+      int i, j, k;
+      int acol = a.col();
+      double res;
       for(i = 0; i < this.lin; i++){
          for(j = 0; j < this.col; j++){
             res = 0;
             for(k = 0; k < acol; k++){
                res += a.elemento(i, k) * b.elemento(k, j);
             }
-            this.editar(i, j, res);    
+            this.editar(i, j, res);
          }
       }
    }
