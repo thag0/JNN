@@ -1,6 +1,7 @@
 package testes;
 
 import java.awt.image.BufferedImage;
+import java.util.concurrent.TimeUnit;
 
 import lib.ged.Ged;
 import lib.geim.Geim;
@@ -22,13 +23,16 @@ public class TreinoConv{
       Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/conv-mnist-89.txt");
       // testarModelo(modelo, digitos, amostras);
 
-      for(int i = 0; i < digitos; i++){
-         for(int j = 0; j < amostras; j++){
-            String caminho = i + "/img_" + j;
-            testarPrevisao(modelo, caminho, false);
-         }
-         System.out.println();
-      }
+      double[][] img = imagemParaMatriz("/dados/mnist/teste/0/img_0.jpg");
+      double[][][] entrada = new double[1][][];
+      entrada[0] = img;
+
+      long t;
+      t = medirTempo(() -> modelo.calcularSaida(entrada));
+      System.out.println("Tempo forward: " + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
+      
+      t = medirTempo(() -> modelo.otimizador().atualizar(modelo.camadas()));
+      System.out.println("Tempo otimizador: " + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
    }
 
    static long medirTempo(Runnable func){

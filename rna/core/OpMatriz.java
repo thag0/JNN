@@ -156,6 +156,35 @@ public class OpMatriz{
    }
 
    /**
+    * Encontra na matriz o maior valor dentro da linha fornecida.
+    * @param m matriz.
+    * @param lin linha desejada.
+    */
+   public void argmax(Mat m, int lin){
+      if(lin < 0 | lin >= m.lin()){
+         throw new IllegalArgumentException(
+            "Índice de linha (" + lin + ") inválido."
+         );
+      }
+
+      double[] linha = m.linha(lin);
+      int maiorId = 0;
+      double maiorValor = linha[0];
+      for(int i = 1; i < linha.length; i++){
+         if(linha[i] > maiorValor){
+            maiorId = i;
+            maiorValor = linha[i];
+         }
+      }
+
+      for(int i = 0; i < linha.length; i++){
+         linha[i] = i == maiorId ? 1 : 0;
+      }
+
+      m.copiar(lin, linha);
+   }
+
+   /**
     * Multiplicação matricial convencional seguindo a expressão:
     * <pre>
     * R = A * B
