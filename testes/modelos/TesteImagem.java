@@ -6,7 +6,7 @@ import lib.ged.Dados;
 import lib.ged.Ged;
 import lib.geim.Geim;
 import rna.avaliacao.perda.*;
-import rna.estrutura.*;
+import rna.camadas.*;
 import rna.inicializadores.*;
 import rna.otimizadores.*;
 import rna.modelos.Modelo;

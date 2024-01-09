@@ -1,6 +1,6 @@
 package rna.otimizadores;
 
-import rna.estrutura.Camada;
+import rna.camadas.Camada;
 
 /**
  * Classe base para implementações de otimizadores do treino da Rede Neural.

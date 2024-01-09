@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import rna.estrutura.Densa;
+import rna.camadas.Densa;
 
 class SerialDensa{
 

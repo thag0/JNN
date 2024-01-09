@@ -1,4 +1,4 @@
-package rna.estrutura;
+package rna.camadas;
 
 import rna.core.Mat;
 import rna.core.Utils;

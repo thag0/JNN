@@ -7,11 +7,11 @@ import java.io.FileReader;
 import java.io.FileWriter;
 
 import rna.avaliacao.perda.Perda;
-import rna.estrutura.Camada;
-import rna.estrutura.Convolucional;
-import rna.estrutura.Densa;
-import rna.estrutura.Flatten;
-import rna.estrutura.MaxPooling;
+import rna.camadas.Camada;
+import rna.camadas.Convolucional;
+import rna.camadas.Densa;
+import rna.camadas.Flatten;
+import rna.camadas.MaxPooling;
 import rna.modelos.RedeNeural;
 import rna.modelos.Sequencial;
 import rna.otimizadores.Otimizador;

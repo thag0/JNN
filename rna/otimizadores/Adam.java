@@ -1,6 +1,6 @@
 package rna.otimizadores;
 
-import rna.estrutura.Camada;
+import rna.camadas.Camada;
 
 /**
  * Implementação do algoritmo de otimização Adam.
@@ -157,11 +157,11 @@ public class Adam extends Otimizador{
    }
 
    @Override
-   public void construir(Camada[] redec){
+   public void construir(Camada[] camadas){
       int nKernel = 0;
       int nBias = 0;
       
-      for(Camada camada : redec){
+      for(Camada camada : camadas){
          if(camada.treinavel == false) continue;
 
          nKernel += camada.obterKernel().length;

@@ -3,11 +3,11 @@ package testes;
 import lib.ged.Dados;
 import lib.ged.Ged;
 import rna.avaliacao.perda.EntropiaCruzada;
+import rna.camadas.Densa;
+import rna.camadas.Flatten;
+import rna.camadas.MaxPooling;
 import rna.core.Mat;
 import rna.core.OpMatriz;
-import rna.estrutura.Densa;
-import rna.estrutura.Flatten;
-import rna.estrutura.MaxPooling;
 import rna.inicializadores.Inicializador;
 import rna.inicializadores.Xavier;
 

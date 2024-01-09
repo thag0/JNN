@@ -3,9 +3,9 @@ package rna.treinamento;
 import java.util.Random;
 
 import rna.avaliacao.perda.Perda;
+import rna.camadas.Camada;
+import rna.camadas.Densa;
 import rna.core.OpMatriz;
-import rna.estrutura.Camada;
-import rna.estrutura.Densa;
 import rna.modelos.Modelo;
 import rna.otimizadores.Otimizador;
 

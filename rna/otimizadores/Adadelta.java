@@ -1,6 +1,6 @@
 package rna.otimizadores;
 
-import rna.estrutura.Camada;
+import rna.camadas.Camada;
 
 /**
  * Implementação do otimizador Adadelta.

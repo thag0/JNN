@@ -6,7 +6,7 @@ import lib.ged.*;
 import lib.geim.Geim;
 import render.JanelaTreino;
 import rna.avaliacao.perda.*;
-import rna.estrutura.*;
+import rna.camadas.*;
 import rna.inicializadores.*;
 import rna.modelos.Modelo;
 import rna.modelos.RedeNeural;
@@ -14,7 +14,7 @@ import rna.modelos.Sequencial;
 import rna.otimizadores.*;
 
 public class Main{
-   static final int epocas = 5*1000;
+   static final int epocas = 10*1000;
    static final float escalaRender = 8f;
    static Ged ged = new Ged();
    static Geim geim = new Geim();

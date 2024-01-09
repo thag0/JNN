@@ -2,7 +2,7 @@ package testes.modelos;
 
 import lib.ged.Ged;
 import rna.ativacoes.Sigmoid;
-import rna.estrutura.Densa;
+import rna.camadas.Densa;
 import rna.inicializadores.Xavier;
 
 public class TesteCamada{

@@ -1,6 +1,6 @@
 package rna.otimizadores;
 
-import rna.estrutura.Camada;
+import rna.camadas.Camada;
 
 /**
  * Implementa o treino da rede neural usando o algoritmo RMSProp (Root Mean Square Propagation).

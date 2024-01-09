@@ -1,7 +1,7 @@
 package rna.otimizadores;
 
+import rna.camadas.Camada;
 import rna.core.OpArray;
-import rna.estrutura.Camada;
 
 /**
  * Implementa uma versão do algoritmo AdaGrad (Adaptive Gradient Algorithm).

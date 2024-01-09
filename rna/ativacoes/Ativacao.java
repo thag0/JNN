@@ -2,9 +2,9 @@ package rna.ativacoes;
 
 import java.util.function.DoubleUnaryOperator;
 
+import rna.camadas.Convolucional;
+import rna.camadas.Densa;
 import rna.core.Mat;
-import rna.estrutura.Convolucional;
-import rna.estrutura.Densa;
 
 /**
  * Classe base para a implementação das funções de ativação.

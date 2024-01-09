@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
-import rna.estrutura.Densa;
+import rna.camadas.Densa;
 import rna.modelos.RedeNeural;
 
 public class PainelRede extends JPanel{

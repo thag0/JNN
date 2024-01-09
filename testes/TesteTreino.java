@@ -2,8 +2,8 @@ package testes;
 
 import lib.ged.Ged;
 import rna.avaliacao.perda.ErroMedioQuadrado;
+import rna.camadas.*;
 import rna.inicializadores.Xavier;
-import rna.estrutura.*;
 import rna.modelos.*;
 import rna.otimizadores.SGD;
 

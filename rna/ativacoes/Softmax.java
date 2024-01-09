@@ -1,8 +1,8 @@
 package rna.ativacoes;
 
+import rna.camadas.Densa;
 import rna.core.Mat;
 import rna.core.OpMatriz;
-import rna.estrutura.Densa;
 
 /**
  * Implementação da função de ativação Softmax para uso

@@ -1,7 +1,7 @@
 package rna.otimizadores;
 
+import rna.camadas.Camada;
 import rna.core.OpArray;
-import rna.estrutura.Camada;
 
 /**
  * Classe que implementa o algoritmo de Descida do Gradiente para otimização de redes neurais.

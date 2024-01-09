@@ -3,7 +3,7 @@ package rna.serializacao;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 
-import rna.estrutura.Flatten;
+import rna.camadas.Flatten;
 
 public class SerialFlatten{
 

@@ -3,7 +3,7 @@ import java.util.concurrent.TimeUnit;
 import lib.ged.Ged;
 import lib.geim.Geim;
 import rna.avaliacao.perda.*;
-import rna.estrutura.*;
+import rna.camadas.*;
 import rna.inicializadores.*;
 import rna.modelos.Sequencial;
 import rna.otimizadores.*;

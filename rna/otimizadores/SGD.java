@@ -1,6 +1,6 @@
 package rna.otimizadores;
 
-import rna.estrutura.Camada;
+import rna.camadas.Camada;
 
 /**
  * Classe que implementa o otimizador Gradiente Descentente Estocástico com momentum.

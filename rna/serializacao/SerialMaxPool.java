@@ -3,7 +3,7 @@ package rna.serializacao;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 
-import rna.estrutura.MaxPooling;
+import rna.camadas.MaxPooling;
 
 class SerialMaxPool{
 

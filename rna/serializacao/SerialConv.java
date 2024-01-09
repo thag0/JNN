@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import rna.estrutura.Convolucional;
+import rna.camadas.Convolucional;
 
 /**
  * Utilitário usado para serialização e desserialização de camadas Convolucionais.

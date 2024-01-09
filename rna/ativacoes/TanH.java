@@ -1,7 +1,7 @@
 package rna.ativacoes;
 
-import rna.estrutura.Convolucional;
-import rna.estrutura.Densa;
+import rna.camadas.Convolucional;
+import rna.camadas.Densa;
 
 public class TanH extends Ativacao{
 

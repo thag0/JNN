@@ -2,7 +2,7 @@ package rna.modelos;
 
 import rna.avaliacao.Avaliador;
 import rna.avaliacao.perda.Perda;
-import rna.estrutura.Camada;
+import rna.camadas.Camada;
 import rna.inicializadores.Inicializador;
 import rna.otimizadores.Otimizador;
 import rna.treinamento.Treinador;

@@ -1,6 +1,6 @@
 package rna.ativacoes;
 
-import rna.estrutura.Densa;
+import rna.camadas.Densa;
 
 /**
  * Implementação da função de ativação Argmax para uso 
