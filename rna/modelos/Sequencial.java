@@ -424,7 +424,8 @@ public class Sequencial extends Modelo implements Cloneable{
          );
       }
 
-      sb.append("\n" + espacamento + "Parâmetros treináveis: " + this.numParametros() + "\n");
+      String params = String.format("%,d", this.numParametros());
+      sb.append("\n" + espacamento + "Parâmetros treináveis: " + params + "\n");
       sb.append("]\n");
 
       System.out.println(sb.toString());

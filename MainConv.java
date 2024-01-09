@@ -61,7 +61,7 @@ public class MainConv{
       testes.modelos.TesteModelos.exportarHistoricoPerda(modelo);
 
       salvarModelo(modelo, caminhoSaidaModelo);
-      Main.executarComando("python grafico.py");
+      MainImg.executarComando("python grafico.py");
    }
 
    /**

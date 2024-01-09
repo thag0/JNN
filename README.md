@@ -23,7 +23,7 @@ Consegui criar essa generalização para o modelo sequencial criando a classe m�
 
 Seguindo a ideia de generalização, os otimizadores também sofreram algumas mudanças para poder lidar com multiplos tipos de camadas. Agora lidam com formas vetorizadas dos kernels e bias das camadas, sem se preocupar com a formatação de cada uma em especifico.
 
-![treino sequencial](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/7fe7881b-5f7c-4e69-a387-418705667b48)
+![treino sequencial](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/368c7994-ccc9-4baa-8417-5d67c7e5320c)
 
 *Exemplo de treino usando o modelo sequencial, usando o otimizador sgd e função de perda mse*
 
