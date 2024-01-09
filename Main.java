@@ -57,9 +57,8 @@ public class Main{
       segundos = segundosTotais % 60;
 
       double precisao = (1 - modelo.avaliador.erroMedioQuadrado(in, out))*100;
-      double perda = modelo.avaliador.erroMedioQuadrado(in, out);
       System.out.println("Precisão = " + formatarDecimal(precisao, 2) + "%");
-      System.out.println("Perda = " + perda);
+      System.out.println("Perda = " + modelo.avaliar(in, out));
       System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
 
       if(calcularHistorico){

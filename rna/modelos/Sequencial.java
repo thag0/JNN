@@ -291,6 +291,36 @@ public class Sequencial extends Modelo implements Cloneable{
   }
 
    @Override
+   public double avaliar(Object[] entrada, Object[] saida){
+      super.verificarCompilacao();
+
+      if(entrada.length != saida.length){
+         throw new IllegalArgumentException(
+            "A quantidade de dados de entrada (" + entrada.length + ") " +
+            "e saída (" + saida.length + ") " + "devem ser iguais."
+         );
+      }
+
+      if(saida instanceof double[][] == false){
+         throw new IllegalArgumentException(
+            "A saída deve ser do tipo double[][]" + 
+            " recebido " + saida.getClass().getTypeName()
+         );
+      }
+
+      double[][] s = (double[][]) saida;
+      
+      int n = entrada.length;
+      double perda = 0;
+      for(int i = 0; i < n; i++){
+         this.calcularSaida(entrada[i]);
+         perda += this.perda.calcular(this.saidaParaArray(), s[i]);
+      }
+
+      return perda/n;
+   }
+  
+   @Override
    public Otimizador otimizador(){
       return this.otimizador;
    }

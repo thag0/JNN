@@ -211,6 +211,20 @@ public abstract class Modelo{
    }
 
    /**
+    * Propaga os dados de entrada através das camadas do modelo.
+    * @param entrada dados de entrada que serão processados, o tipo
+    * de dado depende do tipo da camada inicial do modelo.
+    */
+   public abstract void calcularSaida(Object entrada);
+
+   /**
+    * Propaga os dados de entrada através das camadas do modelo.
+    * @param entradas array contendo multiplas entradas.
+    * @return array contendo as saídas correspondentes.
+    */
+   public abstract Object[] calcularSaidas(Object[] entradas);
+
+   /**
     * Treina o modelo de acordo com as configurações predefinidas.
     * <p>
     *    Certifique-se de configurar adequadamente o modelo para obter os 
@@ -242,18 +256,13 @@ public abstract class Modelo{
    public abstract void treinar(Object[] entradas, Object[] saidas, int epochs, int tamLote, boolean logs);
 
    /**
-    * Propaga os dados de entrada através das camadas do modelo.
-    * @param entrada dados de entrada que serão processados, o tipo
-    * de dado depende do tipo da camada inicial do modelo.
+    * Avalia o modelo calcular o valor de perda usando a função de perda
+    * que foi configurada.
+    * @param entradas dados de entrada para avaliação.
+    * @param saidas dados de saída correspondente as entradas fornecidas.
+    * @return valor de perda do modelo.
     */
-   public abstract void calcularSaida(Object entrada);
-
-   /**
-    * Propaga os dados de entrada através das camadas do modelo.
-    * @param entradas array contendo multiplas entradas.
-    * @return array contendo as saídas correspondentes.
-    */
-   public abstract Object[] calcularSaidas(Object[] entradas);
+   public abstract double avaliar(Object[] entradas, Object[] saidas);
 
    /**
     * Retorna o otimizador que está sendo usado para o treino do modelo.
