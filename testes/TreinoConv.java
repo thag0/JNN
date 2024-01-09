@@ -13,15 +13,22 @@ public class TreinoConv{
    static Geim geim = new Geim();
    static OpMatriz opmat = new OpMatriz();
    static Serializador serializador = new Serializador();
+   static int digitos = 10;
+   static int amostras = 10;
    
    public static void main(String[] args){
       ged.limparConsole();
       
       Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/conv-mnist-89.txt");
+      // testarModelo(modelo, digitos, amostras);
 
-      int digitos = 10;
-      int amostras = 10;
-      testarModelo(modelo, digitos, amostras);
+      for(int i = 0; i < digitos; i++){
+         for(int j = 0; j < amostras; j++){
+            String caminho = i + "/img_" + j;
+            testarPrevisao(modelo, caminho, false);
+         }
+         System.out.println();
+      }
    }
 
    static long medirTempo(Runnable func){
@@ -41,10 +48,10 @@ public class TreinoConv{
    }
 
    static void testarPrevisao(Sequencial modelo, String imagemTeste, boolean prob){
-      double[][][] teste1 = new double[1][][];
-      String extensao = ".png";
-      teste1[0] = imagemParaMatriz("/dados/mnist/teste/" + imagemTeste + extensao);
-      modelo.calcularSaida(teste1);
+      double[][][] entrada = new double[1][][];
+      String extensao = ".jpg";
+      entrada[0] = imagemParaMatriz("/dados/mnist/teste/" + imagemTeste + extensao);
+      modelo.calcularSaida(entrada);
       double[] previsao = modelo.saidaParaArray();
       
       System.out.print("\nTestando: " + imagemTeste + extensao);

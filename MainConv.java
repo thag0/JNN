@@ -30,7 +30,7 @@ public class MainConv{
       System.out.println(
          "Dados de treino (" + 
          treinoX.length + ", " + treinoX[0].length + ", " + treinoX[0][0].length + ", " + treinoX[0][0][0].length + 
-         ")"
+         ")\n"
       );
       
       final var testeX = carregarDadosMNIST(caminhoTeste, NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
@@ -91,13 +91,13 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{3, 3}, 40, "leakyrelu"),
+         new Convolucional(formEntrada, new int[]{3, 3}, 46, "leakyrelu"),
          new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{3, 3}, 40, "leakyrelu"),
+         new Convolucional(new int[]{3, 3}, 46, "leakyrelu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(120, "sigmoid"),
-         new Densa(60, "sigmoid"),
+         new Densa(128, "sigmoid"),
+         new Densa(64, "sigmoid"),
          new Densa(NUM_DIGITOS_TREINO, "softmax"),
       });
 
@@ -117,8 +117,7 @@ public class MainConv{
     */
    static void salvarModelo(Sequencial modelo, String caminho){
       System.out.println("Salvando modelo.");
-      Serializador s = new Serializador();
-      s.salvar(modelo, caminho, "double");
+      new Serializador().salvar(modelo, caminho, "double");
    }
 
    /**
