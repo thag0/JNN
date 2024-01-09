@@ -124,7 +124,7 @@ public class Main{
       
       int i = 0;
       while(i < epocas && jt.isVisible()){
-         modelo.treinar(entradas, saidas, epocasPorFrame, false);
+         modelo.treinar(entradas, saidas, epocasPorFrame, 16, false);
          jt.desenharTreino(modelo, i);
          i += epocasPorFrame;
 

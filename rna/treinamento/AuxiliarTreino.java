@@ -27,19 +27,19 @@ public class AuxiliarTreino{
     *    Os gradientes iniciais são calculados usando a derivada da função de perda, com eles
     *    calculados, são retropropagados da última a primeira camada da rede.
     * </p>
-    * @param redec conjunto de camadas densas da Rede Neural.
+    * @param camadas conjunto de camadas densas da Rede Neural.
     * @param perda função de perda configurada para a Rede Neural.
     * @param real saída real que será usada para calcular os erros e gradientes.
     */
-   public void backpropagation(Camada[] redec, Perda perda, double[] real){
-      Camada saida = redec[redec.length-1];
+   public void backpropagation(Camada[] camadas, Perda perda, double[] real){
+      Camada saida = camadas[camadas.length-1];
       double[] previsto = saida.saidaParaArray();
       double[] gradPrev = perda.derivada(previsto, real);
 
       Mat g = new Mat(gradPrev);
       saida.calcularGradiente(g);
-      for(int i = redec.length-2; i >= 0; i--){
-         redec[i].calcularGradiente(redec[i+1].obterGradEntrada());
+      for(int i = camadas.length-2; i >= 0; i--){
+         camadas[i].calcularGradiente(camadas[i+1].obterGradEntrada());
       }
    }
 
@@ -104,7 +104,7 @@ public class AuxiliarTreino{
     * @param fim índice final do lote.
     * @return lote contendo os dados de acordo com os índices fornecidos.
     */
-   Object[] obterSubMatriz(Object[] dados, int inicio, int fim){
+   public Object[] obterSubMatriz(Object[] dados, int inicio, int fim){
       if(inicio < 0 || fim > dados.length || inicio >= fim){
          throw new IllegalArgumentException("Índices de início ou fim inválidos.");
       }
@@ -113,7 +113,7 @@ public class AuxiliarTreino{
       Object[] subMatriz = new double[linhas][];
 
       for(int i = 0; i < linhas; i++){
-         subMatriz[i] = dados[i];
+         subMatriz[i] = dados[i + inicio];
       }
 
       return subMatriz;
@@ -124,13 +124,10 @@ public class AuxiliarTreino{
     * @param historico histórico com os valores de perda da rede.
     * @param valor novo valor que será adicionado.
     */
-   double[] adicionarPerda(double[] historico, double valor){
+   double[] addPerda(double[] historico, double valor){
       double[] aux = historico;
       historico = new double[historico.length + 1];
-      
-      for(int i = 0; i < aux.length; i++){
-         historico[i] = aux[i];
-      }
+      System.arraycopy(aux, 0, historico, 0, aux.length);
       historico[historico.length-1] = valor;
 
       return historico;

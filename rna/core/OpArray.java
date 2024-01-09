@@ -7,6 +7,15 @@ public class OpArray{
     */
    public OpArray(){}
 
+   public void print(double[] arr){
+      System.out.println("Array = [");
+      System.out.print("  " + arr[0]);
+      for(int i = 1; i < arr.length; i++){
+         System.out.print(", " + arr[i]);
+      }
+      System.out.println("]");
+   }
+
    /**
     * Preenche todo o conteúdo do array com o valor fornecido.
     * @param arr array.

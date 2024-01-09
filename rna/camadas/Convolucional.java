@@ -1,7 +1,7 @@
 package rna.camadas;
 
 import rna.ativacoes.Ativacao;
-import rna.ativacoes.ReLU;
+import rna.ativacoes.Linear;
 import rna.core.Mat;
 import rna.core.OpMatriz;
 import rna.core.Utils;
@@ -228,7 +228,7 @@ public class Convolucional extends Camada implements Cloneable{
    /**
     * Função de ativação da camada.
     */
-   Ativacao ativacao = new ReLU();
+   Ativacao ativacao = null;
 
    /**
     * Instancia uma camada convolucional de acordo com os formatos fornecidos.
@@ -598,6 +598,10 @@ public class Convolucional extends Camada implements Cloneable{
          for(Mat camada : filtro){
             this.numParamsKernel += camada.tamanho();
          }
+      }
+
+      if(ativacao == null){
+         this.ativacao = new Linear();
       }
       
       this.treinavel = true;

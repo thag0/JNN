@@ -82,7 +82,7 @@ public class Treino{
 
          //feedback de avanço da rede
          if(this.calcularHistorico){
-            this.historico = aux.adicionarPerda(this.historico, (double)(perdaEpoca/entrada.length));
+            this.historico = aux.addPerda(this.historico, (double)(perdaEpoca/entrada.length));
          }
       }
    }

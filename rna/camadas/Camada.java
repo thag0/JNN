@@ -129,7 +129,7 @@ public abstract class Camada{
     * função de ativação suportada.
     */
    public void configurarAtivacao(String ativacao){
-      throw new IllegalArgumentException(
+      throw new UnsupportedOperationException(
          "Implementar configuração da função de ativação da camada " + this.getClass().getTypeName() + "."
       );
    }
@@ -146,7 +146,7 @@ public abstract class Camada{
     * @throws IllegalArgumentException se a função de ativação fornecida for nula.
     */
    public void configurarAtivacao(Ativacao ativacao){
-      throw new IllegalArgumentException(
+      throw new UnsupportedOperationException(
          "Implementar configuração da função de ativação da camada " + this.getClass().getTypeName() + "."
       );
    }
@@ -166,7 +166,7 @@ public abstract class Camada{
     * @param usarBias uso do bias.
     */
    public void configurarBias(boolean usarBias){
-      throw new IllegalArgumentException(
+      throw new UnsupportedOperationException(
          "Implementar configuração de bias da camada " + this.getClass().getTypeName() + "."
       );     
    }
@@ -208,7 +208,7 @@ public abstract class Camada{
     * @return função de ativação da camada.
     */
    public Ativacao obterAtivacao(){
-      throw new IllegalArgumentException(
+      throw new UnsupportedOperationException(
          "Implementar retorno da função de ativação da camada " + this.getClass().getTypeName() + "."
       );
    }
@@ -225,7 +225,7 @@ public abstract class Camada{
     * @return array contendo os valores das dimensões de entrada da camada.
     */
    public int[] formatoEntrada(){
-      throw new IllegalArgumentException(
+      throw new UnsupportedOperationException(
          "Implementar formato de entrada da camada" + this.getClass().getTypeName() + "."
       );
    }
@@ -248,7 +248,7 @@ public abstract class Camada{
     * @return saída da camada.
     */
    public double[] saidaParaArray(){
-      throw new IllegalArgumentException(
+      throw new UnsupportedOperationException(
          "Implementar retorno de saída para array da camada" + this.getClass().getTypeName() + "."
       );   
    }
@@ -258,7 +258,7 @@ public abstract class Camada{
     * @return tamanho de saída da camada.
     */
    public int tamanhoSaida(){
-      throw new IllegalArgumentException(
+      throw new UnsupportedOperationException(
          "Implementar retorno de tamanho da saída da camada " + this.getClass().getTypeName() + "."
       );        
    }
@@ -272,7 +272,7 @@ public abstract class Camada{
     * @return número da parâmetros da camada.
     */
    public int numParametros(){
-      throw new IllegalArgumentException(
+      throw new UnsupportedOperationException(
          "Implementar número de parâmetros da camada " + this.getClass().getTypeName() + "."
       );  
    }
@@ -282,7 +282,7 @@ public abstract class Camada{
     * @return uso de bias na camada.
     */
    public boolean temBias(){
-      throw new IllegalArgumentException(
+      throw new UnsupportedOperationException(
          "Implementar uso do bias na camada " + this.getClass().getTypeName() + "."
       );  
    }
@@ -296,7 +296,7 @@ public abstract class Camada{
     * @return kernel da camada.
     */
    public double[] obterKernel(){
-      throw new IllegalArgumentException(
+      throw new UnsupportedOperationException(
          "Implementar retorno do kernel da camada " + this.getClass().getTypeName() + "."
       );       
    }
@@ -307,7 +307,7 @@ public abstract class Camada{
     * @return gradientes para os kernels da camada.
     */
    public double[] obterGradKernel(){
-      throw new IllegalArgumentException(
+      throw new UnsupportedOperationException(
          "Implementar retorno do gradiente para o kernel da camada" + this.getClass().getTypeName() + "."
       );       
    }
@@ -322,7 +322,7 @@ public abstract class Camada{
     * @return acumulador para o kernel da camada.
     */
    public double[] obterAcGradKernel(){
-      throw new IllegalArgumentException(
+      throw new UnsupportedOperationException(
          "Implementar retorno do acumulador para o kernel da camada " + this.getClass().getTypeName() + "."
       );       
    }
@@ -337,7 +337,7 @@ public abstract class Camada{
     * @return bias da camada.
     */
    public double[] obterBias(){
-      throw new IllegalArgumentException(
+      throw new UnsupportedOperationException(
          "Implementar retorno do bias da camada " + this.getClass().getTypeName() + "."
       );        
    }
@@ -348,7 +348,7 @@ public abstract class Camada{
     * @return gradientes para os bias da camada.
     */
    public double[] obterGradBias(){
-      throw new IllegalArgumentException(
+      throw new UnsupportedOperationException(
          "Implementar retorno do gradiente para o bias da camada" + this.getClass().getTypeName() + "."
       );        
    }
@@ -359,7 +359,7 @@ public abstract class Camada{
     * @return acumuladores para os bias da camada.
     */
    public double[] obterAcGradBias(){
-      throw new IllegalArgumentException(
+      throw new UnsupportedOperationException(
          "Implementar retorno do acumulador para o bias da camada" + this.getClass().getTypeName() + "."
       );        
    }
@@ -370,7 +370,7 @@ public abstract class Camada{
     * @return gradiente de entrada da camada.
     */
    public Object obterGradEntrada(){
-      throw new IllegalArgumentException(
+      throw new UnsupportedOperationException(
          "Implementar retorno do gradiente de entrada da camada " + this.getClass().getTypeName() + "."
       );     
    }
@@ -381,7 +381,7 @@ public abstract class Camada{
     * @param grads novos valores de gradientes.
     */
    public void editarGradienteKernel(double[] grads){
-      throw new IllegalArgumentException(
+      throw new UnsupportedOperationException(
          "Implementar edição do gradiente para o kernel para a camada " + this.getClass().getTypeName() + "."
       );
    }
@@ -392,7 +392,7 @@ public abstract class Camada{
     * @param kernel novos valores do kernel.
     */
    public void editarKernel(double[] kernel){
-      throw new IllegalArgumentException(
+      throw new UnsupportedOperationException(
          "Implementar edição do kernel para a camada " + this.getClass().getTypeName() + "."
       );
    }
@@ -403,7 +403,7 @@ public abstract class Camada{
     * @param acumulador novos valores do acumulador.
     */
    public void editarAcGradKernel(double[] acumulador){
-      throw new IllegalArgumentException(
+      throw new UnsupportedOperationException(
          "Implementar edição do acumulador do kernel para a camada " + this.getClass().getTypeName() + "."
       );      
    }
@@ -414,7 +414,7 @@ public abstract class Camada{
     * @param grads novos valores de gradientes.
     */
    public void editarGradienteBias(double[] grads){
-      throw new IllegalArgumentException(
+      throw new UnsupportedOperationException(
          "Implementar edição do gradiente para o bias para a camada " + this.getClass().getTypeName() + "."
       );
    }
@@ -425,7 +425,7 @@ public abstract class Camada{
     * @param bias novos valores do bias.
     */
    public void editarBias(double[] bias){
-      throw new IllegalArgumentException(
+      throw new UnsupportedOperationException(
          "Implementar edição do bias para a camada " + this.getClass().getTypeName() + "."
       );
    }
@@ -436,9 +436,18 @@ public abstract class Camada{
     * @param  acumulador valores do acumulador.
     */
    public void editarAcGradBias(double[] acumulador){
-      throw new IllegalArgumentException(
+      throw new UnsupportedOperationException(
          "Implementar edição do acumulador do bias para a camada " + this.getClass().getTypeName() + "."
       );      
+   }
+
+   /**
+    * Zera os acumudalores de gradientes para os kernels e bias da camada.
+    */
+   public void zerarAcumuladores(){
+      throw new UnsupportedOperationException(
+         "Implementar reset para acumuladores da camada " + this.getClass().getTypeName() + "."
+      );
    }
 
    /**

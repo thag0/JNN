@@ -1,7 +1,7 @@
 package rna.camadas;
 
 import rna.ativacoes.Ativacao;
-import rna.ativacoes.ReLU;
+import rna.ativacoes.Linear;
 import rna.core.Mat;
 import rna.core.OpMatriz;
 import rna.inicializadores.Constante;
@@ -188,7 +188,7 @@ public class Densa extends Camada implements Cloneable{
    /**
     * Função de ativação da camada
     */
-   private Ativacao ativacao = new ReLU();
+   private Ativacao ativacao = null;
 
    /**
     * Instancia uma nova camada densa de neurônios, inicializando seus atributos como:
@@ -352,6 +352,10 @@ public class Densa extends Camada implements Cloneable{
 
       this.gradPesos =   new Mat(this.pesos.lin(), this.pesos.col());
       this.gradAcPesos = new Mat(this.pesos.lin(), this.pesos.col());
+
+      if(ativacao == null){
+         this.ativacao = new Linear();
+      }
       
       this.treinavel = true;
       this.construida = true;//camada pode ser usada.
@@ -831,5 +835,12 @@ public class Densa extends Camada implements Cloneable{
       }
 
       this.bias.copiar(bias);
+   }
+
+   @Override
+   public void zerarAcumuladores(){
+      verificarConstrucao();
+      this.gradAcPesos.preencher(0);
+      this.gradAcBias.preencher(0);
    }
 }

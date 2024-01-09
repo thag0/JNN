@@ -50,11 +50,10 @@ public class TreinoLote{
    }
 
    /**
-    * Treina a rede neural calculando os erros dos neuronios, seus gradientes para cada peso e 
-    * passando essas informações para o otimizador configurado ajustar os pesos.
-    * @param modelo instância da rede.
+    * Treina o modelo por um número determinado de épocas usando o treinamento em lotes.
+    * @param modelo instância de modelo.
     * @param perda função de perda (ou custo) usada para calcular os erros da rede.
-    * @param otimizador otimizador configurado da rede.
+    * @param otimizador otimizador configurado do modelo.
     * @param entradas dados de entrada para o treino.
     * @param saidas dados de saída correspondente as entradas para o treino.
     * @param epochs quantidade de épocas de treinamento.
@@ -97,7 +96,7 @@ public class TreinoLote{
 
          //feedback de avanço da rede
          if(this.calcularHistorico){
-            this.historico = aux.adicionarPerda(this.historico, (perdaEpoca/tamLote));
+            this.historico = aux.addPerda(this.historico, (perdaEpoca/tamLote));
          }
       }
    }
@@ -109,24 +108,24 @@ public class TreinoLote{
     *    calculados, são retropropagados da última a primeira camada da rede.
     * </p>
     * Ao final os gradientes calculados são adicionados aos acumuladores para o lote.
-    * @param redec conjunto de camadas densas da Rede Neural.
-    * @param perda função de perda configurada para a Rede Neural.
+    * @param camadas conjunto de camadas do modelo.
+    * @param perda função de perda do modelo.
     * @param real saída real que será usada para calcular os erros e gradientes.
     */
-   void backpropagationLote(Camada[] redec, Perda perda, double[] real){
-      aux.backpropagation(redec, perda, real);
+   void backpropagationLote(Camada[] camadas, Perda perda, double[] real){
+      aux.backpropagation(camadas, perda, real);
 
-      for(Camada camada : redec){
+      for(Camada camada : camadas){
          if(camada.treinavel == false) continue;
 
          double[] gradK = camada.obterGradKernel();
-         double[] acK = camada.obterAcGradKernel();
+         double[] acK   = camada.obterAcGradKernel();
          oparr.add(acK, gradK, acK);
          camada.editarAcGradKernel(acK);
 
          if(camada.temBias()){
             double[] gradB = camada.obterGradBias();
-            double[] acB = camada.obterAcGradBias();
+            double[] acB   = camada.obterAcGradBias();
             oparr.add(acB, gradB, acB);
             camada.editarAcGradBias(acB);
          }     
@@ -134,31 +133,21 @@ public class TreinoLote{
    }
 
    /**
-    * Zera todos os acumuladores de gradientes das camadas (para pesos e bias)
+    * Zera todos os acumuladores de gradientes das camadas (para kernels e bias)
     * para iniciar o treinamento de um lote.
-    * @param redec conjunto de camadas densas da Rede Neural.
+    * @param camadas conjunto de camadas do modelo.
     */
-   void zerarGradientesAcumulados(Camada[] redec){
-      for(Camada camada : redec){
+   void zerarGradientesAcumulados(Camada[] camadas){
+      for(Camada camada : camadas){
          if(camada.treinavel == false) continue;
-
-         double[] acKernel = camada.obterAcGradKernel();
-         oparr.preencher(acKernel, 0);
-         camada.editarAcGradKernel(acKernel);
-
-         if(camada.temBias()){
-            double[] acBias = camada.obterAcGradBias();
-            oparr.preencher(acBias, 0);
-            camada.editarAcGradBias(acBias);
-         }
+         camada.zerarAcumuladores();
       }
    }
 
    /**
     * 
-    * @param redec conjunto de camadas densas da Rede Neural.
-    * @param tamLote tamanho do lote que foi usado para calcular os acumuladores
-    * de gradiente das camadas.
+    * @param redec conjunto de camadas do modelo.
+    * @param tamLote tamanho do lote usado para o treino.
     */
    void calcularMediaGradientesLote(Camada[] redec, int tamLote){
       double tamanho = (double)tamLote;

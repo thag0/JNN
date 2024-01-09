@@ -10,6 +10,7 @@ import rna.core.Mat;
 import rna.core.OpMatriz;
 import rna.inicializadores.Inicializador;
 import rna.inicializadores.Xavier;
+import rna.treinamento.AuxiliarTreino;
 
 @SuppressWarnings("unused")
 public class MatrizTeste{
@@ -20,34 +21,17 @@ public class MatrizTeste{
       ged.limparConsole();
 
       double[][] e = {
-         {2, 4},
-         {6, 8},
+         {1, 1, 1},
+         {2, 2, 2},
+         {3, 3, 3},
+         {4, 4, 4},
+         {5, 5, 5},
+         {6, 6, 6},
+         {7, 7, 7},
       };
 
-      Mat m = new Mat(e);
-      opmat.multEscalar(m, 2, m);
-      m.print();
-   }
-
-   static void derivadaSoftmax(){
-      double[] saida = {1.0, 2.0, 3.0, 4.0};
-      double[] grad  = {6.0, 6.0, 6.0, 6.0};
-   
-      Mat s = new Mat(1, 4, saida);
-      Mat g = new Mat(1, 4, grad);
-      
-      int n = s.col();
-      Mat tmp = s.bloco(0, n);
-      Mat ident = opmat.identidade(n);
-      Mat trans = tmp.transpor();
-
-      Mat derivada = new Mat(1, 4);
-      
-      Mat resSub = new Mat(n, n);
-      opmat.sub(ident, trans, resSub);
-      opmat.hadamard(tmp, resSub, resSub);
-
-      opmat.mult(g, resSub, derivada);
-      derivada.print();
+      AuxiliarTreino aux = new AuxiliarTreino();
+      Object[] sub = aux.obterSubMatriz(e, 1, 3);
+      ged.imprimirMatriz(sub);
    }
 }
