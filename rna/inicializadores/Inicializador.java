@@ -8,7 +8,7 @@ import rna.core.Mat;
  * Classe responsável pelas funções de inicialização dos pesos
  * da Rede Neural.
  */
-public class Inicializador{
+public abstract class Inicializador{
 
    /**
     * Gerador de números pseudo aleatórios compartilhado
@@ -24,18 +24,10 @@ public class Inicializador{
       this.random.setSeed(seed);
    }
 
-   public double gerarDouble(){
-      return this.random.nextDouble();
-   }
-
    /**
     * Inicializa os valores do array de acordo com o inicializador configurado.
     * @param m matriz de dados.
     * @param x valor usado pelos inicializadores.
     */
-   public void inicializar(Mat m, double x){
-      throw new UnsupportedOperationException(
-         "Método de inicialização não implementado."
-      );
-   }
+   public abstract void inicializar(Mat m, double x);
 }

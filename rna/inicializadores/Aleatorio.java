@@ -17,9 +17,4 @@ public class Aleatorio extends Inicializador{
          }
       }
    }
-
-   @Override
-   public void configurarSeed(long seed){
-      super.configurarSeed(seed);
-   }
 }
