@@ -258,11 +258,44 @@ public abstract class Modelo{
    /**
     * Avalia o modelo calcular o valor de perda usando a função de perda
     * que foi configurada.
-    * @param entradas dados de entrada para avaliação.
-    * @param saidas dados de saída correspondente as entradas fornecidas.
+    * <p>
+    *    É possível utilizar outras funções de perda mesmo que sejam diferentes
+    *    da que o modelo usa, através de:
+    * </p>
+    * <pre>
+    * modelo.avaliador
+    * </pre>
+    * @param entrada dados de entrada para avaliação.
+    * @param saida dados de saída correspondente as entradas fornecidas.
     * @return valor de perda do modelo.
     */
-   public abstract double avaliar(Object[] entradas, Object[] saidas);
+   public double avaliar(Object[] entrada, Object[] saida){
+      verificarCompilacao();
+ 
+      if(entrada.length != saida.length){
+         throw new IllegalArgumentException(
+            "A quantidade de dados de entrada (" + entrada.length + ") " +
+            "e saída (" + saida.length + ") " + "devem ser iguais."
+         );
+      }
+ 
+      if(saida instanceof double[][] == false){
+         throw new IllegalArgumentException(
+            "A saída deve ser do tipo double[][]" + 
+            " recebido " + saida.getClass().getTypeName()
+         );
+      }
+ 
+      double[][] s = (double[][]) saida;
+      int n = entrada.length;
+      double perda = 0;
+      for(int i = 0; i < n; i++){
+         this.calcularSaida(entrada[i]);
+         perda += this.perda.calcular(this.saidaParaArray(), s[i]);
+      }
+
+      return perda/n;
+   }
 
    /**
     * Retorna o otimizador que está sendo usado para o treino do modelo.
