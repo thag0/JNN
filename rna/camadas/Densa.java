@@ -686,11 +686,6 @@ public class Densa extends Camada implements Cloneable{
       return buffer;
    }
 
-   /**
-    * Clona a instância da camada, criando um novo objeto com as 
-    * mesmas características mas em outro espaço de memória.
-    * @return clone da camada.
-    */
    @Override
    public Densa clonar(){
       verificarConstrucao();

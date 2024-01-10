@@ -389,7 +389,6 @@ public abstract class Modelo{
 
    /**
     * Mostra as informações sobre o modelo.
-    * @return buffer formatado contendo as informações do modelo.
     */
    public abstract void info();
 

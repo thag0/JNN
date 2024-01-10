@@ -83,7 +83,7 @@ public class MainImg{
    }
 
    static Modelo criarSequencial(int entradas, int saidas){
-      Otimizador otm = new SGD(0.0001, 0.999, true);
+      Otimizador otm = new SGD(0.0001, 0.999);
       Perda perda = new ErroMedioQuadrado();
       Inicializador ini = new Xavier();
       

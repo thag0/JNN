@@ -194,7 +194,24 @@ public class OpMatriz{
     * @param r matriz contendo o resultado.
     */
    public void mult(Mat a, Mat b, Mat r){
-      r.mult(a, b);
+      if(a.col() != b.lin()){
+         throw new IllegalArgumentException("Dimensões de A e B incompatíveis");
+      }
+      verificarLinhas(a, r);
+      verificarColunas(b, r);
+
+      int i, j, k;
+      int lin = r.lin(), col = r.col(), acol = a.col();
+      double res;
+      for(i = 0; i < lin; i++){
+         for(j = 0; j < col; j++){
+            res = 0;
+            for(k = 0; k < acol; k++){
+               res += a.elemento(i, k) * b.elemento(k, j);
+            }
+            r.editar(i, j, res);
+         }
+      }
    }
 
    /**

@@ -572,46 +572,6 @@ public class Mat{
    }
 
    /**
-    * Salva o conteúdo de resultante da multiplicação matricial
-    * entre os valores das matrizes A e B de acordo com a expressão.
-    * <pre>
-    * this = A * B
-    * </pre>
-    * @param a matriz A.
-    * @param b matriz B.
-    */
-   public void mult(Mat a, Mat b){
-      if(a.col() != b.lin()){
-         throw new IllegalArgumentException("Dimensões de A e B incompatíveis");
-      }
-      if(this.lin != a.lin){
-         throw new IllegalArgumentException(
-            "Incompatibilidade entre as linhas locais (" + this.lin + ") e " +
-            "a matriz A (" + a.lin + ")."
-         );
-      }
-      if(this.col != b.col){
-         throw new IllegalArgumentException(
-            "Incompatibilidade entre as colunas locais (" + this.col + ") e " +
-            "a matriz B (" + b.col + ")."
-         );  
-      }
-
-      int i, j, k;
-      int acol = a.col();
-      double res;
-      for(i = 0; i < this.lin; i++){
-         for(j = 0; j < this.col; j++){
-            res = 0;
-            for(k = 0; k < acol; k++){
-               res += a.elemento(i, k) * b.elemento(k, j);
-            }
-            this.editar(i, j, res);
-         }
-      }
-   }
-
-   /**
     * Divide o valor fornecido ao que estiver contido no
     * conteúdo da matriz, de acordo com os índices dados.
     * <p>

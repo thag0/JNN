@@ -12,8 +12,9 @@ public class Benchmark {
       OpMatriz opamt = new OpMatriz();
       ged.limparConsole();
 
-      int lin = 1024;
-      int col = 1024;
+      int fator = 256;
+      int lin = fator * 5;
+      int col = fator * 5;
 
       Mat a = new Mat(lin, col);
       a.preencher(1);
@@ -26,14 +27,14 @@ public class Benchmark {
       long minutos, segundos;
 
       t1 = System.nanoTime();
-      opamt.mult(a, b, r);
+      opamt.multT(a, b, r, 2);
       t2 = System.nanoTime();
       
       long tempoDecorrido = t2 - t1;
       long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempoDecorrido);
       minutos = (segundosTotais % 3600) / 60;
       segundos = segundosTotais % 60;
-      System.out.println("Concluído em: " + minutos + "m " + segundos + "s " + (t2-t1) + "ms");
+      System.out.println("Concluído em: " + minutos + "m " + segundos + "s " + ((tempoDecorrido)/1e6) + "ms");
       // r.print();
    }
 
