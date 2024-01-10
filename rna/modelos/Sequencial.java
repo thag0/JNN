@@ -11,13 +11,16 @@ import rna.treinamento.Treinador;
 //implementar serialização do modelo
 
 /**
- * <h3>
- *    Modelo sequencial de camadas.
- * </h3>
+ * <h1>
+ *    Modelo sequencial de camadas
+ * </h1>
  * <p>
- *    Funciona usando empilhamento de camadas para dar mais flexibilidade
- *    na construção de modelos.
- * </P>
+ *    Uma api simples para criação de modelos de redes neurais, funciona
+ *    empilhando camadas em sequência que podem ser customizáveis.
+ * </p>
+ * <h2>
+ *    Criação
+ * </h2>
  * <p>
  *    Para qualquer modelo novo, é sempre necessário informar o formato
  *    de entrada da primeira camada contida nele.
@@ -37,9 +40,33 @@ import rna.treinamento.Treinador;
  *    new Densa(2))
  *});
  * </pre>
- * <h3>
+ * O modelo sequencial não é limitado apenas a camadas densas, podem empilhar camadas
+ * compatívels com {@code rna.camadas}, algumas camadas dispoíveis incluem:
+ * <ul>
+ *    <li> Densa; </li>
+ *    <li> Convolucional; </li>
+ *    <li> MaxPooling; </li>
+ *    <li> Flatten; </li>
+ * </ul>
+ * <p>
+ *    Exemplo:
+ * </p>
+ * <pre>
+ *modelo = Sequencial(new Camada[]{
+ *    new Convolucional(new int[]{28, 28, 1}, new int[]{3, 3}, 5),
+ *    new MaxPooling(new int[]{2, 2}),
+ *    new Flatten(),
+ *    new Densa(50)),
+ *    new Densa(10)),
+ *});
+ * </pre>
+ * No exemplo acima é criada uma convolucional, onde o primeiro parâmetro corresponde
+ * ao formato de entrada (altura, largura, profundidade), formato dos filtros (altura, largura),
+ * e quantidade de filtros. Também é criada uma camada de max pooling especificando o formato
+ * do filtro (largura, altura).
+ * <h2>
  *    Compilação
- * </h3>
+ * </h2>
  * <p>
  *    Para poder usar o modelo é necessário compilá-lo, informando parâmetros 
  *    função de perda, otimizador e inicializador para os kernels (inicializador
@@ -49,28 +76,56 @@ import rna.treinamento.Treinador;
  * <pre>
  * modelo.compilar(new SGD(), new ErroMedioQuadrado(), new Xavier());
  * </pre>
- * O modelo sequencial não é limitado apenas a camadas densas, modelos 
- * de camadas convolucionais e de achatamento (flatten) também são suportados.
- * <p>
- *    Exemplo:
- * </p>
- * <pre>
- *modelo = Sequencial(new Camada[]{
- *    new Convolucional(new int[]{28, 28, 1}, new int[]{3, 3}, 5),
- *    new Flatten(),
- *    new Densa(50)),
- *    new Densa(10)),
- *});
- * </pre>
- * No exemplo acima é criada uma camada convolucional com formato de entrada 
- * (28, 28, 1), o formato de entrada para as camadas convolucionais segue o 
- * formato (altura, largura, profundidade)
+ * <h2>
+ *    Treinamento
+ * </h2>
  * <p>
  *    Modelos sequenciais podem ser facilmente treinados usando o método {@code treinar},
  *    onde é apenas necessário informar os dados de entrada, saída e a quantidade de épocas 
  *    desejada para treinar. A entrada pode variar dependendo da primeira camada que for 
  *    adicionada ao modelo.
  * </p>
+ * Exemplo:
+ * <pre>
+ *Object[] treinoX = ...; //dados de entrada
+ *Object[] treinoY = ...; //dados de saída
+ *int epochs = ... ; //iterações dentro do conjunto de dados
+ *boolean logs = ...; //impressão de perda do modelo durante o treino.
+ *modelo.treinar(treinoX, treinoY, epochs, logs);
+ * </pre>
+ * <h2>
+ *    Serialização
+ * </h2>
+ * <p>
+ *    Modelos sequenciais podem ser salvos em arquivos externos {@code .txt} para preservar
+ *    suas configurações mais importantes, como otimizador, função de perda e mais importante
+ *    ainda, as configurações de cada camada, isso inclue os valores para os kernels e bias
+ *    contidos em cada camada treinável além dos formatos para entrada e saída específicos.
+ * </p>
+ * <p>
+ *    Para salvar o modelo deve-se fazer uso da classe Serializador disponível em {@code rna.serializacao.Serializador}
+ * </p>
+ * Exemplo:
+ * <pre>
+ *Sequencial modelo = //modelo já configurado e compilado
+ *Serializador s = new Serializador();
+ *String caminho = "./modelo.txt";
+ *s.salvar(modelo, caminho);
+ * </pre>
+ * <h2>
+ *    Desserialização
+ * </h2>
+ * <p>
+ *    Como esperado após salvar, também é possível ler um modelo sequencial a partir de um
+ *    arquivo gerado pelo serializador. Esse arquivo deve ser compatível com as configurações
+ *    salvas pelo serializador.
+ * </p>
+ * Exemplo:
+ * <pre>
+ *Serializador s = new Serializador();
+ *String caminho = "./modelo.txt";
+ *Sequencial modelo = s.lerSequencial(caminho);
+ * </pre>
  * @author Thiago Barroso, acadêmico de Engenharia da Computação pela Universidade Federal do Pará, 
  * Campus Tucuruí. Dezembro/2023.
  */
@@ -82,7 +137,11 @@ public class Sequencial extends Modelo implements Cloneable{
    private Camada[] camadas;
 
    /**
-    * Inicializa um modelo sequencial vazio.
+    * Instancia um modelo sequencial com o conjunto de camadas vazio.
+    * <p>
+    *    É necessário especificar o formato de entrada da primeira camada
+    *    do modelo.
+    * </p>
     * <p>
     *    As camadas do modelo deverão ser adicionadas manualmente
     *    usando o método {@code add()}.
@@ -150,7 +209,7 @@ public class Sequencial extends Modelo implements Cloneable{
    }
 
    /**
-    * Apaga a última camada contida na lista de camadas do modelo.
+    * Remove a última camada contida na lista de camadas do modelo.
     * @return camada removida.
     * @throws IllegalArgumentException caso o modelo já não possua nenhuma 
     * camada disponível.
@@ -169,6 +228,7 @@ public class Sequencial extends Modelo implements Cloneable{
          this.camadas[i] = c[i];
       }
 
+      this.compilado = false;
       return ultima;
    }
 

@@ -4,10 +4,10 @@ import rna.ativacoes.Ativacao;
 import rna.inicializadores.Inicializador;
 
 /**
- * <h3>
+ * <h2>
  *    Modelo base para a representação de uma Camada individual
- *    dentro da biblioteca.
- * </h3>
+ *    dentro da biblioteca
+ * </h2>
  * <p>
  *    A classe camada serve apenas de molde para criação de novas
  *    camadas e não pode ser especificamente instanciada nem utilizada.
@@ -29,9 +29,9 @@ import rna.inicializadores.Inicializador;
  *    cada camada tem o adicional de calcular os gradientes em relação as suas 
  *    entradas para retropropagar para camadas anteriores usadas pelos modelos.
  * </p>
- * <h3>
+ * <h2>
  * Existem dois detalhes importantes na implementação das camadas.
- * </h3>
+ * </h2>
  * <ul>
  *    <li>
  *       Primeiramente que os elementos das camadas devem ser pré inicializados 

@@ -24,7 +24,7 @@ public class Mat{
    private double[] dados;
 
    /**
-    * Inicializar uma nova matriz com os dados desejados.
+    * Inicializa uma nova matriz com os dados desejados.
     * @param lin quantidade de linhas da matriz.
     * @param col quantidade de colunas da matriz.
     * @param dados estrutura de dados contendo os elementos.
@@ -47,7 +47,7 @@ public class Mat{
    }
 
    /**
-    * Inicializar uma nova matriz com seus dados vazios.
+    * Inicializa uma nova matriz com seus dados vazios.
     * @param lin quantidade de linhas da matriz.
     * @param col quantidade de colunas da matriz.
     */

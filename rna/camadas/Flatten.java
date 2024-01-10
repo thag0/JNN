@@ -5,7 +5,10 @@ import rna.core.Utils;
 import rna.inicializadores.Inicializador;
 
 /**
- * 
+ * Camada flatten ou "achatadora"
+ * <p>
+ *    Transforma os recebidos no formato sequencial.
+ * </p>
  */
 public class Flatten extends Camada{
 

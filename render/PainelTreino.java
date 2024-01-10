@@ -84,39 +84,34 @@ public class PainelTreino extends JPanel{
    }
 
    public void desenharMultithread(Modelo modelo, int epocasPorFrame, int numThreads){
-      this.modelo = modelo;
-      int nSaida = modelo.camadaSaida().tamanhoSaida();
-
-      //organizar
       Thread[] threads = new Thread[numThreads];
       Modelo[] clones = new Modelo[numThreads];
       for(int i = 0; i < clones.length; i++){
          clones[i] = modelo.clonar();
       }
-
+      
       int alturaPorThread = this.altura / numThreads;
       int restoAltura = this.altura % numThreads;
+      int nSaida = modelo.camadaSaida().tamanhoSaida();
 
       for(int i = 0; i < numThreads; i++){
          final int id = i;
          int inicioY = i * alturaPorThread;
          int fimY = inicioY + alturaPorThread + ((i == numThreads-1) ? restoAltura : 0);
 
-         threads[i] = new Thread(()->{
-            if(nSaida == 1){
-               calcularParteImagemEscalaCinza(clones[id], inicioY, fimY);
+         if(nSaida == 1){
+            threads[i] = new Thread(() -> calcularParteImagemEscalaCinza(clones[id], inicioY, fimY));
             
-            }else if(nSaida == 3){
-               calcularParteImagemRGB(clones[id], inicioY, fimY);
-            }
-         });
+         }else if(nSaida == 3){
+            threads[i] = new Thread(() -> calcularParteImagemRGB(clones[id], inicioY, fimY));
+         }
 
          threads[i].start();
       }
 
       try{
-         for(Thread thread : threads){
-            thread.join(0);
+         for(int i = 0; i < numThreads; i++){
+            threads[i].join();
          }
       }catch(Exception e){
          throw new RuntimeException(e);
@@ -155,9 +150,10 @@ public class PainelTreino extends JPanel{
       double[] entrada = new double[2];
       double[] saida = new double[3];
       int r, g, b, rgb;
+      int x, y;
 
-      for(int y = inicioY; y < fimY; y++){
-         for (int x = 0; x < this.largura; x++){
+      for(y = inicioY; y < fimY; y++){
+         for (x = 0; x < this.largura; x++){
             entrada[0] = (double) x / this.largura;
             entrada[1] = (double) y / this.altura;
             

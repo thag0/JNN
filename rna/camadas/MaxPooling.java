@@ -4,6 +4,9 @@ import rna.core.Mat;
 import rna.core.Utils;
 import rna.inicializadores.Inicializador;
 
+/**
+ * 
+ */
 public class MaxPooling extends Camada{
 
    /**

@@ -5,7 +5,7 @@ import java.io.BufferedWriter;
 
 import rna.camadas.Flatten;
 
-public class SerialFlatten{
+class SerialFlatten{
 
    /**
     * Transforma os dados contidos na camada Flatten numa sequência

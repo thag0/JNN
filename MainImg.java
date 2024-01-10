@@ -119,7 +119,7 @@ public class MainImg{
       jt.desenharTreino(modelo, 0);
       
       //trabalhar com o tempo de renderização baseado no fps
-      double intervaloDesenho = 1000000000/fps;
+      double intervaloDesenho = 1_000_000_000/fps;
       double proximoTempoDesenho = System.nanoTime() + intervaloDesenho;
       double tempoRestante;
       
