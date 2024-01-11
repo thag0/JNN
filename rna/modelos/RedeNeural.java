@@ -1,7 +1,7 @@
 package rna.modelos;
 
 import rna.ativacoes.Ativacao;
-import rna.avaliacao.perda.ErroMedioQuadrado;
+import rna.avaliacao.perda.MSE;
 import rna.avaliacao.perda.Perda;
 import rna.camadas.Camada;
 import rna.camadas.Densa;
@@ -421,7 +421,7 @@ public class RedeNeural extends Modelo implements Cloneable{
    public void compilar(){
       //usando valores de configuração prévia, se forem criados.
       Otimizador o = (this.otimizador == null) ? new SGD() : this.otimizador;
-      Perda p = (this.perda == null) ? new ErroMedioQuadrado() : this.perda;
+      Perda p = (this.perda == null) ? new MSE() : this.perda;
       this.compilar(o, p, new Aleatorio());
    }
 
@@ -489,7 +489,7 @@ public class RedeNeural extends Modelo implements Cloneable{
       }
 
       //usando valores de configuração prévia, se forem criados
-      Perda p = (this.perda == null) ? new ErroMedioQuadrado() : this.perda;
+      Perda p = (this.perda == null) ? new MSE() : this.perda;
       this.compilar(otimizador, p, new Aleatorio());
    }
 
@@ -527,7 +527,7 @@ public class RedeNeural extends Modelo implements Cloneable{
 
       //usando valores de configuração prévia, se forem criados.
       if(this.perda == null){
-         this.compilar(otimizador, new ErroMedioQuadrado(), iniPesos);
+         this.compilar(otimizador, new MSE(), iniPesos);
 
       }else{
          this.compilar(otimizador, this.perda, iniPesos);

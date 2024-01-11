@@ -2,7 +2,7 @@ package testes.modelos;
 
 import lib.ged.Dados;
 import lib.ged.Ged;
-import rna.avaliacao.perda.ErroMedioQuadrado;
+import rna.avaliacao.perda.MSE;
 import rna.camadas.Camada;
 import rna.camadas.Densa;
 import rna.core.OpMatriz;
@@ -49,11 +49,11 @@ public class TesteModelos{
          new Densa(nSaidas, atv2)
       });
       seq.configurarSeed(seed);
-      seq.compilar(new SGD(ta, m), new ErroMedioQuadrado(), new Xavier(), new Xavier());
+      seq.compilar(new SGD(ta, m), new MSE(), new Xavier(), new Xavier());
       
       RedeNeural rna = new RedeNeural(new int[]{nEntradas, nOcultas, nOcultas, nSaidas});
       rna.configurarSeed(seed);
-      rna.compilar(new SGD(ta, m), new ErroMedioQuadrado(), new Xavier(), new Xavier());
+      rna.compilar(new SGD(ta, m), new MSE(), new Xavier(), new Xavier());
       rna.configurarAtivacao(atv1);
       rna.configurarAtivacao(rna.camadaSaida(), atv2);
       

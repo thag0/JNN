@@ -16,9 +16,9 @@ import rna.ativacoes.Swish;
 import rna.ativacoes.TanH;
 import rna.avaliacao.perda.EntropiaCruzada;
 import rna.avaliacao.perda.EntropiaCruzadaBinaria;
-import rna.avaliacao.perda.ErroMedioAbsoluto;
-import rna.avaliacao.perda.ErroMedioQuadrado;
-import rna.avaliacao.perda.ErroMedioQuadradoLogaritmico;
+import rna.avaliacao.perda.MAE;
+import rna.avaliacao.perda.MSE;
+import rna.avaliacao.perda.MSLE;
 import rna.avaliacao.perda.Perda;
 import rna.otimizadores.AMSGrad;
 import rna.otimizadores.AdaGrad;
@@ -105,9 +105,9 @@ public class Dicionario{
    public Perda obterPerda(String nome){
       nome = nome.toLowerCase();
       switch(nome){
-         case "erromedioquadrado"      : return new ErroMedioQuadrado();
-         case "erromedioabsoluto"      : return new ErroMedioAbsoluto();
-         case "erromedioquadradologaritmico"   : return new ErroMedioQuadradoLogaritmico();
+         case "erromedioquadrado"      : return new MSE();
+         case "erromedioabsoluto"      : return new MAE();
+         case "erromedioquadradologaritmico"   : return new MSLE();
          case "entropiacruzada"        : return new EntropiaCruzada();
          case "entropiacruzadabinaria" : return new EntropiaCruzadaBinaria();
 

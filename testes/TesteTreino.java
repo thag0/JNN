@@ -1,7 +1,7 @@
 package testes;
 
 import lib.ged.Ged;
-import rna.avaliacao.perda.ErroMedioQuadrado;
+import rna.avaliacao.perda.MSE;
 import rna.camadas.*;
 import rna.inicializadores.Xavier;
 import rna.modelos.*;
@@ -31,7 +31,7 @@ public class TesteTreino{
       
       rede.compilar(
          new SGD(0.1),
-         new ErroMedioQuadrado(),
+         new MSE(),
          new Xavier()
       );
       rede.treinar(entrada, saida, 10_000, false);

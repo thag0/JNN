@@ -70,7 +70,7 @@ public class MainImg{
 
    static Modelo criarRna(int entradas, int saidas){
       Otimizador otm = new SGD(0.0001, 0.9995);
-      Perda perda = new ErroMedioQuadrado();
+      Perda perda = new MSE();
       Inicializador ini = new Xavier();
 
       int[] arq = {entradas, 13, 13, saidas};
@@ -85,7 +85,7 @@ public class MainImg{
 
    static Modelo criarSequencial(int entradas, int saidas){
       Otimizador otm = new SGD(0.0001, 0.999);
-      Perda perda = new ErroMedioQuadrado();
+      Perda perda = new MSE();
       Inicializador ini = new Xavier();
       
       Sequencial modelo = new Sequencial();

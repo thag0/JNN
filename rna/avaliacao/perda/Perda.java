@@ -1,5 +1,15 @@
 package rna.avaliacao.perda;
 
+/**
+ * <h2>
+ *    Base para implementações de funções de perda
+ * </h2>
+ * <p>
+ *    As funções de perda são usadas para avaliações de modelos
+ *    e principalmente para o treinamento, calculando os gradientes
+ *    necessários para a atualização de parâmetros dos modelos.
+ * </p>
+ */
 public abstract class Perda{
 
    /**
@@ -8,11 +18,7 @@ public abstract class Perda{
     * @param real dados rotulados.
     * @return valor de perda de acordo com a função configurada.
     */
-   public double calcular(double[] previsto, double[] real){
-      throw new UnsupportedOperationException(
-         "É necessário implementar o cálculo de perda."
-      );
-   }
+   public abstract double calcular(double[] previsto, double[] real);
 
    /**
     * Calcula a derivada da função de perda configurada.
@@ -20,11 +26,7 @@ public abstract class Perda{
     * @param real dados rotulados.
     * @return valor de derivada de acordo com a função configurada.
     */
-   public double[] derivada(double[] previsto, double[] real){
-      throw new UnsupportedOperationException(
-         "É necessário implementar o cálculo de derivada."
-      );
-   }
+   public abstract double[] derivada(double[] previsto, double[] real);
 
    /**
     * Auxiliar para verificar se os tamanhos dos arrays que serão usados

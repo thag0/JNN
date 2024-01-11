@@ -12,9 +12,9 @@ public class Avaliador{
    Acuracia acuracia = new Acuracia();
    MatrizConfusao matrizConfusao = new MatrizConfusao();
    F1Score f1Score = new F1Score();
-   ErroMedioQuadrado emq = new ErroMedioQuadrado();
-   ErroMedioAbsoluto ema = new ErroMedioAbsoluto();
-   ErroMedioQuadradoLogaritmico emql = new ErroMedioQuadradoLogaritmico();   
+   MSE emq = new MSE();
+   MAE ema = new MAE();
+   MSLE emql = new MSLE();   
 
    /**
     * Instancia um novo avaliador destinado a uma Rede Neural.

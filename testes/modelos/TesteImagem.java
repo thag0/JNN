@@ -33,21 +33,19 @@ public class TesteImagem{
       //criando rede neural para lidar com a imagem
       //nesse exemplo queremos que ela tenha overfitting
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Densa(nEntrada, 13, "tanh"),
-         new Densa(13, "tanh"),
+         new Densa(nEntrada, 7, "sigmoid"),
+         new Densa(7, "sigmoid"),
          new Densa(nSaida, "sigmoid"),
       });
       modelo.configurarHistorico(true);
-      modelo.configurarSeed(1234);
-      Otimizador otm = new SGD(0.00001, 0.999);
-      modelo.compilar(otm, new ErroMedioQuadrado(), new Xavier());
-      modelo.treinar(dadosEntrada, dadosSaida, 1_500, false);
+      Otimizador otm = new SGD(0.001, 0.995);
+      modelo.compilar(otm, new MSE(), new Xavier());
+      modelo.treinar(dadosEntrada, dadosSaida, 2_000, false);
 
       //avaliando resultados
       double precisao = 1 - modelo.avaliador.erroMedioAbsoluto(dadosEntrada, dadosSaida);
-      double perda = modelo.avaliador.erroMedioQuadrado(dadosEntrada, dadosSaida);
       System.out.println("Precisão = " + (precisao * 100));
-      System.out.println("Perda = " + perda);
+      System.out.println("Perda = " + modelo.avaliar(dadosEntrada, dadosSaida));
 
       exportarHistoricoPerda(modelo, ged);
    }
