@@ -1,4 +1,4 @@
-package rna.serializacao;
+package rna.core;
 
 import rna.ativacoes.ArcTan;
 import rna.ativacoes.Argmax;

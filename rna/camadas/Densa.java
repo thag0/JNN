@@ -2,11 +2,11 @@ package rna.camadas;
 
 import rna.ativacoes.Ativacao;
 import rna.ativacoes.Linear;
+import rna.core.Dicionario;
 import rna.core.Mat;
 import rna.core.OpMatriz;
 import rna.inicializadores.Constante;
 import rna.inicializadores.Inicializador;
-import rna.serializacao.Dicionario;
 
 /**
  * Camada Densa ou fully-connected.

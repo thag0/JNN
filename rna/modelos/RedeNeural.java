@@ -5,11 +5,11 @@ import rna.avaliacao.perda.MSE;
 import rna.avaliacao.perda.Perda;
 import rna.camadas.Camada;
 import rna.camadas.Densa;
+import rna.core.Dicionario;
 import rna.inicializadores.Aleatorio;
 import rna.inicializadores.Inicializador;
 import rna.otimizadores.Otimizador;
 import rna.otimizadores.SGD;
-import rna.serializacao.Dicionario;
 
 /**
  * <h3>

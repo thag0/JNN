@@ -12,6 +12,7 @@ import rna.camadas.Convolucional;
 import rna.camadas.Densa;
 import rna.camadas.Flatten;
 import rna.camadas.MaxPooling;
+import rna.core.Dicionario;
 import rna.modelos.RedeNeural;
 import rna.modelos.Sequencial;
 import rna.otimizadores.Otimizador;

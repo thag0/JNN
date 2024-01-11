@@ -3,9 +3,9 @@ package rna.modelos;
 import rna.avaliacao.Avaliador;
 import rna.avaliacao.perda.Perda;
 import rna.camadas.Camada;
+import rna.core.Dicionario;
 import rna.inicializadores.Inicializador;
 import rna.otimizadores.Otimizador;
-import rna.serializacao.Dicionario;
 import rna.treinamento.Treinador;
 
 //implementar serialização do modelo
