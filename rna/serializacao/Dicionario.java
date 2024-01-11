@@ -105,9 +105,9 @@ public class Dicionario{
    public Perda obterPerda(String nome){
       nome = nome.toLowerCase();
       switch(nome){
-         case "erromedioquadrado"      : return new MSE();
-         case "erromedioabsoluto"      : return new MAE();
-         case "erromedioquadradologaritmico"   : return new MSLE();
+         case "mse"                    : return new MSE();
+         case "mae"                    : return new MAE();
+         case "msle"                   : return new MSLE();
          case "entropiacruzada"        : return new EntropiaCruzada();
          case "entropiacruzadabinaria" : return new EntropiaCruzadaBinaria();
 
