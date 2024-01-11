@@ -13,12 +13,23 @@ public class Treinador{
     */
    public boolean calcularHistorico = false;
    
+   /**
+    * Auxiliar para o treinador.
+    */
    AuxiliarTreino aux;
+
+   /**
+    * Operador do treino sequencial.
+    */
    Treino treino;
+
+   /**
+    * Operador do treino em lotes.
+    */
    TreinoLote treinoLote;
 
    /**
-    * Responsável por organizar os tipos de treino da rede neural.
+    * Responsável por organizar os tipos dos modelos.
     */
    public Treinador(){
       aux =        new AuxiliarTreino();
@@ -36,14 +47,26 @@ public class Treinador{
    }
 
    /**
-    * Configura o cálculo do custo da rede neural durante o processo de treinamento.
-    * A mesma configuração se aplica ao treino em lote.
+    * Configura o cálculo para o histórico de perdas durante o treinamento.
     * @param calcularHistorico calcular ou não o histórico de custo.
     */
-    public void configurarHistoricoCusto(boolean calcularHistorico){
+   public void configurarHistoricoCusto(boolean calcularHistorico){
       this.calcularHistorico = calcularHistorico;
       treino.configurarHistorico(calcularHistorico);
       treinoLote.configurarHistorico(calcularHistorico);
+   }
+
+   /**
+    * Treina o modelo ajustando seus parâmetros treináveis usando
+    * os dados fornecidos.
+    * @param modelo modelo que será treinada.
+    * @param entradas dados de entrada para o treino.
+    * @param saidas dados de saída correspondente as entradas para o treino.
+    * @param epochs quantidade de épocas de treinamento.
+    * @param logs logs para perda durante as épocas de treinamento.
+    */
+   public void treino(Modelo modelo, Object[] entradas, Object[] saidas, int epochs, boolean logs){
+      executar(modelo, entradas, saidas, epochs, 0, logs);
    }
 
    /**
@@ -53,42 +76,53 @@ public class Treinador{
     * @param entradas dados de entrada para o treino.
     * @param saidas dados de saída correspondente as entradas para o treino.
     * @param epochs quantidade de épocas de treinamento.
+    * @param tamLote tamanho do lote.
+    * @param logs logs para perda durante as épocas de treinamento.
     */
-   public void treino(Modelo modelo, Object[] entradas, Object[] saidas, int epochs, boolean logs){
-      treino.treinar(
-         modelo,
-         entradas.clone(), 
-         saidas.clone(), 
-         epochs,
-         logs
-      );
-
-      treino.ultimoUsado = true;
-      treinoLote.ultimoUsado = false;
+   public void treino(Modelo modelo, Object[] entradas, Object[] saidas, int epochs, int tamLote, boolean logs){
+      executar(modelo, entradas, saidas, epochs, tamLote, logs);
    }
 
    /**
-    * Treina a rede neural calculando os erros dos neuronios, seus gradientes para cada peso e 
-    * passando essas informações para o otimizador configurado ajustar os pesos.
-    * @param rede rede neural que será treinada.
+    * Executa a função de treino de acordo com os valores configurados.
+    * @param modelo rede neural que será treinada.
     * @param entradas dados de entrada para o treino.
     * @param saidas dados de saída correspondente as entradas para o treino.
     * @param epochs quantidade de épocas de treinamento.
     * @param tamLote tamanho do lote.
     * @param logs logs para perda durante as épocas de treinamento.
     */
-   public void treino(Modelo rede, Object[] entradas, Object[] saidas, int epochs, int tamLote, boolean logs){
-      treinoLote.treinar(
-         rede,
-         entradas, 
-         saidas, 
-         epochs, 
-         tamLote,
-         logs
-      );
+   private void executar(Modelo modelo, Object[] entradas, Object[] saidas, int epochs, int tamLote, boolean logs){
+      if(entradas.length < saidas.length){
+         throw new IllegalArgumentException(
+            "Os dados de entrada e saída devem conter a mesma quantidade de amostras, " +
+            "entrada = " + entradas.length + ", saida = " + saidas.length
+         );
+      }
 
-      treinoLote.ultimoUsado = true;
-      treino.ultimoUsado = false;
+      if(tamLote > 1){
+         treinoLote.treinar(
+            modelo,
+            entradas.clone(),
+            saidas.clone(),
+            epochs,
+            tamLote,
+            logs
+         );
+         treinoLote.ultimoUsado = true;
+      
+      }else{
+         treino.treinar(
+            modelo,
+            entradas.clone(), 
+            saidas.clone(), 
+            epochs,
+            logs
+         );
+         treino.ultimoUsado = true;
+      }
+
+      treino.ultimoUsado = treinoLote.ultimoUsado ? false : true;
    }
 
    /**
@@ -97,7 +131,7 @@ public class Treinador{
     * @return lista com os custo por época durante a fase de treinamento.
     */
    public double[] obterHistorico(){
-      return treino.ultimoUsado ? treino.historico : treinoLote.historico;
+      return treino.ultimoUsado ? treino.historico() : treinoLote.historico();
    }
    
 }

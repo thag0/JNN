@@ -12,7 +12,7 @@ import rna.otimizadores.Otimizador;
 /**
  * Em testes ainda.
  */
-public class TreinoLote{
+class TreinoLote{
    OpMatriz opmat = new OpMatriz();
    OpArray oparr = new OpArray();
    AuxiliarTreino aux = new AuxiliarTreino();
@@ -165,5 +165,13 @@ public class TreinoLote{
             camada.editarGradienteBias(acBias);
          }
       }
+   }
+
+   /**
+    * Retorna o histórico de treino.
+    * @return histórico de treino.
+    */
+   public double[] historico(){
+      return this.historico;
    }
 }

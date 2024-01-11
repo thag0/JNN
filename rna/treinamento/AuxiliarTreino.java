@@ -8,10 +8,26 @@ import rna.core.OpArray;
 import rna.core.Mat;
 import rna.core.OpMatriz;
 
+/**
+ * Classe auxiliar no treinamento, faz uso de ferramentas que podem
+ * ser compartilhadas entre os diferentes tipos de modelos de treinamento.
+ */
 public class AuxiliarTreino{
+
+   /**
+    * Gerador de números aleatórios.
+    */
    Random random = new Random();
-   OpMatriz mat = new OpMatriz();
-   OpArray arr = new OpArray();
+
+   /**
+    * Operador matricial.
+    */
+   OpMatriz opmat = new OpMatriz();
+
+   /**
+    * Operador para arrays.
+    */
+   OpArray oparr = new OpArray();
 
    /**
     * Configura a seed inicial do gerador de números aleatórios.
@@ -24,11 +40,14 @@ public class AuxiliarTreino{
    /**
     * Realiza a retropropagação de gradientes de cada camada para a atualização de pesos.
     * <p>
-    *    Os gradientes iniciais são calculados usando a derivada da função de perda, com eles
-    *    calculados, são retropropagados da última a primeira camada da rede.
+    *    Os gradientes iniciais são calculados usando a derivada da função de perda em relação
+    *    aos erros do modelo.
     * </p>
-    * @param camadas conjunto de camadas densas da Rede Neural.
-    * @param perda função de perda configurada para a Rede Neural.
+    * <p>
+    *    A partir disso, são retropropagados de volta da última camada do modelo até a primeira.
+    * </p>
+    * @param camadas conjunto de camadas de um modelo.
+    * @param perda função de perda configurada para o modelo.
     * @param real saída real que será usada para calcular os erros e gradientes.
     */
    public void backpropagation(Camada[] camadas, Perda perda, double[] real){

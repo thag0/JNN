@@ -9,13 +9,13 @@ import rna.core.OpMatriz;
 import rna.modelos.Modelo;
 import rna.otimizadores.Otimizador;
 
-public class Treino{
+class Treino{
    OpMatriz opmat = new OpMatriz();
    AuxiliarTreino aux = new AuxiliarTreino();
    Random random = new Random();
 
-   public boolean calcularHistorico = false;
-   double[] historico;
+   private boolean calcularHistorico = false;
+   private double[] historico;
    boolean ultimoUsado = false;
 
    /**
@@ -99,6 +99,14 @@ public class Treino{
     */
    public void backpropagation(Camada[] redec, Perda perda, double[] real){
       aux.backpropagation(redec, perda, real);
+   }
+
+   /**
+    * Retorna o histórico de treino.
+    * @return histórico de treino.
+    */
+   public double[] historico(){
+      return this.historico;
    }
 
    /**
