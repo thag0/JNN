@@ -9,6 +9,7 @@ import rna.inicializadores.Aleatorio;
 import rna.inicializadores.Inicializador;
 import rna.otimizadores.Otimizador;
 import rna.otimizadores.SGD;
+import rna.serializacao.Dicionario;
 
 /**
  * <h3>
@@ -535,12 +536,12 @@ public class RedeNeural extends Modelo implements Cloneable{
    }
 
    @Override
-   public void compilar(Otimizador otimizador, Perda perda, Inicializador iniPesos){
+   public void compilar(Object otimizador, Object perda, Inicializador iniPesos){
       this.compilar(otimizador, perda, iniPesos, null);
    }
 
    @Override
-   public void compilar(Otimizador otimizador, Perda perda, Inicializador iniPesos, Inicializador iniBias){
+   public void compilar(Object otimizador, Object perda, Inicializador iniPesos, Inicializador iniBias){
       if(iniPesos == null){
          throw new IllegalArgumentException("O inicializador não pode ser nulo.");
       }
@@ -573,9 +574,20 @@ public class RedeNeural extends Modelo implements Cloneable{
          camada.inicializar(iniPesos, iniBias, alcancePeso);
       }
 
-      this.perda = perda;
+      Dicionario dic = new Dicionario();
+      if(perda instanceof String) this.perda = dic.obterPerda(String.valueOf(perda));
+      else if(perda instanceof Perda) this.perda = (Perda) perda;
+      else throw new IllegalArgumentException(
+         "Objetos aceitos para função de perda são String ou Perda, recebido \"" +
+         perda.getClass().getTypeName() + "\"."
+      );
 
-      this.otimizador = otimizador;
+      if(otimizador instanceof String) this.otimizador = dic.obterOtimizador(String.valueOf(otimizador));
+      else if(otimizador instanceof Otimizador) this.otimizador = (Otimizador) otimizador;
+      else throw new IllegalArgumentException(
+         "Objetos aceitos para otimizador são String ou Otimizador, recebido \"" +
+         otimizador.getClass().getTypeName() + "\"."
+      );
       this.otimizador.construir(this.camadas);
 
       this.compilado = true;

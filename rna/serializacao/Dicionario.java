@@ -20,6 +20,7 @@ import rna.avaliacao.perda.MAE;
 import rna.avaliacao.perda.MSE;
 import rna.avaliacao.perda.MSLE;
 import rna.avaliacao.perda.Perda;
+import rna.avaliacao.perda.RMSE;
 import rna.otimizadores.AMSGrad;
 import rna.otimizadores.AdaGrad;
 import rna.otimizadores.Adadelta;
@@ -108,6 +109,7 @@ public class Dicionario{
          case "mse"                    : return new MSE();
          case "mae"                    : return new MAE();
          case "msle"                   : return new MSLE();
+         case "rmse"                   : return new RMSE();
          case "entropiacruzada"        : return new EntropiaCruzada();
          case "entropiacruzadabinaria" : return new EntropiaCruzadaBinaria();
 

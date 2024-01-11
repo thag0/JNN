@@ -182,7 +182,7 @@ public abstract class Modelo{
     * @param perda função de perda usada para o treinamento do modelo.
     * @param iniKernel inicializador para os kernels.
     */
-   public abstract void compilar(Otimizador otimizador, Perda perda, Inicializador iniKernel);
+   public abstract void compilar(Object otimizador, Object perda, Inicializador iniKernel);
 
    /**
     * Inicializa os parâmetros necessários para cada camada do modelo,
@@ -199,7 +199,7 @@ public abstract class Modelo{
     * @param iniKernel inicializador para os kernels.
     * @param iniBias inicializador para os bias.
     */
-   public abstract void compilar(Otimizador otimizador, Perda perda, Inicializador iniKernel, Inicializador iniBias);
+   public abstract void compilar(Object otimizador, Object perda, Inicializador iniKernel, Inicializador iniBias);
 
    /**
     * Auxiliar na verificação da compilação do modelo.

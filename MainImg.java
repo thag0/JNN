@@ -85,7 +85,6 @@ public class MainImg{
 
    static Modelo criarSequencial(int entradas, int saidas){
       Otimizador otm = new SGD(0.0001, 0.999);
-      Perda perda = new MSE();
       Inicializador ini = new Xavier();
       
       Sequencial modelo = new Sequencial();
@@ -93,7 +92,7 @@ public class MainImg{
       modelo.add(new Densa(7, "sigmoid"));
       modelo.add(new Densa(saidas, "sigmoid"));
       // modelo.configurarSeed(12345);
-      modelo.compilar(otm, perda, ini);
+      modelo.compilar(otm, "mse", ini);
       modelo.configurarHistorico(calcularHistorico);
 
       return modelo;

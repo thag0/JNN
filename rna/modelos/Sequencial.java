@@ -233,12 +233,12 @@ public class Sequencial extends Modelo implements Cloneable{
    }
 
    @Override
-   public void compilar(Otimizador otimizador, Perda perda, Inicializador iniKernel){
+   public void compilar(Object otimizador, Object perda, Inicializador iniKernel){
       this.compilar(otimizador, perda, iniKernel, null);
    }
 
    @Override
-   public void compilar(Otimizador otimizador, Perda perda, Inicializador iniKernel, Inicializador iniBias){
+   public void compilar(Object otimizador, Object perda, Inicializador iniKernel, Inicializador iniBias){
       if(this.camadas[0].construida == false){
          throw new IllegalArgumentException(
             "É necessário que a primeira camada seja construída."
@@ -269,14 +269,22 @@ public class Sequencial extends Modelo implements Cloneable{
             "A função de perda não pode ser nula."
          );
       }
-      this.perda = perda;
 
-      if(otimizador == null){
-         throw new IllegalArgumentException(
-            "O otimizador não pode ser nulo,"
-         );
-      }
-      this.otimizador = otimizador;
+      Dicionario dic = new Dicionario();
+      if(perda instanceof String) this.perda = dic.obterPerda(String.valueOf(perda));
+      else if(perda instanceof Perda) this.perda = (Perda) perda;
+      else throw new IllegalArgumentException(
+         "Objetos aceitos para função de perda são String ou Perda, recebido \"" +
+         perda.getClass().getTypeName() + "\"."
+      );
+
+      if(otimizador instanceof String) this.otimizador = dic.obterOtimizador(String.valueOf(otimizador));
+      else if(otimizador instanceof Otimizador) this.otimizador = (Otimizador) otimizador;
+      else throw new IllegalArgumentException(
+         "Objetos aceitos para otimizador são String ou Otimizador, recebido \"" +
+         otimizador.getClass().getTypeName() + "\"."
+      );
+
       this.otimizador.construir(this.camadas);
       this.compilado = true;
    }
