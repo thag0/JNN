@@ -243,10 +243,7 @@ public class Densa extends Camada implements Cloneable{
     * @param n quantidade de neurônios.
     */
    public Densa(int e, int n){
-      this.tamEntrada = e;
-      this.numNeuronios = n;
-      this.usarBias = true;
-      this.construir(new int[]{1, e});
+      this(e, n, true);
    }
 
    /**
@@ -267,10 +264,8 @@ public class Densa extends Camada implements Cloneable{
     * @param ativacao função de ativação que será usada pela camada.
     */
    public Densa(int e, int n, String ativacao){
-      this.numNeuronios = n;
-      this.usarBias = true;
+      this(e, n, true);
       this.configurarAtivacao(ativacao);
-      this.construir(new int[]{1, e});
    }
 
    /**
@@ -319,13 +314,13 @@ public class Densa extends Camada implements Cloneable{
       if(formatoEntrada.length < 2){
          throw new IllegalArgumentException(
             "O formato de entrada para a camada Densa deve conter pelo menos dois " + 
-            "elementos (altura, largura), objeto recebido possui " + formatoEntrada.length
+            "elementos (altura, largura), objeto recebido possui " + formatoEntrada.length + "."
          );
       }
-      if(formatoEntrada[1] == 0 || formatoEntrada[1] == 0){
+      if(formatoEntrada[1] < 1 || formatoEntrada[1] < 1){
          throw new IllegalArgumentException(
             "Os valores recebidos para o formato de entrada devem ser maiores que zero, " +
-            "recebido = [" + formatoEntrada[0] + ", " + formatoEntrada[1] + "]"
+            "recebido = (" + formatoEntrada[0] + ", " + formatoEntrada[1] + ")."
          );
       }
 
@@ -372,25 +367,14 @@ public class Densa extends Camada implements Cloneable{
       //inicialização do kernel e bias
       if(iniKernel == null){
          throw new IllegalArgumentException(
-            "O inicializador não pode ser nulo."
-            );
+            "O inicializador do kernel não pode ser nulo."
+         );
       }
       iniKernel.inicializar(this.pesos, x);
       
       if(this.usarBias){
          if(iniBias == null) new Constante().inicializar(this.bias, 0);
          else iniBias.inicializar(this.bias, x);
-      }
-   }
-
-   /**
-    * Verificador de inicialização para evitar problemas.
-    */
-   private void verificarConstrucao(){
-      if(this.construida == false){
-         throw new IllegalArgumentException(
-            "Camada Densa (" + this.id + ") não foi construída."
-         );
       }
    }
 
@@ -444,7 +428,7 @@ public class Densa extends Camada implements Cloneable{
     */
    @Override
    public void calcularSaida(Object entrada){
-      verificarConstrucao();
+      super.verificarConstrucao();
 
       if(entrada instanceof Mat[]){
          Mat[] en = (Mat[]) entrada;
@@ -498,7 +482,7 @@ public class Densa extends Camada implements Cloneable{
     */
    @Override
    public void calcularGradiente(Object gradSeguinte){
-      verificarConstrucao();
+      super.verificarConstrucao();
 
       if(gradSeguinte instanceof Mat[]){
          Mat[] grads = (Mat[]) gradSeguinte;
@@ -556,7 +540,7 @@ public class Densa extends Camada implements Cloneable{
     * @return quantidade de neurônios presentes na camada.
     */
    public int numNeuronios(){
-      verificarConstrucao();
+      super.verificarConstrucao();
 
       return this.pesos.col();
    }
@@ -571,7 +555,7 @@ public class Densa extends Camada implements Cloneable{
     * @return tamanho de entrada da camada.
     */
    public int tamanhoEntrada(){
-      verificarConstrucao();
+      super.verificarConstrucao();
 
       return this.entrada.col();
    }
@@ -591,7 +575,7 @@ public class Densa extends Camada implements Cloneable{
 
    @Override
    public int numParametros(){
-      verificarConstrucao();
+      super.verificarConstrucao();
 
       int parametros = 0;
       
@@ -647,6 +631,7 @@ public class Densa extends Camada implements Cloneable{
 
    @Override
    public double[] saidaParaArray(){
+      super.verificarConstrucao();
       return this.saida.paraArray();
    }
 
@@ -663,7 +648,7 @@ public class Densa extends Camada implements Cloneable{
     * @return buffer formatado contendo as informações da camada.
     */
    public String info(){
-      verificarConstrucao();
+      super.verificarConstrucao();
 
       String buffer = "";
       String espacamento = "    ";
@@ -688,7 +673,7 @@ public class Densa extends Camada implements Cloneable{
 
    @Override
    public Densa clonar(){
-      verificarConstrucao();
+      super.verificarConstrucao();
 
       try{
          Densa clone = (Densa) super.clone();
@@ -835,7 +820,7 @@ public class Densa extends Camada implements Cloneable{
 
    @Override
    public void zerarAcumuladores(){
-      verificarConstrucao();
+      super.verificarConstrucao();
       this.gradAcPesos.preencher(0);
       this.gradAcBias.preencher(0);
    }

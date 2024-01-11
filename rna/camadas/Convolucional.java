@@ -636,17 +636,6 @@ public class Convolucional extends Camada implements Cloneable{
       }
    }
 
-   /**
-    * Verificador de inicialização para evitar problemas.
-    */
-    private void verificarConstrucao(){
-      if(this.construida == false){
-         throw new IllegalArgumentException(
-            "Camada Convolucional (" + this.id + ") não foi construída."
-         );
-      }
-   }
-
    @Override
    public void configurarAtivacao(String ativacao){
       Dicionario dic = new Dicionario();
@@ -701,7 +690,7 @@ public class Convolucional extends Camada implements Cloneable{
     */
    @Override
    public void calcularSaida(Object entrada){
-      verificarConstrucao();
+      super.verificarConstrucao();
 
       if(entrada instanceof double[]){
          utils.copiar((double[]) entrada, this.entrada);
@@ -757,7 +746,7 @@ public class Convolucional extends Camada implements Cloneable{
     */
    @Override
    public void calcularGradiente(Object gradSeguinte){
-      verificarConstrucao();
+      super.verificarConstrucao();
 
       if(gradSeguinte instanceof Mat[] == false){
          throw new IllegalArgumentException(
@@ -821,6 +810,7 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override
    public int numParametros(){
+      super.verificarConstrucao();
       int parametros = 0;
 
       parametros += this.numFiltros * this.profEntrada * this.altFiltro * this.largFiltro;
@@ -833,6 +823,8 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override
    public double[] saidaParaArray(){
+      super.verificarConstrucao();
+
       int id = 0;
       double[] saida = new double[this.tamanhoSaida()];
 
@@ -866,6 +858,8 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override
    public Convolucional clonar(){
+      super.verificarConstrucao();
+
       try{
          Convolucional clone = (Convolucional) super.clone();
 
@@ -918,7 +912,7 @@ public class Convolucional extends Camada implements Cloneable{
     */
    @Override
    public int[] formatoSaida(){
-      verificarConstrucao();
+      super.verificarConstrucao();
 
       return new int[]{
          this.altSaida,

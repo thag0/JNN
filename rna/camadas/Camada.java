@@ -87,6 +87,18 @@ public abstract class Camada{
    public abstract void construir(Object entrada);
 
    /**
+    * Verificador de inicialização para evitar problemas.
+    */
+   protected void verificarConstrucao(){
+      if(this.construida == false){
+         throw new IllegalArgumentException(
+            "Camada " + this.getClass().getSimpleName() + 
+            " (" + this.id + ") não foi construída."
+         );
+      }
+   }
+
+   /**
     * Inicaliza os parâmetros treináveis da camada, 
     * @param iniKernel inicializador para o kernel.
     * @param iniBias inicializador de bias.

@@ -162,17 +162,6 @@ public class Flatten extends Camada{
       this.construida = true;//camada pode ser usada.
    }
 
-   /**
-    * Verificador de inicialização para evitar problemas.
-    */
-   private void verificarConstrucao(){
-      if(this.construida == false){
-         throw new IllegalArgumentException(
-            "Camada Densa (" + this.id + ") não foi construída."
-         );
-      }
-   }
-
    @Override
    public void inicializar(Inicializador iniKernel, Inicializador iniBias, double x){}
 
@@ -193,7 +182,7 @@ public class Flatten extends Camada{
     */
    @Override
    public void calcularSaida(Object entrada){
-      verificarConstrucao();
+      super.verificarConstrucao();
 
       if(entrada instanceof Mat[]){
          Mat[] e = (Mat[]) entrada;
@@ -226,7 +215,7 @@ public class Flatten extends Camada{
 
    @Override
    public void calcularGradiente(Object gradSeguinte){
-      verificarConstrucao();
+      super.verificarConstrucao();
 
       if(gradSeguinte instanceof double[]){
          utils.copiar((double[]) gradSeguinte, this.gradEntrada);
@@ -258,19 +247,19 @@ public class Flatten extends Camada{
 
    @Override
    public double[] saidaParaArray(){
-      verificarConstrucao();
+      super.verificarConstrucao();
       return this.saida.paraArray();
    }
 
    @Override
    public int tamanhoSaida(){
-      verificarConstrucao();
+      super.verificarConstrucao();
       return this.saida.col();
    }
 
    @Override
    public int[] formatoEntrada(){
-      verificarConstrucao();
+      super.verificarConstrucao();
       return this.formEntrada;
    }
 
@@ -290,7 +279,7 @@ public class Flatten extends Camada{
     */
     @Override
    public int[] formatoSaida(){
-      verificarConstrucao();
+      super.verificarConstrucao();
       return new int[]{
          this.formSaida[0],
          this.formSaida[1]
@@ -304,7 +293,7 @@ public class Flatten extends Camada{
 
    @Override
    public Object obterGradEntrada(){
-      verificarConstrucao();
+      super.verificarConstrucao();
       return this.gradEntrada;
    }
 

@@ -1,8 +1,13 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+import sys
 
 if __name__ == '__main__':
-   caminho = './historico-perda.csv'
+   if len(sys.argv) < 2:
+      print("Necessário infornar o nome do arquivo csv contendo os dados.")
+      exit()
+
+   caminho = sys.argv[1] + '.csv'
    dados = pd.read_csv(caminho)
 
    qtd_amostras = len(dados)

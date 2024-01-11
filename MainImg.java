@@ -19,6 +19,7 @@ public class MainImg{
    static Ged ged = new Ged();
    static Geim geim = new Geim();
    static boolean calcularHistorico = true;
+   static final String caminhoHistoricoPerda = "historico-perda";
    static final String caminhoImagem = "/dados/mnist/treino/8/img_0.jpg";
    // static final String caminhoImagem = "/dados/mnist/treino/7/img_1.jpg";
    // static final String caminhoImagem = "/dados/32x32/circulos.png";
@@ -63,7 +64,7 @@ public class MainImg{
 
       if(calcularHistorico){
          exportarHistoricoPerda(modelo);
-         executarComando("python grafico.py");
+         executarComando("python grafico.py " + caminhoHistoricoPerda);
       }
    }
 
@@ -90,7 +91,7 @@ public class MainImg{
       Sequencial modelo = new Sequencial();
       modelo.add(new Densa(entradas, 7, "sigmoid"));
       modelo.add(new Densa(7, "sigmoid"));
-      modelo.add(new Densa(7, saidas, "sigmoid"));
+      modelo.add(new Densa(saidas, "sigmoid"));
       // modelo.configurarSeed(12345);
       modelo.compilar(otm, perda, ini);
       modelo.configurarHistorico(calcularHistorico);
@@ -158,7 +159,7 @@ public class MainImg{
       }
 
       Dados dados = new Dados(dadosPerdas);
-      ged.exportarCsv(dados, "historico-perda");
+      ged.exportarCsv(dados, caminhoHistoricoPerda);
    }
 
    /**
@@ -188,7 +189,7 @@ public class MainImg{
       try{
          new ProcessBuilder("cmd", "/c", comando).inheritIO().start().waitFor();
       }catch(Exception e){
-
+         e.printStackTrace();
       }
    }
 }
