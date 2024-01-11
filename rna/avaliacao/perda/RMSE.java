@@ -16,14 +16,14 @@ public class RMSE extends Perda{
       super.verificarDimensoes(previsto, real);
       
       int amostras = previsto.length;
-      double mse = 0.0;
+      double rmse = 0.0;
       for(int i = 0; i < amostras; i++){
          double d = real[i] - previsto[i];
-         mse += d * d;
+         rmse += d * d;
       }
-      mse /= amostras;
+      rmse /= amostras;
       
-      return Math.sqrt(mse);
+      return Math.sqrt(rmse);
    }
     
    @Override
