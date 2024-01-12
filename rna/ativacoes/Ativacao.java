@@ -28,14 +28,7 @@ import rna.core.Mat;
  *       (x) -> { return x > 0 ? 1 : 0; }
  *    );
  *  }
- * 
- *  public void calcular(Densa camada){
- *    super.aplicarFx(camada.somatorio, camada.saida) 
- *  }
- * 
- *  public void derivada(Densa camada){
- *    super.aplicarDx(camada.gradSaida, camada.somatorio, camada.derivada) 
- *  }
+ *
  *}
  * </pre>
  * <p>

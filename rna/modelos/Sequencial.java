@@ -264,20 +264,25 @@ public class Sequencial extends Modelo implements Cloneable{
          this.camadas[i].configurarId(i);
       }
 
+      Dicionario dic = new Dicionario();
+      
       if(perda == null){
          throw new IllegalArgumentException(
             "A função de perda não pode ser nula."
          );
       }
-
-      Dicionario dic = new Dicionario();
       if(perda instanceof String) this.perda = dic.obterPerda(String.valueOf(perda));
       else if(perda instanceof Perda) this.perda = (Perda) perda;
       else throw new IllegalArgumentException(
          "Objetos aceitos para função de perda são String ou Perda, recebido \"" +
          perda.getClass().getTypeName() + "\"."
       );
-
+               
+      if(otimizador == null){
+         throw new IllegalArgumentException(
+            "O otimizador não pode ser nula."
+         );
+      }
       if(otimizador instanceof String) this.otimizador = dic.obterOtimizador(String.valueOf(otimizador));
       else if(otimizador instanceof Otimizador) this.otimizador = (Otimizador) otimizador;
       else throw new IllegalArgumentException(

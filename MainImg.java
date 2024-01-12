@@ -85,7 +85,7 @@ public class MainImg{
 
    static Modelo criarSequencial(int entradas, int saidas){
       Otimizador otm = new SGD(0.0001, 0.999);
-      Inicializador ini = new Xavier();
+      Inicializador ini = new Glorot();
       
       Sequencial modelo = new Sequencial();
       modelo.add(new Densa(entradas, 7, "sigmoid"));
