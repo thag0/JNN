@@ -223,7 +223,7 @@ public class OpMatriz{
     * @param b segunda matriz.
     * @param r matriz contendo o resultado.
     */
-   public void multT(Mat a, Mat b, Mat r, int nThreads){
+   public void mult(Mat a, Mat b, Mat r, int nThreads){
       if(a.col() != b.lin()){
          throw new IllegalArgumentException("Dimensões de A e B incompatíveis");
       }

@@ -199,20 +199,6 @@ public class Mat{
     * na linha e coluna fornecidas.
     */
    private int indice(int lin, int col){
-      //não sei se deixo essas verificações porque são importantes
-      //mas elas também pioram o desempenho
-
-      // if(lin < 0 || lin >= this.lin){
-      //    throw new IllegalArgumentException(
-      //       "Linha fornecida fora de alcance."
-      //    );
-      // }
-      // if(col < 0 || col >= this.col){
-      //    throw new IllegalArgumentException(
-      //       "Col fornecida fora de alcance."
-      //    );
-      // }
-
       return lin*this.col + col;
    }
 
@@ -243,29 +229,36 @@ public class Mat{
     * @param valor novo valor que será colocado.
     */
    public void preencher(double valor){
-      for(int i = 0; i < this.dados.length; i++){
+      int n = this.tamanho();
+      for(int i = 0; i < n; i++){
          this.dados[i] = valor;
       }
    }
 
    /**
     * Copia todo o conteúdo da matriz fornecida para a instância 
-    * que usar o método.
+    * local.
+    * <p>
+    *    Esse método considera apenas o tamanho total das matrizes,
+    *    então é possível copiar matrizes com diferentes formatos 
+    *    desde que seus tamanhos finais sejam os mesmos.
+    * </p>
     * @param m matriz base.
     */
    public void copiar(Mat m){
-      if(m.tamanho() != this.tamanho()){
+      if(this.tamanho() != m.tamanho()){
          throw new IllegalArgumentException(
             "Tamanho de conteúdo de M ("+ m.tamanho() +") " +
             "Não corresponde ao tamanho da matriz (" + this.tamanho() + ")"
          );
       }
+
       System.arraycopy(m.dados, 0, this.dados, 0, this.dados.length);
    }
    
    /**
     * Copia todo o conteúdo da matriz fornecida para a instância 
-    * que usar o método.
+    * local.
     * @param m matriz base.
     */
    public void copiar(double[][] m){
@@ -301,6 +294,12 @@ public class Mat{
     * @param dados
     */
    public void copiar(double[] dados){
+      if(this.tamanho() != dados.length){
+         throw new IllegalArgumentException(
+            "Incompatibilidade de dimensões entre os dados fornecidos (" + dados.length + 
+            ") e a instância local (" + this.tamanho() + ")."
+         );
+      }
       System.arraycopy(dados, 0, this.dados, 0, this.dados.length);
    }
 
@@ -377,7 +376,7 @@ public class Mat{
     *    7, 8, 9
     * ]
     *
-    *m.aplicarFuncao((x) -> {x*2})
+    *m.aplicarFuncao((x) -> x*2)
     *
     *m = [
     *     2,  4,  6
@@ -388,7 +387,8 @@ public class Mat{
     * @param f expressão lambda que atuará em cada elemento da matriz.
     */
    public void aplicarFuncao(DoubleUnaryOperator f){
-      for(int i = 0; i < this.dados.length; i++){
+      int n = this.tamanho();
+      for(int i = 0; i < n; i++){
          this.dados[i] = f.applyAsDouble(this.dados[i]);
       }
    }
@@ -406,7 +406,7 @@ public class Mat{
     *    7, 8, 9
     * ]
     *
-    *m.aplicarFuncao(a, (x) -> {x*2})
+    *m.aplicarFuncao(a, (x) -> x*2)
     *
     *m = [
     *     2,  4,  6
@@ -418,15 +418,10 @@ public class Mat{
     * @param f expressão lambda que atuará em cada elemento da matriz.
     */
    public void aplicarFuncao(Mat m, DoubleUnaryOperator f){
-      if(this.tamanho() != m.tamanho()){
-         throw new IllegalArgumentException(
-            "A matriz fornecida deve possuir o mesmo tamanho."
-         );
-      }
-
       verificarDimensoes(m);
 
-      for(int i = 0; i < this.dados.length; i++){
+      int n = this.tamanho();
+      for(int i = 0; i < n; i++){
          this.dados[i] = f.applyAsDouble(m.dados[i]);
       }
    }
@@ -438,7 +433,7 @@ public class Mat{
     *    Exemplo:
     * </p>
     * <pre>
-    * m[i][j] += d;
+    * m[i][j] += valor;
     * </pre>
     * @param lin índice da linha.
     * @param col índice da coluna.
@@ -453,15 +448,10 @@ public class Mat{
     * @param m matriz com os dados.
     */
    public void add(Mat m){
-      if(this.tamanho() != m.tamanho()){
-         throw new IllegalArgumentException(
-            "A matriz fornecida deve conter o mesmo número de elementos."
-         );
-      }
-
       verificarDimensoes(m);
 
-      for(int i = 0; i < this.dados.length; i++){
+      int n = this.tamanho();
+      for(int i = 0; i < n; i++){
          this.dados[i] += m.dados[i];
       }
    }
@@ -506,15 +496,10 @@ public class Mat{
     * @param m matriz com os dados.
     */
    public void sub(Mat m){
-      if(this.tamanho() != m.tamanho()){
-         throw new IllegalArgumentException(
-            "A matriz fornecida deve conter o mesmo número de elementos."
-         );
-      }
-
       verificarDimensoes(m);
 
-      for(int i = 0; i < this.dados.length; i++){
+      int n = this.tamanho();
+      for(int i = 0; i < n; i++){
          this.dados[i] -= m.dados[i];
       }
    }
@@ -531,7 +516,8 @@ public class Mat{
    public void sub(Mat a, Mat b){
       verificarDimensoes(a, b);
       
-      for(int i = 0; i < this.dados.length; i++){
+      int n = this.tamanho();
+      for(int i = 0; i < n; i++){
          this.dados[i] = a.dados[i] - b.dados[i];
       }
    }
@@ -550,7 +536,7 @@ public class Mat{
     * @param valor dado que será multiplicado.
     */
    public void mult(int lin, int col, double valor){
-      this.dados[indice(lin, col)] *= valor;
+      this.dados[lin*this.col + col] *= valor;
    }
 
    /**
@@ -558,15 +544,10 @@ public class Mat{
     * @param m matriz com os dados.
     */
    public void mult(Mat m){
-      if(this.tamanho() != m.tamanho()){
-         throw new IllegalArgumentException(
-            "A matriz fornecida deve conter o mesmo número de elementos."
-         );
-      }
-      
       verificarDimensoes(m);
 
-      for(int i = 0; i < this.dados.length; i++){
+      int n = this.tamanho();
+      for(int i = 0; i < n; i++){
          this.dados[i] *= m.dados[i];
       }
    }
@@ -585,7 +566,7 @@ public class Mat{
     * @param valor dado que será divido.
     */
    public void div(int lin, int col, double valor){
-      this.dados[indice(lin, col)] /= valor;
+      this.dados[lin*this.col + col] /= valor;
    }
 
    /**
@@ -593,7 +574,8 @@ public class Mat{
     * @param esc valor para multiplicação.
     */
    public void escalar(double esc){
-     for(int i = 0; i < this.dados.length; i++){
+      int n = this.tamanho();
+      for(int i = 0; i < n; i++){
          this.dados[i] *= esc;
       }
    }
@@ -662,7 +644,7 @@ public class Mat{
 
    /**
     * Retorna o tamanho do conjunto de dados suportado pela matriz.
-    * @return número de elementos da matriz.
+    * @return número total de elementos da matriz.
     */
    public int tamanho(){
       return this.dados.length;      
@@ -670,7 +652,7 @@ public class Mat{
 
    /**
     * Retorna a quantidade de linhas presente na matriz.
-    * @return linhas da matriz;
+    * @return linhas da matriz.
     */
    public int lin(){
       return this.lin;
@@ -678,7 +660,7 @@ public class Mat{
 
    /**
     * Retorna a quantidade de colunas presente na matriz.
-    * @return colunas da matriz;
+    * @return colunas da matriz.
     */
    public int col(){
       return this.col;
@@ -686,14 +668,17 @@ public class Mat{
 
    /**
     * Exibe o conteúdo contido na matriz.
+    * @param nome nome personalizado para exibição.
     */
    public void print(String nome){
+      StringBuilder sb = new StringBuilder();
+
       if(nome == null || nome.isBlank() || nome.isEmpty()){
-          System.out.print(this.getClass().getSimpleName());
+         sb.append(this.getClass().getSimpleName());
       }else{
-         System.out.print(nome);
+         sb.append(nome);
       }
-      System.out.println(" (" + this.lin + ", " + this.col + ") = [");
+      sb.append(" (" + this.lin + ", " + this.col + ") = [\n");
 
       int compMax = 0;
       for(int i = 0; i < this.lin; i++){
@@ -706,15 +691,16 @@ public class Mat{
       }
   
       for(int i = 0; i < this.lin; i++){
-         System.out.print(" ");
+         sb.append(" ");
          for(int j = 0; j < this.col; j++){
             String element = String.format("%" + (compMax + 2) + "s", this.elemento(i, j));
-            System.out.print(element);
+            sb.append(element);
          }
-         System.out.println();
+         sb.append("\n");
       }
-  
-      System.out.println("]");
+      
+      sb.append("]");
+      System.out.println(sb.toString());
    }
 
    /**

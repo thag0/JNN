@@ -27,7 +27,7 @@ public class Benchmark {
       long minutos, segundos;
 
       t1 = System.nanoTime();
-      opamt.multT(a, b, r, 2);
+      opamt.mult(a, b, r, 2);
       t2 = System.nanoTime();
       
       long tempoDecorrido = t2 - t1;

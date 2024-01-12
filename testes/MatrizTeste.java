@@ -20,5 +20,6 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
 
+      new Mat(2, 2).print();
    }
 }

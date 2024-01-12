@@ -43,15 +43,11 @@ public class MainImg{
       modelo.info();
 
       //treinar e marcar tempo
-      long t1, t2;
       long horas, minutos, segundos;
 
       System.out.println("Treinando.");
-      t1 = System.nanoTime();
-      treinoEmPainel(modelo, imagem.getWidth(), imagem.getHeight(), in, out);
-      t2 = System.nanoTime();
+      long tempoDecorrido = treinoEmPainel(modelo, imagem.getWidth(), imagem.getHeight(), in, out);
 
-      long tempoDecorrido = t2 - t1;
       long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempoDecorrido);
       horas = segundosTotais / 3600;
       minutos = (segundosTotais % 3600) / 60;
@@ -102,8 +98,9 @@ public class MainImg{
     * @param largura largura da janela renderizada.
     * @param entradas dados de entrada para o treino.
     * @param saidas dados de saída relativos a entrada.
+    * @return tempo (em nano segundos) do treino.
     */
-   static void treinoEmPainel(Modelo modelo, int altura, int largura, double[][] entradas, double[][] saidas){
+   static long treinoEmPainel(Modelo modelo, int altura, int largura, double[][] entradas, double[][] saidas){
       final int fps = 6000;
       int epocasPorFrame = 30;
 
@@ -119,8 +116,9 @@ public class MainImg{
       double intervaloDesenho = 1_000_000_000/fps;
       double proximoTempoDesenho = System.nanoTime() + intervaloDesenho;
       double tempoRestante;
-      
+
       int i = 0;
+      long tempoTreino = System.nanoTime();
       while(i < epocas && jt.isVisible()){
          modelo.treinar(entradas, saidas, epocasPorFrame, false);
          jt.desenharTreino(modelo, i);
@@ -136,8 +134,9 @@ public class MainImg{
 
          }catch(Exception e){ }
       }
-
+      tempoTreino = System.nanoTime() - tempoTreino;
       jt.dispose();
+      return tempoTreino;
    }
 
    /**
