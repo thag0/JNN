@@ -36,9 +36,21 @@ import rna.camadas.Camada;
  * </p>
  */
 public class RMSProp extends Otimizador{
+
+   /**
+    * Valor padrão para a taxa de aprendizagem do otimizador.
+    */
    private static final double PADRAO_TA  = 0.001;
+
+   /**
+    * Valor padrão para a taxa de decaimeto.
+    */
    private static final double PADRAO_RHO = 0.995;
-   private static final double PADRAO_EPS = 1e-7;
+
+	/**
+	 * Valor padrão para epsilon.
+	 */
+	private static final double PADRAO_EPS = 1e-7;
 
    /**
     * Valor de taxa de aprendizagem do otimizador.

@@ -3,15 +3,19 @@ package rna.otimizadores;
 import rna.camadas.Camada;
 
 /**
- * Classe que implementa o otimizador Gradiente Descentente Estocástico com momentum.
+ * <h2>
+ *    Stochastic Gradient Descent 
+ * </h2>
  * <p>
- *    Também possui o adicional do acelerador de nesterov, mas deve ser configurado.
+ *    Implementação do otimizador do gradiente estocástico com momentum e
+ *    acelerador de nesterov.
  * </p>
  * <p>
  *    O SGD funciona usando a seguinte expressão:
  * </p>
  * <pre>
- *    v[i][j] -= (-g[i][j] * tA) - (M * m[i][j])
+ *v[i][j] -= m[i][j] // apenas com momentum
+ *v[i][j] -= (-g[i][j] * tA) - (M * m[i][j]) // com nesterov
  * </pre>
  * Onde:
  * <p>
@@ -60,49 +64,60 @@ public class SGD extends Otimizador{
    public double[] mb;
 
    /**
-    * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient Descent (SGD) </strong> 
-    * usando os valores de hiperparâmetros fornecidos.
+    * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient 
+    * Descent (SGD) </strong> usando os valores de hiperparâmetros fornecidos.
     * @param tA taxa de aprendizagem do otimizador.
     * @param momentum taxa de momentum do otimizador.
     * @param nesterov usar acelerador de nesterov.
     */
    public SGD(double tA, double momentum, boolean nesterov){
+      if(tA <= 0 | tA > 1){
+         throw new IllegalArgumentException(
+            "O valor da taxa de aprendizagem deve estar entre ]0, 1], " + 
+            "recebido: " + tA
+         );
+      }
+      
+      if(momentum < 0 | momentum > 1){         
+         throw new IllegalArgumentException(
+            "O valor de momentum deve estar entre [0, 1], " + 
+            "recebido: " + momentum
+         );
+      }
+
       this.taxaAprendizagem = tA;
       this.momentum = momentum;
       this.nesterov = nesterov;
    }
 
    /**
-    * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient Descent (SGD) </strong> 
-    * usando os valores de hiperparâmetros fornecidos.
+    * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient 
+    * Descent (SGD) </strong> usando os valores de hiperparâmetros fornecidos.
     * @param tA taxa de aprendizagem do otimizador.
     * @param momentum taxa de momentum do otimizador.
     */
    public SGD(double tA, double momentum){
-      this.taxaAprendizagem = tA;
-      this.momentum = momentum;
-      this.nesterov = false;
+      this(tA, momentum, false);
    }
 
    /**
-    * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient Descent (SGD) </strong> 
-    * usando os valores de hiperparâmetros fornecidos.
+    * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient 
+    * Descent (SGD) </strong> usando os valores de hiperparâmetros fornecidos.
     * @param tA taxa de aprendizagem do otimizador.
     */
    public SGD(double tA){
-      this.taxaAprendizagem = tA;
-      this.momentum = 0;
-      this.nesterov = false;
+      this(tA, 0, false);
    }
 
    /**
-    * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient Descent (SGD) </strong>.
+    * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient 
+    * Descent (SGD) </strong>.
     * <p>
     *    Os hiperparâmetros do SGD serão inicializados com seus os valores padrão.
     * </p>
     */
    public SGD(){
-      this(0.001, 0.99, false);
+      this(0.01, 0.9, false);
    }
 
    @Override

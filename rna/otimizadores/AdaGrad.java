@@ -4,6 +4,9 @@ import rna.camadas.Camada;
 import rna.core.OpArray;
 
 /**
+ * <h2>
+ *    Adaptive Gradient Algorithm
+ * </h2>
  * Implementa uma versão do algoritmo AdaGrad (Adaptive Gradient Algorithm).
  * O algoritmo otimiza o processo de aprendizado adaptando a taxa de aprendizagem 
  * de cada parâmetro com base no histórico de atualizações 
@@ -41,7 +44,7 @@ public class AdaGrad extends Otimizador{
    /**
     * Valor padrão para a taxa de aprendizagem do otimizador.
     */
-   private static final double PADRAO_TA = 0.99;
+   private static final double PADRAO_TA = 0.999;
 
    /**
     * Valor padrão para o valor de epsilon pro otimizador.

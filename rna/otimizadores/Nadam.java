@@ -3,6 +3,9 @@ package rna.otimizadores;
 import rna.camadas.Camada;
 
 /**
+ * <h2>
+ *    Nesterov-accelerated Adaptive Moment Estimation
+ * </h2>
  * Implementação do algoritmo de otimização Nadam.
  * <p>
  *    O algoritmo ajusta os pesos da rede neural usando o gradiente descendente 
@@ -49,9 +52,25 @@ import rna.camadas.Camada;
  * </p>
  */
 public class Nadam extends Otimizador{
+
+   /**
+    * Valor padrão para a taxa de aprendizagem do otimizador.
+    */
    private static final double PADRAO_TA = 0.001;
+
+   /**
+    * Valor padrão para o decaimento do momento de primeira ordem.
+    */
    private static final double PADRAO_BETA1 = 0.9;
+
+   /**
+    * Valor padrão para o decaimento do momento de segunda ordem.
+    */
    private static final double PADRAO_BETA2 = 0.999;
+   
+   /**
+    * Valor padrão para epsilon.
+    */
    private static final double PADRAO_EPS = 1e-7;
 
    /**

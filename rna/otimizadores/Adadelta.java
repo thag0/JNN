@@ -44,7 +44,15 @@ import rna.camadas.Camada;
  * </p>
  */
 public class Adadelta extends Otimizador{
+
+   /**
+    * Valor padrão para a taxa de decaimento.
+    */
    private static final double PADRAO_RHO = 0.99;
+
+   /**
+    * Valor padrão para epsilon.
+    */
    private static final double PADRAO_EPS = 1e-7;
 
    /**

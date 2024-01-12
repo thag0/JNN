@@ -58,10 +58,26 @@ import rna.camadas.Camada;
  * </p>
  */
 public class AMSGrad extends Otimizador{
+
+   /**
+    * Valor padrão para a taxa de aprendizagem do otimizador.
+    */
 	private static final double PADRAO_TA = 0.001;
-   private static final double PADRAO_BETA1 = 0.95;
-   private static final double PADRAO_BETA2 = 0.999;
-   private static final double PADRAO_EPS = 1e-7;
+
+	/**
+	 * Valor padrão para o decaimento do momento de primeira ordem.
+	 */
+	private static final double PADRAO_BETA1 = 0.95;
+ 
+	/**
+	 * Valor padrão para o decaimento do momento de segunda ordem.
+	 */
+	private static final double PADRAO_BETA2 = 0.999;
+	 
+	/**
+	 * Valor padrão para epsilon.
+	 */
+	private static final double PADRAO_EPS = 1e-7;
 
    /**
     * Valor de taxa de aprendizagem do otimizador.

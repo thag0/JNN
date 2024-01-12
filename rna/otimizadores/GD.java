@@ -4,6 +4,9 @@ import rna.camadas.Camada;
 import rna.core.OpArray;
 
 /**
+ * <h2>
+ *    Gradient Descent
+ * </h2>
  * Classe que implementa o algoritmo de Descida do Gradiente para otimização de redes neurais.
  * Atualiza diretamente os pesos da rede com base no gradiente.
  * <p>

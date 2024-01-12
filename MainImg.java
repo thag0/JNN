@@ -14,7 +14,7 @@ import rna.modelos.Sequencial;
 import rna.otimizadores.*;
 
 public class MainImg{
-   static final int epocas = 7*1000;
+   static final int epocas = 10*1000;
    static final float escalaRender = 8f;
    static Ged ged = new Ged();
    static Geim geim = new Geim();
@@ -84,15 +84,12 @@ public class MainImg{
    }
 
    static Modelo criarSequencial(int entradas, int saidas){
-      Otimizador otm = new SGD(0.0001, 0.999);
-      Inicializador ini = new Glorot();
-      
       Sequencial modelo = new Sequencial();
       modelo.add(new Densa(entradas, 7, "sigmoid"));
       modelo.add(new Densa(7, "sigmoid"));
       modelo.add(new Densa(saidas, "sigmoid"));
-      // modelo.configurarSeed(12345);
-      modelo.compilar(otm, "mse", ini);
+
+      modelo.compilar("sgd", "mse", new Xavier());
       modelo.configurarHistorico(calcularHistorico);
 
       return modelo;
