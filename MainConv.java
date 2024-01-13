@@ -55,11 +55,13 @@ public class MainConv{
       horas = segundosTotais / 3600;
       minutos = (segundosTotais % 3600) / 60;
       segundos = segundosTotais % 60;
+
+      System.out.println();
       System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
       System.out.println("Perda treino: " + modelo.avaliador.entropiaCruzada(treinoX, treinoY));
       System.out.println("Acurárcia treino: " + modelo.avaliador.acuracia(treinoX, treinoY));
 
-      System.out.println("\n Carregando dados de teste.");
+      System.out.println("\nCarregando dados de teste.");
       final var testeX = carregarDadosMNIST(caminhoTeste, NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
       final var testeY = criarRotulosMNIST(NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
       System.out.println("Perda teste: " + modelo.avaliar(testeX, testeY));
@@ -103,9 +105,8 @@ public class MainConv{
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
          new Densa(128, "sigmoid"),
-         new Dropout(0.5),
+         new Dropout(0.3),
          new Densa(64, "sigmoid"),
-         new Dropout(0.5),
          new Densa(NUM_DIGITOS_TREINO, "softmax"),
       });
 

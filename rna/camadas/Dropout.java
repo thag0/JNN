@@ -181,9 +181,7 @@ public class Dropout extends Camada implements Cloneable{
    public Dropout clonar(){
       try{
          Dropout clone = (Dropout) super.clone();
-
          clone.taxa = this.taxa;
-         clone.construida = this.construida;
          clone.random = new Random();
 
          clone.entrada = this.entrada.clone();

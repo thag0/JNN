@@ -47,15 +47,15 @@ public class Classificador{
 
       //criando e configurando a rede neural
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Densa(qEntradas, 10, "tanh"),
-         new Dropout(0.5),
-         new Densa(10, "tanh"),
-         new Dropout(0.5),
+         new Densa(qEntradas, 8, "sigmoid"),
+         new Dropout(0.4),
+         new Densa(8, "sigmoid"),
+         new Dropout(0.4),
          new Densa(qSaidas, "softmax")
       });
 
       modelo.compilar(
-         new SGD(0.001, 0.95),
+         new SGD(0.0001, 0.999),
          new EntropiaCruzada(),
          new Xavier()
       );

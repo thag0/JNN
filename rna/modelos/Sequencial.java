@@ -47,6 +47,7 @@ import rna.treinamento.Treinador;
  *    <li> Convolucional; </li>
  *    <li> MaxPooling; </li>
  *    <li> Flatten; </li>
+ *    <li> Dropout; </li>
  * </ul>
  * <p>
  *    Exemplo:
@@ -57,6 +58,7 @@ import rna.treinamento.Treinador;
  *    new MaxPooling(new int[]{2, 2}),
  *    new Flatten(),
  *    new Densa(50)),
+ *    new Dropout(0.3)),
  *    new Densa(10)),
  *});
  * </pre>
