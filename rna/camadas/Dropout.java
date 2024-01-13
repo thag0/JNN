@@ -1,5 +1,7 @@
 package rna.camadas;
 
+import java.util.Random;
+
 import rna.core.Mat;
 import rna.inicializadores.Inicializador;
 
@@ -10,14 +12,16 @@ public class Dropout extends Camada implements Cloneable{
 
    private double taxa;
    public Mat entrada;
+   public Mat mascara;
    public Mat saida;
    public Mat gradEntrada;
+   Random random = new Random();//talvez implementar configuração de seed
 
    /**
     * @param taxa 
     */
    public Dropout(double taxa){
-      if(taxa < 0 | taxa > 1){
+      if(taxa < 0 || taxa > 1){
          throw new IllegalArgumentException(
             "O valor da taxa de dropout deve estar entre 0 e 1, " + 
             "recebido: " + taxa
@@ -25,6 +29,22 @@ public class Dropout extends Camada implements Cloneable{
       }
 
       this.taxa = taxa;
+   }
+
+   /**
+    * @param taxa 
+    * @param seed 
+    */
+   public Dropout(double taxa, long seed){
+      if(taxa < 0 || taxa > 1){
+         throw new IllegalArgumentException(
+            "O valor da taxa de dropout deve estar entre 0 e 1, " + 
+            "recebido: " + taxa
+         );
+      }
+
+      this.taxa = taxa;
+      this.random.setSeed(seed);
    }
 
    @Override
@@ -51,6 +71,7 @@ public class Dropout extends Camada implements Cloneable{
       }
 
       this.entrada = new Mat(formatoEntrada[0], formatoEntrada[1]);
+      this.mascara = new Mat(formatoEntrada[0], formatoEntrada[1]);
       this.saida = new Mat(formatoEntrada[0], formatoEntrada[1]);
       this.gradEntrada = new Mat(formatoEntrada[0], formatoEntrada[1]);
       this.construida = true;
@@ -64,19 +85,46 @@ public class Dropout extends Camada implements Cloneable{
 
    @Override
    public void calcularSaida(Object entrada){
+      super.verificarConstrucao();
+
       if(entrada instanceof Mat == false){
          throw new IllegalArgumentException(
             "Entrada aceita para a camada de Dropout deve ser do tipo Mat, " + 
             "objeto recebido é do tipo \"" + entrada.getClass().getTypeName() + "\"."
          );
       }
+      this.entrada.copiar((Mat) entrada);
 
-      //TODO implementar a lógica de dropout
-      this.saida.copiar((Mat) entrada);
+      if(this.treinando){
+         gerarMascara();
+
+         int lin = this.saida.lin(), col = this.saida.col();
+         double val = 0;
+         for(int i = 0; i < lin; i++){
+            for(int j = 0; j < col; j++){
+               val = this.mascara.elemento(i, j) * this.entrada.elemento(i, j);
+               this.saida.editar(i, j, val);
+            }
+         }
+
+      }else{
+         this.saida.copiar((Mat) entrada);
+      }
+   }
+
+   private void gerarMascara(){
+      for(int i = 0; i < this.mascara.lin(); i++){
+         for(int j = 0; j < this.mascara.col(); j++){
+            double val = random.nextDouble() > this.taxa ? 1 : 0;
+            this.mascara.editar(i, j, val);
+         }
+      }
    }
 
    @Override
    public void calcularGradiente(Object gradSeguinte){
+      super.verificarConstrucao();
+
       if(gradSeguinte instanceof Mat == false){
          throw new IllegalArgumentException(
             "Gradiente aceito para a camada de Dropout deve ser do tipo Mat, " + 
@@ -84,7 +132,9 @@ public class Dropout extends Camada implements Cloneable{
          );
       }
 
-      this.gradEntrada.copiar((Mat) gradSeguinte);
+      Mat grads = (Mat) gradSeguinte;
+      this.gradEntrada.copiar(grads);
+      this.gradEntrada.mult(this.mascara);
    }
 
    @Override
@@ -125,8 +175,10 @@ public class Dropout extends Camada implements Cloneable{
 
          clone.taxa = this.taxa;
          clone.construida = this.construida;
+         clone.random = new Random();
 
          clone.entrada = this.entrada.clone();
+         clone.mascara = this.mascara.clone();
          clone.saida = this.saida.clone();
          clone.gradEntrada = this.gradEntrada.clone();
 

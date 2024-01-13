@@ -60,6 +60,11 @@ public abstract class Camada{
    public boolean construida = false;
 
    /**
+    * Controlador de treino da camada.
+    */
+   protected boolean treinando = false;
+
+   /**
     * Identificador único da camada.
     */
    public int id;
@@ -190,6 +195,15 @@ public abstract class Camada{
       throw new UnsupportedOperationException(
          "Implementar configuração de bias da camada " + this.getClass().getTypeName() + "."
       );     
+   }
+
+   /**
+    * Configura a camada para treino.
+    * @param treinando caso verdadeiro a camada será configurada para
+    * treino, caso contrário, será usada para testes/predições.
+    */
+   public void configurarTreino(boolean treinando){
+      this.treinando = true;
    }
 
    /**

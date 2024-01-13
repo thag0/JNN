@@ -298,8 +298,13 @@ public class Sequencial extends Modelo implements Cloneable{
    public void calcularSaida(Object entrada){
       super.verificarCompilacao();
 
+      int n = this.numCamadas();
+      for(int i = 0; i < n; i++){
+         this.camadas[i].configurarTreino(false);
+      }
+
       this.camadas[0].calcularSaida(entrada);
-      for(int i = 1; i < this.numCamadas(); i++){
+      for(int i = 1; i < n; i++){
          this.camadas[i].calcularSaida(this.camadas[i-1].saida());
       }
    }
@@ -307,6 +312,11 @@ public class Sequencial extends Modelo implements Cloneable{
    @Override
    public Object[] calcularSaidas(Object[] entradas){
       super.verificarCompilacao();
+
+      int n = this.numCamadas();
+      for(int i = 0; i < n; i++){
+         this.camadas[i].configurarTreino(false);
+      }
 
       double[][] previsoes = new double[entradas.length][];
 
@@ -335,6 +345,10 @@ public class Sequencial extends Modelo implements Cloneable{
          );
       }
 
+      for(int i = 0; i < this.numCamadas(); i++){
+         this.camadas[i].configurarTreino(true);
+      }
+
       treinador.treino(this, entradas, saidas, epochs, logs);
    }
    
@@ -352,6 +366,10 @@ public class Sequencial extends Modelo implements Cloneable{
            "O valor de tamanho do lote (" + tamLote + ") é inválido."
         );
      }
+
+     for(int i = 0; i < this.numCamadas(); i++){
+      this.camadas[i].configurarTreino(true);
+      }
 
      this.treinador.treino(
         this,

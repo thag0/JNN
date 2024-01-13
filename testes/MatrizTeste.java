@@ -4,6 +4,7 @@ import lib.ged.Dados;
 import lib.ged.Ged;
 import rna.avaliacao.perda.EntropiaCruzada;
 import rna.camadas.Densa;
+import rna.camadas.Dropout;
 import rna.camadas.Flatten;
 import rna.camadas.MaxPooling;
 import rna.core.Mat;
@@ -20,6 +21,18 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
 
-      new Mat(2, 2).print();
+      Mat entrada = new Mat(new double[][]{
+         {1, 2, 3},
+         {4, 5, 6},
+         {7, 8, 9},
+      });
+
+      Dropout dropout = new Dropout(0.5);
+      dropout.construir(new int[]{entrada.lin(), entrada.col()});
+      dropout.configurarTreino(true);
+
+      dropout.calcularSaida(entrada);
+      dropout.mascara.print("mascara");
+      dropout.saida.print("saida");
    }
 }
