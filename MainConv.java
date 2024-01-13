@@ -1,10 +1,13 @@
 import java.awt.image.BufferedImage;
 import java.util.concurrent.TimeUnit;
+
+import lib.ged.Dados;
 import lib.ged.Ged;
 import lib.geim.Geim;
 import rna.avaliacao.perda.*;
 import rna.camadas.*;
 import rna.inicializadores.*;
+import rna.modelos.Modelo;
 import rna.modelos.Sequencial;
 import rna.otimizadores.*;
 import rna.serializacao.Serializador;
@@ -21,6 +24,7 @@ public class MainConv{
    static final String caminhoTreino = "/dados/mnist/treino/";
    static final String caminhoTeste = "/dados/mnist/teste/";
    static final String caminhoSaidaModelo = "./dados/modelosMNIST/modelo-convolucional.txt";
+   static final String caminhoHistorico = "historico-perda";
 
    public static void main(String[] args){
       ged.limparConsole();
@@ -32,9 +36,6 @@ public class MainConv{
          treinoX.length + ", " + treinoX[0].length + ", " + treinoX[0][0].length + ", " + treinoX[0][0][0].length + 
          ")\n"
       );
-      
-      final var testeX = carregarDadosMNIST(caminhoTeste, NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
-      final var testeY = criarRotulosMNIST(NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
 
       Sequencial modelo = criarModelo();
       modelo.configurarHistorico(true);
@@ -55,13 +56,18 @@ public class MainConv{
       minutos = (segundosTotais % 3600) / 60;
       segundos = segundosTotais % 60;
       System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
-      System.out.println("Perda: " + modelo.avaliador.entropiaCruzada(treinoX, treinoY));
+      System.out.println("Perda treino: " + modelo.avaliador.entropiaCruzada(treinoX, treinoY));
       System.out.println("Acurárcia treino: " + modelo.avaliador.acuracia(treinoX, treinoY));
-      System.out.println("Acurárcia teste: " + modelo.avaliador.acuracia(testeX, testeY));
-      testes.modelos.TesteModelos.exportarHistoricoPerda(modelo);
 
+      System.out.println("\n Carregando dados de teste.");
+      final var testeX = carregarDadosMNIST(caminhoTeste, NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
+      final var testeY = criarRotulosMNIST(NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
+      System.out.println("Perda teste: " + modelo.avaliar(testeX, testeY));
+      System.out.println("Acurárcia teste: " + modelo.avaliador.acuracia(testeX, testeY));
+      
+      exportarHistorico(modelo, caminhoHistorico);
       salvarModelo(modelo, caminhoSaidaModelo);
-      MainImg.executarComando("python grafico.py");
+      MainImg.executarComando("python grafico.py " + caminhoHistorico);
    }
 
    /**
@@ -97,7 +103,7 @@ public class MainConv{
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
          new Densa(128, "sigmoid"),
-         new Densa(64, "sigmoid"),
+         new Densa(62, "sigmoid"),
          new Densa(NUM_DIGITOS_TREINO, "softmax"),
       });
 
@@ -173,7 +179,7 @@ public class MainConv{
          }
       }
 
-      System.out.println("Imagens carregadas. (" + entradas.length + ")");
+      System.out.println("Imagens carregadas (" + entradas.length + ").");
       return entradas;
    }
 
@@ -205,5 +211,23 @@ public class MainConv{
          }
          System.out.println();
       }
+   }
+
+   /**
+    * Salva um arquivo csv com o historico de desempenho do modelo.
+    * @param modelo modelo.
+    * @param caminho caminho onde será salvo o arquivo.
+    */
+   static void exportarHistorico(Modelo modelo, String caminho){
+      System.out.println("Exportando histórico de perda");
+      double[] perdas = modelo.historico();
+      double[][] dadosPerdas = new double[perdas.length][1];
+
+      for(int i = 0; i < dadosPerdas.length; i++){
+         dadosPerdas[i][0] = perdas[i];
+      }
+
+      Dados dados = new Dados(dadosPerdas);
+      ged.exportarCsv(dados, caminho);
    }
 }

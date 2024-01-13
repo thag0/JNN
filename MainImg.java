@@ -59,7 +59,7 @@ public class MainImg{
       System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
 
       if(calcularHistorico){
-         exportarHistoricoPerda(modelo);
+         exportarHistorico(modelo, caminhoHistoricoPerda);
          executarComando("python grafico.py " + caminhoHistoricoPerda);
       }
    }
@@ -140,13 +140,13 @@ public class MainImg{
    }
 
    /**
-    * Salva um arquivo csv com o historico de desempenho da rede.
-    * @param rede rede neural.
-    * @param ged gerenciador de dados.
+    * Salva um arquivo csv com o historico de desempenho do modelo.
+    * @param modelo modelo.
+    * @param caminho caminho onde será salvo o arquivo.
     */
-   static void exportarHistoricoPerda(Modelo rede){
+   static void exportarHistorico(Modelo modelo, String caminho){
       System.out.println("Exportando histórico de perda");
-      double[] perdas = rede.historico();
+      double[] perdas = modelo.historico();
       double[][] dadosPerdas = new double[perdas.length][1];
 
       for(int i = 0; i < dadosPerdas.length; i++){
@@ -154,7 +154,7 @@ public class MainImg{
       }
 
       Dados dados = new Dados(dadosPerdas);
-      ged.exportarCsv(dados, caminhoHistoricoPerda);
+      ged.exportarCsv(dados, caminho);
    }
 
    /**
