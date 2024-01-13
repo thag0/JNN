@@ -9,10 +9,17 @@ import rna.inicializadores.Constante;
 import rna.inicializadores.Inicializador;
 
 /**
- * Camada Densa ou fully-connected.
+ * <h2>
+ *    Camada Densa ou Totalmente conectada
+ * </h2>
  * <p>
- *    Ela funciona realizando a operação de produto entre a entrada e 
- *    seus pesos, adicionando os bias caso sejam configurados, de acordo 
+ *    A camada densa é um tipo de camada que está profundamente conectada
+ *    com a camada anterior, onde cada conexão da camada anterior se conecta
+ *    com todas as conexões de saída da camada densa.
+ * </p>
+ * <p>
+ *    Ela funciona realizando a operação de produto entre a {@code entrada} e 
+ *    seus {@code pesos}, adicionando os bias caso sejam configurados, de acordo 
  *    com a expressão:
  * </p>
  * <pre>
@@ -330,6 +337,8 @@ public class Densa extends Camada implements Cloneable{
             "O número de neurônios para a camada Densa não foi definido."
          );
       }
+
+      //inicializações
     
       this.entrada = new Mat(1, this.tamEntrada);
       this.saida =   new Mat(1, this.numNeuronios);
@@ -380,8 +389,7 @@ public class Densa extends Camada implements Cloneable{
 
    @Override
    public void configurarAtivacao(String ativacao){
-      Dicionario dicionario = new Dicionario();
-      this.ativacao = dicionario.obterAtivacao(ativacao);
+      this.ativacao = new Dicionario().obterAtivacao(ativacao);
    }
 
    @Override
@@ -393,11 +401,6 @@ public class Densa extends Camada implements Cloneable{
       }
 
       this.ativacao = ativacao;
-   }
-
-   @Override
-   public void configurarId(int id){
-      this.id = id;
    }
 
    @Override

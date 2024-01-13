@@ -5,9 +5,14 @@ import rna.core.Utils;
 import rna.inicializadores.Inicializador;
 
 /**
- * Camada flatten ou "achatadora"
+ * <h2>
+ *    Camada flatten ou "achatadora"
+ * </h2>
  * <p>
  *    Transforma os recebidos no formato sequencial.
+ * </p>
+ * <p>
+ *    A camada de flatten não possui parâmetros treináveis nem função de ativação.
  * </p>
  */
 public class Flatten extends Camada{
@@ -54,6 +59,11 @@ public class Flatten extends Camada{
 
    /**
     * Matriz contendo a saída achatada da camada.
+    * <p>
+    *    Mesmo a saída sendo uma matriz, ela possui apenas
+    *    uma linha e o número de colunas é equivalente a quantidade
+    *    total de elementos da entrada.
+    * </p>
     */
    public Mat saida;
 
@@ -89,6 +99,11 @@ public class Flatten extends Camada{
     * </p>
     * <pre>
     *    entrada = (altura, largura, profundidade)
+    * </pre>
+    * Também pode ser aceito um objeto de entrada contendo apenas dois elementos,
+    * eles serão formatados como:
+    * <pre>
+    *    entrada = (altura, largura)
     * </pre>
     * @param entrada formato de entrada para a camada.
     */
@@ -134,9 +149,12 @@ public class Flatten extends Camada{
       }else{
          throw new IllegalArgumentException(
             "O formato de entrada para a camada Flatten deve conter três " + 
-            "elementos (altura, largura, profundidade), objeto recebido possui " + formatoEntrada.length
+            "elementos (altura, largura, profundidade) ou dois elementos (altura, largura), " +
+            "objeto recebido possui " + formatoEntrada.length
          );
       }
+
+      //inicialização de parâmetros
 
       this.formEntrada = new int[]{
          altura,
@@ -168,13 +186,16 @@ public class Flatten extends Camada{
    @Override
    public void inicializar(Inicializador iniKernel, double x){}
 
-   @Override
-   public void configurarId(int id){
-      this.id = id;
-   }
-
    /**
-    * Achata os dados de entrada num array unidimensional.
+    * Achata os dados de entrada num formato sequencial.
+    * <h3>
+    *    Nota
+    * </h3>
+    * <p>
+    *    Os dados de saída são armazenados numa matriz do tipo {@code Mat},
+    *    que por sua vez possuem a quantidade de colunas equivalente a quantidade
+    *    total de elementos de entrada.  
+    * </p>
     * @param entrada dados de entrada que serão processados, objetos aceitos incluem:
     * {@code Mat[]}, {@code Mat} ou {@code double[]}.
     * @throws IllegalArgumentException caso a entrada fornecida não seja suportada 
@@ -213,6 +234,10 @@ public class Flatten extends Camada{
       }
    }
 
+   /**
+    * Desserializa os gradientes recebedos de volta para o mesmo formato de entrada.
+    * @param gradSeguinte gradientes de entrada da camada seguinte.
+    */
    @Override
    public void calcularGradiente(Object gradSeguinte){
       super.verificarConstrucao();
@@ -221,7 +246,8 @@ public class Flatten extends Camada{
          utils.copiar((double[]) gradSeguinte, this.gradEntrada);
       
       }else if(gradSeguinte instanceof Mat){
-         calcularGrad((Mat) gradSeguinte);
+         Mat grads = (Mat) gradSeguinte;
+         utils.copiar(grads.paraArray(), this.gradEntrada);
       
       }else{
          throw new IllegalArgumentException(
@@ -229,15 +255,6 @@ public class Flatten extends Camada{
             "Objeto recebido é do tipo " + gradSeguinte.getClass().getTypeName()
          );
       }
-   }
-
-   private void calcularGrad(double[] grad){
-      utils.copiar(grad, this.gradEntrada);
-   }
-  
-   private void calcularGrad(Mat grad){
-      double[] g = grad.paraArray();
-      calcularGrad(g);
    }
 
    @Override

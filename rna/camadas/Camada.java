@@ -164,11 +164,20 @@ public abstract class Camada{
    }
 
    /**
-    * Configura o id da camada. O id deve indicar dentro da rede neural, em 
+    * Configura o id da camada. O id deve indicar dentro de um modelo, em 
     * qual posição a camada está localizada.
     * @param id id da camada.
     */
-   public abstract void configurarId(int id);
+   public void configurarId(int id){
+      if(id < 0){
+         throw new IllegalArgumentException(
+            "O id da camada deve conter um positivo também podendo ser zero, " + 
+            "recebido: " + id
+         );
+      }
+
+      this.id = id;
+   }
 
    /**
     * Configura o uso do bias para a camada.

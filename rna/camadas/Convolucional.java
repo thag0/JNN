@@ -10,7 +10,9 @@ import rna.inicializadores.Constante;
 import rna.inicializadores.Inicializador;
 
 /**
- * Camada Convolucional.
+ * <h2>
+ *    Camada Convolucional
+ * </h2>
  * <p>
  *    A camada convolucional realiza operações de convolução sobre a entrada
  *    utilizando filtros (kernels) para extrair características locais, dada 
@@ -547,6 +549,8 @@ public class Convolucional extends Camada implements Cloneable{
          );
       }
 
+      //inicialização de parâmetros
+
       //inicialização da entrada
       this.altEntrada  = formEntrada[0];
       this.largEntrada = formEntrada[1];
@@ -651,11 +655,6 @@ public class Convolucional extends Camada implements Cloneable{
       }
 
       this.ativacao = ativacao;
-   }
-
-   @Override
-   public void configurarId(int id){
-      this.id = id;
    }
 
    @Override
