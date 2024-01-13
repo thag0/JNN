@@ -168,6 +168,15 @@ public class Dropout extends Camada implements Cloneable{
       return 0;
    }
 
+   /**
+    * Retorna a taxa de dropout usada pela camada.
+    * @return taxa de dropout da camada.
+    */
+   public double taxa(){
+      return this.taxa;
+
+   }
+
    @Override
    public Dropout clonar(){
       try{

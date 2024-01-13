@@ -103,12 +103,14 @@ public class MainConv{
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
          new Densa(128, "sigmoid"),
-         new Densa(62, "sigmoid"),
+         new Dropout(0.5),
+         new Densa(64, "sigmoid"),
+         new Dropout(0.5),
          new Densa(NUM_DIGITOS_TREINO, "softmax"),
       });
 
       modelo.compilar(
-         new SGD(0.001, 0.99),
+         "sgd",
          new EntropiaCruzada(),
          new He()
       );

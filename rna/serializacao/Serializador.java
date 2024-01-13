@@ -10,6 +10,7 @@ import rna.avaliacao.perda.Perda;
 import rna.camadas.Camada;
 import rna.camadas.Convolucional;
 import rna.camadas.Densa;
+import rna.camadas.Dropout;
 import rna.camadas.Flatten;
 import rna.camadas.MaxPooling;
 import rna.core.Dicionario;
@@ -49,6 +50,11 @@ public class Serializador{
     * Auxiliar na serialização de camadas max pooling.
     */
    private SerialMaxPool auxMaxPool = new SerialMaxPool();
+
+   /**
+    * Auxiliar na serialização de camadas de dropout.
+    */
+   private SerialDropout auxDropout = new SerialDropout();
 
    /**
     * Serializador e desserializador de modelos.
@@ -170,6 +176,9 @@ public class Serializador{
             }else if(camada instanceof MaxPooling){
                auxMaxPool.serializar((MaxPooling) camada, bw);
 
+            }else if(camada instanceof Dropout){
+               auxDropout.serializar((Dropout) camada, bw);
+
             }else{
                throw new IllegalArgumentException(
                   "Tipo de camada \"" + camada.getClass().getTypeName() + "\" não suportado."
@@ -183,7 +192,7 @@ public class Serializador{
    }
 
    /**
-    * Lê o arquivo de uma {@code Rede Neural} serializada e converter numa
+    * Lê o arquivo de uma {@code Rede Neural} serializada e converte numa
     * instância pré configurada.
     * <p>
     *    Configurações mantidas: 
@@ -259,6 +268,12 @@ public class Serializador{
       return rede;
    }
 
+   /**
+    * Lê o arquivo de um modelo {@code Sequencial} serializado e converte numa
+    * instância pré configurada.
+    * @param caminho caminho onde está saldo o arquivo {@code .txt} do modelo;
+    * @return instância de um modelo {@code Sequencial} a partir do arquivo lido.
+    */
    public Sequencial lerSequencial(String caminho){
       Sequencial modelo = new Sequencial();
       Dicionario dic = new Dicionario();
@@ -291,6 +306,10 @@ public class Serializador{
                MaxPooling maxPooling = auxMaxPool.lerConfig(br);
                modelo.add(maxPooling);
             
+            }else if(nome.equalsIgnoreCase("dropout")){
+               Dropout dropout = auxDropout.lerConfig(br);
+               modelo.add(dropout);
+
             }else{
                throw new IllegalArgumentException(
                   "Tipo de camada \""+ nome +"\" não suportado."

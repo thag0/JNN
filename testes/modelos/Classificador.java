@@ -9,6 +9,7 @@ import rna.modelos.Sequencial;
 import rna.avaliacao.perda.*;
 import rna.camadas.Camada;
 import rna.camadas.Densa;
+import rna.camadas.Dropout;
 import rna.otimizadores.*;
 import lib.ged.Dados;
 import lib.ged.Ged;
@@ -47,7 +48,9 @@ public class Classificador{
       //criando e configurando a rede neural
       Sequencial modelo = new Sequencial(new Camada[]{
          new Densa(qEntradas, 10, "tanh"),
+         new Dropout(0.5),
          new Densa(10, "tanh"),
+         new Dropout(0.5),
          new Densa(qSaidas, "softmax")
       });
 
@@ -70,7 +73,6 @@ public class Classificador{
       Dados d = new Dados(matrizConfusao);
       d.editarNome("Matriz de confusão");
       d.imprimir();
-
 
       exportarHistoricoPerda(modelo, ged);
       // compararSaidaRede(rede, testeX, testeY, "");
