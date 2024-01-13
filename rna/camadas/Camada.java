@@ -247,7 +247,7 @@ public abstract class Camada{
     */
    public int[] formatoEntrada(){
       throw new UnsupportedOperationException(
-         "Implementar formato de entrada da camada" + this.getClass().getTypeName() + "."
+         "Implementar formato de entrada da camada " + this.getClass().getTypeName() + "."
       );
    }
 
