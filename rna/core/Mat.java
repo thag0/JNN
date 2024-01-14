@@ -367,7 +367,19 @@ public class Mat{
    /**
     * Executa a função fornecida elemento a elemento na matriz.
     * <p>
-    *    Exemplo
+    *    A função aplicada deve seguir o formato:
+    * </p>
+    * <pre>
+    *(x) -> { 
+    *    //"x" é o valor contido na matriz
+    *    //correspondente a cada iteração
+    *
+    *    //processa algo    
+    *    return //resultado
+    *}
+    * </pre>
+    * <p>
+    *    Exemplo:
     * </p>
     * <pre>
     *m = [
@@ -396,6 +408,18 @@ public class Mat{
    /**
     * Executa a função fornecida elemento a elemento na matriz e salva o resultado
     * na intância que foi usada.
+    * <p>
+    *    A função aplicada deve seguir o formato:
+    * </p>
+    * <pre>
+    *(x) -> { 
+    *    //"x" é o valor contido na matriz fornecida
+    *    //correspondente a cada iteração
+    *
+    *    //processa algo    
+    *    return //resultado
+    *}
+    * </pre>
     * <p>
     *    Exemplo
     * </p>

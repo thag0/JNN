@@ -27,12 +27,21 @@ public class MatrizTeste{
          {7, 8, 9},
       });
 
+      Mat gradiente = new Mat(new double[][]{
+         {10, 10, 10},
+         {10, 10, 10},
+         {10, 10, 10},
+      });
+
       Dropout dropout = new Dropout(0.5);
       dropout.construir(new int[]{entrada.lin(), entrada.col()});
       dropout.configurarTreino(true);
 
       dropout.calcularSaida(entrada);
-      dropout.mascara.print("mascara");
-      dropout.saida.print("saida");
+      dropout.mascara[0].print("mascara");
+      dropout.saida[0].print("saida");
+
+      dropout.calcularGradiente(gradiente);
+      dropout.gradEntrada[0].print("gradiente da entrada");
    }
 }

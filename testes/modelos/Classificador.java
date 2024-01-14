@@ -55,7 +55,7 @@ public class Classificador{
       });
 
       modelo.compilar(
-         new SGD(0.0001, 0.999),
+         new SGD(0.001, 0.99),
          new EntropiaCruzada(),
          new Xavier()
       );

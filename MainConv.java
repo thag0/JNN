@@ -9,7 +9,6 @@ import rna.camadas.*;
 import rna.inicializadores.*;
 import rna.modelos.Modelo;
 import rna.modelos.Sequencial;
-import rna.otimizadores.*;
 import rna.serializacao.Serializador;
 
 public class MainConv{
@@ -47,7 +46,7 @@ public class MainConv{
 
       System.out.println("Treinando.");
       t1 = System.nanoTime();
-      rodarTreino(modelo, treinoX, treinoY, 40);
+      rodarTreino(modelo, treinoX, treinoY, 50);
       t2 = System.nanoTime();
       
       long tempoDecorrido = t2 - t1;
@@ -105,7 +104,6 @@ public class MainConv{
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
          new Densa(128, "sigmoid"),
-         new Dropout(0.3),
          new Densa(64, "sigmoid"),
          new Densa(NUM_DIGITOS_TREINO, "softmax"),
       });
