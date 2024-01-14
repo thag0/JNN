@@ -870,13 +870,32 @@ public class Convolucional extends Camada implements Cloneable{
             clone.gradBias = this.gradBias.clone();
          }
 
-         clone.entrada = this.entrada.clone();
-         clone.filtros = this.filtros.clone();
-         clone.somatorio = this.somatorio.clone();
-         clone.saida = this.saida.clone();
-         clone.gradSaida = this.gradSaida.clone();
-         clone.derivada = this.derivada.clone();
-         clone.gradFiltros = this.gradFiltros.clone();
+         clone.entrada = new Mat[this.profEntrada];
+         for(int i = 0; i < this.profEntrada; i++){
+            clone.entrada[i] = this.entrada[i].clone();
+         }
+         
+         clone.filtros     = new Mat[this.numFiltros][];
+         clone.gradFiltros = new Mat[this.numFiltros][];
+         for(int i = 0; i < this.numFiltros; i++){
+            clone.filtros[i]     = new Mat[this.profEntrada];
+            clone.gradFiltros[i] = new Mat[this.profEntrada];
+            for(int j = 0; j < this.profEntrada; j++){
+               clone.filtros[i][j] = this.filtros[i][j].clone();
+               clone.gradFiltros[i][j] = this.gradFiltros[i][j].clone();
+            }
+         }
+
+         clone.somatorio   = new Mat[this.numFiltros];
+         clone.saida       = new Mat[this.numFiltros];
+         clone.gradSaida   = new Mat[this.numFiltros];
+         clone.derivada    = new Mat[this.numFiltros];
+         for(int i = 0; i < this.numFiltros; i++){
+            clone.somatorio[i] = this.somatorio[i].clone();
+            clone.saida[i] = this.saida[i].clone();
+            clone.gradSaida[i] = this.gradSaida[i].clone();
+            clone.derivada[i] = this.derivada[i].clone();
+         }
 
          return clone;
       }catch(Exception e){

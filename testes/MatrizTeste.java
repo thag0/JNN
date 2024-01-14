@@ -3,6 +3,7 @@ package testes;
 import lib.ged.Dados;
 import lib.ged.Ged;
 import rna.avaliacao.perda.EntropiaCruzada;
+import rna.camadas.Convolucional;
 import rna.camadas.Densa;
 import rna.camadas.Dropout;
 import rna.camadas.Flatten;
@@ -21,27 +22,13 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
 
-      Mat entrada = new Mat(new double[][]{
-         {1, 2, 3},
-         {4, 5, 6},
-         {7, 8, 9},
-      });
+      Convolucional conv = new Convolucional(new int[]{2, 2}, 1);
+      conv.construir(new int[]{2, 2, 1});
+      conv.inicializar(new Xavier(), new Xavier(), 0);
 
-      Mat gradiente = new Mat(new double[][]{
-         {10, 10, 10},
-         {10, 10, 10},
-         {10, 10, 10},
-      });
+      Convolucional clone = conv.clonar();
 
-      Dropout dropout = new Dropout(0.5);
-      dropout.construir(new int[]{entrada.lin(), entrada.col()});
-      dropout.configurarTreino(true);
-
-      dropout.calcularSaida(entrada);
-      dropout.mascara[0].print("mascara");
-      dropout.saida[0].print("saida");
-
-      dropout.calcularGradiente(gradiente);
-      dropout.gradEntrada[0].print("gradiente da entrada");
+      System.out.println(conv.entrada);
+      System.out.println(clone.entrada);
    }
 }
