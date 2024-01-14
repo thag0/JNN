@@ -16,7 +16,7 @@ pra ver se ela já conseguia pelo menos ter overfitting sobre os dados, e deu ce
 
 Estou criando e implementando uma api para um modelo sequencial de camadas, ele é uma generalização de um modelo base, assim como na api "RedeNeural", ambos possuem as mesmas implementações de métodos, mas o modelo sequencial tem suas especialidades.
 
-- O modelo sequencial não é limitado apenas à camadas Densas, podendo empilhar camadas convolucionais, flatten e maxpooling (até o momento foi o que adicionei).
+- O modelo sequencial não é limitado apenas à camadas Densas, podendo empilhar camadas convolucionais, flatten, maxpooling e dropout (até o momento foi o que adicionei).
 - O modelo sequencial é capaz de lidar com diferentes tipos de dados de entrada e saída, dependendo das camadas configuradas para ele.
 
 Consegui criar essa generalização para o modelo sequencial criando a classe mãe "Camada" que possui as implementações de métodos necessárias para o funcionamento do modelo. Novas camadas devem implementar esses métodos e seguir os padrões que as demais camadas seguem para manter o funcionamento correto de construção, propagação e treinamento das camadas.
@@ -25,16 +25,28 @@ Seguindo a ideia de generalização, os otimizadores também sofreram algumas mu
 
 ![treino sequencial](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/368c7994-ccc9-4baa-8417-5d67c7e5320c)
 
-*Exemplo de treino usando o modelo sequencial, usando o otimizador sgd e função de perda mse*
+*Exemplo de treino com o modelo sequencial, usando o otimizador sgd (Stochastic Gradient Descent) e função de perda mse (Mean Squared Error)*
 
 Até o momento o modelo sequencial está lidando perfeitamente bem com os métodos já criados na primeira api "RedeNeural" as generalizações estão funcionando bem. 
 
 # Treinamento de modelos Convolucionais
 
-Estou testando os modelos convolucionais no conjunto de dados do MNIST, atualmente estou usando todos os 10 dítigos para treino, onde cada dígito possui 30 amostras cada.
+Estou testando os modelos convolucionais no conjunto de dados do MNIST, atualmente estou usando todos os 10 dítigos para treino, onde cada dígito possui 40 amostras.
 
 Esse é o modelo que até agora teve a maior acurárcia entre os testes (87%)
 
 ![caracteristicas-modelo-convolucional](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/9f0c8938-4ba0-47c8-8d4a-d7a3ba6fe989)
 
 Já estou bem satisfeito de ter conseguido esses resultados com o modelo convolucional, mas sempre há espaço para melhorias e quero continuar trabalhando nisso.
+
+# Regularização
+
+Iniciei um pouco os estudos sobre a regularização e como evitar que os modelos entrem no problema de sobreajuste (overfitting). Inicialmente parti da ideia de que seria mais fácil apenas criar modelos menores (em número de parâmetros e camadas) mas depois pesquisei um pouco mais sobre os métodos de regularização.
+
+Por enquanto a implementação mais fácil de fazer foi criar a camada de Dropout, que aleatoriamente durante o treinamento desativa algumas unidades para que não tenham contribuição no resultado final.
+
+A camada de Dropout é bem simples de usar, basta empilhar entre camadas (também funcionando com camadas que não sejam densas, porém não testado), como sugere na imagem de exemplo:
+
+![exemplo dropout](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/079fae89-dc01-4ea1-9b62-ef4dc3086200)
+
+*Exemplo de modelo usando camadas de abandono (dropout), valores arbitrários.*
