@@ -8,13 +8,14 @@ import rna.camadas.Dropout;
 class SerialDropout{
    
    /**
-    * Transforma os dados contidos na camada Flatten numa sequência
+    * Transforma os dados contidos na camada Dropou numa sequência
     * de informações sequenciais. Essas informações contém:
     * <ul>
     *    <li> Nome da camada; </li>
     *    <li> Formato de entrada (altura, largura, profundidade); </li>
+    *    <li> taxa de dropout; </li>
     * </ul>
-    * @param camada camada flatten que será serializada.
+    * @param camada camada de dropout que será serializada.
     * @param bw escritor de buffer usado para salvar os dados da camada.
     */
    public void serializar(Dropout camada, BufferedWriter bw){
