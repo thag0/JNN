@@ -33,8 +33,13 @@ public class Mat{
    public Mat(int lin, int col, double[] dados){
       if(lin < 1 || col < 1){
          throw new IllegalArgumentException(
-            "Os valores de linhas e colunas devem ser maiores que zero."
+         "Os valores de linhas e colunas devem ser maiores que zero."
          );
+      }
+      if(dados == null){
+         throw new IllegalArgumentException(
+            "O conjunto de dados não pode ser nulo."
+         );      
       }
       if(lin*col != dados.length){
          throw new IllegalArgumentException(
@@ -42,6 +47,7 @@ public class Mat{
             "tamanho do conjunto de dados fornecido."
          );
       }
+
       this.lin = lin;
       this.col = col;
       this.dados = dados;
@@ -54,6 +60,21 @@ public class Mat{
     */
    public Mat(int lin, int col){
       this(lin, col, new double[lin*col]);
+   }
+
+   /**
+    * Inicializa uma nova matriz com seus dados preenchidos de acordo
+    * com o valor fornecido.
+    * @param lin quantidade de linhas da matriz.
+    * @param col quantidade de colunas da matriz.
+    * @param valor de preenchimento.
+    */
+   public Mat(int lin, int col, double valor){
+      this(lin, col, new double[lin*col]);
+
+      for(int i = 0; i < this.dados.length; i++){
+         this.dados[i] = valor;
+      }
    }
 
    /**
@@ -122,16 +143,24 @@ public class Mat{
     * @param arr array base.
     */
    public Mat(double[] arr){
-      if(arr == null){
+      this(1, arr.length, arr);
+   }
+
+   /**
+    * Inicializa uma nova matriz, copiando o conteúdo da matriz fornecida.
+    * @param m matriz base.
+    */
+   public Mat(Mat m){
+      if(m == null){
          throw new IllegalArgumentException(
-            "Array fonecido é nulo."
+            "A matriz fornecida não pode ser nula."
          );
       }
 
-      this.lin = 1;
-      this.col = arr.length;
-      this.dados = new double[this.col];
-      System.arraycopy(arr, 0, this.dados, 0, this.dados.length);
+      this.lin = m.lin;
+      this.col = m.col;
+      this.dados = new double[m.tamanho()];
+      System.arraycopy(m.dados, 0, this.dados, 0, m.tamanho());
    }
 
    /**
