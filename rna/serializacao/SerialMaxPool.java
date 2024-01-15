@@ -17,13 +17,13 @@ class SerialMaxPool{
     *    <li> Formato do filtro (altura, largura); </li>
     *    <li> Formato dos strides (altura, largura); </li>
     * </ul>
-    * @param camada camada flatten que será serializada.
+    * @param camada camada de max pooling que será serializada.
     * @param bw escritor de buffer usado para salvar os dados da camada.
     */
    public void serializar(MaxPooling camada, BufferedWriter bw){
       try{
          //nome da camada pra facilitar
-         bw.write(camada.getClass().getSimpleName());
+         bw.write(camada.nome());
          bw.newLine();
 
          //formato de entrada

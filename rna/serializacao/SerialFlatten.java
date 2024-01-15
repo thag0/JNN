@@ -21,7 +21,7 @@ class SerialFlatten{
    public void serializar(Flatten camada, BufferedWriter bw){
       try{
          //nome da camada pra facilitar
-         bw.write(camada.getClass().getSimpleName());
+         bw.write(camada.nome());
          bw.newLine();
 
          //formato de entrada

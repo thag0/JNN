@@ -494,4 +494,12 @@ public abstract class Camada{
          "Implementar clonagem para a camada " + this.getClass().getTypeName() + "." 
       );
    }
+
+   /**
+    * Retorna o nome da camada.
+    * @return nome da camada.
+    */
+   public String nome(){
+      return this.getClass().getSimpleName();
+   }
 }

@@ -13,7 +13,7 @@ public class Softmax extends Ativacao{
    /**
     * Operador matricial.
     */
-   OpMatriz opm = new OpMatriz();
+   OpMatriz opmat = new OpMatriz();
 
    /**
     * Instancia a função de ativação Softmax.
@@ -24,9 +24,7 @@ public class Softmax extends Ativacao{
     * alta.
     * </p>
     */
-   public Softmax(){
-
-   }
+   public Softmax(){}
 
    @Override
    public void calcular(Densa camada){
@@ -46,12 +44,15 @@ public class Softmax extends Ativacao{
    public void derivada(Densa camada){
       int n = camada.somatorio.col();
       Mat tmp = camada.saida.bloco(0, n);
-      Mat ident = opm.identidade(n);
+      Mat ident = opmat.identidade(n);
       Mat transp = tmp.transpor();
 
-      opm.mult(
+      opmat.mult(
          camada.gradSaida, 
-         opm.hadamard(tmp, opm.sub(ident, transp)), 
+         opmat.hadamard(
+            tmp,
+            opmat.sub(ident, transp)
+         ), 
          camada.derivada
       );
    }

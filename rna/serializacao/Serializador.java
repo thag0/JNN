@@ -156,11 +156,11 @@ public class Serializador{
          bw.newLine();
 
          //otimizador usado
-         bw.write(modelo.otimizador().getClass().getSimpleName());
+         bw.write(modelo.otimizador().nome());
          bw.newLine();
 
          //função de perda
-         bw.write(modelo.perda().getClass().getSimpleName());
+         bw.write(modelo.perda().nome());
          bw.newLine();
 
          for(Camada camada : modelo.camadas()){

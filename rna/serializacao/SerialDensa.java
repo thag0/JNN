@@ -26,7 +26,7 @@ class SerialDensa{
    public void serializar(Densa camada, BufferedWriter bw, String tipo){
       try{
          //nome da camada pra facilitar
-         bw.write(camada.getClass().getSimpleName());
+         bw.write(camada.nome());
          bw.newLine();
 
          //formato de entrada
@@ -72,10 +72,10 @@ class SerialDensa{
    }
 
    /**
-    * 
-    * @param valor
-    * @param tipo
-    * @param bw
+    * Salva o valor de acordo com a configuração de tipo definida.
+    * @param valor valor desejado.
+    * @param tipo formatação do dado (float, double).
+    * @param bw escritor de buffer usado.
     * @throws IOException
     */
     private void escreverDado(double valor, String tipo, BufferedWriter bw) throws IOException{

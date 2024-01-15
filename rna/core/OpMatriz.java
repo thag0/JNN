@@ -145,12 +145,9 @@ public class OpMatriz{
    public Mat identidade(int tamanho){
       Mat id = new Mat(tamanho, tamanho);
       
-      int i, j;
-      for(i = 0; i < id.lin(); i++){
-         for(j = 0; j < id.col(); j++){
-            id.editar(i, j, (i == j ? 1 : 0));
-         }
-      }
+      id.forEach((i, j) -> {
+         id.editar(i, j, (i == j ? 1 : 0));
+      });
 
       return id;
    }
@@ -203,6 +200,7 @@ public class OpMatriz{
       int i, j, k;
       int lin = r.lin(), col = r.col(), acol = a.col();
       double res;
+
       for(i = 0; i < lin; i++){
          for(j = 0; j < col; j++){
             res = 0;

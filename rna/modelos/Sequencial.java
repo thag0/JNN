@@ -485,8 +485,8 @@ public class Sequencial extends Modelo implements Cloneable{
          int[] e = camada.formatoEntrada();
          int[] s = camada.formatoSaida();
          
-         //nome
-         String nomeCamada = camada.id + " - " + camada.getClass().getSimpleName();
+         //identificador da camada
+         String nomeCamada = camada.id + " - " + camada.nome();
 
          //formato de entrada
          String formEntrada = String.format("(%d", e[0]);

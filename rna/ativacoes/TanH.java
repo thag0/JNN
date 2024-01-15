@@ -18,7 +18,8 @@ public class TanH extends Ativacao{
       double grads[] = camada.gradSaida.paraArray();
       double deriv[] = camada.saida.paraArray();
 
-      for(int i = 0; i < camada.saida.col(); i++){
+      int i, tamanho = camada.saida.col();
+      for(i = 0; i < tamanho; i++){
          deriv[i] = 1 - (deriv[i] * deriv[i]);
          deriv[i] *= grads[i];
       }

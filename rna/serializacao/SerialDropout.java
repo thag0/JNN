@@ -21,7 +21,7 @@ class SerialDropout{
    public void serializar(Dropout camada, BufferedWriter bw){
       try{
          //nome da camada pra facilitar
-         bw.write(camada.getClass().getSimpleName());
+         bw.write(camada.nome());
          bw.newLine();
 
          //formato de entrada
