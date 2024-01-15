@@ -1,5 +1,6 @@
 package rna.core;
 
+import java.util.function.BiConsumer;
 import java.util.function.DoubleUnaryOperator;
 
 /**
@@ -447,6 +448,32 @@ public class Mat{
       int n = this.tamanho();
       for(int i = 0; i < n; i++){
          this.dados[i] = f.applyAsDouble(m.dados[i]);
+      }
+   }
+
+   /**
+    * Percorre cada elemento da matriz e aplica uma operação definida pelo 
+    * consumidor, como exemplo:
+    * <pre>
+    *mat.forEach((i, j) -> {
+    *    mat.editar(i, j, i+j);  
+    *})
+    *
+    *mat = [
+    *    0, 1, 2 
+    *    1, 2, 3 
+    *    2, 3, 4 
+    *]
+    * </pre>
+    * @param consumidor operador que vai aplicar a função aos elementos da 
+    * matriz, ele recebe dois argumentos (i, j), que se referem
+    * aos índices de {@code linha e coluna}, respectivamente.
+    */
+   public void forEach(BiConsumer<Integer, Integer> consumidor){
+      for(int i = 0; i < this.lin; i++){
+         for(int j = 0; j < this.col; j++){
+            consumidor.accept(i, j);
+         }
       }
    }
 

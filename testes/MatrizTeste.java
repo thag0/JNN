@@ -22,13 +22,17 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
 
-      Convolucional conv = new Convolucional(new int[]{2, 2}, 1);
-      conv.construir(new int[]{2, 2, 1});
-      conv.inicializar(new Xavier(), new Xavier(), 0);
+      Mat mat = new Mat(new double[][]{
+         {1, 2, 3},
+         {4, 5, 6},
+         {7, 8, 9}
+      });
 
-      Convolucional clone = conv.clonar();
+      mat.forEach((i, j) -> {
+         double x = i * mat.col() + j + 1; 
+         mat.editar(i, j, x);
+      });
 
-      System.out.println(conv.entrada);
-      System.out.println(clone.entrada);
+      mat.print();
    }
 }
