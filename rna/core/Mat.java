@@ -470,8 +470,9 @@ public class Mat{
     * aos índices de {@code linha e coluna}, respectivamente.
     */
    public void forEach(BiConsumer<Integer, Integer> consumidor){
-      for(int i = 0; i < this.lin; i++){
-         for(int j = 0; j < this.col; j++){
+      int i, j;
+      for(i = 0; i < this.lin; i++){
+         for(j = 0; j < this.col; j++){
             consumidor.accept(i, j);
          }
       }
