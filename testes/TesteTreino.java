@@ -1,17 +1,17 @@
 package testes;
 
+import lib.ged.Dados;
 import lib.ged.Ged;
-import rna.avaliacao.perda.MSE;
 import rna.camadas.*;
 import rna.inicializadores.Xavier;
 import rna.modelos.*;
-import rna.otimizadores.SGD;
 
 public class TesteTreino{
    static Ged ged = new Ged();
 
    public static void main(String[] args){
       ged.limparConsole();
+
       double[][] entrada = {
          {0, 0},
          {0, 1},
@@ -25,26 +25,44 @@ public class TesteTreino{
          {0}
       };
 
-      Sequencial rede = new Sequencial();
-      rede.add(new Densa(2, 3, "sigmoid"));
-      rede.add(new Densa(1, "sigmoid"));
+      Sequencial modelo = new Sequencial(new Camada[]{
+         new Densa(2, 3, "sigmoid"),
+         new Densa(1, "sigmoid")
+      });
       
-      rede.compilar(
-         new SGD(0.1),
-         new MSE(),
-         new Xavier()
-      );
-      rede.treinar(entrada, saida, 10_000, false);
+      modelo.compilar("adagrad", "mse", new Xavier(), new Xavier());
+      modelo.treinar(entrada, saida, 3_000, false);
+      verificar(entrada, saida, modelo);
+   }
 
+   static void verificar(double[][] entrada, double[][] saida, Sequencial modelo){
       for(int i = 0; i < entrada.length; i++){
-         rede.calcularSaida(entrada[i]);
+         modelo.calcularSaida(entrada[i]);
          System.out.println(
             entrada[i][0] + " - " + entrada[i][1] + 
-            " R:" + saida[i][0] + 
-            " P:" + rede.saidaParaArray()[0]
+            " R: " + saida[i][0] + 
+            " P: " + modelo.saidaParaArray()[0]
          );
       }
       
-      System.out.println("\nPerda: " + rede.avaliador.erroMedioQuadrado(entrada, saida));
+      System.out.println("\nPerda: " + modelo.avaliar(entrada, saida));
+   }
+
+   /**
+    * Salva um arquivo csv com o historico de desempenho do modelo.
+    * @param modelo modelo.
+    * @param caminho caminho onde será salvo o arquivo.
+    */
+   static void exportarHistorico(Modelo modelo, String caminho){
+      System.out.println("Exportando histórico de perda");
+      double[] perdas = modelo.historico();
+      double[][] dadosPerdas = new double[perdas.length][1];
+
+      for(int i = 0; i < dadosPerdas.length; i++){
+         dadosPerdas[i][0] = perdas[i];
+      }
+
+      Dados dados = new Dados(dadosPerdas);
+      ged.exportarCsv(dados, caminho);
    }
 }
