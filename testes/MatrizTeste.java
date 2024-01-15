@@ -24,8 +24,9 @@ public class MatrizTeste{
 
       Mat mat = new Mat(3, 3);
 
-      Inicializador ini = new Xavier(1234);
-      ini.inicializar(mat, 0);
+      mat.forEach((i, j) -> {
+         mat.add(i, j, 1);
+      });
 
       mat.print();
    }
