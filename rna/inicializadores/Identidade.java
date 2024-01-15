@@ -2,19 +2,25 @@ package rna.inicializadores;
 
 import rna.core.Mat;
 
+/**
+ * Inicializador de matriz identidade para uso dentro da biblioteca.
+ */
 public class Identidade extends Inicializador{
+
+   /**
+    * Instância um inicializador de matriz identidade.
+    */
+   public Identidade(){}
 
    /**
     * Inicializa todos os valores da matriz no formato de identidade.
     * @param m matriz que será inicializada.
-    * @param x valor usado apenas por outros otimizadores.
+    * @param x valor usado apenas por outros inicializadores.
     */
    @Override
    public void inicializar(Mat m, double x){
-      for(int i = 0; i < m.lin(); i++){
-         for(int j = 0; j < m.col(); j++){
-            m.editar(i, j, (i == j ? 1 : 0));
-         }
-      }
+      m.forEach((i, j) -> {
+         m.editar(i, j, (i == j ? 1 : 0));
+      });
    }  
 }

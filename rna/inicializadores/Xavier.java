@@ -2,7 +2,24 @@ package rna.inicializadores;
 
 import rna.core.Mat;
 
+/**
+ * Inicializador Xavier para uso dentro da biblioteca.
+ */
 public class Xavier extends Inicializador{
+
+   /**
+    * Instância um inicializador Xavier para matrizes com seed
+    * aleatória.
+    */
+   public Xavier(){}
+   
+   /**
+    * Instância um inicializador Xavier para matrizes.
+    * @param seed seed usada pelo gerador de números aleatórios.
+    */
+   public Xavier(long seed){
+      super(seed);
+   }
 
    /**
     * Aplica o algoritmo de inicialização Xavier na matriz fornecida.
@@ -12,10 +29,8 @@ public class Xavier extends Inicializador{
    @Override
    public void inicializar(Mat m, double x){
       double desvio = Math.sqrt(2.0 / (m.lin() + m.col()));
-      for(int i = 0; i < m.lin(); i++){
-         for(int j = 0; j < m.col(); j++){
-            m.editar(i, j, (desvio * super.random.nextGaussian()));
-         }
-      }
+      m.forEach((i, j) -> {
+         m.editar(i, j, (desvio * super.random.nextGaussian()));
+      }); 
    }
 }

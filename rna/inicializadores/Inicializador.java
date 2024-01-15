@@ -15,6 +15,19 @@ public abstract class Inicializador{
     * para as classes filhas.
     */
    protected Random random = new Random();
+   
+   /**
+    * Inicialização com seed aleatória
+    */
+   protected Inicializador(){}
+
+   /**
+    * Inicialização com seed configurada.
+    * @param seed seed. 
+    */
+   protected Inicializador(long seed){
+      this.random.setSeed(seed);
+   }
 
    /**
     * Configura o início do gerador aleatório.

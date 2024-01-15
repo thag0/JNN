@@ -2,21 +2,35 @@ package rna.inicializadores;
 
 import rna.core.Mat;
 
+/**
+ * Inicializador He para uso dentro da biblioteca.
+ */
 public class He extends Inicializador{
+
+   /**
+    * Instância um inicializador He para matrizes com seed
+    * aleatória.
+    */
+   public He(){}
+   
+   /**
+    * Instância um inicializador He para matrizes.
+    * @param seed seed usada pelo gerador de números aleatórios.
+    */
+   public He(long seed){
+      super(seed);
+   }
 
    /**
     * Aplica o algoritmo de inicialização He nos pesos.
     * @param m matriz que será inicializada.
-    * @param x valor utilizado apenas por outros otimizadores.
+    * @param x valor usado apenas por outros inicializadores.
     */
    @Override
    public void inicializar(Mat m, double x){
       double a = Math.sqrt(2.0 / m.lin());
-
-      for(int i = 0; i < m.lin(); i++){
-         for(int j = 0; j < m.col(); j++){
-            m.editar(i, j, (a * super.random.nextGaussian()));
-         }
-      }
+      m.forEach((i, j) -> {
+         m.editar(i, j, (a * super.random.nextGaussian()));
+      });
    }
 }

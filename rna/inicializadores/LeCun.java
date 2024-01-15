@@ -2,22 +2,35 @@ package rna.inicializadores;
 
 import rna.core.Mat;
 
+/**
+ * Inicializador LeCun para uso dentro da biblioteca.
+ */
 public class LeCun extends Inicializador{
    
    /**
-    * Aplica o algoritmo de inicialização LeCun nos pesos.
+    * Instância um inicializador LeCun para matrizes com seed
+    * aleatória.
+    */
+   public LeCun(){}
+   
+   /**
+    * Instância um inicializador LeCun para matrizes.
+    * @param seed seed usada pelo gerador de números aleatórios.
+    */
+   public LeCun(long seed){
+      super(seed);
+   }
+
+   /**
+    * Aplica o algoritmo de inicialização LeCun na matriz fornecida.
     * @param m matriz que será inicializada.
-    * @param x valor utilizado apenas por outros otimizadores.
+    * @param x valor utilizado apenas por outros inicializadores.
     */
    @Override
    public void inicializar(Mat m, double x){
       double a = Math.sqrt(1.0 / m.lin());
-
-      for(int i = 0; i < m.lin(); i++){
-         for(int j = 0; j < m.col(); j++){
-            // m.editar(i, j, super.random.nextDouble(-a, a));
-            m.editar(i, j, (a * super.random.nextGaussian()));
-         }
-      }
+      m.forEach((i, j) -> {
+         m.editar(i, j, (a * super.random.nextGaussian()));
+      }); 
    }
 }

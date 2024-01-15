@@ -22,16 +22,10 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
 
-      Mat mat = new Mat(new double[][]{
-         {1, 2, 3},
-         {4, 5, 6},
-         {7, 8, 9}
-      });
+      Mat mat = new Mat(3, 3);
 
-      mat.forEach((i, j) -> {
-         double x = i * mat.col() + j + 1; 
-         mat.editar(i, j, x);
-      });
+      Inicializador ini = new Xavier(1234);
+      ini.inicializar(mat, 0);
 
       mat.print();
    }
