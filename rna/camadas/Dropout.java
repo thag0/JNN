@@ -101,7 +101,8 @@ public class Dropout extends Camada implements Cloneable{
    /**
     * Instancia uma nova camada de dropout, definindo a taxa
     * de abandono que será usada durante o processo de treinamento.
-    * @param taxa taxa de dropout.
+    * @param taxa taxa de dropout, um valor entre 0 e 1 representando a
+    * taxa de abandono da camada.
     */
    public Dropout(double taxa){
       if(taxa <= 0 || taxa >= 1){
@@ -117,7 +118,8 @@ public class Dropout extends Camada implements Cloneable{
    /**
     * Instancia uma nova camada de dropout, definindo a taxa
     * de abandono que será usada durante o processo de treinamento.
-    * @param taxa taxa de dropout.
+    * @param taxa taxa de dropout, um valor entre 0 e 1 representando a
+    * taxa de abandono da camada.
     * @param seed seed usada para o gerador de números aleatórios da camada.
     */
    public Dropout(double taxa, long seed){

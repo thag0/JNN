@@ -4,20 +4,17 @@ import java.text.DecimalFormat;
 
 import rna.inicializadores.*;
 import rna.modelos.Modelo;
-import rna.modelos.RedeNeural;
 import rna.modelos.Sequencial;
-import rna.avaliacao.perda.*;
 import rna.camadas.Camada;
 import rna.camadas.Densa;
 import rna.camadas.Dropout;
-import rna.otimizadores.*;
 import lib.ged.Dados;
 import lib.ged.Ged;
 
 public class Classificador{
+   static Ged ged = new Ged();
    
    public static void main(String[] args){
-      Ged ged = new Ged();
       ged.limparConsole();
 
       //carregando dados e tratando
@@ -47,23 +44,19 @@ public class Classificador{
 
       //criando e configurando a rede neural
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Densa(qEntradas, 10, "sigmoid"),
-         new Dropout(0.3),
-         new Densa(10, "sigmoid"),
-         new Dropout(0.3),
+         new Densa(qEntradas, 12, "sigmoid"),
+         new Dropout(0.2),
+         new Densa(12, "sigmoid"),
+         new Dropout(0.2),
          new Densa(qSaidas, "softmax")
       });
 
-      modelo.compilar(
-         new SGD(0.001, 0.99),
-         new EntropiaCruzada(),
-         new Xavier()
-      );
+      modelo.compilar("sgd", "entropiacruzada", new Xavier());
       modelo.configurarHistorico(true);
       modelo.info();
       
       //treinando e avaliando os resultados
-      modelo.treinar(treinoX, treinoY, 2_000, false);
+      modelo.treinar(treinoX, treinoY, 1_500, false);
       double acc = modelo.avaliador.acuracia(testeX, testeY);
       System.out.println("Acurácia = " + formatarDecimal(acc*100, 4) + "%");
       System.out.println("Perda = " + modelo.avaliar(testeX, testeY));
@@ -73,13 +66,13 @@ public class Classificador{
       d.editarNome("Matriz de confusão");
       d.imprimir();
 
-      exportarHistoricoPerda(modelo, ged);
-      // compararSaidaRede(rede, testeX, testeY, "");
+      exportarHistorico(modelo, "historico-perda");
+      // compararSaidaRede(modelo, testeX, testeY, "");
    }
 
-   public static void compararSaidaRede(RedeNeural rede, double[][] dadosEntrada, double[][] dadosSaida, String texto){
-      int nEntrada = rede.obterTamanhoEntrada();
-      int nSaida = rede.camadaSaida().numNeuronios();
+   public static void compararSaidaRede(Sequencial rede, double[][] dadosEntrada, double[][] dadosSaida, String texto){
+      int nEntrada = rede.camada(0).formatoEntrada()[1];
+      int nSaida = rede.camadaSaida().tamanhoSaida();
 
       double[] entradaRede = new double[nEntrada];
       double[] saidaRede = new double[nSaida];
@@ -127,9 +120,14 @@ public class Classificador{
       return valorFormatado;
    }
 
-   public static void exportarHistoricoPerda(Modelo rede, Ged ged){
+   /**
+    * Salva um arquivo csv com o historico de desempenho do modelo.
+    * @param modelo modelo.
+    * @param caminho caminho onde será salvo o arquivo.
+    */
+   static void exportarHistorico(Modelo modelo, String caminho){
       System.out.println("Exportando histórico de perda");
-      double[] perdas = rede.historico();
+      double[] perdas = modelo.historico();
       double[][] dadosPerdas = new double[perdas.length][1];
 
       for(int i = 0; i < dadosPerdas.length; i++){
@@ -137,6 +135,6 @@ public class Classificador{
       }
 
       Dados dados = new Dados(dadosPerdas);
-      ged.exportarCsv(dados, "historico-perda");
+      ged.exportarCsv(dados, caminho);
    }
 }
