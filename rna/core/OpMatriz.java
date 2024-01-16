@@ -386,7 +386,7 @@ public class OpMatriz{
       verificarColunas(a, r);
 
       r.copiar(a);
-      r.aplicarFuncao((x) -> x * e);
+      r.mapear((x) -> x * e);
    }
 
    /**
@@ -404,7 +404,7 @@ public class OpMatriz{
       verificarColunas(a, r);
 
       r.copiar(a);
-      r.aplicarFuncao((x) -> x / e);
+      r.mapear((x) -> x / e);
    }
 
    /**

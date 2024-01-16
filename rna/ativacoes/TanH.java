@@ -15,10 +15,10 @@ public class TanH extends Ativacao{
    @Override
    public void derivada(Densa camada){
       //forma manual pra aproveitar os valores pre calculados
-      double grads[] = camada.gradSaida.paraArray();
-      double deriv[] = camada.saida.paraArray();
+      double[] grads = camada.gradSaida.paraArray();
+      double[] deriv = camada.saida.paraArray();
 
-      int i, tamanho = camada.saida.col();
+      int i, tamanho = grads.length;
       for(i = 0; i < tamanho; i++){
          deriv[i] = 1 - (deriv[i] * deriv[i]);
          deriv[i] *= grads[i];

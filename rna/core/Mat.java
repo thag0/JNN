@@ -426,12 +426,17 @@ public class Mat{
     *    14, 16, 18
     * ]
     * </pre>
-    * @param f expressão lambda que atuará em cada elemento da matriz.
+    * @param funcao expressão que atuará em cada elemento da matriz.
     */
-   public void aplicarFuncao(DoubleUnaryOperator f){
+   public void mapear(DoubleUnaryOperator funcao){
+      if(funcao == null){
+         throw new IllegalArgumentException(
+            "Função recebida é nula."
+         );
+      }
       int n = this.tamanho();
       for(int i = 0; i < n; i++){
-         this.dados[i] = f.applyAsDouble(this.dados[i]);
+         this.dados[i] = funcao.applyAsDouble(this.dados[i]);
       }
    }
 
@@ -469,14 +474,14 @@ public class Mat{
     * ]
     * </pre>
     * @param m matriz com os dados de entrada
-    * @param f expressão lambda que atuará em cada elemento da matriz.
+    * @param funcao expressão que atuará em cada elemento da matriz.
     */
-   public void aplicarFuncao(Mat m, DoubleUnaryOperator f){
+   public void aplicarFuncao(Mat m, DoubleUnaryOperator funcao){
       verificarDimensoes(m);
 
       int n = this.tamanho();
       for(int i = 0; i < n; i++){
-         this.dados[i] = f.applyAsDouble(m.dados[i]);
+         this.dados[i] = funcao.applyAsDouble(m.dados[i]);
       }
    }
 
