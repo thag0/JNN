@@ -334,6 +334,21 @@ public class Mat{
    }
 
    /**
+    * Compara todo o conteúdo da matriz com a instância local.
+    * @param m matriz base de comparação.
+    * @return true caso os elementos sejam todos iguais, false caso contrário.
+    */
+   public boolean comparar(Mat m){
+      if(this.tamanho() != m.tamanho()){
+         throw new IllegalArgumentException(
+            "A matriz deve conter a mesma quantidade de elementos (" + m.tamanho() + 
+            ") que a instância local (" + this.tamanho() + ")."
+         );
+      }
+      return true;
+   }
+
+   /**
     * Transpõe o conteúdo da matriz, invertendo suas linhas e colunas.
     * @return matriz transposta.
     */

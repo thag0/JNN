@@ -1,5 +1,9 @@
 package rna.core;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 /**
  * Impelementações de operações matriciais para uso dentro
  * da biblioteca.
@@ -228,19 +232,16 @@ public class OpMatriz{
       verificarLinhas(a, r);
       verificarColunas(r, b);
 
-      int linPorThread = a.lin() / nThreads;
       Thread[] threads = new Thread[nThreads];
-
       for(int t = 0; t < nThreads; t++){
          final int id = t;
 
          threads[t] = new Thread(() -> {
-            int inicio = id * linPorThread;
-            int fim = (id == nThreads - 1) ? a.lin() : (id + 1) * linPorThread;
+            int inicio = id;
             double res;
             int i, j, k;
 
-            for(i = inicio; i < fim; i++){
+            for(i = inicio; i < a.lin(); i+=nThreads){
                for(j = 0; j < r.col(); j++){
                   res = 0;
                   for(k = 0; k < a.col(); k++){
@@ -447,6 +448,44 @@ public class OpMatriz{
    } 
 
    /**
+    * Implementação especializada para as camadas convolucionais aproveitarem
+    * um pouco do paralelismo para acelerar o processo de aprendizado.
+    * @param entrada conjunto de entradas.
+    * @param filtros conjuntos de filtros.
+    * @param saida matriz de resultados onde serão armazenados os valores calculados.
+    * @param add verificador para o resultado, se {@code verdadeiro} a matriz de resultados
+    * não será zerada antes da operação, se {@code falso} a matriz de resultados será
+    * zerada antes da operação.
+    */
+   public void correlacaoCruzada(Mat[] entrada, Mat[][] filtros, Mat[] saida, boolean add){
+      if(entrada == null || filtros == null || saida == null){
+         throw new IllegalArgumentException("Os valores fornecidos não podem ser nulos.");
+      }
+      int numFiltros = filtros.length;
+      int profEntrada = entrada.length;
+
+      //talvez considerar valores mais otimizados
+      int numThreads = (profEntrada > 4) ? Runtime.getRuntime().availableProcessors()/2 : 1;
+      ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+
+      for(int i = 0; i < numFiltros; i++){
+         final int idFiltro = i;
+         executor.submit(() -> {
+            for(int j = 0; j < profEntrada; j++){
+               correlacaoCruzada(entrada[j], filtros[idFiltro][j], saida[idFiltro], true);
+            }
+         });
+      }
+
+      executor.shutdown();
+      try {
+         executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+      }catch(InterruptedException e){
+         e.printStackTrace();
+      }
+   }
+
+   /**
     * Realiza a operação de correlação cruzada (válida) entre a matriz de entrada 
     * e o filtro. Expressada por:
     * <pre>
@@ -485,17 +524,18 @@ public class OpMatriz{
       }
 
       int i, j, k, l;
+      int rLin = r.lin(), rCol = r.col();
+      int bLin = b.lin(), bCol = b.col();
       double res;
-      for(i = 0; i < r.lin(); i++){
-         for(j = 0; j < r.col(); j++){
+      for(i = 0; i < rLin; i++){
+         for(j = 0; j < rCol; j++){
             
             res = 0;
-            for(k = 0; k < b.lin(); k++){
-               for(l = 0; l < b.col(); l++){
+            for(k = 0; k < bLin; k++){
+               for(l = 0; l < bCol; l++){
                   res += a.elemento(i + k, j + l) * b.elemento(k, l);
                }
             }
-
             r.add(i, j, res);
          }
       }

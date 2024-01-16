@@ -1,5 +1,7 @@
 package testes;
 
+import java.util.concurrent.TimeUnit;
+
 import lib.ged.Dados;
 import lib.ged.Ged;
 import rna.avaliacao.perda.EntropiaCruzada;
@@ -22,12 +24,26 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
 
-      Mat mat = new Mat(3, 3);
-
+      int lin = 1;
+      int col = 1000;
+      Mat mat = new Mat(lin, col);
       mat.forEach((i, j) -> {
-         mat.add(i, j, 1);
+         mat.editar(i, j, (
+            i*mat.col() + mat.col()
+         ));
       });
 
-      mat.print();
+      Densa densa = new Densa(col, 200);
+      System.out.println(densa.pesos.tamanho());
+
+      long t;
+      t = medirTempo(() -> densa.calcularSaida(mat));
+      System.out.println("Tempo forward: " + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
+   }
+
+   static long medirTempo(Runnable func){
+      long t = System.nanoTime();
+      func.run();
+      return System.nanoTime() - t;
    }
 }
