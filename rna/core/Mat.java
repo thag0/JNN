@@ -770,8 +770,15 @@ public class Mat{
    /**
     * Exibe o conteúdo contido na matriz.
     * @param nome nome personalizado para exibição.
+    * @param casas número de casas decimais de representação.
     */
-   public void print(String nome){
+   public void print(String nome, int casas){
+      if(casas <= 0){
+         throw new IllegalArgumentException(
+            "O número de casas deve ser maior que zero."
+         ); 
+      }
+
       StringBuilder sb = new StringBuilder();
 
       if(nome == null || nome.isBlank() || nome.isEmpty()){
@@ -782,9 +789,11 @@ public class Mat{
       sb.append(" (" + this.lin + ", " + this.col + ") = [\n");
 
       int compMax = 0;
+      String formato = "%." + casas + "f";
       for(int i = 0; i < this.lin; i++){
          for(int j = 0; j < this.col; j++){
-            int compAtual = String.valueOf(this.elemento(i, j)).length();
+            double elemento = this.elemento(i, j);
+            int compAtual = String.format(formato, elemento).length();
             if(compAtual > compMax){
                compMax = compAtual;
             }
@@ -794,8 +803,9 @@ public class Mat{
       for(int i = 0; i < this.lin; i++){
          sb.append(" ");
          for(int j = 0; j < this.col; j++){
-            String element = String.format("%" + (compMax + 2) + "s", this.elemento(i, j));
-            sb.append(element);
+            String elemento = String.format("%" + (compMax + 2) + "s", String.format(formato, this.elemento(i, j)));
+            elemento = elemento.replace(",", ".");
+            sb.append(elemento);
          }
          sb.append("\n");
       }
@@ -806,9 +816,25 @@ public class Mat{
 
    /**
     * Exibe o conteúdo contido na matriz.
+    * @param nome nome personalizado para exibição.
+    */
+   public void print(String nome){
+      this.print(nome, 16);
+   }
+
+   /**
+    * Exibe o conteúdo contido na matriz.
+    * @param casas número de casas decimais de representação.
+    */
+   public void print(int casas){
+      this.print(this.getClass().getSimpleName(), casas);
+   }
+
+   /**
+    * Exibe o conteúdo contido na matriz.
     */
    public void print(){
-      this.print(this.getClass().getSimpleName());
+      this.print(this.getClass().getSimpleName(), 16);
    }
 
    /**
