@@ -9,6 +9,7 @@ import rna.camadas.*;
 import rna.inicializadores.*;
 import rna.modelos.Modelo;
 import rna.modelos.Sequencial;
+import rna.otimizadores.SGD;
 import rna.serializacao.Serializador;
 
 public class MainConv{
@@ -109,7 +110,7 @@ public class MainConv{
       });
 
       modelo.compilar(
-         "sgd",
+         new SGD(0.001, 0.99),
          new EntropiaCruzada(),
          new He()
       );
