@@ -2,7 +2,6 @@ package testes.modelos;
 
 import java.text.DecimalFormat;
 
-import rna.inicializadores.*;
 import rna.modelos.Modelo;
 import rna.modelos.Sequencial;
 import rna.camadas.Camada;
@@ -51,7 +50,7 @@ public class Classificador{
          new Densa(qSaidas, "softmax")
       });
 
-      modelo.compilar("sgd", "entropiacruzada", new Xavier());
+      modelo.compilar("sgd", "entropiacruzada");
       modelo.configurarHistorico(true);
       modelo.info();
       

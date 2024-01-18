@@ -4,7 +4,6 @@ import rna.avaliacao.Avaliador;
 import rna.avaliacao.perda.Perda;
 import rna.camadas.Camada;
 import rna.core.Dicionario;
-import rna.inicializadores.Inicializador;
 import rna.otimizadores.Otimizador;
 import rna.treinamento.Treinador;
 
@@ -235,62 +234,23 @@ public class Sequencial extends Modelo implements Cloneable{
    }
 
    @Override
-   public void compilar(Object otimizador, Object perda, Inicializador iniKernel){
-      this.compilar(otimizador, perda, iniKernel, null);
-   }
-
-   @Override
-   public void compilar(Object otimizador, Object perda, Inicializador iniKernel, Inicializador iniBias){
+   public void compilar(Object otimizador, Object perda){
       if(this.camadas[0].construida == false){
          throw new IllegalArgumentException(
             "É necessário que a primeira camada seja construída."
          );
       }
-      if(iniKernel == null){
-         throw new IllegalArgumentException(
-            "O inicializador para o kernel não pode ser nulo."
-         );
-      }
-
-      if(seedInicial != 0){
-         iniKernel.configurarSeed(seedInicial);
-         if(iniBias != null){
-            iniBias.configurarSeed(seedInicial);
-         } 
-         this.treinador.configurarSeed(seedInicial);
-      }
-      
-      for(int i = 1; i < this.camadas.length; i++){
-         this.camadas[i].construir(this.camadas[i-1].formatoSaida());
-         this.camadas[i].inicializar(iniKernel, iniBias, 1);
-         this.camadas[i].configurarId(i);
-      }
 
       Dicionario dic = new Dicionario();
-      
-      if(perda == null){
-         throw new IllegalArgumentException(
-            "A função de perda não pode ser nula."
-         );
+      for(int i = 1; i < this.camadas.length; i++){
+         this.camadas[i].construir(this.camadas[i-1].formatoSaida());
+         this.camadas[i].configurarId(i);
+         if(this.seedInicial != 0) this.camadas[i].configurarSeed(this.seedInicial);
+         this.camadas[i].inicializar(1);
       }
-      if(perda instanceof String) this.perda = dic.obterPerda(String.valueOf(perda));
-      else if(perda instanceof Perda) this.perda = (Perda) perda;
-      else throw new IllegalArgumentException(
-         "Objetos aceitos para função de perda são String ou Perda, recebido \"" +
-         perda.getClass().getTypeName() + "\"."
-      );
-               
-      if(otimizador == null){
-         throw new IllegalArgumentException(
-            "O otimizador não pode ser nula."
-         );
-      }
-      if(otimizador instanceof String) this.otimizador = dic.obterOtimizador(String.valueOf(otimizador));
-      else if(otimizador instanceof Otimizador) this.otimizador = (Otimizador) otimizador;
-      else throw new IllegalArgumentException(
-         "Objetos aceitos para otimizador são String ou Otimizador, recebido \"" +
-         otimizador.getClass().getTypeName() + "\"."
-      );
+
+      this.perda = dic.obterPerda(perda);
+      this.otimizador = dic.obterOtimizador(otimizador);
 
       this.otimizador.construir(this.camadas);
       this.compilado = true;

@@ -2,7 +2,6 @@ package rna.camadas;
 
 import rna.core.Mat;
 import rna.core.Utils;
-import rna.inicializadores.Inicializador;
 
 /**
  * <h2>
@@ -181,10 +180,7 @@ public class Flatten extends Camada{
    }
 
    @Override
-   public void inicializar(Inicializador iniKernel, Inicializador iniBias, double x){}
-
-   @Override
-   public void inicializar(Inicializador iniKernel, double x){}
+   public void inicializar(double x){}
 
    /**
     * Achata os dados de entrada num formato sequencial.

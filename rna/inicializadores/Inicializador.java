@@ -43,4 +43,12 @@ public abstract class Inicializador{
     * @param x valor usado pelos inicializadores.
     */
    public abstract void inicializar(Mat m, double x);
+
+   /**
+    * Retorna o nome do inicializador.
+    * @return nome do inicializador.
+    */
+   public String nome(){
+      return getClass().getSimpleName();
+   }
 }

@@ -7,7 +7,6 @@ import lib.geim.Geim;
 import render.JanelaTreino;
 import rna.avaliacao.perda.*;
 import rna.camadas.*;
-import rna.inicializadores.*;
 import rna.modelos.Modelo;
 import rna.modelos.RedeNeural;
 import rna.modelos.Sequencial;
@@ -67,11 +66,10 @@ public class MainImg{
    static Modelo criarRna(int entradas, int saidas){
       Otimizador otm = new SGD(0.0001, 0.9995);
       Perda perda = new MSE();
-      Inicializador ini = new Xavier();
 
       int[] arq = {entradas, 13, 13, saidas};
       RedeNeural modelo = new RedeNeural(arq);
-      modelo.compilar(otm, perda, ini);
+      modelo.compilar(otm, perda);
       modelo.configurarAtivacao("tanh");
       modelo.configurarAtivacao(modelo.camadaSaida(), "sigmoid");
       modelo.configurarHistorico(calcularHistorico);
@@ -86,7 +84,7 @@ public class MainImg{
          new Densa(saidas, "sigmoid")
       });
 
-      modelo.compilar("sgd", "mse", new Xavier());
+      modelo.compilar("sgd", "mse");
       modelo.configurarHistorico(calcularHistorico);
 
       return modelo;

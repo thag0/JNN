@@ -1,7 +1,6 @@
 package rna.camadas;
 
 import rna.ativacoes.Ativacao;
-import rna.inicializadores.Inicializador;
 
 /**
  * <h2>
@@ -104,25 +103,16 @@ public abstract class Camada{
    }
 
    /**
-    * Inicaliza os parâmetros treináveis da camada, 
-    * @param iniKernel inicializador para o kernel.
-    * @param iniBias inicializador de bias.
+    * Inicaliza os parâmetros treináveis da camada de acordo com os inicializadores
+    * definidos.
     * @param x valor usado pelos inicializadores, dependendo do que for usado
     * pode servir de alcance na aleatorização, valor de constante, entre outros.
     */
-   public abstract void inicializar(Inicializador iniKernel, Inicializador iniBias, double x);
+   public abstract void inicializar(double x);
 
    /**
-    * Inicaliza os pesos da camada de acordo com o inicializador configurado.
-    * @param iniKernel inicializador para o kernel.
-    * @param x valor usado pelos inicializadores, dependendo do que for usado
-    * pode servir de alcance na aleatorização, valor de constante, entre outros.
-    */
-   public abstract void inicializar(Inicializador iniKernel, double x);
-
-   /**
-    * Configura a função de ativação da camada através do nome fornecido, letras maiúsculas 
-    * e minúsculas não serão diferenciadas.
+    * Configura a função de ativação da camada através de uma instância de 
+    * {@code FuncaoAtivacao} que será usada para ativar seus neurônios.
     * <p>
     *    Ativações disponíveis:
     * </p>
@@ -141,19 +131,6 @@ public abstract class Camada{
     *    <li> Softplus. </li>
     *    <li> ArcTan. </li>
     * </ul>
-    * @param ativacao nome da nova função de ativação.
-    * @throws IllegalArgumentException se o valor fornecido não corresponder a nenhuma 
-    * função de ativação suportada.
-    */
-   public void configurarAtivacao(String ativacao){
-      throw new UnsupportedOperationException(
-         "Implementar configuração da função de ativação da camada " + this.getClass().getTypeName() + "."
-      );
-   }
-
-   /**
-    * Configura a função de ativação da camada através de uma instância de 
-    * {@code FuncaoAtivacao} que será usada para ativar seus neurônios.
     * <p>
     *    Configurando a ativação da camada usando uma instância de função 
     *    de ativação aumenta a liberdade de personalização dos hiperparâmetros
@@ -162,7 +139,7 @@ public abstract class Camada{
     * @param ativacao nova função de ativação.
     * @throws IllegalArgumentException se a função de ativação fornecida for nula.
     */
-   public void configurarAtivacao(Ativacao ativacao){
+   public void configurarAtivacao(Object ativacao){
       throw new UnsupportedOperationException(
          "Implementar configuração da função de ativação da camada " + this.getClass().getTypeName() + "."
       );
@@ -204,6 +181,17 @@ public abstract class Camada{
     */
    public void configurarTreino(boolean treinando){
       this.treinando = true;
+   }
+
+   /**
+    * Configura uma seed fixa para geradores de números aleatórios da
+    * camada.
+    * @param seed nova seed.
+    */
+   public void configurarSeed(long seed){
+      throw new UnsupportedOperationException(
+         "Implementar configuração de seed da camada " + this.getClass().getTypeName() + "."
+      ); 
    }
 
    /**

@@ -7,7 +7,6 @@ import lib.ged.Ged;
 import lib.geim.Geim;
 import rna.avaliacao.perda.*;
 import rna.camadas.*;
-import rna.inicializadores.*;
 import rna.otimizadores.*;
 import rna.modelos.Modelo;
 import rna.modelos.Sequencial;
@@ -39,7 +38,7 @@ public class TesteImagem{
       });
       modelo.configurarHistorico(true);
       Otimizador otm = new SGD(0.001, 0.995);
-      modelo.compilar(otm, new MSE(), new Xavier());
+      modelo.compilar(otm, new MSE());
       modelo.treinar(dadosEntrada, dadosSaida, 2_000, false);
 
       //avaliando resultados

@@ -6,9 +6,7 @@ import rna.avaliacao.perda.MSE;
 import rna.camadas.Camada;
 import rna.camadas.Densa;
 import rna.core.OpMatriz;
-import rna.inicializadores.*;
 import rna.modelos.*;
-import rna.otimizadores.*;
 
 public class TesteModelos{
    static Ged ged = new Ged();
@@ -37,11 +35,8 @@ public class TesteModelos{
       long seed = 0;
       int epocas = 20_000;
 
-      String atv1 = "tanh";
+      String atv1 = "sigmoid";
       String atv2 = "sigmoid";
-
-      double ta = 0.01;
-      double m = 0.95;
 
       Sequencial seq = new Sequencial(new Camada[]{
          new Densa(nEntradas, nOcultas, atv1),
@@ -49,11 +44,11 @@ public class TesteModelos{
          new Densa(nSaidas, atv2)
       });
       seq.configurarSeed(seed);
-      seq.compilar(new SGD(ta, m), new MSE(), new Xavier(), new Xavier());
+      seq.compilar("adagrad", new MSE());
       
       RedeNeural rna = new RedeNeural(new int[]{nEntradas, nOcultas, nOcultas, nSaidas});
       rna.configurarSeed(seed);
-      rna.compilar(new SGD(ta, m), new MSE(), new Xavier(), new Xavier());
+      rna.compilar("adagrad", new MSE());
       rna.configurarAtivacao(atv1);
       rna.configurarAtivacao(rna.camadaSaida(), atv2);
       

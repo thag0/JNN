@@ -6,8 +6,6 @@ import rna.avaliacao.perda.Perda;
 import rna.camadas.Camada;
 import rna.camadas.Densa;
 import rna.core.Dicionario;
-import rna.inicializadores.Aleatorio;
-import rna.inicializadores.Inicializador;
 import rna.otimizadores.Otimizador;
 import rna.otimizadores.SGD;
 
@@ -413,8 +411,8 @@ public class RedeNeural extends Modelo implements Cloneable{
     *    dados necessários. Após a predição pode-se obter o resultado da rede por meio da função 
     *    {@code obterSaidas()};
     * </p>
-    * Os valores de função de perda, otimizador e inicializador serão definidos como os padrões 
-    * {@code ErroMedioQuadrado (MSE)}, {@code SGD} e {@code Aleatorio}. 
+    * Os valores de função de perda, otimizador serão definidos como os padrões 
+    * {@code ErroMedioQuadrado (MSE)} e {@code SGD}. 
     * <p>
     *    Valores de perda e otimizador configurados previamente são mantidos.
     * </p>
@@ -423,7 +421,7 @@ public class RedeNeural extends Modelo implements Cloneable{
       //usando valores de configuração prévia, se forem criados.
       Otimizador o = (this.otimizador == null) ? new SGD() : this.otimizador;
       Perda p = (this.perda == null) ? new MSE() : this.perda;
-      this.compilar(o, p, new Aleatorio());
+      this.compilar(o, p);
    }
 
    /**
@@ -442,8 +440,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     *    dados necessários. Após a predição pode-se obter o resultado da rede por meio da função 
     *    {@code obterSaidas()};
     * </p>
-    * O valor do otimizador será definido como {@code SGD} o valor do inicializador 
-    * será definido como o padrão {@code Aleatorio}.
+    * O valor do otimizador será definido como {@code SGD}.
     * <p>
     *    Valor de otimizador configurado previamente é mantido.
     * </p>
@@ -457,41 +454,7 @@ public class RedeNeural extends Modelo implements Cloneable{
 
       //usando valores de configuração prévia, se forem criados
       Otimizador o = (this.otimizador == null) ? new SGD() : this.otimizador;
-      this.compilar(o, perda, new Aleatorio());
-   }
-
-   /**
-    * Compila o modelo de Rede Neural inicializando as camadas, neurônios e pesos respectivos, 
-    * baseado nos valores fornecidos.
-    * <p>
-    *    Caso nenhuma configuração inicial seja feita, a rede será inicializada com os argumentos padrão. 
-    * </p>
-    * Após a compilação o modelo está pronto para ser usado, mas deverá ser treinado.
-    * <p>
-    *    Para treinar o modelo deve-se fazer uso da função função {@code treinar()} informando os 
-    *    dados necessários para a rede.
-    * </p>
-    * <p>
-    *    Para usar as predições da rede basta usar a função {@code calcularSaida()} informando os
-    *    dados necessários. Após a predição pode-se obter o resultado da rede por meio da função 
-    *    {@code obterSaidas()};
-    * </p>
-    * A função de perda será definida como {@code ErroMedioQuadrado (MSE)} O valor do inicializador 
-    * será definido como o padrão {@code Aleatorio}.
-    * <p>
-    *    Valor de função de perda configurada previamente é mantido.
-    * </p>
-    * @param otimizador otimizador que será usado durante o treino da Rede Neural.
-    * @throws IllegalArgumentException se o otimizador for nulo.
-    */
-   public void compilar(Otimizador otimizador){
-      if(otimizador == null){
-         throw new IllegalArgumentException("O otimizador fornecido não pode ser nulo.");
-      }
-
-      //usando valores de configuração prévia, se forem criados
-      Perda p = (this.perda == null) ? new MSE() : this.perda;
-      this.compilar(otimizador, p, new Aleatorio());
+      this.compilar(o, perda);
    }
 
    /**
@@ -515,79 +478,40 @@ public class RedeNeural extends Modelo implements Cloneable{
     *    Valor de função de perda configurada previamente é mantido.
     * </p>
     * @param otimizador otimizador que será usando para o treino da Rede Neural.
-    * @param iniPesos inicializador de pesos das camadas da Rede Neural.
     * @throws IllegalArgumentException se o otimizador ou inicializador forem nulos.
     */
-   public void compilar(Otimizador otimizador, Inicializador iniPesos){
+   public void compilar(Otimizador otimizador){
       if(otimizador == null){
          throw new IllegalArgumentException("O otimizador fornecido não pode ser nulo.");
-      }
-      if(iniPesos == null){
-         throw new IllegalArgumentException("O inicializador fornecido não pode ser nulo.");
       }
 
       //usando valores de configuração prévia, se forem criados.
       if(this.perda == null){
-         this.compilar(otimizador, new MSE(), iniPesos);
+         this.compilar(otimizador, new MSE());
 
       }else{
-         this.compilar(otimizador, this.perda, iniPesos);
+         this.compilar(otimizador, this.perda);
       }   
    }
 
    @Override
-   public void compilar(Object otimizador, Object perda, Inicializador iniPesos){
-      this.compilar(otimizador, perda, iniPesos, null);
-   }
-
-   @Override
-   public void compilar(Object otimizador, Object perda, Inicializador iniPesos, Inicializador iniBias){
-      if(iniPesos == null){
-         throw new IllegalArgumentException("O inicializador não pode ser nulo.");
-      }
-      if(perda == null){
-         throw new IllegalArgumentException("A função de perda não pode ser nula.");
-      }
-      if(otimizador == null){
-         throw new IllegalArgumentException("O otimizador não pode ser nulo.");
-      }
-
-      if(seedInicial != 0){
-         iniPesos.configurarSeed(seedInicial);
-         if(iniBias != null){
-            iniBias.configurarSeed(seedInicial);
-         } 
-         this.treinador.configurarSeed(seedInicial);
-      }
-
+   public void compilar(Object otimizador, Object perda){
       this.camadas = new Densa[this.arquitetura.length-1];
       this.camadas[0] = new Densa(this.arquitetura[0], this.arquitetura[1], this.bias);
 
+      Dicionario dic = new Dicionario();
       for(int i = 1; i < this.camadas.length; i++){
          this.camadas[i] = new Densa(
             this.camadas[i-1].formatoSaida()[1], this.arquitetura[i+1], this.bias
          );
          this.camadas[i].configurarId(i);
+         if(this.seedInicial != 0) this.camadas[i].configurarSeed(this.seedInicial);
+         this.camadas[i].inicializar(alcancePeso);
       }
 
-      for(Camada camada : this.camadas){
-         camada.inicializar(iniPesos, iniBias, alcancePeso);
-      }
+      this.perda = dic.obterPerda(perda);
+      this.otimizador = dic.obterOtimizador(otimizador);
 
-      Dicionario dic = new Dicionario();
-      if(perda instanceof String) this.perda = dic.obterPerda(String.valueOf(perda));
-      else if(perda instanceof Perda) this.perda = (Perda) perda;
-      else throw new IllegalArgumentException(
-         "Objetos aceitos para função de perda são String ou Perda, recebido \"" +
-         perda.getClass().getTypeName() + "\"."
-      );
-
-      if(otimizador instanceof String) this.otimizador = dic.obterOtimizador(String.valueOf(otimizador));
-      else if(otimizador instanceof Otimizador) this.otimizador = (Otimizador) otimizador;
-      else throw new IllegalArgumentException(
-         "Objetos aceitos para otimizador são String ou Otimizador, recebido \"" +
-         otimizador.getClass().getTypeName() + "\"."
-      );
       this.otimizador.construir(this.camadas);
 
       this.compilado = true;

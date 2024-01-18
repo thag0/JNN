@@ -2,7 +2,6 @@ package testes.modelos;
 import lib.ged.Ged;
 import rna.avaliacao.perda.MSE;
 import rna.camadas.Densa;
-import rna.inicializadores.Xavier;
 import rna.modelos.Sequencial;
 import rna.otimizadores.SGD;
 
@@ -31,11 +30,7 @@ public class TesteFeedForward {
       modelo.add(new Densa(2, 2, "sigmoid"));
       modelo.add(new Densa(1, "sigmoid"));
 
-      modelo.compilar(
-         new SGD(),
-         new MSE(),
-         new Xavier()
-      );
+      modelo.compilar(new SGD(), new MSE());
       
       double[] pN1 = {-7.577308710973026, 7.34560483929071};
       double   bN1 = -3.8770293408497674;

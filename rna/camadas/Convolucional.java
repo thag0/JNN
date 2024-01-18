@@ -6,8 +6,9 @@ import rna.core.Dicionario;
 import rna.core.Mat;
 import rna.core.OpMatriz;
 import rna.core.Utils;
-import rna.inicializadores.Constante;
 import rna.inicializadores.Inicializador;
+
+//TODO implementar ajustes para os inicializadores da camada
 
 /**
  * <h2>
@@ -231,6 +232,16 @@ public class Convolucional extends Camada implements Cloneable{
     * Função de ativação da camada.
     */
    Ativacao ativacao = null;
+
+   /**
+    * Inicializador para os pesos da camada.
+    */
+   private Inicializador iniKernel;
+
+   /**
+    * Inicializador para os bias da camada.
+    */
+   private Inicializador iniBias;
 
    /**
     * Instancia uma camada convolucional de acordo com os formatos fornecidos.
@@ -613,48 +624,24 @@ public class Convolucional extends Camada implements Cloneable{
    }
 
    @Override
-   public void inicializar(Inicializador iniKernel, double x){
-      this.inicializar(iniKernel, null, x);
-   }
-
-   @Override
-   public void inicializar(Inicializador iniKernel, Inicializador iniBias, double x){
-      //inicialização de kernel e bias
-      if(iniKernel == null){
-         throw new IllegalArgumentException(
-         "O inicializador não pode ser nulo."
-         );
-      }
-         
+   public void inicializar(double x){   
       for(int i = 0; i < numFiltros; i++){
          for(int j = 0; j < profEntrada; j++){
-            iniKernel.inicializar(this.filtros[i][j], x);
+            this.iniKernel.inicializar(this.filtros[i][j], x);
          }
       }
 
       if(this.usarBias){
          for(Mat b : this.bias){
-            if(iniBias == null) new Constante().inicializar(b, 0);
-            else iniBias.inicializar(b, x);
+            this.iniBias.inicializar(b, x);
          }
       }
    }
 
    @Override
-   public void configurarAtivacao(String ativacao){
+   public void configurarAtivacao(Object ativacao){
       Dicionario dic = new Dicionario();
       this.ativacao = dic.obterAtivacao(ativacao);
-   }
-
-   @Override
-   public void configurarAtivacao(Ativacao ativacao){
-      if(ativacao == null){
-         throw new IllegalArgumentException(
-            "A função de ativação não pode ser nula."
-         );
-      }
-
-      this.ativacao = ativacao;
    }
 
    @Override

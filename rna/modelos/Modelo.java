@@ -3,7 +3,6 @@ package rna.modelos;
 import rna.avaliacao.Avaliador;
 import rna.avaliacao.perda.Perda;
 import rna.camadas.Camada;
-import rna.inicializadores.Inicializador;
 import rna.otimizadores.Otimizador;
 import rna.treinamento.Treinador;
 
@@ -178,15 +177,6 @@ public abstract class Modelo{
    /**
     * Inicializa os parâmetros necessários para cada camada do modelo,
     * além de gerar os valores iniciais para os kernels e bias.
-    * @param otimizador otimizador usando para ajustar os parâmetros treinavéis do modelo.
-    * @param perda função de perda usada para o treinamento do modelo.
-    * @param iniKernel inicializador para os kernels.
-    */
-   public abstract void compilar(Object otimizador, Object perda, Inicializador iniKernel);
-
-   /**
-    * Inicializa os parâmetros necessários para cada camada do modelo,
-    * além de gerar os valores iniciais para os kernels e bias.
     * <p>
     *    Caso nenhuma configuração inicial seja feita, o modelo será inicializado com os argumentos padrões. 
     * </p>
@@ -196,10 +186,8 @@ public abstract class Modelo{
     * </p>
     * @param otimizador otimizador usando para ajustar os parâmetros treinavéis do modelo.
     * @param perda função de perda usada para o treinamento do modelo.
-    * @param iniKernel inicializador para os kernels.
-    * @param iniBias inicializador para os bias.
     */
-   public abstract void compilar(Object otimizador, Object perda, Inicializador iniKernel, Inicializador iniBias);
+   public abstract void compilar(Object otimizador, Object perda);
 
    /**
     * Auxiliar na verificação da compilação do modelo.

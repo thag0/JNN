@@ -5,7 +5,6 @@ import lib.ged.Ged;
 import rna.camadas.Camada;
 import rna.camadas.Densa;
 import rna.core.Mat;
-import rna.inicializadores.Xavier;
 import rna.modelos.Modelo;
 import rna.modelos.Sequencial;
 
@@ -34,7 +33,7 @@ public class Interpretabilidade{
          new Densa(tamSaida, "sigmoid")
       });
       modelo.configurarSeed(222222222);
-      modelo.compilar("adagrad", "mse", new Xavier());
+      modelo.compilar("adagrad", "mse");
       modelo.configurarHistorico(true);
       modelo.treinar(entrada, saida, 800, false);
       

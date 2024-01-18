@@ -3,7 +3,6 @@ package testes;
 import lib.ged.Dados;
 import lib.ged.Ged;
 import rna.camadas.*;
-import rna.inicializadores.Xavier;
 import rna.modelos.*;
 
 public class TesteTreino{
@@ -26,11 +25,11 @@ public class TesteTreino{
       };
 
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Densa(2, 3, "sigmoid"),
-         new Densa(1, "sigmoid")
+         new Densa(2, 3, "sigmoid", "xavier"),
+         new Densa(1, "sigmoid", "xavier")
       });
       
-      modelo.compilar("adagrad", "mse", new Xavier(), new Xavier());
+      modelo.compilar("adagrad", "mse");
       modelo.treinar(entrada, saida, 3_000, false);
       verificar(entrada, saida, modelo);
    }

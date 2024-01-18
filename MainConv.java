@@ -6,7 +6,6 @@ import lib.ged.Ged;
 import lib.geim.Geim;
 import rna.avaliacao.perda.*;
 import rna.camadas.*;
-import rna.inicializadores.*;
 import rna.modelos.Modelo;
 import rna.modelos.Sequencial;
 import rna.otimizadores.SGD;
@@ -110,11 +109,7 @@ public class MainConv{
          new Densa(NUM_DIGITOS_TREINO, "softmax"),
       });
 
-      modelo.compilar(
-         new SGD(0.001, 0.99),
-         new EntropiaCruzada(),
-         new He()
-      );
+      modelo.compilar(new SGD(0.001, 0.99), new EntropiaCruzada());
 
       return modelo;
    }
