@@ -56,7 +56,7 @@ public class Interpretabilidade{
       }
 
       System.out.println();
-      // exibirParametros(camadas);
+      exibirParametros(camadas);
 
       double[][] pred = obterPredicoes(camadas, entrada);
       Mat neuronio1 = new Mat(pred[0]);
@@ -103,8 +103,6 @@ public class Interpretabilidade{
             " P: " + modelo.saidaParaArray()[0]
          );
       }
-      
-      System.out.println("\nPerda: " + modelo.avaliar(entrada, saida));
    }
 
    static void exportarHistorico(Modelo modelo, String caminho){
