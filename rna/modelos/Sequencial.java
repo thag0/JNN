@@ -262,7 +262,7 @@ public class Sequencial extends Modelo implements Cloneable{
       
       for(int i = 1; i < this.camadas.length; i++){
          this.camadas[i].construir(this.camadas[i-1].formatoSaida());
-         this.camadas[i].inicializar(iniKernel, iniBias, 0.5);
+         this.camadas[i].inicializar(iniKernel, iniBias, 1);
          this.camadas[i].configurarId(i);
       }
 

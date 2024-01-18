@@ -33,9 +33,10 @@ public class Interpretabilidade{
          new Densa(tamEntrada, 2, "sigmoid"),
          new Densa(tamSaida, "sigmoid")
       });
-      modelo.compilar("adagrad", "mse", new Xavier(), new Xavier());
+      modelo.configurarSeed(222222222);
+      modelo.compilar("adagrad", "mse", new Xavier());
       modelo.configurarHistorico(true);
-      modelo.treinar(entrada, saida, 2_000, false);
+      modelo.treinar(entrada, saida, 800, false);
       
       //avaliação de resultados
       System.out.println("Perda: " + modelo.avaliar(entrada, saida));
@@ -44,7 +45,9 @@ public class Interpretabilidade{
       //gráfico de perda durante o treino
       String caminhoHistorico = "historico-perda";
       exportarHistorico(modelo, caminhoHistorico);
-      new Thread(() -> executarComando("python grafico.py " + caminhoHistorico)).start();
+      new Thread(() -> {
+         executarComando("python grafico.py " + caminhoHistorico);
+      }).start();
 
       //"Interpretabilidade"
       Densa[] camadas = new Densa[modelo.numCamadas()];
@@ -66,7 +69,6 @@ public class Interpretabilidade{
       neuronio1.print("neuronio 1", 4);
       neuronio2.print("neuronio 2", 4);
       neuronio3.print("neuronio 3", 4);
-      
    }
 
    static double[][] obterPredicoes(Densa[] camadas, double[][] entrada){
