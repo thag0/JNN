@@ -21,6 +21,17 @@ import rna.avaliacao.perda.MSE;
 import rna.avaliacao.perda.MSLE;
 import rna.avaliacao.perda.Perda;
 import rna.avaliacao.perda.RMSE;
+import rna.inicializadores.Aleatorio;
+import rna.inicializadores.AleatorioPositivo;
+import rna.inicializadores.Constante;
+import rna.inicializadores.Gaussiano;
+import rna.inicializadores.Glorot;
+import rna.inicializadores.He;
+import rna.inicializadores.Identidade;
+import rna.inicializadores.Inicializador;
+import rna.inicializadores.LeCun;
+import rna.inicializadores.Xavier;
+import rna.inicializadores.Zeros;
 import rna.otimizadores.AMSGrad;
 import rna.otimizadores.AdaGrad;
 import rna.otimizadores.Adadelta;
@@ -117,5 +128,30 @@ public class Dicionario{
             "Função de perda \"" + nome + "\" não encontada."
          );
       }      
+   }
+
+   /**
+    * Converte o texto lido em uma instância de inicializador
+    * @param nome nome do inicializador.
+    * @return instância do inicializador lido.
+    */
+   public Inicializador obterInicializador(String nome){
+      nome = nome.toLowerCase();
+      switch(nome){
+         case "aleatorio"           : return new Aleatorio();
+         case "aleatoriopositivo"   : return new AleatorioPositivo();
+         case "constante"           : return new Constante();
+         case "gaussiano"           : return new Gaussiano();
+         case "glorot"              : return new Glorot();
+         case "he"                  : return new He();
+         case "identidade"          : return new Identidade();
+         case "lecun"               : return new LeCun();
+         case "xavier"              : return new Xavier();
+         case "zeros"               : return new Zeros();
+         
+         default: throw new IllegalArgumentException(
+            "Inicializador \"" + nome + "\" não encontado."
+         );
+      }
    }
 }
