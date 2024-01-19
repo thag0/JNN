@@ -7,8 +7,8 @@ import rna.core.Mat;
 import rna.core.OpMatriz;
 import rna.core.Utils;
 import rna.inicializadores.Inicializador;
-
-//TODO implementar ajustes para os inicializadores da camada
+import rna.inicializadores.Xavier;
+import rna.inicializadores.Zeros;
 
 /**
  * <h2>
@@ -231,17 +231,17 @@ public class Convolucional extends Camada implements Cloneable{
    /**
     * Função de ativação da camada.
     */
-   Ativacao ativacao = null;
+   Ativacao ativacao = new Linear();
 
    /**
     * Inicializador para os pesos da camada.
     */
-   private Inicializador iniKernel;
+   private Inicializador iniKernel = new Xavier();
 
    /**
     * Inicializador para os bias da camada.
     */
-   private Inicializador iniBias;
+   private Inicializador iniBias = new Zeros();
 
    /**
     * Instancia uma camada convolucional de acordo com os formatos fornecidos.
@@ -625,10 +625,6 @@ public class Convolucional extends Camada implements Cloneable{
          for(Mat camada : filtro){
             this.numParamsKernel += camada.tamanho();
          }
-      }
-
-      if(ativacao == null){
-         this.ativacao = new Linear();
       }
       
       this.treinavel = true;

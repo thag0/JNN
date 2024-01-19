@@ -196,7 +196,7 @@ public class Densa extends Camada implements Cloneable{
    /**
     * Função de ativação da camada
     */
-   private Ativacao ativacao = null;
+   private Ativacao ativacao = new Linear();
 
    /**
     * Inicializador para os pesos da camada.
@@ -233,11 +233,9 @@ public class Densa extends Camada implements Cloneable{
       this.numNeuronios = n;
       this.usarBias = usarBias;
 
-      if(ativacao == null) this.ativacao = new Linear();
-      else configurarAtivacao(ativacao);
-
       //usar os valores padrão se necessário
       Dicionario dic = new Dicionario();
+      if(ativacao != null) this.ativacao = dic.obterAtivacao(ativacao);
       if(iniKernel != null) this.iniKernel = dic.obterInicializador(iniKernel);
       if(iniBias != null)  this.iniBias = dic.obterInicializador(iniBias);
    
