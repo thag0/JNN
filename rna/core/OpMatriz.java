@@ -448,8 +448,8 @@ public class OpMatriz{
    } 
 
    /**
-    * Implementação especializada para as camadas convolucionais aproveitarem
-    * um pouco do paralelismo para acelerar o processo de aprendizado.
+    * Implementação especializada para a propação direta de camadas convolucionais,
+    * para que aproveitem um pouco do paralelismo para acelerar o processo de aprendizado.
     * @param entrada conjunto de entradas.
     * @param filtros conjuntos de filtros.
     * @param saida matriz de resultados onde serão armazenados os valores calculados.

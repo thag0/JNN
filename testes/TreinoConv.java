@@ -25,15 +25,15 @@ public class TreinoConv{
       ged.limparConsole();
       
       Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/conv-mnist-91.txt");
-      modelo.info();
+      // modelo.info();
       // testarModelo(modelo, digitos, amostras);
       // testarTodosDados(modelo);
 
       // tempoForward(modelo);
-      // tempoBackward(modelo);
+      tempoBackward(modelo);
 
-      long t = medirTempo(() -> modelo.otimizador().atualizar(modelo.camadas()));
-      System.out.println("Tempo otimizador: " + TimeUnit.NANOSECONDS.toMillis(t) + "ms"); 
+      // long t = medirTempo(() -> modelo.otimizador().atualizar(modelo.camadas()));
+      // System.out.println("Tempo otimizador: " + TimeUnit.NANOSECONDS.toMillis(t) + "ms"); 
    }
 
    static void testarTodosDados(Sequencial modelo){

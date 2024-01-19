@@ -756,15 +756,15 @@ public class Convolucional extends Camada implements Cloneable{
       utils.copiar(grads, this.gradSaida);
 
       this.ativacao.derivada(this);
-      for(Mat gradE : this.gradEntrada){
-         gradE.preencher(0);
+      for(int i = 0; i < this.profEntrada; i++){
+         this.gradEntrada[i].preencher(0);
       }
 
       //backward
-      for(int i = 0; i < this.numFiltros; i++){
-         for(int j = 0; j < this.profEntrada; j++){
-            opmat.correlacaoCruzada(this.entrada[j], this.derivada[i], this.gradFiltros[i][j], false);
-            opmat.convolucaoFull(this.derivada[i], this.filtros[i][j], this.gradEntrada[j], true);
+      for(int i = 0; i < this.profEntrada; i++){
+         for(int j = 0; j < this.numFiltros; j++){
+            opmat.correlacaoCruzada(this.entrada[i], this.derivada[j], this.gradFiltros[j][i], false);
+            opmat.convolucaoFull(this.derivada[j], this.filtros[j][i], this.gradEntrada[i], true);
          }
       }
 
