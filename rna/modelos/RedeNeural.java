@@ -497,13 +497,15 @@ public class RedeNeural extends Modelo implements Cloneable{
    @Override
    public void compilar(Object otimizador, Object perda){
       this.camadas = new Densa[this.arquitetura.length-1];
-      this.camadas[0] = new Densa(this.arquitetura[0], this.arquitetura[1], this.bias);
+      this.camadas[0] = new Densa(this.arquitetura[0], this.arquitetura[1]);
+      this.camadas[0].configurarBias(this.bias);
 
       Dicionario dic = new Dicionario();
       for(int i = 1; i < this.camadas.length; i++){
          this.camadas[i] = new Densa(
-            this.camadas[i-1].formatoSaida()[1], this.arquitetura[i+1], this.bias
+            this.camadas[i-1].formatoSaida()[1], this.arquitetura[i+1]
          );
+         this.camadas[i].configurarBias(this.bias);
          this.camadas[i].configurarId(i);
          if(this.seedInicial != 0) this.camadas[i].configurarSeed(this.seedInicial);
          this.camadas[i].inicializar(alcancePeso);

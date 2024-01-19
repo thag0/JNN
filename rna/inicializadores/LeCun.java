@@ -30,7 +30,9 @@ public class LeCun extends Inicializador{
    public void inicializar(Mat m, double x){
       double a = Math.sqrt(1.0 / m.lin());
       m.forEach((i, j) -> {
-         m.editar(i, j, (a * super.random.nextGaussian()));
+         m.editar(i, j, (
+            a * (2.0 * super.random.nextDouble()) - 1
+         ));
       }); 
    }
 }

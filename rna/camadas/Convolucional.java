@@ -143,7 +143,7 @@ public class Convolucional extends Camada implements Cloneable{
    /**
     * Auxiliar na verificação de uso do bias.
     */
-   private boolean usarBias;
+   private boolean usarBias = true;
 
    /**
     * Array de matrizes contendo valores de somatório para cada valor de 
@@ -769,9 +769,7 @@ public class Convolucional extends Camada implements Cloneable{
       }
 
       if(this.usarBias){
-         for(int i = 0; i < this.gradBias.length; i++){
-            this.gradBias[i].copiar(this.derivada[i]);
-         }
+         utils.copiar(this.derivada, this.gradBias);
       }
    }
 

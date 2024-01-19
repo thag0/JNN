@@ -9,6 +9,7 @@ import rna.camadas.Convolucional;
 import rna.camadas.Densa;
 import rna.camadas.Flatten;
 import rna.camadas.MaxPooling;
+import rna.core.Mat;
 import rna.core.OpMatriz;
 import rna.modelos.Sequencial;
 import rna.serializacao.Serializador;
@@ -26,6 +27,7 @@ public class TreinoConv{
       
       Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/conv-mnist-89.txt");
       // testarModelo(modelo, digitos, amostras);
+      // testarTodosDados(modelo);
 
       double[][] img = imagemParaMatriz("/dados/mnist/teste/0/img_0.jpg");
       double[][][] entrada = new double[1][][];
@@ -39,32 +41,38 @@ public class TreinoConv{
       Densa d1 = (Densa) modelo.camada(5);
       Densa d2 = (Densa) modelo.camada(6);
 
+      double[] grad = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
       long t;
-      t = medirTempo(() -> modelo.calcularSaida(entrada));
-      System.out.println("forward mod: \t" + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
+      t = medirTempo(() -> d2.calcularGradiente(new Mat(grad)));
+      System.out.println("backward den2:  \t " + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
+      
+      t = medirTempo(() -> d1.calcularGradiente(d2.obterGradEntrada()));
+      System.out.println("backward den1:  \t " + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
+      
+      t = medirTempo(() -> flat.calcularGradiente(d1.obterGradEntrada()));
+      System.out.println("backward flat:  \t " + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
+      
+      t = medirTempo(() -> max2.calcularGradiente(flat.obterGradEntrada()));
+      System.out.println("backward max2:  \t " + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
+      
+      t = medirTempo(() -> conv2.calcularGradiente(max2.obterGradEntrada()));
+      System.out.println("backward conv2:  \t " + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
+      
+      t = medirTempo(() -> max1.calcularGradiente(conv2.obterGradEntrada()));
+      System.out.println("backward max1:  \t " + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
+      
+      t = medirTempo(() -> conv1.calcularGradiente(max1.obterGradEntrada()));
+      System.out.println("backward conv1:  \t " + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
+   }
 
-      t = medirTempo(() -> conv1.calcularSaida(entrada));
-      System.out.println("forward conv1: \t" + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
-      
-      t = medirTempo(() -> max1.calcularSaida(conv1.saida()));
-      System.out.println("forward max1: \t" + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
-      
-      t = medirTempo(() -> conv2.calcularSaida(max1.saida()));
-      System.out.println("forward conv2: \t" + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
-      
-      t = medirTempo(() -> max2.calcularSaida(conv2.saida()));
-      System.out.println("forward conv2: \t" + TimeUnit.NANOSECONDS.toMillis(t) + "ms");    
-      
-      t = medirTempo(() -> flat.calcularSaida(max2.saida()));
-      System.out.println("forward flat: \t" + TimeUnit.NANOSECONDS.toMillis(t) + "ms");    
-      
-      t = medirTempo(() -> d1.calcularSaida(flat.saida()));
-      System.out.println("forward d1: \t" + TimeUnit.NANOSECONDS.toMillis(t) + "ms");    
-      
-      t = medirTempo(() -> d2.calcularSaida(d1.saida()));
-      System.out.println("forward d2: \t" + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
-
-      System.out.println("Prev: " + maiorIndice(d2.saida.paraArray()));
+   static void testarTodosDados(Sequencial modelo){
+      for(int i = 0; i < digitos; i++){
+         for(int j = 0; j < amostras; j++){
+            testarPrevisao(modelo, (i + "/img_" + j), false);
+         }
+         System.out.println();
+      }
    }
 
    static long medirTempo(Runnable func){
@@ -77,9 +85,8 @@ public class TreinoConv{
       var testeX = carregarDadosMNIST("/dados/mnist/teste/", amostras, digitos);
       var testeY = criarRotulosMNIST(amostras, digitos);
 
-      double perda = modelo.avaliador.entropiaCruzada(testeX, testeY);
       double acuraria = modelo.avaliador.acuracia(testeX, testeY);
-      System.out.println("Perda: " + perda);
+      System.out.println("Perda: " + modelo.avaliar(testeX, testeY));
       System.out.println("Acurácia: " + acuraria + "%");
    }
 

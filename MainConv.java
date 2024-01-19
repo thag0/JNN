@@ -4,7 +4,6 @@ import java.util.concurrent.TimeUnit;
 import lib.ged.Dados;
 import lib.ged.Ged;
 import lib.geim.Geim;
-import rna.avaliacao.perda.*;
 import rna.camadas.*;
 import rna.modelos.Modelo;
 import rna.modelos.Sequencial;
@@ -98,18 +97,18 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{3, 3}, 48, "leakyrelu"),
+         new Convolucional(formEntrada, new int[]{3, 3}, 44, "leakyrelu", "he"),
          new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{3, 3}, 48, "leakyrelu"),
+         new Convolucional(new int[]{3, 3}, 44, "leakyrelu", "he"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(134, "sigmoid"),
+         new Densa(128, "sigmoid", "xavier"),
          new Dropout(0.25),
-         new Densa(68, "sigmoid"),
-         new Densa(NUM_DIGITOS_TREINO, "softmax"),
+         new Densa(64, "sigmoid", "xavier"),
+         new Densa(NUM_DIGITOS_TREINO, "softmax", "he"),
       });
 
-      modelo.compilar(new SGD(0.001, 0.99), new EntropiaCruzada());
+      modelo.compilar(new SGD(0.001, 0.99), "entropiacruzada");
 
       return modelo;
    }

@@ -55,6 +55,19 @@ public class Dicionario{
    public Dicionario(){}
 
    /**
+    * Remove caracteres especiais.
+    * @param nome nome de alguma instância que o dicionário lê.
+    * @return valor do nome tratado.
+    */
+   private String tratarNome(String nome){
+      nome = nome.trim();
+      nome = nome.replace("_", "");
+      nome = nome.replace("-", "");
+      nome = nome.replace(".", "");
+      return nome;
+   }
+
+   /**
     * Converte a ativação lida em uma instância de função
     * de ativação correspondente.
     * @param ativacao tipo função de ativação.
@@ -71,6 +84,7 @@ public class Dicionario{
       
       }else if(ativacao instanceof String){
          String nome = (String) ativacao;
+         nome = tratarNome(nome);
          switch(nome.toLowerCase()){
             case "argmax"     : return new Argmax();
             case "elu"        : return new ELU();
@@ -114,6 +128,7 @@ public class Dicionario{
 
       }else if(otimizador instanceof String){
          String nome = (String) otimizador;
+         nome = tratarNome(nome);
          switch(nome.toLowerCase()){
             case "adadelta":  return new Adadelta();
             case "adagrad":   return new AdaGrad();
@@ -152,6 +167,7 @@ public class Dicionario{
 
       }else if(perda instanceof String){
          String nome = (String) perda;
+         nome = tratarNome(nome);
          switch(nome.toLowerCase()){
             case "mse"                    : return new MSE();
             case "mae"                    : return new MAE();
@@ -188,6 +204,7 @@ public class Dicionario{
       
       }else if(inicializador instanceof String){
          String nome = (String) inicializador;
+         nome = tratarNome(nome);
          switch(nome.toLowerCase()){
             case "aleatorio"           : return new Aleatorio();
             case "aleatoriopositivo"   : return new AleatorioPositivo();
