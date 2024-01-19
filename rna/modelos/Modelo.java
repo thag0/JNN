@@ -28,13 +28,12 @@ public abstract class Modelo{
    public boolean compilado;
 
    /**
-    * Função de perda usada durante o processo de treinamento.
+    * Função de perda para avaliar o erro durante o treino.
     */
    protected Perda perda;
 
     /**
-     * Otimizador que será utilizado durante o processo de aprendizagem da
-     * da Rede Neural.
+     * Otimizador usado para ajuste de parâmetros treináveis.
      */
    protected Otimizador otimizador;
 
@@ -60,11 +59,11 @@ public abstract class Modelo{
    protected boolean calcularHistorico = false;
 
    /**
-    * Responsável pelo retorno de desempenho da Rede Neural.
+    * Responsável pelo retorno de desempenho do modelo.
     * Contém implementações de métodos tanto para cálculo de perdas
     * quanto de métricas.
     * <p>
-    *    Cada instância de rede neural possui seu próprio avaliador.
+    *    Cada modelo possui seu próprio avaliador.
     * </p>
     */
    public Avaliador avaliador = new Avaliador(this);
@@ -87,7 +86,7 @@ public abstract class Modelo{
     *    O nome padrão é o mesmo nome da classe.
     * </p>
     * @param nome novo nome da rede.
-    * @throws IllegalArgumentException se o novo nome for uulo ou inválido.
+    * @throws IllegalArgumentException se o novo nome for nulo ou inválido.
     */
    public void configurarNome(String nome){
       if(nome == null){
@@ -121,7 +120,7 @@ public abstract class Modelo{
     * função de custo/perda de cada época.
     * <p>
     *    Calcular a perda é uma operação que pode ser computacionalmente cara dependendo do 
-    *    tamanho da rede e do conjunto de dados, então deve ser bem avaliado querer habilitar 
+    *    tamanho do modelo e do conjunto de dados, então deve ser bem avaliado querer habilitar 
     *    ou não esse recurso.
     * </p>
     * <p>
@@ -148,7 +147,7 @@ public abstract class Modelo{
    }
 
    /**
-    * Configura o novo otimizador do Modelo com base numa nova instância de otimizador.
+    * Configura o novo otimizador do modelo com base numa nova instância de otimizador.
     * <p>
     *    Configurando o otimizador passando diretamente uma nova instância permite configurar
     *    os hiperparâmetros do otimizador fora dos valores padrão, o que pode ajudar a
@@ -178,14 +177,21 @@ public abstract class Modelo{
     * Inicializa os parâmetros necessários para cada camada do modelo,
     * além de gerar os valores iniciais para os kernels e bias.
     * <p>
-    *    Caso nenhuma configuração inicial seja feita, o modelo será inicializado com os argumentos padrões. 
+    *    Caso nenhuma configuração inicial seja feita ou sejam fornecidos apenas 
+    *    nomes referenciando os objetos desejados, o modelo será compilado com os 
+    *    valores padrões. 
     * </p>
     * <p>
-    *    Para treinar o modelo deve-se fazer uso da função função {@code treinar()} informando os 
-    *    dados necessários para a rede.
+    *    Otimizadores podem ser recebidos usando instâncias pré configuradas, essas 
+    *    intâncias dão a liberdade de inicializar o otimizador com valores personalizáveis 
+    *    para seus parâmetros (como taxa de aprendizagem, por exemplo).
+    * </p>
+    * <p>
+    *    Para treinar o modelo deve-se fazer uso da função função {@code treinar()} informando 
+    *    os dados necessários para treino.
     * </p>
     * @param otimizador otimizador usando para ajustar os parâmetros treinavéis do modelo.
-    * @param perda função de perda usada para o treinamento do modelo.
+    * @param perda função de perda usada para avaliar o erro do modelo durante o treino.
     */
    public abstract void compilar(Object otimizador, Object perda);
 

@@ -1,14 +1,13 @@
 package testes;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
+import lib.ged.Dados;
 import lib.ged.Ged;
 import lib.geim.Geim;
-import rna.camadas.Convolucional;
-import rna.camadas.Densa;
-import rna.camadas.Flatten;
-import rna.camadas.MaxPooling;
+import rna.camadas.Camada;
 import rna.core.Mat;
 import rna.core.OpMatriz;
 import rna.modelos.Sequencial;
@@ -25,45 +24,16 @@ public class TreinoConv{
    public static void main(String[] args){
       ged.limparConsole();
       
-      Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/conv-mnist-89.txt");
+      Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/conv-mnist-91.txt");
+      modelo.info();
       // testarModelo(modelo, digitos, amostras);
       // testarTodosDados(modelo);
 
-      double[][] img = imagemParaMatriz("/dados/mnist/teste/0/img_0.jpg");
-      double[][][] entrada = new double[1][][];
-      entrada[0] = img;
+      // tempoForward(modelo);
+      // tempoBackward(modelo);
 
-      Convolucional conv1 = (Convolucional) modelo.camada(0);
-      MaxPooling max1 = (MaxPooling) modelo.camada(1);
-      Convolucional conv2 = (Convolucional) modelo.camada(2);
-      MaxPooling max2 = (MaxPooling) modelo.camada(3);
-      Flatten flat = (Flatten) modelo.camada(4);
-      Densa d1 = (Densa) modelo.camada(5);
-      Densa d2 = (Densa) modelo.camada(6);
-
-      double[] grad = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-      long t;
-      t = medirTempo(() -> d2.calcularGradiente(new Mat(grad)));
-      System.out.println("backward den2:  \t " + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
-      
-      t = medirTempo(() -> d1.calcularGradiente(d2.obterGradEntrada()));
-      System.out.println("backward den1:  \t " + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
-      
-      t = medirTempo(() -> flat.calcularGradiente(d1.obterGradEntrada()));
-      System.out.println("backward flat:  \t " + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
-      
-      t = medirTempo(() -> max2.calcularGradiente(flat.obterGradEntrada()));
-      System.out.println("backward max2:  \t " + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
-      
-      t = medirTempo(() -> conv2.calcularGradiente(max2.obterGradEntrada()));
-      System.out.println("backward conv2:  \t " + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
-      
-      t = medirTempo(() -> max1.calcularGradiente(conv2.obterGradEntrada()));
-      System.out.println("backward max1:  \t " + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
-      
-      t = medirTempo(() -> conv1.calcularGradiente(max1.obterGradEntrada()));
-      System.out.println("backward conv1:  \t " + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
+      long t = medirTempo(() -> modelo.otimizador().atualizar(modelo.camadas()));
+      System.out.println("Tempo otimizador: " + TimeUnit.NANOSECONDS.toMillis(t) + "ms"); 
    }
 
    static void testarTodosDados(Sequencial modelo){
@@ -79,6 +49,89 @@ public class TreinoConv{
       long t1 = System.nanoTime();
       func.run();
       return System.nanoTime() - t1;
+   }
+
+   static void tempoForward(Sequencial modelo){
+      //arbritário
+      double[][] img = imagemParaMatriz("/dados/mnist/teste/0/img_0.jpg");
+      double[][][] entrada = new double[1][][];
+      entrada[0] = img;
+
+      int n = modelo.numCamadas();
+      long t, total = 0;
+
+      Dados dados = new Dados();
+      dados.editarNome("Tempos Forward");
+      ArrayList<String[]> conteudo = new ArrayList<>();
+
+      t = medirTempo(() -> modelo.camada(0).calcularSaida(entrada));
+      conteudo.add(new String[]{
+         modelo.camada(0).nome(),
+         String.valueOf(TimeUnit.NANOSECONDS.toMillis(t)) + " ms"        
+      });
+      total += t;
+      
+      for(int i = 1; i < n; i++){
+         Camada atual = modelo.camada(i);
+         Camada anterior = modelo.camada(i-1);
+         t = medirTempo(() -> {
+            atual.calcularSaida(anterior.saida());
+         });
+         total += t;
+
+         conteudo.add(new String[]{
+            modelo.camada(i).nome(),
+            String.valueOf(TimeUnit.NANOSECONDS.toMillis(t)) + " ms"        
+         });
+      }
+      conteudo.add(new String[]{
+         "Tempo total", 
+         String.valueOf(TimeUnit.NANOSECONDS.toMillis(total)) + " ms"
+      });
+
+      dados.atribuir(conteudo);
+      dados.imprimir();
+   }
+
+   static void tempoBackward(Sequencial modelo){
+      //arbritário
+      double[] grad = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+      int n = modelo.numCamadas();
+      long t, total = 0;
+
+      Dados dados = new Dados();
+      dados.editarNome("Tempos Backward");
+      ArrayList<String[]> conteudo = new ArrayList<>();
+
+      t = medirTempo(() -> modelo.camada(n-1).calcularGradiente(new Mat(grad)));
+      conteudo.add(new String[]{
+         modelo.camada(n-1).nome(),
+         String.valueOf(TimeUnit.NANOSECONDS.toMillis(t)) + " ms"        
+      });
+      total += t;
+      
+      for(int i = n-2; i >= 0; i--){
+         final int id = i;
+         Camada atual = modelo.camada(id);
+         Camada proxima = modelo.camada(id+1);
+         t = medirTempo(() -> {
+            atual.calcularGradiente(proxima.obterGradEntrada());
+         });
+         total += t;
+
+         conteudo.add(new String[]{
+            modelo.camada(i).nome(),
+            String.valueOf(TimeUnit.NANOSECONDS.toMillis(t)) + " ms"        
+         });
+      }
+      conteudo.add(new String[]{
+         "Tempo total",
+         String.valueOf(TimeUnit.NANOSECONDS.toMillis(total)) + " ms"        
+      });
+
+      dados.atribuir(conteudo);
+      dados.imprimir();
    }
 
    static void testarModelo(Sequencial modelo, int digitos, int amostras){

@@ -7,7 +7,6 @@ import lib.geim.Geim;
 import rna.camadas.*;
 import rna.modelos.Modelo;
 import rna.modelos.Sequencial;
-import rna.otimizadores.SGD;
 import rna.serializacao.Serializador;
 
 public class MainConv{
@@ -105,10 +104,10 @@ public class MainConv{
          new Densa(128, "sigmoid", "xavier"),
          new Dropout(0.25),
          new Densa(64, "sigmoid", "xavier"),
-         new Densa(NUM_DIGITOS_TREINO, "softmax", "he"),
+         new Densa(NUM_DIGITOS_TREINO, "softmax", "he")
       });
 
-      modelo.compilar(new SGD(0.001, 0.99), "entropiacruzada");
+      modelo.compilar("sgd", "entropia-cruzada");
 
       return modelo;
    }

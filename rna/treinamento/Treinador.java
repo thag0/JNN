@@ -100,6 +100,11 @@ public class Treinador{
          );
       }
 
+      // por enquanto só pra uso da camada de dropout
+      for(int i = 0; i < modelo.numCamadas(); i++){
+         modelo.camada(i).configurarTreino(true);
+      }
+
       if(tamLote > 1){
          treinoLote.treinar(
             modelo,
@@ -120,6 +125,10 @@ public class Treinador{
             logs
          );
          treino.ultimoUsado = true;
+      }
+
+      for(int i = 0; i < modelo.numCamadas(); i++){
+         modelo.camada(i).configurarTreino(false);
       }
 
       treino.ultimoUsado = treinoLote.ultimoUsado ? false : true;

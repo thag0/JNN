@@ -77,7 +77,7 @@ class Treino{
          }
 
          if(logs & (e % 5 == 0)){
-            System.out.println("Perda (" + e + "): " + (double)(perdaEpoca/entrada.length));
+            System.out.println("Perda (época " + e + "): " + (double)(perdaEpoca/entrada.length));
          }
 
          //feedback de avanço da rede

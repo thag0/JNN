@@ -199,7 +199,7 @@ public class Sequencial extends Modelo implements Cloneable{
       }
 
       Camada[] c = this.camadas;
-      this.camadas = new Camada[c.length+1];
+      this.camadas = new Camada[c.length + 1];
 
       for(int i = 0; i < c.length; i++){
          this.camadas[i] = c[i];
@@ -216,7 +216,7 @@ public class Sequencial extends Modelo implements Cloneable{
     * camada disponível.
     */
    public Camada sub(){
-      if(this.camadas.length == 0){
+      if(this.camadas.length < 1){
          throw new IllegalArgumentException(
             "Não há camadas no modelo."
          );
@@ -260,13 +260,8 @@ public class Sequencial extends Modelo implements Cloneable{
    public void calcularSaida(Object entrada){
       super.verificarCompilacao();
 
-      int n = this.numCamadas();
-      for(int i = 0; i < n; i++){
-         this.camadas[i].configurarTreino(false);
-      }
-
       this.camadas[0].calcularSaida(entrada);
-      for(int i = 1; i < n; i++){
+      for(int i = 1; i < this.camadas.length; i++){
          this.camadas[i].calcularSaida(this.camadas[i-1].saida());
       }
    }
@@ -274,11 +269,6 @@ public class Sequencial extends Modelo implements Cloneable{
    @Override
    public Object[] calcularSaidas(Object[] entradas){
       super.verificarCompilacao();
-
-      int n = this.numCamadas();
-      for(int i = 0; i < n; i++){
-         this.camadas[i].configurarTreino(false);
-      }
 
       double[][] previsoes = new double[entradas.length][];
 
@@ -307,10 +297,6 @@ public class Sequencial extends Modelo implements Cloneable{
          );
       }
 
-      for(int i = 0; i < this.numCamadas(); i++){
-         this.camadas[i].configurarTreino(true);
-      }
-
       treinador.treino(this, entradas, saidas, epochs, logs);
    }
    
@@ -318,19 +304,15 @@ public class Sequencial extends Modelo implements Cloneable{
    public void treinar(Object[] entradas, Object[] saidas, int epochs, int tamLote, boolean logs){
      super.verificarCompilacao();
 
-     if(epochs < 1){
-        throw new IllegalArgumentException(
-           "O valor de epochs (" + epochs + ") não pode ser menor que um"
-        );
-     }
-     if(tamLote <= 0 || tamLote > entradas.length){
-        throw new IllegalArgumentException(
-           "O valor de tamanho do lote (" + tamLote + ") é inválido."
-        );
-     }
-
-     for(int i = 0; i < this.numCamadas(); i++){
-      this.camadas[i].configurarTreino(true);
+      if(epochs < 1){
+         throw new IllegalArgumentException(
+            "O valor de epochs (" + epochs + ") não pode ser menor que um"
+         );
+      }
+      if(tamLote <= 0 || tamLote > entradas.length){
+         throw new IllegalArgumentException(
+            "O valor de tamanho do lote (" + tamLote + ") é inválido."
+         );
       }
 
      this.treinador.treino(
@@ -437,7 +419,7 @@ public class Sequencial extends Modelo implements Cloneable{
       //camadas
       sb.append(
          espacamento + String.format(
-         "%-23s%-23s%-23s%-23s\n", "Camada", "Formato de Entrada", "Formato de Saída", "Ativação"
+         "%-23s%-23s%-23s%-23s\n", "Camada", "Entrada", "Saída", "Ativação"
          )
       );
 
