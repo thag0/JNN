@@ -72,11 +72,11 @@ public class MainConv{
    }
 
    /**
-    * 
-    * @param modelo
-    * @param entradas
-    * @param saidas
-    * @param epochs
+    * Executa o treino numa thread separada.
+    * @param modelo modelo.
+    * @param entradas dados de entrada.
+    * @param saidas dados de saída correspondente a entrada.
+    * @param epochs épocas de treino.
     */
    static void rodarTreino(Sequencial modelo, double[][][][] entradas, double[][] saidas, int epochs){
       try{

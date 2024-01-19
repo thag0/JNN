@@ -261,167 +261,43 @@ public class Convolucional extends Camada implements Cloneable{
     *    formFiltro = (altura, largura)
     * </pre>
     * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-    * @param formFiltro formato dos filtros da camada.
-    * @param filtros quantidade de filtros.
-    * @throws IllegalArgumentException se as dimensões fornecidas não correspondenrem
-    * ao padrão desejado ou se o número de filtros for menor que 1.
-    */
-   public Convolucional(int[] formFiltro, int filtros){
-      this(formFiltro, filtros, true);
-   }
-
-   /**
-    * Instancia uma camada convolucional de acordo com os formatos fornecidos.
-    * <p>
-    *    A disposição do formato de entrada deve ser da seguinte forma:
-    * </p>
-    * <pre>
-    *    formEntrada = (altura, largura, profundidade)
-    * </pre>
-    * Onde largura e altura devem corresponder as dimensões dos dados de entrada
-    * que serão processados pela camada e a profundidade diz respeito a quantidade
-    * de entradas que a camada deve processar.
-    * <p>
-    *    A disposição do formato do filtro deve ser da seguinte forma:
-    * </p>
-    * <pre>
-    *    formFiltro = (altura, largura)
-    * </pre>
-    * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-    * @param formFiltro formato dos filtros da camada.
-    * @param filtros quantidade de filtros.
-    * @param usarBias adicionar uso do bias para a camada.
-    * @throws IllegalArgumentException se as dimensões fornecidas não correspondenrem
-    * ao padrão desejado ou se o número de filtros for menor que 1.
-    */
-   public Convolucional(int[] formFiltro, int filtros, boolean usarBias){
-      if(formFiltro.length != 2){
-         throw new IllegalArgumentException(
-            "O formato do filtro deve conter 2 elementos (altura, largura)" 
-         );
-      }
-      for(int i = 0; i < formFiltro.length; i++){
-         if(formFiltro[i] < 1){
-            throw new IllegalArgumentException(
-               "O formato do filtro deve conter valores maiores do que zero." 
-            ); 
-         }
-      }
-      if(filtros < 1){
-         throw new IllegalArgumentException(
-            "A camada deve conter ao menos 1 filtro."
-         );
-      }
-
-      this.altFiltro  = formFiltro[0];
-      this.largFiltro = formFiltro[1];
-      this.numFiltros = filtros;
-      this.usarBias = usarBias;
-   }
-
-   /**
-    * Instancia uma camada convolucional de acordo com os formatos fornecidos.
-    * <p>
-    *    A disposição do formato de entrada deve ser da seguinte forma:
-    * </p>
-    * <pre>
-    *    formEntrada = (altura, largura, profundidade)
-    * </pre>
-    * Onde largura e altura devem corresponder as dimensões dos dados de entrada
-    * que serão processados pela camada e a profundidade diz respeito a quantidade
-    * de entradas que a camada deve processar.
-    * <p>
-    *    A disposição do formato do filtro deve ser da seguinte forma:
-    * </p>
-    * <pre>
-    *    formFiltro = (altura, largura)
-    * </pre>
-    * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-    * @param formFiltro formato dos filtros da camada.
-    * @param filtros quantidade de filtros.
-    * @param ativacao função de ativação para a camada.
-    */
-   public Convolucional(int[] formFiltro, int filtros, String ativacao){
-      this(formFiltro, filtros, true, ativacao);
-   }
-
-   /**
-    * Instancia uma camada convolucional de acordo com os formatos fornecidos.
-    * <p>
-    *    A disposição do formato de entrada deve ser da seguinte forma:
-    * </p>
-    * <pre>
-    *    formEntrada = (altura, largura, profundidade)
-    * </pre>
-    * Onde largura e altura devem corresponder as dimensões dos dados de entrada
-    * que serão processados pela camada e a profundidade diz respeito a quantidade
-    * de entradas que a camada deve processar.
-    * <p>
-    *    A disposição do formato do filtro deve ser da seguinte forma:
-    * </p>
-    * <pre>
-    *    formFiltro = (altura, largura)
-    * </pre>
-    * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-    * @param formFiltro formato dos filtros da camada.
-    * @param filtros quantidade de filtros.
-    * @param usarBias adicionar uso do bias para a camada.
-    * @param ativacao função de ativação para a camada.
-    */
-   public Convolucional(int[] formFiltro, int filtros, boolean usarBias, String ativacao){
-      if(formFiltro.length != 2){
-         throw new IllegalArgumentException(
-            "O formato do filtro deve conter 2 elementos (altura, largura)" 
-         );
-      }
-      for(int i = 0; i < formFiltro.length; i++){
-         if(formFiltro[i] < 1){
-            throw new IllegalArgumentException(
-               "O formato do filtro deve conter valores maiores do que zero." 
-            ); 
-         }
-      }
-      if(filtros < 1){
-         throw new IllegalArgumentException(
-            "A camada deve conter ao menos 1 filtro."
-         );
-      }
-      this.altFiltro  = formFiltro[0];
-      this.largFiltro = formFiltro[1];
-      this.numFiltros = filtros;
-      this.usarBias = usarBias;
-      this.configurarAtivacao(ativacao);
-   }
-
-   /**
-    * Instancia uma camada convolucional de acordo com os formatos fornecidos.
-    * <p>
-    *    A disposição do formato de entrada deve ser da seguinte forma:
-    * </p>
-    * <pre>
-    *    formEntrada = (altura, largura, profundidade)
-    * </pre>
-    * Onde largura e altura devem corresponder as dimensões dos dados de entrada
-    * que serão processados pela camada e a profundidade diz respeito a quantidade
-    * de entradas que a camada deve processar.
-    * <p>
-    *    A disposição do formato do filtro deve ser da seguinte forma:
-    * </p>
-    * <pre>
-    *    formFiltro = (altura, largura)
-    * </pre>
-    * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-    * <p>
-    *    O valor de uso do bias será usado como {@code true} por padrão.
-    * <p>
     * @param formEntrada formato de entrada da camada.
     * @param formFiltro formato dos filtros da camada.
     * @param filtros quantidade de filtros.
-    * @throws IllegalArgumentException se as dimensões fornecidas não correspondenrem
-    * ao padrão desejado ou se o número de filtros for menor que 1.
+    * @param ativacao função de ativação.
+    * @param iniKernel inicializador para os filtros.
+    * @param iniBias inicializador para os bias.
     */
-   public Convolucional(int[] formEntrada, int[] formFiltro, int filtros){
-      this(formEntrada, formFiltro, filtros, true);
+   public Convolucional(int[] formEntrada, int[] formFiltro, int filtros, String ativacao, Object iniKernel, Object iniBias){
+      this(formFiltro, filtros, ativacao, iniKernel, iniBias);
+
+      if(formEntrada == null){
+         throw new IllegalArgumentException(
+            "O formato de entrada não pode ser nulo."
+         );
+      }
+
+      int[] e = (int[]) formEntrada;
+      if(e.length != 3){
+         throw new IllegalArgumentException(
+            "O formato de entrada deve conter 3 elementos (altura, largura, profundidade), " +
+            "recebido: " + e.length
+         );
+      }
+      if(utils.apenasMaiorZero(e) == false){
+         throw new IllegalArgumentException(
+            "Os valores do formato de entrada devem ser maiores que zero."
+         );
+      }
+      this.altEntrada  = e[0];
+      this.largEntrada = e[1];
+      this.profEntrada = e[2];
+
+      construir(new int[]{
+         this.altEntrada,
+         this.largEntrada,
+         this.profEntrada
+      });
    }
 
    /**
@@ -442,19 +318,41 @@ public class Convolucional extends Camada implements Cloneable{
     *    formFiltro = (altura, largura)
     * </pre>
     * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-    * <p>
-    *    O valor de uso do bias será usado como {@code true} por padrão.
-    * <p>
     * @param formEntrada formato de entrada da camada.
     * @param formFiltro formato dos filtros da camada.
     * @param filtros quantidade de filtros.
-    * @param ativacao função de ativação que será usada pela camada.
-    * @throws IllegalArgumentException se as dimensões fornecidas não correspondenrem
-    * ao padrão desejado ou se o número de filtros for menor que 1.
+    * @param ativacao função de ativação.
+    * @param iniKernel inicializador para os filtros.
+    */
+   public Convolucional(int[] formEntrada, int[] formFiltro, int filtros, String ativacao, Object iniKernel){
+      this(formEntrada, formFiltro, filtros, ativacao, iniKernel, null);
+   }
+
+   /**
+    * Instancia uma camada convolucional de acordo com os formatos fornecidos.
+    * <p>
+    *    A disposição do formato de entrada deve ser da seguinte forma:
+    * </p>
+    * <pre>
+    *    formEntrada = (altura, largura, profundidade)
+    * </pre>
+    * Onde largura e altura devem corresponder as dimensões dos dados de entrada
+    * que serão processados pela camada e a profundidade diz respeito a quantidade
+    * de entradas que a camada deve processar.
+    * <p>
+    *    A disposição do formato do filtro deve ser da seguinte forma:
+    * </p>
+    * <pre>
+    *    formFiltro = (altura, largura)
+    * </pre>
+    * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
+    * @param formEntrada formato de entrada da camada.
+    * @param formFiltro formato dos filtros da camada.
+    * @param filtros quantidade de filtros.
+    * @param ativacao função de ativação.
     */
    public Convolucional(int[] formEntrada, int[] formFiltro, int filtros, String ativacao){
-      this(formEntrada, formFiltro, filtros, true);
-      this.configurarAtivacao(ativacao);
+      this(formEntrada, formFiltro, filtros, ativacao, null, null);
    }
 
    /**
@@ -475,49 +373,163 @@ public class Convolucional extends Camada implements Cloneable{
     *    formFiltro = (altura, largura)
     * </pre>
     * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
+    * @param formFiltro formato dos filtros da camada.
+    * @param filtros quantidade de filtros.
+    * @param ativacao função de ativação.
+    * @param iniKernel inicializador para os filtros.
+    * @param iniBias inicializador para os bias.
+    */
+   public Convolucional(int[] formFiltro, int filtros, String ativacao, Object iniKernel, Object iniBias){
+      if(formFiltro == null){
+         throw new IllegalArgumentException(
+            "O formato do filtro não pode ser nulo."
+         );
+      }
+
+      //formado dos filtros
+      int[] f = (int[]) formFiltro;
+      if(f.length != 2){
+         throw new IllegalArgumentException(
+            "O formato dos filtros deve conter 2 elementos (altura, largura), " +
+            "recebido: " + f.length
+         );
+      }
+      if(utils.apenasMaiorZero(f) == false){
+         throw new IllegalArgumentException(
+            "Os valores de formato para os filtros devem ser maiores que zero."
+         );      
+      }
+      this.altFiltro  = f[0];
+      this.largFiltro = f[1];
+
+      //número de filtros
+      if(filtros <= 0){
+         throw new IllegalArgumentException(
+            "O número de filtro deve ser maior que zero, recebido: " + filtros
+         );
+      }
+      this.numFiltros = filtros;
+
+      if(ativacao != null){
+         configurarAtivacao(ativacao);
+      }
+
+      Dicionario dic = new Dicionario();
+
+      if(iniKernel != null){
+         this.iniKernel = dic.obterInicializador(iniKernel);
+      }
+
+      if(iniBias != null){
+         this.iniBias = dic.obterInicializador(iniBias);
+      }      
+   }
+
+   /**
+    * Instancia uma camada convolucional de acordo com os formatos fornecidos.
+    * <p>
+    *    A disposição do formato de entrada deve ser da seguinte forma:
+    * </p>
+    * <pre>
+    *    formEntrada = (altura, largura, profundidade)
+    * </pre>
+    * Onde largura e altura devem corresponder as dimensões dos dados de entrada
+    * que serão processados pela camada e a profundidade diz respeito a quantidade
+    * de entradas que a camada deve processar.
+    * <p>
+    *    A disposição do formato do filtro deve ser da seguinte forma:
+    * </p>
+    * <pre>
+    *    formFiltro = (altura, largura)
+    * </pre>
+    * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
+    * @param formFiltro formato dos filtros da camada.
+    * @param filtros quantidade de filtros.
+    * @param ativacao função de ativação.
+    * @param iniKernel inicializador para os filtros.
+    */
+   public Convolucional(int[] formFiltro, int filtros, String ativacao, Object iniKernel){
+      this(formFiltro, filtros, ativacao, iniKernel, null);
+   }
+
+   /**
+    * Instancia uma camada convolucional de acordo com os formatos fornecidos.
+    * <p>
+    *    A disposição do formato de entrada deve ser da seguinte forma:
+    * </p>
+    * <pre>
+    *    formEntrada = (altura, largura, profundidade)
+    * </pre>
+    * Onde largura e altura devem corresponder as dimensões dos dados de entrada
+    * que serão processados pela camada e a profundidade diz respeito a quantidade
+    * de entradas que a camada deve processar.
+    * <p>
+    *    A disposição do formato do filtro deve ser da seguinte forma:
+    * </p>
+    * <pre>
+    *    formFiltro = (altura, largura)
+    * </pre>
+    * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
+    * @param formFiltro formato dos filtros da camada.
+    * @param filtros quantidade de filtros.
+    * @param ativacao função de ativação.
+    */
+   public Convolucional(int[] formFiltro, int filtros, String ativacao){
+      this(formFiltro, filtros, ativacao, null, null);
+   }
+
+   /**
+    * Instancia uma camada convolucional de acordo com os formatos fornecidos.
+    * <p>
+    *    A disposição do formato de entrada deve ser da seguinte forma:
+    * </p>
+    * <pre>
+    *    formEntrada = (altura, largura, profundidade)
+    * </pre>
+    * Onde largura e altura devem corresponder as dimensões dos dados de entrada
+    * que serão processados pela camada e a profundidade diz respeito a quantidade
+    * de entradas que a camada deve processar.
+    * <p>
+    *    A disposição do formato do filtro deve ser da seguinte forma:
+    * </p>
+    * <pre>
+    *    formFiltro = (altura, largura)
+    * </pre>
+    * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
+    * @param formFiltro formato dos filtros da camada.
+    * @param filtros quantidade de filtros.
+    */
+   public Convolucional(int[] formFiltro, int filtros){
+      this(formFiltro, filtros, null, null, null);
+   }
+
+   /**
+    * Instancia uma camada convolucional de acordo com os formatos fornecidos.
+    * <p>
+    *    A disposição do formato de entrada deve ser da seguinte forma:
+    * </p>
+    * <pre>
+    *    formEntrada = (altura, largura, profundidade)
+    * </pre>
+    * Onde largura e altura devem corresponder as dimensões dos dados de entrada
+    * que serão processados pela camada e a profundidade diz respeito a quantidade
+    * de entradas que a camada deve processar.
+    * <p>
+    *    A disposição do formato do filtro deve ser da seguinte forma:
+    * </p>
+    * <pre>
+    *    formFiltro = (altura, largura)
+    * </pre>
+    * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
+    * <p>
+    *    O valor de uso do bias será usado como {@code true} por padrão.
+    * <p>
     * @param formEntrada formato de entrada da camada.
     * @param formFiltro formato dos filtros da camada.
     * @param filtros quantidade de filtros.
-    * @param usarBias adicionar uso do bias para a camada.
-    * @throws IllegalArgumentException se as dimensões fornecidas não correspondenrem
-    * ao padrão desejado ou se o número de filtros for menor que 1.
     */
-   public Convolucional(int[] formEntrada, int[] formFiltro, int filtros, boolean usarBias){
-      if(formEntrada.length != 3){
-         throw new IllegalArgumentException(
-            "O formato de entrada deve conter 3 elementos (altura, largura, profundidade)" 
-         );
-      }
-      if(utils.apenasMaiorZero(formEntrada) == false){
-         throw new IllegalArgumentException(
-            "O formato de entrada deve conter valores maiores do que zero." 
-         );          
-      }
-      if(formFiltro.length != 2){
-         throw new IllegalArgumentException(
-            "O formato do filtro deve conter 2 elementos (altura, largura)" 
-         );
-      }
-      for(int i = 0; i < formFiltro.length; i++){
-         if(formFiltro[i] < 1){
-            throw new IllegalArgumentException(
-               "O formato do filtro deve conter valores maiores do que zero." 
-            ); 
-         }
-      }
-      if(filtros < 1){
-         throw new IllegalArgumentException(
-            "A camada deve conter ao menos 1 filtro."
-         );
-      }
-
-      //formato dos filtros da camada
-      this.altFiltro  = formFiltro[0];
-      this.largFiltro = formFiltro[1];
-      this.numFiltros = filtros;
-      this.usarBias = usarBias;
-
-      this.construir(formEntrada);
+   public Convolucional(int[] formEntrada, int[] formFiltro, int filtros){
+      this(formEntrada, formFiltro, filtros, null, null, null);
    }
    
    /**
