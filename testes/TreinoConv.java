@@ -26,7 +26,7 @@ public class TreinoConv{
       
       Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/conv-mnist-91.txt");
       // modelo.info();
-      // testarModelo(modelo, digitos, amostras);
+      testarModelo(modelo, digitos, amostras);
       // testarTodosDados(modelo);
 
       // tempoForward(modelo);
