@@ -200,7 +200,9 @@ public abstract class Modelo{
     */
    protected void verificarCompilacao(){
       if(this.compilado == false){
-         throw new IllegalArgumentException("O modelo ainda não foi compilado.");
+         throw new IllegalStateException(
+            "O modelo ainda não foi compilado."
+         );
       }
    }
 

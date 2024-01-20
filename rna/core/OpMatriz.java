@@ -465,7 +465,7 @@ public class OpMatriz{
       int profEntrada = entrada.length;
 
       //talvez considerar valores mais otimizados
-      int numThreads = (profEntrada > 4) ? Runtime.getRuntime().availableProcessors()/2 : 1;
+      int numThreads = (profEntrada > 10) ? Runtime.getRuntime().availableProcessors()/2 : 1;
       ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 
       for(int i = 0; i < numFiltros; i++){

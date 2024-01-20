@@ -24,21 +24,11 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
 
-      int lin = 1;
-      int col = 1000;
-      Mat mat = new Mat(lin, col);
-      mat.forEach((i, j) -> {
-         mat.editar(i, j, (
-            i*mat.col() + mat.col()
-         ));
-      });
-
-      Densa densa = new Densa(col, 200);
-      System.out.println(densa.pesos.tamanho());
-
-      long t;
-      t = medirTempo(() -> densa.calcularSaida(mat));
-      System.out.println("Tempo forward: " + TimeUnit.NANOSECONDS.toMillis(t) + "ms");
+      Dropout drop = new Dropout(0.25);
+      drop.construir(new int[]{3, 3, 1});
+      drop.configurarTreino(true);
+      drop.calcularSaida(new Mat(1, 9));
+      drop.mascara[0].print();
    }
 
    static long medirTempo(Runnable func){

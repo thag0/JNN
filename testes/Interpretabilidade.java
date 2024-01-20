@@ -7,6 +7,7 @@ import rna.camadas.Densa;
 import rna.core.Mat;
 import rna.modelos.Modelo;
 import rna.modelos.Sequencial;
+import rna.otimizadores.SGD;
 
 public class Interpretabilidade{
    static Ged ged = new Ged();
@@ -33,10 +34,10 @@ public class Interpretabilidade{
          new Densa(tamSaida, "sigmoid")
       });
       modelo.configurarSeed(222222222);
-      modelo.compilar("adagrad", "mse");
+      modelo.compilar(new SGD(0.5, 0.9), "mse");
       modelo.configurarHistorico(true);
-      modelo.treinar(entrada, saida, 800, false);
-      
+      modelo.treinar(entrada, saida, 200, false);
+
       //avaliação de resultados
       System.out.println("Perda: " + modelo.avaliar(entrada, saida));
       verificar(modelo, entrada, saida);

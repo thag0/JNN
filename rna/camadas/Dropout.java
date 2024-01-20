@@ -182,6 +182,15 @@ public class Dropout extends Camada implements Cloneable{
    public void inicializar(double x){}
 
    /**
+    * Configura uma seed fixa para geradores de números aleatórios da
+    * camada.
+    * @param seed nova seed.
+    */
+   public void configurarSeed(long seed){
+      this.random.setSeed(seed);
+   }
+
+   /**
     * Propaga os dados de entrada recebido pela camada de dropout.
     * <p>
     *    A máscara de dropout é gerada e utilizada apenas durante o processo
