@@ -241,14 +241,14 @@ public class Sequencial extends Modelo implements Cloneable{
          );
       }
 
-      Dicionario dic = new Dicionario();
       for(int i = 1; i < this.camadas.length; i++){
          this.camadas[i].construir(this.camadas[i-1].formatoSaida());
          this.camadas[i].configurarId(i);
          if(this.seedInicial != 0) this.camadas[i].configurarSeed(this.seedInicial);
          this.camadas[i].inicializar();
       }
-
+      
+      Dicionario dic = new Dicionario();
       this.perda = dic.obterPerda(perda);
       this.otimizador = dic.obterOtimizador(otimizador);
 

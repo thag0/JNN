@@ -27,6 +27,8 @@ public class Gaussiano extends Inicializador{
     */
    @Override
    public void inicializar(Mat m){
-      m.map(val -> super.random.nextGaussian());
+      m.map((x) -> (
+         super.random.nextGaussian()
+      ));
    }
 }

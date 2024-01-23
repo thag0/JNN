@@ -28,7 +28,7 @@ public class LeCun extends Inicializador{
    @Override
    public void inicializar(Mat m){
       double a = Math.sqrt(1.0 / m.lin());
-      m.map(val -> (
+      m.map((x) -> (
          a * (2.0 * super.random.nextDouble()) - 1
       ));
    }

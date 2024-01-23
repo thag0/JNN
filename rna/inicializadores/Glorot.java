@@ -28,7 +28,7 @@ public class Glorot extends Inicializador{
    @Override
    public void inicializar(Mat m){
       double desvio = Math.sqrt(6.0 / (m.lin() + m.col()));
-      m.map(val -> (
+      m.map((x) -> (
          super.random.nextDouble() * (2 * desvio) - desvio
       ));
    }

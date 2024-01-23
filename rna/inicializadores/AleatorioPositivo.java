@@ -63,6 +63,8 @@ public class AleatorioPositivo extends Inicializador{
     */
    @Override
    public void inicializar(Mat m){
-      m.map(val -> super.random.nextDouble(0, max));
+      m.map((x) -> (
+         super.random.nextDouble(0, max)
+      ));
    }
 }

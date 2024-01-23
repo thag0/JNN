@@ -107,7 +107,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     * @throws IllegalArgumentException se o array de arquitetura não possuir, pelo menos, dois elementos.
     * @throws IllegalArgumentException se os valores fornecidos forem menores que um.
     */
-   public RedeNeural(int[] arquitetura){
+   public RedeNeural(int... arquitetura){
       if(arquitetura == null){
          throw new IllegalArgumentException("A arquitetura fornecida não deve ser nula.");
       }

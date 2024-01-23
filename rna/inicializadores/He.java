@@ -28,7 +28,7 @@ public class He extends Inicializador{
    @Override
    public void inicializar(Mat m){
       double a = Math.sqrt(2.0 / m.lin());
-      m.map(val -> (
+      m.map((x) -> (
          a * super.random.nextGaussian()
       ));
    }

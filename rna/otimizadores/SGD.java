@@ -143,25 +143,26 @@ public class SGD extends Otimizador{
    public void atualizar(Camada[] camadas){
       super.verificarConstrucao();
 
-      int i, idKernel = 0, idBias = 0;
-
+      int idKernel = 0, idBias = 0;
       for(Camada camada : camadas){
          if(camada.treinavel == false) continue;
 
          double[] kernel = camada.obterKernel();
          double[] gradK = camada.obterGradKernel();
-         for(i = 0; i < kernel.length; i++){
+         for(int i = 0; i < kernel.length; i++){
             m[idKernel] = (m[idKernel] * momentum) - (gradK[i] * taxaAprendizagem);
-            kernel[i] -= nesterov ? (m[idKernel++] * momentum) - (gradK[i] * taxaAprendizagem) : m[idKernel++];
+            kernel[i] -= nesterov ? (m[idKernel] * momentum) - (gradK[i] * taxaAprendizagem) : m[idKernel];
+            idKernel++;
          }
          camada.editarKernel(kernel);
 
          if(camada.temBias()){
             double[] bias = camada.obterBias();
             double[] gradB = camada.obterGradBias();
-            for(i = 0; i < bias.length; i++){
+            for(int i = 0; i < bias.length; i++){
                mb[idBias] = (mb[idBias] * momentum) - (gradB[i] * taxaAprendizagem);
-               bias[i] -= nesterov ? (mb[idBias++] * momentum) - (gradB[i] * taxaAprendizagem) : mb[idBias++];
+               bias[i] -= nesterov ? (mb[idBias] * momentum) - (gradB[i] * taxaAprendizagem) : mb[idBias];
+               idBias++;
             }
             camada.editarBias(bias);
          }

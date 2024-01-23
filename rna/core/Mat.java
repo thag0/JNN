@@ -22,7 +22,7 @@ public class Mat{
    /**
     * Conjunto de dados da matriz.
     */
-   private double[] dados;
+   private final double[] dados;
 
    /**
     * Inicializa uma nova matriz com os dados desejados.

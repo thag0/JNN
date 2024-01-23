@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit;
 import lib.ged.*;
 import lib.geim.Geim;
 import render.JanelaTreino;
-import rna.avaliacao.perda.*;
 import rna.camadas.*;
 import rna.modelos.Modelo;
 import rna.modelos.RedeNeural;
@@ -65,11 +64,9 @@ public class MainImg{
 
    static Modelo criarRna(int entradas, int saidas){
       Otimizador otm = new SGD(0.0001, 0.9995);
-      Perda perda = new MSE();
 
-      int[] arq = {entradas, 13, 13, saidas};
-      RedeNeural modelo = new RedeNeural(arq);
-      modelo.compilar(otm, perda);
+      RedeNeural modelo = new RedeNeural(entradas, 13, 13, saidas);
+      modelo.compilar(otm, "mse");
       modelo.configurarAtivacao("tanh");
       modelo.configurarAtivacao(modelo.camadaSaida(), "sigmoid");
       modelo.configurarHistorico(calcularHistorico);
@@ -85,7 +82,7 @@ public class MainImg{
       });
 
       modelo.configurarSeed(1234);
-      modelo.compilar("sgd", "mse");
+      modelo.compilar("adam", "mse");
       modelo.configurarHistorico(calcularHistorico);
 
       return modelo;
@@ -102,12 +99,12 @@ public class MainImg{
     */
    static long treinoEmPainel(Modelo modelo, int altura, int largura, double[][] entradas, double[][] saidas){
       final int fps = 6000;
-      int epocasPorFrame = 30;
+      int epocasPorFrame = 40;
 
       //acelerar o processo de desenho
       //bom em situações de janelas muito grandes
       int n = Runtime.getRuntime().availableProcessors();
-      int numThreads = (n > 1) ? (int)(n * 0.25) : 1;
+      int numThreads = (n > 1) ? (int)(n * 0.5) : 1;
 
       JanelaTreino jt = new JanelaTreino(largura, altura, escalaRender, numThreads);
       jt.desenharTreino(modelo, 0);
@@ -126,7 +123,7 @@ public class MainImg{
 
          try{
             tempoRestante = proximoTempoDesenho - System.nanoTime();
-            tempoRestante /= 1000000;
+            tempoRestante /= 1_000_000;
             if(tempoRestante < 0) tempoRestante = 0;
 
             Thread.sleep((long)tempoRestante);

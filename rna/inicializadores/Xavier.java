@@ -29,7 +29,7 @@ public class Xavier extends Inicializador{
    @Override
    public void inicializar(Mat m){
       double desvio = Math.sqrt(2.0 / (m.lin() + m.col()));
-      m.map(val -> (
+      m.map((x) -> (
          desvio * super.random.nextGaussian()
       ));
    }
