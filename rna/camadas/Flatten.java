@@ -180,7 +180,7 @@ public class Flatten extends Camada{
    }
 
    @Override
-   public void inicializar(double x){}
+   public void inicializar(){}
 
    /**
     * Achata os dados de entrada num formato sequencial.

@@ -7,11 +7,30 @@ import rna.core.Mat;
  */
 public class AleatorioPositivo extends Inicializador{
 
+   private double max = 0;
+
+   /**
+    * Instancia um inicializador de valores aleatórios positivos
+    * com seed aleatória.
+    * @param max valor máximo de aleatorização.
+    */
+   public AleatorioPositivo(double max){
+      if(max <= 0){
+         throw new IllegalArgumentException(
+            "O valor máximo deve ser maior que zero."
+         );
+      }
+
+      this.max = max;
+   }
+
    /**
     * Instancia um inicializador de valores aleatórios positivos
     * com seed aleatória.
     */
-   public AleatorioPositivo(){}
+   public AleatorioPositivo(){
+      this(1.0);
+   }
 
    /**
     * Instancia um inicializador de valores aleatórios positivos.
@@ -22,14 +41,11 @@ public class AleatorioPositivo extends Inicializador{
    }
 
    /**
-    * Inicializa os valores aleatoriamente dentro do intervalo {@code 0 : x}
+    * Inicializa os valores aleatoriamente dentro do intervalo {@code 0 : max}
     * @param m matriz que será inicializada.
-    * @param x valor que será usado como máximo e mínimo na aleatorização.
     */
    @Override
-   public void inicializar(Mat m, double x){
-      m.forEach((i, j) -> {
-         m.editar(i, j, super.random.nextDouble(0, x));
-      });
+   public void inicializar(Mat m){
+      m.map(val -> super.random.nextDouble(0, max));
    }
 }

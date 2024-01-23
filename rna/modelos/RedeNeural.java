@@ -70,12 +70,6 @@ public class RedeNeural extends Modelo implements Cloneable{
    private boolean bias = true;
 
    /**
-    * Valor máximo e mínimo na hora de aleatorizar os pesos da rede neural, para
-    * alguns inicializadores.
-    */
-   private double alcancePeso = 0.5;
-
-   /**
     * <p>
     *    Cria uma instância de rede neural artificial. A arquitetura da rede será baseada de acordo 
     *    com cada posição do array, cada valor contido nele representará a quantidade de neurônios da 
@@ -132,29 +126,6 @@ public class RedeNeural extends Modelo implements Cloneable{
 
       this.arquitetura = arquitetura;
       this.compilado = false;
-   }
-
-   /**
-    * Define o valor máximo e mínimo na hora de aleatorizar os pesos iniciais da 
-    * rede para a compilação, os novos valores não podem ser menores ou iguais a zero.
-    * <p>
-    *    É necessário informar o alcance <strong>antes</strong> de compilar a rede.
-    * </p>
-    * <p>
-    *    {@code O valor padrão de alcance é 0.5}
-    * </p>
-    * @param alcance novo valor máximo e mínimo.
-    * @throws IllegalArgumentException se o novo valor for menor ou igual a zero.
-    */
-   public void configurarAlcancePesos(double alcance){
-      if(alcance <= 0){
-         throw new IllegalArgumentException(
-            "O novo valor de alcance dos pesos (" + alcance + 
-            ") deve ser maior que zero."
-         );
-      }
-      
-      this.alcancePeso = alcance;
    }
 
    /**
@@ -508,7 +479,7 @@ public class RedeNeural extends Modelo implements Cloneable{
          this.camadas[i].configurarBias(this.bias);
          this.camadas[i].configurarId(i);
          if(this.seedInicial != 0) this.camadas[i].configurarSeed(this.seedInicial);
-         this.camadas[i].inicializar(alcancePeso);
+         this.camadas[i].inicializar();
       }
 
       this.perda = dic.obterPerda(perda);

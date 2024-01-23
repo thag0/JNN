@@ -7,18 +7,29 @@ import rna.core.Mat;
  */
 public class Constante extends Inicializador{
    
+   private double val = 0;
+
+   /**
+    * Instância um inicializador de valor constante.
+    * @param val valor usado de constante na inicialização.
+    */
+   public Constante(double val){
+      this.val = val;
+   }
+
    /**
     * Instância um inicializador de valor constante.
     */
-   public Constante(){}
+   public Constante(){
+      this(0);
+   }
 
    /**
     * Inicializa todos os valores da matriz com um valor constante.
     * @param m matriz que será inicializada.
-    * @param x valor usado para preencher a matriz.
     */
    @Override
-   public void inicializar(Mat m, double x){
-      m.preencher(x);
+   public void inicializar(Mat m){
+      m.preencher(val);
    }
 }

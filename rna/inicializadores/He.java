@@ -24,13 +24,12 @@ public class He extends Inicializador{
    /**
     * Aplica o algoritmo de inicialização He nos pesos.
     * @param m matriz que será inicializada.
-    * @param x valor usado apenas por outros inicializadores.
     */
    @Override
-   public void inicializar(Mat m, double x){
+   public void inicializar(Mat m){
       double a = Math.sqrt(2.0 / m.lin());
-      m.forEach((i, j) -> {
-         m.editar(i, j, (a * super.random.nextGaussian()));
-      });
+      m.map(val -> (
+         a * super.random.nextGaussian()
+      ));
    }
 }

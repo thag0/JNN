@@ -22,7 +22,8 @@ public class OpArray{
     * @param val valor desejado.
     */
    public void preencher(double[] arr, double val){
-      for(int i = 0; i < arr.length; i++){
+      int n = arr.length;
+      for(int i = 0; i < n; i++){
          arr[i] = val;
       }
    }
@@ -54,7 +55,8 @@ public class OpArray{
       }
 
       System.arraycopy(a, 0, r, 0, r.length);
-      for(int i = 0; i < r.length; i++){
+      int n = r.length;
+      for(int i = 0; i < n; i++){
          r[i] += b[i];
       }
    }
@@ -86,7 +88,8 @@ public class OpArray{
       }
 
       System.arraycopy(a, 0, r, 0, r.length);
-      for(int i = 0; i < r.length; i++){
+      int n = r.length;
+      for(int i = 0; i < n; i++){
          r[i] -= b[i];
       }
    }
@@ -117,8 +120,10 @@ public class OpArray{
          );      
       }
 
-      for(int i = 0; i < r.length; i++){
-         r[i] = a[i] * b[i];
+      System.arraycopy(a, 0, r, 0, r.length);
+      int n = r.length;
+      for(int i = 0; i < n; i++){
+         r[i] *= b[i];
       }
    }
 
@@ -132,7 +137,7 @@ public class OpArray{
     * @param e valor usado para dividir os elementos dos array.
     * @param r array contendo o resultado da divisão.
     */
-   public void dividirEscalar(double[] a, double e, double[] r){
+   public void divEscalar(double[] a, double e, double[] r){
       if(a.length != r.length){
          throw new IllegalArgumentException(
             "As dimensões de R (" + r.length + 
@@ -155,7 +160,7 @@ public class OpArray{
     * @param e valor usado para multiplicar os elementos dos array.
     * @param r array contendo o resultado da divisão.
     */
-   public void multiplicarEscalar(double[] a, double e, double[] r){
+   public void multEscalar(double[] a, double e, double[] r){
       if(a.length != r.length){
          throw new IllegalArgumentException(
             "As linhas de A (" + a.length + 

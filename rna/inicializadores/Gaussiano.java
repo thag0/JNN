@@ -24,12 +24,9 @@ public class Gaussiano extends Inicializador{
    /**
     * Aplica o algoritmo de inicialização gaussiano/normal nos pesos.
     * @param m matriz que será inicializada
-    * @param x valor usado apenas por outros inicializadores.
     */
    @Override
-   public void inicializar(Mat m, double x){
-      m.forEach((i, j) -> {
-         m.editar(i, j, (super.random.nextGaussian()));
-      });
+   public void inicializar(Mat m){
+      m.map(val -> super.random.nextGaussian());
    }
 }

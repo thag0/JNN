@@ -40,9 +40,8 @@ public abstract class Inicializador{
    /**
     * Inicializa os valores do array de acordo com o inicializador configurado.
     * @param m matriz de dados.
-    * @param x valor usado pelos inicializadores.
     */
-   public abstract void inicializar(Mat m, double x);
+   public abstract void inicializar(Mat m);
 
    /**
     * Retorna o nome do inicializador.

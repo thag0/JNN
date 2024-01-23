@@ -237,7 +237,7 @@ public class MaxPooling extends Camada{
    }
 
    @Override
-   public void inicializar(double x){}
+   public void inicializar(){}
 
    @Override
    public void calcularSaida(Object entrada){

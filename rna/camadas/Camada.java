@@ -105,10 +105,8 @@ public abstract class Camada{
    /**
     * Inicaliza os parâmetros treináveis da camada de acordo com os inicializadores
     * definidos.
-    * @param x valor usado pelos inicializadores, dependendo do que for usado
-    * pode servir de alcance na aleatorização, valor de constante, entre outros.
     */
-   public abstract void inicializar(double x);
+   public abstract void inicializar();
 
    /**
     * Configura a função de ativação da camada através de uma instância de 

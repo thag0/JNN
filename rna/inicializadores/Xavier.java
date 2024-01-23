@@ -27,10 +27,10 @@ public class Xavier extends Inicializador{
     * @param x valor utilizado apenas por outros otimizadores.
     */
    @Override
-   public void inicializar(Mat m, double x){
+   public void inicializar(Mat m){
       double desvio = Math.sqrt(2.0 / (m.lin() + m.col()));
-      m.forEach((i, j) -> {
-         m.editar(i, j, (desvio * super.random.nextGaussian()));
-      }); 
+      m.map(val -> (
+         desvio * super.random.nextGaussian()
+      ));
    }
 }

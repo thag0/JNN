@@ -24,15 +24,12 @@ public class LeCun extends Inicializador{
    /**
     * Aplica o algoritmo de inicialização LeCun na matriz fornecida.
     * @param m matriz que será inicializada.
-    * @param x valor utilizado apenas por outros inicializadores.
     */
    @Override
-   public void inicializar(Mat m, double x){
+   public void inicializar(Mat m){
       double a = Math.sqrt(1.0 / m.lin());
-      m.forEach((i, j) -> {
-         m.editar(i, j, (
-            a * (2.0 * super.random.nextDouble()) - 1
-         ));
-      }); 
+      m.map(val -> (
+         a * (2.0 * super.random.nextDouble()) - 1
+      ));
    }
 }

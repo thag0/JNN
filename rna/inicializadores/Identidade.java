@@ -15,10 +15,9 @@ public class Identidade extends Inicializador{
    /**
     * Inicializa todos os valores da matriz no formato de identidade.
     * @param m matriz que será inicializada.
-    * @param x valor usado apenas por outros inicializadores.
     */
    @Override
-   public void inicializar(Mat m, double x){
+   public void inicializar(Mat m){
       m.forEach((i, j) -> {
          m.editar(i, j, (i == j ? 1 : 0));
       });

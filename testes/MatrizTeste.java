@@ -12,6 +12,7 @@ import rna.camadas.Flatten;
 import rna.camadas.MaxPooling;
 import rna.core.Mat;
 import rna.core.OpMatriz;
+import rna.inicializadores.AleatorioPositivo;
 import rna.inicializadores.Inicializador;
 import rna.inicializadores.Xavier;
 import rna.treinamento.AuxiliarTreino;
@@ -24,11 +25,9 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
 
-      Dropout drop = new Dropout(0.25);
-      drop.construir(new int[]{3, 3, 1});
-      drop.configurarTreino(true);
-      drop.calcularSaida(new Mat(1, 9));
-      drop.mascara[0].print();
+      Mat m = new Mat(2, 2);
+      new AleatorioPositivo(2.0).inicializar(m);
+      m.print();
    }
 
    static long medirTempo(Runnable func){

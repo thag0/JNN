@@ -156,12 +156,12 @@ class TreinoLote{
          if(camada.treinavel == false) continue;
          
          double[] acKernel = camada.obterAcGradKernel();
-         oparr.dividirEscalar(acKernel, tamanho, acKernel);
+         oparr.divEscalar(acKernel, tamanho, acKernel);
          camada.editarGradienteKernel(acKernel);
 
          if(camada.temBias()){
             double[] acBias = camada.obterAcGradBias();
-            oparr.dividirEscalar(acBias, tamanho, acBias);
+            oparr.divEscalar(acBias, tamanho, acBias);
             camada.editarGradienteBias(acBias);
          }
       }

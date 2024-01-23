@@ -632,16 +632,17 @@ public class Convolucional extends Camada implements Cloneable{
    }
 
    @Override
-   public void inicializar(double x){   
+   public void inicializar(){
+      super.verificarConstrucao();
       for(int i = 0; i < numFiltros; i++){
          for(int j = 0; j < profEntrada; j++){
-            this.iniKernel.inicializar(this.filtros[i][j], x);
+            this.iniKernel.inicializar(this.filtros[i][j]);
          }
       }
 
       if(this.usarBias){
          for(Mat b : this.bias){
-            this.iniBias.inicializar(b, x);
+            this.iniBias.inicializar(b);
          }
       }
    }

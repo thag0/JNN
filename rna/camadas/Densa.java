@@ -401,9 +401,10 @@ public class Densa extends Camada implements Cloneable{
    }
 
    @Override
-   public void inicializar(double x){
-      this.iniKernel.inicializar(this.pesos, x);
-      this.iniBias.inicializar(this.bias, x);
+   public void inicializar(){
+      super.verificarConstrucao();
+      this.iniKernel.inicializar(this.pesos);
+      this.iniBias.inicializar(this.bias);
    }
 
    @Override

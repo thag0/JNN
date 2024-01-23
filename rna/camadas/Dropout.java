@@ -179,7 +179,7 @@ public class Dropout extends Camada implements Cloneable{
    }
 
    @Override
-   public void inicializar(double x){}
+   public void inicializar(){}
 
    /**
     * Configura uma seed fixa para geradores de números aleatórios da
@@ -255,7 +255,7 @@ public class Dropout extends Camada implements Cloneable{
     */
    private void gerarMascaras(){
       for(int i = 0; i < this.formEntrada[2]; i++){
-         this.mascara[i].mapear((x) -> {
+         this.mascara[i].map((x) -> {
             return (this.random.nextDouble() > this.taxa) ? 1 : 0;
          });
       }
@@ -331,13 +331,13 @@ public class Dropout extends Camada implements Cloneable{
          clone.taxa = this.taxa;
          clone.random = new Random();
 
-         int profundidade = this.formEntrada[2];
-         clone.entrada = new Mat[profundidade];
-         clone.mascara = new Mat[profundidade];
-         clone.saida = new Mat[profundidade];
-         clone.gradEntrada = new Mat[profundidade];
+         int prof = this.formEntrada[2];
+         clone.entrada = new Mat[prof];
+         clone.mascara = new Mat[prof];
+         clone.saida = new Mat[prof];
+         clone.gradEntrada = new Mat[prof];
          
-         for(int i = 0; i < profundidade; i++){
+         for(int i = 0; i < prof; i++){
             clone.entrada[i] = this.entrada[i].clone();
             clone.mascara[i] = this.mascara[i].clone();
             clone.saida[i] = this.saida[i].clone();

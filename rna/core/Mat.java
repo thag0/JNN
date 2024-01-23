@@ -151,16 +151,7 @@ public class Mat{
     * @param m matriz base.
     */
    public Mat(Mat m){
-      if(m == null){
-         throw new IllegalArgumentException(
-            "A matriz fornecida não pode ser nula."
-         );
-      }
-
-      this.lin = m.lin;
-      this.col = m.col;
-      this.dados = new double[m.tamanho()];
-      System.arraycopy(m.dados, 0, this.dados, 0, m.tamanho());
+      this(m.lin(), m.col(), m.dados.clone());
    }
 
    /**
@@ -443,7 +434,7 @@ public class Mat{
     * </pre>
     * @param funcao expressão que atuará em cada elemento da matriz.
     */
-   public void mapear(DoubleUnaryOperator funcao){
+   public void map(DoubleUnaryOperator funcao){
       if(funcao == null){
          throw new IllegalArgumentException(
             "Função recebida é nula."
@@ -674,7 +665,7 @@ public class Mat{
     * Multiplica todo o conteúdo da matriz pelo valor fornecido.
     * @param esc valor para multiplicação.
     */
-   public void escalar(double esc){
+   public void multEsc(double esc){
       int n = this.tamanho();
       for(int i = 0; i < n; i++){
          this.dados[i] *= esc;

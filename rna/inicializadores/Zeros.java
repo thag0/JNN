@@ -3,14 +3,18 @@ package rna.inicializadores;
 import rna.core.Mat;
 
 public class Zeros extends Inicializador{
+
+   /**
+    * Inizialiciador para matrizes com valor zero.
+    */
+   public Zeros(){}
    
    /**
     * Inicializa todos os valores da matriz como zero.
     * @param m matriz que será inicializada.
-    * @param x valor usado apenas por outros otimizadores.
     */
    @Override
-   public void inicializar(Mat m, double x){
+   public void inicializar(Mat m){
       m.preencher(0);
    }
 }
