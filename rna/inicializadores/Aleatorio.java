@@ -36,6 +36,26 @@ public class Aleatorio extends Inicializador{
    }
 
    /**
+    * Instancia um inicializador de valores aleatórios.
+    * @param min valor mínimo de aleatorização.
+    * @param max valor máximo de aleatorização.
+    * @param seed seed usada pelo gerador de números aleatórios.
+    */
+   public Aleatorio(double min, double max, long seed){
+      super(seed);
+
+      if(min >= max){
+         throw new IllegalArgumentException(
+            "O valor mínimo (" + min +") " +
+            "deve ser menor que o valor máximo (" + max + ")."
+         );
+      }
+
+      this.min = min;
+      this.max = max;
+   }
+
+   /**
     * Instancia um inicializador de valores aleatórios com seed
     * também aleatória.
     */
@@ -49,6 +69,8 @@ public class Aleatorio extends Inicializador{
     */
    public Aleatorio(long seed){
       super(seed);
+      this.min = -1;
+      this.max =  1;
    }
 
    /**

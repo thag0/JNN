@@ -7,6 +7,9 @@ import rna.core.Mat;
  */
 public class Constante extends Inicializador{
    
+   /**
+    * Valor de preenchimento.
+    */
    private double val = 0;
 
    /**

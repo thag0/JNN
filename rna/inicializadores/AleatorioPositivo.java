@@ -25,6 +25,22 @@ public class AleatorioPositivo extends Inicializador{
    }
 
    /**
+    * Instancia um inicializador de valores aleatórios positivos.
+    * @param max valor máximo de aleatorização.
+    * @param seed seed usada pelo gerador de números aleatórios.
+    */
+   public AleatorioPositivo(double max, long seed){
+      if(max <= 0){
+         throw new IllegalArgumentException(
+            "O valor máximo deve ser maior que zero."
+         );
+      }
+
+      super.configurarSeed(seed);
+      this.max = max;
+   }
+
+   /**
     * Instancia um inicializador de valores aleatórios positivos
     * com seed aleatória.
     */
@@ -38,6 +54,7 @@ public class AleatorioPositivo extends Inicializador{
     */
    public AleatorioPositivo(long seed){
       super(seed);
+      this.max = 1;
    }
 
    /**
