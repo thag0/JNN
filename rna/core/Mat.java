@@ -71,10 +71,7 @@ public class Mat{
     */
    public Mat(int lin, int col, double valor){
       this(lin, col, new double[lin*col]);
-
-      for(int i = 0; i < this.dados.length; i++){
-         this.dados[i] = valor;
-      }
+      preencher(valor);
    }
 
    /**
@@ -231,7 +228,7 @@ public class Mat{
     * @return valor baseado de acordo com os índices.
     */
    public double elemento(int lin, int col){
-      return this.dados[indice(lin, col)];
+      return dados[indice(lin, col)];
    }
 
    /**
@@ -242,7 +239,7 @@ public class Mat{
     * @param valor novo valor que será colocado.
     */
    public void editar(int lin, int col, double valor){
-      this.dados[indice(lin, col)] = valor;
+      dados[indice(lin, col)] = valor;
    }
 
    /**
@@ -252,7 +249,7 @@ public class Mat{
    public void preencher(double valor){
       int n = this.tamanho();
       for(int i = 0; i < n; i++){
-         this.dados[i] = valor;
+         dados[i] = valor;
       }
    }
 
@@ -274,7 +271,7 @@ public class Mat{
          );
       }
 
-      System.arraycopy(m.dados, 0, this.dados, 0, this.dados.length);
+      System.arraycopy(m.dados, 0, dados, 0, dados.length);
    }
    
    /**
@@ -294,8 +291,8 @@ public class Mat{
          );
       }
 
-      for(int i = 0; i < this.lin; i++){
-         this.copiar(i, m[i]);
+      for(int i = 0; i < lin; i++){
+         copiar(i, m[i]);
       }
    }
 
@@ -305,8 +302,8 @@ public class Mat{
     * @param dados novos dados que serão escritos na linha. 
     */
    public void copiar(int lin, double[] dados){
-      int id = lin*this.col;
-      System.arraycopy(dados, 0, this.dados, id, this.col);
+      int id = lin*col;
+      System.arraycopy(dados, 0, this.dados, id, col);
    }
 
    /**
@@ -349,7 +346,7 @@ public class Mat{
       int i, j;
       for(i = 0; i < t.lin; i++){
          for(j = 0; j < t.col; j++){
-            t.editar(i, j, this.elemento(j, i));
+            t.editar(i, j, elemento(j, i));
          }
       }
 
@@ -394,7 +391,7 @@ public class Mat{
 
       Mat b = new Mat(n, this.col);
       for(int i = 0; i < b.lin; i++){
-         b.copiar(i, this.linha(lin));
+         b.copiar(i, linha(lin));
       }
 
       return b;
@@ -442,7 +439,7 @@ public class Mat{
       }
       int n = this.tamanho();
       for(int i = 0; i < n; i++){
-         this.dados[i] = funcao.applyAsDouble(this.dados[i]);
+         dados[i] = funcao.applyAsDouble(dados[i]);
       }
    }
 
@@ -487,7 +484,7 @@ public class Mat{
 
       int n = this.tamanho();
       for(int i = 0; i < n; i++){
-         this.dados[i] = funcao.applyAsDouble(m.dados[i]);
+         dados[i] = funcao.applyAsDouble(m.dados[i]);
       }
    }
 
@@ -532,7 +529,7 @@ public class Mat{
     * @param valor dado que será adicionado.
     */
    public void add(int lin, int col, double valor){
-      this.dados[indice(lin, col)] += valor;
+      dados[indice(lin, col)] += valor;
    }
 
    /**
@@ -544,7 +541,7 @@ public class Mat{
 
       int n = this.tamanho();
       for(int i = 0; i < n; i++){
-         this.dados[i] += m.dados[i];
+         dados[i] += m.dados[i];
       }
    }
 
@@ -562,7 +559,7 @@ public class Mat{
       
       int n = this.tamanho();
       for(int i = 0; i < n; i++){
-         this.dados[i] = a.dados[i] + b.dados[i];
+         dados[i] = a.dados[i] + b.dados[i];
       }
    }
 
@@ -580,7 +577,7 @@ public class Mat{
     * @param valor dado que será subtraído.
     */
    public void sub(int lin, int col, double valor){
-      this.dados[indice(lin, col)] -= valor;
+      dados[indice(lin, col)] -= valor;
    }
 
    /**
@@ -592,7 +589,7 @@ public class Mat{
 
       int n = this.tamanho();
       for(int i = 0; i < n; i++){
-         this.dados[i] -= m.dados[i];
+         dados[i] -= m.dados[i];
       }
    }
 
@@ -610,7 +607,7 @@ public class Mat{
       
       int n = this.tamanho();
       for(int i = 0; i < n; i++){
-         this.dados[i] = a.dados[i] - b.dados[i];
+         dados[i] = a.dados[i] - b.dados[i];
       }
    }
 
@@ -628,7 +625,7 @@ public class Mat{
     * @param valor dado que será multiplicado.
     */
    public void mult(int lin, int col, double valor){
-      this.dados[lin*this.col + col] *= valor;
+      dados[lin*this.col + col] *= valor;
    }
 
    /**
@@ -640,7 +637,7 @@ public class Mat{
 
       int n = this.tamanho();
       for(int i = 0; i < n; i++){
-         this.dados[i] *= m.dados[i];
+         dados[i] *= m.dados[i];
       }
    }
 
@@ -658,7 +655,7 @@ public class Mat{
     * @param valor dado que será divido.
     */
    public void div(int lin, int col, double valor){
-      this.dados[lin*this.col + col] /= valor;
+      dados[lin*this.col + col] /= valor;
    }
 
    /**
@@ -668,7 +665,7 @@ public class Mat{
    public void multEsc(double esc){
       int n = this.tamanho();
       for(int i = 0; i < n; i++){
-         this.dados[i] *= esc;
+         dados[i] *= esc;
       }
    }
 
@@ -687,7 +684,7 @@ public class Mat{
 
       double[] linha = new double[this.col];
       int inicio = lin * this.col;
-      System.arraycopy(this.dados, inicio, linha, 0, this.col);
+      System.arraycopy(dados, inicio, linha, 0, this.col);
       return linha;
    }
 
@@ -706,7 +703,7 @@ public class Mat{
 
       double[] coluna = new double[this.lin];
       for(int i = 0; i < this.lin; i++){
-         coluna[i] = this.elemento(i, col);
+         coluna[i] = elemento(i, col);
       }
 
       return coluna;
@@ -720,7 +717,7 @@ public class Mat{
       double[][] m = new double[this.lin][this.col];
 
       for(int i = 0; i < this.lin; i++){
-         m[i] = this.linha(i);
+         m[i] = linha(i);
       }
 
       return m;
@@ -731,7 +728,7 @@ public class Mat{
     * @return array contendo os elementos da matriz.
     */
    public double[] paraArray(){
-      return this.dados;
+      return dados;
    }
 
    /**
@@ -739,7 +736,7 @@ public class Mat{
     * @return número total de elementos da matriz.
     */
    public int tamanho(){
-      return this.dados.length;      
+      return dados.length;      
    }
 
    /**
@@ -783,7 +780,7 @@ public class Mat{
       String formato = "%." + casas + "f";
       for(int i = 0; i < this.lin; i++){
          for(int j = 0; j < this.col; j++){
-            double elemento = this.elemento(i, j);
+            double elemento = elemento(i, j);
             int compAtual = String.format(formato, elemento).length();
             if(compAtual > compMax){
                compMax = compAtual;
@@ -794,7 +791,7 @@ public class Mat{
       for(int i = 0; i < this.lin; i++){
          sb.append(" ");
          for(int j = 0; j < this.col; j++){
-            String elemento = String.format("%" + (compMax + 2) + "s", String.format(formato, this.elemento(i, j)));
+            String elemento = String.format("%" + (compMax + 2) + "s", String.format(formato, elemento(i, j)));
             elemento = elemento.replace(",", ".");
             sb.append(elemento);
          }
@@ -810,7 +807,7 @@ public class Mat{
     * @param nome nome personalizado para exibição.
     */
    public void print(String nome){
-      this.print(nome, 16);
+      print(nome, 16);
    }
 
    /**
@@ -818,14 +815,14 @@ public class Mat{
     * @param casas número de casas decimais de representação.
     */
    public void print(int casas){
-      this.print(this.getClass().getSimpleName(), casas);
+      print(this.getClass().getSimpleName(), casas);
    }
 
    /**
     * Exibe o conteúdo contido na matriz.
     */
    public void print(){
-      this.print(this.getClass().getSimpleName(), 16);
+      print(this.getClass().getSimpleName(), 16);
    }
 
    /**
@@ -835,7 +832,7 @@ public class Mat{
     */
    public Mat clone(){
       Mat clone = new Mat(this.lin, this.col);
-      System.arraycopy(this.dados, 0, clone.dados, 0, this.dados.length);
+      System.arraycopy(dados, 0, clone.dados, 0, dados.length);
       return clone;
    }
 }

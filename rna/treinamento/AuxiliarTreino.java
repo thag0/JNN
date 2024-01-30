@@ -71,11 +71,12 @@ public class AuxiliarTreino{
       int linhas = entradas.length;
       int i, idAleatorio;
 
+      Object temp;
       for(i = linhas - 1; i > 0; i--){
          idAleatorio = random.nextInt(i+1);
 
          //trocar entradas
-         Object temp = entradas[i];
+         temp = entradas[i];
          entradas[i] = entradas[idAleatorio];
          entradas[idAleatorio] = temp;
 

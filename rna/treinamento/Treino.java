@@ -93,12 +93,12 @@ class Treino{
     *    Os gradientes iniciais são calculados usando a derivada da função de perda, com eles
     *    calculados, são retropropagados da última a primeira camada da rede.
     * </p>
-    * @param redec conjunto de camadas densas da Rede Neural.
+    * @param camadas conjunto de camadas de um modelo.
     * @param perda função de perda configurada para a Rede Neural.
     * @param real saída real que será usada para calcular os erros e gradientes.
     */
-   public void backpropagation(Camada[] redec, Perda perda, double[] real){
-      aux.backpropagation(redec, perda, real);
+   public void backpropagation(Camada[] camadas, Perda perda, double[] real){
+      aux.backpropagation(camadas, perda, real);
    }
 
    /**

@@ -146,13 +146,13 @@ class TreinoLote{
 
    /**
     * 
-    * @param redec conjunto de camadas do modelo.
+    * @param camadas conjunto de camadas do modelo.
     * @param tamLote tamanho do lote usado para o treino.
     */
-   void calcularMediaGradientesLote(Camada[] redec, int tamLote){
+   void calcularMediaGradientesLote(Camada[] camadas, int tamLote){
       double tamanho = (double)tamLote;
 
-      for(Camada camada : redec){
+      for(Camada camada : camadas){
          if(camada.treinavel == false) continue;
          
          double[] acKernel = camada.obterAcGradKernel();
