@@ -27,7 +27,7 @@ public class MatrizTeste{
 
       Mat m = new Mat(2, 2);
       new AleatorioPositivo(2.0).inicializar(m);
-      m.print();
+      m.print(4);
    }
 
    static long medirTempo(Runnable func){

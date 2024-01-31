@@ -198,11 +198,11 @@ public class Sequencial extends Modelo implements Cloneable{
          throw new IllegalArgumentException("Camada fornecida é nula.");
       }
 
-      Camada[] c = this.camadas;
-      this.camadas = new Camada[c.length + 1];
+      Camada[] antigas = this.camadas;
+      this.camadas = new Camada[antigas.length + 1];
 
-      for(int i = 0; i < c.length; i++){
-         this.camadas[i] = c[i];
+      for(int i = 0; i < antigas.length; i++){
+         this.camadas[i] = antigas[i];
       }
       this.camadas[this.camadas.length-1] = camada;
 
@@ -221,12 +221,12 @@ public class Sequencial extends Modelo implements Cloneable{
             "Não há camadas no modelo."
          );
       }
-      Camada ultima = this.camadaSaida();
+      Camada ultima = camadaSaida();
 
-      Camada[] c = this.camadas;
+      Camada[] novas = this.camadas;
       this.camadas = new Camada[this.camadas.length-1];
       for(int i = 0; i < this.camadas.length; i++){
-         this.camadas[i] = c[i];
+         this.camadas[i] = novas[i];
       }
 
       this.compilado = false;
@@ -235,24 +235,24 @@ public class Sequencial extends Modelo implements Cloneable{
 
    @Override
    public void compilar(Object otimizador, Object perda){
-      if(this.camadas[0].construida == false){
+      if(camadas[0].construida == false){
          throw new IllegalArgumentException(
             "É necessário que a primeira camada seja construída."
          );
       }
 
       for(int i = 1; i < this.camadas.length; i++){
-         this.camadas[i].construir(this.camadas[i-1].formatoSaida());
-         this.camadas[i].configurarId(i);
-         if(this.seedInicial != 0) this.camadas[i].configurarSeed(this.seedInicial);
-         this.camadas[i].inicializar();
+         camadas[i].construir(camadas[i-1].formatoSaida());
+         if(seedInicial != 0) camadas[i].configurarSeed(seedInicial);
+         camadas[i].inicializar();
+         camadas[i].configurarId(i);
       }
       
       Dicionario dic = new Dicionario();
       this.perda = dic.obterPerda(perda);
       this.otimizador = dic.obterOtimizador(otimizador);
 
-      this.otimizador.construir(this.camadas);
+      this.otimizador.construir(camadas);
       this.compilado = true;
    }
 
@@ -260,9 +260,9 @@ public class Sequencial extends Modelo implements Cloneable{
    public void calcularSaida(Object entrada){
       super.verificarCompilacao();
 
-      this.camadas[0].calcularSaida(entrada);
-      for(int i = 1; i < this.camadas.length; i++){
-         this.camadas[i].calcularSaida(this.camadas[i-1].saida());
+      camadas[0].calcularSaida(entrada);
+      for(int i = 1; i < camadas.length; i++){
+         camadas[i].calcularSaida(camadas[i-1].saida());
       }
    }
 
@@ -273,8 +273,8 @@ public class Sequencial extends Modelo implements Cloneable{
       double[][] previsoes = new double[entradas.length][];
 
       for(int i = 0; i < previsoes.length; i++){
-         this.calcularSaida(entradas[i]);
-         previsoes[i] = this.saidaParaArray().clone();
+         calcularSaida(entradas[i]);
+         previsoes[i] = saidaParaArray().clone();
       }
 
       return previsoes;
@@ -339,14 +339,14 @@ public class Sequencial extends Modelo implements Cloneable{
    public Camada camada(int id){
       super.verificarCompilacao();
    
-      if((id < 0) || (id >= this.camadas.length)){
+      if((id < 0) || (id >= camadas.length)){
          throw new IllegalArgumentException(
             "O índice fornecido (" + id + 
             ") é inválido ou fora de alcance."
          );
       }
    
-      return this.camadas[id];
+      return camadas[id];
    }
 
    @Override
@@ -358,18 +358,18 @@ public class Sequencial extends Modelo implements Cloneable{
    @Override
    public Camada camadaSaida(){
       super.verificarCompilacao();
-      return this.camadas[this.camadas.length-1];
+      return camadas[camadas.length-1];
    }
 
    @Override
    public double[] saidaParaArray(){
       super.verificarCompilacao();
-      return this.camadaSaida().saidaParaArray();
+      return camadaSaida().saidaParaArray();
    }
 
    @Override
    public void copiarDaSaida(double[] arr){
-      double[] saida = this.saidaParaArray();
+      double[] saida = saidaParaArray();
       if(saida.length != arr.length){
          throw new IllegalArgumentException(
             "Incompatibilidade de dimensões entre o array fornecido (" + arr.length + 
@@ -397,7 +397,7 @@ public class Sequencial extends Modelo implements Cloneable{
    @Override
    public int numCamadas(){
       super.verificarCompilacao();
-      return this.camadas.length;
+      return camadas.length;
    }
 
    @Override

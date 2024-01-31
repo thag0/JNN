@@ -78,9 +78,7 @@ public class MainConv{
     */
    static void rodarTreino(Sequencial modelo, double[][][][] entradas, double[][] saidas, int epochs){
       try{
-         Thread t = new Thread(() -> {
-            modelo.treinar(entradas, saidas, epochs, true);
-         });
+         Thread t = new Thread(() -> modelo.treinar(entradas, saidas, epochs, true));
          t.setPriority(Thread.MAX_PRIORITY);
          t.start();
          t.join();
