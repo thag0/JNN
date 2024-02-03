@@ -108,8 +108,8 @@ public class Convolucional extends Camada implements Cloneable{
     *    O formato da entrada é dado por:
     * </p>
     * <pre>
-    *entrada = [profundidade entrada]
-    *entrada[n] = [alturaEntrada][larguraEntrada]
+    *entrada = Mat[profundidadeEntrada]
+    *entrada[n] = (alturaEntrada, larguraEntrada)
     * </pre>
     */
    public Mat[] entrada;
@@ -121,8 +121,8 @@ public class Convolucional extends Camada implements Cloneable{
     *    O formato dos filtros é dado por:
     * </p>
     * <pre>
-    *filtros = [numFiltro][profundidadeEntrada]
-    *filtros[i][j] = [alturaFiltro][larguraFiltro]
+    *filtros = (numFiltros, profundidadeEntrada)
+    *filtros[i][j] = (alturaFiltro, larguraFiltro)
     * </pre>
     */
    public Mat[][] filtros;
@@ -134,8 +134,8 @@ public class Convolucional extends Camada implements Cloneable{
     *    O formato do bias é dado por:
     * </p>
     * <pre>
-    *bias = [numeroFiltros]
-    *bias[n] = [alturaSaida][larguraSaida]
+    *bias = Mat[numFiltros]
+    *bias[n] = (alturaSaida, larguraSaida)
     * </pre>
     */
    public Mat[] bias;
@@ -152,8 +152,8 @@ public class Convolucional extends Camada implements Cloneable{
     *    O formato somatório é dado por:
     * </p>
     * <pre>
-    *somatorio = [numeroFiltros]
-    *somatorio[n] = [alturaSaida][larguraSaida]
+    *somatorio = Mat[numeroFiltros]
+    *somatorio[n] = (alturaSaida, larguraSaida)
     * </pre>
     */
    public Mat[] somatorio;
@@ -164,8 +164,8 @@ public class Convolucional extends Camada implements Cloneable{
     *    O formato da saída é dado por:
     * </p>
     * <pre>
-    *saida = [numeroFiltros]
-    *saida[n] = [alturaSaida][larguraSaida]
+    *saida = Mat[numeroFiltros]
+    *saida[n] = (alturaSaida, larguraSaida)
     * </pre>
     */
    public Mat[] saida;
@@ -177,8 +177,8 @@ public class Convolucional extends Camada implements Cloneable{
     *    O formato da derivada é dado por:
     * </p>
     * <pre>
-    *derivada = [numeroFiltros]
-    *derivada[n] = [alturaSaida][larguraSaida]
+    *derivada = Mat[numFiltros]
+    *derivada[n] = (alturaSaida, larguraSaida)
     * </pre>
     */
    public Mat[] derivada;
@@ -196,8 +196,8 @@ public class Convolucional extends Camada implements Cloneable{
     *    O formato dos gradientes da saída é dado por:
     * </p>
     * <pre>
-    *gradSaida = [numFiltros]
-    *gradSaida[n] = [alturaSaida, larguraSaida]
+    *gradSaida = Mat[numFiltros]
+    *gradSaida[n] = (alturaSaida, larguraSaida)
     * </pre>
     */
    public Mat[] gradSaida;
@@ -209,8 +209,8 @@ public class Convolucional extends Camada implements Cloneable{
     *    O formato dos gradientes para os filtros é dado por:
     * </p>
     * <pre>
-    *gradFiltros = [numFiltros]
-    *gradFiltros[n] = [alturaFiltro, larguraFiltro]
+    *gradFiltros = Mat(numFiltros, profundidadeEntrada)
+    *gradFiltros[i][j] = (alturaFiltro, larguraFiltro)
     * </pre>
     */
    public Mat[][] gradFiltros;
@@ -222,8 +222,8 @@ public class Convolucional extends Camada implements Cloneable{
     *    O formato dos gradientes para os bias é dado por:
     * </p>
     * <pre>
-    *gradBias = [numFiltros]
-    *gradBias[n] = [alturaSaida, larguraSaida]
+    *gradBias = Mat[numFiltros]
+    *gradBias[n] = (alturaSaida, larguraSaida)
     * </pre>
     */
    public Mat[] gradBias;
@@ -410,19 +410,11 @@ public class Convolucional extends Camada implements Cloneable{
       }
       this.numFiltros = filtros;
 
-      if(ativacao != null){
-         configurarAtivacao(ativacao);
-      }
-
+      
       Dicionario dic = new Dicionario();
-
-      if(iniKernel != null){
-         this.iniKernel = dic.obterInicializador(iniKernel);
-      }
-
-      if(iniBias != null){
-         this.iniBias = dic.obterInicializador(iniBias);
-      }      
+      if(ativacao != null) this.ativacao = dic.obterAtivacao(ativacao);
+      if(iniKernel != null) this.iniKernel = dic.obterInicializador(iniKernel);
+      if(iniBias != null) this.iniBias = dic.obterInicializador(iniBias);
    }
 
    /**
