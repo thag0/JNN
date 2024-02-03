@@ -252,8 +252,8 @@ public abstract class Modelo{
    public abstract void treinar(Object[] entradas, Object[] saidas, int epochs, int tamLote, boolean logs);
 
    /**
-    * Avalia o modelo calcular o valor de perda usando a função de perda
-    * que foi configurada.
+    * Avalia o modelo, calculando o seu valor de perda fazendo uso da função 
+    * de perda que foi configurada.
     * <p>
     *    É possível utilizar outras funções de perda mesmo que sejam diferentes
     *    da que o modelo usa, através de:
