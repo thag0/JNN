@@ -67,7 +67,7 @@ class TreinoLote{
       Perda perda = modelo.perda();
 
       double perdaEpoca;
-      for(int e = 0; e < epochs; e++){
+      for(int e = 1; e <= epochs; e++){
          aux.embaralharDados(entradas, saidas);
          perdaEpoca = 0;
 

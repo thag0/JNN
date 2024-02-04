@@ -7,6 +7,7 @@ import lib.geim.Geim;
 import rna.camadas.*;
 import rna.modelos.Modelo;
 import rna.modelos.Sequencial;
+import rna.otimizadores.SGD;
 import rna.serializacao.Serializador;
 
 public class MainConv{
@@ -62,7 +63,7 @@ public class MainConv{
       final var testeX = carregarDadosMNIST(caminhoTeste, NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
       final var testeY = criarRotulosMNIST(NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
       System.out.println("Perda teste: " + modelo.avaliar(testeX, testeY));
-      System.out.println("Acurárcia teste: " + modelo.avaliador.acuracia(testeX, testeY));
+      System.out.println("Acurárcia teste: " + (modelo.avaliador.acuracia(testeX, testeY) * 100) + "%");
       
       exportarHistorico(modelo, caminhoHistorico);
       salvarModelo(modelo, caminhoSaidaModelo);
@@ -94,18 +95,19 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{5, 5}, 44, "leakyrelu", "he"),
+         new Convolucional(formEntrada, new int[]{5, 5}, 52, "leakyrelu", "he"),
          new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{4, 4}, 44, "leakyrelu", "he"),
+         new Convolucional(new int[]{4, 4}, 52, "leakyrelu", "he"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(132, "sigmoid", "xavier"),
+         new Densa(128, "sigmoid", "xavier"),
          new Dropout(0.25),
-         new Densa(68, "sigmoid", "xavier"),
+         new Densa(128, "sigmoid", "xavier"),
+         new Dropout(0.2),
          new Densa(NUM_DIGITOS_TREINO, "softmax", "he")
       });
 
-      modelo.compilar("sgd", "entropia-cruzada");
+      modelo.compilar(new SGD(0.001, 0.99), "entropia-cruzada");
 
       return modelo;
    }
@@ -196,6 +198,10 @@ public class MainConv{
       return rotulos;
    }
 
+   /**
+    * 
+    * @param sample
+    */
    static void printImagemMNIST(double[][] sample){
       for(int y = 0; y < sample.length; y++){
          for(int x = 0; x < sample[y].length; x++){
