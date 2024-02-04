@@ -18,25 +18,25 @@ public class TreinoConv{
    static Geim geim = new Geim();
    static OpMatriz opmat = new OpMatriz();
    static Serializador serializador = new Serializador();
+   static int amostras = 20;
    static int digitos = 10;
-   static int amostras = 10;
    
    public static void main(String[] args){
       ged.limparConsole();
       
       Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/conv-mnist-91.txt");
       // modelo.info();
-      testarModelo(modelo, digitos, amostras+10);
+      testarModelo(modelo, digitos, amostras);
       // testarTodosDados(modelo);
 
       // tempoForward(modelo);
       // tempoBackward(modelo);
 
-      long t = medirTempo(() -> modelo.otimizador().atualizar(modelo.camadas()));
-      System.out.println(
-         "Tempo otimizador (" + modelo.otimizador().nome() + 
-         "): " + TimeUnit.NANOSECONDS.toMillis(t) + "ms"
-      ); 
+      // long t = medirTempo(() -> modelo.otimizador().atualizar(modelo.camadas()));
+      // System.out.println(
+      //    "Tempo otimizador (" + modelo.otimizador().nome() + 
+      //    "): " + TimeUnit.NANOSECONDS.toMillis(t) + "ms"
+      // ); 
    }
 
    static void testarTodosDados(Sequencial modelo){
@@ -143,7 +143,7 @@ public class TreinoConv{
 
       double acuraria = modelo.avaliador.acuracia(testeX, testeY);
       System.out.println("Perda: " + modelo.avaliar(testeX, testeY));
-      System.out.println("Acurácia: " + acuraria + "%");
+      System.out.println("Acurácia: " + (acuraria * 100) + "%");
    }
 
    static void testarPrevisao(Sequencial modelo, String imagemTeste, boolean prob){
