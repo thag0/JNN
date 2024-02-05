@@ -18,7 +18,7 @@ public class TreinoConv{
    static Geim geim = new Geim();
    static OpMatriz opmat = new OpMatriz();
    static Serializador serializador = new Serializador();
-   static int amostras = 20;
+   static int amostras = 100;
    static int digitos = 10;
    
    public static void main(String[] args){
