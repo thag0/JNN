@@ -1,4 +1,5 @@
 import java.awt.image.BufferedImage;
+import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
 
 import lib.ged.Dados;
@@ -7,7 +8,6 @@ import lib.geim.Geim;
 import rna.camadas.*;
 import rna.modelos.Modelo;
 import rna.modelos.Sequencial;
-import rna.otimizadores.SGD;
 import rna.serializacao.Serializador;
 
 public class MainConv{
@@ -56,14 +56,18 @@ public class MainConv{
 
       System.out.println();
       System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
-      System.out.println("Perda treino: " + modelo.avaliador.entropiaCruzada(treinoX, treinoY));
-      System.out.println("Acurárcia treino: " + modelo.avaliador.acuracia(treinoX, treinoY));
+      System.out.println(
+         "Treino -> perda: " + modelo.avaliar(treinoX, treinoY) + 
+         "- acurária: " + (modelo.avaliador.acuracia(treinoX, treinoY) * 100) + "%"
+      );
 
       System.out.println("\nCarregando dados de teste.");
       final var testeX = carregarDadosMNIST(caminhoTeste, NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
       final var testeY = criarRotulosMNIST(NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
-      System.out.println("Perda teste: " + modelo.avaliar(testeX, testeY));
-      System.out.println("Acurárcia teste: " + (modelo.avaliador.acuracia(testeX, testeY) * 100) + "%");
+      System.out.println(
+         "Teste -> perda: " + modelo.avaliar(testeX, testeY) + 
+         "- acurária: " + (modelo.avaliador.acuracia(testeX, testeY) * 100) + "%"
+      );
       
       exportarHistorico(modelo, caminhoHistorico);
       salvarModelo(modelo, caminhoSaidaModelo);
@@ -95,19 +99,19 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{5, 5}, 52, "leakyrelu", "he"),
+         new Convolucional(formEntrada, new int[]{3, 3}, 36, "leakyrelu", "he"),
          new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{4, 4}, 52, "leakyrelu", "he"),
+         new Convolucional(new int[]{3, 3}, 64, "leakyrelu", "he"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(128, "sigmoid", "xavier"),
+         new Densa(134, "sigmoid", "xavier"),
          new Dropout(0.25),
-         new Densa(128, "sigmoid", "xavier"),
-         new Dropout(0.2),
+         new Densa(64, "sigmoid", "xavier"),
+         new Dropout(0.25),
          new Densa(NUM_DIGITOS_TREINO, "softmax", "he")
       });
 
-      modelo.compilar(new SGD(0.001, 0.99), "entropia-cruzada");
+      modelo.compilar("sgd", "entropia-cruzada");
 
       return modelo;
    }
@@ -196,6 +200,25 @@ public class MainConv{
       
       System.out.println("Rótulos gerados de 0 a " + (digitos-1) + ".");
       return rotulos;
+   }
+
+   /**
+    * Formata o valor recebido para a quantidade de casas após o ponto
+    * flutuante.
+    * @param valor valor alvo.
+    * @param casas quantidade de casas após o ponto flutuante.
+    * @return
+    */
+   static String formatarDecimal(double valor, int casas){
+      String valorFormatado = "";
+
+      String formato = "#.";
+      for(int i = 0; i < casas; i++) formato += "#";
+
+      DecimalFormat df = new DecimalFormat(formato);
+      valorFormatado = df.format(valor);
+
+      return valorFormatado;
    }
 
    /**
