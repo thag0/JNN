@@ -8,6 +8,7 @@ import lib.ged.Dados;
 import lib.ged.Ged;
 import lib.geim.Geim;
 import rna.camadas.Camada;
+import rna.camadas.Convolucional;
 import rna.core.Mat;
 import rna.core.OpMatriz;
 import rna.modelos.Sequencial;
@@ -25,17 +26,29 @@ public class TreinoConv{
       ged.limparConsole();
       
       Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/modelo-convolucional.txt");
+      modelo.info();
+
+      Convolucional camada = (Convolucional) modelo.camada(0);
+      var bias = camada.bias.clone();
+      double[] somaBias = new double[bias.length];
+      for(int i = 0; i < bias.length; i++){
+         somaBias[i] = bias[i].somarElementos();
+      }
+      
+      Mat b = new Mat(somaBias);
+      b.print(6);
+
       // testarModelo(modelo, digitos, amostras);
       // testarTodosDados(modelo);
 
-      tempoForward(modelo);//keras += 30ms
-      tempoBackward(modelo);
+      // tempoForward(modelo);//keras += 30ms
+      // tempoBackward(modelo);
 
       // long t = medirTempo(() -> modelo.otimizador().atualizar(modelo.camadas()));
       // System.out.println(
       //    "Tempo otimizador (" + modelo.otimizador().nome() + 
       //    "): " + TimeUnit.NANOSECONDS.toMillis(t) + "ms"
-      // ); 
+      // );
    }
 
    static void testarTodosDados(Sequencial modelo){

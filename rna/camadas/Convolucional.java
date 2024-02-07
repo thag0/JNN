@@ -788,9 +788,9 @@ public class Convolucional extends Camada implements Cloneable{
       super.verificarConstrucao();
       int parametros = 0;
 
-      parametros += this.numFiltros * this.profEntrada * this.altFiltro * this.largFiltro;
+      parametros += filtros.length * filtros[0].length * filtros[0][0].tamanho();
       if(this.usarBias){
-         parametros += this.bias.length * this.altSaida * this.altSaida;
+         parametros += bias.length * bias[0].tamanho();
       }
 
       return parametros;

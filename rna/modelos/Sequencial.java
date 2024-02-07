@@ -419,7 +419,7 @@ public class Sequencial extends Modelo implements Cloneable{
       //camadas
       sb.append(
          espacamento + String.format(
-         "%-23s%-23s%-23s%-23s\n", "Camada", "Entrada", "Saída", "Ativação"
+         "%-23s%-23s%-23s%-23s%-23s\n", "Camada", "Entrada", "Saída", "Ativação", "Parâmetros"
          )
       );
 
@@ -452,9 +452,12 @@ public class Sequencial extends Modelo implements Cloneable{
             ativacao = "n/a";
          }
 
+
+         String parametros = String.valueOf(camada.numParametros());
+
          sb.append(
             espacamento + String.format(
-               "%-23s%-23s%-23s%-23s\n", nomeCamada, formEntrada, formSaida, ativacao
+               "%-23s%-23s%-23s%-23s%-23s\n", nomeCamada, formEntrada, formSaida, ativacao, parametros
             )
          );
       }

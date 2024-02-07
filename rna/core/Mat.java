@@ -670,6 +670,19 @@ public class Mat{
    }
 
    /**
+    * Soma todos os valores contidos na matriz.
+    * @return resultado da soma.
+    */
+   public double somarElementos(){
+      double soma = 0;
+      for(int i = 0; i < dados.length; i++){
+         soma += dados[i];
+      }
+
+      return soma;
+   }
+
+   /**
     * Retorna o conteúdo da linha indicada.
     * @param lin índice da linha.
     * @return array contendo os valores dentro da linha 
