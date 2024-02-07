@@ -24,8 +24,7 @@ public class TreinoConv{
    public static void main(String[] args){
       ged.limparConsole();
       
-      // Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/modelo-convolucional.txt");
-      Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/conv-mnist-89.txt");
+      Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/modelo-convolucional.txt");
       // testarModelo(modelo, digitos, amostras);
       // testarTodosDados(modelo);
 

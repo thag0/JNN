@@ -86,8 +86,8 @@ public class MainConv{
          new Convolucional(new int[]{3, 3}, 64, "leakyrelu", "he"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(128, "sigmoid", "xavier"),
-         new Dropout(0.2),
+         new Densa(132, "sigmoid", "xavier"),
+         new Dropout(0.25),
          new Densa(NUM_DIGITOS_TREINO, "softmax", "xavier")
       });
 
