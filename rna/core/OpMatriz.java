@@ -457,28 +457,61 @@ public class OpMatriz{
     * não será zerada antes da operação, se {@code falso} a matriz de resultados será
     * zerada antes da operação.
     */
-   public void correlacaoCruzada(Mat[] entrada, Mat[][] filtros, Mat[] saida, boolean add){
+   public void convForward(Mat[] entrada, Mat[][] filtros, Mat[] saida, boolean add){
       if(entrada == null || filtros == null || saida == null){
          throw new IllegalArgumentException("Os valores fornecidos não podem ser nulos.");
       }
       int numFiltros = filtros.length;
       int profEntrada = entrada.length;
 
-      //talvez considerar valores mais otimizados
       int numThreads = (profEntrada > 10) ? Runtime.getRuntime().availableProcessors()/2 : 1;
-      ExecutorService executor = Executors.newFixedThreadPool(numThreads);
-
-      for(int i = 0; i < numFiltros; i++){
-         final int idFiltro = i;
-         executor.submit(() -> {
+      
+      if(numThreads == 1){
+         for(int i = 0; i < numFiltros; i++){
             for(int j = 0; j < profEntrada; j++){
-               correlacaoCruzada(entrada[j], filtros[idFiltro][j], saida[idFiltro], true);
+               correlacaoCruzada(entrada[j], filtros[i][j], saida[i], true);
+            }
+         }
+         
+      }else{
+         ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+         for(int i = 0; i < numFiltros; i++){
+            final int idFiltro = i;
+            executor.submit(() -> {
+               for(int j = 0; j < profEntrada; j++){
+                  correlacaoCruzada(entrada[j], filtros[idFiltro][j], saida[idFiltro], true);
+               }
+            });
+         }
+         executor.shutdown();
+
+         try{
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+         }catch(InterruptedException e){
+            e.printStackTrace();
+         }
+      }
+   }
+
+   public void convBackward(Mat[] entrada, Mat[][] filtros, Mat[] derivada, Mat[][] gradFiltros, Mat[] gradEntrada){
+      int profEntrada = entrada.length;
+      int numFiltros = filtros.length;
+      
+      int numThreads = 2;
+      ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+      
+      for(int i = 0; i < profEntrada; i++){
+         final int idEntrada = i;
+         executor.submit(() -> {
+            for (int j = 0; j < numFiltros; j++){
+               correlacaoCruzada(entrada[idEntrada], derivada[j], gradFiltros[j][idEntrada], false);
+               convolucaoFull(derivada[j], filtros[j][idEntrada], gradEntrada[idEntrada], true);
             }
          });
       }
-
+  
       executor.shutdown();
-      try {
+      try{
          executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
       }catch(InterruptedException e){
          e.printStackTrace();

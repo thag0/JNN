@@ -26,12 +26,11 @@ public class TreinoConv{
       
       // Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/modelo-convolucional.txt");
       Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/conv-mnist-89.txt");
-      modelo.info();
       // testarModelo(modelo, digitos, amostras);
       // testarTodosDados(modelo);
 
-      // tempoForward(modelo);
-      // tempoBackward(modelo);
+      tempoForward(modelo);//keras += 30ms
+      tempoBackward(modelo);
 
       // long t = medirTempo(() -> modelo.otimizador().atualizar(modelo.camadas()));
       // System.out.println(

@@ -45,7 +45,7 @@ public class MainConv{
 
       System.out.println("Treinando.");
       t1 = System.nanoTime();
-      rodarTreino(modelo, treinoX, treinoY, 45);
+      modelo.treinar(treinoX, treinoY, 30, true);
       t2 = System.nanoTime();
       
       long tempoDecorrido = t2 - t1;
@@ -58,7 +58,7 @@ public class MainConv{
       System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
       System.out.println(
          "Treino -> perda: " + modelo.avaliar(treinoX, treinoY) + 
-         "- acurária: " + (modelo.avaliador.acuracia(treinoX, treinoY) * 100) + "%"
+         " - acurácia: " + (modelo.avaliador.acuracia(treinoX, treinoY) * 100) + "%"
       );
 
       System.out.println("\nCarregando dados de teste.");
@@ -66,30 +66,12 @@ public class MainConv{
       final var testeY = criarRotulosMNIST(NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
       System.out.println(
          "Teste -> perda: " + modelo.avaliar(testeX, testeY) + 
-         "- acurária: " + (modelo.avaliador.acuracia(testeX, testeY) * 100) + "%"
+         " - acurácia: " + (modelo.avaliador.acuracia(testeX, testeY) * 100) + "%"
       );
       
       exportarHistorico(modelo, caminhoHistorico);
       salvarModelo(modelo, caminhoSaidaModelo);
       MainImg.executarComando("python grafico.py " + caminhoHistorico);
-   }
-
-   /**
-    * Executa o treino numa thread separada.
-    * @param modelo modelo.
-    * @param entradas dados de entrada.
-    * @param saidas dados de saída correspondente a entrada.
-    * @param epochs épocas de treino.
-    */
-   static void rodarTreino(Sequencial modelo, double[][][][] entradas, double[][] saidas, int epochs){
-      try{
-         Thread t = new Thread(() -> modelo.treinar(entradas, saidas, epochs, true));
-         t.setPriority(Thread.MAX_PRIORITY);
-         t.start();
-         t.join();
-      }catch(Exception e){
-         e.printStackTrace();
-      }
    }
 
    /*
@@ -99,16 +81,14 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{3, 3}, 46, "leakyrelu", "he"),
+         new Convolucional(formEntrada, new int[]{3, 3}, 32, "leakyrelu", "he"),
          new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{3, 3}, 46, "leakyrelu", "he"),
+         new Convolucional(new int[]{3, 3}, 64, "leakyrelu", "he"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
          new Densa(128, "sigmoid", "xavier"),
-         new Dropout(0.25),
-         new Densa(128, "sigmoid", "xavier"),
-         new Dropout(0.25),
-         new Densa(NUM_DIGITOS_TREINO, "softmax", "he")
+         new Dropout(0.2),
+         new Densa(NUM_DIGITOS_TREINO, "softmax", "xavier")
       });
 
       modelo.compilar("sgd", "entropia-cruzada");

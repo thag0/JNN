@@ -668,8 +668,8 @@ public class Convolucional extends Camada implements Cloneable{
     *    Após a propagação dos dados, a função de ativação da camada é aplicada
     *    ao resultado do somatório e o resultado é salvo da saída da camada.
     * </p>
-    * @param entrada dados de entrada que serão processados, deve ser um array 
-    * tridimensional do tipo {@code double[][][]}.
+    * @param entrada dados de entrada que serão processados, tipos aceitos são {@code double[]},
+    * {@code double[][][]} ou {@code Mat[]}.
     * @throws IllegalArgumentException caso a entrada fornecida não seja suportada 
     * pela camada.
     * @throws IllegalArgumentException caso haja alguma incompatibilidade entre a entrada
@@ -701,18 +701,17 @@ public class Convolucional extends Camada implements Cloneable{
          throw new IllegalArgumentException(
             "Os dados de entrada para a camada Convolucional devem ser " +
             "do tipo \"double[][][]\", \"double[]\" ou \"Mat[]\", objeto recebido é do tipo \"" + 
-            entrada.getClass().getTypeName() + "\""
+            entrada.getClass().getTypeName() + "\"."
          );
       }
 
       //feedforward
-      if(this.usarBias){
+      if(usarBias){
          utils.copiar(this.bias, this.somatorio);
       }
+      opmat.convForward(this.entrada, this.filtros, this.somatorio, true);
 
-      this.opmat.correlacaoCruzada(this.entrada, this.filtros, this.somatorio, true);
-
-      this.ativacao.calcular(this);
+      ativacao.calcular(this);
    }
 
    /**
@@ -748,18 +747,19 @@ public class Convolucional extends Camada implements Cloneable{
       }
       utils.copiar(grads, this.gradSaida);
 
-      this.ativacao.derivada(this);
-      for(int i = 0; i < this.profEntrada; i++){
+      ativacao.derivada(this);
+      for(int i = 0; i < profEntrada; i++){
          this.gradEntrada[i].preencher(0);
       }
 
       //backward
-      for(int i = 0; i < this.profEntrada; i++){
-         for(int j = 0; j < this.numFiltros; j++){
-            opmat.correlacaoCruzada(this.entrada[i], this.derivada[j], this.gradFiltros[j][i], false);
-            opmat.convolucaoFull(this.derivada[j], this.filtros[j][i], this.gradEntrada[i], true);
-         }
-      }
+      opmat.convBackward(this.entrada, this.filtros, this.derivada, this.gradFiltros, this.gradEntrada);
+      // for(int i = 0; i < profEntrada; i++){
+      //    for(int j = 0; j < numFiltros; j++){
+      //       opmat.correlacaoCruzada(this.entrada[i], this.derivada[j], this.gradFiltros[j][i], false);
+      //       opmat.convolucaoFull(this.derivada[j], this.filtros[j][i], this.gradEntrada[i], true);
+      //    }
+      // }
 
       if(this.usarBias){
          utils.copiar(this.derivada, this.gradBias);
