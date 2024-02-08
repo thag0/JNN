@@ -2,12 +2,12 @@ package testes.modelos;
 
 import java.io.Serializable;
 
+import rna.camadas.Convolucional;
 import lib.ged.Dados;
 import lib.ged.Ged;
 import rna.ativacoes.Sigmoid;
 import rna.avaliacao.perda.MSE;
 import rna.camadas.Camada;
-import rna.camadas.Convolucional;
 import rna.camadas.Densa;
 import rna.inicializadores.Xavier;
 import rna.inicializadores.Zeros;

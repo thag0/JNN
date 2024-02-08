@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit;
 import lib.ged.Dados;
 import lib.ged.Ged;
 import rna.avaliacao.perda.EntropiaCruzada;
-import rna.camadas.Convolucional;
 import rna.camadas.Densa;
 import rna.camadas.Dropout;
 import rna.camadas.Flatten;
@@ -25,9 +24,12 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
 
-      Mat m = new Mat(2, 2);
-      new AleatorioPositivo(2.0).inicializar(m);
-      m.print(4);
+      Mat m = new Mat(new double[][]{
+         {1, -1},
+         {-1, 1}
+      });
+
+      System.out.println(m.somarElementos());
    }
 
    static long medirTempo(Runnable func){

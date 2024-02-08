@@ -448,7 +448,7 @@ public class OpMatriz{
    } 
 
    /**
-    * Implementação especializada para a propação direta de camadas convolucionais,
+    * Implementação especializada para a propagação direta de camadas convolucionais,
     * para que aproveitem um pouco do paralelismo para acelerar o processo de aprendizado.
     * @param entrada conjunto de entradas.
     * @param filtros conjuntos de filtros.
@@ -493,19 +493,28 @@ public class OpMatriz{
       }
    }
 
+   /**
+    * Implementação exclusiva para propagação reversa de camadas convolucionais,
+    * para que aproveitem um pouco do paralelismo para acelerar o processo de aprendizado.
+    * @param entrada entrada da camada.
+    * @param filtros filtros da camada.
+    * @param derivada matrizes com os valores de derivada da função de ativação da camada.
+    * @param gradFiltros gradiente dos filtros da camada.
+    * @param gradEntrada gradiente de entrada da camada.
+    */
    public void convBackward(Mat[] entrada, Mat[][] filtros, Mat[] derivada, Mat[][] gradFiltros, Mat[] gradEntrada){
       int profEntrada = entrada.length;
       int numFiltros = filtros.length;
       
-      int numThreads = 2;
+      int numThreads = Runtime.getRuntime().availableProcessors()/2;
       ExecutorService executor = Executors.newFixedThreadPool(numThreads);
       
       for(int i = 0; i < profEntrada; i++){
-         final int idEntrada = i;
+         int id = i;
          executor.submit(() -> {
-            for (int j = 0; j < numFiltros; j++){
-               correlacaoCruzada(entrada[idEntrada], derivada[j], gradFiltros[j][idEntrada], false);
-               convolucaoFull(derivada[j], filtros[j][idEntrada], gradEntrada[idEntrada], true);
+         for(int j = 0; j < numFiltros; j++){
+               correlacaoCruzada(entrada[id], derivada[j], gradFiltros[j][id], false);
+               convolucaoFull(derivada[j], filtros[j][id], gradEntrada[id], true);
             }
          });
       }

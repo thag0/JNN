@@ -15,8 +15,8 @@ public class MainConv{
    static Geim geim = new Geim();
 
    static final int NUM_DIGITOS_TREINO = 10;
-   static final int NUM_AMOSTRAS_TREINO = 100;
    static final int NUM_DIGITOS_TESTE = 10;
+   static final int NUM_AMOSTRAS_TREINO = 100;
    static final int NUM_AMOSTRAS_TESTE = 100;
 
    static final String caminhoTreino = "/dados/mnist/treino/";
@@ -45,9 +45,9 @@ public class MainConv{
 
       System.out.println("Treinando.");
       t1 = System.nanoTime();
-      modelo.treinar(treinoX, treinoY, 35, true);
+      modelo.treinar(treinoX, treinoY, 25, true);
       t2 = System.nanoTime();
-      
+
       long tempoDecorrido = t2 - t1;
       long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempoDecorrido);
       horas = segundosTotais / 3600;
@@ -81,13 +81,12 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{3, 3}, 34, "leakyrelu", "he"),
+         new Convolucional(formEntrada, new int[]{3, 3}, 32, "leakyrelu", "he"),
          new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{3, 3}, 66, "leakyrelu", "he"),
+         new Convolucional(new int[]{3, 3}, 64, "leakyrelu", "he"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
          new Densa(128, "sigmoid", "xavier"),
-         new Dropout(0.3),
          new Densa(NUM_DIGITOS_TREINO, "softmax", "xavier")
       });
 
