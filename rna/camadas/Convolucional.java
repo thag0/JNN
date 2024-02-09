@@ -7,7 +7,7 @@ import rna.core.Mat;
 import rna.core.OpMatriz;
 import rna.core.Utils;
 import rna.inicializadores.Inicializador;
-import rna.inicializadores.Xavier;
+import rna.inicializadores.GlorotUniforme;
 import rna.inicializadores.Zeros;
 
 /**
@@ -236,7 +236,7 @@ public class Convolucional extends Camada implements Cloneable{
    /**
     * Inicializador para os pesos da camada.
     */
-   private Inicializador iniKernel = new Xavier();
+   private Inicializador iniKernel = new GlorotUniforme();
 
    /**
     * Inicializador para os bias da camada.
@@ -706,9 +706,14 @@ public class Convolucional extends Camada implements Cloneable{
       }
 
       //feedforward
+      for(int i = 0; i < somatorio.length; i++){
+         somatorio[i].preencher(0);
+      }
+
       if(usarBias){
          utils.copiar(this.bias, this.somatorio);
       }
+      
       opmat.convForward(this.entrada, this.filtros, this.somatorio, true);
 
       ativacao.calcular(this);

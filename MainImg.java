@@ -76,12 +76,12 @@ public class MainImg{
 
    static Modelo criarSequencial(int entradas, int saidas){
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Densa(entradas, 7, "sigmoid", "xavier"),
-         new Densa(7, "sigmoid", "xavier"),
-         new Densa(saidas, "sigmoid", "xavier")
+         new Densa(entradas, 7, "sigmoid", "glorot-uniforme"),
+         new Densa(7, "sigmoid", "glorot-uniforme"),
+         new Densa(saidas, "sigmoid", "glorot-uniforme")
       });
 
-      modelo.compilar("sgd", "mse");
+      modelo.compilar(new Adam(0.001), "mse");
       modelo.configurarHistorico(calcularHistorico);
 
       return modelo;
@@ -98,7 +98,7 @@ public class MainImg{
     */
    static long treinoEmPainel(Modelo modelo, int altura, int largura, double[][] entradas, double[][] saidas){
       final int fps = 6000;
-      int epocasPorFrame = 40;
+      int epocasPorFrame = 50;
 
       //acelerar o processo de desenho
       //bom em situações de janelas muito grandes

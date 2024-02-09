@@ -45,7 +45,7 @@ public class MainConv{
 
       System.out.println("Treinando.");
       t1 = System.nanoTime();
-      modelo.treinar(treinoX, treinoY, 25, true);
+      modelo.treinar(treinoX, treinoY, 30, true);
       t2 = System.nanoTime();
 
       long tempoDecorrido = t2 - t1;
@@ -81,13 +81,14 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{3, 3}, 32, "leakyrelu", "he"),
+         new Convolucional(formEntrada, new int[]{3, 3}, 32, "leaky-relu", "glorot-uniforme"),
          new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{3, 3}, 64, "leakyrelu", "he"),
+         new Convolucional(new int[]{3, 3}, 64, "leaky-relu", "glorot-uniforme"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(128, "sigmoid", "xavier"),
-         new Densa(NUM_DIGITOS_TREINO, "softmax", "xavier")
+         new Densa(128, "sigmoid", "glorot-uniforme"),
+         new Dropout(0.25),
+         new Densa(NUM_DIGITOS_TREINO, "softmax", "glorot-uniforme")
       });
 
       modelo.compilar("sgd", "entropia-cruzada");

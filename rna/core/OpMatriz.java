@@ -201,14 +201,12 @@ public class OpMatriz{
       verificarLinhas(a, r);
       verificarColunas(b, r);
 
-      int i, j, k;
       int lin = r.lin(), col = r.col(), acol = a.col();
       double res;
-
-      for(i = 0; i < lin; i++){
-         for(j = 0; j < col; j++){
+      for(int i = 0; i < lin; i++){
+         for(int j = 0; j < col; j++){
             res = 0;
-            for(k = 0; k < acol; k++){
+            for(int k = 0; k < acol; k++){
                res += a.elemento(i, k) * b.elemento(k, j);
             }
             r.editar(i, j, res);
@@ -565,16 +563,15 @@ public class OpMatriz{
          r.preencher(0);
       }
 
-      int i, j, k, l;
       int rLin = r.lin(), rCol = r.col();
       int bLin = b.lin(), bCol = b.col();
       double res;
-      for(i = 0; i < rLin; i++){
-         for(j = 0; j < rCol; j++){
+      for(int i = 0; i < rLin; i++){
+         for(int j = 0; j < rCol; j++){
             
             res = 0;
-            for(k = 0; k < bLin; k++){
-               for(l = 0; l < bCol; l++){
+            for(int k = 0; k < bLin; k++){
+               for(int l = 0; l < bCol; l++){
                   res += a.elemento(i + k, j + l) * b.elemento(k, l);
                }
             }

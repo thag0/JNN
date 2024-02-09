@@ -279,51 +279,6 @@ public class Sequencial extends Modelo implements Cloneable{
 
       return previsoes;
    }
-
-   @Override
-   public void treinar(Object[] entradas, Object[] saidas, int epochs, boolean logs){
-      super.verificarCompilacao();
-      
-      if(entradas.length != saidas.length){
-         throw new IllegalArgumentException(
-            "Incompatibilidade na quantidade de amostras de entrada (" + entradas.length + ")" +
-            "e saídas (" + saidas.length + ")."
-         );
-      }
-
-      if(epochs < 1){
-         throw new IllegalArgumentException(
-            "O valor de épocas deve ser maior que zero, recebido = " + epochs
-         );
-      }
-
-      treinador.treino(this, entradas, saidas, epochs, logs);
-   }
-   
-   @Override
-   public void treinar(Object[] entradas, Object[] saidas, int epochs, int tamLote, boolean logs){
-     super.verificarCompilacao();
-
-      if(epochs < 1){
-         throw new IllegalArgumentException(
-            "O valor de epochs (" + epochs + ") não pode ser menor que um"
-         );
-      }
-      if(tamLote <= 0 || tamLote > entradas.length){
-         throw new IllegalArgumentException(
-            "O valor de tamanho do lote (" + tamLote + ") é inválido."
-         );
-      }
-
-     this.treinador.treino(
-        this,
-        entradas,
-        saidas,
-        epochs,
-        tamLote,
-        logs
-     );
-  }
   
    @Override
    public Otimizador otimizador(){

@@ -6,7 +6,7 @@ import rna.core.Dicionario;
 import rna.core.Mat;
 import rna.core.OpMatriz;
 import rna.inicializadores.Inicializador;
-import rna.inicializadores.Xavier;
+import rna.inicializadores.GlorotUniforme;
 import rna.inicializadores.Zeros;
 
 /**
@@ -201,7 +201,7 @@ public class Densa extends Camada implements Cloneable{
    /**
     * Inicializador para os pesos da camada.
     */
-   private Inicializador iniKernel = new Xavier();
+   private Inicializador iniKernel = new GlorotUniforme();
 
    /**
     * Inicializador para os bias da camada.

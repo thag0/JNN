@@ -13,7 +13,7 @@ import rna.core.Mat;
 import rna.core.OpMatriz;
 import rna.inicializadores.AleatorioPositivo;
 import rna.inicializadores.Inicializador;
-import rna.inicializadores.Xavier;
+import rna.inicializadores.GlorotUniforme;
 import rna.treinamento.AuxiliarTreino;
 
 @SuppressWarnings("unused")

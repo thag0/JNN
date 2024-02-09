@@ -25,12 +25,12 @@ import rna.inicializadores.Aleatorio;
 import rna.inicializadores.AleatorioPositivo;
 import rna.inicializadores.Constante;
 import rna.inicializadores.Gaussiano;
-import rna.inicializadores.Glorot;
 import rna.inicializadores.He;
 import rna.inicializadores.Identidade;
 import rna.inicializadores.Inicializador;
 import rna.inicializadores.LeCun;
-import rna.inicializadores.Xavier;
+import rna.inicializadores.GlorotNormal;
+import rna.inicializadores.GlorotUniforme;
 import rna.inicializadores.Zeros;
 import rna.otimizadores.AMSGrad;
 import rna.otimizadores.AdaGrad;
@@ -210,11 +210,11 @@ public class Dicionario{
             case "aleatoriopositivo"   : return new AleatorioPositivo();
             case "constante"           : return new Constante();
             case "gaussiano"           : return new Gaussiano();
-            case "glorot"              : return new Glorot();
+            case "glorotnormal"        : return new GlorotNormal();
+            case "glorotuniforme"      : return new GlorotUniforme();
             case "he"                  : return new He();
             case "identidade"          : return new Identidade();
             case "lecun"               : return new LeCun();
-            case "xavier"              : return new Xavier();
             case "zeros"               : return new Zeros();
             
             default: throw new IllegalArgumentException(

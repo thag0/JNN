@@ -233,7 +233,24 @@ public abstract class Modelo{
     * @param epochs quantidade de épocas de treinamento.
     * @param logs logs para perda durante as épocas de treinamento.
     */
-   public abstract void treinar(Object[] entradas, Object[] saidas, int epochs, boolean logs);
+   public void treinar(Object[] entradas, Object[] saidas, int epochs, boolean logs){
+      verificarCompilacao();
+      
+      if(entradas.length != saidas.length){
+         throw new IllegalArgumentException(
+            "Incompatibilidade na quantidade de amostras de entrada (" + entradas.length + ")" +
+            "e saídas (" + saidas.length + ")."
+         );
+      }
+
+      if(epochs < 1){
+         throw new IllegalArgumentException(
+            "O valor de épocas deve ser maior que zero, recebido = " + epochs
+         );
+      }
+
+      treinador.treino(this, entradas, saidas, epochs, logs);
+   }
    
    /**
     * Treina o modelo de acordo com as configurações predefinidas.
@@ -249,7 +266,22 @@ public abstract class Modelo{
     * @param tamLote tamanho do lote de treinamento.
     * @param logs logs para perda durante as épocas de treinamento.
     */
-   public abstract void treinar(Object[] entradas, Object[] saidas, int epochs, int tamLote, boolean logs);
+   public void treinar(Object[] entradas, Object[] saidas, int epochs, int tamLote, boolean logs){
+      verificarCompilacao();
+
+      if(epochs < 1){
+         throw new IllegalArgumentException(
+            "O valor de epochs (" + epochs + ") não pode ser menor que um"
+         );
+      }
+      if(tamLote <= 0 || tamLote > entradas.length){
+         throw new IllegalArgumentException(
+            "O valor de tamanho do lote (" + tamLote + ") é inválido."
+         );
+      }
+
+      treinador.treino(this, entradas, saidas, epochs, tamLote, logs);
+   }
 
    /**
     * Avalia o modelo, calculando o seu valor de perda fazendo uso da função 
@@ -284,13 +316,13 @@ public abstract class Modelo{
  
       double[][] s = (double[][]) saida;
       int n = entrada.length;
-      double perda = 0;
+      double soma = 0;
       for(int i = 0; i < n; i++){
-         this.calcularSaida(entrada[i]);
-         perda += this.perda.calcular(this.saidaParaArray(), s[i]);
+         calcularSaida(entrada[i]);
+         soma += perda.calcular(saidaParaArray(), s[i]);
       }
 
-      return perda/n;
+      return soma/n;
    }
 
    /**
@@ -373,14 +405,7 @@ public abstract class Modelo{
     * @return array contendo o valor de perda durante cada época de treinamento do modelo.
     */
    public double[] historico(){
-      if(this.calcularHistorico){
-         return this.treinador.obterHistorico();
-      
-      }else{
-         throw new UnsupportedOperationException(
-            "O histórico de treino do modelo deve ser configurado previamente."
-         );
-      }
+      return treinador.obterHistorico();
    }
 
    /**

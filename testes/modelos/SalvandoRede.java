@@ -9,7 +9,7 @@ import rna.ativacoes.Sigmoid;
 import rna.avaliacao.perda.MSE;
 import rna.camadas.Camada;
 import rna.camadas.Densa;
-import rna.inicializadores.Xavier;
+import rna.inicializadores.GlorotUniforme;
 import rna.inicializadores.Zeros;
 import rna.modelos.*;
 import rna.otimizadores.*;
