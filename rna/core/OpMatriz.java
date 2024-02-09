@@ -504,8 +504,7 @@ public class OpMatriz{
       int profEntrada = entrada.length;
       int numFiltros = filtros.length;
       
-      int numThreads = Runtime.getRuntime().availableProcessors()/2;
-      ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+      ExecutorService executor = Executors.newFixedThreadPool(2);
       
       for(int i = 0; i < profEntrada; i++){
          int id = i;
