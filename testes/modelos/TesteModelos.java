@@ -2,7 +2,6 @@ package testes.modelos;
 
 import lib.ged.Dados;
 import lib.ged.Ged;
-import rna.avaliacao.perda.MSE;
 import rna.camadas.Camada;
 import rna.camadas.Densa;
 import rna.core.OpMatriz;
@@ -32,11 +31,13 @@ public class TesteModelos{
       int nEntradas = entrada[0].length;
       int nSaidas = saida[0].length;
       int nOcultas = 3;
-      long seed = 0;
-      int epocas = 20_000;
+      long seed = 1;
+      int epocas = 10_000;
 
       String atv1 = "sigmoid";
       String atv2 = "sigmoid";
+      String otm = "rmsprop";
+      String perda = "mse";
 
       Sequencial seq = new Sequencial(new Camada[]{
          new Densa(nEntradas, nOcultas, atv1),
@@ -44,19 +45,19 @@ public class TesteModelos{
          new Densa(nSaidas, atv2)
       });
       seq.configurarSeed(seed);
-      seq.compilar("adagrad", new MSE());
+      seq.compilar(otm, perda);
       
       RedeNeural rna = new RedeNeural(new int[]{nEntradas, nOcultas, nOcultas, nSaidas});
       rna.configurarSeed(seed);
-      rna.compilar("adagrad", new MSE());
+      rna.compilar(otm, perda);
       rna.configurarAtivacao(atv1);
       rna.configurarAtivacao(rna.camadaSaida(), atv2);
       
       seq.treinar(entrada, saida, epocas, false);
       rna.treinar(entrada, saida, epocas, false);
 
-      double perdaSeq = seq.avaliador.erroMedioQuadrado(entrada, saida);
-      double perdaRna = rna.avaliador.erroMedioQuadrado(entrada, saida);
+      double perdaSeq = seq.avaliador().erroMedioQuadrado(entrada, saida);
+      double perdaRna = rna.avaliador().erroMedioQuadrado(entrada, saida);
 
       System.out.println("Perda Seq: " + perdaSeq);
       System.out.println("Perda Rna: " + perdaRna);

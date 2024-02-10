@@ -136,7 +136,7 @@ public class Conv{
       var testeX = carregarDadosMNIST("/dados/mnist/teste/", amostras, digitos);
       var testeY = criarRotulosMNIST(amostras, digitos);
 
-      double acuraria = modelo.avaliador.acuracia(testeX, testeY);
+      double acuraria = modelo.avaliador().acuracia(testeX, testeY);
       System.out.println("Perda: " + modelo.avaliar(testeX, testeY));
       System.out.println("Acurácia: " + (acuraria * 100) + "%");
    }

@@ -58,7 +58,7 @@ public class MainConv{
       System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
       System.out.println(
          "Treino -> perda: " + modelo.avaliar(treinoX, treinoY) + 
-         " - acurácia: " + (modelo.avaliador.acuracia(treinoX, treinoY) * 100) + "%"
+         " - acurácia: " + (modelo.avaliador().acuracia(treinoX, treinoY) * 100) + "%"
       );
 
       System.out.println("\nCarregando dados de teste.");
@@ -66,7 +66,7 @@ public class MainConv{
       final var testeY = criarRotulosMNIST(NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
       System.out.println(
          "Teste -> perda: " + modelo.avaliar(testeX, testeY) + 
-         " - acurácia: " + (modelo.avaliador.acuracia(testeX, testeY) * 100) + "%"
+         " - acurácia: " + (modelo.avaliador().acuracia(testeX, testeY) * 100) + "%"
       );
       
       exportarHistorico(modelo, caminhoHistorico);
@@ -81,13 +81,13 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{3, 3}, 34, "leaky-relu", "glorot-uniforme"),
+         new Convolucional(formEntrada, new int[]{3, 3}, 36, "leaky-relu", "glorot-uniforme"),
          new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{3, 3}, 66, "leaky-relu", "glorot-uniforme"),
+         new Convolucional(new int[]{3, 3}, 64, "leaky-relu", "glorot-uniforme"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
          new Densa(128, "sigmoid", "glorot-uniforme"),
-         new Dropout(0.25),
+         new Dropout(0.2),
          new Densa(NUM_DIGITOS_TREINO, "softmax", "glorot-uniforme")
       });
 

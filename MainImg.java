@@ -51,7 +51,7 @@ public class MainImg{
       minutos = (segundosTotais % 3600) / 60;
       segundos = segundosTotais % 60;
 
-      double precisao = (1 - modelo.avaliador.erroMedioQuadrado(in, out))*100;
+      double precisao = (1 - modelo.avaliador().erroMedioQuadrado(in, out))*100;
       System.out.println("Precisão = " + formatarDecimal(precisao, 2) + "%");
       System.out.println("Perda = " + modelo.avaliar(in, out));
       System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
@@ -76,12 +76,12 @@ public class MainImg{
 
    static Modelo criarSequencial(int entradas, int saidas){
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Densa(entradas, 7, "sigmoid", "glorot-uniforme"),
-         new Densa(7, "sigmoid", "glorot-uniforme"),
-         new Densa(saidas, "sigmoid", "glorot-uniforme")
+         new Densa(entradas, 8, "sigmoid"),
+         new Densa(8, "sigmoid"),
+         new Densa(saidas, "sigmoid")
       });
 
-      modelo.compilar(new Adam(0.001), "mse");
+      modelo.compilar("sgd", "mse");
       modelo.configurarHistorico(calcularHistorico);
 
       return modelo;

@@ -66,7 +66,7 @@ public abstract class Modelo{
     *    Cada modelo possui seu próprio avaliador.
     * </p>
     */
-   public Avaliador avaliador = new Avaliador(this);
+   protected Avaliador avaliador = new Avaliador(this);
    
    /**
     * Inicializa um modelo vazio, sem implementações de métodos.
@@ -291,7 +291,7 @@ public abstract class Modelo{
     *    da que o modelo usa, através de:
     * </p>
     * <pre>
-    * modelo.avaliador
+    * modelo.avaliador()
     * </pre>
     * @param entrada dados de entrada para avaliação.
     * @param saida dados de saída correspondente as entradas fornecidas.
@@ -323,6 +323,15 @@ public abstract class Modelo{
       }
 
       return soma/n;
+   }
+
+   /**
+    * Retorna o avaliador do modelo, ele contém diferentes métodos de métricas úteis
+    * para medir o desempenho da rede.
+    * @return avaliador do modelo.
+    */
+   public Avaliador avaliador(){
+      return this.avaliador;
    }
 
    /**

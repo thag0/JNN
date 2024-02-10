@@ -6,7 +6,6 @@ import rna.modelos.Modelo;
 import rna.modelos.Sequencial;
 import rna.camadas.Camada;
 import rna.camadas.Densa;
-import rna.camadas.Dropout;
 import lib.ged.Dados;
 import lib.ged.Ged;
 
@@ -43,10 +42,8 @@ public class Classificador{
 
       //criando e configurando a rede neural
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Densa(qEntradas, 12, "sigmoid"),
-         new Dropout(0.2),
-         new Densa(12, "sigmoid"),
-         new Dropout(0.2),
+         new Densa(qEntradas, 20, "relu"),
+         new Densa(20, "relu"),
          new Densa(qSaidas, "softmax")
       });
 
@@ -55,12 +52,12 @@ public class Classificador{
       modelo.info();
       
       //treinando e avaliando os resultados
-      modelo.treinar(treinoX, treinoY, 1_500, false);
-      double acc = modelo.avaliador.acuracia(testeX, testeY);
+      modelo.treinar(treinoX, treinoY, 2_000, false);
+      double acc = modelo.avaliador().acuracia(testeX, testeY);
       System.out.println("Acurácia = " + formatarDecimal(acc*100, 4) + "%");
       System.out.println("Perda = " + modelo.avaliar(testeX, testeY));
 
-      int[][] matrizConfusao = modelo.avaliador.matrizConfusao(testeX, testeY);
+      int[][] matrizConfusao = modelo.avaliador().matrizConfusao(testeX, testeY);
       Dados d = new Dados(matrizConfusao);
       d.editarNome("Matriz de confusão");
       d.imprimir();

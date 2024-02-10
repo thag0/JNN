@@ -234,7 +234,7 @@ public class Convolucional extends Camada implements Cloneable{
    Ativacao ativacao = new Linear();
 
    /**
-    * Inicializador para os pesos da camada.
+    * Inicializador para os filtros da camada.
     */
    private Inicializador iniKernel = new GlorotUniforme();
 
@@ -277,27 +277,22 @@ public class Convolucional extends Camada implements Cloneable{
          );
       }
 
-      int[] e = (int[]) formEntrada;
-      if(e.length != 3){
+      if(formEntrada.length != 3){
          throw new IllegalArgumentException(
             "O formato de entrada deve conter 3 elementos (altura, largura, profundidade), " +
-            "recebido: " + e.length
+            "recebido: " + formEntrada.length
          );
       }
-      if(utils.apenasMaiorZero(e) == false){
+      if(utils.apenasMaiorZero(formEntrada) == false){
          throw new IllegalArgumentException(
             "Os valores do formato de entrada devem ser maiores que zero."
          );
       }
-      this.altEntrada  = e[0];
-      this.largEntrada = e[1];
-      this.profEntrada = e[2];
+      this.altEntrada  = formEntrada[0];
+      this.largEntrada = formEntrada[1];
+      this.profEntrada = formEntrada[2];
 
-      construir(new int[]{
-         this.altEntrada,
-         this.largEntrada,
-         this.profEntrada
-      });
+      construir(formEntrada);
    }
 
    /**
@@ -542,6 +537,7 @@ public class Convolucional extends Camada implements Cloneable{
             "Formato de entrada fornecida para camada Convolucional é nulo."
          );
       }
+
       if(entrada instanceof int[] == false){
          throw new IllegalArgumentException(
             "Objeto esperado para entrada da camada Convolucional é do tipo int[], " +
@@ -575,39 +571,39 @@ public class Convolucional extends Camada implements Cloneable{
       this.largSaida = this.largEntrada - this.largFiltro + 1;
 
       //inicialização dos parâmetros necessários
-      this.entrada = new Mat[this.profEntrada];
-      this.gradEntrada = new Mat[this.profEntrada];
+      this.entrada      = new Mat[this.profEntrada];
+      this.gradEntrada  = new Mat[this.profEntrada];
       for(int i = 0; i < this.profEntrada; i++){
-         this.entrada[i] = new Mat(this.altEntrada, this.largEntrada);
-         this.gradEntrada[i] = new Mat(this.altEntrada, this.largEntrada);
+         this.entrada[i]      = new Mat(this.altEntrada, this.largEntrada);
+         this.gradEntrada[i]  = new Mat(this.altEntrada, this.largEntrada);
       }
 
-      this.filtros = new Mat[this.numFiltros][this.profEntrada];
-      this.gradFiltros = new Mat[this.numFiltros][this.profEntrada];
-      this.somatorio = new Mat[this.numFiltros];
-      this.saida = new Mat[this.numFiltros];
-      this.derivada = new Mat[this.numFiltros];
-      this.gradSaida = new Mat[this.numFiltros];
+      this.filtros      = new Mat[this.numFiltros][this.profEntrada];
+      this.gradFiltros  = new Mat[this.numFiltros][this.profEntrada];
+      this.somatorio    = new Mat[this.numFiltros];
+      this.saida        = new Mat[this.numFiltros];
+      this.derivada     = new Mat[this.numFiltros];
+      this.gradSaida    = new Mat[this.numFiltros];
 
       if(this.usarBias){
-         this.bias = new Mat[this.numFiltros];
-         this.gradBias = new Mat[this.numFiltros];
+         this.bias      = new Mat[this.numFiltros];
+         this.gradBias  = new Mat[this.numFiltros];
       }
 
-      for(int i = 0; i < this.numFiltros; i++){
-         for(int j = 0; j < this.profEntrada; j++){
-            this.filtros[i][j] = new Mat(this.altFiltro, this.largFiltro);
-            this.gradFiltros[i][j] = new Mat(this.altFiltro, this.largFiltro);
+      for(int i = 0; i < numFiltros; i++){
+         for(int j = 0; j < profEntrada; j++){
+            this.filtros[i][j]      = new Mat(this.altFiltro, this.largFiltro);
+            this.gradFiltros[i][j]  = new Mat(this.altFiltro, this.largFiltro);
          }
 
          this.somatorio[i] = new Mat(this.altSaida, this.largSaida);
-         this.saida[i] = new Mat(this.altSaida, this.largSaida);
-         this.derivada[i] = new Mat(this.altSaida, this.largSaida);
+         this.saida[i]     = new Mat(this.altSaida, this.largSaida);
+         this.derivada[i]  = new Mat(this.altSaida, this.largSaida);
          this.gradSaida[i] = new Mat(this.altSaida, this.largSaida);
 
          if(this.usarBias){
-            this.bias[i] = new Mat(this.altSaida, this.largSaida);
-            this.gradBias[i] = new Mat(this.altSaida, this.largSaida);
+            this.bias[i]      = new Mat(this.altSaida, this.largSaida);
+            this.gradBias[i]  = new Mat(this.altSaida, this.largSaida);
          }
       }
 
@@ -625,24 +621,24 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override
    public void inicializar(){
-      super.verificarConstrucao();
+      verificarConstrucao();
+      
       for(int i = 0; i < numFiltros; i++){
          for(int j = 0; j < profEntrada; j++){
-            this.iniKernel.inicializar(this.filtros[i][j]);
+            iniKernel.inicializar(filtros[i][j]);
          }
       }
 
-      if(this.usarBias){
-         for(Mat b : this.bias){
-            this.iniBias.inicializar(b);
+      if(usarBias){
+         for(int i = 0; i < numFiltros; i++){
+            iniBias.inicializar(bias[i]);
          }
       }
    }
 
    @Override
    public void configurarAtivacao(Object ativacao){
-      Dicionario dic = new Dicionario();
-      this.ativacao = dic.obterAtivacao(ativacao);
+      this.ativacao = new Dicionario().obterAtivacao(ativacao);
    }
 
    @Override
@@ -677,7 +673,7 @@ public class Convolucional extends Camada implements Cloneable{
     */
    @Override
    public void calcularSaida(Object entrada){
-      super.verificarConstrucao();
+      verificarConstrucao();
 
       if(entrada instanceof double[]){
          utils.copiar((double[]) entrada, this.entrada);
@@ -706,7 +702,7 @@ public class Convolucional extends Camada implements Cloneable{
       }
 
       //feedforward
-      for(int i = 0; i < somatorio.length; i++){
+      for(int i = 0; i < numFiltros; i++){
          somatorio[i].preencher(0);
       }
 
@@ -790,7 +786,8 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override
    public int numParametros(){
-      super.verificarConstrucao();
+      verificarConstrucao();
+
       int parametros = 0;
 
       parametros += filtros.length * filtros[0].length * filtros[0][0].tamanho();
@@ -803,10 +800,10 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override
    public double[] saidaParaArray(){
-      super.verificarConstrucao();
+      verificarConstrucao();
 
       int id = 0;
-      double[] saida = new double[this.tamanhoSaida()];
+      double[] saida = new double[tamanhoSaida()];
 
       for(int i = 0; i < this.saida.length; i++){
          double[] s = this.saida[i].paraArray();
@@ -838,7 +835,7 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override
    public Convolucional clonar(){
-      super.verificarConstrucao();
+      verificarConstrucao();
 
       try{
          Convolucional clone = (Convolucional) super.clone();
@@ -911,7 +908,7 @@ public class Convolucional extends Camada implements Cloneable{
     */
    @Override
    public int[] formatoSaida(){
-      super.verificarConstrucao();
+      verificarConstrucao();
 
       return new int[]{
          this.altSaida,
@@ -925,6 +922,8 @@ public class Convolucional extends Camada implements Cloneable{
     * @return formato de cada filtro (altura, largura).
     */
    public int[] formatoFiltro(){
+      verificarConstrucao();
+
       return new int[]{
          this.altFiltro,
          this.largFiltro
@@ -933,11 +932,12 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override
    public double[] obterKernel(){
+
       int cont = 0, i, j;
-      double[] kernel = new double[this.numParamsKernel];
+      double[] kernel = new double[numParamsKernel];
       for(i = 0; i < numFiltros; i++){
-         for(j = 0; j < this.profEntrada; j++){
-            double[] arr = this.filtros[i][j].paraArray();
+         for(j = 0; j < profEntrada; j++){
+            double[] arr = filtros[i][j].paraArray();
             System.arraycopy(arr, 0, kernel, cont, arr.length);
             cont += arr.length;
          }
@@ -949,11 +949,11 @@ public class Convolucional extends Camada implements Cloneable{
    @Override
    public double[] obterGradKernel(){
       int cont = 0, i, j;
-      double[] grad = new double[this.numParamsKernel];
+      double[] grad = new double[numParamsKernel];
       
       for(i = 0; i < numFiltros; i++){
-         for(j = 0; j < this.profEntrada; j++){
-            double[] arr = this.gradFiltros[i][j].paraArray();
+         for(j = 0; j < profEntrada; j++){
+            double[] arr = gradFiltros[i][j].paraArray();
             System.arraycopy(arr, 0, grad, cont, arr.length);
             cont += arr.length;
          }
@@ -964,10 +964,10 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override
    public double[] obterBias(){
-      double[] bias = new double[this.numFiltros * this.altSaida * this.largSaida];
+      double[] bias = new double[numFiltros * altSaida * largSaida];
       int cont = 0;
 
-      for(int i = 0; i < this.bias.length; i++){
+      for(int i = 0; i < numFiltros; i++){
          double[] arr = this.bias[i].paraArray();
          System.arraycopy(arr, 0, bias, cont, arr.length);
          cont += arr.length;
@@ -978,10 +978,10 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override
    public double[] obterGradBias(){
-      double[] grad = new double[this.numFiltros * this.altEntrada * this.largEntrada];
+      double[] grad = new double[numFiltros * altSaida * largSaida];
       int cont = 0;
 
-      for(int i = 0; i < this.gradBias.length; i++){
+      for(int i = 0; i < numFiltros; i++){
          double[] arr = this.gradBias[i].paraArray();
          System.arraycopy(arr, 0, grad, cont, arr.length);
          cont += arr.length;

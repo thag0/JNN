@@ -42,7 +42,7 @@ public class TesteImagem{
       modelo.treinar(dadosEntrada, dadosSaida, 2_000, false);
 
       //avaliando resultados
-      double precisao = 1 - modelo.avaliador.erroMedioAbsoluto(dadosEntrada, dadosSaida);
+      double precisao = 1 - modelo.avaliador().erroMedioAbsoluto(dadosEntrada, dadosSaida);
       System.out.println("Precisão = " + (precisao * 100));
       System.out.println("Perda = " + modelo.avaliar(dadosEntrada, dadosSaida));
 

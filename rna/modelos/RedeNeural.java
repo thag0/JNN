@@ -172,7 +172,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     *    <li> ArcTan. </li>
     * </ul>
     * <p>
-    *    {@code A função de ativação padrão é a ReLU para todas as camadas}
+    *    {@code A função de ativação padrão é a Linear para todas as camadas}
     * </p>
     * @param ativacao instância da função de ativação.
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
@@ -210,7 +210,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     *    <li> ArcTan. </li>
     * </ul>
     * <p>
-    *    {@code A função de ativação padrão é a ReLU para todas as camadas}
+    *    {@code A função de ativação padrão é a Linear para todas as camadas}
     * </p>
     * @param ativacao nome da função de ativação.
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
@@ -248,7 +248,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     *    <li> ArcTan. </li>
     * </ul>
     * <p>
-    *    {@code A função de ativação padrão é a ReLU para todas as camadas}
+    *    {@code A função de ativação padrão é a Linear para todas as camadas}
     * </p>
     * @param camada camada que será configurada.
     * @param ativacao instância da função de ativação.
@@ -289,7 +289,7 @@ public class RedeNeural extends Modelo implements Cloneable{
     *    <li> ArcTan. </li>
     * </ul>
     * <p>
-    *    {@code A função de ativação padrão é a ReLU para todas as camadas}
+    *    {@code A função de ativação padrão é a Linear para todas as camadas}
     * </p>
     * @param camada camada que será configurada.
     * @param ativacao nome da função de ativação.
@@ -617,13 +617,13 @@ public class RedeNeural extends Modelo implements Cloneable{
       double salvo;
       for(int e = 0; e < epochs; e++){
 
-         double custo = this.avaliador.erroMedioQuadrado(entradas, saidas);
+         double custo = avaliador().erroMedioQuadrado(entradas, saidas);
          for(Densa camada : this.camadas){   
             for(int i = 0; i < camada.pesos.lin(); i++){
                for(int j = 0; j < camada.pesos.col(); j++){
                   salvo = camada.pesos.elemento(i, j);
                   camada.pesos.add(i, j, eps);
-                  double d = (this.avaliador.erroMedioQuadrado(entradas, saidas) - custo) / eps;
+                  double d = (avaliador().erroMedioQuadrado(entradas, saidas) - custo) / eps;
                   camada.gradPesos.editar(i, j, d);
                   camada.pesos.editar(i, j, salvo);
                }
@@ -632,7 +632,7 @@ public class RedeNeural extends Modelo implements Cloneable{
                for(int j = 0; j < camada.bias.col(); j++){
                   salvo = camada.bias.elemento(i, j);
                   camada.bias.add(i, j, eps);
-                  double d = (this.avaliador.erroMedioQuadrado(entradas, saidas) - custo) / eps;
+                  double d = (avaliador().erroMedioQuadrado(entradas, saidas) - custo) / eps;
                   camada.gradSaida.editar(i, j, d);
                   camada.bias.editar(i, j, salvo);    
                }
