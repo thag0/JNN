@@ -333,6 +333,11 @@ public class Mat{
             ") que a instância local (" + this.tamanho() + ")."
          );
       }
+
+      for(int i = 0; i < dados.length; i++){
+         if(dados[i] != m.dados[i]) return false;
+      }
+
       return true;
    }
 

@@ -32,6 +32,15 @@ public class Conv{
 
       tempoForward(modelo);//keras += 30ms
       tempoBackward(modelo);
+
+      // Convolucional conv = (Convolucional) modelo.camada(0);
+      Convolucional conv = (Convolucional) modelo.camada(2);
+
+      for(int i = 0; i < conv.gradFiltros.length; i++){
+         for(int j = 0; j < conv.gradFiltros[i].length; j++){
+            conv.gradFiltros[i][j].print("grad filtro " + i + "-" + j);
+         }
+      }
    }
 
    static void testarTodosDados(Sequencial modelo){
@@ -51,7 +60,7 @@ public class Conv{
 
    static void tempoForward(Sequencial modelo){
       //arbritário
-      double[][] img = imagemParaMatriz("/dados/mnist/teste/0/img_0.jpg");
+      double[][] img = imagemParaMatriz("/dados/mnist/teste/1/img_0.jpg");
       double[][][] entrada = new double[1][][];
       entrada[0] = img;
 

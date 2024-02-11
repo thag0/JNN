@@ -21,6 +21,11 @@ import java.util.concurrent.TimeUnit;
 public class OpMatriz{
 
    /**
+    * Operador para arrays.
+    */
+   OpArray oparr = new OpArray();
+
+   /**
     * Impelementações de operações matriciais para uso dentro
     * da biblioteca.
     */
@@ -464,10 +469,10 @@ public class OpMatriz{
 
       int numThreads = (profEntrada > 10) ? Runtime.getRuntime().availableProcessors()/2 : 1;
       
-      if(numThreads == 1){
+      if(numThreads == 1){//implementação single thread
          for(int i = 0; i < numFiltros; i++){
             for(int j = 0; j < profEntrada; j++){
-               correlacaoCruzada(entrada[j], filtros[i][j], saida[i], true);
+               correlacao2D(entrada[j], filtros[i][j], saida[i], true);
             }
          }
          
@@ -477,7 +482,7 @@ public class OpMatriz{
             final int idFiltro = i;
             executor.submit(() -> {
                for(int j = 0; j < profEntrada; j++){
-                  correlacaoCruzada(entrada[j], filtros[idFiltro][j], saida[idFiltro], true);
+                  correlacao2D(entrada[j], filtros[idFiltro][j], saida[idFiltro], true);
                }
             });
          }
@@ -504,14 +509,14 @@ public class OpMatriz{
       int profEntrada = entrada.length;
       int numFiltros = filtros.length;
       
-      ExecutorService executor = Executors.newFixedThreadPool(2);
+      ExecutorService executor = Executors.newFixedThreadPool(2);//menos instável
       
       for(int i = 0; i < profEntrada; i++){
          int id = i;
          executor.submit(() -> {
          for(int j = 0; j < numFiltros; j++){
-               correlacaoCruzada(entrada[id], derivada[j], gradFiltros[j][id], false);
-               convolucaoFull(derivada[j], filtros[j][id], gradEntrada[id], true);
+               correlacao2D(entrada[id], derivada[j], gradFiltros[j][id], false);
+               convolucao2DFull(derivada[j], filtros[j][id], gradEntrada[id], true);
             }
          });
       }
@@ -543,7 +548,7 @@ public class OpMatriz{
     * não será zerada antes da operação, se {@code falso} a matriz de resultados será
     * zerada antes da operação.
     */
-   public void correlacaoCruzada(Mat a, Mat b, Mat r, boolean add){
+   public void correlacao2D(Mat a, Mat b, Mat r, boolean add){
       if(r.lin() != (a.lin() - b.lin() + 1)){
          throw new IllegalArgumentException(
             "Dimensões entre as linhas de A (" + a.lin() + 
@@ -566,8 +571,7 @@ public class OpMatriz{
       int bLin = b.lin(), bCol = b.col();
       double res;
       for(int i = 0; i < rLin; i++){
-         for(int j = 0; j < rCol; j++){
-            
+         for(int j = 0; j < rCol; j++){     
             res = 0;
             for(int k = 0; k < bLin; k++){
                for(int l = 0; l < bCol; l++){
@@ -597,7 +601,7 @@ public class OpMatriz{
     * não será zerada antes da operação, se {@code falso} a matriz de resultados será
     * zerada antes da operação.
     */
-   public void correlacaoCruzadaFull(Mat a, Mat b, Mat r, boolean add){
+   public void correlacao2DFull(Mat a, Mat b, Mat r, boolean add){
       if(r.lin() != (a.lin() + b.lin() - 1)){
          throw new IllegalArgumentException(
             "Dimensões entre as linhas de A, B e R incompatíveis."
@@ -614,17 +618,21 @@ public class OpMatriz{
       }
   
       int i, j, k, l, posX, posY;
+      int aLin = a.lin(), aCol = a.col();
+      int rLin = r.lin(), rCol = r.col();
       double res;
+
       Mat filtro = rotacionar180R(b);
-      for(i = 0; i < r.lin(); i++){
-         for(j = 0; j < r.col(); j++){
+      int filLin = filtro.lin(), filCol = filtro.col();
+      for(i = 0; i < rLin; i++){
+         for(j = 0; j < rCol; j++){
             res = 0;
-            for(k = 0; k < filtro.lin(); k++){
-               for (l = 0; l < filtro.col(); l++){
+            for(k = 0; k < filLin; k++){
+               for (l = 0; l < filCol; l++){
                   posX = i - k;
                   posY = j - l;
   
-                  if(posX >= 0 && posX < a.lin() && posY >= 0 && posY < a.col()){
+                  if(posX >= 0 && posX < aLin && posY >= 0 && posY < aCol){
                      res += a.elemento(posX, posY) * filtro.elemento(k, l);
                   }
                }
@@ -652,13 +660,16 @@ public class OpMatriz{
     * não será zerada antes da operação, se {@code falso} a matriz de resultados será
     * zerada antes da operação.
     */
-   public void convolucao(Mat a, Mat b, Mat r, boolean add){
-      if(r.lin() != (a.lin() - b.lin() + 1)){
+   public void convolucao2D(Mat a, Mat b, Mat r, boolean add){
+      int lin = a.lin() - b.lin() + 1;
+      int col = a.col() - b.col() + 1;
+      
+      if(r.lin() != lin){
          throw new IllegalArgumentException(
             "Dimensões entre as linhas de A, B e R incompatíveis."
          );
       }
-      if(r.col() != (a.col() - b.col() + 1)){
+      if(r.col() != lin){
          throw new IllegalArgumentException(
             "Dimensões entre as colunas de A, B e R incompatíveis."
          );
@@ -667,26 +678,33 @@ public class OpMatriz{
       if(add == false){
          r.preencher(0);
       }
-      
-      int i, j, k, l;
-      double res;
-      Mat filtro = rotacionar180R(b);
-      for(i = 0; i < r.lin(); i++){
-         for(j = 0; j < r.col(); j++){
-            
-            res = 0;
-            for(k = 0; k < filtro.lin(); k++){
-               for(l = 0; l < filtro.col(); l++){
-                  res += a.elemento(i + k, j + l) * filtro.elemento(k, l);
+
+      double[] entrada = a.paraArray();
+      double[] filtro = b.paraArray();
+      oparr.inverter(filtro);
+
+      int lenResultado = lin*col;
+      double[] resultado = new double[lenResultado];
+  
+      int blin = b.lin(), bcol = b.col(), acol = a.col();
+      double soma;
+      for(int i = 0; i < lin; i++){
+         for(int j = 0; j < col; j++){
+            soma = 0;
+            for(int k = 0; k < blin; k++){ 
+               for(int l = 0; l < bcol; l++){
+                  soma += entrada[(i + k) * acol + (j + l)] * filtro[k * bcol + l];
                }
             }
-            r.add(i, j, res);
+            resultado[i * col + j] = soma;
          }
       }
+
+      r.copiar(resultado);
    }
 
    /**
-    * Realiza a operação convolucional (comlpeta) entre a matriz de entrada 
+    * Realiza a operação convolucional (completa) entre a matriz de entrada 
     * e o filtro. Expressada por:
     * <pre>
     *    R = A ∗ B
@@ -703,7 +721,7 @@ public class OpMatriz{
     * não será zerada antes da operação, se {@code falso} a matriz de resultados será
     * zerada antes da operação.
     */
-   public void convolucaoFull(Mat a, Mat b, Mat r, boolean add){
+   public void convolucao2DFull(Mat a, Mat b, Mat r, boolean add){
       if(r.lin() != (a.lin() + b.lin() - 1)){
          throw new IllegalArgumentException(
             "Dimensões entre as linhas de A, B e R incompatíveis."

@@ -1,14 +1,32 @@
 package rna.core;
 
+/**
+ * Utilitário geral para a biblioteca.
+ */
 public class Utils{
 
+   /**
+    * Utilitário geral para a biblioteca.
+    */
+   public Utils(){}
+
+   /**
+    * Verifica se o conteúdo do array contém valores maiores que zero.
+    * @param arr array base.
+    * @return resultado da verificação.
+    */
    public boolean apenasMaiorZero(int[] arr){
-      for(int i : arr){
-         if(i < 1) return false;
+      for(int i = 0; i < arr.length; i++){
+         if(arr[i] < 1) return false;
       }
       return true;
    }
 
+   /**
+    * Desserializa o array no array de matrizes de destino.
+    * @param arr array contendo os dados.
+    * @param dest destino da cópia
+    */
    public void copiar(double[] arr, Mat[] dest){
       if(arr.length != (dest.length * dest[0].tamanho())){
          throw new IllegalArgumentException(
@@ -27,6 +45,11 @@ public class Utils{
       }
    }
 
+   /**
+    * Desserializa o array na matriz de matriz de destino.
+    * @param arr array contendo os dados.
+    * @param dest destino da cópia
+    */
    public void copiar(double[] arr, Mat[][] dest){
       if(arr.length != (dest.length * dest[0].length * dest[0][0].tamanho())){
          throw new IllegalArgumentException(
@@ -48,22 +71,34 @@ public class Utils{
       }
    }
 
-   public void copiar(double[][][] tensor, Mat[] dest){
-      if((tensor.length * tensor[0].length * tensor[0][0].length) != (dest.length * dest[0].tamanho())){
+   /**
+    * Copia o conteúdo contido do array de matrizes para o
+    * destino desejado.
+    * @param arr array de matrizes contendo os dados.
+    * @param dest destino da cópia.
+    */
+   public void copiar(double[][][] arr, Mat[] dest){
+      if((arr.length * arr[0].length * arr[0][0].length) != (dest.length * dest[0].tamanho())){
          throw new IllegalArgumentException(
-            "Tamanhos incompatíveis entre o tensor (" + (tensor.length * tensor[0].length) + 
+            "Tamanhos incompatíveis entre o tensor (" + (arr.length * arr[0].length) + 
             ") e o destino (" + (dest.length * dest[0].tamanho()) + ")."
          );
       }
 
       for(int i = 0; i < dest.length; i++){
-         dest[i].copiar(tensor[i]);
+         dest[i].copiar(arr[i]);
       }
    }
 
-   public void copiar(Mat[] arrMat, Mat[] dest){
+   /**
+    * Copia o conteúdo contido do array de matrizes para o
+    * destino desejado.
+    * @param arr array de matrizes contendo os dados.
+    * @param dest destino da cópia.
+    */
+   public void copiar(Mat[] arr, Mat[] dest){
       for(int i = 0; i < dest.length; i++){
-         dest[i].copiar(arrMat[i]);
+         dest[i].copiar(arr[i]);
       }
    }
 }

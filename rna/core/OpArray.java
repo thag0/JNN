@@ -196,4 +196,21 @@ public class OpArray{
 
       return produto;
    }
+
+   /**
+    * Inverte todo o conteúdo do array
+    * @param arr array base;
+    */
+   public void inverter(double[] arr){
+      int inicio = 0;
+      int fim = arr.length - 1;
+      double temp;
+      while(inicio < fim){
+         temp = arr[inicio];
+         arr[inicio] = arr[fim];
+         arr[fim] = temp;
+         inicio++;
+         fim--;
+      }
+   }
 }

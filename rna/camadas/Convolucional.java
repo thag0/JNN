@@ -283,11 +283,13 @@ public class Convolucional extends Camada implements Cloneable{
             "recebido: " + formEntrada.length
          );
       }
+
       if(utils.apenasMaiorZero(formEntrada) == false){
          throw new IllegalArgumentException(
             "Os valores do formato de entrada devem ser maiores que zero."
          );
       }
+
       this.altEntrada  = formEntrada[0];
       this.largEntrada = formEntrada[1];
       this.profEntrada = formEntrada[2];
@@ -368,6 +370,35 @@ public class Convolucional extends Camada implements Cloneable{
     *    formFiltro = (altura, largura)
     * </pre>
     * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
+    * <p>
+    *    O valor de uso do bias será usado como {@code true} por padrão.
+    * <p>
+    * @param formEntrada formato de entrada da camada.
+    * @param formFiltro formato dos filtros da camada.
+    * @param filtros quantidade de filtros.
+    */
+   public Convolucional(int[] formEntrada, int[] formFiltro, int filtros){
+      this(formEntrada, formFiltro, filtros, null, null, null);
+   }
+
+   /**
+    * Instancia uma camada convolucional de acordo com os formatos fornecidos.
+    * <p>
+    *    A disposição do formato de entrada deve ser da seguinte forma:
+    * </p>
+    * <pre>
+    *    formEntrada = (altura, largura, profundidade)
+    * </pre>
+    * Onde largura e altura devem corresponder as dimensões dos dados de entrada
+    * que serão processados pela camada e a profundidade diz respeito a quantidade
+    * de entradas que a camada deve processar.
+    * <p>
+    *    A disposição do formato do filtro deve ser da seguinte forma:
+    * </p>
+    * <pre>
+    *    formFiltro = (altura, largura)
+    * </pre>
+    * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
     * @param formFiltro formato dos filtros da camada.
     * @param filtros quantidade de filtros.
     * @param ativacao função de ativação.
@@ -404,7 +435,6 @@ public class Convolucional extends Camada implements Cloneable{
          );
       }
       this.numFiltros = filtros;
-
       
       Dicionario dic = new Dicionario();
       if(ativacao != null) this.ativacao = dic.obterAtivacao(ativacao);
@@ -488,35 +518,6 @@ public class Convolucional extends Camada implements Cloneable{
     */
    public Convolucional(int[] formFiltro, int filtros){
       this(formFiltro, filtros, null, null, null);
-   }
-
-   /**
-    * Instancia uma camada convolucional de acordo com os formatos fornecidos.
-    * <p>
-    *    A disposição do formato de entrada deve ser da seguinte forma:
-    * </p>
-    * <pre>
-    *    formEntrada = (altura, largura, profundidade)
-    * </pre>
-    * Onde largura e altura devem corresponder as dimensões dos dados de entrada
-    * que serão processados pela camada e a profundidade diz respeito a quantidade
-    * de entradas que a camada deve processar.
-    * <p>
-    *    A disposição do formato do filtro deve ser da seguinte forma:
-    * </p>
-    * <pre>
-    *    formFiltro = (altura, largura)
-    * </pre>
-    * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-    * <p>
-    *    O valor de uso do bias será usado como {@code true} por padrão.
-    * <p>
-    * @param formEntrada formato de entrada da camada.
-    * @param formFiltro formato dos filtros da camada.
-    * @param filtros quantidade de filtros.
-    */
-   public Convolucional(int[] formEntrada, int[] formFiltro, int filtros){
-      this(formEntrada, formFiltro, filtros, null, null, null);
    }
    
    /**
