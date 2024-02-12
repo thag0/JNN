@@ -185,7 +185,7 @@ public class MaxPooling extends Camada{
     */
    public MaxPooling(int[] formEntrada, int[] formFiltro, int[] stride){
       this(formFiltro, stride);
-      this.construir(formEntrada);
+      construir(formEntrada);
    }
 
    /**
@@ -343,7 +343,7 @@ public class MaxPooling extends Camada{
     * na submatriz.
     */
    private int[] posicaoMaxima(Mat m, int linInicio, int colInicio, int linFim, int colFim){
-      int[] posMaximo = new int[]{linInicio, colInicio};
+      int[] posMaximo = {linInicio, colInicio};
       double valMaximo = Double.NEGATIVE_INFINITY;
   
       for(int lin = linInicio; lin < linFim; lin++){

@@ -8,7 +8,7 @@ import java.nio.file.StandardCopyOption;
 public class Renomear{
 
    public static void main(String[] args){
-      String caminho = "./dados/mnist/teste/9";
+      String caminho = "./dados/mnist/treino/9";
       File diretorio = new File(caminho);
 
       if(diretorio.isDirectory()){
