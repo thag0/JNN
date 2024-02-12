@@ -1,9 +1,12 @@
 package testes;
 
+import java.awt.image.BufferedImage;
+import java.nio.Buffer;
 import java.util.concurrent.TimeUnit;
 
 import lib.ged.Dados;
 import lib.ged.Ged;
+import lib.geim.Geim;
 import rna.avaliacao.perda.EntropiaCruzada;
 import rna.camadas.Densa;
 import rna.camadas.Dropout;
@@ -20,26 +23,27 @@ import rna.treinamento.AuxiliarTreino;
 public class MatrizTeste{
    static Ged ged = new Ged();
    static OpMatriz opmat = new OpMatriz();
+   static Geim geim = new Geim();
    
    public static void main(String[] args){
       ged.limparConsole();
 
-      Mat entrada = new Mat(new double[][]{
-         {1, 2, 3},
-         {4, 5, 6},
-         {7, 8, 9}
-      });
-      Mat filtro = new Mat(new double[][]{
-         {4, 7},
-         {6, 2}
-      });
+      // Mat entrada = new Mat(new double[][]{
+      //    {1, 2, 3},
+      //    {4, 5, 6},
+      //    {7, 8, 9}
+      // });
+      // Mat filtro = new Mat(new double[][]{
+      //    {4, 7},
+      //    {6, 2}
+      // });
 
-      Mat res1 = new Mat(entrada.lin() - filtro.lin() + 1, entrada.col()-filtro.col()+1);
-      Mat res2 = new Mat(entrada.lin() - filtro.lin() + 1, entrada.col()-filtro.col()+1);
+      // Mat res1 = new Mat(entrada.lin() - filtro.lin() + 1, entrada.col()-filtro.col()+1);
+      // Mat res2 = new Mat(entrada.lin() - filtro.lin() + 1, entrada.col()-filtro.col()+1);
 
-      opmat.correlacao2D(entrada, filtro, res1, false);
-      correlacao2D(entrada, filtro, res2);
-      System.out.println(res1.comparar(res2));
+      // opmat.correlacao2D(entrada, filtro, res1, false);
+      // correlacao2D(entrada, filtro, res2);
+      // System.out.println(res1.comparar(res2));
    }
 
    /**

@@ -17,7 +17,7 @@ public class MainConv{
 
    static final int NUM_DIGITOS_TREINO = 10;
    static final int NUM_DIGITOS_TESTE  = 10;
-   static final int NUM_AMOSTRAS_TREINO = 100;
+   static final int NUM_AMOSTRAS_TREINO = 200;
    static final int NUM_AMOSTRAS_TESTE  = 100;
 
    static final String caminhoTreino = "/dados/mnist/treino/";
@@ -46,7 +46,7 @@ public class MainConv{
 
       System.out.println("Treinando.");
       t1 = System.nanoTime();
-      modelo.treinar(treinoX, treinoY, 30, true);
+      modelo.treinar(treinoX, treinoY, 25, true);
       t2 = System.nanoTime();
 
       long tempoDecorrido = t2 - t1;
@@ -82,17 +82,17 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{3, 3}, 32, "leaky-relu"),
+         new Convolucional(formEntrada, new int[]{5, 5}, 32, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{3, 3}, 64, "leaky-relu"),
+         new Convolucional(new int[]{4, 4}, 64, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(140, "sigmoid"),
-         new Dropout(0.2),
+         new Densa(128, "sigmoid"),
+         new Dropout(0.25),
          new Densa(NUM_DIGITOS_TREINO, "softmax")
       });
 
-      modelo.compilar(new SGD(0.001, 0.99), "entropia-cruzada");
+      modelo.compilar(new SGD(0.001, 0.95), "entropia-cruzada");
 
       return modelo;
    }
