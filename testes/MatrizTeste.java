@@ -110,13 +110,13 @@ public class MatrizTeste{
       int inicio = 0;
       int fim = arr.length - 1;
       while (inicio < fim) {
-          // Troca os elementos nas posições start e end
-          double temp = arr[inicio];
-          arr[inicio] = arr[fim];
-          arr[fim] = temp;
-          // Move para os próximos elementos
-          inicio++;
-          fim--;
+         // Troca os elementos nas posições start e end
+         double temp = arr[inicio];
+         arr[inicio] = arr[fim];
+         arr[fim] = temp;
+         // Move para os próximos elementos
+         inicio++;
+         fim--;
       }
    }
 }

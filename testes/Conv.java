@@ -24,7 +24,7 @@ public class Conv{
    public static void main(String[] args){
       ged.limparConsole();
       
-      Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/modelo-convolucional.txt");
+      Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/conv-mnist-89.txt");
       // modelo.info();
 
       // testarModelo(modelo, digitos, amostras);
@@ -32,15 +32,6 @@ public class Conv{
 
       tempoForward(modelo);//keras += 30ms
       tempoBackward(modelo);
-
-      // Convolucional conv = (Convolucional) modelo.camada(0);
-      Convolucional conv = (Convolucional) modelo.camada(2);
-
-      for(int i = 0; i < conv.gradFiltros.length; i++){
-         for(int j = 0; j < conv.gradFiltros[i].length; j++){
-            conv.gradFiltros[i][j].print("grad filtro " + i + "-" + j);
-         }
-      }
    }
 
    static void testarTodosDados(Sequencial modelo){

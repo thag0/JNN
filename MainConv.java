@@ -82,14 +82,14 @@ public class MainConv{
       int[] formEntrada = {28, 28, 1};
       
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{4, 4}, 32, "leaky-relu", "glorot-uniforme"),
+         new Convolucional(formEntrada, new int[]{3, 3}, 32, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{3, 3}, 64, "leaky-relu", "glorot-uniforme"),
+         new Convolucional(new int[]{3, 3}, 64, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(128, "sigmoid", "glorot-uniforme"),
+         new Densa(140, "sigmoid"),
          new Dropout(0.2),
-         new Densa(NUM_DIGITOS_TREINO, "softmax", "glorot-uniforme")
+         new Densa(NUM_DIGITOS_TREINO, "softmax")
       });
 
       modelo.compilar(new SGD(0.001, 0.99), "entropia-cruzada");

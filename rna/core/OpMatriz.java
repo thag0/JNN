@@ -438,16 +438,16 @@ public class OpMatriz{
    public Mat rotacionar180R(Mat m){
       int lin = m.lin();
       int col = m.col();
-      Mat rot = new Mat(lin, col);
+      double[] elementos = new double[lin*col];
   
       int i, j;
       for(i = 0; i < lin; i++){
          for(j = 0; j < col; j++){
-            rot.editar(i, j, m.elemento(lin - 1 - i, col - 1 - j));
+            elementos[i*col + j] = m.elemento(lin - 1 - i, col - 1 - j);
          }
       }
       
-      return rot;
+      return new Mat(lin, col, elementos);
    } 
 
    /**
