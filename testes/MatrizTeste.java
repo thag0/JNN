@@ -33,29 +33,29 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
 
-      double[][][] exemploEntrada = {
+      double[][][] amostra1 = {
          {
             {1, 6, 2},
             {5, 3, 1},
             {7, 0, 4}
          }
       };
-      double[][][] exemploFiltro = {
-         {
-            {1, 0, 0},
-            {0, 1, 0},
-            {0, 0, 1},
-         }
+
+      double[][] amostra2 = {
+         {2, 2, 2},
+         {2, 2, 2},
+         {2, 2, 2}
       };
 
-      Tensor4D a = new Tensor4D(exemploEntrada);
-      Tensor4D b = new Tensor4D(exemploFiltro);
-      Tensor4D r = new Tensor4D(a.dim1(), a.dim2(), a.dim3(), a.dim4());
-      r.nome("Resultado");
+      Inicializador iniKernel = new GlorotUniforme(1234);
+      Densa densa = new Densa(3, 3, "softmax", iniKernel);
+      densa.inicializar();
 
-      optensor.matMult(a, b, r, 0);
-
-      r.print();
+      densa.calcularSaida(new Mat(amostra1[0][0]));
+      densa.calcularGradiente(new Mat(new double[]{0.5, 0.4, 0.1}));
+      densa.saida.print(6);
+      densa.gradPesos.print(6);
+      densa.gradEntrada.print(6);
    }
 
    /**
