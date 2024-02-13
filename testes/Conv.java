@@ -30,8 +30,15 @@ public class Conv{
       // testarModelo(modelo, digitos, amostras);
       // testarTodosDados(modelo);
 
-      tempoForward(modelo);//keras += 30ms
-      tempoBackward(modelo);
+      // tempoForward(modelo);//keras += 30ms
+      // tempoBackward(modelo);
+
+      Convolucional conv = (Convolucional) modelo.camada(2);
+      for(int i = 0; i < conv.gradFiltros.length; i++){
+         for(int j = 0; j < conv.gradFiltros[i].length; j++){
+            conv.gradFiltros[i][j].print("grad filtro " + i + "-" + j, 12);
+         }
+      }
    }
 
    static void testarTodosDados(Sequencial modelo){
@@ -93,7 +100,11 @@ public class Conv{
 
    static void tempoBackward(Sequencial modelo){
       //arbritário
-      double[] grad = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+      double[] grad = new double[modelo.saidaParaArray().length];
+      grad[0] = 1;
+      for(int i = 1; i < grad.length; i++){
+         grad[i] = 0.02;
+      }
 
       int n = modelo.numCamadas();
       long t, total = 0;

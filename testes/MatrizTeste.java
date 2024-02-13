@@ -14,6 +14,7 @@ import rna.camadas.Flatten;
 import rna.camadas.MaxPooling;
 import rna.core.Mat;
 import rna.core.OpMatriz;
+import rna.core.Tensor4D;
 import rna.inicializadores.AleatorioPositivo;
 import rna.inicializadores.Inicializador;
 import rna.inicializadores.GlorotUniforme;
@@ -28,22 +29,18 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
 
-      // Mat entrada = new Mat(new double[][]{
-      //    {1, 2, 3},
-      //    {4, 5, 6},
-      //    {7, 8, 9}
-      // });
-      // Mat filtro = new Mat(new double[][]{
-      //    {4, 7},
-      //    {6, 2}
-      // });
+      double[][][][] exemplo = {
+         {
+            {
+               {1, 2, 3},
+               {4, 5, 6},
+               {7, 8, 9},
+            }
+         }
+      };
 
-      // Mat res1 = new Mat(entrada.lin() - filtro.lin() + 1, entrada.col()-filtro.col()+1);
-      // Mat res2 = new Mat(entrada.lin() - filtro.lin() + 1, entrada.col()-filtro.col()+1);
-
-      // opmat.correlacao2D(entrada, filtro, res1, false);
-      // correlacao2D(entrada, filtro, res2);
-      // System.out.println(res1.comparar(res2));
+      Tensor4D tensor = new Tensor4D(exemplo);
+      tensor.print();
    }
 
    /**
