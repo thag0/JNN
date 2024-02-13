@@ -4,11 +4,36 @@ package rna.core;
  * Experimental
  */
 public class Tensor4D{
-   int d1;
+
+   /**
+    * Primeira dimensão do tensor.
+    */
+    int d1;
+    
+   /**
+    * Segunda dimensão do tensor.
+    */
    int d2;
+
+   /**
+    * Terceira dimensão do tensor.
+    */
    int d3;
+
+   /**
+    * Quarta dimensão do tensor
+    */
    int d4;
-   double[] dados;
+
+   /**
+    * Conjunto de elementos do tensor.
+    */
+   final double[] dados;
+
+   /**
+    * Estético com finalidade de debug, nome do tensor.
+    */
+   String nome = getClass().getSimpleName();
 
    /**
     * Inicializa um tensor com quatro dimensões a partir de outra instância de 
@@ -168,10 +193,26 @@ public class Tensor4D{
       this(d1, d2, d3, d4, new double[d1 * d2 * d3 * d4]);
    }
 
+   /**
+    * Calcula o índice do elemento dentro do array de elementos do tensor.
+    * @param i índice da primeira dimensão.
+    * @param j índice da segunda dimensão.
+    * @param k índice da terceira dimensão.
+    * @param l índice da quarta dimensão.
+    * @return índice calculado.
+    */
    private int indice(int i, int j, int k, int l){
       return i * d2 * d3 * d4 + j * d3 * d4 + k * d4 + l;
    }
 
+   /**
+    * Retorna o elemento do tensor de acordo com os índices fornecidos.
+    * @param i índice da primeira dimensão.
+    * @param j índice da segunda dimensão.
+    * @param k índice da terceira dimensão.
+    * @param l índice da quarta dimensão.
+    * @return valor de acordo com os índices.
+    */
    public double elemento(int i, int j, int k, int l){
       return dados[indice(i, j, k, l)];
    }
@@ -273,6 +314,22 @@ public class Tensor4D{
          (this.d4 != tensor.d4)
       ){
          return false;
+      }
+
+      return true;
+   }
+
+   /**
+    * Compara todo o conteúdo da instância local, isso inclui as {@code dimensões}
+    * de cada tensor e seus {@code elementos individuais}.
+    * @param tensor tensor base.
+    * @return {@code true} caso sejam iguais, {@code false} caso contrário.
+    */
+   public boolean comparar(Tensor4D tensor){
+      if(compararDimensoes(tensor) == false) return false;
+
+      for(int i = 0; i < dados.length; i++){
+         if(dados[i] != tensor.dados[i]) return false;
       }
 
       return true;
@@ -468,6 +525,24 @@ public class Tensor4D{
    }
 
    /**
+    * Configura o nome do tensor.
+    * @param nome novo nome.
+    */
+   public void nome(String nome){
+      if(nome != null){
+         this.nome = nome;
+      }
+   }
+
+   /**
+    * Retorna o nome do tensor.
+    * @return nome do tensor.
+    */
+   public String nome(){
+      return this.nome;
+   }
+
+   /**
     * Retorna um array contendo as dimensões do tensor, seguindo a ordem:
     * <pre>
     *    dim = [d1, d2, d3, d4];
@@ -481,6 +556,38 @@ public class Tensor4D{
    }
 
    /**
+    * Retorna a primeira dimensão do tensor.
+    * @return primeira dimensão do tensor.
+    */
+   public int dim1(){
+      return d1;
+   }
+
+   /**
+    * Retorna a segunda dimensão do tensor.
+    * @return segunda dimensão do tensor.
+    */
+   public int dim2(){
+      return d2;
+   }
+
+   /**
+    * Retorna a terceira dimensão do tensor.
+    * @return terceira dimensão do tensor.
+    */
+   public int dim3(){
+      return d3;
+   }
+
+   /**
+    * Retorna a quarta dimensão do tensor.
+    * @return quarta dimensão do tensor.
+    */
+   public int dim4(){
+      return d4;
+   }
+
+   /**
     * Retorna uma String contendo as dimensões do tensor, seguindo a ordem:
     * <pre>
     *    dim = [d1, d2, d3, d4];
@@ -489,5 +596,13 @@ public class Tensor4D{
     */
    public String dimensoesStr(){
       return "(" + d1 + ", " + d2 + ", " + d3 + ", " + d4 + ")";
+   }
+
+   /**
+    * Retorna a quantidade total de elementos no tensor.
+    * @return número elementos do tensor.
+    */
+   public int tamanho(){
+      return dados.length;
    }
 }

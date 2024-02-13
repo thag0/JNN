@@ -13,7 +13,9 @@ import rna.camadas.Dropout;
 import rna.camadas.Flatten;
 import rna.camadas.MaxPooling;
 import rna.core.Mat;
+import rna.core.OpArray;
 import rna.core.OpMatriz;
+import rna.core.OpTensor4D;
 import rna.core.Tensor4D;
 import rna.inicializadores.AleatorioPositivo;
 import rna.inicializadores.Inicializador;
@@ -23,24 +25,45 @@ import rna.treinamento.AuxiliarTreino;
 @SuppressWarnings("unused")
 public class MatrizTeste{
    static Ged ged = new Ged();
+   static OpArray oparr = new OpArray();
    static OpMatriz opmat = new OpMatriz();
+   static OpTensor4D optensor = new OpTensor4D();
    static Geim geim = new Geim();
    
    public static void main(String[] args){
       ged.limparConsole();
 
-      double[][][][] exemplo = {
+      double[][][] exemploEntrada = {
          {
-            {
-               {1, 2, 3},
-               {4, 5, 6},
-               {7, 8, 9},
-            }
+            {1, 6, 2},
+            {5, 3, 1},
+            {7, 0, 4}
+         },
+         {
+            {1, 6, 2},
+            {5, 3, 1},
+            {7, 0, 4}
          }
       };
+      double[][][] exemploFiltro = {
+         {
+            {1, 2},
+            {-1, 0},
+         },
+         {
+            {1, 2},
+            {-1, 0},
+         },
+      };
 
-      Tensor4D tensor = new Tensor4D(exemplo);
-      tensor.print();
+      Tensor4D entrada = new Tensor4D(exemploEntrada);
+      Tensor4D kernel = new Tensor4D(exemploFiltro);
+      Tensor4D saida = new Tensor4D(1, 2, (entrada.dim3()-kernel.dim3()+1), (entrada.dim4()-kernel.dim4()+1));
+
+      optensor.convolucao2D(entrada, kernel, saida, 0);
+      optensor.convolucao2D(entrada, kernel, saida, 1);
+
+      saida.print();
    }
 
    /**
