@@ -500,7 +500,7 @@ public class Tensor4D{
       StringBuilder sb = new StringBuilder();
 
       //nem me pergunte
-      sb.append("Tensor4D " + dimensoesStr() + " = [\n");
+      sb.append(nome + " " + dimensoesStr() + " = [\n");
       for(int i = 0; i < d1; i++){
          sb.append(pad + "[\n");
          for(int j = 0; j < d2; j++){

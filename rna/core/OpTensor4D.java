@@ -6,7 +6,164 @@ public class OpTensor4D{
    
    public OpTensor4D(){}
 
-   public Tensor4D inverterMatriz(Tensor4D tensor, int dim1, int dim2){
+   /**
+    * Verifica se os tensores possuem a mesma altura (dim3) e largura (dim4).
+    * @param a tensor A.
+    * @param b tensor B.
+    * @return resultado da verificação.
+    */
+   public boolean compararAlturaLargura(Tensor4D a, Tensor4D b){
+      if((a.dim3() != b.dim3()) || (a.dim4() != b.dim4())){
+         return false;
+      }
+
+      return true;
+   }
+
+   /**
+    * Realiza a adição {@code elemento a elemento} entre matrizes de tensores, como no exemplo.
+    * <pre>
+    *    R[i][j] = A[i][j] + B[i][j]
+    * </pre>
+    * @param a primeiro tensor.
+    * @param b segundo tensor.
+    * @param r tensor de destino do resultado.
+    * @param idProfundidade índice do canal de profundidade desejado.
+    */
+   public void matAdd(Tensor4D a, Tensor4D b, Tensor4D r, int idProfundidade){
+      int profA = a.dim2();
+      int profB = b.dim2();
+      int profR = r.dim2();
+   
+      if(
+         (idProfundidade < 0 || idProfundidade >= profA) || 
+         (idProfundidade < 0 || idProfundidade >= profB) || 
+         (idProfundidade < 0 || idProfundidade >= profR)
+         ){
+         throw new IllegalArgumentException(
+            "\nTodos os tensores fornecidos devem conter o índice de profundidade válido."
+         );
+      }
+
+      if(compararAlturaLargura(a, b) == false){
+         throw new IllegalArgumentException(
+            "As dimensões de A " + a.dimensoesStr() + " e B " + b.dimensoesStr() +
+            " devem ser iguais compatíveis"
+         );
+      }
+      if(compararAlturaLargura(a, r) == false){
+         throw new IllegalArgumentException(
+            "As dimensões de A " + a.dimensoesStr() + " e R " + b.dimensoesStr() +
+            " devem ser iguais compatíveis"
+         );
+      }
+
+      int linhas = r.dim3(), colunas = r.dim4();
+      for(int i = 0; i < linhas; i++){
+         for(int j = 0; j < colunas; j++){
+            r.editar(0, idProfundidade, i, j, (
+               a.elemento(0, idProfundidade, i, j) + b.elemento(0, idProfundidade, i, j)
+            ));
+         }
+      }
+   }
+
+   /**
+    * Realiza a subtração {@code elemento a elemento} entre matrizes de tensores, como no exemplo.
+    * <pre>
+    *    R[i][j] = A[i][j] - B[i][j]
+    * </pre>
+    * @param a primeiro tensor.
+    * @param b segundo tensor.
+    * @param r tensor de destino do resultado.
+    * @param idProfundidade índice do canal de profundidade desejado.
+    */
+   public void matSub(Tensor4D a, Tensor4D b, Tensor4D r, int idProfundidade){
+      int profA = a.dim2();
+      int profB = b.dim2();
+      int profR = r.dim2();
+   
+      if(
+         (idProfundidade < 0 || idProfundidade >= profA) || 
+         (idProfundidade < 0 || idProfundidade >= profB) || 
+         (idProfundidade < 0 || idProfundidade >= profR)
+         ){
+         throw new IllegalArgumentException(
+            "\nTodos os tensores fornecidos devem conter o índice de profundidade válido."
+         );
+      }
+
+      if(compararAlturaLargura(a, b) == false){
+         throw new IllegalArgumentException(
+            "As dimensões de A " + a.dimensoesStr() + " e B " + b.dimensoesStr() +
+            " devem ser iguais compatíveis"
+         );
+      }
+      if(compararAlturaLargura(a, r) == false){
+         throw new IllegalArgumentException(
+            "As dimensões de A " + a.dimensoesStr() + " e R " + b.dimensoesStr() +
+            " devem ser iguais compatíveis"
+         );
+      }
+
+      int linhas = r.dim3(), colunas = r.dim4();
+      for(int i = 0; i < linhas; i++){
+         for(int j = 0; j < colunas; j++){
+            r.editar(0, idProfundidade, i, j, (
+               a.elemento(0, idProfundidade, i, j) - b.elemento(0, idProfundidade, i, j)
+            ));
+         }
+      }
+   }
+
+   /**
+    * Realiza multiplicação matricial entre tensores, como no exemplo.
+    * <pre>
+    *    R[i][j] = A[i][j] * B[i][j]
+    * </pre>
+    * @param a primeiro tensor.
+    * @param b segundo tensor.
+    * @param r tensor de destino do resultado.
+    * @param idProfundidade índice do canal de profundidade desejado.
+    */
+   public void matMult(Tensor4D a, Tensor4D b, Tensor4D r, int idProfundidade){
+      int profA = a.dim2();
+      int profB = b.dim2();
+      int profR = r.dim2();
+   
+      if(
+         (idProfundidade < 0 || idProfundidade >= profA) || 
+         (idProfundidade < 0 || idProfundidade >= profB) || 
+         (idProfundidade < 0 || idProfundidade >= profR)
+         ){
+         throw new IllegalArgumentException(
+            "\nTodos os tensores fornecidos devem conter o índice de profundidade válido."
+         );
+      }
+
+      int rLin = r.dim3(), rCol = r.dim4();
+      int aCol = a.dim4();
+      double res = 0;
+
+      for(int i = 0; i < rLin; i++){
+         for(int j = 0; j < rCol; j++){
+            res = 0;
+            for(int k = 0; k < aCol; k++){
+               res += a.elemento(0, idProfundidade, i, k) * b.elemento(0, idProfundidade, k, j);
+            }
+            r.editar(0, idProfundidade, i, j, res);
+         }
+      }
+   }
+
+   /**
+    * Rotaciona em 180° o conteúdo da matriz contido no tensor.
+    * @param tensor tensor desejado
+    * @param dim1 índice da primeira dimensão do tensor.
+    * @param dim2 índice da segunda dimensão do tensor.
+    * @return tensor com uma matriz rotacionada de acordo com os índices dados.
+    */
+   public Tensor4D rotacionarMatriz180(Tensor4D tensor, int dim1, int dim2){
       if(dim2 < 0 || dim2 > tensor.dim1()){
          throw new IllegalArgumentException(
             "Valor da dimensão 2 (" + dim2 + ") inválido."
@@ -127,7 +284,7 @@ public class OpTensor4D{
       int alturaKernel = kernel.dim3();
       int larguraKernel = kernel.dim4();
 
-      Tensor4D rotacionado = inverterMatriz(kernel, 0, idProfundidade);
+      Tensor4D rotacionado = rotacionarMatriz180(kernel, 0, idProfundidade);
   
       for(int i = 0; i < alturaEsperada; i++){
          for(int j = 0; j < larguraEsperada; j++){

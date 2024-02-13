@@ -38,32 +38,24 @@ public class MatrizTeste{
             {1, 6, 2},
             {5, 3, 1},
             {7, 0, 4}
-         },
-         {
-            {1, 6, 2},
-            {5, 3, 1},
-            {7, 0, 4}
          }
       };
       double[][][] exemploFiltro = {
          {
-            {1, 2},
-            {-1, 0},
-         },
-         {
-            {1, 2},
-            {-1, 0},
-         },
+            {1, 0, 0},
+            {0, 1, 0},
+            {0, 0, 1},
+         }
       };
 
-      Tensor4D entrada = new Tensor4D(exemploEntrada);
-      Tensor4D kernel = new Tensor4D(exemploFiltro);
-      Tensor4D saida = new Tensor4D(1, 2, (entrada.dim3()-kernel.dim3()+1), (entrada.dim4()-kernel.dim4()+1));
+      Tensor4D a = new Tensor4D(exemploEntrada);
+      Tensor4D b = new Tensor4D(exemploFiltro);
+      Tensor4D r = new Tensor4D(a.dim1(), a.dim2(), a.dim3(), a.dim4());
+      r.nome("Resultado");
 
-      optensor.convolucao2D(entrada, kernel, saida, 0);
-      optensor.convolucao2D(entrada, kernel, saida, 1);
+      optensor.matMult(a, b, r, 0);
 
-      saida.print();
+      r.print();
    }
 
    /**
