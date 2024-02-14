@@ -8,6 +8,7 @@ import lib.ged.Dados;
 import lib.ged.Ged;
 import lib.geim.Geim;
 import rna.avaliacao.perda.EntropiaCruzada;
+import rna.camadas.Convolucional;
 import rna.camadas.Densa;
 import rna.camadas.Dropout;
 import rna.camadas.Flatten;
@@ -33,29 +34,60 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
 
-      double[][][] amostra1 = {
-         {
-            {1, 6, 2},
-            {5, 3, 1},
-            {7, 0, 4}
-         }
+      // double[][][] amostra = {
+      //    {
+      //       {1, 6, 2},
+      //       {5, 3, 1},
+      //       {7, 0, 4},
+      //    },
+      //    {
+      //       {1, 6, 2},
+      //       {5, 3, 1},
+      //       {7, 0, 4},
+      //    }
+      // };
+
+      // double[][][] grad = {
+      //    {
+      //       {1, 2},
+      //       {6, 5},
+      //    },
+      //    {
+      //       {1, 7},
+      //       {3, 9},
+      //    }
+      // };
+
+      // Inicializador iniKernel = new GlorotUniforme(12345);
+      // Convolucional conv = new Convolucional(new int[]{3, 3, 2}, new int[]{2, 2}, 2, "leakyrelu", iniKernel);
+      // conv.inicializar();
+
+      // conv.calcularSaida(amostra);
+      // conv.calcularGradiente(new Mat[]{
+      //    new Mat(grad[0]),
+      //    new Mat(grad[1]),
+      // });
+      // for(int i = 0; i < conv.gradEntrada.length; i++){
+      //    conv.gradEntrada[i].print("grad entrada " + i, 4);
+      // }
+
+      double[][] a = {
+         {1, 6, 2},
+         {5, 3, 1},
+         {7, 0, 4},
       };
 
-      double[][] amostra2 = {
-         {2, 2, 2},
-         {2, 2, 2},
-         {2, 2, 2}
+      double[][] k = {
+         {1, 2},
+         {-1, 0},
       };
 
-      Inicializador iniKernel = new GlorotUniforme(1234);
-      Densa densa = new Densa(3, 3, "softmax", iniKernel);
-      densa.inicializar();
+      Mat entrada = new Mat(a);
+      Mat filtro = new Mat(k);
+      Mat saida = new Mat(4, 4);
 
-      densa.calcularSaida(new Mat(amostra1[0][0]));
-      densa.calcularGradiente(new Mat(new double[]{0.5, 0.4, 0.1}));
-      densa.saida.print(6);
-      densa.gradPesos.print(6);
-      densa.gradEntrada.print(6);
+      opmat.convolucao2DFull(entrada, filtro, saida, false);
+      saida.print(4);
    }
 
    /**

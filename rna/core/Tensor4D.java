@@ -1,5 +1,7 @@
 package rna.core;
 
+import java.util.function.DoubleUnaryOperator;
+
 /**
  * Experimental
  */
@@ -161,7 +163,8 @@ public class Tensor4D{
    public Tensor4D(int d1, int d2, int d3, int d4, double[] elementos){
       if(d1 < 1 || d2 < 1 || d3 < 1 || d4 < 1){
          throw new IllegalArgumentException(
-            "\nOs valores de dimensões não podem ser menores que 1."
+            "\nOs valores de dimensões não podem ser menores que 1, recebido: (" +
+            d1 + ", " + d2 + ", " + d3 + ", " + d4 + ")."
          );
       }
 
@@ -234,6 +237,31 @@ public class Tensor4D{
    }
 
    /**
+    * Preenche o conteúdo do tensor com um valor constante.
+    * @param dim1 índice da primeira dimensão.
+    * @param dim2 índice da segunda dimensão.
+    * @param valor valor desejado.
+    */
+   public void preencher2D(int dim1, int dim2, double valor){
+      if(dim1 < 0 || dim1 >= d1){
+         throw new IllegalArgumentException(
+            "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
+         );
+      }
+      if(dim2 < 0 || dim2 >= d2){
+         throw new IllegalArgumentException(
+            "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
+         );
+      }
+
+      int inicio = indice(dim1, dim2, 0, 0);
+      int fim = inicio + (d3*d4);
+      for(int i = inicio; i < fim; i++){
+         dados[i] = valor;
+      }
+   }
+
+   /**
     * Preenche o conteúdo do tensor usando um contador iniciado com
     * valor 1 que é alterado a cada elemento.
     * @param crescente contador crescente (1, 2, 3, ...), caso falso o 
@@ -266,7 +294,7 @@ public class Tensor4D{
     * @param tensor tensor desejado.
     */
    public void copiar(Tensor4D tensor){
-      if(compararDimensoes(tensor) == false){
+      if(comparar4D(tensor) == false){
          throw new IllegalArgumentException(
             "\nDimensões " + dimensoesStr() + " incompatíveis com as do" + 
             " tensor recebido " + tensor.dimensoesStr()
@@ -277,20 +305,20 @@ public class Tensor4D{
    }
 
    /**
-    * Copia todo o conteúdo do tensor na instância local.
-    * @param tensor tensor desejado.
+    * Copia todo o conteúdo do array na instância local.
+    * @param arr array desejado.
     */
-   public void copiar(double[][][][] tensor){
+   public void copiar(double[][][][] arr){
       if(
-         d1 != tensor.length ||
-         d2 != tensor[0].length ||
-         d3 != tensor[0][0].length ||
-         d4 != tensor[0][0][0].length
+         d1 != arr.length ||
+         d2 != arr[0].length ||
+         d3 != arr[0][0].length ||
+         d4 != arr[0][0][0].length
          ){
          throw new IllegalArgumentException(
             "\nDimensões " + dimensoesStr() + " incompatíveis com as do" + 
             " tensor recebido (" 
-            + tensor.length + ", " + tensor[0].length + ", " + tensor[0][0].length + ", " + tensor[0][0][0].length + ")."
+            + arr.length + ", " + arr[0].length + ", " + arr[0][0].length + ", " + arr[0][0][0].length + ")."
          );
       }
 
@@ -299,7 +327,7 @@ public class Tensor4D{
          for(int j = 0; j < d2; j++){
             for(int k = 0; k < d3; k++){
                for(int l = 0; l < d4; l++){
-                  this.dados[cont++] = tensor[i][j][k][l];
+                  this.dados[cont++] = arr[i][j][k][l];
                }
             }
          }
@@ -307,22 +335,37 @@ public class Tensor4D{
    }
 
    /**
-    * Copia o conteúdo do array na instância local.
+    * Copia todo o conteúdo do array na instância local.
     * @param arr array desejado.
-    * @param d1 índice da primeira dimensão.
-    * @param d2 índice da segunda dimensão.
-    * @param d3 índice da terceira dimensão.
     */
-   public void copiar(double[] arr, int dim1, int dim2, int dim3){
-      if(arr.length != d4){
+   public void copiar(double[][][] arr, int dim1){
+      if(arr.length != d2){
          throw new IllegalArgumentException(
-            "\nTamanho do array (" + arr.length + 
+            "\nTamanho da primeira dimensão array (" + arr.length + 
+            ") íncompatível com a capacidade do tensor (" + d2 + ")."
+         );
+      }
+      if(arr[0].length != d3){
+         throw new IllegalArgumentException(
+            "\nTamanho da segunda dimensão array (" + arr[0].length + 
+            ") íncompatível com a capacidade do tensor (" + d3 + ")."
+         );
+      }
+      if(arr[0][0].length != d4){
+         throw new IllegalArgumentException(
+            "\nTamanho da terceira dimensão array (" + arr[0][0].length + 
             ") íncompatível com a capacidade do tensor (" + d4 + ")."
          );
       }
 
-      int inicio = indice(dim1, dim2, dim3, 0);
-      System.arraycopy(arr, 0, dados, inicio, d4);
+      int cont = 0;
+      for(int j = 0; j < d2; j++){
+         for(int k = 0; k < d3; k++){
+            for(int l = 0; l < d4; l++){
+               this.dados[cont++] = arr[j][k][l];
+            }
+         }
+      }
    }
 
    /**
@@ -352,22 +395,96 @@ public class Tensor4D{
    }
 
    /**
+    * Copia o conteúdo do array na instância local.
+    * @param arr array desejado.
+    * @param d1 índice da primeira dimensão.
+    * @param d2 índice da segunda dimensão.
+    * @param d3 índice da terceira dimensão.
+    */
+   public void copiar(double[] arr, int dim1, int dim2, int dim3){
+      if(arr.length != d4){
+         throw new IllegalArgumentException(
+            "\nTamanho do array (" + arr.length + 
+            ") íncompatível com a capacidade do tensor (" + d4 + ")."
+         );
+      }
+
+      int inicio = indice(dim1, dim2, dim3, 0);
+      System.arraycopy(arr, 0, dados, inicio, d4);
+   }
+
+   /**
+    * Copia apenas os dados contidos no array, sem levar em considerasão
+    * as dimensões do tensor.
+    * @param elementos array de elementos desejado.
+    */
+   public void copiarElementos(double[] elementos){
+      if(elementos.length != dados.length){
+         throw new IllegalArgumentException(
+            "\nTamanho do array fornecido (" + elementos.length + ") inconpatível" +
+            "com os elementos do tensor (" + dados.length + ")."
+         );
+      }
+
+      System.arraycopy(elementos, 0, dados, 0, dados.length);
+   }
+
+   /**
+    * Verifica se as dimensões selecionada são iguais as da instância local.
+    * @param tensor tensor base.
+    * @param dim1 comparar primeira dimensão.
+    * @param dim2 comparar segunda dimensão.
+    * @param dim3 comparar terceira dimensão.
+    * @param dim4 comparar quarta dimensão.
+    * @return resultado da verifcação.
+    */
+   private boolean compararDimensoes(Tensor4D tensor, boolean dim1, boolean dim2, boolean dim3, boolean dim4){
+      if(dim1 && (tensor.d1 != this.d1)) return false;
+      if(dim2 && (tensor.d2 != this.d2)) return false;
+      if(dim3 && (tensor.d3 != this.d3)) return false;
+      if(dim4 && (tensor.d4 != this.d4)) return false;
+
+      return true;
+   }
+
+   /**
     * Verifica todas as quatro dimensões do tensor local com os
     * valores de dimensões do tensor recebido.
     * @param tensor tensor alvo.
     * @return resultado da verificação.
     */
-   public boolean compararDimensoes(Tensor4D tensor){
-      if(
-         (this.d1 != tensor.d1) ||
-         (this.d2 != tensor.d2) ||
-         (this.d3 != tensor.d3) ||
-         (this.d4 != tensor.d4)
-      ){
-         return false;
-      }
+   public boolean comparar4D(Tensor4D tensor){
+      return compararDimensoes(tensor, true, true, true, true);
+   }
 
-      return true;
+   /**
+    * Verifica as três últimas dimensões do tensor local com os
+    * valores de dimensões do tensor recebido.
+    * @param tensor tensor alvo.
+    * @return resultado da verificação.
+    */
+   public boolean comparar3D(Tensor4D tensor){
+      return compararDimensoes(tensor, false, true, true, true);
+   }
+
+   /**
+    * Verifica as duas últimas dimensões do tensor local com os
+    * valores de dimensões do tensor recebido.
+    * @param tensor tensor alvo.
+    * @return resultado da verificação.
+    */
+   public boolean comparar2D(Tensor4D tensor){
+      return compararDimensoes(tensor, false, false, true, true);
+   }
+
+   /**
+    * Verifica a última dimensõe do tensor local com os
+    * valores de dimensões do tensor recebido.
+    * @param tensor tensor alvo.
+    * @return resultado da verificação.
+    */
+   public boolean comparar1D(Tensor4D tensor){
+      return compararDimensoes(tensor, false, false, false, true);
    }
 
    /**
@@ -377,13 +494,85 @@ public class Tensor4D{
     * @return {@code true} caso sejam iguais, {@code false} caso contrário.
     */
    public boolean comparar(Tensor4D tensor){
-      if(compararDimensoes(tensor) == false) return false;
+      if(comparar4D(tensor) == false) return false;
 
       for(int i = 0; i < dados.length; i++){
          if(dados[i] != tensor.dados[i]) return false;
       }
 
       return true;
+   }
+
+   /**
+    * Aplica a função recebida em todos os elementos do tensor.
+    * @param funcao função desejada.
+    */
+   public void map(DoubleUnaryOperator funcao){
+      if(funcao == null){
+         throw new IllegalArgumentException(
+            "\nFunção recebida é nula."
+         );
+      }
+
+      for(int i = 0; i < dados.length; i++){
+         dados[i] = funcao.applyAsDouble(dados[i]);
+      }
+   }
+
+   /**
+    * Aplica a função recebida em todos os elementos da primeira dimensão
+    * do tensor.
+    * @param dim1 índice da primeira dimensão.
+    * @param funcao função desejada.
+    */
+   public void map3D(int dim1, DoubleUnaryOperator funcao){
+      if(dim1 < 0 || dim1 >= d1){
+         throw new IllegalArgumentException(
+            "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
+         );
+      }
+      if(funcao == null){
+         throw new IllegalArgumentException(
+            "\nFunção recebida é nula."
+         );
+      }
+
+      int inicio = indice(dim1, 0, 0, 0);
+      int fim = inicio + (d2*d3*d4);
+      for(int i = inicio; i < fim; i++){
+         dados[i] = funcao.applyAsDouble(dados[i]);
+      }
+   }
+
+   /**
+    * Aplica a função recebida em todos os elementos da segunda dimensão
+    * do tensor.
+    * @param dim1 índice da primeira dimensão.
+    * @param dim2 índice da segunda dimensão.
+    * @param funcao função desejada.
+    */
+   public void map2D(int dim1, int dim2, DoubleUnaryOperator funcao){
+      if(dim1 < 0 || dim1 >= d1){
+         throw new IllegalArgumentException(
+            "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
+         );
+      }
+      if(dim2 < 0 || dim2 >= d2){
+         throw new IllegalArgumentException(
+            "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
+         );
+      }
+      if(funcao == null){
+         throw new IllegalArgumentException(
+            "\nFunção recebida é nula."
+         );
+      }
+
+      int inicio = indice(dim1, dim2, 0, 0);
+      int fim = inicio + (d3*d4);
+      for(int i = inicio; i < fim; i++){
+         dados[i] = funcao.applyAsDouble(dados[i]);
+      }
    }
 
    /**
@@ -476,7 +665,7 @@ public class Tensor4D{
     * @param tensor tensor com conteúdo.
     */
    public void add(Tensor4D tensor){
-      if(compararDimensoes(tensor) == false){
+      if(comparar4D(tensor) == false){
          throw new IllegalArgumentException(
             "\nDimensões " + dimensoesStr() + " incompatíveis com as do" + 
             " tensor recebido " + tensor.dimensoesStr()
@@ -509,7 +698,7 @@ public class Tensor4D{
     * @param tensor tensor com conteúdo.
     */
    public void sub(Tensor4D tensor){
-      if(compararDimensoes(tensor) == false){
+      if(comparar4D(tensor) == false){
          throw new IllegalArgumentException(
             "\nDimensões " + dimensoesStr() + " incompatíveis com as do" + 
             " tensor recebido " + tensor.dimensoesStr()
@@ -542,7 +731,7 @@ public class Tensor4D{
     * @param tensor tensor com conteúdo.
     */
    public void mult(Tensor4D tensor){
-      if(compararDimensoes(tensor) == false){
+      if(comparar4D(tensor) == false){
          throw new IllegalArgumentException(
             "\nDimensões " + dimensoesStr() + " incompatíveis com as do" + 
             " tensor recebido " + tensor.dimensoesStr()
@@ -575,7 +764,7 @@ public class Tensor4D{
     * @param tensor tensor com conteúdo.
     */
    public void div(Tensor4D tensor){
-      if(compararDimensoes(tensor) == false){
+      if(comparar4D(tensor) == false){
          throw new IllegalArgumentException(
             "\nDimensões " + dimensoesStr() + " incompatíveis com as do" + 
             " tensor recebido " + tensor.dimensoesStr()
@@ -620,17 +809,17 @@ public class Tensor4D{
     * @return array contendo os elementos.
     */
    public double[] array1D(int dim1, int dim2, int dim3){
-      if(dim1 < 0 || dim1 > d1){
+      if(dim1 < 0 || dim1 >= d1){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );
       }
-      if(dim2 < 0 || dim2 > d2){
+      if(dim2 < 0 || dim2 >= d2){
          throw new IllegalArgumentException(
             "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
          );
       }
-      if(dim3 < 0 || dim3 > d3){
+      if(dim3 < 0 || dim3 >= d3){
          throw new IllegalArgumentException(
             "\nÍndice da terceira dimensão (" + dim3 + ") inválido."
          );
@@ -653,12 +842,12 @@ public class Tensor4D{
     * @return array contendo os elementos.
     */
    public double[][] array2D(int dim1, int dim2){
-      if(dim1 < 0 || dim1 > d1){
+      if(dim1 < 0 || dim1 >= d1){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );
       }
-      if(dim2 < 0 || dim2 > d2){
+      if(dim2 < 0 || dim2 >= d2){
          throw new IllegalArgumentException(
             "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
          );
@@ -682,7 +871,7 @@ public class Tensor4D{
     * @return array contendo os elementos.
     */
    public double[][][] array3D(int dim1){
-      if(dim1 < 0 || dim1 > d1){
+      if(dim1 < 0 || dim1 >= d1){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );

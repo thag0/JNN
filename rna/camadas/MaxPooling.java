@@ -51,18 +51,18 @@ public class MaxPooling extends Camada{
    /**
     * Array de matrizes contendo os dados de entrada.
     */
-   private Mat[] entrada;
+   public Mat[] entrada;
 
    /**
     * Array de matrizes contendo os dados de saída.
     */
-   private Mat[] saida;
+   public Mat[] saida;
 
    /**
     * Array de matrizes contendo os gradientes que serão
     * retropropagados para as camadas anteriores.
     */
-   private Mat[] gradEntrada;
+   public Mat[] gradEntrada;
 
    /**
     * Formato do filtro de pooling (altura, largura).

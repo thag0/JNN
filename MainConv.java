@@ -17,7 +17,7 @@ public class MainConv{
 
    static final int NUM_DIGITOS_TREINO = 10;
    static final int NUM_DIGITOS_TESTE  = 10;
-   static final int NUM_AMOSTRAS_TREINO = 200;
+   static final int NUM_AMOSTRAS_TREINO = 100;
    static final int NUM_AMOSTRAS_TESTE  = 100;
 
    static final String caminhoTreino = "/dados/mnist/treino/";
@@ -81,10 +81,19 @@ public class MainConv{
    static Sequencial criarModelo(){
       int[] formEntrada = {28, 28, 1};
       
+      // Sequencial modelo = new Sequencial(new Camada[]{
+      //    new Convolucional(formEntrada, new int[]{5, 5}, 32, "leaky-relu"),
+      //    new MaxPooling(new int[]{2, 2}),
+      //    new Convolucional(new int[]{4, 4}, 64, "leaky-relu"),
+      //    new MaxPooling(new int[]{2, 2}),
+      //    new Flatten(),
+      //    new Densa(128, "sigmoid"),
+      //    new Dropout(0.25),
+      //    new Densa(NUM_DIGITOS_TREINO, "softmax")
+      // });
+
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{5, 5}, 32, "leaky-relu"),
-         new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{4, 4}, 64, "leaky-relu"),
+         new Convolucional(formEntrada, new int[]{5, 5}, 20, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
          new Densa(128, "sigmoid"),

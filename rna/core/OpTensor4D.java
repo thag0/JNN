@@ -337,6 +337,10 @@ public class OpTensor4D{
          );
       }
 
+      System.out.println(a.nome() + " " + a.dimensoesStr());
+      System.out.println(b.nome() + " " + b.dimensoesStr());
+      System.out.println(r.nome() + " " + r.dimensoesStr());
+
       int linhas = r.dim3(), colunas = r.dim4();
       for(int i = 0; i < linhas; i++){
          for(int j = 0; j < colunas; j++){
@@ -444,6 +448,76 @@ public class OpTensor4D{
     * @param entrada tensor com a matriz de entrada.
     * @param kernel tensor com a matriz de kernel.
     * @param saida tensor de destino.
+    * @param idEntrada índice desejado para a entrada (id[0], id[1] ...).
+    * @param idKernel índice desejado para o kernel (id[0], id[1] ...).
+    * @param idSaida índice desejado para a saída (id[0], id[1] ...).
+    * @param add verificador para o resultado, se {@code verdadeiro} a matriz de resultados
+    * não será zerada antes da operação, se {@code falso} a matriz de resultados será
+    * zerada antes da operação.
+    */
+   public void correlacao2D(Tensor4D entrada, Tensor4D kernel, Tensor4D saida, int[] idEntrada, int[] idKernel, int[] idSaida, boolean add){
+      if((idEntrada[0] < 0 || idEntrada[0] >= entrada.dim1()) || (idEntrada[1] < 0 || idEntrada[1] >= entrada.dim2())){
+         throw new IllegalArgumentException(
+            "\nÍndices de entrada (" + idEntrada[0] + ", " + idEntrada[1] + ") " +
+            "incompatíveis com o tensor de entrada (" + entrada.dim1() + ", " + entrada.dim2() + ")."
+         );
+      }
+      if((idKernel[0] < 0 || idKernel[0] >= kernel.dim1()) || (idKernel[1] < 0 || idKernel[1] >= kernel.dim2())){
+         throw new IllegalArgumentException(
+            "\nÍndices do kernel (" + idKernel[0] + ", " + idKernel[1] + ") " +
+            "incompatíveis com o tensor do kernel (" + kernel.dim1() + ", " + kernel.dim2() + ")."
+         );
+      }
+      if((idSaida[0] < 0 || idSaida[0] >= saida.dim1()) || (idSaida[1] < 0 || idSaida[1] >= saida.dim2())){
+         throw new IllegalArgumentException(
+            "\nÍndices da saída (" + idSaida[0] + ", " + idSaida[1] + ") " +
+            "incompatíveis com o tensor de saída (" + saida.dim1() + ", " + saida.dim2() + ")."
+         );
+      }
+
+      if(add == false){
+         saida.preencher2D(idSaida[0], idSaida[1] ,0);
+      }
+
+      int alturaEsperada = entrada.dim3()-kernel.dim3()+1;
+      int larguraEsperada = entrada.dim4()-kernel.dim4()+1;
+      if(saida.dim3() != alturaEsperada){
+         throw new IllegalArgumentException(
+            "\nAltura da saída (" + saida.dim3() + 
+            ") íncompatível com o valor esperado (" + alturaEsperada + ")."
+         );
+      }
+      if(saida.dim4() != larguraEsperada){
+         throw new IllegalArgumentException(
+            "\nAltura da saída (" + saida.dim4() + 
+            ") íncompatível com o valor esperado (" + larguraEsperada + ")."
+         );
+      }
+
+      int alturaKernel = kernel.dim3();
+      int larguraKernel = kernel.dim4();
+      for(int i = 0; i < alturaEsperada; i++){
+         for(int j = 0; j < larguraEsperada; j++){
+            double soma = 0.0;
+            for(int m = 0; m < alturaKernel; m++){
+                 for(int n = 0; n < larguraKernel; n++){
+                  int posX = i + m;
+                  int posY = j + n;
+                  soma += entrada.elemento(idEntrada[0], idEntrada[1], posX, posY) * 
+                           kernel.elemento(idKernel[0], idKernel[1], m, n);
+               }
+            }
+            saida.add(idSaida[0], idSaida[1], i, j, soma);
+         }
+      }
+   }
+
+   /**
+    * Realiza a operação de correlação cruzada (apenas 2D) entre dois tensores usando
+    * a dimensão de profundidade desejada.
+    * @param entrada tensor com a matriz de entrada.
+    * @param kernel tensor com a matriz de kernel.
+    * @param saida tensor de destino.
     * @param idProfundidade índice do canal de profundidade desejado.
     */
    public void correlacao2D(Tensor4D entrada, Tensor4D kernel, Tensor4D saida, int idProfundidade){
@@ -505,6 +579,154 @@ public class OpTensor4D{
    }
 
    /**
+    * Realiza a operação de convolução (apenas 2D) entre dois tensores usando
+    * a dimensão de profundidade desejada.
+    * @param entrada tensor com a matriz de entrada.
+    * @param kernel tensor com a matriz de kernel.
+    * @param saida tensor de destino.
+    * @param idEntrada índice desejado para a entrada (id[0], id[1] ...).
+    * @param idKernel índice desejado para o kernel (id[0], id[1] ...).
+    * @param idSaida índice desejado para a saída (id[0], id[1] ...).
+    * @param add verificador para o resultado, se {@code verdadeiro} a matriz de resultados
+    * não será zerada antes da operação, se {@code falso} a matriz de resultados será
+    * zerada antes da operação.
+    */
+   public void convolucao2D(Tensor4D entrada, Tensor4D kernel, Tensor4D saida, int[] idEntrada, int[] idKernel, int[] idSaida, boolean add){
+      if((idEntrada[0] < 0 || idEntrada[0] >= entrada.dim1()) || (idEntrada[1] < 0 || idEntrada[1] >= entrada.dim2())){
+         throw new IllegalArgumentException(
+            "\nÍndices de entrada (" + idEntrada[0] + ", " + idEntrada[1] + ") " +
+            "incompatíveis com o tensor de entrada (" + entrada.dim1() + ", " + entrada.dim2() + ")."
+         );
+      }
+      if((idKernel[0] < 0 || idKernel[0] >= kernel.dim1()) || (idKernel[1] < 0 || idKernel[1] >= kernel.dim2())){
+         throw new IllegalArgumentException(
+            "\nÍndices do kernel (" + idEntrada[0] + ", " + idEntrada[1] + ") " +
+            "incompatíveis com o tensor do kernel (" + entrada.dim1() + ", " + entrada.dim2() + ")."
+         );
+      }
+      if((idSaida[0] < 0 || idSaida[0] >= saida.dim1()) || (idSaida[1] < 0 || idSaida[1] >= saida.dim2())){
+         throw new IllegalArgumentException(
+            "\nÍndices da saída (" + idEntrada[0] + ", " + idEntrada[1] + ") " +
+            "incompatíveis com o tensor de saída (" + entrada.dim1() + ", " + entrada.dim2() + ")."
+         );
+      }
+
+      if(add == false){
+         saida.preencher2D(idSaida[0], idSaida[1] ,0);
+      }
+
+      int alturaEsperada = entrada.dim3()-kernel.dim3()+1;
+      int larguraEsperada = entrada.dim4()-kernel.dim4()+1;
+      if(saida.dim3() != alturaEsperada){
+         throw new IllegalArgumentException(
+            "\nAltura da saída (" + saida.dim3() + 
+            ") íncompatível com o valor esperado (" + alturaEsperada + ")."
+         );
+      }
+      if(saida.dim4() != larguraEsperada){
+         throw new IllegalArgumentException(
+            "\nAltura da saída (" + saida.dim4() + 
+            ") íncompatível com o valor esperado (" + larguraEsperada + ")."
+         );
+      }
+
+      Tensor4D rotacionado = rotacionarMatriz180(kernel, idKernel[0], idKernel[1]);
+
+      int alturaKernel = rotacionado.dim3();
+      int larguraKernel = rotacionado.dim4();
+      for(int i = 0; i < alturaEsperada; i++){
+         for(int j = 0; j < larguraEsperada; j++){
+            double soma = 0.0;
+            for(int m = 0; m < alturaKernel; m++){
+                 for(int n = 0; n < larguraKernel; n++){
+                  int posX = i + m;
+                  int posY = j + n;
+                  soma += entrada.elemento(idEntrada[0], idEntrada[1], posX, posY) * 
+                        rotacionado.elemento(idKernel[0], idKernel[1], m, n);
+               }
+            }
+            saida.add(idSaida[0], idSaida[1], i, j, soma);
+         }
+      }
+   }
+
+   /**
+    * Realiza a operação de convolução (apenas 2D) entre dois tensores usando
+    * a dimensão de profundidade desejada.
+    * @param entrada tensor com a matriz de entrada.
+    * @param kernel tensor com a matriz de kernel.
+    * @param saida tensor de destino.
+    * @param idEntrada índice desejado para a entrada (id[0], id[1] ...).
+    * @param idKernel índice desejado para o kernel (id[0], id[1] ...).
+    * @param idSaida índice desejado para a saída (id[0], id[1] ...).
+    * @param add verificador para o resultado, se {@code verdadeiro} a matriz de resultados
+    * não será zerada antes da operação, se {@code falso} a matriz de resultados será
+    * zerada antes da operação.
+    */
+   public void convolucao2DFull(Tensor4D entrada, Tensor4D kernel, Tensor4D saida, int[] idEntrada, int[] idKernel, int[] idSaida, boolean add){
+      if((idEntrada[0] < 0 || idEntrada[0] >= entrada.dim1()) || (idEntrada[1] < 0 || idEntrada[1] >= entrada.dim2())){
+         throw new IllegalArgumentException(
+            "\nÍndices de entrada (" + idEntrada[0] + ", " + idEntrada[1] + ") " +
+            "incompatíveis com o tensor de entrada (" + entrada.dim1() + ", " + entrada.dim2() + ")."
+         );
+      }
+      if((idKernel[0] < 0 || idKernel[0] >= kernel.dim1()) || (idKernel[1] < 0 || idKernel[1] >= kernel.dim2())){
+         throw new IllegalArgumentException(
+            "\nÍndices do kernel (" + idKernel[0] + ", " + idKernel[1] + ") " +
+            "incompatíveis com o tensor do kernel (" + kernel.dim1() + ", " + kernel.dim2() + ")."
+         );
+      }
+      if((idSaida[0] < 0 || idSaida[0] >= saida.dim1()) || (idSaida[1] < 0 || idSaida[1] >= saida.dim2())){
+         throw new IllegalArgumentException(
+            "\nÍndices da saída (" + idSaida[0] + ", " + idSaida[1] + ") " +
+            "incompatíveis com o tensor de saída (" + saida.dim1() + ", " + saida.dim2() + ")."
+         );
+      }
+
+      if(add == false){
+         saida.preencher2D(idSaida[0], idSaida[1] ,0);
+      }
+
+      int alturaEsperada = entrada.dim3()+kernel.dim3()-1;
+      int larguraEsperada = entrada.dim4()+kernel.dim4()-1;
+      if(saida.dim3() != alturaEsperada){
+         throw new IllegalArgumentException(
+            "\nAltura da saída (" + saida.dim3() + 
+            ") íncompatível com o valor esperado (" + alturaEsperada + ")."
+         );
+      }
+      if(saida.dim4() != larguraEsperada){
+         throw new IllegalArgumentException(
+            "\nAltura da saída (" + saida.dim4() + 
+            ") íncompatível com o valor esperado (" + larguraEsperada + ")."
+         );
+      }
+
+      int i, j, k, l, posX, posY;
+      double res;
+      int linEntrada = entrada.dim3(), colEntrada = entrada.dim4();
+      int linKernel = kernel.dim3(), colKernel = kernel.dim4();
+      int linSaida = saida.dim3(), colSaida = saida.dim4();
+      for(i = 0; i < linSaida; i++){
+         for(j = 0; j < colSaida; j++){
+            res = 0;
+            for(k = 0; k < linKernel; k++){
+               for(l = 0; l < colKernel; l++){
+                  posX = i - k;
+                  posY = j - l;
+  
+                  if(posX >= 0 && posX < linEntrada && posY >= 0 && posY < colEntrada){
+                     res += 
+                        entrada.elemento(idEntrada[0], idEntrada[1], posX, posY) * kernel.elemento(idKernel[0], idKernel[1], k, l);
+                  }
+               }
+            }
+            saida.add(idSaida[0], idSaida[1], i, j, res);
+         }
+      }
+   }
+
+   /**
     * Realiza a operação de correlação convolução (apenas 2D) entre dois tensores usando
     * a dimensão de profundidade desejada.
     * @param entrada tensor com a matriz de entrada.
@@ -558,5 +780,55 @@ public class OpTensor4D{
     */
    public void convolucao2D(Tensor4D entrada, Tensor4D kernel, Tensor4D saida){
       convolucao2D(entrada, kernel, saida, 0);
+   }
+
+   /**
+    * Método exluviso para a propagação direta de camadas convolucionais
+    * @param entrada tensor de entrada.
+    * @param kernel tensor dos kernels.
+    * @param saida tensor de destino.
+    */
+   public void convForward(Tensor4D entrada, Tensor4D kernel, Tensor4D saida){
+      int numFiltros = kernel.dim1();
+      int profEntrada = kernel.dim2();
+
+      for(int i = 0; i < numFiltros; i++){
+         int[] idSaida = {0, i};
+         for(int j = 0; j < profEntrada; j++){
+            int[] idEntrada = {0, j};
+            int[] idKernel = {i, j};
+            correlacao2D(entrada, kernel, saida, idEntrada, idKernel, idSaida, true);
+         }
+      }
+   }
+
+   /**
+    * Método exluviso para a propagação reversa de camadas convolucionais
+    * @param entrada tensor de entrada.
+    * @param kernel tensor dos kernels.
+    * @param saida tensor de destino.
+    */
+   public void convBackward(Tensor4D entrada, Tensor4D kernel, Tensor4D derivada, Tensor4D gradKernel, Tensor4D gradEntrada){
+      int numFiltros = kernel.dim1();
+      int profEntrada = kernel.dim2();
+
+      for(int i = 0; i < numFiltros; i++){
+         for(int j = 0; j < profEntrada; j++){
+            int[] idEntrada = {0, j};
+            int[] idDerivada = {0, i};
+            int[] idGradKernel = {i, j};
+            correlacao2D(entrada, derivada, gradKernel, idEntrada, idDerivada, idGradKernel, false);
+         }
+      }
+
+      for(int i = 0; i < numFiltros; i++){
+         for(int j = 0; j < profEntrada; j++){
+            int[] idDerivada = {0, i};
+            int[] idKernel = {i, j};
+            int[] idGradEntrada = {0, j};
+            convolucao2DFull(derivada, kernel, gradEntrada, idDerivada, idKernel, idGradEntrada, true);
+         }
+      }
+
    }
 }
