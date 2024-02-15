@@ -34,60 +34,6 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
 
-      // double[][][] amostra = {
-      //    {
-      //       {1, 6, 2},
-      //       {5, 3, 1},
-      //       {7, 0, 4},
-      //    },
-      //    {
-      //       {1, 6, 2},
-      //       {5, 3, 1},
-      //       {7, 0, 4},
-      //    }
-      // };
-
-      // double[][][] grad = {
-      //    {
-      //       {1, 2},
-      //       {6, 5},
-      //    },
-      //    {
-      //       {1, 7},
-      //       {3, 9},
-      //    }
-      // };
-
-      // Inicializador iniKernel = new GlorotUniforme(12345);
-      // Convolucional conv = new Convolucional(new int[]{3, 3, 2}, new int[]{2, 2}, 2, "leakyrelu", iniKernel);
-      // conv.inicializar();
-
-      // conv.calcularSaida(amostra);
-      // conv.calcularGradiente(new Mat[]{
-      //    new Mat(grad[0]),
-      //    new Mat(grad[1]),
-      // });
-      // for(int i = 0; i < conv.gradEntrada.length; i++){
-      //    conv.gradEntrada[i].print("grad entrada " + i, 4);
-      // }
-
-      double[][] a = {
-         {1, 6, 2},
-         {5, 3, 1},
-         {7, 0, 4},
-      };
-
-      double[][] k = {
-         {1, 2},
-         {-1, 0},
-      };
-
-      Mat entrada = new Mat(a);
-      Mat filtro = new Mat(k);
-      Mat saida = new Mat(4, 4);
-
-      opmat.convolucao2DFull(entrada, filtro, saida, false);
-      saida.print(4);
    }
 
    /**

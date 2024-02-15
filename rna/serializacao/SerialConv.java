@@ -64,11 +64,11 @@ class SerialConv{
          bw.newLine();
 
          //filtros
-         for(int i = 0; i < camada.filtros.length; i++){
-            for(int j = 0; j < camada.filtros[i].length; j++){
-               for(int k = 0; k < camada.filtros[i][j].lin(); k++){
-                  for(int l = 0; l < camada.filtros[i][j].col(); l++){
-                     escreverDado(camada.filtros[i][j].elemento(k, l), tipo, bw);
+         for(int i = 0; i < camada.filtros.dim1(); i++){
+            for(int j = 0; j < camada.filtros.dim2(); j++){
+               for(int k = 0; k < camada.filtros.dim3(); k++){
+                  for(int l = 0; l < camada.filtros.dim4(); l++){
+                     escreverDado(camada.filtros.elemento(i, j, k, l), tipo, bw);
                      bw.newLine();
                   }
                }
@@ -76,13 +76,10 @@ class SerialConv{
          }
          
          if(camada.temBias()){
-            for(int i = 0; i < camada.bias.length; i++){
-               for(int j = 0; j < camada.bias[i].lin(); j++){
-                  for(int k = 0; k < camada.bias[i].col(); k++){
-                     escreverDado(camada.bias[i].elemento(j, k), tipo, bw);
-                     bw.newLine();
-                  }
-               }
+            double[] arrB = camada.bias.paraArray();
+            for(int i = 0; i < arrB.length; i++){
+               escreverDado(arrB[i], tipo, bw);
+               bw.newLine();
             }
          }
       }catch(Exception e){
@@ -149,7 +146,7 @@ class SerialConv{
          boolean bias = Boolean.valueOf(br.readLine());
          
 
-         int numFiltros = saida[2];
+         int numFiltros = saida[0];
 
          Convolucional camada = new Convolucional(formFiltro, numFiltros);
          camada.configurarAtivacao(ativacao);
@@ -169,23 +166,31 @@ class SerialConv{
     */
    public void lerPesos(Convolucional camada, BufferedReader br){
       try{
-         for(int i = 0; i < camada.filtros.length; i++){
-            for(int j = 0; j < camada.filtros[i].length; j++){
-               for(int k = 0; k < camada.filtros[i][j].lin(); k++){
-                  for(int l = 0; l < camada.filtros[i][j].col(); l++){
-                     double filtro = Double.parseDouble(br.readLine());
-                     camada.filtros[i][j].editar(k, l, filtro);
+         int d1 = camada.filtros.dim1();
+         int d2 = camada.filtros.dim2();
+         int d3 = camada.filtros.dim3();
+         int d4 = camada.filtros.dim4();
+         for(int i = 0; i < d1; i++){
+            for(int j = 0; j < d2; j++){
+               for(int k = 0; k < d3; k++){
+                  for(int l = 0; l < d4; l++){
+                     double valor = Double.parseDouble(br.readLine());
+                     camada.filtros.editar(i, j, k, l, valor);
                   }
                }
             }
          }
          
          if(camada.temBias()){
-            for(int i = 0; i < camada.bias.length; i++){
-               for(int j = 0; j < camada.bias[i].lin(); j++){
-                  for(int k = 0; k < camada.bias[i].col(); k++){
+            int profBias = camada.bias.dim2();
+            int alturaBias = camada.bias.dim3();
+            int larguraBias = camada.bias.dim4();
+            
+            for(int i = 0; i < profBias; i++){
+               for(int j = 0; j < alturaBias; j++){
+                  for(int k = 0; k < larguraBias; k++){
                      double bias = Double.parseDouble(br.readLine());
-                     camada.bias[i].editar(j, k, bias);
+                     camada.bias.editar(0, i, j, k, bias);
                   }
                }
             }

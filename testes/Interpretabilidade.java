@@ -88,8 +88,8 @@ public class Interpretabilidade{
 
    static void exibirParametros(Densa[] camadas){
       for(int i = 0; i < camadas.length; i++){
-         camadas[i].pesos.print("pesos c" + i, 4);
-         camadas[i].bias.print("bias c" + i, 4);
+         camadas[i].pesos.print();
+         camadas[i].bias.print();
          System.out.println();
       }
    }

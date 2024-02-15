@@ -42,8 +42,8 @@ public class Classificador{
 
       //criando e configurando a rede neural
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Densa(qEntradas, 20, "relu"),
-         new Densa(20, "relu"),
+         new Densa(qEntradas, 20, "leakyrelu"),
+         new Densa(20, "leakyrelu"),
          new Densa(qSaidas, "softmax")
       });
 

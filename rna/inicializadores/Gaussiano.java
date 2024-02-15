@@ -1,6 +1,7 @@
 package rna.inicializadores;
 
 import rna.core.Mat;
+import rna.core.Tensor4D;
 
 /**
  * Inicializador Gaussiano para uso dentro da biblioteca.
@@ -30,5 +31,16 @@ public class Gaussiano extends Inicializador{
       m.map((x) -> (
          super.random.nextGaussian()
       ));
+   }
+
+   @Override
+   public void inicializar(Tensor4D tensor, int dim1, int dim2){
+      for(int i = 0; i < tensor.dim3(); i++){
+         for(int j = 0; j < tensor.dim4(); j++){
+            tensor.editar(dim1, dim2, i, j, (
+               super.random.nextGaussian()
+            ));
+         }
+      }
    }
 }

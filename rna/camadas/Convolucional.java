@@ -3,8 +3,8 @@ package rna.camadas;
 import rna.ativacoes.Ativacao;
 import rna.ativacoes.Linear;
 import rna.core.Dicionario;
-import rna.core.Mat;
-import rna.core.OpMatriz;
+import rna.core.OpTensor4D;
+import rna.core.Tensor4D;
 import rna.core.Utils;
 import rna.inicializadores.Inicializador;
 import rna.inicializadores.GlorotUniforme;
@@ -38,9 +38,9 @@ import rna.inicializadores.Zeros;
 public class Convolucional extends Camada implements Cloneable{
 
    /**
-    * Operador matricial para a camada.
+    * Operador de tensores para a camada.
     */
-   OpMatriz opmat = new OpMatriz();
+   OpTensor4D optensor = new OpTensor4D();
 
    /**
     * Utilitário.
@@ -102,43 +102,40 @@ public class Convolucional extends Camada implements Cloneable{
    private int largSaida;
 
    /**
-    * Array de matrizes contendo os valores de entrada para a camada,
+    * Tensor contendo os valores de entrada para a camada,
     * que serão usados para o processo de feedforward.
     * <p>
     *    O formato da entrada é dado por:
     * </p>
     * <pre>
-    *entrada = Mat[profundidadeEntrada]
-    *entrada[n] = (alturaEntrada, larguraEntrada)
+    *    entrada = (1, profundidade, altura, largura)
     * </pre>
     */
-   public Mat[] entrada;
+   public Tensor4D entrada;
 
    /**
-    * Array bidimensional de matrizes contendo os filtros (ou kernels)
+    * Tensor contendo os filtros (ou kernels)
     * da camada.
     * <p>
     *    O formato dos filtros é dado por:
     * </p>
     * <pre>
-    *filtros = (numFiltros, profundidadeEntrada)
-    *filtros[i][j] = (alturaFiltro, larguraFiltro)
+    *    entrada = (numFiltros, profundidadeEntrada, alturaFiltro, larguraFiltro)
     * </pre>
     */
-   public Mat[][] filtros;
+   public Tensor4D filtros;
 
    /**
-    * Array de matrizes contendo os bias (vieses) para cada valor de 
+    * Tensor contendo os bias (vieses) para cada valor de 
     * saída da camada.
     * <p>
     *    O formato do bias é dado por:
     * </p>
     * <pre>
-    *bias = Mat[numFiltros]
-    *bias[n] = (alturaSaida, larguraSaida)
+    *    bias = (1, numFiltros, alturaSaida, larguraSaida)
     * </pre>
     */
-   public Mat[] bias;
+   public Tensor4D bias;
 
    /**
     * Auxiliar na verificação de uso do bias.
@@ -146,87 +143,87 @@ public class Convolucional extends Camada implements Cloneable{
    private boolean usarBias = true;
 
    /**
-    * Array de matrizes contendo valores de somatório para cada valor de 
-    * saída da camada.
+    * Tensor contendo valores resultantes do cálculo de correlação cruzada
+    * entre a entrada e os filtros, com o bias adicionado (se houver).
     * <p>
     *    O formato somatório é dado por:
     * </p>
     * <pre>
-    *somatorio = Mat[numeroFiltros]
-    *somatorio[n] = (alturaSaida, larguraSaida)
+    *    somatorio = (1, numeroFiltros, alturaSaida, larguraSaida)
     * </pre>
     */
-   public Mat[] somatorio;
+   public Tensor4D somatorio;
    
    /**
-    * Array de matrizes contendo os valores de saídas da camada.
+    * Tensor contendo os valores de saídas da camada.
     * <p>
     *    O formato da saída é dado por:
     * </p>
     * <pre>
-    *saida = Mat[numeroFiltros]
-    *saida[n] = (alturaSaida, larguraSaida)
+    *    saida = (1, numeroFiltros, alturaSaida, larguraSaida)
     * </pre>
     */
-   public Mat[] saida;
+   public Tensor4D saida;
 
    /**
-    * Array de matrizes contendo os valores relativos a derivada da função de
+    * Tensor contendo os valores relativos a derivada da função de
     * ativação da camada.
     * <p>
     *    O formato da derivada é dado por:
     * </p>
     * <pre>
-    *derivada = Mat[numFiltros]
-    *derivada[n] = (alturaSaida, larguraSaida)
+    *    derivada = (1, numFiltros, alturaSaida, larguraSaida)
     * </pre>
     */
-   public Mat[] derivada;
+   public Tensor4D derivada;
 
    /**
-    * Array de matrizes contendo os valores dos gradientes usados para 
+    * Tensor contendo os valores dos gradientes usados para 
     * a retropropagação para camadas anteriores.
+    * <p>
+    *    O formato do gradiente de entrada é dado por:
+    * </p>
+    * <pre>
+    *    gradEntrada = (1, profEntrada, alturaEntrada, larguraEntrada)
+    * </pre>
     */
-   public Mat[] gradEntrada;
+   public Tensor4D gradEntrada;
 
    /**
-    * Array de matrizes contendo os valores dos gradientes relativos a saída
+    * Tensor contendo os valores dos gradientes relativos a saída
     * da camada.
     * <p>
     *    O formato dos gradientes da saída é dado por:
     * </p>
     * <pre>
-    *gradSaida = Mat[numFiltros]
-    *gradSaida[n] = (alturaSaida, larguraSaida)
+    *    gradSaida = (1, numFiltros, alturaSaida, larguraSaida)
     * </pre>
     */
-   public Mat[] gradSaida;
+   public Tensor4D gradSaida;
 
    /**
-    * Array de matrizes contendo os valores dos gradientes relativos a cada
+    * Tensor contendo os valores dos gradientes relativos a cada
     * filtro da camada.
     * <p>
     *    O formato dos gradientes para os filtros é dado por:
     * </p>
     * <pre>
-    *gradFiltros = Mat(numFiltros, profundidadeEntrada)
-    *gradFiltros[i][j] = (alturaFiltro, larguraFiltro)
+    * gradFiltros = (numFiltros, profundidadeEntrada, alturaFiltro, larguraFiltro)
     * </pre>
     */
-   public Mat[][] gradFiltros;
+   public Tensor4D gradFiltros;
 
    /**
-    * Array de matrizes contendo os valores dos gradientes relativos a cada
+    * Tensor contendo os valores dos gradientes relativos a cada
     * bias da camada.
     * <p>
     *    O formato dos gradientes para os bias é dado por:
     * </p>
     * <pre>
-    *gradBias = Mat[numFiltros]
-    *gradBias[n] = (alturaSaida, larguraSaida)
+    *    gradBias = (1, numFiltros, alturaSaida, larguraSaida)
     * </pre>
     */
-   public Mat[] gradBias;
+   public Tensor4D gradBias;
 
    /**
     * Função de ativação da camada.
@@ -249,7 +246,7 @@ public class Convolucional extends Camada implements Cloneable{
     *    A disposição do formato de entrada deve ser da seguinte forma:
     * </p>
     * <pre>
-    *    formEntrada = (altura, largura, profundidade)
+    *    formEntrada = (profundidade, altura, largura)
     * </pre>
     * Onde largura e altura devem corresponder as dimensões dos dados de entrada
     * que serão processados pela camada e a profundidade diz respeito a quantidade
@@ -290,9 +287,9 @@ public class Convolucional extends Camada implements Cloneable{
          );
       }
 
-      this.altEntrada  = formEntrada[0];
-      this.largEntrada = formEntrada[1];
-      this.profEntrada = formEntrada[2];
+      this.profEntrada = formEntrada[0];
+      this.altEntrada  = formEntrada[1];
+      this.largEntrada = formEntrada[2];
 
       construir(formEntrada);
    }
@@ -303,7 +300,7 @@ public class Convolucional extends Camada implements Cloneable{
     *    A disposição do formato de entrada deve ser da seguinte forma:
     * </p>
     * <pre>
-    *    formEntrada = (altura, largura, profundidade)
+    *    formEntrada = (profundidade, altura, largura)
     * </pre>
     * Onde largura e altura devem corresponder as dimensões dos dados de entrada
     * que serão processados pela camada e a profundidade diz respeito a quantidade
@@ -331,7 +328,7 @@ public class Convolucional extends Camada implements Cloneable{
     *    A disposição do formato de entrada deve ser da seguinte forma:
     * </p>
     * <pre>
-    *    formEntrada = (altura, largura, profundidade)
+    *    formEntrada = (profundidade, altura, largura)
     * </pre>
     * Onde largura e altura devem corresponder as dimensões dos dados de entrada
     * que serão processados pela camada e a profundidade diz respeito a quantidade
@@ -387,7 +384,7 @@ public class Convolucional extends Camada implements Cloneable{
     *    A disposição do formato de entrada deve ser da seguinte forma:
     * </p>
     * <pre>
-    *    formEntrada = (altura, largura, profundidade)
+    *    formEntrada = (profundidade, altura, largura)
     * </pre>
     * Onde largura e altura devem corresponder as dimensões dos dados de entrada
     * que serão processados pela camada e a profundidade diz respeito a quantidade
@@ -448,7 +445,7 @@ public class Convolucional extends Camada implements Cloneable{
     *    A disposição do formato de entrada deve ser da seguinte forma:
     * </p>
     * <pre>
-    *    formEntrada = (altura, largura, profundidade)
+    *    formEntrada = (profundidade, altura, largura)
     * </pre>
     * Onde largura e altura devem corresponder as dimensões dos dados de entrada
     * que serão processados pela camada e a profundidade diz respeito a quantidade
@@ -475,7 +472,7 @@ public class Convolucional extends Camada implements Cloneable{
     *    A disposição do formato de entrada deve ser da seguinte forma:
     * </p>
     * <pre>
-    *    formEntrada = (altura, largura, profundidade)
+    *    formEntrada = (profundidade, altura, largura)
     * </pre>
     * Onde largura e altura devem corresponder as dimensões dos dados de entrada
     * que serão processados pela camada e a profundidade diz respeito a quantidade
@@ -501,7 +498,7 @@ public class Convolucional extends Camada implements Cloneable{
     *    A disposição do formato de entrada deve ser da seguinte forma:
     * </p>
     * <pre>
-    *    formEntrada = (altura, largura, profundidade)
+    *    formEntrada = (profundidade, altura, largura)
     * </pre>
     * Onde largura e altura devem corresponder as dimensões dos dados de entrada
     * que serão processados pela camada e a profundidade diz respeito a quantidade
@@ -524,10 +521,10 @@ public class Convolucional extends Camada implements Cloneable{
     * Inicializa os parâmetros necessários para a camada Convolucional.
     * <p>
     *    O formato de entrada deve ser um array contendo o tamanho de 
-    *    cada dimensão e entrada da camada, e deve estar no formato:
+    *    cada dimensão de entrada da camada, e deve estar no formato:
     * </p>
     * <pre>
-    *    entrada = (altura, largura, profundidade)
+    *    entrada = (profundidade, altura, largura)
     * </pre>
     * @param entrada formato de entrada para a camada.
     */
@@ -546,75 +543,63 @@ public class Convolucional extends Camada implements Cloneable{
          );
       }
 
-      int[] formEntrada = (int[]) entrada;
-      if(formEntrada.length != 3){
+      int[] fEntrada = (int[]) entrada;
+      if(fEntrada.length == 4){
+         this.profEntrada = fEntrada[1];
+         this.altEntrada  = fEntrada[2];
+         this.largEntrada = fEntrada[3];
+      
+      }else if(fEntrada.length == 3){
+         this.profEntrada = fEntrada[0];
+         this.altEntrada  = fEntrada[1];
+         this.largEntrada = fEntrada[2];
+         
+      }else{
          throw new IllegalArgumentException(
             "O formato de entrada para a camada Convolucional deve conter três " + 
-            "elementos (altura, largura, profundidade), objeto recebido possui " + formEntrada.length
+            "elementos (profundidade, altura, largura), ou quatro elementos (primeiro desconsiderado)" + 
+            "objeto recebido possui " + fEntrada.length
          );
       }
 
-      if(utils.apenasMaiorZero(formEntrada) == false){
+      if(utils.apenasMaiorZero(fEntrada) == false){
          throw new IllegalArgumentException(
             "Os valores de dimensões de entrada para a camada Convolucional não " +
             "podem conter valores menores que 1."
          );
       }
 
-      //inicialização de parâmetros
-
-      //inicialização da entrada
-      this.altEntrada  = formEntrada[0];
-      this.largEntrada = formEntrada[1];
-      this.profEntrada = formEntrada[2];
-
       this.altSaida = this.altEntrada - this.altFiltro + 1;
       this.largSaida = this.largEntrada - this.largFiltro + 1;
 
       //inicialização dos parâmetros necessários
-      this.entrada      = new Mat[this.profEntrada];
-      this.gradEntrada  = new Mat[this.profEntrada];
-      for(int i = 0; i < this.profEntrada; i++){
-         this.entrada[i]      = new Mat(this.altEntrada, this.largEntrada);
-         this.gradEntrada[i]  = new Mat(this.altEntrada, this.largEntrada);
-      }
+      this.entrada      = new Tensor4D(1, profEntrada, altEntrada, largEntrada);
+      this.gradEntrada  = new Tensor4D(this.entrada);
+      this.entrada.nome("Entrada");
+      this.gradEntrada.nome("Gradiente entrada");
 
-      this.filtros      = new Mat[this.numFiltros][this.profEntrada];
-      this.gradFiltros  = new Mat[this.numFiltros][this.profEntrada];
-      this.somatorio    = new Mat[this.numFiltros];
-      this.saida        = new Mat[this.numFiltros];
-      this.derivada     = new Mat[this.numFiltros];
-      this.gradSaida    = new Mat[this.numFiltros];
+      this.filtros      = new Tensor4D(numFiltros, profEntrada, altFiltro, largFiltro);
+      this.saida        = new Tensor4D(1, numFiltros, altSaida, largSaida);
+      this.gradFiltros  = new Tensor4D(this.filtros);
+      this.somatorio    = new Tensor4D(this.saida);
+      this.derivada     = new Tensor4D(this.saida);
+      this.gradSaida    = new Tensor4D(this.saida);
+      this.filtros.nome("Kernel");
+      this.saida.nome("Saída");
+      this.gradFiltros.nome("Gradiente kernel");
+      this.somatorio.nome("Somatório");
+      this.derivada.nome("Derivada");
+      this.gradSaida.nome("Gradiente saída");
 
-      if(this.usarBias){
-         this.bias      = new Mat[this.numFiltros];
-         this.gradBias  = new Mat[this.numFiltros];
-      }
-
-      for(int i = 0; i < numFiltros; i++){
-         for(int j = 0; j < profEntrada; j++){
-            this.filtros[i][j]      = new Mat(this.altFiltro, this.largFiltro);
-            this.gradFiltros[i][j]  = new Mat(this.altFiltro, this.largFiltro);
-         }
-
-         this.somatorio[i] = new Mat(this.altSaida, this.largSaida);
-         this.saida[i]     = new Mat(this.altSaida, this.largSaida);
-         this.derivada[i]  = new Mat(this.altSaida, this.largSaida);
-         this.gradSaida[i] = new Mat(this.altSaida, this.largSaida);
-
-         if(this.usarBias){
-            this.bias[i]      = new Mat(this.altSaida, this.largSaida);
-            this.gradBias[i]  = new Mat(this.altSaida, this.largSaida);
-         }
+      if(usarBias){
+         this.bias      = new Tensor4D(1, this.numFiltros, altSaida, largSaida);
+         this.gradBias  = new Tensor4D(this.bias);
+         this.bias.nome("Bias");
+         this.gradBias.nome("Gradiente bias");
       }
 
       //auxiliar
-      this.numParamsKernel = 0;
-      for(Mat[] filtro : this.filtros){
-         for(Mat camada : filtro){
-            this.numParamsKernel += camada.tamanho();
-         }
-      }
+      this.numParamsKernel = this.filtros.tamanho();
       
       this.treinavel = true;
       this.construida = true;//camada pode ser usada.
@@ -626,13 +611,13 @@ public class Convolucional extends Camada implements Cloneable{
       
       for(int i = 0; i < numFiltros; i++){
          for(int j = 0; j < profEntrada; j++){
-            iniKernel.inicializar(filtros[i][j]);
+            iniKernel.inicializar(filtros, i, j);
          }
       }
 
       if(usarBias){
          for(int i = 0; i < numFiltros; i++){
-            iniBias.inicializar(bias[i]);
+            iniBias.inicializar(bias, 0, i);
          }
       }
    }
@@ -665,8 +650,8 @@ public class Convolucional extends Camada implements Cloneable{
     *    Após a propagação dos dados, a função de ativação da camada é aplicada
     *    ao resultado do somatório e o resultado é salvo da saída da camada.
     * </p>
-    * @param entrada dados de entrada que serão processados, tipos aceitos são {@code double[]},
-    * {@code double[][][]} ou {@code Mat[]}.
+    * @param entrada dados de entrada que serão processados, tipos aceitos são,
+    * {@code double[][][]} ou {@code Tensor4D}.
     * @throws IllegalArgumentException caso a entrada fornecida não seja suportada 
     * pela camada.
     * @throws IllegalArgumentException caso haja alguma incompatibilidade entre a entrada
@@ -676,42 +661,46 @@ public class Convolucional extends Camada implements Cloneable{
    public void calcularSaida(Object entrada){
       verificarConstrucao();
 
-      if(entrada instanceof double[]){
-         utils.copiar((double[]) entrada, this.entrada);
-      
-      }else if(entrada instanceof double[][][]){
+      if(entrada instanceof double[][][]){
          double[][][] e = (double[][][]) entrada;
          if(e.length != this.profEntrada || e[0].length != this.largEntrada || e[0][0].length != this.altEntrada){
             throw new IllegalArgumentException(
-               "As dimensões da entrada " + 
-               "(" + e[0].length + ", " + e[0][0].length + ", " + e.length + ") " +
+               "\nAs dimensões da entrada " + 
+               "(" + e.length + ", " + e[0].length + ", " + e[0][0].length + ") " +
                "não correspondem as dimensões de entrada da camada Convolucional " + 
-               "(" + this.altEntrada +", " + this.largEntrada + ", " + this.profEntrada + ")"
+               "(" + this.profEntrada +", " + this.altEntrada + ", " + this.largEntrada + ")"
             );
          }
-         utils.copiar(e, this.entrada);
+
+         this.entrada.copiar(e, 0);
       
-      }else if(entrada instanceof Mat[]){
-         utils.copiar((Mat[]) entrada, this.entrada);
+      }else if(entrada instanceof Tensor4D){
+         Tensor4D e = (Tensor4D) entrada;
+         if(this.entrada.comparar3D(e) == false){
+            throw new IllegalArgumentException(
+               "\n Dimensões de entrada " + e.dimensoesStr() + 
+               "incompatível com as dimensões da entrada da camada " + this.entrada.dimensoesStr()
+            );
+         }
+
+         this.entrada.copiar(e.array3D(0), 0);
 
       }else{         
          throw new IllegalArgumentException(
-            "Os dados de entrada para a camada Convolucional devem ser " +
-            "do tipo \"double[][][]\", \"double[]\" ou \"Mat[]\", objeto recebido é do tipo \"" + 
+            "\nOs dados de entrada para a camada Convolucional devem ser " +
+            "do tipo \"double[][][]\" ou \"Tensor4D\" objeto recebido é do tipo \"" + 
             entrada.getClass().getTypeName() + "\"."
          );
       }
 
       //feedforward
-      for(int i = 0; i < numFiltros; i++){
-         somatorio[i].preencher(0);
-      }
+      somatorio.preencher(0);
 
       if(usarBias){
-         utils.copiar(this.bias, this.somatorio);
+         somatorio.copiar(bias);
       }
       
-      opmat.convForward(this.entrada, this.filtros, this.somatorio, true);
+      optensor.convForward(this.entrada, this.filtros, this.somatorio);
 
       ativacao.calcular(this);
    }
@@ -732,7 +721,18 @@ public class Convolucional extends Camada implements Cloneable{
    public void calcularGradiente(Object gradSeguinte){
       super.verificarConstrucao();
 
-      if(gradSeguinte instanceof Mat[] == false){
+      if(gradSeguinte instanceof Tensor4D){
+         Tensor4D g = (Tensor4D) gradSeguinte;
+         if(this.gradSaida.comparar3D(g) == false){
+            throw new IllegalArgumentException(
+               "\nAs três dimensões finais do tensor recebido " + g.dimensoesStr() +
+               "são imcompatíveis as três primeira dimensões do tensor de gradiente"
+            );
+         }
+
+         this.gradSaida.copiar(g);
+
+      }else{
          throw new IllegalArgumentException(
             "Os gradientes para a camada Convolucional devem ser " +
             "do tipo \"" + this.gradSaida.getClass().getTypeName() + 
@@ -740,25 +740,14 @@ public class Convolucional extends Camada implements Cloneable{
          );
       }
 
-      Mat[] grads = (Mat[]) gradSeguinte;
-      if(grads.length != this.gradSaida.length){
-         throw new IllegalArgumentException(
-            "Incompatibilidade entre o número de gradientes fornecidos (" + grads.length + 
-            ") e o suportado pela camada (" + this.gradSaida.length + ")"
-         );
-      }
-      utils.copiar(grads, this.gradSaida);
-
       ativacao.derivada(this);
-      for(int i = 0; i < profEntrada; i++){
-         this.gradEntrada[i].preencher(0);
-      }
+      this.gradEntrada.preencher(0);
 
       //backward
-      opmat.convBackward(this.entrada, this.filtros, this.derivada, this.gradFiltros, this.gradEntrada);
+      optensor.convBackward(this.entrada, this.filtros, this.derivada, this.gradFiltros, this.gradEntrada);
 
       if(this.usarBias){
-         utils.copiar(this.derivada, this.gradBias);
+         this.bias.copiar(this.derivada);
       }
    }
 
@@ -776,7 +765,7 @@ public class Convolucional extends Camada implements Cloneable{
    }
 
    @Override
-   public Mat[] saida(){
+   public Tensor4D saida(){
       return this.saida;
    }
 
@@ -791,9 +780,9 @@ public class Convolucional extends Camada implements Cloneable{
 
       int parametros = 0;
 
-      parametros += filtros.length * filtros[0].length * filtros[0][0].tamanho();
+      parametros += filtros.tamanho();
       if(this.usarBias){
-         parametros += bias.length * bias[0].tamanho();
+         parametros += bias.tamanho();
       }
 
       return parametros;
@@ -803,35 +792,12 @@ public class Convolucional extends Camada implements Cloneable{
    public double[] saidaParaArray(){
       verificarConstrucao();
 
-      int id = 0;
-      double[] saida = new double[tamanhoSaida()];
-
-      for(int i = 0; i < this.saida.length; i++){
-         double[] s = this.saida[i].paraArray();
-         for(double valor : s){
-            saida[id++] = valor;
-         }
-      }
-
-      return saida;
+      return saida.paraArray();
    }
 
    @Override 
    public int tamanhoSaida(){
       return this.numFiltros * this.altSaida * this.largSaida;
-   }
-
-   /**
-    * Retorna as saídas da camada no formato de um array trimensional.
-    * @return saída da camada.
-    */
-   public double[][][] saidaParaDouble(){
-      double[][][] saida = new double[this.numFiltros][][];
-      for(int i = 0; i < saida.length; i++){
-         saida[i] = this.saida[i].paraDouble();
-      }
-
-      return saida;
    }
 
    @Override
@@ -849,32 +815,14 @@ public class Convolucional extends Camada implements Cloneable{
             clone.gradBias = this.gradBias.clone();
          }
 
-         clone.entrada = new Mat[this.profEntrada];
-         for(int i = 0; i < this.profEntrada; i++){
-            clone.entrada[i] = this.entrada[i].clone();
-         }
-         
-         clone.filtros     = new Mat[this.numFiltros][];
-         clone.gradFiltros = new Mat[this.numFiltros][];
-         for(int i = 0; i < this.numFiltros; i++){
-            clone.filtros[i]     = new Mat[this.profEntrada];
-            clone.gradFiltros[i] = new Mat[this.profEntrada];
-            for(int j = 0; j < this.profEntrada; j++){
-               clone.filtros[i][j] = this.filtros[i][j].clone();
-               clone.gradFiltros[i][j] = this.gradFiltros[i][j].clone();
-            }
-         }
+         clone.entrada = this.entrada.clone();
+         clone.filtros     = this.filtros.clone();
+         clone.gradFiltros = this.gradFiltros.clone();
 
-         clone.somatorio   = new Mat[this.numFiltros];
-         clone.saida       = new Mat[this.numFiltros];
-         clone.gradSaida   = new Mat[this.numFiltros];
-         clone.derivada    = new Mat[this.numFiltros];
-         for(int i = 0; i < this.numFiltros; i++){
-            clone.somatorio[i] = this.somatorio[i].clone();
-            clone.saida[i] = this.saida[i].clone();
-            clone.gradSaida[i] = this.gradSaida[i].clone();
-            clone.derivada[i] = this.derivada[i].clone();
-         }
+         clone.somatorio   = somatorio.clone();
+         clone.saida       = saida.clone();
+         clone.gradSaida   = gradSaida.clone();
+         clone.derivada    = derivada.clone();
 
          return clone;
       }catch(Exception e){
@@ -892,10 +840,12 @@ public class Convolucional extends Camada implements Cloneable{
     */
    @Override
    public int[] formatoEntrada(){
+      verificarConstrucao();
+
       return new int[]{
-         this.entrada[0].lin(), 
-         this.entrada[0].col(), 
-         this.entrada.length
+         profEntrada, 
+         altEntrada, 
+         largEntrada
       };
    }
  
@@ -912,9 +862,9 @@ public class Convolucional extends Camada implements Cloneable{
       verificarConstrucao();
 
       return new int[]{
+         this.numFiltros,
          this.altSaida,
-         this.largSaida,
-         this.numFiltros
+         this.largSaida
       };
    }
 
@@ -933,62 +883,22 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override
    public double[] obterKernel(){
-
-      int cont = 0, i, j;
-      double[] kernel = new double[numParamsKernel];
-      for(i = 0; i < numFiltros; i++){
-         for(j = 0; j < profEntrada; j++){
-            double[] arr = filtros[i][j].paraArray();
-            System.arraycopy(arr, 0, kernel, cont, arr.length);
-            cont += arr.length;
-         }
-      }
-
-      return kernel;
+      return this.filtros.paraArray();
    }
 
    @Override
    public double[] obterGradKernel(){
-      int cont = 0, i, j;
-      double[] grad = new double[numParamsKernel];
-      
-      for(i = 0; i < numFiltros; i++){
-         for(j = 0; j < profEntrada; j++){
-            double[] arr = gradFiltros[i][j].paraArray();
-            System.arraycopy(arr, 0, grad, cont, arr.length);
-            cont += arr.length;
-         }
-      }
-
-      return grad;
+      return this.gradFiltros.paraArray();
    }
 
    @Override
    public double[] obterBias(){
-      double[] bias = new double[numFiltros * altSaida * largSaida];
-      int cont = 0;
-
-      for(int i = 0; i < numFiltros; i++){
-         double[] arr = this.bias[i].paraArray();
-         System.arraycopy(arr, 0, bias, cont, arr.length);
-         cont += arr.length;
-      }
-
-      return bias;
+      return this.bias.paraArray();
    }
 
    @Override
    public double[] obterGradBias(){
-      double[] grad = new double[numFiltros * altSaida * largSaida];
-      int cont = 0;
-
-      for(int i = 0; i < numFiltros; i++){
-         double[] arr = this.gradBias[i].paraArray();
-         System.arraycopy(arr, 0, grad, cont, arr.length);
-         cont += arr.length;
-      }
-
-      return grad;
+      return this.gradBias.paraArray();
    }
 
    @Override
@@ -998,26 +908,26 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override
    public void editarKernel(double[] kernel){
-      if(kernel.length != this.numParamsKernel){
+      if(kernel.length != this.filtros.tamanho()){
          throw new IllegalArgumentException(
             "A dimensão do kernel fornecido (" + kernel.length + ") não é igual a quantidade de " +
             " parâmetros para os kernels da camada ("+ this.numParamsKernel + ")."
          );
       }
          
-      utils.copiar(kernel, this.filtros);
+      this.filtros.copiarElementos(kernel);
    }
 
    @Override
    public void editarBias(double[] bias){
-      if(bias.length != (this.altSaida * this.largSaida * this.numFiltros)){
+      if(bias.length != this.bias.tamanho()){
          throw new IllegalArgumentException(
             "A dimensão do bias fornecido não é igual a quantidade de " +
             " parâmetros para os bias da camada."
          );
       }
       
-      utils.copiar(bias, this.bias);
+      this.bias.copiarElementos(bias);
    }
 
 }

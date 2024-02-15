@@ -24,7 +24,7 @@ public class Sigmoid extends Ativacao{
          deriv[i] *= grads[i];
       }
       
-      camada.derivada.copiar(0, deriv);
+      camada.derivada.copiar(deriv, 0, 0, 0);
    }
 
    @Override
@@ -33,14 +33,17 @@ public class Sigmoid extends Ativacao{
       int i, j, k;
       double grad, d;
 
-      for(i = 0; i < camada.somatorio.length; i++){
-         for(j = 0; j < camada.somatorio[i].lin(); j++){
-            for(k = 0; k < camada.somatorio[i].col(); k++){
-               grad = camada.gradSaida[i].elemento(j, k);
-               d = camada.saida[i].elemento(j, k);
+      int prof = camada.somatorio.dim2();
+      int alt = camada.somatorio.dim3();
+      int larg = camada.somatorio.dim4();
+      for(i = 0; i < prof; i++){
+         for(j = 0; j < alt; j++){
+            for(k = 0; k < larg; k++){
+               grad = camada.gradSaida.elemento(0, i, j, k);
+               d = camada.saida.elemento(0, i, j, k);
                d = d * (1 - d);
 
-               camada.derivada[i].editar(j, k, (grad * d));
+               camada.derivada.editar(0, i, j, k, (grad * d));
             }
          }
       }

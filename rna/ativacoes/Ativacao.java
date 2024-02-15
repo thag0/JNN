@@ -92,7 +92,15 @@ public abstract class Ativacao{
     * @param camada camada densa usada.
     */
    public void calcular(Densa camada){
-      this.aplicarFx(camada.somatorio, camada.saida);
+      int linhas = camada.somatorio.dim3();
+      int colunas = camada.somatorio.dim4();
+      for(int i = 0; i < linhas; i++){
+         for(int j = 0; j < colunas; j++){
+            camada.saida.editar(0, 0, i, j, (
+               fx.applyAsDouble(camada.somatorio.elemento(0, 0, i, j)
+            )));
+         }
+      }
    }
 
    /**
@@ -104,7 +112,19 @@ public abstract class Ativacao{
     * @param camada camada densa usada.
     */
    public void derivada(Densa camada){
-      this.aplicarDx(camada.gradSaida, camada.somatorio, camada.derivada);
+      double grad, entrada;
+      int linhas = camada.somatorio.dim3();
+      int colunas = camada.somatorio.dim4();
+
+      for(int i = 0; i < linhas; i++){
+         for(int j = 0; j < colunas; j++){
+            entrada = camada.somatorio.elemento(0, 0, i, j);
+            grad = camada.gradSaida.elemento(0, 0, i, j);
+            camada.derivada.editar(0, 0, i, j, (
+               dx.applyAsDouble(entrada) * grad
+            ));
+         }
+      }
    }
 
 
@@ -116,8 +136,18 @@ public abstract class Ativacao{
     * @param camada camada convolucional usada.
     */
    public void calcular(Convolucional camada){
-      for(int i = 0; i < camada.somatorio.length; i++){
-         this.aplicarFx(camada.somatorio[i], camada.saida[i]);
+      int prof = camada.somatorio.dim2();
+      int altura = camada.somatorio.dim3();
+      int largura = camada.somatorio.dim4();
+
+      for(int i = 0; i < prof; i++){
+         for(int j = 0; j < altura; j++){
+            for(int k = 0; k < largura; k++){
+               camada.saida.editar(0, i, j, k, (
+                  fx.applyAsDouble(camada.somatorio.elemento(0, i, j, k))
+               ));
+            }
+         }
       }
    }
 
@@ -130,8 +160,21 @@ public abstract class Ativacao{
     * @param camada camada convolucional usada.
     */
    public void derivada(Convolucional camada){
-      for(int i = 0; i < camada.somatorio.length; i++){
-         this.aplicarDx(camada.gradSaida[i], camada.somatorio[i], camada.derivada[i]);
+      int prof = camada.somatorio.dim2();
+      int altura = camada.somatorio.dim3();
+      int largura = camada.somatorio.dim4();
+      double entrada, grad;
+
+      for(int i = 0; i < prof; i++){
+         for(int j = 0; j < altura; j++){
+            for(int k = 0; k < largura; k++){
+               entrada = camada.somatorio.elemento(0, i, j, k);
+               grad = camada.gradSaida.elemento(0, i, j, k);
+               camada.derivada.editar(0, i, j, k, (
+                  dx.applyAsDouble(entrada) * grad
+               ));
+            }
+         }
       }
    }
 

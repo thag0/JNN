@@ -35,7 +35,7 @@ public class Tensor4D{
    /**
     * Estético com finalidade de debug, nome do tensor.
     */
-   String nome = getClass().getSimpleName();
+   private String nome = getClass().getSimpleName();
 
    /**
     * Inicializa um tensor com quatro dimensões a partir de outra instância de 

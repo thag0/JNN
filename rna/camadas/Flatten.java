@@ -1,6 +1,6 @@
 package rna.camadas;
 
-import rna.core.Mat;
+import rna.core.Tensor4D;
 import rna.core.Utils;
 
 /**
@@ -24,7 +24,7 @@ public class Flatten extends Camada{
    /**
     * Array contendo o formato de entrada da camada, de acordo com o formato:
     * <pre>
-    * entrada = (altura, largura, profundidade)
+    *    entrada = (altura, largura, profundidade)
     * </pre>
     */
    int[] formEntrada;
@@ -32,43 +32,48 @@ public class Flatten extends Camada{
    /**
     * Array contendo o formato de saida da camada, de acordo com o formato:
     * <pre>
-    * saida = (altura, largura)
+    *    saida = (elementosTotaisEntrada)
     * </pre>
     */
    int[] formSaida;
 
    /**
-    * Array de matrizes contendo os valores de entrada para a camada,
+    * Tensor contendo os valores de entrada para a camada,
     * que serão usados para o processo de feedforward.
     * <p>
     *    O formato da entrada é dado por:
     * </p>
     * <pre>
-    *entrada = [profundidade entrada]
-    *entrada[n] = [alturaEntrada][larguraEntrada]
+    *    entrada = (1, profundidade, altura, largura)
     * </pre>
     */
-   public Mat[] entrada;
+   public Tensor4D entrada;
    
-    /**
-    * Array de matrizes contendo os valores dos gradientes usados para 
+   /**
+    * Tensor contendo os valores dos gradientes usados para 
     * a retropropagação para camadas anteriores.
+    * <p>
+    *    O formato dos gradientes é dado por:
+    * </p>
+    * <pre>
+    *    gradEntrada = (1, profundidadeEntrada, alturaEntrada, larguraEntrada)
+    * </pre>
     */
-   public Mat[] gradEntrada;
+   public Tensor4D gradEntrada;
 
    /**
-    * Matriz contendo a saída achatada da camada.
+    * Tensor contendo a saída achatada da camada.
     * <p>
-    *    Mesmo a saída sendo uma matriz, ela possui apenas
+    *    Mesmo a saída sendo um tensor, ela possui apenas
     *    uma linha e o número de colunas é equivalente a quantidade
     *    total de elementos da entrada.
     * </p>
     */
-   public Mat saida;
+   public Tensor4D saida;
 
    /**
     * Inicializa uma camada Flatten, que irá achatar a entrada recebida
-    * no formato de um array unidimensional.
+    * no formato de um tensor unidimensional.
     * <p>
     *    É necessário construir a camada para que ela possa ser usada.
     * </p>
@@ -77,32 +82,32 @@ public class Flatten extends Camada{
 
    /**
     * Instancia uma camada Flatten, que irá achatar a entrada recebida
-    * no formato de um array unidimensional.
+    * no formato de um tensor unidimensional.
     * <p>
     *    O formato de entrada da camada deve seguir o formato:
     * </p>
     * <pre>
-    *    formEntrada = (altura, largura, profundidade)
+    *    formEntrada = (profundidade, altura, largura)
     * </pre>
     * @param formEntrada formato dos dados de entrada para a camada.
     */
    public Flatten(int[] formEntrada){
-      this.construir(formEntrada);
+      construir(formEntrada);
    }
 
    /**
     * Inicializa os parâmetros necessários para a camada Flatten.
     * <p>
     *    O formato de entrada deve ser um array contendo o tamanho de 
-    *    cada dimensão e entrada da camada, e deve estar no formato:
+    *    cada dimensão de entrada da camada, e deve estar no formato:
     * </p>
     * <pre>
-    *    entrada = (altura, largura, profundidade)
+    *    entrada = (1, profundidade, altura, largura)
     * </pre>
     * Também pode ser aceito um objeto de entrada contendo apenas dois elementos,
     * eles serão formatados como:
     * <pre>
-    *    entrada = (altura, largura)
+    *    entrada = (1, 1, altura, largura)
     * </pre>
     * @param entrada formato de entrada para a camada.
     */
@@ -121,44 +126,44 @@ public class Flatten extends Camada{
       }
 
       int[] formatoEntrada = (int[]) entrada;
-      int altura, largura, profundidade;
-      if(formatoEntrada.length == 2){
-         if(formatoEntrada[0] == 0 || formatoEntrada[1] == 0){
-            throw new IllegalArgumentException(
-               "Os valores recebidos para o formato de entrada devem ser maiores que zero, " +
-               "recebido = [" + formatoEntrada[0] + ", " + formatoEntrada[1] + "]"
-            );
-         }
+      if(utils.apenasMaiorZero(formatoEntrada) == false){
+         throw new IllegalArgumentException(
+            "\nOs valores do formato de entrada devem ser maiores que zero."
+         );
+      }
 
-         altura = formatoEntrada[0];
-         largura = formatoEntrada[1];
-         profundidade = 1;
-      
+      int altura, largura, profundidade;
+      if(formatoEntrada.length == 4){
+         profundidade = formatoEntrada[1];
+         altura = formatoEntrada[2];
+         largura = formatoEntrada[3];
+
       }else if(formatoEntrada.length == 3){
-         if(formatoEntrada[0] == 0 || formatoEntrada[1] == 0 || formatoEntrada[2] == 0){
-            throw new IllegalArgumentException(
-               "Os valores recebidos para o formato de entrada devem ser maiores que zero, " +
-               "recebido = [" + formatoEntrada[0] + ", " + formatoEntrada[1] + ", " + formatoEntrada[2] + "]"
-            );
-         }
+         profundidade = formatoEntrada[0];
+         altura = formatoEntrada[1];
+         largura = formatoEntrada[2];
+      
+      }else if(formatoEntrada.length == 2){
+         profundidade = 1;
          altura = formatoEntrada[0];
          largura = formatoEntrada[1];
-         profundidade = formatoEntrada[2];
       
       }else{
          throw new IllegalArgumentException(
-            "O formato de entrada para a camada Flatten deve conter três " + 
-            "elementos (altura, largura, profundidade) ou dois elementos (altura, largura), " +
-            "objeto recebido possui " + formatoEntrada.length
+            "O formato de entrada para a camada Flatten deve conter dois " + 
+            "elementos (altura, largura), três elementos (profundidade, altura, largura), " +
+            " ou quatro elementos (primeiro desconsiderado)" +
+            "objeto recebido possui " + formatoEntrada.length + " elementos."
          );
       }
 
       //inicialização de parâmetros
 
       this.formEntrada = new int[]{
+         1,
+         profundidade,
          altura,
-         largura,
-         profundidade
+         largura
       };
 
       int tamanho = 1;
@@ -166,15 +171,14 @@ public class Flatten extends Camada{
          tamanho *= i;
       }
 
-      this.entrada = new Mat[formEntrada[2]];
-      this.gradEntrada = new Mat[formEntrada[2]];
-      for(int i = 0; i < this.entrada.length; i++){
-         this.entrada[i] = new Mat(formEntrada[0], formEntrada[1]);
-         this.gradEntrada[i] = new Mat(formEntrada[0], formEntrada[1]);
-      }
+      this.entrada = new Tensor4D(formEntrada[0], formEntrada[1], formEntrada[2], formEntrada[3]);
+      this.gradEntrada = new Tensor4D(this.entrada);
+      this.saida = new Tensor4D(1, 1, 1, tamanho);
+      this.formSaida = new int[]{1, 1, 1, tamanho};
 
-      this.saida = new Mat(1, (this.entrada.length * this.entrada[0].lin() * this.entrada[0].col()));
-      this.formSaida = new int[]{1, tamanho};
+      this.entrada.nome("Entrada");
+      this.saida.nome("Saída");
+      this.gradEntrada.nome("Gradiente Entrada");
 
       this.construida = true;//camada pode ser usada.
    }
@@ -193,27 +197,29 @@ public class Flatten extends Camada{
     *    total de elementos de entrada.  
     * </p>
     * @param entrada dados de entrada que serão processados, objetos aceitos incluem:
-    * {@code Mat[]}, {@code Mat} ou {@code double[]}.
+    * {@code Tensor4D} ou {@code double[]}.
     * @throws IllegalArgumentException caso a entrada fornecida não seja suportada 
     * pela camada.
     */
    @Override
    public void calcularSaida(Object entrada){
-      super.verificarConstrucao();
+      verificarConstrucao();
 
-      if(entrada instanceof Mat[]){
-         Mat[] e = (Mat[]) entrada;
-
-         for(int i = 0; i < this.entrada.length; i++){
-            this.entrada[i].copiar(e[i]);
+      if(entrada instanceof Tensor4D){
+         Tensor4D e = (Tensor4D) entrada;
+         if(this.entrada.comparar3D(e) == false){
+            throw new IllegalArgumentException(
+               "\nDimensões da entrada recebida " + e.dimensoesStr() +
+               " incompatíveis com a entrada da camada " + this.entrada.dimensoesStr()
+            );
          }
-      
-      }else if(entrada instanceof Mat){
-         this.entrada[0].copiar((Mat) entrada);
+
+         this.entrada.copiar(e.array3D(0), 0);
 
       }else if(entrada instanceof double[]){
          double[] e = (double[]) entrada;
-         utils.copiar(e, this.entrada);
+         this.saida.copiarElementos(e);
+         return;
       
       }else{
          throw new IllegalArgumentException(
@@ -221,13 +227,8 @@ public class Flatten extends Camada{
          );
       }
 
-      int id = 0;
-      for(int i = 0; i < this.entrada.length; i++){
-         double[] arr = this.entrada[i].paraArray();
-         for(int j = 0; j < arr.length; j++){
-            this.saida.editar(0, id++, arr[j]);
-         }
-      }
+      double[] arr = this.entrada.paraArray();
+      this.saida.copiarElementos(arr);
    }
 
    /**
@@ -238,41 +239,50 @@ public class Flatten extends Camada{
    public void calcularGradiente(Object gradSeguinte){
       super.verificarConstrucao();
 
-      if(gradSeguinte instanceof double[]){
-         utils.copiar((double[]) gradSeguinte, this.gradEntrada);
+      if(gradSeguinte instanceof Tensor4D){
+         Tensor4D g = (Tensor4D) gradSeguinte;
+         if(g.tamanho() != this.gradEntrada.tamanho()){
+            throw new IllegalArgumentException(
+               "\nDimensões do gradiente recebido " + g.dimensoesStr() +
+               "inconpatíveis com o suportado pela camada " + this.gradEntrada.dimensoesStr()
+            );
+         }
+
+         this.gradEntrada.copiarElementos(g.paraArray());
       
-      }else if(gradSeguinte instanceof Mat){
-         Mat grads = (Mat) gradSeguinte;
-         utils.copiar(grads.paraArray(), this.gradEntrada);
+      }else if(gradSeguinte instanceof double[]){
+         double[] g = (double[]) gradSeguinte;
+         this.gradEntrada.copiarElementos(g);
       
       }else{
          throw new IllegalArgumentException(
-            "O gradiente seguinte para a camada Flatten deve ser do tipo \"double[]\" ou \"Mat\", " +
+            "O gradiente seguinte para a camada Flatten deve ser do tipo \"double[]\" ou \"Tensor4D\", " +
             "Objeto recebido é do tipo " + gradSeguinte.getClass().getTypeName()
          );
       }
    }
 
    @Override
-   public Mat saida(){
+   public Tensor4D saida(){
+      verificarConstrucao();
       return this.saida;
    }
 
    @Override
    public double[] saidaParaArray(){
-      super.verificarConstrucao();
+      verificarConstrucao();
       return this.saida.paraArray();
    }
 
    @Override
    public int tamanhoSaida(){
-      super.verificarConstrucao();
-      return this.saida.col();
+      verificarConstrucao();
+      return this.saida.tamanho();
    }
 
    @Override
    public int[] formatoEntrada(){
-      super.verificarConstrucao();
+      verificarConstrucao();
       return this.formEntrada;
    }
 
@@ -280,11 +290,7 @@ public class Flatten extends Camada{
     * Calcula o formato de saída da camada Flatten, que é disposto da
     * seguinte forma:
     * <pre>
-    *    formato = (altura, largura)
-    * </pre>
-    * No caso da camada flatten, o formato também pode ser dito como:
-    * <pre>
-    *    formato = (1, elementosEntrada)
+    *    formato = (1, 1, 1, elementosEntrada)
     * </pre>
     * Onde {@code elementosEntrada} é a quantidade total de elementos 
     * contidos no formato de entrada da camada.
@@ -292,10 +298,13 @@ public class Flatten extends Camada{
     */
     @Override
    public int[] formatoSaida(){
-      super.verificarConstrucao();
+      verificarConstrucao();
+      
       return new int[]{
-         this.formSaida[0],
-         this.formSaida[1]
+         1,
+         1,
+         1,
+         tamanhoSaida()
       };
    }
 

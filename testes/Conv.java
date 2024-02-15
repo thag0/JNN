@@ -8,8 +8,8 @@ import lib.ged.Dados;
 import lib.ged.Ged;
 import lib.geim.Geim;
 import rna.camadas.*;
-import rna.core.Mat;
 import rna.core.OpMatriz;
+import rna.core.Tensor4D;
 import rna.modelos.Sequencial;
 import rna.serializacao.Serializador;
 
@@ -24,21 +24,14 @@ public class Conv{
    public static void main(String[] args){
       ged.limparConsole();
       
-      Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/conv-mnist-89.txt");
+      Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/conv-mnist-91.txt");
       // modelo.info();
 
       // testarModelo(modelo, digitos, amostras);
       // testarTodosDados(modelo);
 
-      // tempoForward(modelo);//keras += 30ms
-      // tempoBackward(modelo);
-
-      Convolucional conv = (Convolucional) modelo.camada(2);
-      for(int i = 0; i < conv.gradFiltros.length; i++){
-         for(int j = 0; j < conv.gradFiltros[i].length; j++){
-            conv.gradFiltros[i][j].print("grad filtro " + i + "-" + j, 12);
-         }
-      }
+      tempoForward(modelo);//keras += 30ms
+      tempoBackward(modelo);
    }
 
    static void testarTodosDados(Sequencial modelo){
@@ -113,7 +106,7 @@ public class Conv{
       dados.editarNome("Tempos Backward");
       ArrayList<String[]> conteudo = new ArrayList<>();
 
-      t = medirTempo(() -> modelo.camada(n-1).calcularGradiente(new Mat(grad)));
+      t = medirTempo(() -> modelo.camada(n-1).calcularGradiente(new Tensor4D(grad)));
       conteudo.add(new String[]{
          modelo.camada(n-1).nome(),
          String.valueOf(TimeUnit.NANOSECONDS.toMillis(t)) + " ms"        

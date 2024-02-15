@@ -5,8 +5,8 @@ import java.util.Random;
 import rna.avaliacao.perda.Perda;
 import rna.camadas.Camada;
 import rna.core.OpArray;
-import rna.core.Mat;
 import rna.core.OpMatriz;
+import rna.core.Tensor4D;
 
 /**
  * Classe auxiliar no treinamento, faz uso de ferramentas que podem
@@ -55,7 +55,7 @@ public class AuxiliarTreino{
       double[] previsto = saida.saidaParaArray();
       double[] gradPrev = perda.derivada(previsto, real);
 
-      Mat g = new Mat(gradPrev);
+      Tensor4D g = new Tensor4D(gradPrev);
       saida.calcularGradiente(g);
       for(int i = camadas.length-2; i >= 0; i--){
          camadas[i].calcularGradiente(camadas[i+1].obterGradEntrada());

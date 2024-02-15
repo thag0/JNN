@@ -20,17 +20,27 @@ public class SalvandoRede{
    public static void main(String[] args){
       Ged ged = new Ged();
       ged.limparConsole();
-      String caminho = "./dados/modelosMNIST/conv-mnist-89.txt";
+      String caminho = "./modelo-teste.txt";
       Serializador serializador = new Serializador();
+      
+      Sequencial modelo = ler(caminho);
+      // Sequencial modelo = criar();
 
-      // Sequencial modelo = new Sequencial(new Camada[]{
-      //    new Convolucional(new int[]{3, 3, 1}, new int[]{2, 2}, 2, "tanh")
-      // });
-      // modelo.compilar(new SGD(), new ErroMedioQuadrado(), new Zeros());
-      // modelo.camada(0).inicializar(new Xavier(), new Xavier(), 0);
-      // serializador.salvar(modelo, caminho);
-
-      Sequencial modelo = serializador.lerSequencial(caminho);
       modelo.info();
+
+      // serializador.salvar(modelo, caminho);
+   }
+
+   static Sequencial criar(){
+      Sequencial modelo = new Sequencial(new Camada[]{
+         new Convolucional(new int[]{10, 10, 2}, new int[]{3, 3}, 2),
+      });
+
+      modelo.compilar("sgd", "mse");
+      return modelo;
+   }
+
+   static Sequencial ler(String caminho){
+      return new Serializador().lerSequencial(caminho); 
    }
 }

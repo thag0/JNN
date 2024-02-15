@@ -244,6 +244,7 @@ public class Sequencial extends Modelo implements Cloneable{
       camadas[0].inicializar();
       camadas[0].configurarId(0);
 
+
       for(int i = 1; i < this.camadas.length; i++){
          camadas[i].construir(camadas[i-1].formatoSaida());
          if(seedInicial != 0) camadas[i].configurarSeed(seedInicial);

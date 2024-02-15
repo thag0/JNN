@@ -684,7 +684,7 @@ public class OpTensor4D{
       }
 
       if(add == false){
-         saida.preencher2D(idSaida[0], idSaida[1] ,0);
+         saida.preencher2D(idSaida[0], idSaida[1], 0);
       }
 
       int alturaEsperada = entrada.dim3()+kernel.dim3()-1;
@@ -804,9 +804,11 @@ public class OpTensor4D{
 
    /**
     * Método exluviso para a propagação reversa de camadas convolucionais
-    * @param entrada tensor de entrada.
+    * @param entrada tensor de entrada da camada.
     * @param kernel tensor dos kernels.
-    * @param saida tensor de destino.
+    * @param derivada tensor com os valores de derivada da função de ativação.
+    * @param gradKernel tensor dos gradientes em relação aos filtros.
+    * @param gradEntrada tensor com o gradiente de entrada.
     */
    public void convBackward(Tensor4D entrada, Tensor4D kernel, Tensor4D derivada, Tensor4D gradKernel, Tensor4D gradEntrada){
       int numFiltros = kernel.dim1();
@@ -829,6 +831,5 @@ public class OpTensor4D{
             convolucao2DFull(derivada, kernel, gradEntrada, idDerivada, idKernel, idGradEntrada, true);
          }
       }
-
    }
 }

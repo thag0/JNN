@@ -24,7 +24,7 @@ public class TanH extends Ativacao{
          deriv[i] *= grads[i];
       }
       
-      camada.derivada.copiar(0, deriv);
+      camada.derivada.copiar(deriv, 0, 0, 0);
    }
 
    @Override
@@ -32,18 +32,18 @@ public class TanH extends Ativacao{
       //forma manual pra aproveitar os valores pre calculados
       int i, j, k;
       double grad, d;
-      int linhas, colunas;
 
-      for(i = 0; i < camada.somatorio.length; i++){
-         linhas = camada.somatorio[i].lin();
-         colunas = camada.somatorio[i].col();
-         for(j = 0; j < linhas; j++){
-            for(k = 0; k < colunas; k++){
-               grad = camada.gradSaida[i].elemento(j, k);
-               d = camada.saida[i].elemento(j, k);
+      int prof = camada.somatorio.dim2();
+      int alt = camada.somatorio.dim3();
+      int larg = camada.somatorio.dim4();
+      for(i = 0; i < prof; i++){
+         for(j = 0; j < alt; j++){
+            for(k = 0; k < larg; k++){
+               grad = camada.gradSaida.elemento(0, i, j, k);
+               d = camada.saida.elemento(0, i, j, k);
                d = 1 - (d * d);
 
-               camada.derivada[i].editar(j, k, (grad * d));
+               camada.derivada.editar(0, i, j, k, (grad * d));
             }
          }
       }

@@ -3,6 +3,7 @@ package rna.inicializadores;
 import java.util.Random;
 
 import rna.core.Mat;
+import rna.core.Tensor4D;
 
 /**
  * Classe responsável pelas funções de inicialização dos pesos
@@ -42,6 +43,12 @@ public abstract class Inicializador{
     * @param m matriz de dados.
     */
    public abstract void inicializar(Mat m);
+
+   /**
+    * Inicializa os valores tensor.
+    * @param tensor tensor desejado.
+    */
+   public abstract void inicializar(Tensor4D tensor, int dim1, int dim2);
 
    /**
     * Retorna o nome do inicializador.

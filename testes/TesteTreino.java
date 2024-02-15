@@ -25,8 +25,8 @@ public class TesteTreino{
       };
 
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Densa(2, 3, "sigmoid", "xavier"),
-         new Densa(1, "sigmoid", "xavier")
+         new Densa(2, 3, "sigmoid"),
+         new Densa(1, "sigmoid")
       });
       
       modelo.compilar("adagrad", "mse");

@@ -11,6 +11,25 @@ public class Utils{
    public Utils(){}
 
    /**
+    * Retorna o último índice válido do array.
+    * @param arr array base.
+    * @return último índice.
+    */
+   public int ultimoIndice(Object arr){
+      if(arr instanceof int[]){
+         int[] a = (int[]) arr;
+         if(a.length == 1){
+            return 0;
+         }
+         return a.length-1;
+      }else{
+         throw new IllegalArgumentException(
+            "Tipo de dado (" + arr.getClass().getTypeName() + ") não suportado."
+         );
+      }
+   }
+
+   /**
     * Verifica se o conteúdo do array contém valores maiores que zero.
     * @param arr array base.
     * @return resultado da verificação.

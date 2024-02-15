@@ -2,7 +2,7 @@ package rna.camadas;
 
 import java.util.Random;
 
-import rna.core.Mat;
+import rna.core.Tensor4D;
 import rna.core.Utils;
 
 /**
@@ -38,62 +38,58 @@ public class Dropout extends Camada implements Cloneable{
    int[] formEntrada;
 
    /**
-    * Array de matrizes contendo os valores de entrada para a camada.
+    * Tensor contendo os valores de entrada para a camada.
     * <p>
     *    O formato da entrada é dado por:
     * </p>
     * <pre>
-    *entrada = [profundidade]
-    *entrada[n] = [altura][largura]
+    *    entrada = (1, profundidade, altura, largura)
     * </pre>
     */
-   public Mat[] entrada;
+   public Tensor4D entrada;
 
    /**
-    * Array de matrizes contendo as máscaras que serão usadas durante
+    * Tensores contendo as máscaras que serão usadas durante
     * o processo de treinamento.
     * <p>
     *    O formato das máscaras é dado por:
     * </p>
     * <pre>
-    *mascara = [profundidade]
-    *mascara[n] = [altura][largura]
+    *    mascara = (1, profundidade, altura, largura)
     * </pre>
     */
-   public Mat[] mascara;
+   public Tensor4D mascara;
 
    /**
-    * Array de matrizes contendo os valores de saída da camada.
+    * Tensor contendo os valores de saída da camada.
     * <p>
     *    O formato de saída é dado por:
     * </p>
     * <pre>
-    *saida = [profundidade]
-    *saida[n] = [altura][largura]
+    *    saida = (1, profundidade, altura, largura)
     * </pre>
     */
-   public Mat[] saida;
+   public Tensor4D saida;
 
    /**
-    * Array de matrizes contendo os valores dos gradientes que
+    * Tensor contendo os valores dos gradientes que
     * serão retropropagados durante o processo de treinamento.
     * <p>
     *    O formato dos gradientes é dado por:
     * </p>
     * <pre>
-    *grad = [profundidade]
-    *grad[n] = [altura][largura]
+    *    gradEntrada = (1, profundidade, altura, largura)
     * </pre>
     */
-   public Mat[] gradEntrada;
+   public Tensor4D gradEntrada;
 
    /**
     * Gerador de valores aleatórios.
     */
-   Random random = new Random();//talvez implementar configuração de seed
+   Random random = new Random();//implementar configuração de seed
 
    /**
-    * 
+    * Utilitário.
     */
    Utils utils = new Utils();
 
@@ -106,7 +102,7 @@ public class Dropout extends Camada implements Cloneable{
    public Dropout(double taxa){
       if(taxa <= 0 || taxa >= 1){
          throw new IllegalArgumentException(
-            "O valor da taxa de dropout deve estar entre 0 e 1, " + 
+            "\nO valor da taxa de dropout deve estar entre 0 e 1, " + 
             "recebido: " + taxa
          );
       }
@@ -130,7 +126,7 @@ public class Dropout extends Camada implements Cloneable{
    public void construir(Object entrada){
       if(entrada instanceof int[] == false){
          throw new IllegalArgumentException(
-            "Objeto esperado para entrada da camada Dropout é do tipo int[], " +
+            "\nObjeto esperado para entrada da camada Dropout é do tipo int[], " +
             "objeto recebido é do tipo " + entrada.getClass().getTypeName()
          );
       }
@@ -138,44 +134,54 @@ public class Dropout extends Camada implements Cloneable{
       int[] formato = (int[]) entrada;
       if(utils.apenasMaiorZero(formato) == false){
          throw new IllegalArgumentException(
-            "Os argumentos do formato de entrada devem ser maiores que zero."
+            "\nOs argumentos do formato de entrada devem ser maiores que zero."
          );
       }
 
       if(formato.length == 2){
          this.formEntrada = new int[]{
-            formato[0],
-            formato[1],
-            1
+            1,
+            1,
+            formato[0],//altura
+            formato[1],//largura
          };
 
       }else if(formato.length == 3){
          this.formEntrada = new int[]{
-            formato[0],
-            formato[1],
-            formato[2]
+            1,
+            formato[0],//profundidade
+            formato[1],//altura
+            formato[2],//largura
+         };
+
+      }else if(formato.length == 4){
+         this.formEntrada = new int[]{
+            1,
+            formato[1],//profundidade
+            formato[2],//altura
+            formato[3],//largura
          };
 
       }else{
          throw new IllegalArgumentException(
-            "A camada de dropout aceita formatos bidimensionais (altura, largura) " + 
-            " ou tridimensionais (altura, largura, profundidade), " +
+            "\nA camada de dropout aceita formatos bidimensionais (altura, largura) " + 
+            " tridimensionais (profundidade, altura, largura) " +
+            " ou quadridimensionais (primeiro valor desconsiderado) " +
             "entrada recebida possui " + formato.length + " dimensões."
          );
       }
-
-      this.entrada =     new Mat[this.formEntrada[2]];
-      this.mascara =     new Mat[this.formEntrada[2]];
-      this.saida =       new Mat[this.formEntrada[2]];
-      this.gradEntrada = new Mat[this.formEntrada[2]];
       
-      for(int i = 0; i < this.formEntrada[2]; i++){
-         this.entrada[i] =     new Mat(this.formEntrada[0], this.formEntrada[1]);
-         this.mascara[i] =     new Mat(this.formEntrada[0], this.formEntrada[1]);
-         this.saida[i] =       new Mat(this.formEntrada[0], this.formEntrada[1]);
-         this.gradEntrada[i] = new Mat(this.formEntrada[0], this.formEntrada[1]);
-      }
-      this.construida = true;
+      this.entrada =     new Tensor4D(this.formEntrada[0], this.formEntrada[1], this.formEntrada[2], this.formEntrada[3]);
+      this.mascara =     new Tensor4D(this.entrada);
+      this.saida =       new Tensor4D(this.entrada);
+      this.gradEntrada = new Tensor4D(this.entrada);
+
+      this.entrada.nome("Entrada");
+      this.mascara.nome("Mascara");
+      this.saida.nome("Saida");
+      this.gradEntrada.nome("Gradiente entrada");
+      
+      this.construida = true;//camada pode ser usada
    }
 
    @Override
@@ -203,38 +209,40 @@ public class Dropout extends Camada implements Cloneable{
    public void calcularSaida(Object entrada){
       super.verificarConstrucao();
 
-      if(entrada instanceof Mat){
-         this.entrada[0].copiar((Mat) entrada);
-
-      }else if(entrada instanceof Mat[]){
-         Mat[] e = (Mat[]) entrada;
-         for(int i = 0; i < this.formEntrada[2]; i++){
-            this.entrada[i].copiar(e[i]);
+      if(entrada instanceof Tensor4D){
+         Tensor4D e = (Tensor4D) entrada;
+         if(this.entrada.comparar3D(e) == false){
+            throw new IllegalArgumentException(
+               "\n Dimensões de entrada " + e.dimensoesStr() + 
+               "incompatível com as dimensões da entrada da camada " + this.entrada.dimensoesStr()
+            );
          }
 
+         this.entrada.copiar(e.array3D(0), 0);
+   
       }else{
          throw new IllegalArgumentException(
-            "Entrada aceita para a camada de Dropout deve ser do tipo Mat ou Mat[], " + 
-            "objeto recebido é do tipo \"" + entrada.getClass().getTypeName() + "\"."
+            "\nEntrada aceita para a camada de Dropout deve ser do tipo " + this.entrada.getClass().getSimpleName() + 
+            " , objeto recebido é do tipo \"" + entrada.getClass().getTypeName() + "\"."
          );
       }
 
+      int prof = this.saida.dim2() ,lin = this.saida.dim3(), col = this.saida.dim4();
       if(this.treinando){
          gerarMascaras();
-         int lin = this.saida[0].lin(), col = this.saida[0].col();
          double res;
-         for(int i = 0; i < this.formEntrada[2]; i++){
+         for(int i = 0; i < prof; i++){
             for(int j = 0; j < lin; j++){
                for(int k = 0; k < col; k++){
-                  res = this.mascara[i].elemento(j, k) * this.entrada[i].elemento(j, k);
-                  this.saida[i].editar(j, k, res);
+                  res = this.mascara.elemento(0, i, j, k) * this.entrada.elemento(0, i, j, k);
+                  this.saida.editar(0, i, j, k, res);
                }
             }
          }
 
       }else{
-         for(int i = 0; i < this.formEntrada[2]; i++){
-            this.saida[i].copiar(this.entrada[i]);
+         for(int i = 0; i < prof; i++){
+            this.saida.copiar(this.entrada);
          }
       }
    }
@@ -254,9 +262,10 @@ public class Dropout extends Camada implements Cloneable{
     * </pre>
     */
    private void gerarMascaras(){
-      for(int i = 0; i < this.formEntrada[2]; i++){
-         this.mascara[i].map((x) -> {
-            return (this.random.nextDouble() > this.taxa) ? 1 : 0;
+      int prof = entrada.dim2();
+      for(int i = 0; i < prof; i++){
+         mascara.map3D(0, (x) -> {
+            return random.nextDouble() > taxa ? 1 : 0;
          });
       }
    }
@@ -270,25 +279,26 @@ public class Dropout extends Camada implements Cloneable{
    public void calcularGradiente(Object gradSeguinte){
       super.verificarConstrucao();
 
-      if(gradSeguinte instanceof Mat){
-         this.gradEntrada[0].copiar((Mat) gradSeguinte);
-
-      }else if(gradSeguinte instanceof Mat[]){
-         Mat[] g = (Mat[]) gradSeguinte;
-         for(int i = 0; i < this.formEntrada[2]; i++){
-            this.gradEntrada[i].copiar(g[i]);
+      if(gradSeguinte instanceof Tensor4D){
+         Tensor4D g = (Tensor4D) gradSeguinte;
+         if(this.gradEntrada.comparar3D(g) == false){
+            throw new IllegalArgumentException(
+               "\nDimensões incompatíveis entre o gradiente recebido " + g.dimensoesStr() +
+               "e o suportado pela camada " + gradEntrada.dimensoesStr()
+            );
          }
+
+         this.gradEntrada.copiar(g.array3D(0), 0);
 
       }else{
          throw new IllegalArgumentException(
-            "Gradiente aceito para a camada de Dropout deve ser do tipo Mat ou Mat[], " + 
-            "objeto recebido é do tipo \"" + entrada.getClass().getTypeName() + "\"."
+            "Gradiente aceito para a camada de Dropout deve ser do tipo " + 
+            this.gradEntrada.getClass().getTypeName() +
+            " ,objeto recebido é do tipo \"" + entrada.getClass().getTypeName() + "\"."
          );
       }
 
-      for(int i = 0; i < this.formEntrada[2]; i++){
-         this.gradEntrada[i].mult(this.mascara[i]);
-      }
+      gradEntrada.mult(mascara);
    }
 
    @Override
@@ -331,18 +341,10 @@ public class Dropout extends Camada implements Cloneable{
          clone.taxa = this.taxa;
          clone.random = new Random();
 
-         int prof = this.formEntrada[2];
-         clone.entrada = new Mat[prof];
-         clone.mascara = new Mat[prof];
-         clone.saida = new Mat[prof];
-         clone.gradEntrada = new Mat[prof];
-         
-         for(int i = 0; i < prof; i++){
-            clone.entrada[i] = this.entrada[i].clone();
-            clone.mascara[i] = this.mascara[i].clone();
-            clone.saida[i] = this.saida[i].clone();
-            clone.gradEntrada[i] = this.gradEntrada[i].clone();
-         }
+         clone.entrada = this.entrada.clone();
+         clone.mascara = this.mascara.clone();
+         clone.saida = this.saida.clone();
+         clone.gradEntrada = this.gradEntrada.clone();
 
          return clone;
       }catch(Exception e){
@@ -351,7 +353,7 @@ public class Dropout extends Camada implements Cloneable{
    }
 
    @Override
-   public Mat[] obterGradEntrada(){
+   public Tensor4D obterGradEntrada(){
       super.verificarConstrucao();
       return this.gradEntrada;
    }

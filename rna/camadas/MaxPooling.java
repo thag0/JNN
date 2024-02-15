@@ -1,6 +1,6 @@
 package rna.camadas;
 
-import rna.core.Mat;
+import rna.core.Tensor4D;
 import rna.core.Utils;
 
 /**
@@ -39,30 +39,51 @@ public class MaxPooling extends Camada{
    Utils utils = new Utils();
 
    /**
-    * Dimensões dos dados de entrada (altura, largura, profundidade)
+    * Dimensões dos dados de entrada (1, profundidade, altura, largura)
     */
    private int[] formEntrada;
 
    /**
-    * Dimensões dos dados de saída (altura, largura, profundidade)
+    * Dimensões dos dados de saída (1, profundidade, altura, largura)
     */
    private int[] formSaida;
 
    /**
-    * Array de matrizes contendo os dados de entrada.
+    * Tensor contendo os dados de entrada da camada.
+    * <p>
+    *    O formato da entrada é dado por:
+    * </p>
+    * <pre>
+    *    entrada = (1, profundidade, altura, largura)
+    * </pre>
     */
-   public Mat[] entrada;
+   public Tensor4D entrada;
 
    /**
-    * Array de matrizes contendo os dados de saída.
+    * Tensor contendo os dados de saída da camada.
+    * <p>
+    *    O formato de entrada varia dependendo da configuração da
+    *    camada (filtro, strides) mas é dado como:
+    * </p>
+    * <pre>
+    *largura = (larguraEntrada = larguraFiltro) / larguraStride + 1;
+    *altura = (alturaEntrada = alturaFiltro) / alturaStride + 1;
+    * </pre>
+    * Essa relação é válida pra cada canal de entrada.
     */
-   public Mat[] saida;
+   public Tensor4D saida;
 
    /**
-    * Array de matrizes contendo os gradientes que serão
+    * Tensor contendo os gradientes que serão
     * retropropagados para as camadas anteriores.
+    * <p>
+    *    O formato do gradiente de entrada é dado por:
+    * </p>
+    * <pre>
+    *    entrada = (1, profundidadeEntrada, alturaEntrada, larguraEntrad)
+    * </pre>
     */
-   public Mat[] gradEntrada;
+   public Tensor4D gradEntrada;
 
    /**
     * Formato do filtro de pooling (altura, largura).
@@ -213,27 +234,33 @@ public class MaxPooling extends Camada{
       }
       
       int[] e = (int[]) entrada;
-      if(e.length != 3){
+      if(e.length == 4){
+         this.formEntrada = new int[]{1, e[1], e[2], e[3]};
+      
+      }else if(e.length == 3){
+         this.formEntrada = new int[]{1, e[0], e[1], e[2]};
+      }else{         
          throw new IllegalArgumentException(
-            "O formato de entrada deve conter três elementos (altura, largura, profundidade)."
+            "O formato de entrada deve conter três elementos (profundidade, altura, largura) ou " +
+            "quatro elementos (primeiro elementos desconsiderado)" +
+            "formato recebido possui " + e.length + " elementos."
          );
       }
-      this.formEntrada = new int[]{e[0], e[1], e[2]};
 
-      this.formSaida = new int[3];
-      formSaida[0] = (formEntrada[0] - formFiltro[0]) / this.stride[0] + 1;
-      formSaida[1] = (formEntrada[1] - formFiltro[1]) / this.stride[1] + 1;
-      formSaida[2] = formEntrada[2];
+      this.formSaida = new int[4];
+      formSaida[0] = 1;
+      formSaida[1] = formEntrada[1];//profundidade
+      formSaida[2] = (formEntrada[2] - formFiltro[0]) / this.stride[0] + 1;//altura
+      formSaida[3] = (formEntrada[3] - formFiltro[1]) / this.stride[1] + 1;//largura
       
-      this.entrada = new Mat[formEntrada[2]];
-      this.gradEntrada = new Mat[formSaida[2]];
-      this.saida = new Mat[formSaida[2]];
+      this.entrada = new Tensor4D(formEntrada[0], formEntrada[1], formEntrada[2], formEntrada[3]);
+      this.gradEntrada = new Tensor4D(this.entrada);
+      this.saida = new Tensor4D(formSaida[0], formSaida[1], formSaida[2], formSaida[3]);
+      this.entrada.nome("Entrada");
+      this.gradEntrada.nome("Gradiente entrada");
+      this.saida.nome("Saída");
 
-      for(int i = 0; i < formEntrada[2]; i++){
-         this.entrada[i] = new Mat(this.formEntrada[0], this.formEntrada[1]);
-         this.saida[i] = new Mat(this.formSaida[0], this.formSaida[1]);
-         this.gradEntrada[i] = new Mat(this.formEntrada[0], this.formEntrada[1]);
-      }
+      this.construida = true;//camada pode ser usada
    }
 
    @Override
@@ -241,19 +268,25 @@ public class MaxPooling extends Camada{
 
    @Override
    public void calcularSaida(Object entrada){
-      if(entrada instanceof Mat[]){
-         Mat[] e = (Mat[]) entrada;
-         utils.copiar(e, this.entrada);
-         for(int i = 0; i < this.entrada.length; i++){
-            aplicarMaxPooling(this.entrada[i], this.saida[i]);
-         }
-         
-      }else if(entrada instanceof double[]){
-         utils.copiar((double[]) entrada, this.entrada);
-         for(int i = 0; i < this.entrada.length; i++){
-            aplicarMaxPooling(this.entrada[i], this.saida[i]);
+      verificarConstrucao();
+
+      if(entrada instanceof Tensor4D){
+         Tensor4D e = (Tensor4D) entrada;
+
+         if(this.entrada.comparar3D(e) == false){
+            throw new IllegalArgumentException(
+               "\nDimensões da entrada recebida " + e.dimensoesStr() +
+               " incompatíveis com a entrada da camada " + this.entrada.dimensoesStr()
+            );
          }
 
+         this.entrada.copiar(e);
+
+         int profundidade = formEntrada[1];
+         for(int i = 0; i < profundidade; i++){
+            aplicarMaxPooling(this.entrada, this.saida, i);
+         }
+         
       }else{
          throw new IllegalArgumentException(
             "Tipo de entrada \"" + entrada.getClass().getTypeName() + "\" não suportada."
@@ -261,34 +294,49 @@ public class MaxPooling extends Camada{
       }
    }
 
-   private void aplicarMaxPooling(Mat entrada, Mat saida){
-      for(int i = 0; i < saida.lin(); i++){
-         for(int j = 0; j < saida.col(); j++){
+   /**
+    * Agrupa os valores máximos encontrados na entrada de acordo com as 
+    * configurações de filtro e strides.
+    * @param entrada tensor de entrada.
+    * @param saida tensor de destino.
+    * @param prof índice de profundidade da operação.
+    */
+   private void aplicarMaxPooling(Tensor4D entrada, Tensor4D saida, int prof){
+      int alturaEntrada = entrada.dim3();
+      int larguraEntrada = entrada.dim4();
+      int alturaSaida = saida.dim3();
+      int larguraSaida = saida.dim4();
+  
+      for(int i = 0; i < alturaSaida; i++){
+         for(int j = 0; j < larguraSaida; j++){
             int linInicio = i * this.stride[0];
-            int colIincio = j * this.stride[1];
-            int linFim = Math.min(linInicio + this.formFiltro[0], entrada.lin());
-            int colFim = Math.min(colIincio + this.formFiltro[1], entrada.col());
+            int colInicio = j * this.stride[1];
+            int linFim = Math.min(linInicio + this.formFiltro[0], alturaEntrada);
+            int colFim = Math.min(colInicio + this.formFiltro[1], larguraEntrada);
             double maxValor = Double.MIN_VALUE;
-            
+
             for(int lin = linInicio; lin < linFim; lin++){
-               for(int col = colIincio; col < colFim; col++){
-                  double valor = entrada.elemento(lin, col);
-                  if (valor > maxValor){
+               for(int col = colInicio; col < colFim; col++){
+                  double valor = entrada.elemento(0, prof, lin, col);
+                  if(valor > maxValor){
                      maxValor = valor;
                   }
                }
             }
-            saida.editar(i, j, maxValor);
+            saida.editar(0, prof, i, j, maxValor);
          }
       }
    }
 
    @Override
    public void calcularGradiente(Object gradSeguinte){
-      if(gradSeguinte instanceof Mat[]){
-         Mat[] grad = (Mat[]) gradSeguinte;   
-         for(int i = 0; i < gradEntrada.length; i++){
-            gradienteMaxPooling(this.entrada[i], grad[i], this.gradEntrada[i]);
+      verificarConstrucao();
+
+      if(gradSeguinte instanceof Tensor4D){
+         Tensor4D g = (Tensor4D) gradSeguinte;
+         int profundidade = formEntrada[1];   
+         for(int i = 0; i < profundidade; i++){
+            gradienteMaxPooling(this.entrada, g, this.gradEntrada, i);
          }
       
       }else{
@@ -309,47 +357,55 @@ public class MaxPooling extends Camada{
     * @param entrada entrada da camada.
     * @param gradSeguinte gradiente da camada seguinte.
     * @param gradEntrada gradiente de entrada da camada de max pooling.
+    * @param prof índice de profundidade da operação.
     */
-   private void gradienteMaxPooling(Mat entrada, Mat gradSeguinte, Mat gradEntrada){
-      for(int i = 0; i < gradSeguinte.lin(); i++){
-         for(int j = 0; j < gradSeguinte.col(); j++){
+    private void gradienteMaxPooling(Tensor4D entrada, Tensor4D gradSeguinte, Tensor4D gradEntrada, int prof){
+      int alturaEntrada = entrada.dim3();
+      int larguraEntrada = entrada.dim4();
+      int alturaGradSeguinte = gradSeguinte.dim3();
+      int larguraGradSeguinte = gradSeguinte.dim4();
+  
+      for(int i = 0; i < alturaGradSeguinte; i++){
+          for(int j = 0; j < larguraGradSeguinte; j++){
             int linInicio = i * this.stride[0];
             int colInicio = j * this.stride[1];
-            int linFim = Math.min(linInicio + this.formFiltro[0], entrada.lin());
-            int colFim = Math.min(colInicio + this.formFiltro[1], entrada.col());
-
-            int[] posicaoMaximo = posicaoMaxima(entrada, linInicio, colInicio, linFim, colFim);
+            int linFim = Math.min(linInicio + this.formFiltro[0], alturaEntrada);
+            int colFim = Math.min(colInicio + this.formFiltro[1], larguraEntrada);
+  
+            int[] posicaoMaximo = posicaoMaxima(entrada, prof, linInicio, colInicio, linFim, colFim);
             int linMaximo = posicaoMaximo[0];
             int colMaximo = posicaoMaximo[1];
-
-            double valorGradSeguinte = gradSeguinte.elemento(i, j);
-            gradEntrada.editar(linMaximo, colMaximo, valorGradSeguinte);
+  
+            double valorGradSeguinte = gradSeguinte.elemento(0, prof, i, j);
+            gradEntrada.editar(0, prof, linMaximo, colMaximo, valorGradSeguinte);
          }
       }
    }
   
+  
    /**
-    * Encontra a posição do valor máximo em uma submatriz da matriz.
+    * Encontra a posição do valor máximo em uma submatriz do tensor.
     * <p>
     *    Se houver múltiplos elementos com o valor máximo, a função retorna as coordenadas 
     *    do primeiro encontrado.
     * </p>
-    * @param m matriz base.
+    * @param tensor tensor alvo.
     * @param linInicio índice inicial para linha.
     * @param colInicio índice final para a linha.
     * @param linFim índice inicial para coluna (exclusivo).
     * @param colFim índice final para coluna (exclusivo).
+    * @param prof índice de profundidade da operação.
     * @return array representando as coordenadas (linha, coluna) do valor máximo
     * na submatriz.
     */
-   private int[] posicaoMaxima(Mat m, int linInicio, int colInicio, int linFim, int colFim){
-      int[] posMaximo = {linInicio, colInicio};
+   private int[] posicaoMaxima(Tensor4D tensor, int prof, int linInicio, int colInicio, int linFim, int colFim){
+      int[] posMaximo = {0, 0};
       double valMaximo = Double.NEGATIVE_INFINITY;
   
       for(int lin = linInicio; lin < linFim; lin++){
          for(int col = colInicio; col < colFim; col++){
-            if(m.elemento(lin, col) > valMaximo){
-               valMaximo = m.elemento(lin, col);
+            if(tensor.elemento(0, prof, lin, col) > valMaximo){
+               valMaximo = tensor.elemento(0, prof, lin, col);
                posMaximo[0] = lin;
                posMaximo[1] = col;
             }
@@ -371,7 +427,8 @@ public class MaxPooling extends Camada{
 
    @Override
    public int tamanhoSaida(){
-      return this.saida.length * this.saida[0].lin() * this.saida[0].col();
+      verificarConstrucao();
+      return this.saida.tamanho();
    }
 
    /**
@@ -396,27 +453,20 @@ public class MaxPooling extends Camada{
    }
 
    @Override
-   public Mat[] saida(){
+   public Tensor4D saida(){
+      verificarConstrucao();
       return this.saida;
    }
 
    @Override
    public double[] saidaParaArray(){
-      int id = 0;
-      double[] saida = new double[this.tamanhoSaida()];
-
-      for(int i = 0; i < this.saida.length; i++){
-         double[] s = this.saida[i].paraArray();
-         for(int j = 0; j < s.length; j++){
-            saida[id++] = s[j];
-         }
-      }
-
-      return saida;
+      verificarConstrucao();
+      return this.saida.paraArray();
    }
 
    @Override
-   public Mat[] obterGradEntrada(){
+   public Tensor4D obterGradEntrada(){
+      verificarConstrucao();
       return this.gradEntrada;
    }
 }

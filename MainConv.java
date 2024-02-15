@@ -79,7 +79,7 @@ public class MainConv{
     * Criação de modelos para testes.
     */
    static Sequencial criarModelo(){
-      int[] formEntrada = {28, 28, 1};
+      int[] formEntrada = {1, 28, 28};
       
       // Sequencial modelo = new Sequencial(new Camada[]{
       //    new Convolucional(formEntrada, new int[]{5, 5}, 32, "leaky-relu"),
@@ -96,8 +96,8 @@ public class MainConv{
          new Convolucional(formEntrada, new int[]{5, 5}, 20, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(128, "sigmoid"),
-         new Dropout(0.25),
+         new Densa(100, "sigmoid"),
+         new Dropout(0.3),
          new Densa(NUM_DIGITOS_TREINO, "softmax")
       });
 

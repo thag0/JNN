@@ -51,19 +51,17 @@ class SerialDensa{
          bw.write(String.valueOf(camada.temBias()));
          bw.newLine();
          
-         for(int i = 0; i < camada.pesos.lin(); i++){
-            for(int j = 0; j < camada.pesos.col(); j++){
-               escreverDado(camada.pesos.elemento(i, j), tipo, bw);
-               bw.newLine();
-            }
+         double[] pesos = camada.pesos.paraArray();
+         for(int i = 0; i < pesos.length; i++){
+            escreverDado(pesos[i], tipo, bw);
+            bw.newLine();
          }
-         
+
          if(camada.temBias()){
-            for(int i = 0; i < camada.bias.lin(); i++){
-               for(int j = 0; j < camada.bias.col(); j++){
-                  escreverDado(camada.bias.elemento(i, j), tipo, bw);
-                  bw.newLine();
-               }
+            double[] bias = camada.bias.paraArray();
+            for(int i = 0; i < bias.length; i++){
+               escreverDado(bias[i], tipo, bw);
+               bw.newLine();
             }
          }
       }catch(Exception e){
@@ -137,20 +135,21 @@ class SerialDensa{
     * @param br leitor de buffer.
     */
    public void lerPesos(Densa camada, BufferedReader br){
-      try{         
-         for(int i = 0; i < camada.pesos.lin(); i++){
-            for(int j = 0; j < camada.pesos.col(); j++){
+      try{ 
+         int linPesos = camada.pesos.dim3();
+         int colPesos = camada.pesos.dim4();        
+         for(int i = 0; i < linPesos; i++){
+            for(int j = 0; j < colPesos; j++){
                double p = Double.parseDouble(br.readLine());
-               camada.pesos.editar(i, j, p);
+               camada.pesos.editar(0, 0, i, j, p);
             }
          }
          
          if(camada.temBias()){
-            for(int i = 0; i < camada.bias.lin(); i++){
-               for(int j = 0; j < camada.bias.col(); j++){
-                  double b = Double.parseDouble(br.readLine());
-                  camada.bias.editar(i, j, b);
-               }
+            int colBias = camada.bias.dim4();        
+            for(int i = 0; i < colBias; i++){
+               double b = Double.parseDouble(br.readLine());
+               camada.bias.editar(0, 0, 0, i, b);
             }
          }
       }catch(Exception e){

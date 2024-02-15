@@ -618,38 +618,42 @@ public class RedeNeural extends Modelo implements Cloneable{
       for(int e = 0; e < epochs; e++){
 
          double custo = avaliador().erroMedioQuadrado(entradas, saidas);
-         for(Densa camada : this.camadas){   
-            for(int i = 0; i < camada.pesos.lin(); i++){
-               for(int j = 0; j < camada.pesos.col(); j++){
-                  salvo = camada.pesos.elemento(i, j);
-                  camada.pesos.add(i, j, eps);
+         for(Densa camada : this.camadas){
+            int linhas = camada.pesos.dim3(); 
+            int colunas = camada.pesos.dim4(); 
+            for(int i = 0; i < linhas; i++){
+               for(int j = 0; j < colunas; j++){
+                  salvo = camada.pesos.elemento(0, 0, i, j);
+                  camada.pesos.add(0, 0, i, j, eps);
                   double d = (avaliador().erroMedioQuadrado(entradas, saidas) - custo) / eps;
-                  camada.gradPesos.editar(i, j, d);
-                  camada.pesos.editar(i, j, salvo);
+                  camada.gradPesos.editar(0, 0, i, j, d);
+                  camada.pesos.editar(0, 0, i, j, salvo);
                }
             }
-            for(int i = 0; i < camada.bias.lin(); i++){
-               for(int j = 0; j < camada.bias.col(); j++){
-                  salvo = camada.bias.elemento(i, j);
-                  camada.bias.add(i, j, eps);
+            for(int i = 0; i < linhas; i++){
+               for(int j = 0; j < colunas; j++){
+                  salvo = camada.bias.elemento(0, 0, i, j);
+                  camada.bias.add(0, 0, i, j, eps);
                   double d = (avaliador().erroMedioQuadrado(entradas, saidas) - custo) / eps;
-                  camada.gradSaida.editar(i, j, d);
-                  camada.bias.editar(i, j, salvo);    
+                  camada.gradSaida.editar(0, 0, i, j, d);
+                  camada.bias.editar(0, 0, i, j, salvo);    
                }
             }
          }
 
-         for(Densa camada : this.camadas){            
-            for(int i = 0; i < camada.pesos.lin(); i++){
-               for(int j = 0; j < camada.pesos.col(); j++){
-                  camada.pesos.sub(i, j, (tA * camada.gradPesos.elemento(i, j)));
+         for(Densa camada : this.camadas){
+            int linhas = camada.pesos.dim3(); 
+            int colunas = camada.pesos.dim4();         
+            for(int i = 0; i < linhas; i++){
+               for(int j = 0; j < colunas; j++){
+                  camada.pesos.sub(0, 0, i, j, (tA * camada.gradPesos.elemento(0, 0, i, j)));
                }
             }
 
             if(camada.temBias()){
-               for(int i = 0; i < camada.bias.lin(); i++){
-                  for(int j = 0; j < camada.bias.col(); j++){
-                     camada.bias.sub(i, j, (tA * camada.gradSaida.elemento(i, j)));
+               for(int i = 0; i < linhas; i++){
+                  for(int j = 0; j < colunas; j++){
+                     camada.bias.sub(0, 0, i, j, (tA * camada.gradSaida.elemento(0, 0, i, j)));
                   }
                }
             }
