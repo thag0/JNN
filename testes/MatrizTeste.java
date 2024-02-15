@@ -34,6 +34,37 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
 
+      double[][][][] exmeplo = {
+         {
+            {
+               {1, 1, 1},
+               {1, 1, 1},
+               {1, 1, 1},
+            },
+            {
+               {2, 2, 2},
+               {2, 2, 2},
+               {2, 2, 2},
+            }
+         },
+         {
+            {
+               {3, 4, 5},
+               {3, 4, 5},
+               {3, 4, 5},
+            },
+            {
+               {6, 7, 8},
+               {6, 7, 8},
+               {6, 7, 8},
+            }
+         }
+      };
+
+      Tensor4D tensor = new Tensor4D(exmeplo);
+      Tensor4D tensor2 = new Tensor4D(tensor.dimensoes());
+      tensor2.copiar(tensor, 0, 0, 1);
+      tensor2.print();
    }
 
    /**

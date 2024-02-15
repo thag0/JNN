@@ -791,12 +791,16 @@ public class OpTensor4D{
    public void convForward(Tensor4D entrada, Tensor4D kernel, Tensor4D saida){
       int numFiltros = kernel.dim1();
       int profEntrada = kernel.dim2();
+      int[] idEntrada = {0, 0};
+      int[] idKernel = {0, 0};
+      int[] idSaida = {0, 0};
 
       for(int i = 0; i < numFiltros; i++){
-         int[] idSaida = {0, i};
+         idSaida[1] = i;
          for(int j = 0; j < profEntrada; j++){
-            int[] idEntrada = {0, j};
-            int[] idKernel = {i, j};
+            idEntrada[1] = j;
+            idKernel[0] = i;
+            idKernel[1] = j;
             correlacao2D(entrada, kernel, saida, idEntrada, idKernel, idSaida, true);
          }
       }

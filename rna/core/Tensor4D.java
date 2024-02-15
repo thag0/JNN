@@ -10,7 +10,7 @@ public class Tensor4D{
    /**
     * Primeira dimensão do tensor.
     */
-    int d1;
+   int d1;
     
    /**
     * Segunda dimensão do tensor.
@@ -185,7 +185,8 @@ public class Tensor4D{
       this.d3 = d3;
       this.d4 = d4;
 
-      this.dados = elementos;
+      this.dados = new double[elementos.length];
+      System.arraycopy(elementos, 0, dados, 0, dados.length);
    }
 
    /**
@@ -199,7 +200,54 @@ public class Tensor4D{
     * @param d4 índice da quarta dimensão.
     */
    public Tensor4D(int d1, int d2, int d3, int d4){
-      this(d1, d2, d3, d4, new double[d1 * d2 * d3 * d4]);
+      this(d1, d2, d3, d4, new double[d1*d2*d3*d4]);
+   }
+
+   /**
+    * Inicializa um tensor com quatro dimensões de acordo com os valores fornecidos.
+    * <p>
+    *    O conteúdo do tensor estará zerado.
+    * </p>
+    * @param dimensoes array de dimensões contendo os valores em ordem crescente
+    * das dimensões do tensor (d1, d2, d3, d4)
+    */
+   public Tensor4D(int[] dimensoes){
+      if(dimensoes == null){
+         throw new IllegalArgumentException(
+            "\tArray de dimensões fornecido é nulo."
+         );
+      }
+      if(dimensoes.length > 4){
+         throw new IllegalArgumentException(
+            "\nA quantidade de dimensões deve conter no máximo quatro elementos, " +
+            "recebido " + dimensoes().length
+         );
+      }
+      
+      this.d1 = 1;
+      this.d2 = 1;
+      this.d3 = 1;
+      
+      if(dimensoes.length == 1){
+         this.d4 = dimensoes[0];
+      
+      }else if(dimensoes.length == 2){
+         this.d3 = dimensoes[0];
+         this.d4 = dimensoes[1];
+         
+      }else if(dimensoes.length == 3){
+         this.d2 = dimensoes[0];
+         this.d3 = dimensoes[1];
+         this.d4 = dimensoes[2];
+         
+      }else{
+         this.d1 = dimensoes[0];
+         this.d2 = dimensoes[1];
+         this.d3 = dimensoes[2];
+         this.d4 = dimensoes[3];
+      }
+
+      this.dados = new double[d1*d2*d3*d4];
    }
 
    /**
@@ -305,6 +353,60 @@ public class Tensor4D{
    }
 
    /**
+    * Copia o conteúdo do tensor na instância local de acordo a dimensão fornecida.
+    * @param tensor tensor desejado.
+    * @param dim1 índice da primeira dimensão desejada.
+    */
+   public void copiar(Tensor4D tensor, int dim1){
+      if(comparar3D(tensor) == false){
+         throw new IllegalArgumentException(
+            "\nIncompatibilidade entre as três últimas dimensões do tensor " + dimensoesStr() +
+            " com o tensor fornecido " + tensor.dimensoesStr()
+         );
+      }
+
+      int inicio = indice(dim1, 0, 0, 0);
+      System.arraycopy(tensor.dados, inicio, this.dados, inicio, (d2*d3*d4));
+   }
+
+   /**
+    * Copia o conteúdo do tensor na instância local de acordo as dimensões fornecidas.
+    * @param tensor tensor desejado.
+    * @param dim1 índice da primeira dimensão desejada.
+    * @param dim2 índice da segunda dimensão desejada.
+    */
+   public void copiar(Tensor4D tensor, int dim1, int dim2){
+      if(comparar2D(tensor) == false){
+         throw new IllegalArgumentException(
+            "\nIncompatibilidade entre as duas últimas dimensões do tensor " + dimensoesStr() +
+            " com o tensor fornecido " + tensor.dimensoesStr()
+         );
+      }
+
+      int inicio = indice(dim1, dim2, 0, 0);
+      System.arraycopy(tensor.dados, inicio, this.dados, inicio, (d3*d4));
+   }
+
+   /**
+    * Copia o conteúdo do tensor na instância local de acordo as dimensões fornecidas.
+    * @param tensor tensor desejado.
+    * @param dim1 índice da primeira dimensão desejada.
+    * @param dim2 índice da segunda dimensão desejada.
+    * @param dim3 índice da terceira dimensão desejada.
+    */
+   public void copiar(Tensor4D tensor, int dim1, int dim2, int dim3){
+      if(comparar1D(tensor) == false){
+         throw new IllegalArgumentException(
+            "\nIncompatibilidade entre a última dimensão do tensor " + dimensoesStr() +
+            " com o tensor fornecido " + tensor.dimensoesStr()
+         );
+      }
+
+      int inicio = indice(dim1, dim2, dim3, 0);
+      System.arraycopy(tensor.dados, inicio, this.dados, inicio, d4);
+   }
+
+   /**
     * Copia todo o conteúdo do array na instância local.
     * @param arr array desejado.
     */
@@ -337,6 +439,7 @@ public class Tensor4D{
    /**
     * Copia todo o conteúdo do array na instância local.
     * @param arr array desejado.
+    * @param dim1 índice da primeira dimensão.
     */
    public void copiar(double[][][] arr, int dim1){
       if(arr.length != d2){
@@ -371,8 +474,8 @@ public class Tensor4D{
    /**
     * Copia o conteúdo do array na instância local.
     * @param arr array desejado.
-    * @param d1 índice da primeira dimensão.
-    * @param d2 índice da segunda dimensão.
+    * @param dim1 índice da primeira dimensão.
+    * @param dim2 índice da segunda dimensão.
     */
    public void copiar(double[][] arr, int dim1, int dim2){
       if(arr.length != d3){
@@ -397,9 +500,9 @@ public class Tensor4D{
    /**
     * Copia o conteúdo do array na instância local.
     * @param arr array desejado.
-    * @param d1 índice da primeira dimensão.
-    * @param d2 índice da segunda dimensão.
-    * @param d3 índice da terceira dimensão.
+    * @param dim1 índice da primeira dimensão.
+    * @param dim2 índice da segunda dimensão.
+    * @param dim3 índice da terceira dimensão.
     */
    public void copiar(double[] arr, int dim1, int dim2, int dim3){
       if(arr.length != d4){
@@ -416,6 +519,10 @@ public class Tensor4D{
    /**
     * Copia apenas os dados contidos no array, sem levar em considerasão
     * as dimensões do tensor.
+    * <p>
+    *    Ainda é necessário que a quantidade de elementos do array seja igual
+    *    a quantidade de elementos do tensor.
+    * </p>
     * @param elementos array de elementos desejado.
     */
    public void copiarElementos(double[] elementos){
