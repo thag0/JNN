@@ -18,7 +18,7 @@ import rna.core.Utils;
  *    Essencialmente, a camada realiza a operação de subamostragem, mantendo apenas 
  *    as informações mais relevantes.
  * </p>
- * Exemplo simples de operação Max Pooling para uma região 2x2:
+ * Exemplo simples de operação Max Pooling para uma região 2x2 com máscara 2x2:
  * <pre>
  *entrada = [
  *    1, 2
@@ -68,6 +68,12 @@ public class MaxPooling extends Camada{
     * <pre>
     *largura = (larguraEntrada = larguraFiltro) / larguraStride + 1;
     *altura = (alturaEntrada = alturaFiltro) / alturaStride + 1;
+    * </pre>
+    * <p>
+    *    Com isso o formato de saída é dado por:
+    * </p>
+    * <pre>
+    *    saida = (1, profundidade, altura, largura)
     * </pre>
     * Essa relação é válida pra cada canal de entrada.
     */
@@ -215,8 +221,15 @@ public class MaxPooling extends Camada{
     *    O formato de entrada da camada deve seguir o padrão:
     * </p>
     * <pre>
-    *    formEntrada = (altura, largura, profundidade)
+    *    formEntrada = (profundidade, altura, largura)
     * </pre>
+    * <h3>
+    *    Nota
+    * </h3>
+    * <p>
+    *    Caso o formato de entrada contenha quatro elementos, o primeiro
+    *    valor é descondiderado.
+    * </p>
     * @param entrada formato dos dados de entrada para a camada.
     */
    @Override

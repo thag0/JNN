@@ -650,6 +650,13 @@ public class Convolucional extends Camada implements Cloneable{
     *    Após a propagação dos dados, a função de ativação da camada é aplicada
     *    ao resultado do somatório e o resultado é salvo da saída da camada.
     * </p>
+    * <h3>
+    *    Nota
+    * </h3>
+    * <p>
+    *    Caso a entrada seja um {@code Tensor4D}, é considerada apenas a primeira dimensão do
+    *    tensor.
+    * </p>
     * @param entrada dados de entrada que serão processados, tipos aceitos são,
     * {@code double[][][]} ou {@code Tensor4D}.
     * @throws IllegalArgumentException caso a entrada fornecida não seja suportada 
@@ -683,7 +690,7 @@ public class Convolucional extends Camada implements Cloneable{
             );
          }
 
-         this.entrada.copiar(e.array3D(0), 0);
+         this.entrada.copiar(e, 0);
 
       }else{         
          throw new IllegalArgumentException(
@@ -696,11 +703,11 @@ public class Convolucional extends Camada implements Cloneable{
       //feedforward
       somatorio.preencher(0);
 
-      if(usarBias){
-         somatorio.copiar(bias);
-      }
-      
       optensor.convForward(this.entrada, this.filtros, this.somatorio);
+      
+      if(usarBias){
+         somatorio.add(bias);
+      }
 
       ativacao.calcular(this);
    }
@@ -715,6 +722,13 @@ public class Convolucional extends Camada implements Cloneable{
     * </p>
     * Resultados calculados ficam salvos nas prorpiedades {@code camada.gradFiltros} e
     * {@code camada.gradBias}.
+    * <h3>
+    *    Nota
+    * </h3>
+    * <p>
+    *    Caso o gradiente seja um {@code Tensor4D}, é considerada apenas a primeira dimensão 
+    *    do tensor.
+    * </p>
     * @param gradSeguinte gradiente da camada seguinte.
     */
    @Override
@@ -730,7 +744,7 @@ public class Convolucional extends Camada implements Cloneable{
             );
          }
 
-         this.gradSaida.copiar(g);
+         this.gradSaida.copiar(g, 0);
 
       }else{
          throw new IllegalArgumentException(
@@ -815,7 +829,7 @@ public class Convolucional extends Camada implements Cloneable{
             clone.gradBias = this.gradBias.clone();
          }
 
-         clone.entrada = this.entrada.clone();
+         clone.entrada     = this.entrada.clone();
          clone.filtros     = this.filtros.clone();
          clone.gradFiltros = this.gradFiltros.clone();
 
@@ -834,7 +848,7 @@ public class Convolucional extends Camada implements Cloneable{
     * Calcula o formato de entrada da camada Convolucional, que é disposto da
     * seguinte forma:
     * <pre>
-    *    formato = (entrada.altura, entrada.largura, entrada.profundidade)
+    *    formato = (profundidade, altura, largura)
     * </pre>
     * @return formato de entrada da camada.
     */
@@ -853,7 +867,7 @@ public class Convolucional extends Camada implements Cloneable{
     * Calcula o formato de saída da camada Convolucional, que é disposto da
     * seguinte forma:
     * <pre>
-    *    formato = (altura, largura, profundidade)
+    *    formato = (profundidade, altura, largura)
     * </pre>
     * @return formato de saída da camada.
     */

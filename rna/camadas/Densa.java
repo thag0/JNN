@@ -334,7 +334,7 @@ public class Densa extends Camada implements Cloneable{
     *    cada dimensão e entrada da camada, e deve estar no formato:
     * </p>
     * <pre>
-    *    entrada = (altura, largura)
+    *    entrada = (1, tamEntrada)
     * </pre>
     * @param entrada formato de entrada para a camada.
     */
@@ -479,8 +479,9 @@ public class Densa extends Camada implements Cloneable{
 
       //feedforward
       optensor.matMult(this.entrada, this.pesos, this.somatorio, 0, 0);
+
       if(this.usarBias){
-         optensor.matAdd(this.somatorio, this.bias, this.somatorio, 0);
+         this.somatorio.add(this.bias);
       }
 
       this.ativacao.calcular(this);
@@ -496,7 +497,8 @@ public class Densa extends Camada implements Cloneable{
     * </p>
     * Resultados calculados ficam salvos nas prorpiedades {@code camada.gradPesos} e
     * {@code camada.gradBias}.
-    * @param gradSeguinte gradiente da camada seguinte, deve ser um objeto do tipo {@code Tensor4D}.
+    * @param gradSeguinte gradiente da camada seguinte, deve ser um objeto do tipo 
+    * {@code Tensor4D} ou {@code double[]}.
     */
    @Override
    public void calcularGradiente(Object gradSeguinte){

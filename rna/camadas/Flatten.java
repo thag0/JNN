@@ -24,7 +24,7 @@ public class Flatten extends Camada{
    /**
     * Array contendo o formato de entrada da camada, de acordo com o formato:
     * <pre>
-    *    entrada = (altura, largura, profundidade)
+    *    entrada = (profundidade, altura, largura)
     * </pre>
     */
    int[] formEntrada;
@@ -32,7 +32,7 @@ public class Flatten extends Camada{
    /**
     * Array contendo o formato de saida da camada, de acordo com o formato:
     * <pre>
-    *    saida = (elementosTotaisEntrada)
+    *    saida = (1, 1, elementosTotaisEntrada)
     * </pre>
     */
    int[] formSaida;
@@ -132,7 +132,7 @@ public class Flatten extends Camada{
          );
       }
 
-      int altura, largura, profundidade;
+      int profundidade, altura, largura;
       if(formatoEntrada.length == 4){
          profundidade = formatoEntrada[1];
          altura = formatoEntrada[2];
@@ -171,10 +171,11 @@ public class Flatten extends Camada{
          tamanho *= i;
       }
 
-      this.entrada = new Tensor4D(formEntrada[0], formEntrada[1], formEntrada[2], formEntrada[3]);
-      this.gradEntrada = new Tensor4D(this.entrada);
-      this.saida = new Tensor4D(1, 1, 1, tamanho);
       this.formSaida = new int[]{1, 1, 1, tamanho};
+
+      this.entrada = new Tensor4D(formEntrada);
+      this.gradEntrada = new Tensor4D(this.entrada);
+      this.saida = new Tensor4D(formSaida);
 
       this.entrada.nome("Entrada");
       this.saida.nome("Saída");
@@ -188,14 +189,6 @@ public class Flatten extends Camada{
 
    /**
     * Achata os dados de entrada num formato sequencial.
-    * <h3>
-    *    Nota
-    * </h3>
-    * <p>
-    *    Os dados de saída são armazenados numa matriz do tipo {@code Mat},
-    *    que por sua vez possuem a quantidade de colunas equivalente a quantidade
-    *    total de elementos de entrada.  
-    * </p>
     * @param entrada dados de entrada que serão processados, objetos aceitos incluem:
     * {@code Tensor4D} ou {@code double[]}.
     * @throws IllegalArgumentException caso a entrada fornecida não seja suportada 
@@ -233,7 +226,8 @@ public class Flatten extends Camada{
 
    /**
     * Desserializa os gradientes recebedos de volta para o mesmo formato de entrada.
-    * @param gradSeguinte gradientes de entrada da camada seguinte.
+    * @param gradSeguinte gradientes de entrada da camada seguinte, objetos aceitos incluem:
+    * {@code Tensor4D} ou {@code double[]}.
     */
    @Override
    public void calcularGradiente(Object gradSeguinte){

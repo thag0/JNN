@@ -33,7 +33,7 @@ public class Dropout extends Camada implements Cloneable{
    private double taxa;
 
    /**
-    * Formato de entrada da camada (altura, largura, profundidade).
+    * Formato de entrada da camada (profundidade, altura, largura).
     */
    int[] formEntrada;
 
@@ -171,7 +171,7 @@ public class Dropout extends Camada implements Cloneable{
          );
       }
       
-      this.entrada =     new Tensor4D(this.formEntrada[0], this.formEntrada[1], this.formEntrada[2], this.formEntrada[3]);
+      this.entrada =     new Tensor4D(this.formEntrada);
       this.mascara =     new Tensor4D(this.entrada);
       this.saida =       new Tensor4D(this.entrada);
       this.gradEntrada = new Tensor4D(this.entrada);
@@ -204,6 +204,15 @@ public class Dropout extends Camada implements Cloneable{
     *    a máscara será usada como filtro para os dados de entrada e os valores de 
     *    unidades desativadas serão propagados como "0".
     * </p>
+    * <h3>
+    *    Nota
+    * </h3>
+    * <p>
+    *    Caso a entrada recebida seja um {@code Tensor4D}, os valores de entrada
+    *    que serão considerados serão apenas o da primeira dimensão do tensor.
+    * </p>
+    * @param entrada dados de entrada para a camada, objetos aceitos são {@code Tensor4D}
+    * ou {@code double[][][]}.
     */
    @Override
    public void calcularSaida(Object entrada){
@@ -218,32 +227,27 @@ public class Dropout extends Camada implements Cloneable{
             );
          }
 
-         this.entrada.copiar(e.array3D(0), 0);
+         this.entrada.copiar(e, 0);
    
+      }else if(entrada instanceof double[][][]){
+         double[][][] e = (double[][][]) entrada;
+         this.entrada.copiar(e, 0);
+
       }else{
          throw new IllegalArgumentException(
-            "\nEntrada aceita para a camada de Dropout deve ser do tipo " + this.entrada.getClass().getSimpleName() + 
+            "\nEntrada aceita para a camada de Dropout deve ser do tipo " +
+            this.entrada.getClass().getSimpleName() + " ou double[][][]" + 
             " , objeto recebido é do tipo \"" + entrada.getClass().getTypeName() + "\"."
          );
       }
 
-      int prof = this.saida.dim2() ,lin = this.saida.dim3(), col = this.saida.dim4();
       if(this.treinando){
          gerarMascaras();
-         double res;
-         for(int i = 0; i < prof; i++){
-            for(int j = 0; j < lin; j++){
-               for(int k = 0; k < col; k++){
-                  res = this.mascara.elemento(0, i, j, k) * this.entrada.elemento(0, i, j, k);
-                  this.saida.editar(0, i, j, k, res);
-               }
-            }
-         }
+         this.entrada.mult(this.mascara);
+         this.saida.copiar(this.entrada);
 
       }else{
-         for(int i = 0; i < prof; i++){
-            this.saida.copiar(this.entrada);
-         }
+         this.saida.copiar(this.entrada);
       }
    }
 
@@ -260,19 +264,24 @@ public class Dropout extends Camada implements Cloneable{
     *    0, 1, 0  
     *]
     * </pre>
+    * Nos valores em que a máscara for igual a 1, o valor de entrada será
+    * passado para a saída, nos valores iguais a 0, a entrada será desconsiderada. 
     */
    private void gerarMascaras(){
-      int prof = entrada.dim2();
-      for(int i = 0; i < prof; i++){
-         mascara.map3D(0, (x) -> {
-            return random.nextDouble() > taxa ? 1 : 0;
-         });
-      }
+      mascara.map3D(0, (x) -> {
+         return random.nextDouble() >= taxa ? 1 : 0;
+      });
    }
 
    /**
     * Retropropaga os gradientes da camada suguinte, aplicando a máscara usada
     * no cálculo da saída.
+    * <h3>
+    *    Nota
+    * </h3>
+    * <p>
+    *    Serão considerados apenas os gradientes da primeira dimensão do tensor.
+    * </p>
     * @param gradSeguinte gradientes da camada seguiente.
     */
    @Override
@@ -288,7 +297,7 @@ public class Dropout extends Camada implements Cloneable{
             );
          }
 
-         this.gradEntrada.copiar(g.array3D(0), 0);
+         this.gradEntrada.copiar(g);
 
       }else{
          throw new IllegalArgumentException(
