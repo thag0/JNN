@@ -1,5 +1,9 @@
 package rna.core;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 public class OpTensor4D{
 
    OpArray oparr = new OpArray();
@@ -791,17 +795,46 @@ public class OpTensor4D{
    public void convForward(Tensor4D entrada, Tensor4D kernel, Tensor4D saida){
       int numFiltros = kernel.dim1();
       int profEntrada = kernel.dim2();
-      int[] idEntrada = {0, 0};
-      int[] idKernel = {0, 0};
-      int[] idSaida = {0, 0};
+      
+      if(profEntrada <= 1){//arbritário
+         int[] idEntrada = {0, 0};
+         int[] idKernel = {0, 0};
+         int[] idSaida = {0, 0};
+         for(int i = 0; i < numFiltros; i++){
+            idSaida[1] = i;
+            for(int j = 0; j < profEntrada; j++){
+               idEntrada[1] = j;
+               idKernel[0] = i;
+               idKernel[1] = j;
+               correlacao2D(entrada, kernel, saida, idEntrada, idKernel, idSaida, true);
+            }
+         }
 
-      for(int i = 0; i < numFiltros; i++){
-         idSaida[1] = i;
-         for(int j = 0; j < profEntrada; j++){
-            idEntrada[1] = j;
-            idKernel[0] = i;
-            idKernel[1] = j;
-            correlacao2D(entrada, kernel, saida, idEntrada, idKernel, idSaida, true);
+      }else{
+         final int numThreads = Runtime.getRuntime().availableProcessors()/2;
+         ExecutorService executor = Executors.newFixedThreadPool(numThreads > 1 ? numThreads : 1);
+         for(int ent = 0; ent < profEntrada; ent++){
+            final int e = ent;
+            executor.submit(() -> {
+               int[] idEntrada = {0, 0};
+               int[] idKernel = {0, 0};
+               int[] idSaida = {0, 0};
+               for(int f = 0; f < numFiltros; f++){
+                  //entrada = [0][e], kernel = [f][e], saida = [0][f]
+                  idEntrada[1] = e;
+                  idKernel[0] = f;
+                  idKernel[1] = e;
+                  idSaida[1] = f;
+                  correlacao2D(entrada, kernel, saida, idEntrada, idKernel, idSaida, true);
+               }
+            });
+         }
+         
+         executor.shutdown();
+         try{
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+         }catch(InterruptedException e){
+            e.printStackTrace();
          }
       }
    }
@@ -817,23 +850,30 @@ public class OpTensor4D{
    public void convBackward(Tensor4D entrada, Tensor4D kernel, Tensor4D derivada, Tensor4D gradKernel, Tensor4D gradEntrada){
       int numFiltros = kernel.dim1();
       int profEntrada = kernel.dim2();
-
+      
+      ExecutorService executor = Executors.newFixedThreadPool(2);
       for(int i = 0; i < numFiltros; i++){
-         for(int j = 0; j < profEntrada; j++){
-            int[] idEntrada = {0, j};
-            int[] idDerivada = {0, i};
-            int[] idGradKernel = {i, j};
-            correlacao2D(entrada, derivada, gradKernel, idEntrada, idDerivada, idGradKernel, false);
-         }
+         final int id = i;
+         int[] idDerivada = {0, id};
+         
+         executor.submit(() -> {
+            for(int j = 0; j < profEntrada; j++){
+               int[] idEntrada = {0, j};
+               int[] idKernel = {id, j};
+               int[] idGradKernel = {id, j};
+               int[] idGradEntrada = {0, j};
+
+               correlacao2D(entrada, derivada, gradKernel, idEntrada, idDerivada, idGradKernel, false);
+               convolucao2DFull(derivada, kernel, gradEntrada, idDerivada, idKernel, idGradEntrada, true);
+            }
+         });
       }
-
-      for(int i = 0; i < numFiltros; i++){
-         for(int j = 0; j < profEntrada; j++){
-            int[] idDerivada = {0, i};
-            int[] idKernel = {i, j};
-            int[] idGradEntrada = {0, j};
-            convolucao2DFull(derivada, kernel, gradEntrada, idDerivada, idKernel, idGradEntrada, true);
-         }
+  
+      executor.shutdown();
+      try{
+         executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+      }catch(InterruptedException e){
+         Thread.currentThread().interrupt();
       }
    }
 }

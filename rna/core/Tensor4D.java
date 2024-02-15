@@ -3,7 +3,17 @@ package rna.core;
 import java.util.function.DoubleUnaryOperator;
 
 /**
- * Experimental
+ * Implementação de um array multidimensional (atualmente com no máximo quatro
+ * dimentões) com finalidade de simplificar o uso de estrutura de dados dentro
+ * da biblioteca.
+ * <p>
+ *    O tensor possui algumas funções próprias com intuito de aproveitar a velocidade
+ *    de processamento usando um único array contendo os dados do dele.
+ * </p>
+ * <p>
+ *    Algumas operações mais elaboradas podem precisar do auxílio da classe {@code OpTensor4D},
+ *    que implementa operações entre vários tensores.
+ * </p>
  */
 public class Tensor4D{
 
