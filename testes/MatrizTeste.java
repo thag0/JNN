@@ -33,15 +33,7 @@ public class MatrizTeste{
    
    public static void main(String[] args){
       ged.limparConsole();
-
-      Tensor4D tensor = new Tensor4D(new double[]{1, 2, 3, 4, 5});
-
-      Dropout drop = new Dropout(0.3);
-      drop.construir(new int[]{1, 1, 5});
-
-      drop.configurarTreino(true);
-      drop.calcularSaida(tensor);
-      drop.saida.print();
+      
    }
 
    /**
@@ -55,70 +47,4 @@ public class MatrizTeste{
       return System.nanoTime() - t;
    }
 
-   static void conv2D(Mat entrada, Mat filtro, Mat res){
-      double[] e = entrada.paraArray();
-      double[] k = filtro.paraArray();
-      inverterArray(k);
-  
-      int lenEntrada = e.length;
-      int lenFiltro = k.length;
-      int lin = entrada.lin() - filtro.lin() + 1;
-      int col = entrada.col() - filtro.col() + 1;
-      int lenResultado = lin*col;
-      double[] resultado = new double[lenResultado];
-  
-      for(int i = 0; i < lin; i++){
-         for(int j = 0; j < col; j++){
-            double sum = 0;
-            for(int m = 0; m < filtro.lin(); m++){ 
-               for(int n = 0; n < filtro.col(); n++){
-                  sum += e[(i + m) * entrada.col() + (j + n)] * k[m * filtro.col() + n];
-               }
-            }
-            resultado[i * col + j] = sum;
-         }
-      }
-
-      res.copiar(resultado);
-   }
-
-   static void correlacao2D(Mat entrada, Mat filtro, Mat res){
-      double[] e = entrada.paraArray();
-      double[] k = filtro.paraArray();
-  
-      int lenEntrada = e.length;
-      int lenFiltro = k.length;
-      int lin = entrada.lin() - filtro.lin() + 1;
-      int col = entrada.col() - filtro.col() + 1;
-      int lenResultado = lin*col;
-      double[] resultado = new double[lenResultado];
-  
-      for(int i = 0; i < lin; i++){
-         for(int j = 0; j < col; j++){
-            double sum = 0;
-            for(int m = 0; m < filtro.lin(); m++){ 
-               for(int n = 0; n < filtro.col(); n++){
-                  sum += e[(i + m) * entrada.col() + (j + n)] * k[m * filtro.col() + n];
-               }
-            }
-            resultado[i * col + j] = sum;
-         }
-      }
-
-      res.copiar(resultado);
-   }
-
-   public static void inverterArray(double[] arr){
-      int inicio = 0;
-      int fim = arr.length - 1;
-      while (inicio < fim) {
-         // Troca os elementos nas posições start e end
-         double temp = arr[inicio];
-         arr[inicio] = arr[fim];
-         arr[fim] = temp;
-         // Move para os próximos elementos
-         inicio++;
-         fim--;
-      }
-   }
 }

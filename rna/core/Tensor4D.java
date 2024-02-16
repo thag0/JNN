@@ -693,6 +693,109 @@ public class Tensor4D{
    }
 
    /**
+    * Retorna a soma de todos os elementos do tensor.
+    * @return soma total.
+    */
+   public double somarElementos(){
+      double soma = 0;
+      for(int i = 0; i < dados.length; i++){
+         soma += dados[i];
+      }
+
+      return soma;
+   }
+
+   /**
+    * Retorna a soma de todos os elementos das últimas três dimensões
+    * do tensor de acordo com o índice especificado.
+    * @param dim1 índice da primeira dimensão do tensor.
+    * @return soma total.
+    */
+   public double somarElementos3D(int dim1){
+      if(dim1 < 0 || dim1 >= d1){
+         throw new IllegalArgumentException(
+            "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
+         );
+      }
+
+      int inicio = indice(dim1, 0, 0, 0);
+      int fim = inicio + (d2*d3*d4);
+
+      double soma = 0;
+      for(int i = inicio; i < fim; i++){
+         soma += dados[i];
+      }
+
+      return soma;
+   }
+
+   /**
+    * Retorna a soma de todos os elementos das últimas duas dimensões
+    * do tensor de acordo com os índices especificados.
+    * @param dim1 índice da primeira dimensão do tensor.
+    * @param dim2 índice da segunda dimensão do tensor.
+    * @return soma total.
+    */
+   public double somarElementos2D(int dim1, int dim2){
+      if(dim1 < 0 || dim1 >= d1){
+         throw new IllegalArgumentException(
+            "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
+         );
+      }
+      if(dim2 < 0 || dim2 >= d2){
+         throw new IllegalArgumentException(
+            "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
+         );
+      }
+
+      int inicio = indice(dim1, dim2, 0, 0);
+      int fim = inicio + (d3*d4);
+
+      double soma = 0;
+      for(int i = inicio; i < fim; i++){
+         soma += dados[i];
+      }
+
+      return soma;
+   }
+
+   /**
+    * Retorna a soma de todos os elementos da última dimensão
+    * do tensor de acordo com os índices especificados.
+    * @param dim1 índice da primeira dimensão do tensor.
+    * @param dim2 índice da segunda dimensão do tensor.
+    * @param dim3 índice da terceira dimensão do tensor.
+    * @return soma total.
+    */
+   public double somarElementos1D(int dim1, int dim2, int dim3){
+      if(dim1 < 0 || dim1 >= d1){
+         throw new IllegalArgumentException(
+            "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
+         );
+      }
+      if(dim2 < 0 || dim2 >= d2){
+         throw new IllegalArgumentException(
+            "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
+         );
+      }
+      if(dim3 < 0 || dim3 >= d3){
+         throw new IllegalArgumentException(
+            "\nÍndice da terceira dimensão (" + dim3 + ") inválido."
+         );
+      }
+
+      int inicio = indice(dim1, dim2, dim3, 0);
+      int fim = inicio + d4;
+
+      double soma = 0;
+      for(int i = inicio; i < fim; i++){
+         soma += dados[i];
+      }
+
+      return soma;
+   }
+
+   /**
     * Edita o conteúdo do tensor para que o valor fornecido esteja
     * configurado de acordo com os índices fornecidos.
     * @param d1 índice da primeira dimensão.

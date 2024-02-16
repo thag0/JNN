@@ -592,7 +592,7 @@ public class Convolucional extends Camada implements Cloneable{
       this.gradSaida.nome("Gradiente saída");
 
       if(usarBias){
-         this.bias      = new Tensor4D(1, this.numFiltros, altSaida, largSaida);
+         this.bias      = new Tensor4D(1, 1, 1, numFiltros);
          this.gradBias  = new Tensor4D(this.bias);
          this.bias.nome("Bias");
          this.gradBias.nome("Gradiente bias");
@@ -616,9 +616,7 @@ public class Convolucional extends Camada implements Cloneable{
       }
 
       if(usarBias){
-         for(int i = 0; i < numFiltros; i++){
-            iniBias.inicializar(bias, 0, i);
-         }
+         iniBias.inicializar(bias, 0, 0);
       }
    }
 
@@ -706,7 +704,14 @@ public class Convolucional extends Camada implements Cloneable{
       optensor.convForward(this.entrada, this.filtros, this.somatorio);
       
       if(usarBias){
-         somatorio.add(bias);
+         for(int i = 0; i < numFiltros; i++){
+            double b = bias.elemento(0, 0, 0, i);
+            for(int j = 0; j < altSaida; j++){
+               for(int k = 0; k < largSaida; k++){
+                  somatorio.add(0, i, j, k, b);
+               }
+            }
+         }
       }
 
       ativacao.calcular(this);
@@ -755,13 +760,15 @@ public class Convolucional extends Camada implements Cloneable{
       }
 
       ativacao.derivada(this);
-      this.gradEntrada.preencher(0);
+      gradEntrada.preencher(0);
 
       //backward
-      optensor.convBackward(this.entrada, this.filtros, this.derivada, this.gradFiltros, this.gradEntrada);
+      optensor.convBackward(this.entrada, filtros, derivada, gradFiltros, gradEntrada);
 
-      if(this.usarBias){
-         this.bias.copiar(this.derivada);
+      if(usarBias){
+         for(int i = 0; i < numFiltros; i++){
+            this.gradBias.editar(0, 0, 0, i, derivada.somarElementos2D(0, i));
+         }
       }
    }
 
