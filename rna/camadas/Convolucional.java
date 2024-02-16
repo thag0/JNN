@@ -79,19 +79,6 @@ public class Convolucional extends Camada implements Cloneable{
    private int numFiltros;
 
    /**
-    * Auxiliar na contagem de parâmetros para os filtros.
-    * <p>
-    *    O numero de kernels corresponde a quantidade de parametros total
-    *    presente em cada filtro da camada.
-    * </p>
-    * Exemplo:
-    * <p>
-    *    Um filtro 3x3x1 possui 9 parâmetros.
-    * </p>
-    */
-   private int numParamsKernel;
-
-   /**
     * Altura da saída da camada.
     */
    private int altSaida;
@@ -132,7 +119,7 @@ public class Convolucional extends Camada implements Cloneable{
     *    O formato do bias é dado por:
     * </p>
     * <pre>
-    *    bias = (1, numFiltros, alturaSaida, larguraSaida)
+    *    bias = (1, 1, 1, numFiltros)
     * </pre>
     */
    public Tensor4D bias;
@@ -220,7 +207,7 @@ public class Convolucional extends Camada implements Cloneable{
     *    O formato dos gradientes para os bias é dado por:
     * </p>
     * <pre>
-    *    gradBias = (1, numFiltros, alturaSaida, larguraSaida)
+    *    gradBias = (1, 1, 1, numFiltros)
     * </pre>
     */
    public Tensor4D gradBias;
@@ -270,20 +257,20 @@ public class Convolucional extends Camada implements Cloneable{
 
       if(formEntrada == null){
          throw new IllegalArgumentException(
-            "O formato de entrada não pode ser nulo."
+            "\nO formato de entrada não pode ser nulo."
          );
       }
 
       if(formEntrada.length != 3){
          throw new IllegalArgumentException(
-            "O formato de entrada deve conter 3 elementos (altura, largura, profundidade), " +
+            "\nO formato de entrada deve conter 3 elementos (altura, largura, profundidade), " +
             "recebido: " + formEntrada.length
          );
       }
 
       if(utils.apenasMaiorZero(formEntrada) == false){
          throw new IllegalArgumentException(
-            "Os valores do formato de entrada devem ser maiores que zero."
+            "\nOs valores do formato de entrada devem ser maiores que zero."
          );
       }
 
@@ -405,7 +392,7 @@ public class Convolucional extends Camada implements Cloneable{
    public Convolucional(int[] formFiltro, int filtros, String ativacao, Object iniKernel, Object iniBias){
       if(formFiltro == null){
          throw new IllegalArgumentException(
-            "O formato do filtro não pode ser nulo."
+            "\nO formato do filtro não pode ser nulo."
          );
       }
 
@@ -413,13 +400,13 @@ public class Convolucional extends Camada implements Cloneable{
       int[] f = (int[]) formFiltro;
       if(f.length != 2){
          throw new IllegalArgumentException(
-            "O formato dos filtros deve conter 2 elementos (altura, largura), " +
+            "\nO formato dos filtros deve conter 2 elementos (altura, largura), " +
             "recebido: " + f.length
          );
       }
       if(utils.apenasMaiorZero(f) == false){
          throw new IllegalArgumentException(
-            "Os valores de formato para os filtros devem ser maiores que zero."
+            "\nOs valores de formato para os filtros devem ser maiores que zero."
          );      
       }
       this.altFiltro  = f[0];
@@ -428,7 +415,7 @@ public class Convolucional extends Camada implements Cloneable{
       //número de filtros
       if(filtros <= 0){
          throw new IllegalArgumentException(
-            "O número de filtro deve ser maior que zero, recebido: " + filtros
+            "\nO número de filtro deve ser maior que zero, recebido: " + filtros
          );
       }
       this.numFiltros = filtros;
@@ -532,13 +519,13 @@ public class Convolucional extends Camada implements Cloneable{
    public void construir(Object entrada){
       if(entrada == null){
          throw new IllegalArgumentException(
-            "Formato de entrada fornecida para camada Convolucional é nulo."
+            "\nFormato de entrada fornecida para camada Convolucional é nulo."
          );
       }
 
       if(entrada instanceof int[] == false){
          throw new IllegalArgumentException(
-            "Objeto esperado para entrada da camada Convolucional é do tipo int[], " +
+            "\nObjeto esperado para entrada da camada Convolucional é do tipo int[], " +
             "objeto recebido é do tipo " + entrada.getClass().getTypeName()
          );
       }
@@ -556,7 +543,7 @@ public class Convolucional extends Camada implements Cloneable{
          
       }else{
          throw new IllegalArgumentException(
-            "O formato de entrada para a camada Convolucional deve conter três " + 
+            "\nO formato de entrada para a camada Convolucional deve conter três " + 
             "elementos (profundidade, altura, largura), ou quatro elementos (primeiro desconsiderado)" + 
             "objeto recebido possui " + fEntrada.length
          );
@@ -564,7 +551,7 @@ public class Convolucional extends Camada implements Cloneable{
 
       if(utils.apenasMaiorZero(fEntrada) == false){
          throw new IllegalArgumentException(
-            "Os valores de dimensões de entrada para a camada Convolucional não " +
+            "\nOs valores de dimensões de entrada para a camada Convolucional não " +
             "podem conter valores menores que 1."
          );
       }
@@ -575,31 +562,19 @@ public class Convolucional extends Camada implements Cloneable{
       //inicialização dos parâmetros necessários
       this.entrada      = new Tensor4D(1, profEntrada, altEntrada, largEntrada);
       this.gradEntrada  = new Tensor4D(this.entrada);
-      this.entrada.nome("Entrada");
-      this.gradEntrada.nome("Gradiente entrada");
-
       this.filtros      = new Tensor4D(numFiltros, profEntrada, altFiltro, largFiltro);
       this.saida        = new Tensor4D(1, numFiltros, altSaida, largSaida);
       this.gradFiltros  = new Tensor4D(this.filtros);
       this.somatorio    = new Tensor4D(this.saida);
       this.derivada     = new Tensor4D(this.saida);
       this.gradSaida    = new Tensor4D(this.saida);
-      this.filtros.nome("Kernel");
-      this.saida.nome("Saída");
-      this.gradFiltros.nome("Gradiente kernel");
-      this.somatorio.nome("Somatório");
-      this.derivada.nome("Derivada");
-      this.gradSaida.nome("Gradiente saída");
 
+      configurarNomes();
+      
       if(usarBias){
          this.bias      = new Tensor4D(1, 1, 1, numFiltros);
          this.gradBias  = new Tensor4D(this.bias);
-         this.bias.nome("Bias");
-         this.gradBias.nome("Gradiente bias");
       }
-
-      //auxiliar
-      this.numParamsKernel = this.filtros.tamanho();
       
       this.treinavel = true;
       this.construida = true;//camada pode ser usada.
@@ -628,6 +603,23 @@ public class Convolucional extends Camada implements Cloneable{
    @Override
    public void configurarBias(boolean usarBias){
       this.usarBias = usarBias;
+   }
+
+   @Override
+   protected void configurarNomes(){
+      this.entrada.nome("entrada");
+      this.gradEntrada.nome("gradiente entrada");
+      this.filtros.nome("kernel");
+      this.saida.nome("saída");
+      this.gradFiltros.nome("gradiente kernel");
+      this.somatorio.nome("somatório");
+      this.derivada.nome("derivada");
+      this.gradSaida.nome("gradiente saída");
+
+      if(usarBias){
+         this.bias.nome("bias");
+         this.gradBias.nome("gradiente bias");
+      }
    }
 
    /**
@@ -932,7 +924,7 @@ public class Convolucional extends Camada implements Cloneable{
       if(kernel.length != this.filtros.tamanho()){
          throw new IllegalArgumentException(
             "A dimensão do kernel fornecido (" + kernel.length + ") não é igual a quantidade de " +
-            " parâmetros para os kernels da camada ("+ this.numParamsKernel + ")."
+            " parâmetros para os kernels da camada ("+ this.filtros.tamanho() + ")."
          );
       }
          

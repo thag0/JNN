@@ -222,12 +222,12 @@ public class Densa extends Camada implements Cloneable{
 
       if(e < 1){
          throw new IllegalArgumentException(
-            "A camada deve conter ao menos uma entrada."
+            "\nA camada deve conter ao menos uma entrada."
          );
       }
       if(e <= 0){
          throw new IllegalArgumentException(
-            "O valor de entrada deve ser maior que zero."
+            "\nO valor de entrada deve ser maior que zero."
          );
       }
    
@@ -342,7 +342,7 @@ public class Densa extends Camada implements Cloneable{
    public void construir(Object entrada){
       if(entrada instanceof int[] == false){
          throw new IllegalArgumentException(
-            "Objeto esperado para entrada da camada Densa é do tipo int[], " +
+            "\nObjeto esperado para entrada da camada Densa é do tipo int[], " +
             "objeto recebido é do tipo " + entrada.getClass().getTypeName()
          );
       }
@@ -350,7 +350,7 @@ public class Densa extends Camada implements Cloneable{
       int[] formatoEntrada = (int[]) entrada;
       if(utils.apenasMaiorZero(formatoEntrada) == false){
          throw new IllegalArgumentException(
-            "Os valores recebidos para o formato de entrada devem ser maiores que zero."
+            "\nOs valores recebidos para o formato de entrada devem ser maiores que zero."
          );       
       }
 
@@ -358,7 +358,7 @@ public class Densa extends Camada implements Cloneable{
 
       if(this.numNeuronios <= 0){
          throw new IllegalArgumentException(
-            "O número de neurônios para a camada Densa não foi definido."
+            "\nO número de neurônios para a camada Densa não foi definido."
          );
       }
 
@@ -366,32 +366,21 @@ public class Densa extends Camada implements Cloneable{
       this.entrada = new Tensor4D(1, 1, 1, this.tamEntrada);
       this.saida =   new Tensor4D(1, 1, 1, this.numNeuronios);
       this.pesos = new Tensor4D(1, 1, this.tamEntrada, this.numNeuronios);
-      this.entrada.nome("Entrada");
-      this.saida.nome("Saida");
-      this.pesos.nome("Kernel");
 
       if(usarBias){
          this.bias =       new Tensor4D(this.saida);
          this.gradBias =   new Tensor4D(this.saida);
          this.gradAcBias = new Tensor4D(this.saida);
-         this.bias.nome("Bias");
-         this.gradBias.nome("Gradiente Bias");
-         this.gradAcBias.nome("Acumulador Gradiente Bias");
       }
 
       this.somatorio =   new Tensor4D(this.saida);
       this.derivada =    new Tensor4D(this.saida);
       this.gradSaida =   new Tensor4D(this.saida);
       this.gradEntrada = new Tensor4D(1, 1, this.entrada.dim3(), this.entrada.dim4());
-      this.somatorio.nome("Somatório");
-      this.derivada.nome("Derivada");
-      this.gradSaida.nome("Gradiente saída");
-      this.gradEntrada.nome("Gradiente entrada");
 
       this.gradPesos =   new Tensor4D(this.pesos);
       this.gradAcPesos = new Tensor4D(this.pesos);
-      this.gradPesos.nome("Gradiente pesos");
-      this.gradAcPesos.nome("Acumulador Gradiente pesos");
+
       
       this.treinavel = true;
       this.construida = true;//camada pode ser usada.
@@ -405,9 +394,9 @@ public class Densa extends Camada implements Cloneable{
 
    @Override
    public void inicializar(){
-      super.verificarConstrucao();
-      this.iniKernel.inicializar(this.pesos, 0, 0);
-      this.iniBias.inicializar(this.bias, 0, 0);
+      verificarConstrucao();
+      iniKernel.inicializar(pesos, 0, 0);
+      iniBias.inicializar(bias, 0, 0);
    }
 
    @Override
@@ -418,6 +407,25 @@ public class Densa extends Camada implements Cloneable{
    @Override
    public void configurarBias(boolean usarBias){
       this.usarBias = usarBias;
+   }
+
+   @Override
+   protected void configurarNomes(){
+      this.entrada.nome("entrada");
+      this.pesos.nome("kernel");
+      this.saida.nome("saida");
+      this.somatorio.nome("somatório");
+      this.derivada.nome("derivada");
+      this.gradSaida.nome("gradiente saída");
+      this.gradEntrada.nome("gradiente entrada");
+      this.gradPesos.nome("gradiente kernel");
+      this.gradAcPesos.nome("acumulador gradiente pesos");  
+
+      if(usarBias){
+         this.bias.nome("bias");
+         this.gradBias.nome("gradiente bias");
+         this.gradAcBias.nome("acumulador gradiente Bias");
+      }
    }
 
    /**
@@ -478,13 +486,13 @@ public class Densa extends Camada implements Cloneable{
       }
 
       //feedforward
-      optensor.matMult(this.entrada, this.pesos, this.somatorio, 0, 0);
+      optensor.matMult(this.entrada, pesos, somatorio, 0, 0);
 
       if(this.usarBias){
-         this.somatorio.add(this.bias);
+         somatorio.add(bias);
       }
 
-      this.ativacao.calcular(this);
+      ativacao.calcular(this);
    }
 
    /**
@@ -505,18 +513,19 @@ public class Densa extends Camada implements Cloneable{
       verificarConstrucao();
 
       if(gradSeguinte instanceof double[]){
-         double[] grads = (double[]) gradSeguinte;
-         if(grads.length != this.gradSaida.dim4()){
+         double[] grad = (double[]) gradSeguinte;
+         if(grad.length != gradSaida.dim4()){
             throw new IllegalArgumentException(
-               "\nTamanho do gradiente recebido (" + grads.length + ") incompatível com o " +
-               "suportado pela camada Densa (" + this.gradSaida.dim4() + ")."
+               "\nTamanho do gradiente recebido (" + grad.length + ") incompatível com o " +
+               "suportado pela camada Densa (" + gradSaida.dim4() + ")."
             );
          }
-         this.gradSaida.copiar(grads, 0, 0, 0);
+
+         gradSaida.copiar(grad, 0, 0, 0);
       
       }else if(gradSeguinte instanceof Tensor4D){
          Tensor4D grad = (Tensor4D) gradSeguinte;
-         this.gradSaida.copiar(
+         gradSaida.copiar(
             grad.array1D(0, 0, 0),
             0, 0, 0
          );
@@ -530,19 +539,25 @@ public class Densa extends Camada implements Cloneable{
 
       //backward
       //derivada da função de ativação em relação ao gradiente de saída
-      this.ativacao.derivada(this);
+      ativacao.derivada(this);
       
       //derivada da função de ativação em relação ao pesos.
-      optensor.matMult(optensor.matTranspor(this.entrada, 0, 0), this.derivada, this.gradPesos, 0, 0);
+      optensor.matMult(
+         optensor.matTranspor(this.entrada, 0, 0),
+         derivada,
+         gradPesos,
+         0,
+         0
+      );
 
       //gradiente para o bias é apenas a derivada da ativação em relação a saída.
-      if(this.temBias()){
-         this.gradBias.copiar(this.derivada);
+      if(usarBias){
+         gradBias.copiar(derivada);
       }
 
       //derivada da saída em relação aos pesos para retropropagação.
       optensor.matMult(
-         this.derivada, optensor.matTranspor(this.pesos, 0, 0), this.gradEntrada, 0, 0
+         derivada, optensor.matTranspor(pesos, 0, 0), gradEntrada, 0, 0
       );
    }
 

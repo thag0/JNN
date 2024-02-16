@@ -123,17 +123,17 @@ public class MaxPooling extends Camada{
    public MaxPooling(int[] formFiltro){
       if(formFiltro == null){
          throw new IllegalArgumentException(
-            "O formato do filtro não pode ser nulo."
+            "\nO formato do filtro não pode ser nulo."
          );
       }
       if(formFiltro.length != 2){
          throw new IllegalArgumentException(
-            "O formato do filtro deve conter dois elementos (altura, largura)."
+            "\nO formato do filtro deve conter dois elementos (altura, largura)."
          );
       }
       if(utils.apenasMaiorZero(formFiltro) == false){
          throw new IllegalArgumentException(
-            "Os valores de dimensões do filtro devem ser maiores que zero."
+            "\nOs valores de dimensões do filtro devem ser maiores que zero."
          );
       }
 
@@ -160,33 +160,33 @@ public class MaxPooling extends Camada{
    public MaxPooling(int[] formFiltro, int[] stride){
       if(formFiltro == null){
          throw new IllegalArgumentException(
-            "O formato do filtro não pode ser nulo."
+            "\nO formato do filtro não pode ser nulo."
          );
       }
       if(formFiltro.length != 2){
          throw new IllegalArgumentException(
-            "O formato do filtro deve conter três elementos (altura, largura)."
+            "\nO formato do filtro deve conter três elementos (altura, largura)."
          );
       }
       if(utils.apenasMaiorZero(formFiltro) == false){
          throw new IllegalArgumentException(
-            "Os valores de dimensões do filtro devem ser maiores que zero."
+            "\nOs valores de dimensões do filtro devem ser maiores que zero."
          );
       }
 
       if(stride == null){
          throw new IllegalArgumentException(
-            "O formato do filtro não pode ser nulo."
+            "\nO formato do filtro não pode ser nulo."
          );
       }
       if(stride.length != 2){
          throw new IllegalArgumentException(
-            "O formato para os strides deve conter dois elementos (altura, largura)."
+            "\nO formato para os strides deve conter dois elementos (altura, largura)."
          );
       }
       if(utils.apenasMaiorZero(stride) == false){
          throw new IllegalArgumentException(
-            "Os valores para os strides devem ser maiores que zero."
+            "\nOs valores para os strides devem ser maiores que zero."
          );
       }
 
@@ -236,12 +236,12 @@ public class MaxPooling extends Camada{
    public void construir(Object entrada){
       if(entrada == null){
          throw new IllegalArgumentException(
-            "Formato de entrada fornecida para camada MaxPooling é nulo."
+            "\nFormato de entrada fornecida para camada MaxPooling é nulo."
          );
       }
       if(entrada instanceof int[] == false){
          throw new IllegalArgumentException(
-            "Objeto esperado para entrada da camada MaxPooling é do tipo int[], " +
+            "\nObjeto esperado para entrada da camada MaxPooling é do tipo int[], " +
             "objeto recebido é do tipo " + entrada.getClass().getTypeName()
          );
       }
@@ -254,7 +254,7 @@ public class MaxPooling extends Camada{
          this.formEntrada = new int[]{1, e[0], e[1], e[2]};
       }else{         
          throw new IllegalArgumentException(
-            "O formato de entrada deve conter três elementos (profundidade, altura, largura) ou " +
+            "\nO formato de entrada deve conter três elementos (profundidade, altura, largura) ou " +
             "quatro elementos (primeiro elementos desconsiderado)" +
             "formato recebido possui " + e.length + " elementos."
          );
@@ -266,18 +266,22 @@ public class MaxPooling extends Camada{
       formSaida[2] = (formEntrada[2] - formFiltro[0]) / this.stride[0] + 1;//altura
       formSaida[3] = (formEntrada[3] - formFiltro[1]) / this.stride[1] + 1;//largura
       
-      this.entrada = new Tensor4D(formEntrada[0], formEntrada[1], formEntrada[2], formEntrada[3]);
+      this.entrada = new Tensor4D(formEntrada);
       this.gradEntrada = new Tensor4D(this.entrada);
-      this.saida = new Tensor4D(formSaida[0], formSaida[1], formSaida[2], formSaida[3]);
-      this.entrada.nome("Entrada");
-      this.gradEntrada.nome("Gradiente entrada");
-      this.saida.nome("Saída");
+      this.saida = new Tensor4D(formSaida);
 
       this.construida = true;//camada pode ser usada
    }
 
    @Override
    public void inicializar(){}
+
+   @Override
+   protected void configurarNomes(){
+      this.entrada.nome("Entrada");
+      this.gradEntrada.nome("Gradiente entrada");
+      this.saida.nome("Saída");
+   }
 
    @Override
    public void calcularSaida(Object entrada){
@@ -306,7 +310,7 @@ public class MaxPooling extends Camada{
 
       }else{
          throw new IllegalArgumentException(
-            "Tipo de entrada \"" + entrada.getClass().getTypeName() + "\" não suportada."
+            "\nTipo de entrada \"" + entrada.getClass().getTypeName() + "\" não suportada."
          );
       }
    }

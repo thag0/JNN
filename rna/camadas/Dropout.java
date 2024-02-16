@@ -175,11 +175,6 @@ public class Dropout extends Camada implements Cloneable{
       this.mascara =     new Tensor4D(this.entrada);
       this.saida =       new Tensor4D(this.entrada);
       this.gradEntrada = new Tensor4D(this.entrada);
-
-      this.entrada.nome("Entrada");
-      this.mascara.nome("Mascara");
-      this.saida.nome("Saida");
-      this.gradEntrada.nome("Gradiente entrada");
       
       this.construida = true;//camada pode ser usada
    }
@@ -194,6 +189,14 @@ public class Dropout extends Camada implements Cloneable{
     */
    public void configurarSeed(long seed){
       this.random.setSeed(seed);
+   }
+
+   @Override
+   protected void configurarNomes(){
+      this.entrada.nome("entrada");
+      this.mascara.nome("máscara");
+      this.saida.nome("saida");
+      this.gradEntrada.nome("gradiente entrada");    
    }
 
    /**
@@ -216,7 +219,7 @@ public class Dropout extends Camada implements Cloneable{
     */
    @Override
    public void calcularSaida(Object entrada){
-      super.verificarConstrucao();
+      verificarConstrucao();
 
       if(entrada instanceof Tensor4D){
          Tensor4D e = (Tensor4D) entrada;
@@ -243,11 +246,11 @@ public class Dropout extends Camada implements Cloneable{
 
       if(this.treinando){
          gerarMascaras();
-         this.entrada.mult(this.mascara);
-         this.saida.copiar(this.entrada);
+         this.entrada.mult(mascara);
+         saida.copiar(this.entrada);
 
       }else{
-         this.saida.copiar(this.entrada);
+         saida.copiar(this.entrada);
       }
    }
 
@@ -286,7 +289,7 @@ public class Dropout extends Camada implements Cloneable{
     */
    @Override
    public void calcularGradiente(Object gradSeguinte){
-      super.verificarConstrucao();
+      verificarConstrucao();
 
       if(gradSeguinte instanceof Tensor4D){
          Tensor4D g = (Tensor4D) gradSeguinte;
@@ -301,7 +304,7 @@ public class Dropout extends Camada implements Cloneable{
 
       }else{
          throw new IllegalArgumentException(
-            "Gradiente aceito para a camada de Dropout deve ser do tipo " + 
+            "\nGradiente aceito para a camada de Dropout deve ser do tipo " + 
             this.gradEntrada.getClass().getTypeName() +
             " ,objeto recebido é do tipo \"" + entrada.getClass().getTypeName() + "\"."
          );
@@ -312,19 +315,19 @@ public class Dropout extends Camada implements Cloneable{
 
    @Override
    public Object saida(){
-      super.verificarConstrucao();
+      verificarConstrucao();
       return this.saida;
    }
 
    @Override
    public int[] formatoEntrada(){
-      super.verificarConstrucao();
+      verificarConstrucao();
       return this.formEntrada;
    }
 
    @Override
    public int[] formatoSaida(){
-      super.verificarConstrucao();
+      verificarConstrucao();
       return this.formEntrada;
    }
 
@@ -344,6 +347,8 @@ public class Dropout extends Camada implements Cloneable{
 
    @Override
    public Dropout clonar(){
+      verificarConstrucao();
+
       try{
          Dropout clone = (Dropout) super.clone();
          clone.formEntrada = this.formEntrada.clone();
@@ -363,7 +368,7 @@ public class Dropout extends Camada implements Cloneable{
 
    @Override
    public Tensor4D obterGradEntrada(){
-      super.verificarConstrucao();
+      verificarConstrucao();
       return this.gradEntrada;
    }
 }

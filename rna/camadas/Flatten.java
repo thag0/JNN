@@ -115,12 +115,12 @@ public class Flatten extends Camada{
    public void construir(Object entrada){
       if(entrada == null){
          throw new IllegalArgumentException(
-            "Formato de entrada fornecida para camada Flatten é nulo."
+            "\nFormato de entrada fornecida para camada Flatten é nulo."
          );
       }
       if(entrada instanceof int[] == false){
          throw new IllegalArgumentException(
-            "Objeto esperado para entrada da camada Flatten é do tipo int[], " +
+            "\nObjeto esperado para entrada da camada Flatten é do tipo int[], " +
             "objeto recebido é do tipo " + entrada.getClass().getTypeName()
          );
       }
@@ -177,15 +177,18 @@ public class Flatten extends Camada{
       this.gradEntrada = new Tensor4D(this.entrada);
       this.saida = new Tensor4D(formSaida);
 
-      this.entrada.nome("Entrada");
-      this.saida.nome("Saída");
-      this.gradEntrada.nome("Gradiente Entrada");
-
       this.construida = true;//camada pode ser usada.
    }
 
    @Override
    public void inicializar(){}
+
+   @Override
+   protected void configurarNomes(){
+      this.entrada.nome("entrada");
+      this.saida.nome("saída");
+      this.gradEntrada.nome("gradiente Entrada");     
+   }
 
    /**
     * Achata os dados de entrada num formato sequencial.
@@ -221,7 +224,7 @@ public class Flatten extends Camada{
       }
 
       double[] arr = this.entrada.paraArray();
-      this.saida.copiarElementos(arr);
+      saida.copiarElementos(arr);
    }
 
    /**
@@ -231,7 +234,7 @@ public class Flatten extends Camada{
     */
    @Override
    public void calcularGradiente(Object gradSeguinte){
-      super.verificarConstrucao();
+      verificarConstrucao();
 
       if(gradSeguinte instanceof Tensor4D){
          Tensor4D g = (Tensor4D) gradSeguinte;
@@ -246,7 +249,7 @@ public class Flatten extends Camada{
       
       }else if(gradSeguinte instanceof double[]){
          double[] g = (double[]) gradSeguinte;
-         this.gradEntrada.copiarElementos(g);
+         gradEntrada.copiarElementos(g);
       
       }else{
          throw new IllegalArgumentException(
@@ -309,7 +312,7 @@ public class Flatten extends Camada{
 
    @Override
    public Object obterGradEntrada(){
-      super.verificarConstrucao();
+      verificarConstrucao();
       return this.gradEntrada;
    }
 

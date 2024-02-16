@@ -26,11 +26,11 @@ Até o momento o modelo sequencial está lidando perfeitamente bem com os métod
 
 Estou testando os modelos convolucionais no conjunto de dados do MNIST, atualmente estou usando todos os 10 dítigos para treino, onde cada dígito possui 200 amostras.
 
-Esse é o modelo que até agora teve a maior acurárcia entre os testes (91%)
+Esse é o modelo que até agora teve a maior acurárcia entre os testes (92%)
 
-![conv-mnist-91](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/841acff8-0fed-480e-8b04-773a35272f70)
+![modelo-mnist](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/e84701b4-ad04-4c52-8b64-dc7f98da80d1)
 
-Já estou bem satisfeito de ter conseguido esses resultados com o modelo convolucional, mas sempre há espaço para melhorias e quero continuar trabalhando nisso.
+Já estou bem satisfeito de ter conseguido esses resultados com o modelo convolucional, mas sempre há espaço para melhorias e quero continuar trabalhando nisso, principalmente acelerando as operações dentro da camada.
 
 # Regularização
 
@@ -38,7 +38,7 @@ Iniciei um pouco os estudos sobre a regularização e como evitar que os modelos
 
 Por enquanto a implementação mais fácil de fazer foi criar a camada de Dropout, que aleatoriamente durante o treinamento desativa algumas unidades para que não tenham contribuição no resultado final.
 
-A camada de Dropout é bem simples de usar, basta empilhar entre camadas (também funcionando com camadas que não sejam densas, porém não testado), como sugere na imagem de exemplo:
+A camada de Dropout é bem simples de usar, basta empilhar entre camadas, como sugere na imagem de exemplo:
 
 ![exemplo dropout](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/079fae89-dc01-4ea1-9b62-ef4dc3086200)
 
