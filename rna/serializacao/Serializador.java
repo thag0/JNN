@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 
 import rna.avaliacao.perda.Perda;
+import rna.camadas.AvgPooling;
 import rna.camadas.Camada;
 import rna.camadas.Convolucional;
 import rna.camadas.Densa;
@@ -19,15 +20,12 @@ import rna.modelos.Sequencial;
 import rna.otimizadores.Otimizador;
 
 /**
- * Classe responsável por tratar da serialização/desserialização de objetos
- * da {@Rede Neural}.
+ * Classe responsável por tratar da serialização/desserialização de modelos
+ * de {@Rede Neural} e {@code Sequencial}.
  * <p>
  *    Manipula os arquivos {@code .txt} baseados na rede para escrita e leitura, 
- *    possibilitando mais portabilidade de Redes Neurais treinadas.
+ *    possibilitando mais portabilidade de modelos treinados.
  * </p>
- * Os pesos salvos são do tipo double (8 bytes), caso seja necessário mais economia
- * de memória pode ser recomendável converter os arquivos escritos para o tipo float 
- * (4 bytes).
  */
 public class Serializador{
 
@@ -52,6 +50,11 @@ public class Serializador{
    private SerialMaxPool auxMaxPool = new SerialMaxPool();
 
    /**
+    * Auxiliar na serialização de camadas avg pooling.
+    */
+   private SerialAvgPool auxAvgPool = new SerialAvgPool();
+
+   /**
     * Auxiliar na serialização de camadas de dropout.
     */
    private SerialDropout auxDropout = new SerialDropout();
@@ -61,6 +64,21 @@ public class Serializador{
     */
    public Serializador(){}
 
+   /**
+    * Salva as informações mais essenciais sobre a Rede Neural incluindo arquitetura,
+    * funções de ativação de todas as camadas, bias configurado e o mais importante que
+    * são os pesos de cada neurônio da rede.
+    * <p>
+    *    <strong> Reforçando</strong>: as informações sobre o otimizador e todas suas 
+    *    configurações, treino, nome e outras pequenas coisas que não afetam diretamente 
+    *    o funcionamento da rede serão perdidas.
+    * </p>
+    * <p>
+    *    O arquivo deve ser salvo no formato {@code .txt}
+    * </p>
+    * @param rede instância de uma Rede Neural.
+    * @param caminho caminho onde o arquivo da rede será salvo.
+    */
    public void salvar(RedeNeural rede, String caminho){
       salvar(rede, caminho, "double");
    }
@@ -79,7 +97,7 @@ public class Serializador{
     * </p>
     * @param rede instância de uma Rede Neural.
     * @param caminho caminho onde o arquivo da rede será salvo.
-    * @param tipo classe contendo tipo de valor que será usado para salvar os pesos da Rede Neural.
+    * @param tipo tipo de dados salvo (double / float).
     */
    public void salvar(RedeNeural rede, String caminho, String tipo){
       File arquivo = new File(caminho);
@@ -175,6 +193,9 @@ public class Serializador{
             
             }else if(camada instanceof MaxPooling){
                auxMaxPool.serializar((MaxPooling) camada, bw);
+
+            }else if(camada instanceof AvgPooling){
+               auxAvgPool.serializar((AvgPooling) camada, bw);
 
             }else if(camada instanceof Dropout){
                auxDropout.serializar((Dropout) camada, bw);
@@ -306,6 +327,10 @@ public class Serializador{
                MaxPooling maxPooling = auxMaxPool.lerConfig(br);
                modelo.add(maxPooling);
             
+            }else if(nome.equalsIgnoreCase("avgpooling")){
+               AvgPooling avgPooling = auxAvgPool.lerConfig(br);
+               modelo.add(avgPooling);
+
             }else if(nome.equalsIgnoreCase("dropout")){
                Dropout dropout = auxDropout.lerConfig(br);
                modelo.add(dropout);

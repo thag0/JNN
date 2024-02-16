@@ -203,28 +203,21 @@ public abstract class Camada{
    }
 
    /**
-    * Lógica para o processamento dos dados recebidos pela camada.
+    * Propaga os dados de entrada pela camada.
     * <p>
-    *    Aqui as classes devem propagar os dados recebidos para
-    *    as suas saídas.
+    *    Resultados processados ficam salvos na {@code saída} da camada.
     * </p>
-    * O método deve levar em consideração o uso das funções de ativação
-    * diretamente no seu processo de propagação.
-    * @param entrada dados de entrada que poderão ser processados pela camada.
+    * @param entrada dados de entrada que serão processados pela camada.
     */
    public abstract void calcularSaida(Object entrada);
 
    /**
-    * Lógica para o cálculos dos gradientes de parâmetros treináveis dentro
-    * da camada.
+    * Retropropaga os gradientes recebidos para as camadas anteriores.
     * <p>
-    *    Aqui as classes devem retropropagar os gradientes vindos da camada
-    *    posterior, os usando para calcular seus próprios gradientes de parâmetros
-    *    treinaveis (kernels, bias, etc).
+    *    Resultados processados ficam salvos no {@code gradiente de entrada} 
+    *    da camada.
     * </p>
-    * O método deve levar em consideração o uso das funções de ativação
-    * diretamente no seu processo de retropropagação.
-    * @param gradSeguinte
+    * @param gradSeguinte gradiente da camada seguinte.
     */
    public abstract void calcularGradiente(Object gradSeguinte);
 
@@ -255,11 +248,7 @@ public abstract class Camada{
     * </pre>
     * @return array contendo os valores das dimensões de entrada da camada.
     */
-   public int[] formatoEntrada(){
-      throw new UnsupportedOperationException(
-         "\nImplementar formato de entrada da camada " + this.getClass().getTypeName() + "."
-      );
-   }
+   public abstract int[] formatoEntrada();
 
    /**
     * Lógica para retornar o formato configurado de saída da camada.
@@ -302,11 +291,7 @@ public abstract class Camada{
     * O resultado deve ser a quantidade total desses elementos.
     * @return número da parâmetros da camada.
     */
-   public int numParametros(){
-      throw new UnsupportedOperationException(
-         "\nImplementar número de parâmetros da camada " + this.getClass().getTypeName() + "."
-      );  
-   }
+   public abstract int numParametros();
 
    /**
     * Retorna o verificador de uso do bias dentro da camada.

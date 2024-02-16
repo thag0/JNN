@@ -8,6 +8,7 @@ import lib.ged.Dados;
 import lib.ged.Ged;
 import lib.geim.Geim;
 import rna.avaliacao.perda.EntropiaCruzada;
+import rna.camadas.AvgPooling;
 import rna.camadas.Convolucional;
 import rna.camadas.Densa;
 import rna.camadas.Dropout;
@@ -34,6 +35,26 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
       
+      double[][][] entrada1 = {
+         {
+            {1, 2},
+            {3, 4}
+         }
+      };
+      double[][][] grad1 = {
+         {
+            {1, 2},
+            {3, 4}
+         }
+      };
+
+      Tensor4D entrada2 = new Tensor4D(entrada1);
+
+      AvgPooling camada = new AvgPooling(new int[]{1, 2, 2}, new int[]{2, 2}, new int[]{2, 2});
+      camada.calcularSaida(entrada1);
+      camada.calcularGradiente(new Tensor4D(grad1));
+      camada.saida.print();
+      camada.gradEntrada.print();
    }
 
    /**
