@@ -569,12 +569,12 @@ public class Convolucional extends Camada implements Cloneable{
       this.derivada     = new Tensor4D(this.saida);
       this.gradSaida    = new Tensor4D(this.saida);
 
-      configurarNomes();
-      
       if(usarBias){
          this.bias      = new Tensor4D(1, 1, 1, numFiltros);
          this.gradBias  = new Tensor4D(this.bias);
       }
+
+      configurarNomes();
       
       this.treinavel = true;
       this.construida = true;//camada pode ser usada.
