@@ -6,6 +6,7 @@ import rna.modelos.Modelo;
 import rna.modelos.Sequencial;
 import rna.camadas.Camada;
 import rna.camadas.Densa;
+import rna.camadas.Dropout;
 import lib.ged.Dados;
 import lib.ged.Ged;
 
@@ -42,8 +43,10 @@ public class Classificador{
 
       //criando e configurando a rede neural
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Densa(qEntradas, 20, "leakyrelu"),
-         new Densa(20, "leakyrelu"),
+         new Densa(qEntradas, 10, "sigmoid"),
+         new Dropout(0.25),
+         new Densa(10, "sigmoid"),
+         new Dropout(0.25),
          new Densa(qSaidas, "softmax")
       });
 

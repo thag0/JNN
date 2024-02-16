@@ -99,11 +99,13 @@ public class OpTensor4D{
          );
       }
 
+      r.copiar(a, 0, idProfundidade);
+
       int linhas = r.dim3(), colunas = r.dim4();
       for(int i = 0; i < linhas; i++){
          for(int j = 0; j < colunas; j++){
-            r.editar(0, idProfundidade, i, j, (
-               a.elemento(0, idProfundidade, i, j) + b.elemento(0, idProfundidade, i, j)
+            r.add(0, idProfundidade, i, j, (
+               b.elemento(0, idProfundidade, i, j)
             ));
          }
       }

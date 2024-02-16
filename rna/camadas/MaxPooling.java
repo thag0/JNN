@@ -300,6 +300,10 @@ public class MaxPooling extends Camada{
             aplicarMaxPooling(this.entrada, this.saida, i);
          }
          
+      }else if(entrada instanceof double[][][]){
+         double[][][] e = (double[][][]) entrada;
+         this.entrada.copiar(e, 0);
+
       }else{
          throw new IllegalArgumentException(
             "Tipo de entrada \"" + entrada.getClass().getTypeName() + "\" não suportada."
