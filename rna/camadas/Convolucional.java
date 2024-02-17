@@ -698,11 +698,7 @@ public class Convolucional extends Camada implements Cloneable{
       if(usarBias){
          for(int i = 0; i < numFiltros; i++){
             double b = bias.elemento(0, 0, 0, i);
-            for(int j = 0; j < altSaida; j++){
-               for(int k = 0; k < largSaida; k++){
-                  somatorio.add(0, i, j, k, b);
-               }
-            }
+            somatorio.add2D(0, i, b);
          }
       }
 
@@ -730,23 +726,23 @@ public class Convolucional extends Camada implements Cloneable{
     */
    @Override
    public void calcularGradiente(Object gradSeguinte){
-      super.verificarConstrucao();
+      verificarConstrucao();
 
       if(gradSeguinte instanceof Tensor4D){
          Tensor4D g = (Tensor4D) gradSeguinte;
-         if(this.gradSaida.comparar3D(g) == false){
+         if(gradSaida.comparar3D(g) == false){
             throw new IllegalArgumentException(
                "\nAs três dimensões finais do tensor recebido " + g.dimensoesStr() +
                "são imcompatíveis as três primeira dimensões do tensor de gradiente"
             );
          }
 
-         this.gradSaida.copiar(g, 0);
+         gradSaida.copiar(g, 0);
 
       }else{
          throw new IllegalArgumentException(
             "Os gradientes para a camada Convolucional devem ser " +
-            "do tipo \"" + this.gradSaida.getClass().getTypeName() + 
+            "do tipo \"" + gradSaida.getClass().getTypeName() + 
             "\", objeto recebido é do tipo \"" + gradSeguinte.getClass().getTypeName() + "\""
          );
       }
@@ -759,7 +755,7 @@ public class Convolucional extends Camada implements Cloneable{
 
       if(usarBias){
          for(int i = 0; i < numFiltros; i++){
-            this.gradBias.editar(0, 0, 0, i, derivada.somarElementos2D(0, i));
+            gradBias.editar(0, 0, 0, i, derivada.somarElementos2D(0, i));
          }
       }
    }

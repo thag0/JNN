@@ -2,6 +2,7 @@ package testes;
 
 import java.awt.image.BufferedImage;
 import java.nio.Buffer;
+import java.sql.Time;
 import java.util.concurrent.TimeUnit;
 
 import lib.ged.Dados;
@@ -35,19 +36,6 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
       
-      double[][][] amostra = {
-         {
-            {1, 2, 3, 4},
-            {8, 7, 6, 5},
-            {1, 2, 3, 4},
-            {8, 7, 6, 5},
-         }
-      };
-
-      Tensor4D entrada = new Tensor4D(amostra);
-      Convolucional conv = new Convolucional(new int[]{1, 4, 4}, new int[]{3, 3}, 2);
-      conv.inicializar();
-      conv.filtros.print(2);
    }
 
    /**

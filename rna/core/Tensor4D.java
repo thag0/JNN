@@ -50,6 +50,9 @@ public class Tensor4D{
    /**
     * Inicializa um tensor com quatro dimensões a partir de outra instância de 
     * Tensor4D.
+    * <p>
+    *    O conteúdo do tensor recebido será copiado.
+    * </p>
     * @param tensor tensor desejado.
     */
    public Tensor4D(Tensor4D tensor){
@@ -69,14 +72,20 @@ public class Tensor4D{
    }
 
    /**
-    * Inicializa um tensor com quatro dimensões a partir de um tensor primitivo
-    * do tipo double[][][][]
+    * Inicializa um tensor com quatro dimensões a partir de um tensor quadridimensional
+    * primitivo.
+    * <p>
+    *    O formato do tensor criado será:
+    * </p>
+    * <pre>
+    *    formato = (dim4, dim3, dim2, dim1)
+    * </pre>
     * @param tensor tensor desejado.
     */
    public Tensor4D(double[][][][] tensor){
       if(tensor == null){
          throw new IllegalArgumentException(
-            "O tensor fornecido é nulo."
+            "\nO tensor fornecido é nulo."
          );
       }
 
@@ -92,12 +101,18 @@ public class Tensor4D{
    /**
     * Inicializa um tensor com quatro dimensões a partir de um tensor tridimensional
     * primitivo.
+    * <p>
+    *    O formato do tensor criado será:
+    * </p>
+    * <pre>
+    *    formato = (1, profundidade, linhas, colunas)
+    * </pre>
      * @param tensor tensor desejado.
     */
    public Tensor4D(double[][][] tensor){
       if(tensor == null){
          throw new IllegalArgumentException(
-            "O tensor fornecido é nulo."
+            "\nO tensor fornecido é nulo."
          );
       }
 
@@ -107,25 +122,33 @@ public class Tensor4D{
       this.d4 = tensor[0][0].length;
       this.dados = new double[d1*d2*d3*d4];
 
-      int cont = 0;
-      for(int i = 0; i < d2; i++){
-         for(int j = 0; j < d3; j++){
-            for(int k = 0; k < d4; k++){
-               dados[cont++] = tensor[i][j][k];
-            }
-         }
-      }
+      copiar(tensor, 0);
    }
 
    /**
     * Inicializa um tensor com quatro dimensões a partir de uma matriz primitiva.
+    * <p>
+    *    O formato do tensor criado será:
+    * </p>
+    * <pre>
+    *    formato = (1, 1, linhas, colunas)
+    * </pre>
     * @param matriz matriz desejado.
     */
    public Tensor4D(double[][] matriz){
       if(matriz == null){
          throw new IllegalArgumentException(
-            "A matriz fornecida é nula."
+            "\nA matriz fornecida é nula."
          );
+      }
+
+      int col = matriz[0].length;
+      for(int i = 1; i < matriz.length; i++){
+         if(matriz[i].length != col){
+            throw new IllegalArgumentException(
+               "\nA matriz deve conter a mesma quantidade de linhas para todas as colunas."
+            );
+         }
       }
 
       this.d1 = 1;
@@ -134,22 +157,23 @@ public class Tensor4D{
       this.d4 = matriz[0].length;
       this.dados = new double[d1*d2*d3*d4];
 
-      int cont = 0;
-      for(int i = 0; i < d3; i++){
-         for(int j = 0; j < d4; j++){
-            dados[cont++] = matriz[i][j];
-         }
-      }
+      copiar(matriz, 0, 0);
    }
 
    /**
     * Inicializa um tensor com quatro dimensões a partir de um array primitivo.
+    * <p>
+    *    O formato do tensor criado será:
+    * </p>
+    * <pre>
+    *    formato = (1, 1, 1, tamanhoArray)
+    * </pre>
     * @param array array desejado.
     */
    public Tensor4D(double[] array){
       if(array == null){
          throw new IllegalArgumentException(
-            "A matriz fornecida é nula."
+            "\nO array fornecido é nulo."
          );
       }
 
@@ -164,17 +188,17 @@ public class Tensor4D{
 
    /**
     * Inicializa um tensor com quatro dimensões de acordo com os valores fornecidos.
-    * @param d1 índice da primeira dimensão.
-    * @param d2 índice da segunda dimensão.
-    * @param d3 índice da terceira dimensão.
-    * @param d4 índice da quarta dimensão.
+    * @param dim1 índice da primeira dimensão.
+    * @param dim2 índice da segunda dimensão.
+    * @param dim3 índice da terceira dimensão.
+    * @param dim4 índice da quarta dimensão.
     * @param elementos array de elementos com dados predefinidos.
     */
-   public Tensor4D(int d1, int d2, int d3, int d4, double[] elementos){
-      if(d1 < 1 || d2 < 1 || d3 < 1 || d4 < 1){
+   public Tensor4D(int dim1, int dim2, int dim3, int dim4, double[] elementos){
+      if(dim1 < 1 || dim2 < 1 || dim3 < 1 || dim4 < 1){
          throw new IllegalArgumentException(
             "\nOs valores de dimensões não podem ser menores que 1, recebido: (" +
-            d1 + ", " + d2 + ", " + d3 + ", " + d4 + ")."
+            dim1 + ", " + dim2 + ", " + dim3 + ", " + dim4 + ")."
          );
       }
 
@@ -184,16 +208,16 @@ public class Tensor4D{
          );
       }
       
-      if((d1*d2*d3*d4) != elementos.length){
+      if((dim1*dim2*dim3*dim4) != elementos.length){
          throw new IllegalArgumentException(
             "\nOs valores de índices não correspondem a quantidade de elementos recebida."
          );
       }
 
-      this.d1 = d1;
-      this.d2 = d2;
-      this.d3 = d3;
-      this.d4 = d4;
+      this.d1 = dim1;
+      this.d2 = dim2;
+      this.d3 = dim3;
+      this.d4 = dim4;
 
       this.dados = new double[elementos.length];
       System.arraycopy(elementos, 0, dados, 0, dados.length);
@@ -204,13 +228,13 @@ public class Tensor4D{
     * <p>
     *    O conteúdo do tensor estará zerado.
     * </p>
-    * @param d1 índice da primeira dimensão.
-    * @param d2 índice da segunda dimensão.
-    * @param d3 índice da terceira dimensão.
-    * @param d4 índice da quarta dimensão.
+    * @param dim1 índice da primeira dimensão.
+    * @param dim2 índice da segunda dimensão.
+    * @param dim3 índice da terceira dimensão.
+    * @param dim4 índice da quarta dimensão.
     */
-   public Tensor4D(int d1, int d2, int d3, int d4){
-      this(d1, d2, d3, d4, new double[d1*d2*d3*d4]);
+   public Tensor4D(int dim1, int dim2, int dim3, int dim4){
+      this(dim1, dim2, dim3, dim4, new double[dim1*dim2*dim3*dim4]);
    }
 
    /**
@@ -230,7 +254,12 @@ public class Tensor4D{
       if(dimensoes.length > 4){
          throw new IllegalArgumentException(
             "\nA quantidade de dimensões deve conter no máximo quatro elementos, " +
-            "recebido " + dimensoes().length
+            "recebido " + dimensoes().length + "."
+         );
+      }
+      if((dimensoes[0] < 1) || (dimensoes[1] < 1) || (dimensoes[2] < 1) || (dimensoes[3] < 1)){
+         throw new IllegalArgumentException(
+            "\nOs valores de dimensões devem ser maiores que zero."
          );
       }
       
@@ -285,7 +314,7 @@ public class Tensor4D{
    }
 
    /**
-    * Preenche o conteúdo do tensor com um valor constante.
+    * Preenche todo o conteúdo do tensor com um valor constante.
     * @param valor valor desejado.
     */
    public void preencher(double valor){
@@ -429,7 +458,7 @@ public class Tensor4D{
          ){
          throw new IllegalArgumentException(
             "\nDimensões " + dimensoesStr() + " incompatíveis com as do" + 
-            " tensor recebido (" 
+            " array recebido (" 
             + arr.length + ", " + arr[0].length + ", " + arr[0][0].length + ", " + arr[0][0][0].length + ")."
          );
       }
@@ -798,25 +827,49 @@ public class Tensor4D{
    /**
     * Edita o conteúdo do tensor para que o valor fornecido esteja
     * configurado de acordo com os índices fornecidos.
-    * @param d1 índice da primeira dimensão.
-    * @param d2 índice da segunda dimensão.
-    * @param d3 índice da terceira dimensão.
-    * @param d4 índice da quarta dimensão.
+    * @param dim1 índice da primeira dimensão.
+    * @param dim2 índice da segunda dimensão.
+    * @param dim3 índice da terceira dimensão.
+    * @param dim4 índice da quarta dimensão.
     * @param valor valor desejado.
     */
-   public void editar(int d1, int d2, int d3, int d4, double valor){
-      dados[indice(d1, d2, d3, d4)] = valor;
+   public void editar(int dim1, int dim2, int dim3, int dim4, double valor){
+      dados[indice(dim1, dim2, dim3, dim4)] = valor;
    }
 
    /**
-    * TODO
-    * @param dim1
-    * @param dim2
-    * @param idLinhas
-    * @param quantidade
-    * @return
+    * Copia o conteúdo de uma linha do tensor e repete ela na quantidade fornecida.
+    * <p>
+    *    Exemplo:
+    * </p>
+    * <pre>
+    *tensor = [
+    * [
+    *  [
+    *   1, 2, 3 
+    *  ]  
+    * ]  
+    *]
+    *
+    *bloco = bloco2D(0, 0, 0, 3);
+    *
+    *tensorBloco = [
+    * [
+    *  [
+    *   1, 2, 3
+    *   1, 2, 3
+    *   1, 2, 3
+    *  ]  
+    * ]  
+    *]
+    * </pre>
+    * @param dim1 índice da primeira dimensão.
+    * @param dim2 índice da segunda dimensão.
+    * @param dim3 índice da terceira dimensão.
+    * @param quantidade quantidade de repetições.
+    * @return novo tensor com o resultado.
     */
-   public Tensor4D bloco2D(int dim1, int dim2, int idLinha, int quantidade){
+   public Tensor4D bloco2D(int dim1, int dim2, int dim3, int quantidade){
       if(dim1 < 0 || dim1 >= d1){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
@@ -827,16 +880,16 @@ public class Tensor4D{
             "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
          );
       }
-      if(idLinha < 0 || idLinha >= d3){
+      if(dim3 < 0 || dim3 >= d3){
          throw new IllegalArgumentException(
-            "\nÍndice de linha (" + idLinha + ") inválido."
+            "\nÍndice da terceira dimensão (" + dim3 + ") inválido."
          );
       }
 
 
       Tensor4D bloco = new Tensor4D(1, 1, quantidade, d4);
       
-      double[] arr = array1D(dim1, dim2, idLinha);
+      double[] arr = array1D(dim1, dim2, dim3);
 
       for(int i = 0; i < quantidade; i++){
          for(int j = 0; j < d4; j++){
@@ -851,11 +904,11 @@ public class Tensor4D{
     * Transoforma o conteúdo das últimas duas dimensões do tensor em uma matriz
     * identidade.
     * <p>
-    *    Na matriz itenditade todos os valores são zerados e os valores da diagonal
+    *    Na matriz identidade todos os valores são zerados e os valores da diagonal
     *    principal são editados para 1.
     * </p>
-    * @param d1 índice da primeira dimensão.
-    * @param d2 índice da segunda dimensão.
+    * @param dim1 índice da primeira dimensão.
+    * @param dim2 índice da segunda dimensão.
     */
    public void identidade2D(int dim1, int dim2){
       if(dim1 < 0 || dim1 >= d1){
@@ -910,6 +963,31 @@ public class Tensor4D{
    }
 
    /**
+    * Adiciona o valor fornecido ao conteúdo das duas últimas dimensões do tensor.
+    * @param dim1 índice da primeira dimensão.
+    * @param dim2 índice da segunda dimensão.
+    * @param valor valor desejado.
+    */
+   public void add2D(int dim1, int dim2, double valor){
+      if(dim1 < 0 || dim1 >= d1){
+         throw new IllegalArgumentException(
+            "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
+         );
+      }
+      if(dim2 < 0 || dim2 >= d2){
+         throw new IllegalArgumentException(
+            "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
+         );
+      }
+
+      int inicio = indice(dim1, dim2, 0, 0);
+      int fim = inicio + (d3*d4);
+      for(int i = inicio; i < fim; i++){
+         dados[i] += valor;
+      }
+   }
+
+   /**
     * Subtrai todo o conteúdo {@code elemento a elemento} do tensor recebido, seguindo
     * a expressão:
     * <pre>
@@ -943,6 +1021,31 @@ public class Tensor4D{
    }
 
    /**
+    * Subtrai o valor fornecido ao conteúdo das duas últimas dimensões do tensor.
+    * @param dim1 índice da primeira dimensão.
+    * @param dim2 índice da segunda dimensão.
+    * @param valor valor desejado.
+    */
+   public void sub2D(int dim1, int dim2, double valor){
+      if(dim1 < 0 || dim1 >= d1){
+         throw new IllegalArgumentException(
+            "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
+         );
+      }
+      if(dim2 < 0 || dim2 >= d2){
+         throw new IllegalArgumentException(
+            "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
+         );
+      }
+
+      int inicio = indice(dim1, dim2, 0, 0);
+      int fim = inicio + (d3*d4);
+      for(int i = inicio; i < fim; i++){
+         dados[i] -= valor;
+      }
+   }
+
+   /**
     * Multiplica todo o conteúdo {@code elemento a elemento} do tensor recebido, seguindo
     * a expressão:
     * <pre>
@@ -973,6 +1076,31 @@ public class Tensor4D{
     */
    public void mult(int d1, int d2, int d3, int d4, double valor){
       dados[indice(d1, d2, d3, d4)] *= valor;
+   }
+
+   /**
+    * Multiplica o valor fornecido ao conteúdo das duas últimas dimensões do tensor.
+    * @param dim1 índice da primeira dimensão.
+    * @param dim2 índice da segunda dimensão.
+    * @param valor valor desejado.
+    */
+    public void mult2D(int dim1, int dim2, double valor){
+      if(dim1 < 0 || dim1 >= d1){
+         throw new IllegalArgumentException(
+            "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
+         );
+      }
+      if(dim2 < 0 || dim2 >= d2){
+         throw new IllegalArgumentException(
+            "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
+         );
+      }
+
+      int inicio = indice(dim1, dim2, 0, 0);
+      int fim = inicio + (d3*d4);
+      for(int i = inicio; i < fim; i++){
+         dados[i] *= valor;
+      }
    }
 
    /**
@@ -1013,6 +1141,31 @@ public class Tensor4D{
    }
 
    /**
+    * Divide o valor fornecido ao conteúdo das duas últimas dimensões do tensor.
+    * @param dim1 índice da primeira dimensão.
+    * @param dim2 índice da segunda dimensão.
+    * @param valor valor desejado.
+    */
+    public void div2D(int dim1, int dim2, double valor){
+      if(dim1 < 0 || dim1 >= d1){
+         throw new IllegalArgumentException(
+            "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
+         );
+      }
+      if(dim2 < 0 || dim2 >= d2){
+         throw new IllegalArgumentException(
+            "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
+         );
+      }
+
+      int inicio = indice(dim1, dim2, 0, 0);
+      int fim = inicio + (d3*d4);
+      for(int i = inicio; i < fim; i++){
+         dados[i] /= valor;
+      }
+   }
+
+   /**
     * Retorna o conteúdo do tensor no formato de array
     * @return conteúdo do tensor.
     */
@@ -1023,9 +1176,9 @@ public class Tensor4D{
    /**
     * Retorna um array de uma dimensão de acordo com os índices
     * especificados.
-    * @param d1 índice da primeira dimensão.
-    * @param d2 índice da segunda dimensão.
-    * @param d3 índice da terceira dimensão.
+    * @param dim1 índice da primeira dimensão.
+    * @param dim2 índice da segunda dimensão.
+    * @param dim3 índice da terceira dimensão.
     * @return array contendo os elementos.
     */
    public double[] array1D(int dim1, int dim2, int dim3){
@@ -1047,9 +1200,8 @@ public class Tensor4D{
 
       double[] res = new double[d4];
 
-      for(int i = 0; i < d4; i++){
-         res[i] = elemento(dim1, dim2, dim3, i);
-      }
+      int inicio = indice(dim1, dim2, dim3, 0);
+      System.arraycopy(this.dados, inicio, res, 0, d4);
 
       return res;
    }
@@ -1057,8 +1209,8 @@ public class Tensor4D{
    /**
     * Retorna um array de duas dimensões de acordo com os índices
     * especificados.
-    * @param d1 índice da primeira dimensão.
-    * @param d2 índice da segunda dimensão.
+    * @param dim1 índice da primeira dimensão.
+    * @param dim2 índice da segunda dimensão.
     * @return array contendo os elementos.
     */
    public double[][] array2D(int dim1, int dim2){
@@ -1075,19 +1227,19 @@ public class Tensor4D{
 
       double[][] res = new double[d3][d4];
 
+      int inicio;
       for(int i = 0; i < d3; i++){
-         for(int j = 0; j < d4; j++){
-            res[i][j] = elemento(dim1, dim2, i, j);
-         }
+         inicio = indice(dim1, dim2, i, 0);
+         System.arraycopy(this.dados, inicio, res[i], 0, d4);
       }
 
       return res;
    }
 
    /**
-    * Retorna um array de três dimensões de acordo com os índices
-    * especificados.
-    * @param d1 índice da primeira dimensão.
+    * Retorna um array de três dimensões de acordo com o índice
+    * especificado.
+    * @param dim1 índice da primeira dimensão.
     * @return array contendo os elementos.
     */
    public double[][][] array3D(int dim1){
@@ -1099,11 +1251,11 @@ public class Tensor4D{
 
       double[][][] res = new double[d2][d3][d4];
 
+      int inicio;
       for(int i = 0; i < d2; i++){
          for(int j = 0; j < d3; j++){
-            for(int k = 0; k < d4; k++){
-               res[i][j][k] = elemento(dim1, i, j, k);
-            }
+            inicio = indice(dim1, i, j, 0);
+            System.arraycopy(this.dados, inicio, res[i][j], 0, d4);
          }
       }
 
@@ -1133,7 +1285,7 @@ public class Tensor4D{
                for(int l = 0; l < d4; l++){
                   double valor = dados[indice(i, j, k, l)];
                   String formato = String.format("%." + casas + "f", valor);
-                  sb.append(valor > 0 ? "+" : "");
+                  sb.append(valor >= 0 ? " " : "");//alinhamento de valores negativos e positivos
                   sb.append(formato).append("   ");
                }
                sb.append("\n");

@@ -25,7 +25,7 @@ public class Conv{
       ged.limparConsole();
       
       Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/conv-mnist-92.txt");
-      modelo.info();
+      // modelo.info();
 
       // testarModelo(modelo, digitos, amostras);
       // testarTodosDados(modelo);
