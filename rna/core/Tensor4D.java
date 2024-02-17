@@ -20,22 +20,22 @@ public class Tensor4D{
    /**
     * Primeira dimensão do tensor.
     */
-   int d1;
+   private int d1;
     
    /**
     * Segunda dimensão do tensor.
     */
-   int d2;
+   private int d2;
 
    /**
     * Terceira dimensão do tensor.
     */
-   int d3;
+    private int d3;
 
    /**
     * Quarta dimensão do tensor
     */
-   int d4;
+    private int d4;
 
    /**
     * Conjunto de elementos do tensor.
@@ -1112,12 +1112,17 @@ public class Tensor4D{
 
    /**
     * Exibe todo o conteúdo do tensor.
+    * @param casas quantidade de casas decimais que serão exibidas. Esse
+    * valor só {@code será usado caso seja maior que zero}. Por padrão são usadas
+    * 15 casas decimais. A quantidade de casas usadas pode afetar a legibilidade
+    * do conteúdo.
     */
-   public void print(){
+   public void print(int casas){
       String pad = "   ";
       StringBuilder sb = new StringBuilder();
 
-      //nem me pergunte
+      casas = (casas > 0) ? casas : 15;
+
       sb.append(nome + " " + dimensoesStr() + " = [\n");
       for(int i = 0; i < d1; i++){
          sb.append(pad + "[\n");
@@ -1126,7 +1131,10 @@ public class Tensor4D{
             for(int k = 0; k < d3; k++){
                sb.append(pad + pad + pad);
                for(int l = 0; l < d4; l++){
-                  sb.append(dados[indice(i, j, k, l)] + "  ");
+                  double valor = dados[indice(i, j, k, l)];
+                  String formato = String.format("%." + casas + "f", valor);
+                  sb.append(valor > 0 ? "+" : "");
+                  sb.append(formato).append("   ");
                }
                sb.append("\n");
             }
@@ -1140,6 +1148,13 @@ public class Tensor4D{
       sb.append("]\n");
 
       System.out.println(sb.toString());
+   }
+
+   /**
+    * Exibe todo o conteúdo do tensor.
+    */
+   public void print(){
+      print(15);
    }
 
    /**

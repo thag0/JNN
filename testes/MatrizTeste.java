@@ -35,26 +35,19 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
       
-      double[][][] entrada1 = {
+      double[][][] amostra = {
          {
-            {1, 2},
-            {3, 4}
-         }
-      };
-      double[][][] grad1 = {
-         {
-            {1, 2},
-            {3, 4}
+            {1, 2, 3, 4},
+            {8, 7, 6, 5},
+            {1, 2, 3, 4},
+            {8, 7, 6, 5},
          }
       };
 
-      Tensor4D entrada2 = new Tensor4D(entrada1);
-
-      AvgPooling camada = new AvgPooling(new int[]{1, 2, 2}, new int[]{2, 2}, new int[]{2, 2});
-      camada.calcularSaida(entrada1);
-      camada.calcularGradiente(new Tensor4D(grad1));
-      camada.saida.print();
-      camada.gradEntrada.print();
+      Tensor4D entrada = new Tensor4D(amostra);
+      Convolucional conv = new Convolucional(new int[]{1, 4, 4}, new int[]{3, 3}, 2);
+      conv.inicializar();
+      conv.filtros.print(2);
    }
 
    /**

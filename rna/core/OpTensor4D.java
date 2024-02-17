@@ -4,10 +4,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Auxiliar em operação para tensores 4D.
+ */
 public class OpTensor4D{
 
+   /**
+    * Auxiliar na opeação com arrays.
+    */
    OpArray oparr = new OpArray();
    
+   /**
+    * Auxiliar em operação para tensores 4D.
+    */
    public OpTensor4D(){}
 
    /**
@@ -24,17 +33,39 @@ public class OpTensor4D{
       return true;
    }
 
-
    /**
-    * 
-    * @param tensor
-    * @param idProfundidade
+    * Copia o conteúdo das duas últimas dimensões do tensor para o destino.
+    * @param tensor tensor base.
+    * @param destino tensor de destino da cópia.
+    * @param dimA índies das duas primeiras dimensões do tensor base (dim1, dim2)
+    * @param dimA índies das duas primeiras dimensões do tensor de destino (dim1, dim2)
     */
-   public void copiarMatriz(Tensor4D a, Tensor4D r, int idProfundidade){
-      for(int i = 0; i < r.dim3(); i++){
-         for(int j = 0; j < r.dim4(); j++){
-            r.editar(0, idProfundidade, i, j, (
-               a.elemento(0, idProfundidade, i, j)
+   public void copiarMatriz(Tensor4D tensor, Tensor4D destino, int[] dimA, int[] dimB){
+      if(tensor.comparar2D(destino) == false){
+         throw new IllegalArgumentException(
+            "\nAs duas últimas dimensões do tensor recebido " + tensor.dimensoesStr() +
+            " e de destino " + destino.dimensoesStr() + " devem ser iguais."
+         );
+      }
+
+      if((dimA[0] < 0 || dimA[0] >= tensor.dim1()) || (dimA[1] < 0 || dimA[1] >= tensor.dim2())){
+         throw new IllegalArgumentException(
+            "\nÍndices do tensor base (" + dimA[0] + ", " + dimA[1] + ") " +
+            "inválidos para o tensor com dimensões " + tensor.dimensoesStr()
+         );
+      }
+
+      if((dimB[0] < 0 || dimB[0] >= destino.dim1()) || (dimB[1] < 0 || dimB[1] >= destino.dim2())){
+         throw new IllegalArgumentException(
+            "\nÍndices do tensor de destino (" + dimB[0] + ", " + dimB[1] + ") " +
+            "inválidos para o tensor de destino com dimensões " + destino.dimensoesStr()
+         );
+      }
+
+      for(int i = 0; i < destino.dim3(); i++){
+         for(int j = 0; j < destino.dim4(); j++){
+            destino.editar(dimB[0], dimB[1], i, j, (
+               tensor.elemento(dimA[0], dimA[1], i, j)
             ));
          }
       }
@@ -343,10 +374,6 @@ public class OpTensor4D{
          );
       }
 
-      System.out.println(a.nome() + " " + a.dimensoesStr());
-      System.out.println(b.nome() + " " + b.dimensoesStr());
-      System.out.println(r.nome() + " " + r.dimensoesStr());
-
       int linhas = r.dim3(), colunas = r.dim4();
       for(int i = 0; i < linhas; i++){
          for(int j = 0; j < colunas; j++){
@@ -520,68 +547,41 @@ public class OpTensor4D{
 
    /**
     * Realiza a operação de correlação cruzada (apenas 2D) entre dois tensores usando
-    * a dimensão de profundidade desejada.
+    * a dimensão primeira dimensão dos tensores e a segunda dimensão (profundidade) desejada.
     * @param entrada tensor com a matriz de entrada.
     * @param kernel tensor com a matriz de kernel.
     * @param saida tensor de destino.
     * @param idProfundidade índice do canal de profundidade desejado.
     */
    public void correlacao2D(Tensor4D entrada, Tensor4D kernel, Tensor4D saida, int idProfundidade){
-      if(idProfundidade < 0 || idProfundidade >= entrada.dim2()){
-         throw new IllegalArgumentException(
-            "\nO tensor de entrada " + entrada.dimensoesStr() + 
-            " não possui a profundidade desejada ("+ idProfundidade + ")."
-         );
-      }
-      if(idProfundidade < 0 || idProfundidade >= kernel.dim2()){
-         throw new IllegalArgumentException(
-            "\nO tensor de kernel " + entrada.dimensoesStr() + 
-            " não possui a profundidade desejada ("+ idProfundidade + ")."
-         );
-      }
-
-      int alturaEsperada = entrada.dim3()-kernel.dim3()+1;
-      int larguraEsperada = entrada.dim4()-kernel.dim4()+1;
-      if(saida.dim3() != alturaEsperada){
-         throw new IllegalArgumentException(
-            "\nAltura da saída (" + saida.dim3() + 
-            ") íncompatível com o valor esperado (" + alturaEsperada + ")."
-         );
-      }
-      if(saida.dim4() != larguraEsperada){
-         throw new IllegalArgumentException(
-            "\nAltura da saída (" + saida.dim4() + 
-            ") íncompatível com o valor esperado (" + larguraEsperada + ")."
-         );
-      }
-
-      int alturaKernel = kernel.dim3();
-      int larguraKernel = kernel.dim4();
-      for(int i = 0; i < alturaEsperada; i++){
-         for(int j = 0; j < larguraEsperada; j++){
-            double soma = 0.0;
-            for(int m = 0; m < alturaKernel; m++){
-                 for(int n = 0; n < larguraKernel; n++){
-                  int posX = i + m;
-                  int posY = j + n;
-                  soma += entrada.elemento(0, idProfundidade, posX, posY) * 
-                           kernel.elemento(0, idProfundidade, m, n);
-               }
-             }
-            saida.editar(0, idProfundidade, i, j, soma);
-         }
-      }
+      correlacao2D(
+         entrada, 
+         kernel, 
+         saida, 
+         new int[]{0, idProfundidade}, 
+         new int[]{0, idProfundidade}, 
+         new int[]{0, idProfundidade}, 
+         false
+      );
    }
 
    /**
     * Realiza a operação de correlação cruzada (apenas 2D) entre dois tensores usando
-    * a primeira dimensão de profundidade.
+    * as duas primeiras dimensões de profundidade.
     * @param entrada tensor com a matriz de entrada.
     * @param kernel tensor com a matriz de kernel.
     * @param saida tensor de destino.
     */
    public void correlacao2D(Tensor4D entrada, Tensor4D kernel, Tensor4D saida){
-      correlacao2D(entrada, kernel, saida, 0);
+      correlacao2D(
+         entrada, 
+         kernel, 
+         saida, 
+         new int[]{0, 0}, 
+         new int[]{0, 0}, 
+         new int[]{0, 0}, 
+         false
+      );
    }
 
    /**
@@ -654,6 +654,45 @@ public class OpTensor4D{
             saida.add(idSaida[0], idSaida[1], i, j, soma);
          }
       }
+   }
+
+   /**
+    * Realiza a operação de convolução (apenas 2D) entre dois tensores usando
+    * a dimensão primeira dimensão dos tensores e a segunda dimensão (profundidade) desejada.
+    * @param entrada tensor com a matriz de entrada.
+    * @param kernel tensor com a matriz de kernel.
+    * @param saida tensor de destino.
+    * @param idProfundidade índice do canal de profundidade desejado.
+    */
+   public void convolucao2D(Tensor4D entrada, Tensor4D kernel, Tensor4D saida, int idProfundidade){
+      convolucao2D(
+         entrada, 
+         kernel, 
+         saida, 
+         new int[]{0, idProfundidade}, 
+         new int[]{0, idProfundidade}, 
+         new int[]{0, idProfundidade}, 
+         false
+      );
+   }
+
+   /**
+    * Realiza a operação de correlação convolução (apenas 2D) entre dois tensores usando
+    * a primeira dimensão de profundidade.
+    * @param entrada tensor com a matriz de entrada.
+    * @param kernel tensor com a matriz de kernel.
+    * @param saida tensor de destino.
+    */
+   public void convolucao2D(Tensor4D entrada, Tensor4D kernel, Tensor4D saida){
+      convolucao2D(
+         entrada, 
+         kernel, 
+         saida, 
+         new int[]{0, 0}, 
+         new int[]{0, 0}, 
+         new int[]{0, 0}, 
+         false
+      );
    }
 
    /**
@@ -733,62 +772,6 @@ public class OpTensor4D{
    }
 
    /**
-    * Realiza a operação de correlação convolução (apenas 2D) entre dois tensores usando
-    * a dimensão de profundidade desejada.
-    * @param entrada tensor com a matriz de entrada.
-    * @param kernel tensor com a matriz de kernel.
-    * @param saida tensor de destino.
-    * @param idProfundidade índice do canal de profundidade desejado.
-    */
-   public void convolucao2D(Tensor4D entrada, Tensor4D kernel, Tensor4D saida, int idProfundidade){
-      int alturaEsperada = entrada.dim3() - kernel.dim3() + 1;
-      int larguraEsperada = entrada.dim4() - kernel.dim4() + 1;
-      
-      if(saida.dim3() != alturaEsperada){
-         throw new IllegalArgumentException(
-            "\nAltura da saída (" + saida.dim3() + ") incompatível com o valor esperado (" + alturaEsperada + ")."
-         );
-      }
-      
-      if(saida.dim4() != larguraEsperada){
-         throw new IllegalArgumentException(
-            "\nLargura da saída (" + saida.dim4() + ") incompatível com o valor esperado (" + larguraEsperada + ")."
-         );
-      }
-  
-      int alturaKernel = kernel.dim3();
-      int larguraKernel = kernel.dim4();
-
-      Tensor4D rotacionado = rotacionarMatriz180(kernel, 0, idProfundidade);
-  
-      for(int i = 0; i < alturaEsperada; i++){
-         for(int j = 0; j < larguraEsperada; j++){
-            double soma = 0.0;
-            for(int m = 0; m < alturaKernel; m++){
-                 for(int n = 0; n < larguraKernel; n++){
-                  int posX = i + m;
-                  int posY = j + n;
-                  soma += entrada.elemento(0, idProfundidade, posX, posY) * 
-                           rotacionado.elemento(0, idProfundidade, m, n);
-               }
-             }
-            saida.editar(0, idProfundidade, i, j, soma);
-         }
-      }
-   }
-
-   /**
-    * Realiza a operação de correlação convolução (apenas 2D) entre dois tensores usando
-    * a primeira dimensão de profundidade.
-    * @param entrada tensor com a matriz de entrada.
-    * @param kernel tensor com a matriz de kernel.
-    * @param saida tensor de destino.
-    */
-   public void convolucao2D(Tensor4D entrada, Tensor4D kernel, Tensor4D saida){
-      convolucao2D(entrada, kernel, saida, 0);
-   }
-
-   /**
     * Método exluviso para a propagação direta de camadas convolucionais
     * @param entrada tensor de entrada.
     * @param kernel tensor dos kernels.
@@ -798,7 +781,7 @@ public class OpTensor4D{
       int numFiltros = kernel.dim1();
       int profEntrada = kernel.dim2();
       
-      if(profEntrada <= 1){//arbritário
+      if(profEntrada <= 2){//arbritário
          int[] idEntrada = {0, 0};
          int[] idKernel = {0, 0};
          int[] idSaida = {0, 0};
