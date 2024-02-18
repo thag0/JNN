@@ -45,6 +45,7 @@ import rna.treinamento.Treinador;
  *    <li> Densa; </li>
  *    <li> Convolucional; </li>
  *    <li> MaxPooling; </li>
+ *    <li> AvgPooling; </li>
  *    <li> Flatten; </li>
  *    <li> Dropout; </li>
  * </ul>
@@ -75,7 +76,7 @@ import rna.treinamento.Treinador;
  * </p>
  *    Exemplo:
  * <pre>
- * modelo.compilar(new SGD(), new ErroMedioQuadrado(), new Xavier());
+ * modelo.compilar("sgd", "mse");
  * </pre>
  * <h2>
  *    Treinamento

@@ -50,12 +50,12 @@ public class Classificador{
          new Densa(qSaidas, "softmax")
       });
 
-      modelo.compilar("sgd", "entropiacruzada");
+      modelo.compilar("adam", "entropiacruzada");
       modelo.configurarHistorico(true);
       modelo.info();
       
       //treinando e avaliando os resultados
-      modelo.treinar(treinoX, treinoY, 2_500, false);
+      modelo.treinar(treinoX, treinoY, 1_000, 16 , false);
       double acc = modelo.avaliador().acuracia(testeX, testeY);
       System.out.println("Acurácia = " + formatarDecimal(acc*100, 4) + "%");
       System.out.println("Perda = " + modelo.avaliar(testeX, testeY));
@@ -67,6 +67,7 @@ public class Classificador{
 
       exportarHistorico(modelo, "historico-perda");
       // compararSaidaRede(modelo, testeX, testeY, "");
+      executarComando("python grafico.py historico-perda");
    }
 
    public static void compararSaidaRede(Sequencial rede, double[][] dadosEntrada, double[][] dadosSaida, String texto){
@@ -135,5 +136,13 @@ public class Classificador{
 
       Dados dados = new Dados(dadosPerdas);
       ged.exportarCsv(dados, caminho);
+   }
+
+   public static void executarComando(String comando){
+      try{
+         new ProcessBuilder("cmd", "/c", comando).inheritIO().start().waitFor();
+      }catch(Exception e){
+         e.printStackTrace();
+      }
    }
 }

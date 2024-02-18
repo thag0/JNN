@@ -3,7 +3,9 @@ package rna.otimizadores;
 import rna.camadas.Camada;
 
 /**
- * Implementa o treino da rede neural usando o algoritmo RMSProp (Root Mean Square Propagation).
+ * <h2>
+ *    Root Mean Square Propagation
+ * </h2>
  * <p>
  *    Ele é uma adaptação do Gradiente Descendente Estocástico (SGD) que ajuda a lidar com a
  *    oscilação do gradiente, permitindo que a taxa de aprendizado seja adaptada para cada 
@@ -17,11 +19,12 @@ import rna.camadas.Camada;
  *    O RMSProp funciona usando a seguinte expressão:
  * </p>
  * <pre>
- *    v[i][j] -= (-g[i][j] * tA) / ((√ ac[i][j]) + eps)
+ *ac = (rho * ac) + ((1- rho) * g²);
+ *v += (g * tA) / ((√ ac) + eps)
  * </pre>
  * Onde:
  * <p>
- *    {@code v} - variável que será otimizada (kernel, bias).
+ *    {@code v} - variável que será otimizada..
  * </p>
  * <p>
  *    {@code g} - gradiente correspondente a variável
@@ -33,6 +36,9 @@ import rna.camadas.Camada;
  * <p>
  *    {@code ac} - acumulador de gradiente correspondente a variável
  *    que será otimizada.
+ * </p>
+ * <p>
+ *    {@code rho} - taxa de decaimento do otimizador.
  * </p>
  */
 public class RMSProp extends Otimizador{
@@ -50,7 +56,7 @@ public class RMSProp extends Otimizador{
 	/**
 	 * Valor padrão para epsilon.
 	 */
-	private static final double PADRAO_EPS = 1e-7;
+	private static final double PADRAO_EPS = 1e-8;
 
    /**
     * Valor de taxa de aprendizagem do otimizador.
@@ -85,9 +91,35 @@ public class RMSProp extends Otimizador{
     * @param epsilon usado para evitar a divisão por zero.
     */
    public RMSProp(double tA, double rho, double epsilon){
+      if(tA <= 0){
+         throw new IllegalArgumentException(
+            "\nTaxa de aprendizagem (" + tA + "), inválida."
+         );
+      }
+      if(rho <= 0){
+         throw new IllegalArgumentException(
+            "\nTaxa de decaimento (" + rho + "), inválida."
+         );
+      }
+      if(epsilon <= 0){
+         throw new IllegalArgumentException(
+            "\nEpsilon (" + epsilon + "), inválido."
+         );
+      }
+
       this.taxaAprendizagem = tA;
       this.rho = rho;
       this.epsilon = epsilon;
+   }
+
+   /**
+    * Inicializa uma nova instância de otimizador <strong> RMSProp </strong> 
+    * usando os valores de hiperparâmetros fornecidos.
+    * @param tA valor de taxa de aprendizagem.
+    * @param rho fator de decaimento do RMSProp.
+    */
+   public RMSProp(double tA, double rho){
+      this(tA, rho, PADRAO_EPS);
    }
 
    /**
@@ -102,16 +134,7 @@ public class RMSProp extends Otimizador{
    /**
     * Inicializa uma nova instância de otimizador <strong> RMSProp </strong>.
     * <p>
-    *    Os hiperparâmetros do RMSProp serão inicializados com os valores padrão, que são:
-    * </p>
-    * <p>
-    *    {@code taxaAprendizagem = 0.001}
-    * </p>
-    * <p>
-    *    {@code rho = 0.99}
-    * </p>
-    * <p>
-    *    {@code epsilon = 1e-7}
+    *    Os hiperparâmetros do RMSProp serão inicializados com os valores padrão.
     * </p>
     */
    public RMSProp(){
@@ -139,37 +162,42 @@ public class RMSProp extends Otimizador{
 
    @Override
    public void atualizar(Camada[] camadas){
-      super.verificarConstrucao();
+      verificarConstrucao();
+      
       int idKernel = 0, idBias = 0;
-      double g;
-
       for(Camada camada : camadas){
          if(camada.treinavel == false) continue;
 
          double[] kernel = camada.obterKernel();
          double[] gradK = camada.obterGradKernel();
-
-         for(int i = 0; i < kernel.length; i++){
-            g = gradK[i];
-            ac[idKernel] = (rho * ac[idKernel]) + ((1 - rho) * (g*g));
-            kernel[i] += (g * taxaAprendizagem) / (Math.sqrt(ac[idKernel]) + epsilon);
-            idKernel++;
-         }
+         idKernel = calcular(kernel, gradK, ac, idKernel);
          camada.editarKernel(kernel);
 
          if(camada.temBias()){
             double[] bias = camada.obterBias();
             double[] gradB = camada.obterGradBias();
-            
-            for(int i = 0; i < bias.length; i++){
-               g = gradB[i];
-               acb[idBias] = (rho * acb[idBias]) + ((1 - rho) * (g*g));
-               bias[i] += (g * taxaAprendizagem) / (Math.sqrt(acb[idBias]) + epsilon);
-               idBias++;
-            }
+            idBias = calcular(bias, gradB, acb, idBias);
             camada.editarBias(bias);
          }
       }
+   }
+
+   /**
+    * Atualiza as variáveis usando o gradiente pré calculado.
+    * @param vars variáveis que serão atualizadas.
+    * @param grads gradientes das variáveis.
+    * @param acumulador acumulador do otimizador.
+    * @param id índice inicial das variáveis dentro do array de momentums.
+    * @return índice final após as atualizações.
+    */
+   private int calcular(double[] vars, double[] grads, double[] acumulador, int id){
+      for(int i = 0; i < vars.length; i++){
+         acumulador[id] = (rho * ac[id]) + ((1- rho) * (grads[i]*grads[i]));
+         vars[i] += (grads[i] * taxaAprendizagem) / (Math.sqrt(ac[id]) + epsilon);
+         id++;
+      }
+
+      return id;
    }
 
    @Override

@@ -13,11 +13,11 @@ import rna.camadas.Camada;
  *    O AMSGrad funciona usando a seguinte expressão:
  * </p>
  * <pre>
- *    v[i][j] -= (tA * mc) / ((√ vc) + eps)
+ *    v -= (tA * mc) / ((√ vc) + eps)
  * </pre>
  * Onde:
  * <p>
- *    {@code p} - variável que será otimizada (kernel, bias).
+ *    {@code p} - variável que será otimizada.
  * </p>
  * <p>
  *    {@code tA} - valor de taxa de aprendizagem.
@@ -31,10 +31,10 @@ import rna.camadas.Camada;
  * Os valores de momentum corrigido (mc) e momentum de segunda ordem
  * corrigido (vc) se dão por:
  * <pre>
- *    mc = m[i][j] / (1 - beta1ⁱ)
+ *    mc = m / (1 - beta1ⁱ)
  * </pre>
  * <pre>
- *    vc = vC[i][j] / (1 - beta2ⁱ)
+ *    vc = vC / (1 - beta2ⁱ)
  * </pre>
  * Onde:
  * <p>
@@ -49,7 +49,7 @@ import rna.camadas.Camada;
  * </p>
  * O valor de momentum de segunda ordem corrigido (vC) é dado por:
  * <pre>
- * vC[i] = max(vC[i], v[i])
+ * vC = max(vC, v)
  * </pre>
  * Onde:
  * <p>
@@ -138,15 +138,47 @@ public class AMSGrad extends Otimizador{
 	 * Inicializa uma nova instância de otimizador <strong> AMSGrad </strong> usando os 
 	 * valores de hiperparâmetros fornecidos.
     * @param tA valor de taxa de aprendizagem.
-	 * @param epsilon usado para evitar a divisão por zero.
 	 * @param beta1 decaimento do momento.
 	 * @param beta2 decaimento do momento de segunda ordem.
+	 * @param epsilon usado para evitar a divisão por zero.
 	 */
 	public AMSGrad(double tA, double beta1, double beta2, double epsilon){
+      if(tA <= 0){
+         throw new IllegalArgumentException(
+            "\nTaxa de aprendizagem (" + tA + "), inválida."
+         );
+      }
+      if(beta1 <= 0){
+         throw new IllegalArgumentException(
+            "\nTaxa de decaimento de primeira ordem (" + beta1 + "), inválida."
+         );
+      }
+      if(beta2 <= 0){
+         throw new IllegalArgumentException(
+            "\nTaxa de decaimento de segunda ordem (" + beta2 + "), inválida."
+         );
+      }
+      if(epsilon <= 0){
+         throw new IllegalArgumentException(
+            "\nEpsilon (" + epsilon + "), inválido."
+         );
+      }
+		
 		this.taxaAprendizagem = tA;
 		this.beta1 = beta1;
 		this.beta2 = beta2;
 		this.epsilon = epsilon;
+	}
+
+	/**
+	 * Inicializa uma nova instância de otimizador <strong> AMSGrad </strong> usando os 
+	 * valores de hiperparâmetros fornecidos.
+    * @param tA valor de taxa de aprendizagem.
+	 * @param beta1 decaimento do momento.
+	 * @param beta2 decaimento do momento de segunda ordem.
+	 */
+	public AMSGrad(double tA, double beta1, double beta2){
+      this(tA, beta1, beta2, PADRAO_EPS);
 	}
 
 	/**
@@ -193,9 +225,9 @@ public class AMSGrad extends Otimizador{
 
 	@Override
 	public void atualizar(Camada[] camadas){
-		super.verificarConstrucao();
+		verificarConstrucao();
+		
 		int idKernel = 0, idBias = 0;
-		double g, mChapeu, vChapeu;
 
 		interacoes++;
 		double forcaB1 = (1 - Math.pow(beta1, interacoes));
@@ -206,39 +238,48 @@ public class AMSGrad extends Otimizador{
 
 			double[] kernel = camada.obterKernel();
 			double[] gradK = camada.obterGradKernel();
-
-			for(int i = 0; i < kernel.length; i++){
-				g = gradK[i];
-				m[idKernel] = (beta1 * m[idKernel]) + ((1 - beta1) * g);
-				v[idKernel] = (beta2 * v[idKernel]) + ((1 - beta2) * (g*g));
-				vc[idKernel] = Math.max(vc[idKernel], v[idKernel]);
-
-				mChapeu = m[idKernel] / forcaB1;
-				vChapeu = v[idKernel] / forcaB2;
-				kernel[i] += (mChapeu * taxaAprendizagem) / (Math.sqrt(vChapeu) + epsilon);
-				idKernel++;
-			}
+			idKernel = calcular(kernel, gradK, m, v, vc, forcaB1, forcaB2, idKernel);
 			camada.editarKernel(kernel);
 
          if(camada.temBias()){
 				double[] bias = camada.obterBias();
 				double[] gradB = camada.obterGradBias();
-
-				for(int i = 0; i < bias.length; i++){
-					g = gradB[i];
-					mb[idBias] = (beta1 * mb[idBias]) + ((1 - beta1) * g);
-					vb[idBias] = (beta2 * vb[idBias]) + ((1 - beta2) * (g*g));
-					vcb[idBias] = Math.max(vcb[idBias], vb[idBias]);
-
-					mChapeu = mb[idBias] / forcaB1;
-					vChapeu = vb[idBias] / forcaB2;
-					bias[i] += (mChapeu * taxaAprendizagem) / (Math.sqrt(vChapeu) + epsilon);
-					idBias++;	
-				}
+				idBias = calcular(bias, gradB, mb, vb, vcb, forcaB1, forcaB2, idBias);
 				camada.editarBias(bias);
          } 
 		}
   	}
+
+   /**
+    * Atualiza as variáveis usando o gradiente pré calculado.
+    * @param vars variáveis que serão atualizadas.
+    * @param grads gradientes das variáveis.
+    * @param m coeficientes de momentum de primeira ordem das variáveis.
+    * @param v coeficientes de momentum de segunda ordem das variáveis.
+	 * @param vc coeficientes de momentum de segunda ordem corrigidos.
+    * @param forcaB1 força do decaimento do momentum de primeira ordem.
+    * @param forcaB2 força do decaimento do momentum de segunda ordem.
+    * @param id índice inicial das variáveis dentro do array de momentums.
+    * @return índice final após as atualizações.
+	 */
+	private int calcular(double[] vars, double[] grads, double[] m, double[] v, double[] vc, double forcaB1, double forcaB2, int id){
+		double mChapeu, vChapeu, g;
+
+		for(int i = 0; i < vars.length; i++){
+			g = grads[i];
+			m[id] = (beta1 * m[id]) + ((1 - beta1) * g);
+			v[id] = (beta2 * v[id]) + ((1 - beta2) * (g*g));
+			vc[id] = Math.max(vc[id], v[id]);
+
+			mChapeu = m[id] / forcaB1;
+			vChapeu = v[id] / forcaB2;
+			vars[i] += (mChapeu * taxaAprendizagem) / (Math.sqrt(vChapeu) + epsilon);
+
+			id++;
+		}
+
+		return id;
+	}
 
 	@Override
 	public String info(){

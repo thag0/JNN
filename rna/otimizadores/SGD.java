@@ -14,12 +14,13 @@ import rna.camadas.Camada;
  *    O SGD funciona usando a seguinte expressão:
  * </p>
  * <pre>
- *v[i][j] -= m[i][j] // apenas com momentum
- *v[i][j] -= (-g[i][j] * tA) - (M * m[i][j]) // com nesterov
+ *m = (m * M) - (g * tA)
+ *v -= m // apenas com momentum
+ *v -= (M * m) - (g * tA) // com nesterov
  * </pre>
  * Onde:
  * <p>
- *    {@code v} - variável que será otimizada (kernel, bias).
+ *    {@code v} - variável que será otimizada.
  * </p>
  * <p>
  *    {@code M} - valor de taxa de momentum (ou constante de momentum) 
@@ -67,26 +68,24 @@ public class SGD extends Otimizador{
     * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient 
     * Descent (SGD) </strong> usando os valores de hiperparâmetros fornecidos.
     * @param tA taxa de aprendizagem do otimizador.
-    * @param momentum taxa de momentum do otimizador.
+    * @param m taxa de momentum do otimizador.
     * @param nesterov usar acelerador de nesterov.
     */
-   public SGD(double tA, double momentum, boolean nesterov){
-      if(tA <= 0 | tA > 1){
+   public SGD(double tA, double m, boolean nesterov){
+      if(tA <= 0){
          throw new IllegalArgumentException(
-            "O valor da taxa de aprendizagem deve estar entre ]0, 1], " + 
-            "recebido: " + tA
+            "\nTaxa de aprendizagem (" + tA + "), inválida."
          );
       }
       
-      if(momentum < 0 | momentum > 1){         
+      if(m < 0){         
          throw new IllegalArgumentException(
-            "O valor de momentum deve estar entre [0, 1], " + 
-            "recebido: " + momentum
+            "\nTaxa de momentum (" + m + "), inválida."
          );
       }
 
       this.taxaAprendizagem = tA;
-      this.momentum = momentum;
+      this.momentum = m;
       this.nesterov = nesterov;
    }
 
@@ -94,10 +93,10 @@ public class SGD extends Otimizador{
     * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient 
     * Descent (SGD) </strong> usando os valores de hiperparâmetros fornecidos.
     * @param tA taxa de aprendizagem do otimizador.
-    * @param momentum taxa de momentum do otimizador.
+    * @param m taxa de momentum do otimizador.
     */
-   public SGD(double tA, double momentum){
-      this(tA, momentum, false);
+   public SGD(double tA, double m){
+      this(tA, m, false);
    }
 
    /**
@@ -141,7 +140,7 @@ public class SGD extends Otimizador{
 
    @Override
    public void atualizar(Camada[] camadas){
-      super.verificarConstrucao();
+      verificarConstrucao();
 
       int idKernel = 0, idBias = 0;
       for(Camada camada : camadas){
@@ -149,24 +148,34 @@ public class SGD extends Otimizador{
 
          double[] kernel = camada.obterKernel();
          double[] gradK = camada.obterGradKernel();
-         for(int i = 0; i < kernel.length; i++){
-            m[idKernel] = (m[idKernel] * momentum) - (gradK[i] * taxaAprendizagem);
-            kernel[i] -= nesterov ? (m[idKernel] * momentum) - (gradK[i] * taxaAprendizagem) : m[idKernel];
-            idKernel++;
-         }
+         idKernel = calcular(kernel, gradK, m, idKernel);
          camada.editarKernel(kernel);
 
          if(camada.temBias()){
             double[] bias = camada.obterBias();
             double[] gradB = camada.obterGradBias();
-            for(int i = 0; i < bias.length; i++){
-               mb[idBias] = (mb[idBias] * momentum) - (gradB[i] * taxaAprendizagem);
-               bias[i] -= nesterov ? (mb[idBias] * momentum) - (gradB[i] * taxaAprendizagem) : mb[idBias];
-               idBias++;
-            }
+            idBias = calcular(bias, gradB, mb, idBias);
             camada.editarBias(bias);
          }
       }
+   }
+
+   /**
+    * Atualiza as variáveis usando o gradiente pré calculado.
+    * @param vars variáveis que serão atualizadas.
+    * @param grads gradientes das variáveis.
+    * @param m coeficientes de momentum.
+    * @param id índice inicial das variáveis dentro do array de momentums.
+    * @return índice final após as atualizações.
+    */
+   private int calcular(double[] vars, double[] grads, double[] m, int id){
+      for(int i = 0; i < vars.length; i++){
+         m[id] = (m[id] * momentum) - (grads[i] * taxaAprendizagem);
+         vars[i] -= nesterov ? (m[id] * momentum) - (grads[i] * taxaAprendizagem) : m[id];
+         id++;
+      }
+
+      return id;
    }
 
    @Override

@@ -3,15 +3,15 @@ package rna.otimizadores;
 import rna.camadas.Camada;
 
 /**
- * Classe base para implementações de otimizadores do treino da Rede Neural.
+ * Classe base para implementações de otimizadores do treino da biblioteca.
  * <p>
  *		O otimizador já deve levar em consideração que os gradientes para todas
  *		as camadas foram calculados previamente.
  * </p>
  * <p>
- *		Novos otimizadores devem implementar (pelo menos) os métodos {@code inicialziar()} 
+ *		Novos otimizadores devem implementar (pelo menos) os métodos {@code construir()} 
  *		e {@code atualizar()} que são chamados obrigatoriamente no momento da compilação e 
- *		treino da Rede Neural.
+ *		treino dos modelos.
  * </p>
  * <p>
  *		O método {@code inicializar()} é útil para aqueles otimizadores que possuem atributos 
@@ -41,7 +41,7 @@ public abstract class Otimizador{
 	protected void verificarConstrucao(){
 		if(this.construido == false){
 			throw new IllegalStateException(
-				"O otimizador deve ser construído para poder ser usado."
+				"\nO otimizador deve ser construído para poder ser usado."
 			);
 		}
 	}

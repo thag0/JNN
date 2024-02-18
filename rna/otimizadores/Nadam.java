@@ -17,11 +17,11 @@ import rna.camadas.Camada;
  *    O Nadam funciona usando a seguinte expressão:
  * </p>
  * <pre>
- *    v[i][j] -= (tA * mc) / ((√ vc) + eps)
+ *    v += (tA * mc) / ((√ vc) + eps)
  * </pre>
  * Onde:
  * <p>
- *    {@code v} - variável que será otimizada (kernel, bias).
+ *    {@code v} - variável que será otimizada.
  * </p>
  * <p>
  *    {@code tA} - valor de taxa de aprendizagem do otimizador.
@@ -30,12 +30,12 @@ import rna.camadas.Camada;
  *    {@code mc} - valor de momentum corrigido
  * </p>
  * <p>
- *    {@code m2c} - valor de velocidade (momentum de segunda ordem) corrigido
+ *    {@code vc} - valor de velocidade (momentum de segunda ordem) corrigido
  * </p>
  * Os valores de momentum e velocidade corrigidos se dão por:
  * <pre>
- *mc = ((beta1 * m[[i][j]) + ((1 - beta1) * g[i][j])) / (1 - beta1ⁱ)
- *vc = (beta2 * v[i][j]) / (1 - beta2ⁱ)
+ *mc = ((beta1 * m) + ((1 - beta1) * g)) / (1 - beta1ⁱ)
+ *vc = (beta2 * v) / (1 - beta2ⁱ)
  * </pre>
  * Onde:
  * <p>
@@ -127,10 +127,42 @@ public class Nadam extends Otimizador{
     * @param epsilon usado para evitar a divisão por zero.
     */
    public Nadam(double tA, double beta1, double beta2, double epsilon){
+      if(tA <= 0){
+         throw new IllegalArgumentException(
+            "\nTaxa de aprendizagem (" + tA + "), inválida."
+         );
+      }
+      if(beta1 <= 0){
+         throw new IllegalArgumentException(
+            "\nTaxa de decaimento de primeira ordem (" + beta1 + "), inválida."
+         );
+      }
+      if(beta2 <= 0){
+         throw new IllegalArgumentException(
+            "\nTaxa de decaimento de segunda ordem (" + beta2 + "), inválida."
+         );
+      }
+      if(epsilon <= 0){
+         throw new IllegalArgumentException(
+            "\nEpsilon (" + epsilon + "), inválido."
+         );
+      }
+      
       this.taxaAprendizagem = tA;
       this.beta1 = beta1;
       this.beta2 = beta2;
       this.epsilon = epsilon;
+   }
+
+   /**
+    * Inicializa uma nova instância de otimizador <strong> Nadam </strong> 
+    * usando os valores de hiperparâmetros fornecidos.
+    * @param tA valor de taxa de aprendizagem.
+    * @param beta1 decaimento do momento de primeira ordem.
+    * @param beta2 decaimento da segunda ordem.
+    */
+   public Nadam(double tA, double beta1, double beta2){
+      this(tA, beta1, beta2, PADRAO_EPS);
    }
 
    /**
@@ -175,49 +207,57 @@ public class Nadam extends Otimizador{
 
    @Override
    public void atualizar(Camada[] camadas){
-      super.verificarConstrucao();
-      int idKernel = 0, idBias = 0;
-      double g, mChapeu, vChapeu;
-
+      verificarConstrucao();
+      
       interacoes++;
       double forcaB1 = 1 - Math.pow(beta1, interacoes);
       double forcaB2 = 1 - Math.pow(beta2, interacoes);
-   
+      
+      int idKernel = 0, idBias = 0;
       for(Camada camada : camadas){
          if(camada.treinavel == false) continue;
 
          double[] kernel = camada.obterKernel();
          double[] gradK = camada.obterGradKernel();
-
-         for(int i = 0; i < kernel.length; i++){
-            g = gradK[i];
-            m[idKernel] = (beta1 * m[idKernel]) + ((1 - beta1) * g);
-            v[idKernel] = (beta2 * v[idKernel]) + ((1 - beta2) * (g*g));
-
-            mChapeu = (beta1 * m[idKernel]) + ((1 - beta1) * g) / forcaB1;
-            vChapeu = (beta2 * v[idKernel]) / forcaB2;
-            kernel[i] += (taxaAprendizagem * mChapeu) / (Math.sqrt(vChapeu) + epsilon);
-            idKernel++;
-         }
+         idKernel = calcular(kernel, gradK, m, v, forcaB1, forcaB2, idKernel);
          camada.editarKernel(kernel);
          
          if(camada.temBias()){
             double[] bias = camada.obterBias();
             double[] gradB = camada.obterGradBias();
-
-            for(int i = 0; i < bias.length; i++){
-               g = gradB[i];
-               mb[idBias] = (beta1 * mb[idBias]) + ((1 - beta1) * g);
-               vb[idBias] = (beta2 * vb[idBias]) + ((1 - beta2) * (g*g));
-
-               mChapeu = (beta1 * mb[idBias]) + ((1 - beta1) * g) / forcaB1;
-               vChapeu = (beta2 * vb[idBias]) / forcaB2;
-               bias[i] += (taxaAprendizagem * mChapeu) / (Math.sqrt(vChapeu) + epsilon);
-               idBias++;
-            }
+            idBias = calcular(bias, gradB, mb, vb, forcaB1, forcaB2, idBias);
             camada.editarBias(bias);
          }     
       }
+   }
+
+   /**
+    * Atualiza as variáveis usando o gradiente pré calculado.
+    * @param vars variáveis que serão atualizadas.
+    * @param grads gradientes das variáveis.
+    * @param m coeficientes de momentum de primeira ordem das variáveis.
+    * @param v coeficientes de momentum de segunda ordem das variáveis.
+    * @param forcaB1 força do decaimento do momentum de primeira ordem.
+    * @param forcaB2 força do decaimento do momentum de segunda ordem.
+    * @param id índice inicial das variáveis dentro do array de momentums.
+    * @return índice final após as atualizações.
+    */
+   private int calcular(double[] vars, double[] grads, double[] m, double[] v, double forcaB1, double forcaB2, int id){
+      double g, mChapeu, vChapeu;
+      
+      for(int i = 0; i < vars.length; i++){
+         g = grads[i];
+         m[id] = (beta1 * m[id]) + ((1 - beta1) * g);
+         v[id] = (beta2 * v[id]) + ((1 - beta2) * (g*g));
+         
+         mChapeu = (beta1 * m[id]) + ((1 - beta1) * g) / forcaB1;
+         vChapeu = (beta2 * v[id]) / forcaB2;
+         vars[i] += (mChapeu * taxaAprendizagem) / (Math.sqrt(vChapeu) + epsilon);
+      
+         id++;
+      }
+
+      return id;
    }
 
    @Override

@@ -19,11 +19,11 @@ import rna.camadas.Camada;
  *    O Adam funciona usando a seguinte expressão:
  * </p>
  * <pre>
- *    var[i][j] -= (alfa * m[i][j]) / ((√ v[i][j]) + eps)
+ *var += (alfa * m) / ((√ v) + eps)
  * </pre>
  * Onde:
  * <p>
- *    {@code var} - variável que será otimizada (kernel, bias).
+ *    {@code var} - variável que será otimizada.
  * </p>
  * <p>
  *    {@code alfa} - correção aplicada a taxa de aprendizagem.
@@ -49,8 +49,8 @@ import rna.camadas.Camada;
  * </p>
  * As atualizações de momentum de primeira e segunda ordem se dão por:
  *<pre>
- *m[i][j] += (1 - beta1) * (g  - m[i][j])
- *v[i][j] += (1 - beta2) * (g² - v[i][j])
+ *m += (1 - beta1) * (g  - m)
+ *v += (1 - beta2) * (g² - v)
  *</pre>
  * Onde:
  * <p>
@@ -137,10 +137,42 @@ public class Adam extends Otimizador{
     * @param epsilon usado para evitar a divisão por zero.
     */
    public Adam(double tA, double beta1, double beta2, double epsilon){
+      if(tA <= 0){
+         throw new IllegalArgumentException(
+            "\nTaxa de aprendizagem (" + tA + "), inválida."
+         );
+      }
+      if(beta1 <= 0){
+         throw new IllegalArgumentException(
+            "\nTaxa de decaimento de primeira ordem (" + beta1 + "), inválida."
+         );
+      }
+      if(beta2 <= 0){
+         throw new IllegalArgumentException(
+            "\nTaxa de decaimento de segunda ordem (" + beta2 + "), inválida."
+         );
+      }
+      if(epsilon <= 0){
+         throw new IllegalArgumentException(
+            "\nEpsilon (" + epsilon + "), inválido."
+         );
+      }
+      
       this.taxaAprendizagem = tA;
       this.beta1 = beta1;
       this.beta2 = beta2;
       this.epsilon = epsilon;
+   }
+ 
+   /**
+    * Inicializa uma nova instância de otimizador <strong> Adam </strong> 
+    * usando os valores de hiperparâmetros fornecidos.
+    * @param tA taxa de aprendizagem do otimizador.
+    * @param beta1 decaimento do momento de primeira ordem.
+    * @param beta2 decaimento do momento de segunda ordem.
+    */
+   public Adam(double tA, double beta1, double beta2){
+      this(tA, beta1, beta2, PADRAO_EPS);
    }
  
    /**
@@ -156,19 +188,7 @@ public class Adam extends Otimizador{
     * Inicializa uma nova instância de otimizador <strong> Adam </strong>.
     * <p>
     *    Os hiperparâmetros do Adam serão inicializados com os valores 
-    *    padrão, que são:
-    * </p>
-    * <p>
-    *    {@code taxaAprendizagem = 0.001}
-    * </p>
-    * <p>
-    *    {@code beta1 = 0.9}
-    * </p>
-    * <p>
-    *    {@code beta2 = 0.999}
-    * </p>
-    * <p>
-    *    {@code epsilon = 1e-7}
+    *    padrão.
     * </p>
     */
    public Adam(){
@@ -198,44 +218,56 @@ public class Adam extends Otimizador{
 
    @Override
    public void atualizar(Camada[] camadas){
-      super.verificarConstrucao();
-      int idKernel = 0, idBias = 0;
-      double g;
-
+      verificarConstrucao();
+      
       interacoes++;
       double forcaB1 = Math.pow(beta1, interacoes);
       double forcaB2 = Math.pow(beta2, interacoes);
       double alfa = taxaAprendizagem * Math.sqrt(1 - forcaB2) / (1 - forcaB1);
-   
+      
+      int idKernel = 0, idBias = 0;
       for(Camada camada : camadas){
          if(camada.treinavel == false) continue;
 
          double[] kernel = camada.obterKernel();
          double[] gradK = camada.obterGradKernel();
-
-         for(int i = 0; i < kernel.length; i++){
-            g = gradK[i];
-            m[idKernel] += (1 - beta1) * (g     - m[idKernel]);
-            v[idKernel] += (1 - beta2) * ((g*g) - v[idKernel]);
-            kernel[i] += (alfa * m[idKernel]) / (Math.sqrt(v[idKernel]) + epsilon);
-            idKernel++;
-         }
+         idKernel = calcular(kernel, gradK, m, v, alfa, forcaB1, forcaB2, idKernel);
          camada.editarKernel(kernel);
          
          if(camada.temBias()){
             double[] bias = camada.obterBias();
             double[] gradB = camada.obterGradBias();
-
-            for(int i = 0; i < bias.length; i++){
-               g = gradB[i];
-               mb[idBias] += (1 - beta1) * (g     - mb[idBias]);
-               vb[idBias] += (1 - beta2) * ((g*g) - vb[idBias]);
-               bias[i] += (alfa * mb[idBias]) / (Math.sqrt(vb[idBias]) + epsilon);
-               idBias++;
-            }
+            idBias = calcular(bias, gradB, mb, vb, alfa, forcaB1, forcaB2, idBias);
             camada.editarBias(bias);
          }     
       }
+   }
+
+   /**
+    * Atualiza as variáveis usando o gradiente pré calculado.
+    * @param vars variáveis que serão atualizadas.
+    * @param grads gradientes das variáveis.
+    * @param m coeficientes de momentum de primeira ordem das variáveis.
+    * @param v coeficientes de momentum de segunda ordem das variáveis.
+    * @param alfa pequena correção na taxa de aprendizagem.
+    * @param forcaB1 força do decaimento do momentum de primeira ordem.
+    * @param forcaB2 força do decaimento do momentum de segunda ordem.
+    * @param id índice inicial das variáveis dentro do array de momentums.
+    * @return índice final após as atualizações.
+    */
+   private int calcular(double[] vars, double[] grads, double[] m, double[] v, double alfa, double forcaB1, double forcaB2, int id){
+      double g;
+
+      for(int i = 0; i < vars.length; i++){
+         g = grads[i];
+         m[id] += (1 - beta1) * (g    - m[id]);
+         v[id] += (1 - beta2) + ((g*g - v[id]));  
+         vars[i] += (alfa * m[id]) / (Math.sqrt(v[id]) + epsilon);
+      
+         id++;
+      }
+
+      return id;
    }
 
    @Override

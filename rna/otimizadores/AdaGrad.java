@@ -19,11 +19,11 @@ import rna.core.OpArray;
  *    O Adagrad funciona usando a seguinte expressão:
  * </p>
  * <pre>
- *    v[i][j] -= (tA * g[i][j]) / (√ ac[i][j] + eps)
+ *    v += (tA * g) / (√ ac + eps)
  * </pre>
  * Onde:
  * <p>
- *    {@code v} - variável que será otimizada (kernel, bias).
+ *    {@code v} - variável que será otimizada.
  * </p>
  * <p>
  *    {@code tA} - taxa de aprendizagem do otimizador.
@@ -83,6 +83,17 @@ public class AdaGrad extends Otimizador{
     * @param epsilon usado para evitar a divisão por zero.
     */
    public AdaGrad(double tA, double epsilon){
+      if(tA <= 0){
+         throw new IllegalArgumentException(
+            "\nTaxa de aprendizagem (" + tA + "), inválida."
+         );
+      }
+      if(epsilon <= 0){
+         throw new IllegalArgumentException(
+            "\nEpsilon (" + epsilon + "), inválido."
+         );
+      }
+      
       this.taxaAprendizagem = tA;
       this.epsilon = epsilon;
    }
@@ -131,37 +142,42 @@ public class AdaGrad extends Otimizador{
 
    @Override
    public void atualizar(Camada[] camadas){
-      super.verificarConstrucao();
-      int i, idKernel = 0, idBias = 0;
-      double g;
-
+      verificarConstrucao();
+      
+      int idKernel = 0, idBias = 0;
       for(Camada camada : camadas){
          if(camada.treinavel == false) continue;
 
          double[] kernel = camada.obterKernel();
-         double[] gradP = camada.obterGradKernel();
-
-         for(i = 0; i < kernel.length; i++){
-            g = gradP[i];
-            ac[idKernel] += g*g;
-            kernel[i] += (g * taxaAprendizagem) / (Math.sqrt(ac[idKernel] + epsilon));
-            idKernel++;
-         }
+         double[] gradK = camada.obterGradKernel();
+         idKernel = calcular(kernel, gradK, ac, idKernel);
          camada.editarKernel(kernel);
          
          if(camada.temBias()){
             double[] bias = camada.obterBias();
             double[] gradB = camada.obterGradBias();
-
-            for(i = 0; i < bias.length; i++){
-               g = gradB[i];
-               acb[idBias] += g*g;
-               bias[i] += (g * taxaAprendizagem) / (Math.sqrt(acb[idBias] + epsilon));
-               idBias++;
-            }
+            idBias = calcular(bias, gradB, acb, idBias);
             camada.editarBias(bias);
          }
       }
+   }
+
+   /**
+    * Atualiza as variáveis usando o gradiente pré calculado.
+    * @param vars variáveis que serão atualizadas.
+    * @param grads gradientes das variáveis.
+    * @param acumulador acumulador do otimizador.
+    * @param id índice inicial das variáveis dentro do array de momentums.
+    * @return índice final após as atualizações.
+    */
+   private int calcular(double[] vars, double[] grads, double[] acumulador, int id){
+      for(int i = 0; i < vars.length; i++){
+         acumulador[id] += grads[i] * grads[i];
+         vars[i] += (grads[i] * taxaAprendizagem) / (Math.sqrt(ac[id] + epsilon));
+         id++;
+      }
+
+      return id;
    }
 
    @Override

@@ -25,7 +25,7 @@ import rna.inicializadores.Zeros;
  *    com a expressão:
  * </p>
  * <pre>
- *    somatorio = (pesos * entrada) + bias
+ *    somatorio = matMult(pesos * entrada) + bias
  * </pre>
  * Após a propagação dos dados, a função de ativação da camada é aplicada ao 
  * resultado do somatório, que por fim é salvo na saída da camada.
@@ -765,7 +765,19 @@ public class Densa extends Camada implements Cloneable{
 
    @Override
    public void editarGradienteKernel(double[] grads){
-      this.gradPesos.copiar(grads, 0, 0, 0);
+      if(grads.length != gradPesos.tamanho()){
+         throw new IllegalArgumentException(
+            "A dimensão dos gradientes fornecidos não é igual a quantidade de " +
+            "parâmetros para os kernels da camada (" + gradPesos.tamanho() + ")."
+         );         
+      }
+
+      int cont = 0, lin = gradPesos.dim3(), col = gradPesos.dim4();
+      for(int i = 0; i < lin; i++){
+         for(int j = 0; j < col; j++){
+            gradPesos.editar(0, 0, i, j, grads[cont++]);
+         }
+      }
    }
 
    @Override

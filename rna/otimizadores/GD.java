@@ -13,11 +13,11 @@ import rna.core.OpArray;
  *    O Gradiente descendente funciona usando a seguinte expressão:
  * </p>
  * <pre>
- *    v[i][j] -= g[i][j] * tA
+ *    v += g * tA
  * </pre>
  * Onde:
  * <p>
- *    {@code v} - variável que será otimizadada (kernel, bias).
+ *    {@code v} - variável que será otimizadada.
  * </p>
  *    {@code g} - gradiente correspondente a variável que será otimizada.
  * </p>
@@ -43,15 +43,20 @@ public class GD extends Otimizador{
     * @param tA taxa de aprendizagem do otimizador.
     */
    public GD(double tA){
+      if(tA <= 0){
+         throw new IllegalArgumentException(
+            "\nTaxa de aprendizagem (" + tA + "), inválida."
+         );
+      }
+
       this.taxaAprendizagem = tA;
    }
 
    /**
     * Inicializa uma nova instância de otimizador da <strong> Descida do Gradiente </strong>.
     * <p>
-    *    Os hiperparâmetros do GD serão inicializados com os valores padrão, que são:
+    *    Os hiperparâmetros do GD serão inicializados com os valores padrão.
     * </p>
-    * {@code taxaAprendizagem = 0.01}
     */
    public GD(){
       this(0.1);
@@ -65,7 +70,8 @@ public class GD extends Otimizador{
 
    @Override
    public void atualizar(Camada[] camadas){
-      super.verificarConstrucao();
+      verificarConstrucao();
+      
       for(Camada camada : camadas){
          if(camada.treinavel == false) continue;
 

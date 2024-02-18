@@ -12,15 +12,15 @@ import rna.camadas.Camada;
  *    O Adadelta funciona usando a seguinte expressão:
  * </p>
  * <pre>
- *    v[i][j] -= delta
+ *    v += delta
  * </pre>
  * Onde delta é dado por:
  * <pre>
- * delta = √(acAt[i][j] + eps) / √(ac[i][j] + eps) * g
+ * delta = √(acAt + eps) / √(ac + eps) * g
  * </pre>
  * Onde:
  * <p>
- *    {@code v} - variável que será otimizada (kernel, bias).
+ *    {@code v} - variável que será otimizada.
  * </p>
  * <p>
  *    {@code acAt} - acumulador atualizado correspondente a variável que
@@ -35,8 +35,8 @@ import rna.camadas.Camada;
  * </p>
  * Os valores do acumulador (ac) e acumulador atualizado (acAt) se dão por:
  * <pre>
- *ac[i][j]   = (rho * ac[i][j])   + ((1 - rho) * g²)
- *acAt[i][j] = (rho * acAt[i][j]) + ((1 - rho) * delta²)
+ *ac   = (rho * ac)   + ((1 - rho) * g²)
+ *acAt = (rho * acAt) + ((1 - rho) * delta²)
  * </pre>
  * Onde:
  * <p>
@@ -76,7 +76,7 @@ public class Adadelta extends Otimizador{
    private double[] acb;
 
    /**
-    * Acumulador atualziado para os pesos.
+    * Acumulador atualizado para os kernels.
     */
    private double[] acAt;
 
@@ -92,6 +92,17 @@ public class Adadelta extends Otimizador{
     * @param epsilon usado para evitar a divisão por zero.
     */
    public Adadelta(double rho, double epsilon){
+      if(rho <= 0){
+         throw new IllegalArgumentException(
+            "\nTaxa de decaimento (" + rho + "), inválida."
+         );
+      }
+      if(epsilon <= 0){
+         throw new IllegalArgumentException(
+            "\nEpsilon (" + epsilon + "), inválido."
+         );
+      }
+
       this.rho = rho;
       this.epsilon = epsilon;
    }
@@ -139,43 +150,49 @@ public class Adadelta extends Otimizador{
 
    @Override
    public void atualizar(Camada[] camadas){
-      super.verificarConstrucao();
+      verificarConstrucao();
+      
       int idKernel = 0, idBias = 0;
-      double g, delta;
-
       for(Camada camada : camadas){
          if(camada.treinavel == false) continue;
 
          double[] kernel = camada.obterKernel();
          double[] gradK = camada.obterGradKernel();
-
-         for(int i = 0; i < kernel.length; i++){
-            g = gradK[i];
-            ac[idKernel] = (rho * ac[idKernel]) + ((1 - rho) * (g*g));
-            delta = Math.sqrt(acAt[idKernel] + epsilon) / Math.sqrt(ac[idKernel] + epsilon) * g;
-            acAt[idKernel] = (rho * acAt[idKernel]) + ((1 - rho) * (delta * delta));
-            kernel[i] += delta;
-
-            idKernel++;
-         }
+         idKernel = calcular(kernel, gradK, ac, acAt, idKernel);
          camada.editarKernel(kernel);
 
          if(camada.temBias()){
             double[] bias = camada.obterBias();
             double[] gradB = camada.obterGradBias();
-
-            for(int i = 0; i < bias.length; i++){
-               g = gradB[i];
-               acb[idBias] = (rho * acb[idBias]) + ((1 - rho) * (g*g));
-               delta = Math.sqrt(acAtb[idBias] + epsilon) / Math.sqrt(acb[idBias] + epsilon) * g;
-               acAtb[idBias] = (rho * acAtb[idBias]) + ((1 - rho) * (delta * delta));
-               bias[i] += delta;
-
-               idBias++;       
-            }
+            idBias = calcular(bias, gradB, acb, acAtb, idBias);
             camada.editarBias(bias);
          }
       }
+   }
+
+   /**
+    * Atualiza as variáveis usando o gradiente pré calculado.
+    * @param vars variáveis que serão atualizadas.
+    * @param grads gradientes das variáveis.
+    * @param ac acumulador do otimizador.
+    * @param acAt acumulador atualizado.
+    * @param id índice inicial das variáveis dentro do array de momentums.
+    * @return índice final após as atualizações.
+    */
+   private int calcular(double[] vars, double[] grads, double[] ac, double[] acAt, int id){
+      double g, delta;
+
+      for(int i = 0; i < vars.length; i++){
+         g = grads[i];
+         ac[id] = (rho * ac[id]) + ((1 - rho) * (g*g));
+         delta = Math.sqrt(acAt[id] + epsilon) / Math.sqrt(ac[id] + epsilon) * g;
+         acAt[id] = (rho * acAt[id]) + ((1 - rho) * (delta * delta));
+         vars[i] += delta;
+         
+         id++;
+      }
+
+      return id;
    }
 
    @Override
