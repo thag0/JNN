@@ -36,6 +36,66 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
       
+      double[][] a = {
+         {1, 2, 3, 4},
+         {5, 6, 7, 8},
+      };
+      Tensor4D b = new Tensor4D(2, 2, 2, 2);
+      b.preencherContador(true);
+
+      Object[] arr = teste(a);
+      for(int i = 0; i < arr.length; i++){
+         ged.imprimirArray(arr[i]);
+      }
+   }
+
+   static Object[] teste(Object obj){
+      Object[] elementos = new Object[0];
+
+      if(obj instanceof Object[]){
+         elementos = (Object[]) obj;
+      
+      }else if(obj instanceof Tensor4D){
+         Tensor4D t = (Tensor4D) obj;
+         int idArray = 0;
+         int[] dim = t.dimensoes();
+
+         for(int i = dim.length-1; i >= 0; i--){
+            if(dim[i] > 1) idArray = i;
+         }
+
+         Tensor4D[] amostras = new Tensor4D[dim[idArray]];
+
+         for(int i = 0; i < amostras.length; i++){
+            if(idArray == 0){//tensores 3d
+               amostras[i] = new Tensor4D(t.array3D(i));
+
+            }else if(idArray == 1){//matrizes
+               amostras[i] = new Tensor4D(t.array2D(0, i));
+            
+            }else if(idArray == 2){//vetores
+               amostras[i] = new Tensor4D(1, 1, 1, dim[idArray]);
+               for(int j = 0; j < amostras[i].dim3(); j++){
+                  amostras[i].copiar(t.array1D(0, 0, i), 0, 0, j);
+               }
+            
+            }else if(idArray == 3){//escalar
+               amostras[i] = new Tensor4D(1, 1, 1, 1);
+               amostras[i].editar(0, 0, 0, 0, t.elemento(0, 0, 0, i));
+            }
+         }
+
+         for(Tensor4D tensor : amostras){
+            tensor.print(1);
+         }
+
+      }else{
+         throw new IllegalArgumentException(
+            "Tipo de objeto (" + obj.getClass().getSimpleName() + ") inválido."
+         );
+      }
+
+      return elementos;
    }
 
    /**

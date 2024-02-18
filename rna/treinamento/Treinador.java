@@ -65,7 +65,7 @@ public class Treinador{
     * @param epochs quantidade de épocas de treinamento.
     * @param logs logs para perda durante as épocas de treinamento.
     */
-   public void treino(Modelo modelo, Object[] entradas, Object[] saidas, int epochs, boolean logs){
+   public void treino(Modelo modelo, Object entradas, Object[] saidas, int epochs, boolean logs){
       executar(modelo, entradas, saidas, epochs, 0, logs);
    }
 
@@ -92,14 +92,7 @@ public class Treinador{
     * @param tamLote tamanho do lote.
     * @param logs logs para perda durante as épocas de treinamento.
     */
-   private void executar(Modelo modelo, Object[] entradas, Object[] saidas, int epochs, int tamLote, boolean logs){
-      if(entradas.length < saidas.length){
-         throw new IllegalArgumentException(
-            "Os dados de entrada e saída devem conter a mesma quantidade de amostras, " +
-            "entrada = " + entradas.length + ", saida = " + saidas.length
-         );
-      }
-
+   private void executar(Modelo modelo, Object entradas, Object[] saidas, int epochs, int tamLote, boolean logs){
       // por enquanto só pra uso da camada de dropout
       for(int i = 0; i < modelo.numCamadas(); i++){
          modelo.camada(i).configurarTreino(true);
@@ -108,8 +101,8 @@ public class Treinador{
       if(tamLote > 1){
          treinoLote.treinar(
             modelo,
-            entradas.clone(),
-            saidas.clone(),
+            entradas,
+            saidas,
             epochs,
             tamLote,
             logs
@@ -119,8 +112,8 @@ public class Treinador{
       }else{
          treino.treinar(
             modelo,
-            entradas.clone(), 
-            saidas.clone(), 
+            entradas, 
+            saidas, 
             epochs,
             logs
          );
@@ -140,7 +133,12 @@ public class Treinador{
     * @return lista com os custo por época durante a fase de treinamento.
     */
    public double[] obterHistorico(){
-      return treino.ultimoUsado ? treino.historico() : treinoLote.historico();
+      Object[] historico = treino.ultimoUsado ? treino.historico() : treinoLote.historico();
+      double[] h = new double[historico.length];
+      for(int i = 0; i < h.length; i++){
+         h[i] = (double) historico[i];
+      }
+      return h;
    }
    
 }

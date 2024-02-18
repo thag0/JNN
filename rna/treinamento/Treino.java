@@ -1,5 +1,6 @@
 package rna.treinamento;
 
+import java.util.ArrayList;
 import java.util.Random;
 import rna.avaliacao.perda.Perda;
 import rna.camadas.Camada;
@@ -11,7 +12,7 @@ class Treino{
    Random random = new Random();
 
    private boolean calcularHistorico = false;
-   private double[] historico;
+   private ArrayList<Double> historico;
    boolean ultimoUsado = false;
 
    /**
@@ -19,7 +20,7 @@ class Treino{
     * @param historico lista de custos da rede durante cada época de treino.
     */
    public Treino(boolean calcularHistorico){
-      this.historico = new double[0];
+      this.historico = new ArrayList<>(0);
       this.calcularHistorico = calcularHistorico;
    }
 
@@ -50,19 +51,22 @@ class Treino{
     * @param epochs quantidade de épocas de treinamento.
     * @param logs logs para perda durante as épocas de treinamento.
     */
-   public void treinar(Modelo modelo, Object[] entrada, Object[] saida, int epochs, boolean logs){
+   public void treinar(Modelo modelo, Object entrada, Object[] saida, int epochs, boolean logs){
       Camada[] camadas = modelo.camadas();
       Otimizador otimizador = modelo.otimizador();
       Perda perda = modelo.perda();
       
+      Object[] amostras = aux.entradaParaArray(entrada);
+      int numAmostras = amostras.length;
+
       double perdaEpoca;
       for(int e = 1; e <= epochs; e++){
-         aux.embaralharDados(entrada, saida);
+         aux.embaralharDados(amostras, saida);
          perdaEpoca = 0;
          
-         for(int i = 0; i < entrada.length; i++){
+         for(int i = 0; i < numAmostras; i++){
             double[] amostraSaida = (double[]) saida[i];
-            modelo.calcularSaida(entrada[i]);
+            modelo.calcularSaida(amostras[i]);
             
             //feedback de avanço da rede
             if(calcularHistorico){
@@ -74,12 +78,12 @@ class Treino{
          }
 
          if(logs && (e % 5 == 0)){
-            System.out.println("Época " +  e + "/" + epochs + " -> perda: " + (double)(perdaEpoca/entrada.length));
+            System.out.println("Época " +  e + "/" + epochs + " -> perda: " + (double)(perdaEpoca/numAmostras));
          }
 
          //feedback de avanço da rede
          if(calcularHistorico){
-            this.historico = aux.addPerda(this.historico, (double)(perdaEpoca/entrada.length));
+            historico.add((perdaEpoca/numAmostras));
          }
       }
    }
@@ -102,8 +106,8 @@ class Treino{
     * Retorna o histórico de treino.
     * @return histórico de treino.
     */
-   public double[] historico(){
-      return this.historico;
+   public Object[] historico(){
+      return this.historico.toArray();
    }
   
 }

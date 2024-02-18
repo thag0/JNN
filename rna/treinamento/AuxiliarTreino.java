@@ -140,20 +140,6 @@ public class AuxiliarTreino{
    }
 
    /**
-    * Adiciona o novo valor de perda no final do histórico.
-    * @param historico histórico com os valores de perda da rede.
-    * @param valor novo valor que será adicionado.
-    */
-   double[] addPerda(double[] historico, double valor){
-      double[] aux = historico;
-      historico = new double[historico.length + 1];
-      System.arraycopy(aux, 0, historico, 0, aux.length);
-      historico[historico.length-1] = valor;
-
-      return historico;
-   }
-
-   /**
     * Copia todo o conteúdo do array fornecido para o destino.
     * @param arr array contendo os dados.
     * @param dest destino da cópia.
@@ -166,8 +152,59 @@ public class AuxiliarTreino{
       }
 
       System.arraycopy(arr, 0, dest, 0, dest.length);
-      // for(int i = 0; i < arr.length; i++){
-      //    dest[i] = arr[i];
-      // }
+   }
+
+   /**
+    * Experimental ainda.
+    * @param entrada
+    * @return
+    */
+   Object[] entradaParaArray(Object entrada){
+      Object[] elementos = new Object[0];
+
+      if(entrada instanceof Object[]){
+         elementos = (Object[]) entrada;
+      
+      }else if(entrada instanceof Tensor4D){
+         Tensor4D t = (Tensor4D) entrada;
+         int idArray = 0;
+         int[] dim = t.dimensoes();
+
+         for(int i = dim.length-1; i >= 0; i--){
+            if(dim[i] > 1) idArray = i;
+         }
+
+         Tensor4D[] amostras = new Tensor4D[dim[idArray]];
+
+         for(int i = 0; i < amostras.length; i++){
+            if(idArray == 0){//tensores 3d
+               amostras[i] = new Tensor4D(t.array3D(i));
+
+            }else if(idArray == 1){//matrizes
+               amostras[i] = new Tensor4D(t.array2D(0, i));
+            
+            }else if(idArray == 2){//vetores
+               amostras[i] = new Tensor4D(1, 1, 1, dim[idArray+1]);
+               for(int j = 0; j < amostras[i].dim3(); j++){
+                  amostras[i].copiar(t.array1D(0, 0, i), 0, 0, j);
+               }
+            
+            }else if(idArray == 3){//escalar
+               amostras[i] = new Tensor4D(1, 1, 1, 1);
+               amostras[i].editar(0, 0, 0, 0, t.elemento(0, 0, 0, i));
+            }
+         }
+
+         //temp
+         throw new UnsupportedOperationException(
+            "\nTransformação dos dados de entrada para tensores não testada."
+         );
+      }else{
+         throw new IllegalArgumentException(
+            "Tipo de objeto (" + entrada.getClass().getSimpleName() + ") inválido."
+         );
+      }
+
+      return elementos;
    }
 }

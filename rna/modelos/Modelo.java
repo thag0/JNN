@@ -233,15 +233,8 @@ public abstract class Modelo{
     * @param epochs quantidade de épocas de treinamento.
     * @param logs logs para perda durante as épocas de treinamento.
     */
-   public void treinar(Object[] entradas, Object[] saidas, int epochs, boolean logs){
+   public void treinar(Object entradas, Object[] saidas, int epochs, boolean logs){
       verificarCompilacao();
-      
-      if(entradas.length != saidas.length){
-         throw new IllegalArgumentException(
-            "Incompatibilidade na quantidade de amostras de entrada (" + entradas.length + ")" +
-            "e saídas (" + saidas.length + ")."
-         );
-      }
 
       if(epochs < 1){
          throw new IllegalArgumentException(

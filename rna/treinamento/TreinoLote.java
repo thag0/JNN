@@ -1,5 +1,6 @@
 package rna.treinamento;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import rna.avaliacao.perda.Perda;
@@ -19,7 +20,7 @@ class TreinoLote{
    Random random = new Random();
 
    public boolean calcularHistorico = false;
-   double[] historico;
+   private ArrayList<Double> historico;
    boolean ultimoUsado = false;
 
    /**
@@ -27,7 +28,7 @@ class TreinoLote{
     * @param historico
     */
    public TreinoLote(boolean calcularHistorico){
-      this.historico = new double[0];
+      this.historico = new ArrayList<>(0);
       this.calcularHistorico = calcularHistorico;
    }
 
@@ -61,19 +62,22 @@ class TreinoLote{
     * @param tamLote tamanho do lote.
     * @param logs logs para perda durante as épocas de treinamento.
     */
-   public void treinar(Modelo modelo, Object[] entradas, Object[] saidas, int epochs, int tamLote, boolean logs){
+   public void treinar(Modelo modelo, Object entradas, Object[] saidas, int epochs, int tamLote, boolean logs){
       Camada[] camadas = modelo.camadas();
       Otimizador otimizador = modelo.otimizador();
       Perda perda = modelo.perda();
 
+      Object[] amostras = aux.entradaParaArray(entradas);
+      int numAmostras = amostras.length;
+
       double perdaEpoca;
       for(int e = 1; e <= epochs; e++){
-         aux.embaralharDados(entradas, saidas);
+         aux.embaralharDados(amostras, saidas);
          perdaEpoca = 0;
 
-         for(int i = 0; i < entradas.length; i += tamLote){
-            int fimIndice = Math.min(i + tamLote, entradas.length);
-            Object[] entradaLote = aux.obterSubMatriz(entradas, i, fimIndice);
+         for(int i = 0; i < numAmostras; i += tamLote){
+            int fimIndice = Math.min(i + tamLote, numAmostras);
+            Object[] entradaLote = aux.obterSubMatriz(amostras, i, fimIndice);
             Object[] saidaLote = aux.obterSubMatriz(saidas, i, fimIndice);
 
             //reiniciar gradiente do lote
@@ -95,8 +99,8 @@ class TreinoLote{
          }
 
          //feedback de avanço da rede
-         if(this.calcularHistorico){
-            this.historico = aux.addPerda(this.historico, (perdaEpoca/tamLote));
+         if(calcularHistorico){
+            historico.add((perdaEpoca/tamLote));
          }
       }
    }
@@ -171,7 +175,7 @@ class TreinoLote{
     * Retorna o histórico de treino.
     * @return histórico de treino.
     */
-   public double[] historico(){
-      return this.historico;
+   public Object[] historico(){
+      return this.historico.toArray();
    }
 }

@@ -30,11 +30,6 @@ public class MainConv{
       
       final var treinoX = carregarDadosMNIST(caminhoTreino, NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO);
       final var treinoY = criarRotulosMNIST(NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO);
-      System.out.println(
-         "Dados de treino (" + 
-         treinoX.length + ", " + treinoX[0].length + ", " + treinoX[0][0].length + ", " + treinoX[0][0][0].length + 
-         ")\n"
-      );
 
       Sequencial modelo = criarModelo();
       modelo.configurarHistorico(true);
@@ -82,9 +77,8 @@ public class MainConv{
       int[] formEntrada = {1, 28, 28};
 
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{5, 5}, 10, "leaky-relu"),
-         new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{5, 5}, 10, "leaky-relu"),
+         new Convolucional(formEntrada, new int[]{4, 4}, 15, "leaky-relu"),
+         new Dropout(0.3),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
          new Densa(128, "sigmoid"),
