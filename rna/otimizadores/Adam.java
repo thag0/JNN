@@ -231,13 +231,13 @@ public class Adam extends Otimizador{
 
          double[] kernel = camada.obterKernel();
          double[] gradK = camada.obterGradKernel();
-         idKernel = calcular(kernel, gradK, m, v, alfa, forcaB1, forcaB2, idKernel);
+         idKernel = calcular(kernel, gradK, m, v, alfa, idKernel);
          camada.editarKernel(kernel);
          
          if(camada.temBias()){
             double[] bias = camada.obterBias();
             double[] gradB = camada.obterGradBias();
-            idBias = calcular(bias, gradB, mb, vb, alfa, forcaB1, forcaB2, idBias);
+            idBias = calcular(bias, gradB, mb, vb, alfa, idBias);
             camada.editarBias(bias);
          }     
       }
@@ -250,12 +250,10 @@ public class Adam extends Otimizador{
     * @param m coeficientes de momentum de primeira ordem das variáveis.
     * @param v coeficientes de momentum de segunda ordem das variáveis.
     * @param alfa pequena correção na taxa de aprendizagem.
-    * @param forcaB1 força do decaimento do momentum de primeira ordem.
-    * @param forcaB2 força do decaimento do momentum de segunda ordem.
     * @param id índice inicial das variáveis dentro do array de momentums.
     * @return índice final após as atualizações.
     */
-   private int calcular(double[] vars, double[] grads, double[] m, double[] v, double alfa, double forcaB1, double forcaB2, int id){
+   private int calcular(double[] vars, double[] grads, double[] m, double[] v, double alfa, int id){
       double g;
 
       for(int i = 0; i < vars.length; i++){
