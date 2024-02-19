@@ -295,6 +295,27 @@ public class Tensor4D{
     *    A configuração não altera o conteúdo do tensor, e sim a forma
     *    como os dados são tratados e acessados.
     * </p>
+    * Exemplo:
+    * <pre>
+    *tensor = [
+    *  [
+    *    [
+    *       1, 2
+    *       3, 4
+    *    ]
+    *  ]  
+    *]
+    *
+    *tensor.reformatar(1, 1, 1, 4);
+    *
+    *tensor = [
+    *  [
+    *    [
+    *       1, 2, 3, 4
+    *    ]
+    *  ]  
+    *]
+    * </pre>
     * @param dim1 novo valor para primeira dimensão.
     * @param dim2 novo valor para segunda dimensão.
     * @param dim3 novo valor para terceira dimensão.
@@ -318,6 +339,62 @@ public class Tensor4D{
       this.d2 = dim2;
       this.d3 = dim3;
       this.d4 = dim4;
+   }
+
+   /**
+    * Configura o novo formato para o tensor.
+    * <p>
+    *    A configuração não altera o conteúdo do tensor, e sim a forma
+    *    como os dados são tratados e acessados.
+    * </p>
+    * Exemplo:
+    * <pre>
+    *tensor = [
+    *  [
+    *    [
+    *       1, 2
+    *       3, 4
+    *    ]
+    *  ]  
+    *]
+    *
+    *int[] novoFormato = {1, 1, 1 4};
+    *tensor.reformatar(novoFormato);
+    *
+    *tensor = [
+    *  [
+    *    [
+    *       1, 2, 3, 4
+    *    ]
+    *  ]  
+    *]
+    * </pre>
+    * @param indices array contendo os novos índices (dim1, dim2, dim3, dim4).
+    */
+   public void reformatar(int[] indices){
+      if(indices == null){
+         throw new IllegalArgumentException(
+            "\nO array de íncides fonecido é nulo."
+         );
+      }
+
+      if(indices.length == 1){
+         reformatar(1, 1, 1, indices[0]);
+      
+      }else if(indices.length == 2){
+         reformatar(1, 1, indices[0], indices[1]);
+      
+      }else if(indices.length == 2){
+         reformatar(1, indices[0], indices[1], indices[2]);
+      
+      }else if(indices.length == 2){
+         reformatar(indices[0], indices[1], indices[2], indices[3]);
+      
+      }else{
+         throw new IllegalArgumentException(
+            "\nO array de índices deve conter pelo menos 4 elementos, recebido: " + indices.length
+         );
+      }
    }
 
    /**
@@ -1414,13 +1491,10 @@ public class Tensor4D{
                }
                sb.append("\n");
             }
-            sb.append(pad + pad + "]");
-            sb.append((j+1 < d2) ? ",\n" : "\n");
+            sb.append(pad + pad + "]").append((j+1 < d2) ? ",\n" : "\n");
          }
-         sb.append(pad + "]");
-         sb.append((i+1 < d1) ? ",\n" : "\n");
+         sb.append(pad + "]").append((i+1 < d1) ? ",\n" : "\n");
       }
-
       sb.append("]\n");
 
       System.out.println(sb.toString());
