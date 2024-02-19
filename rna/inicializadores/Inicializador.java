@@ -1,8 +1,8 @@
 package rna.inicializadores;
 
 import java.util.Random;
+import java.util.function.DoubleUnaryOperator;
 
-import rna.core.Mat;
 import rna.core.Tensor4D;
 
 /**
@@ -16,7 +16,12 @@ public abstract class Inicializador{
     * para as classes filhas.
     */
    protected Random random = new Random();
-   
+
+   /**
+    * Função usada pelo inicializador.
+    */
+   DoubleUnaryOperator func;
+
    /**
     * Inicialização com seed aleatória
     */
@@ -39,16 +44,34 @@ public abstract class Inicializador{
    }
 
    /**
-    * Inicializa os valores do array de acordo com o inicializador configurado.
-    * @param m matriz de dados.
+    * Inicializa os valores tensor de acordo com o índice especificado.
+    * @param tensor tensor desejado.
+    * @param dim1 índice da primeira dimensão.
     */
-   public abstract void inicializar(Mat m);
+   public abstract void inicializar(Tensor4D tensor, int dim1);
 
    /**
-    * Inicializa os valores tensor.
+    * Inicializa todos os valores tensor.
     * @param tensor tensor desejado.
     */
+   public abstract void inicializar(Tensor4D tensor);
+
+   /**
+    * Inicializa os valores tensor de acordo com os índices especificados.
+    * @param tensor tensor desejado.
+    * @param dim1 índice da primeira dimensão.
+    * @param dim2 índice da segunda dimensão.
+    */
    public abstract void inicializar(Tensor4D tensor, int dim1, int dim2);
+
+   /**
+    * Inicializa os valores tensor de acordo com os índices especificados.
+    * @param tensor tensor desejado.
+    * @param dim1 índice da primeira dimensão.
+    * @param dim2 índice da segunda dimensão.
+    * @param dim3 índice da terceira dimensão.
+    */
+   public abstract void inicializar(Tensor4D tensor, int dim1, int dim2, int dim3);
 
    /**
     * Retorna o nome do inicializador.

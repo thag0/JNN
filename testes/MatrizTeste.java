@@ -22,7 +22,9 @@ import rna.core.OpTensor4D;
 import rna.core.Tensor4D;
 import rna.inicializadores.AleatorioPositivo;
 import rna.inicializadores.Inicializador;
+import rna.inicializadores.Zeros;
 import rna.inicializadores.GlorotUniforme;
+import rna.inicializadores.Identidade;
 import rna.treinamento.AuxiliarTreino;
 
 @SuppressWarnings("unused")
@@ -36,17 +38,14 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
       
-      double[][] a = {
-         {1, 2, 3, 4},
-         {5, 6, 7, 8},
-      };
-      Tensor4D b = new Tensor4D(2, 2, 2, 2);
-      b.preencherContador(true);
-
-      Object[] arr = teste(a);
-      for(int i = 0; i < arr.length; i++){
-         ged.imprimirArray(arr[i]);
-      }
+      
+      Tensor4D tensor = new Tensor4D(1, 2, 2, 2);
+      
+      tensor.preencherContador(true);
+      tensor.print(2);
+      
+      tensor.reformatar(1, 1, 2, 4);
+      tensor.print(2);
    }
 
    static Object[] teste(Object obj){

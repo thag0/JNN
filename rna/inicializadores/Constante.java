@@ -1,6 +1,5 @@
 package rna.inicializadores;
 
-import rna.core.Mat;
 import rna.core.Tensor4D;
 
 /**
@@ -23,26 +22,31 @@ public class Constante extends Inicializador{
 
    /**
     * Instância um inicializador de valor constante.
+    * <p>
+    *    Por padrão o valor é zero.
+    * </p>
     */
    public Constante(){
       this(0);
    }
 
-   /**
-    * Inicializa todos os valores da matriz com um valor constante.
-    * @param m matriz que será inicializada.
-    */
    @Override
-   public void inicializar(Mat m){
-      m.preencher(val);
+   public void inicializar(Tensor4D tensor){
+      tensor.map((x) -> val);
+   }
+
+   @Override
+   public void inicializar(Tensor4D tensor, int dim1){
+      tensor.map3D(dim1, (x) -> val);
    }
 
    @Override
    public void inicializar(Tensor4D tensor, int dim1, int dim2){
-      for(int i = 0; i < tensor.dim3(); i++){
-         for(int j = 0; j < tensor.dim4(); j++){
-            tensor.editar(dim1, dim2, i, j, val);
-         }
-      }
+      tensor.map2D(dim1, dim2, (x) -> val);
+   }
+
+   @Override
+   public void inicializar(Tensor4D tensor, int dim1, int dim2, int dim3){
+      tensor.map1D(dim1, dim2, dim3, (x) -> val);
    }
 }

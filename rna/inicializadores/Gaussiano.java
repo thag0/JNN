@@ -1,6 +1,5 @@
 package rna.inicializadores;
 
-import rna.core.Mat;
 import rna.core.Tensor4D;
 
 /**
@@ -22,25 +21,31 @@ public class Gaussiano extends Inicializador{
       super(seed);
    }
 
-   /**
-    * Aplica o algoritmo de inicialização gaussiano/normal nos pesos.
-    * @param m matriz que será inicializada
-    */
    @Override
-   public void inicializar(Mat m){
-      m.map((x) -> (
-         super.random.nextGaussian()
-      ));
+   public void inicializar(Tensor4D tensor){
+      tensor.map((x) -> {
+         return super.random.nextGaussian();
+      });
+   }
+
+   @Override
+   public void inicializar(Tensor4D tensor, int dim1){
+      tensor.map3D(dim1, (x) -> {
+         return super.random.nextGaussian();
+      });
    }
 
    @Override
    public void inicializar(Tensor4D tensor, int dim1, int dim2){
-      for(int i = 0; i < tensor.dim3(); i++){
-         for(int j = 0; j < tensor.dim4(); j++){
-            tensor.editar(dim1, dim2, i, j, (
-               super.random.nextGaussian()
-            ));
-         }
-      }
+      tensor.map2D(dim1, dim2, (x) -> {
+         return super.random.nextGaussian();
+      });
+   }
+
+   @Override
+   public void inicializar(Tensor4D tensor, int dim1, int dim2, int dim3){
+      tensor.map1D(dim1, dim2, dim3, (x) -> {
+         return super.random.nextGaussian();
+      });
    }
 }

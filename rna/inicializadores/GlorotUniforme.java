@@ -1,6 +1,5 @@
 package rna.inicializadores;
 
-import rna.core.Mat;
 import rna.core.Tensor4D;
 
 /**
@@ -22,17 +21,22 @@ public class GlorotUniforme extends Inicializador{
       super(seed);
    }
 
-   /**
-    * Aplica o algoritmo de inicialização Xavier na matriz fornecida.
-    * @param m matriz que será inicializada.
-    * @param x valor utilizado apenas por outros otimizadores.
-    */
    @Override
-   public void inicializar(Mat m){
-      double limite = Math.sqrt(6.0 / (m.lin() + m.col()));
-      m.map((x) -> (
-         super.random.nextDouble() * (2 * limite) - limite 
-      ));
+   public void inicializar(Tensor4D tensor){
+      double limite = Math.sqrt(2.0 / (tensor.dim3() + tensor.dim4()));
+
+      tensor.map((x) -> {
+         return super.random.nextDouble() * (2.0 * limite) - limite;
+      });
+   }
+
+   @Override
+   public void inicializar(Tensor4D tensor, int dim1){
+      double limite = Math.sqrt(2.0 / (tensor.dim3() + tensor.dim4()));
+
+      tensor.map3D(dim1, (x) -> {
+         return super.random.nextDouble() * (2.0 * limite) - limite;
+      });
    }
 
    @Override
@@ -40,6 +44,15 @@ public class GlorotUniforme extends Inicializador{
       double limite = Math.sqrt(6.0 / (tensor.dim3() + tensor.dim4()));
 
       tensor.map2D(dim1, dim2, (x) -> {
+         return super.random.nextDouble() * (2.0 * limite) - limite;
+      });
+   }
+
+   @Override
+   public void inicializar(Tensor4D tensor, int dim1, int dim2, int dim3){
+      double limite = Math.sqrt(6.0 / tensor.dim4());
+
+      tensor.map1D(dim1, dim2, dim3, (x) -> {
          return super.random.nextDouble() * (2.0 * limite) - limite;
       });
    }

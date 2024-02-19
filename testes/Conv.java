@@ -20,11 +20,13 @@ public class Conv{
    static Serializador serializador = new Serializador();
    static int amostras = 100;
    static int digitos = 10;
+
+   static final String CAMINHO_MODELOS = "./dados/modelosMNIST/";
    
    public static void main(String[] args){
       ged.limparConsole();
-      
-      Sequencial modelo = serializador.lerSequencial("./dados/modelosMNIST/conv-mnist-92.txt");
+
+      Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + "conv-teste.txt");
       // modelo.info();
 
       // testarModelo(modelo, digitos, amostras);

@@ -780,8 +780,8 @@ public class OpTensor4D{
    public void convForward(Tensor4D entrada, Tensor4D kernel, Tensor4D saida){
       int numFiltros = kernel.dim1();
       int profEntrada = kernel.dim2();
-      
-      if(profEntrada <= 2){//arbritário
+         
+      if(profEntrada < 2){//arbritário
          int[] idEntrada = {0, 0};
          int[] idKernel = {0, 0};
          int[] idSaida = {0, 0};
@@ -795,32 +795,34 @@ public class OpTensor4D{
             }
          }
 
-      }else{
-         final int numThreads = Runtime.getRuntime().availableProcessors()/2;
-         ExecutorService executor = Executors.newFixedThreadPool(numThreads > 1 ? numThreads : 1);
-         for(int ent = 0; ent < profEntrada; ent++){
-            final int e = ent;
-            executor.submit(() -> {
-               int[] idEntrada = {0, 0};
-               int[] idKernel = {0, 0};
-               int[] idSaida = {0, 0};
-               for(int f = 0; f < numFiltros; f++){
-                  //entrada = [0][e], kernel = [f][e], saida = [0][f]
-                  idEntrada[1] = e;
-                  idKernel[0] = f;
-                  idKernel[1] = e;
-                  idSaida[1] = f;
-                  correlacao2D(entrada, kernel, saida, idEntrada, idKernel, idSaida, true);
-               }
-            });
-         }
-         
-         executor.shutdown();
+      }else{//multithread
+
+         final int numThreads = Runtime.getRuntime().availableProcessors()/4;
+         ExecutorService executor = Executors.newFixedThreadPool(numThreads > 1 ? numThreads : 2);
          try{
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-         }catch(InterruptedException e){
-            e.printStackTrace();
+            for(int i = 0; i < numFiltros; i++){
+               final int idFiltro = i;
+               executor.submit(() -> {
+                  int[] idEntrada = {0, 0};
+                  int[] idKernel = {idFiltro, 0};
+                  int[] idSaida = {0, idFiltro};
+                  for(int j = 0; j < profEntrada; j++){
+                     idEntrada[1] = j;
+                     idKernel[1] = j;
+                     correlacao2D(entrada, kernel, saida, idEntrada, idKernel, idSaida, true);
+                  }
+               });
+            }
+
+         }finally{
+            executor.shutdown();
          }
+  
+        try{
+           executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        }catch(Exception e){
+           throw new RuntimeException(e);
+        }
       }
    }
 
@@ -836,18 +838,21 @@ public class OpTensor4D{
       int numFiltros = kernel.dim1();
       int profEntrada = kernel.dim2();
       
-      ExecutorService executor = Executors.newFixedThreadPool(2);
+      ExecutorService executor = Executors.newFixedThreadPool(2);//mais estável em média
       for(int i = 0; i < numFiltros; i++){
-         final int id = i;
-         int[] idDerivada = {0, id};
+         final int idFiltro = i;
+         int[] idDerivada = {0, idFiltro};
          
          executor.submit(() -> {
+            int[] idEntrada = {0, 0};
+            int[] idKernel = {idFiltro, 0};
+            int[] idGradKernel = {idFiltro, 0};
+            int[] idGradEntrada = {0, 0};
             for(int j = 0; j < profEntrada; j++){
-               int[] idEntrada = {0, j};
-               int[] idKernel = {id, j};
-               int[] idGradKernel = {id, j};
-               int[] idGradEntrada = {0, j};
-
+               idEntrada[1] = j;
+               idKernel[1] = j;
+               idGradKernel[1] = j;
+               idGradEntrada[1] = j;
                correlacao2D(entrada, derivada, gradKernel, idEntrada, idDerivada, idGradKernel, false);
                convolucao2DFull(derivada, kernel, gradEntrada, idDerivada, idKernel, idGradEntrada, true);
             }

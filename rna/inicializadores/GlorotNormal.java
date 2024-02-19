@@ -1,6 +1,5 @@
 package rna.inicializadores;
 
-import rna.core.Mat;
 import rna.core.Tensor4D;
 
 /**
@@ -23,29 +22,39 @@ public class GlorotNormal extends Inicializador{
       super(seed);
    }
 
-   /**
-    * Aplica o algoritmo de inicialização Glorot normalizado na matriz 
-    * fornecida.
-    * @param m matriz que será inicializada.
-    */
    @Override
-   public void inicializar(Mat m){
-      double desvio = Math.sqrt(2.0 / (m.lin() + m.col()));
-      m.map((x) -> (
-         super.random.nextGaussian() * desvio
-      ));
+   public void inicializar(Tensor4D tensor){
+      double desvio = Math.sqrt(2.0 / (tensor.dim3() + tensor.dim4()));
+
+      tensor.map((x) -> {
+         return super.random.nextGaussian() * desvio;
+      });
+   }
+
+   @Override
+   public void inicializar(Tensor4D tensor, int dim1){
+      double desvio = Math.sqrt(2.0 / (tensor.dim3() + tensor.dim4()));
+
+      tensor.map3D(dim1, (x) -> {
+         return super.random.nextGaussian() * desvio;
+      });
    }
 
    @Override
    public void inicializar(Tensor4D tensor, int dim1, int dim2){
       double desvio = Math.sqrt(2.0 / (tensor.dim3() + tensor.dim4()));
 
-      for(int i = 0; i < tensor.dim3(); i++){
-         for(int j = 0; j < tensor.dim4(); j++){
-            tensor.editar(dim1, dim2, i, j, (
-               super.random.nextGaussian() * desvio
-            ));
-         }
-      }
+      tensor.map2D(dim1, dim2, (x) -> {
+         return super.random.nextGaussian() * desvio;
+      });
+   }
+
+   @Override
+   public void inicializar(Tensor4D tensor, int dim1, int dim2, int dim3){
+      double desvio = Math.sqrt(2.0 / tensor.dim4());
+
+      tensor.map1D(dim1, dim2, dim3, (x) -> {
+         return super.random.nextGaussian() * desvio;
+      });
    }
 }

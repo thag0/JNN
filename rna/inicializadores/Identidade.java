@@ -1,6 +1,5 @@
 package rna.inicializadores;
 
-import rna.core.Mat;
 import rna.core.Tensor4D;
 
 /**
@@ -13,26 +12,56 @@ public class Identidade extends Inicializador{
     */
    public Identidade(){}
 
-   /**
-    * Inicializa todos os valores da matriz no formato de identidade.
-    * @param m matriz que será inicializada.
-    */
    @Override
-   public void inicializar(Mat m){
-      m.forEach((i, j) -> {
-         m.editar(i, j, (i == j ? 1 : 0));
-      });
+   public void inicializar(Tensor4D tensor){
+      int canais = tensor.dim1();
+      int profundidade = tensor.dim2();
+
+      for(int c = 0; c < canais; c++){
+         for(int p = 0; p < profundidade; p++){
+            for(int i = 0; i < tensor.dim3(); i++){
+               for(int j = 0; j < tensor.dim4(); j++){
+                  tensor.editar(c, p, i, j, (
+                     (i == j ? 1 : 0)
+                  ));
+               }
+            }
+         }
+      }
+   }
+
+   @Override
+   public void inicializar(Tensor4D tensor, int dim1){
+      int profundidade = tensor.dim2();
+
+      for(int p = 0; p < profundidade; p++){
+         for(int i = 0; i < tensor.dim3(); i++){
+            for(int j = 0; j < tensor.dim4(); j++){
+               tensor.editar(dim1, p, i, j, (
+                  (i == j ? 1 : 0)
+               ));
+            }
+         }
+      }
    }
 
    @Override
    public void inicializar(Tensor4D tensor, int dim1, int dim2){
-
       for(int i = 0; i < tensor.dim3(); i++){
          for(int j = 0; j < tensor.dim4(); j++){
             tensor.editar(dim1, dim2, i, j, (
                (i == j ? 1 : 0)
             ));
          }
+      }
+   }
+
+   @Override
+   public void inicializar(Tensor4D tensor, int dim1, int dim2, int dim3){
+      for(int j = 0; j < tensor.dim4(); j++){
+         tensor.editar(dim1, dim2, dim3, j, (
+            (dim3 == j ? 1 : 0)
+         ));
       }
    }
 }
