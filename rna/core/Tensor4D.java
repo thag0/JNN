@@ -581,11 +581,11 @@ public class Tensor4D{
          );
       }
 
-      int cont = 0;
+      int inicio = indice(dim1, 0, 0, 0);
       for(int j = 0; j < d2; j++){
          for(int k = 0; k < d3; k++){
             for(int l = 0; l < d4; l++){
-               this.dados[cont++] = arr[j][k][l];
+               this.dados[inicio++] = arr[j][k][l];
             }
          }
       }

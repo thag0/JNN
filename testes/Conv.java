@@ -11,6 +11,7 @@ import rna.camadas.*;
 import rna.core.OpMatriz;
 import rna.core.Tensor4D;
 import rna.modelos.Sequencial;
+import rna.otimizadores.Otimizador;
 import rna.serializacao.Serializador;
 
 public class Conv{
@@ -26,14 +27,16 @@ public class Conv{
    public static void main(String[] args){
       ged.limparConsole();
 
-      Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + "conv-teste.txt");
+      Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + "modelo-convolucional.txt");
       // modelo.info();
 
       // testarModelo(modelo, digitos, amostras);
       // testarTodosDados(modelo);
 
-      tempoForward(modelo);//keras += 30ms
-      tempoBackward(modelo);
+      tempoOtimizador(modelo);
+
+      // tempoForward(modelo);//keras += 30ms
+      // tempoBackward(modelo);
    }
 
    static void testarTodosDados(Sequencial modelo){
@@ -136,6 +139,31 @@ public class Conv{
 
       dados.atribuir(conteudo);
       dados.imprimir();
+   }
+
+   static void tempoOtimizador(Sequencial modelo){
+      Otimizador otm = modelo.otimizador();
+
+      //arbritário
+      double[] grad = new double[modelo.saidaParaArray().length];
+      grad[0] = 1;
+      for(int i = 1; i < grad.length; i++){
+         grad[i] = 0.02;
+      }
+
+      //backward simples
+      modelo.camadaSaida().calcularGradiente(new Tensor4D(grad));
+      for(int i = modelo.numCamadas()-2; i >= 0; i--){
+         modelo.camada(i).calcularGradiente(modelo.camada(i+1).obterGradEntrada());
+      }
+
+      long t = System.nanoTime();
+      otm.atualizar(modelo.camadas());
+      t = System.nanoTime() - t;
+
+      System.out.println(
+         "Tempo otimizador (" + otm.nome() + "): " + TimeUnit.NANOSECONDS.toMillis(t) + "ms"
+      );
    }
 
    static void testarModelo(Sequencial modelo, int digitos, int amostras){

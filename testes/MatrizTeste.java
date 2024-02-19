@@ -39,13 +39,19 @@ public class MatrizTeste{
       ged.limparConsole();
       
       
-      Tensor4D tensor = new Tensor4D(1, 2, 2, 2);
-      
-      tensor.preencherContador(true);
-      tensor.print(2);
-      
-      tensor.reformatar(1, 1, 2, 4);
-      tensor.print(2);
+      Tensor4D tensor = new Tensor4D(2, 2, 2, 2);
+      tensor.copiar(new double[][][]{
+         {
+            {1, 2},
+            {3, 4},
+         },
+         {
+            {5, 6},
+            {7, 8},
+         }
+      }, 1);
+
+      tensor.print(1);
    }
 
    static Object[] teste(Object obj){

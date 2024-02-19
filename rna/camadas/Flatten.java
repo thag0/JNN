@@ -193,7 +193,7 @@ public class Flatten extends Camada{
    /**
     * Achata os dados de entrada num formato sequencial.
     * @param entrada dados de entrada que serão processados, objetos aceitos incluem:
-    * {@code Tensor4D} ou {@code double[]}.
+    * {@code Tensor4D}, {@code double[][][]} ou {@code double[]}.
     * @throws IllegalArgumentException caso a entrada fornecida não seja suportada 
     * pela camada.
     */
@@ -211,6 +211,10 @@ public class Flatten extends Camada{
          }
 
          this.entrada.copiar(e.array3D(0), 0);
+
+      }else if(entrada instanceof double[][][]){
+         double[][][] e = (double[][][]) entrada;
+         this.entrada.copiar(e, 0);
 
       }else if(entrada instanceof double[]){
          double[] e = (double[]) entrada;
