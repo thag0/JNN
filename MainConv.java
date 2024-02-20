@@ -51,7 +51,7 @@ public class MainConv{
       segundos = segundosTotais % 60;
 
       System.out.println();
-      System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
+      System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "min " + segundos + "s");
       System.out.println(
          "Treino -> perda: " + modelo.avaliar(treinoX, treinoY) + 
          " - acurácia: " + (modelo.avaliador().acuracia(treinoX, treinoY) * 100) + "%"
@@ -77,14 +77,12 @@ public class MainConv{
       int[] formEntrada = {1, 28, 28};
 
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{3, 3}, 18, "leaky-relu"),
+         new Convolucional(formEntrada, new int[]{4, 4}, 20, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{3, 3}, 32, "leaky-relu"),
-         new Dropout(0.25),
+         new Convolucional(new int[]{3, 3}, 20, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
          new Densa(128, "sigmoid"),
-         new Dropout(0.25),
          new Densa(NUM_DIGITOS_TREINO, "softmax")
       });
 

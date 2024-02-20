@@ -39,9 +39,8 @@ public class MatrizTeste{
       ged.limparConsole();
       
 
-      Tensor4D tensor = new Tensor4D(1, 1, 2, 2);
-      tensor.reformatar(new int[]{1, 4});
-      tensor.print(2);
+      Tensor4D a = new Tensor4D(1, 2, 2, 2);
+      System.out.println(a);
    }
 
    /**

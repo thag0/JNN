@@ -9,7 +9,11 @@ import lib.ged.Ged;
 import lib.geim.Geim;
 import rna.camadas.*;
 import rna.core.OpMatriz;
+import rna.core.OpTensor4D;
 import rna.core.Tensor4D;
+import rna.inicializadores.GlorotUniforme;
+import rna.inicializadores.Inicializador;
+import rna.inicializadores.Zeros;
 import rna.modelos.Sequencial;
 import rna.otimizadores.Otimizador;
 import rna.serializacao.Serializador;
@@ -18,6 +22,7 @@ public class Conv{
    static Ged ged = new Ged();
    static Geim geim = new Geim();
    static OpMatriz opmat = new OpMatriz();
+   static OpTensor4D optensor = new OpTensor4D();
    static Serializador serializador = new Serializador();
    static int amostras = 100;
    static int digitos = 10;
@@ -28,15 +33,88 @@ public class Conv{
       ged.limparConsole();
 
       Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + "modelo-convolucional.txt");
-      // modelo.info();
 
-      // testarModelo(modelo, digitos, amostras);
-      // testarTodosDados(modelo);
+      tempoForward(modelo);//keras += 30ms
+      tempoBackward(modelo);
 
-      tempoOtimizador(modelo);
+      testarForward();
+   }
 
-      // tempoForward(modelo);//keras += 30ms
-      // tempoBackward(modelo);
+   /**
+    * Testar com multithread
+    */
+   static void testarForward(){
+      int[] formEntrada = {5, 8, 8};
+      Inicializador iniKernel = new GlorotUniforme(12345);
+      Inicializador iniBias = new Zeros();
+      Convolucional conv = new Convolucional(formEntrada, new int[]{2, 2}, 3, "linear", iniKernel, iniBias);
+      conv.inicializar();
+
+      Tensor4D entrada = new Tensor4D(conv.entrada.dimensoes());
+      entrada.preencherContador(true);
+
+      //simulação de propagação dos dados numa camada convolucional sem bias
+      Tensor4D filtros = new Tensor4D(conv.filtros);
+      Tensor4D saidaEsperada = new Tensor4D(conv.saida);
+      int[] idEntrada = {0, 0};
+      int[] idKernel = {0, 0};
+      int[] idSaida = {0, 0};
+      for(int i = 0; i < filtros.dim1(); i++){
+         idSaida[1] = i;
+         for(int j = 0; j < filtros.dim2(); j++){
+            idEntrada[1] = j;
+            idKernel[0] = i;
+            idKernel[1] = j;
+            optensor.correlacao2D(entrada, filtros, saidaEsperada, idEntrada, idKernel, idSaida, true);
+         }
+      }
+
+      conv.calcularSaida(entrada);
+
+      System.out.println("Forward esperado: " + conv.somatorio.comparar(saidaEsperada));
+   }
+
+   /**
+    * Testar com multithread
+    */
+   static void testarBackward(){
+      int[] formEntrada = {2, 8, 8};
+      Convolucional conv = new Convolucional(formEntrada, new int[]{3, 3}, 4, "linear");
+
+      Tensor4D grad = new Tensor4D(conv.gradSaida);
+
+      Tensor4D entrada = new Tensor4D(conv.entrada);
+      entrada.preencherContador(true);
+
+      Tensor4D filtros = new Tensor4D(conv.filtros);
+      filtros.preencherContador(true);
+      conv.filtros.copiar(filtros);
+
+      Tensor4D derivada = new Tensor4D(conv.derivada);
+      Tensor4D gradFiltroEsperado = new Tensor4D(conv.gradFiltros);
+      Tensor4D gradEntradaEsperado = new Tensor4D(conv.gradEntrada);
+   
+      //backward
+      conv.entrada.copiar(entrada);
+      conv.calcularGradiente(grad);
+
+      gradEntradaEsperado.preencher(0);
+      gradFiltroEsperado.preencher(0);
+
+      for(int i = 0; i < conv.filtros.dim1(); i++){
+         for(int j = 0; j < conv.filtros.dim2(); j++){
+            int[] idDerivada = {0, i};
+            int[] idEntrada = {0, j};
+            int[] idKernel = {i, j};
+            int[] idGradKernel = {i, j};
+            int[] idGradEntrada = {0, j};
+            optensor.correlacao2D(entrada, derivada, gradFiltroEsperado, idEntrada, idDerivada, idGradKernel, false);
+            optensor.convolucao2DFull(derivada, filtros, gradEntradaEsperado, idDerivada, idKernel, idGradEntrada, true);
+         }
+      }
+
+      System.out.println("grad entrada esperado: " + conv.gradEntrada.comparar(gradEntradaEsperado));
+      System.out.println("grad filtros esperado: " + conv.gradFiltros.comparar(gradFiltroEsperado));
    }
 
    static void testarTodosDados(Sequencial modelo){

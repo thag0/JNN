@@ -14,6 +14,27 @@ import java.util.function.DoubleUnaryOperator;
  *    Algumas operações mais elaboradas podem precisar do auxílio da classe {@code OpTensor4D},
  *    que implementa operações entre vários tensores.
  * </p>
+ * Exemplo de criação:
+ * <pre>
+ * Tensor4D tensor = new Tensor4D(1, 1, 2, 2);
+ *tensor = [
+ *  [[0.0, 0.0
+ *    0.0, 0.0]]
+ *]
+ * </pre>
+ * Algumas operações entre tensores são válidas desde que as dimensões
+ * da operação sejam válidas.
+ * <pre>
+ *Tensor4D a = new Tensor4D(1, 1, 2, 2);
+ *a.preencer(1);
+ *Tensor4D b = new Tensor4D(1, 1, 2, 2);
+ *b.preencer(2);
+ *a.add(b);//operação acontece dentro do tensor a
+ *a = [
+ *  [[3.0, 3.0
+ *    3.0, 3.0]]
+ *]
+ * </pre>
  */
 public class Tensor4D{
 
@@ -1463,18 +1484,11 @@ public class Tensor4D{
       return res;
    }
 
-   /**
-    * Exibe todo o conteúdo do tensor.
-    * @param casas quantidade de casas decimais que serão exibidas. Esse
-    * valor só {@code será usado caso seja maior que zero}. Por padrão são usadas
-    * 15 casas decimais. A quantidade de casas usadas pode afetar a legibilidade
-    * do conteúdo.
-    */
-   public void print(int casas){
+   private String construirPrint(int casas){
       String pad = "   ";
       StringBuilder sb = new StringBuilder();
 
-      casas = (casas > 0) ? casas : 15;
+      casas = (casas >= 0) ? casas : 15;
 
       sb.append(nome + " " + dimensoesStr() + " = [\n");
       for(int i = 0; i < d1; i++){
@@ -1497,7 +1511,18 @@ public class Tensor4D{
       }
       sb.append("]\n");
 
-      System.out.println(sb.toString());
+      return sb.toString();
+   }
+
+   /**
+    * Exibe todo o conteúdo do tensor.
+    * @param casas quantidade de casas decimais que serão exibidas. Esse
+    * valor só {@code será usado caso seja maior que zero}. Por padrão são usadas
+    * 15 casas decimais. A quantidade de casas usadas pode afetar a legibilidade
+    * do conteúdo.
+    */
+   public void print(int casas){
+      System.out.println(construirPrint(casas));
    }
 
    /**
@@ -1505,6 +1530,20 @@ public class Tensor4D{
     */
    public void print(){
       print(15);
+   }
+
+   @Override
+   public String toString(){
+      StringBuilder sb = new StringBuilder(construirPrint(8));
+      int tamanho = sb.length();
+
+      sb.delete(tamanho-1, tamanho);//remover ultimo "\n"    
+      
+      sb.append(" <tipo: " +dados.getClass().getComponentType().getSimpleName() + ">");
+      sb.append(" <hash: " + Integer.toHexString(hashCode()) + ">");
+      sb.append("\n");
+      
+      return sb.toString();
    }
 
    /**

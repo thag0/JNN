@@ -777,57 +777,36 @@ public class OpTensor4D{
     * @param kernel tensor dos kernels.
     * @param saida tensor de destino.
     */
-   public void convForward(Tensor4D entrada, Tensor4D kernel, Tensor4D saida){
-      int numFiltros = kernel.dim1();
-      int profEntrada = kernel.dim2();
-         
-      if(profEntrada < 2){//arbritário
-         int[] idEntrada = {0, 0};
-         int[] idKernel = {0, 0};
-         int[] idSaida = {0, 0};
-         for(int i = 0; i < numFiltros; i++){
-            idSaida[1] = i;
-            for(int j = 0; j < profEntrada; j++){
-               idEntrada[1] = j;
-               idKernel[0] = i;
-               idKernel[1] = j;
+    public void convForward(Tensor4D entrada, Tensor4D kernel, Tensor4D saida){
+      final int numFiltros = kernel.dim1();
+      final int profEntrada = kernel.dim2();
+
+      int numThreads = profEntrada > 3 ? 2 : 1;
+
+      ExecutorService exec1 = Executors.newFixedThreadPool(numThreads);  
+      exec1.submit(() -> {
+         for(int fil = 0; fil < numFiltros; fil++){
+            for(int ent = 0; ent < profEntrada; ent++){
+               int[] idEntrada = {0, ent};
+               int[] idKernel = {fil, ent};
+               int[] idSaida = {0, fil};
                correlacao2D(entrada, kernel, saida, idEntrada, idKernel, idSaida, true);
             }
          }
+      });
 
-      }else{//multithread
-
-         final int numThreads = Runtime.getRuntime().availableProcessors()/4;
-         ExecutorService executor = Executors.newFixedThreadPool(numThreads > 1 ? numThreads : 2);
-         try{
-            for(int i = 0; i < numFiltros; i++){
-               final int idFiltro = i;
-               executor.submit(() -> {
-                  int[] idEntrada = {0, 0};
-                  int[] idKernel = {idFiltro, 0};
-                  int[] idSaida = {0, idFiltro};
-                  for(int j = 0; j < profEntrada; j++){
-                     idEntrada[1] = j;
-                     idKernel[1] = j;
-                     correlacao2D(entrada, kernel, saida, idEntrada, idKernel, idSaida, true);
-                  }
-               });
-            }
-
-         }finally{
-            executor.shutdown();
-         }
-  
-        try{
-           executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-        }catch(Exception e){
-           throw new RuntimeException(e);
-        }
+      exec1.shutdown();
+      
+      try{
+         exec1.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+      }catch(Exception e){
+         System.out.println("\nOcorreu um erro de runtime.");
+         throw new RuntimeException(e);
       }
    }
 
    /**
-    * Método exluviso para a propagação reversa de camadas convolucionais
+    * Método exluviso para a propagação reversa de camadas convolucionais.
     * @param entrada tensor de entrada da camada.
     * @param kernel tensor dos kernels.
     * @param derivada tensor com os valores de derivada da função de ativação.
@@ -837,33 +816,46 @@ public class OpTensor4D{
    public void convBackward(Tensor4D entrada, Tensor4D kernel, Tensor4D derivada, Tensor4D gradKernel, Tensor4D gradEntrada){
       int numFiltros = kernel.dim1();
       int profEntrada = kernel.dim2();
+
+      ExecutorService exec1 = Executors.newFixedThreadPool(2);
+      ExecutorService exec2 = Executors.newFixedThreadPool(2);
       
-      ExecutorService executor = Executors.newFixedThreadPool(2);//mais estável em média
-      for(int i = 0; i < numFiltros; i++){
-         final int idFiltro = i;
-         int[] idDerivada = {0, idFiltro};
-         
-         executor.submit(() -> {
-            int[] idEntrada = {0, 0};
-            int[] idKernel = {idFiltro, 0};
-            int[] idGradKernel = {idFiltro, 0};
-            int[] idGradEntrada = {0, 0};
-            for(int j = 0; j < profEntrada; j++){
-               idEntrada[1] = j;
-               idKernel[1] = j;
-               idGradKernel[1] = j;
-               idGradEntrada[1] = j;
-               correlacao2D(entrada, derivada, gradKernel, idEntrada, idDerivada, idGradKernel, false);
-               convolucao2DFull(derivada, kernel, gradEntrada, idDerivada, idKernel, idGradEntrada, true);
+      exec1.submit(() -> {
+         for(int i = 0; i < numFiltros; i++){
+            final int idFiltro = i;
+
+            exec2.submit(() -> {
+               int[] idDerivada = {0, idFiltro};
+               int[] idEntrada = {0, 0};
+               int[] idKernel = {idFiltro, 0};
+               int[] idGradKernel = {idFiltro, 0};
+               int[] idGradEntrada = {0, 0};
+               for(int j = 0; j < profEntrada; j++){
+                  idEntrada[1] = j;
+                  idKernel[1] = j;
+                  idGradKernel[1] = j;
+                  idGradEntrada[1] = j;
+                  correlacao2D(entrada, derivada, gradKernel, idEntrada, idDerivada, idGradKernel, false);
+                  convolucao2DFull(derivada, kernel, gradEntrada, idDerivada, idKernel, idGradEntrada, true);
+               }
+            });
+
+            try{
+               exec2.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+            }catch (Exception e){
+               throw new RuntimeException(e);
             }
-         });
-      }
+         }
+      });
   
-      executor.shutdown();
+      exec2.shutdown();
+      exec1.shutdown();
+      
       try{
-         executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-      }catch(InterruptedException e){
-         Thread.currentThread().interrupt();
+         exec1.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+      }catch(Exception e){
+         System.out.println("\nOcorreu um erro de runtime.");
+         throw new RuntimeException(e);
       }
    }
 }
