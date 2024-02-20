@@ -38,9 +38,11 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
       
-
       Tensor4D a = new Tensor4D(1, 2, 2, 2);
-      System.out.println(a);
+      a.preencherContador(true);
+      a.print(1);
+      a = optensor.matTranspor(a, 0, 0);
+      a.print(1);
    }
 
    /**

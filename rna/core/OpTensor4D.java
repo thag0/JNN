@@ -79,11 +79,11 @@ public class OpTensor4D{
     * @return tensor transposto.
     */
    public Tensor4D matTranspor(Tensor4D tensor, int dim1, int dim2){
-      Tensor4D t = new Tensor4D(tensor.dim1(), tensor.dim2(), tensor.dim4(), tensor.dim3());
+      Tensor4D t = new Tensor4D(1, 1, tensor.dim4(), tensor.dim3());
 
       for(int i = 0; i < tensor.dim3(); i++){
          for(int j = 0; j < tensor.dim4(); j++){
-            t.editar(dim1, dim2, j, i, (
+            t.editar(0, 0, j, i, (
                tensor.elemento(dim1, dim2, i, j)
             ));
          }
@@ -777,11 +777,12 @@ public class OpTensor4D{
     * @param kernel tensor dos kernels.
     * @param saida tensor de destino.
     */
-    public void convForward(Tensor4D entrada, Tensor4D kernel, Tensor4D saida){
+   public void convForward(Tensor4D entrada, Tensor4D kernel, Tensor4D saida){
       final int numFiltros = kernel.dim1();
       final int profEntrada = kernel.dim2();
 
-      int numThreads = profEntrada > 3 ? 2 : 1;
+      //considerar uma lógica melhor futuramente
+      int numThreads = (profEntrada > 5) ? 2 : 1;
 
       ExecutorService exec1 = Executors.newFixedThreadPool(numThreads);  
       exec1.submit(() -> {

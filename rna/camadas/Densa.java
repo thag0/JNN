@@ -538,10 +538,8 @@ public class Densa extends Camada implements Cloneable{
       }
 
       //backward
-      //derivada da função de ativação em relação ao gradiente de saída
       ativacao.derivada(this);
       
-      //derivada da função de ativação em relação ao pesos.
       optensor.matMult(
          optensor.matTranspor(this.entrada, 0, 0),
          derivada,
@@ -550,12 +548,10 @@ public class Densa extends Camada implements Cloneable{
          0
       );
 
-      //gradiente para o bias é apenas a derivada da ativação em relação a saída.
       if(usarBias){
          gradBias.copiar(derivada);
       }
 
-      //derivada da saída em relação aos pesos para retropropagação.
       optensor.matMult(
          derivada, optensor.matTranspor(pesos, 0, 0), gradEntrada, 0, 0
       );
