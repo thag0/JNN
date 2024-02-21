@@ -629,17 +629,13 @@ public class Convolucional extends Camada implements Cloneable{
     * é adicionado após a operação. Por fim é aplicada a função de ativação aos resultados
     * que serão salvos da saída da camada.
     * <p>
-    *    A expressão que define a saída para cada filtro é dada por:
+    *    A expressão que define a saída da camada é dada por:
     * </p>
     * <pre>
-    *somatorio[i] = correlacaoCruzada(filtros[i][j], entrada[j]) + bias[i]
-    *saida[i] = ativacao(somatorio[i])
+    *somatorio = correlacaoCruzada(filtros, entrada)
+    *somatorio.add(bias)
+    *saida = ativacao(somatorio)
     * </pre>
-    * onde {@code i} é o índice do filtro e {@code j} é o índice dos dados de entrada.
-    * <p>
-    *    Após a propagação dos dados, a função de ativação da camada é aplicada
-    *    ao resultado do somatório e o resultado é salvo da saída da camada.
-    * </p>
     * <h3>
     *    Nota
     * </h3>

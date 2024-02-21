@@ -38,6 +38,7 @@ public class Conv{
       tempoBackward(modelo);
 
       testarForward();
+      testarBackward();
    }
 
    /**

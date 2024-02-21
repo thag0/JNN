@@ -184,6 +184,9 @@ public class Flatten extends Camada{
    public void inicializar(){}
 
    @Override
+   public void configurarSeed(long seed){}
+
+   @Override
    protected void configurarNomes(){
       this.entrada.nome("entrada");
       this.saida.nome("saída");

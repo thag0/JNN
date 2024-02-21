@@ -533,7 +533,7 @@ public class OpTensor4D{
          for(int j = 0; j < larguraEsperada; j++){
             double soma = 0.0;
             for(int m = 0; m < alturaKernel; m++){
-                 for(int n = 0; n < larguraKernel; n++){
+               for(int n = 0; n < larguraKernel; n++){
                   int posX = i + m;
                   int posY = j + n;
                   soma += entrada.elemento(idEntrada[0], idEntrada[1], posX, posY) * 
@@ -782,12 +782,12 @@ public class OpTensor4D{
       final int profEntrada = kernel.dim2();
 
       //considerar uma lógica melhor futuramente
-      int numThreads = (profEntrada > 5) ? 2 : 1;
+      int numThreads = (profEntrada > 5) ? 1 : 1;
 
-      ExecutorService exec1 = Executors.newFixedThreadPool(numThreads);  
+      ExecutorService exec1 = Executors.newFixedThreadPool(numThreads);
       exec1.submit(() -> {
-         for(int fil = 0; fil < numFiltros; fil++){
-            for(int ent = 0; ent < profEntrada; ent++){
+         for(int ent = 0; ent < profEntrada; ent++){
+            for(int fil = 0; fil < numFiltros; fil++){
                int[] idEntrada = {0, ent};
                int[] idKernel = {fil, ent};
                int[] idSaida = {0, fil};

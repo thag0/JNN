@@ -8,6 +8,7 @@ import lib.geim.Geim;
 import rna.camadas.*;
 import rna.modelos.Modelo;
 import rna.modelos.Sequencial;
+import rna.otimizadores.SGD;
 import rna.serializacao.Serializador;
 
 public class MainConv{
@@ -18,7 +19,7 @@ public class MainConv{
    static final int NUM_DIGITOS_TESTE  = NUM_DIGITOS_TREINO;
    static final int NUM_AMOSTRAS_TREINO = 200;
    static final int NUM_AMOSTRAS_TESTE  = 100;
-   static final int EPOCAS_TREINO = 20;
+   static final int EPOCAS_TREINO = 30;
 
    static final String caminhoTreino = "/dados/mnist/treino/";
    static final String caminhoTeste = "/dados/mnist/teste/";
@@ -77,17 +78,17 @@ public class MainConv{
       int[] formEntrada = {1, 28, 28};
 
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{4, 4}, 24, "leaky-relu"),
+         new Convolucional(formEntrada, new int[]{4, 4}, 14, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{3, 3}, 24, "leaky-relu"),
+         new Convolucional(new int[]{3, 3}, 16, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(128, "sigmoid"),
+         new Densa(100, "sigmoid"),
+         new Dropout(0.25),
          new Densa(NUM_DIGITOS_TREINO, "softmax")
       });
 
-      // modelo.compilar(new SGD(0.001, 0.99), "entropia-cruzada");
-      modelo.compilar("adam", "entropia-cruzada");
+      modelo.compilar(new SGD(0.0001, 0.995), "entropia-cruzada");
 
       return modelo;
    }

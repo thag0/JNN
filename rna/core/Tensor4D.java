@@ -18,8 +18,8 @@ import java.util.function.DoubleUnaryOperator;
  * <pre>
  * Tensor4D tensor = new Tensor4D(1, 1, 2, 2);
  *tensor = [
- *  [[0.0, 0.0
- *    0.0, 0.0]]
+ *  [[[0.0, 0.0],
+ *    [0.0, 0.0]]]
  *]
  * </pre>
  * Algumas operações entre tensores são válidas desde que as dimensões
@@ -29,10 +29,10 @@ import java.util.function.DoubleUnaryOperator;
  *a.preencer(1);
  *Tensor4D b = new Tensor4D(1, 1, 2, 2);
  *b.preencer(2);
- *a.add(b);//operação acontece dentro do tensor a
+ *a.add(b);//operação acontece dentro do tensor A
  *a = [
- *  [[3.0, 3.0
- *    3.0, 3.0]]
+ *  [[[3.0, 3.0],
+ *    [3.0, 3.0]]]
  *]
  * </pre>
  */
@@ -319,22 +319,14 @@ public class Tensor4D{
     * Exemplo:
     * <pre>
     *tensor = [
-    *  [
-    *    [
-    *       1, 2
-    *       3, 4
-    *    ]
-    *  ]  
+    *  [[[1.0, 2.0],
+    *    [3.0, 4.0]]]
     *]
     *
     *tensor.reformatar(1, 1, 1, 4);
     *
     *tensor = [
-    *  [
-    *    [
-    *       1, 2, 3, 4
-    *    ]
-    *  ]  
+    *  [[[1.0, 2.0, 3.0, 4.0]]]
     *]
     * </pre>
     * @param dim1 novo valor para primeira dimensão.
