@@ -49,9 +49,9 @@ class SerialConv{
          bw.newLine();
          
          //formato dos filtros
-         int[] filtros = camada.formatoFiltro();
-         for(int i = 0; i < filtros.length; i++){
-            bw.write(filtros[i] + " ");
+         int[] formFiltro = camada.formatoFiltro();
+         for(int i = 0; i < formFiltro.length; i++){
+            bw.write(formFiltro[i] + " ");
          }
          bw.newLine();
          
@@ -76,10 +76,10 @@ class SerialConv{
          }
          
          if(camada.temBias()){
-            double[] arrB = camada.bias.paraArray();
-            for(int i = 0; i < arrB.length; i++){
-               escreverDado(arrB[i], tipo, bw);
-               bw.newLine();
+            double[] bias = camada.bias.paraArray();
+            for(double valor : bias){
+               escreverDado(valor, tipo, bw);
+               bw.newLine();               
             }
          }
       }catch(Exception e){
@@ -166,34 +166,24 @@ class SerialConv{
     */
    public void lerPesos(Convolucional camada, BufferedReader br){
       try{
-         int d1 = camada.filtros.dim1();
-         int d2 = camada.filtros.dim2();
-         int d3 = camada.filtros.dim3();
-         int d4 = camada.filtros.dim4();
-         for(int i = 0; i < d1; i++){
-            for(int j = 0; j < d2; j++){
-               for(int k = 0; k < d3; k++){
-                  for(int l = 0; l < d4; l++){
-                     double valor = Double.parseDouble(br.readLine());
-                     camada.filtros.editar(i, j, k, l, valor);
-                  }
-               }
-            }
+         int tamKernel = camada.filtros.tamanho();
+         double[] arrKernel = new double[tamKernel];
+
+         for(int i = 0; i < tamKernel; i++){
+            arrKernel[i] = Double.parseDouble(br.readLine());
          }
+
+         camada.editarKernel(arrKernel);
          
          if(camada.temBias()){
-            int profBias = camada.bias.dim2();
-            int alturaBias = camada.bias.dim3();
-            int larguraBias = camada.bias.dim4();
-            
-            for(int i = 0; i < profBias; i++){
-               for(int j = 0; j < alturaBias; j++){
-                  for(int k = 0; k < larguraBias; k++){
-                     double bias = Double.parseDouble(br.readLine());
-                     camada.bias.editar(0, i, j, k, bias);
-                  }
-               }
+            int tamBias = camada.bias.tamanho();
+            double[] arrBias = new double[tamBias];
+
+            for(int i = 0; i < tamBias; i++){
+               arrBias[i] = Double.parseDouble(br.readLine());
             }
+            
+            camada.editarBias(arrBias);
          }
       }catch(Exception e){
          throw new RuntimeException(e);

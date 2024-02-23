@@ -144,7 +144,7 @@ public class Avaliador{
     * @param saida dados de saída contendo os resultados respectivos para as entradas.
     * @return A acurácia da rede neural em forma de probabilidade.
     */
-   public double acuracia(Object[] entrada, Object[] saida){
+   public double acuracia(Object entrada, Object[] saida){
       return acuracia.calcular(this.modelo, entrada, saida);
    }
 
@@ -234,7 +234,7 @@ public class Avaliador{
     * @return matriz de confusão para avaliar o desempenho do modelo.
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
-   public int[][] matrizConfusao(double[][] entradas, double[][] saidas){
+   public int[][] matrizConfusao(Object entradas, double[][] saidas){
       return matrizConfusao.calcularMatriz(this.modelo, entradas, saidas);
    }
 

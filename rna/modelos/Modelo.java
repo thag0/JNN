@@ -226,9 +226,7 @@ public abstract class Modelo{
     *    Certifique-se de configurar adequadamente o modelo para obter os 
     *    melhores resultados.
     * </p>
-    * @param entradas dados de entrada do treino (features). Dependendo da entrada
-    * do modelo, pode assumir diferentes formatos, para camadas convolucionais é
-    * {@code double[][][][]}, para camadas densas é {@code double[][]}.
+    * @param entradas dados de entrada do treino (features).
     * @param saidas dados de saída correspondente a entrada (class).
     * @param epochs quantidade de épocas de treinamento.
     * @param logs logs para perda durante as épocas de treinamento.
@@ -251,9 +249,7 @@ public abstract class Modelo{
     *    Certifique-se de configurar adequadamente o modelo para obter os 
     *    melhores resultados.
     * </p>
-    * @param entradas dados de entrada do treino (features). Dependendo da entrada
-    * do modelo, pode assumir diferentes formatos, para camadas convolucionais é
-    * {@code double[][][][]}, para camadas densas é {@code double[][]}.
+    * @param entradas dados de entrada do treino (features).
     * @param saidas dados de saída correspondente a entrada (class).
     * @param epochs quantidade de épocas de treinamento.
     * @param tamLote tamanho do lote de treinamento.

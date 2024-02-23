@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.Random;
 import rna.avaliacao.perda.Perda;
 import rna.camadas.Camada;
+import rna.core.Utils;
 import rna.modelos.Modelo;
 import rna.otimizadores.Otimizador;
 
 class Treino{
    AuxiliarTreino aux = new AuxiliarTreino();
+   Utils utils = new Utils();
    Random random = new Random();
 
    private boolean calcularHistorico = false;
@@ -56,7 +58,7 @@ class Treino{
       Otimizador otimizador = modelo.otimizador();
       Perda perda = modelo.perda();
       
-      Object[] amostras = aux.entradaParaArray(entrada);
+      Object[] amostras = utils.transformarParaArray(entrada);
       int numAmostras = amostras.length;
 
       double perdaEpoca;

@@ -7,6 +7,7 @@ import rna.modelos.Sequencial;
 import rna.camadas.Camada;
 import rna.camadas.Densa;
 import rna.camadas.Dropout;
+import rna.core.Tensor4D;
 import lib.ged.Dados;
 import lib.ged.Ged;
 
@@ -35,18 +36,18 @@ public class Classificador{
       int qEntradas = 4;// dados de entrada (features)
       int qSaidas = 3;// classificações (class)
 
-      double[][] treinoX = (double[][]) ged.separarDadosEntrada(treino, qEntradas);
-      double[][] treinoY = (double[][]) ged.separarDadosSaida(treino, qSaidas);
+      var treinoX = new Tensor4D((double[][]) ged.separarDadosEntrada(treino, qEntradas));
+      var treinoY = (double[][]) ged.separarDadosSaida(treino, qSaidas);
 
-      double[][] testeX = (double[][]) ged.separarDadosEntrada(teste, qEntradas);
-      double[][] testeY = (double[][]) ged.separarDadosSaida(teste, qSaidas);
+      var testeX = (double[][]) ged.separarDadosEntrada(teste, qEntradas);
+      var testeY = (double[][]) ged.separarDadosSaida(teste, qSaidas);
 
       //criando e configurando a rede neural
       Sequencial modelo = new Sequencial(new Camada[]{
          new Densa(qEntradas, 8, "sigmoid"),
-         new Dropout(0.25),
+         new Dropout(0.2),
          new Densa(8, "sigmoid"),
-         new Dropout(0.25),
+         new Dropout(0.2),
          new Densa(qSaidas, "softmax")
       });
 

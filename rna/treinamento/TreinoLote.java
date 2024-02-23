@@ -6,6 +6,7 @@ import java.util.Random;
 import rna.avaliacao.perda.Perda;
 import rna.camadas.Camada;
 import rna.core.OpMatriz;
+import rna.core.Utils;
 import rna.core.OpArray;
 import rna.modelos.Modelo;
 import rna.otimizadores.Otimizador;
@@ -16,6 +17,7 @@ import rna.otimizadores.Otimizador;
 class TreinoLote{
    OpMatriz opmat = new OpMatriz();
    OpArray oparr = new OpArray();
+   Utils utils = new Utils();
    AuxiliarTreino aux = new AuxiliarTreino();
    Random random = new Random();
 
@@ -67,7 +69,7 @@ class TreinoLote{
       Otimizador otimizador = modelo.otimizador();
       Perda perda = modelo.perda();
 
-      Object[] amostras = aux.entradaParaArray(entradas);
+      Object[] amostras = utils.transformarParaArray(entradas);
       int numAmostras = amostras.length;
 
       double perdaEpoca;

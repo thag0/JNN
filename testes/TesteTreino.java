@@ -3,10 +3,14 @@ package testes;
 import lib.ged.Dados;
 import lib.ged.Ged;
 import rna.camadas.*;
+import rna.core.Tensor4D;
+import rna.core.Utils;
 import rna.modelos.*;
+import rna.otimizadores.SGD;
 
 public class TesteTreino{
    static Ged ged = new Ged();
+   static Utils utils = new Utils();
 
    public static void main(String[] args){
       ged.limparConsole();
@@ -24,27 +28,28 @@ public class TesteTreino{
          {0}
       };
 
+      Tensor4D treinoX = new Tensor4D(entrada);
+
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Densa(2, 3, "sigmoid"),
+         new Densa(2, 3, "tanh"),
          new Densa(1, "sigmoid")
       });
       
-      modelo.compilar("adagrad", "mse");
-      modelo.treinar(entrada, saida, 3_000, false);
+      modelo.compilar(new SGD(0.00001, 0.9999), "mse");
+      modelo.treinar(treinoX, saida, 10_000, false);
       verificar(entrada, saida, modelo);
    }
 
-   static void verificar(double[][] entrada, double[][] saida, Sequencial modelo){
-      for(int i = 0; i < entrada.length; i++){
-         modelo.calcularSaida(entrada[i]);
+   static void verificar(Object entrada, double[][] saida, Sequencial modelo){
+      Object[] arr = utils.transformarParaArray(entrada);
+
+      for(int i = 0; i < arr.length; i++){
+         modelo.calcularSaida(arr[i]);
          System.out.println(
-            entrada[i][0] + " - " + entrada[i][1] + 
-            " R: " + saida[i][0] + 
+            "R: " + saida[i][0] + 
             " P: " + modelo.saidaParaArray()[0]
          );
       }
-      
-      System.out.println("\nPerda: " + modelo.avaliar(entrada, saida));
    }
 
    /**

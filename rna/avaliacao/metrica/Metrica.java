@@ -1,5 +1,6 @@
 package rna.avaliacao.metrica;
 
+import rna.core.Utils;
 import rna.modelos.Modelo;
 
 /**
@@ -11,13 +12,18 @@ import rna.modelos.Modelo;
 abstract class Metrica{
 
    /**
+    * Transofar entradas em arrays por enquanto.
+    */
+   Utils utils = new Utils();
+
+   /**
     * Calcula a métrica de avaliação configurada.
     * @param rede rede neural.
     * @param entrada dados de entrada.
     * @param saida dados de saída relativos a entrada.
     * @return valor de avaliação de acordo com a métrica configurada
     */
-   public double calcular(Modelo rede, Object[] entrada, Object[] saida){
+   public double calcular(Modelo rede, Object entrada, Object[] saida){
       throw new UnsupportedOperationException(
          "É necessário implementar a métrica de avaliação da rede."
       );
@@ -31,7 +37,7 @@ abstract class Metrica{
     * @param saida dados de saída relativos a entrada.
     * @return valor de avaliação de acordo com a métrica configurada
     */
-   public int[][] calcularMatriz(Modelo rede, double[][] entrada, double[][] saida){
+   public int[][] calcularMatriz(Modelo rede, Object entrada, double[][] saida){
       throw new UnsupportedOperationException(
          "É necessário implementar a métrica de avaliação da rede."
       );
@@ -71,12 +77,14 @@ abstract class Metrica{
     * @param saidas
     * @return
     */
-   protected int[][] matrizConfusao(Modelo rede, Object[] entradas, Object[] saidas){
+   protected int[][] matrizConfusao(Modelo rede, Object entradas, Object[] saidas){
       if(saidas instanceof double[][] == false){
          throw new IllegalArgumentException(
             "Objeto esperado para saída é double[][], recebido " + saidas.getClass().getTypeName()
          );
       }
+
+      Object[] arrEntrada = utils.transformarParaArray(entradas);
 
       double[][] s = (double[][]) saidas;
 
@@ -84,8 +92,8 @@ abstract class Metrica{
       int[][] matriz = new int[nClasses][nClasses];
       double[] saidaRede = new double[rede.camadaSaida().tamanhoSaida()];
 
-      for(int i = 0; i < entradas.length; i++){
-         rede.calcularSaida(entradas[i]);
+      for(int i = 0; i < arrEntrada.length; i++){
+         rede.calcularSaida(arrEntrada[i]);
          saidaRede = rede.saidaParaArray();
 
          int real = this.indiceMaiorValor(s[i]);

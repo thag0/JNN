@@ -33,12 +33,13 @@ public class Conv{
       ged.limparConsole();
 
       Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + "modelo-convolucional.txt");
+      testarModelo(modelo, digitos, amostras);
 
-      tempoForward(modelo);//keras += 30ms
-      tempoBackward(modelo);
+      // tempoForward(modelo);//keras += 30ms
+      // tempoBackward(modelo);
 
-      testarForward();
-      testarBackward();
+      // testarForward();
+      // testarBackward();
    }
 
    /**

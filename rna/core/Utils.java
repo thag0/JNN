@@ -120,4 +120,60 @@ public class Utils{
          dest[i].copiar(arr[i]);
       }
    }
+
+   /**
+    * Transforma a entrada num array de amostras.
+    * <p>
+    *    Até o momento criei esse método para usar com os tensores.
+    * </p>
+    * @param entrada dados de entrada, se já for um array ele será preservado.
+    * Caso seja um tensor, será convertido num array de sub tensores.
+    * @return array de objetos para uso no treino.
+    */
+   public Object[] transformarParaArray(Object entrada){
+      Object[] elementos = new Object[0];
+
+      if(entrada instanceof Object[]){
+         elementos = (Object[]) entrada;
+      
+      }else if(entrada instanceof Tensor4D){
+         Tensor4D t = (Tensor4D) entrada;
+         int idArray = 0;
+         int[] dim = t.dimensoes();
+
+         for(int i = dim.length-1; i >= 0; i--){
+            if(dim[i] > 1) idArray = i;
+         }
+
+         Tensor4D[] amostras = new Tensor4D[dim[idArray]];
+
+         for(int i = 0; i < amostras.length; i++){
+            if(idArray == 0){//tensores 3d
+               amostras[i] = new Tensor4D(t.array3D(i));
+
+            }else if(idArray == 1){//matrizes
+               amostras[i] = new Tensor4D(t.array2D(0, i));
+            
+            }else if(idArray == 2){//vetores
+               amostras[i] = new Tensor4D(1, 1, 1, dim[idArray+1]);
+               for(int j = 0; j < amostras[i].dim3(); j++){
+                  amostras[i].copiar(t.array1D(0, 0, i), 0, 0, j);
+               }
+            
+            }else if(idArray == 3){//escalar
+               amostras[i] = new Tensor4D(1, 1, 1, 1);
+               amostras[i].editar(0, 0, 0, 0, t.elemento(0, 0, 0, i));
+            }
+         }
+
+         elementos = new Object[amostras.length];
+         System.arraycopy(amostras, 0, elementos, 0, amostras.length);
+      }else{
+         throw new IllegalArgumentException(
+            "Tipo de objeto (" + entrada.getClass().getSimpleName() + ") inválido."
+         );
+      }
+
+      return elementos;
+   }
 }
