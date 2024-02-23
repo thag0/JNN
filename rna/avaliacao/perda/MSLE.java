@@ -19,7 +19,7 @@ public class MSLE extends Perda{
       int amostras = previsto.length;
       double emql = 0;
       for(int i = 0; i < amostras; i++){
-         double d = Math.log(1 + real[i]) - Math.log(1 + previsto[i]);
+         double d = Math.log(1 + previsto[i]) - Math.log(1 + real[i]);
          emql += d * d;
       }
       emql /= amostras;
@@ -34,7 +34,7 @@ public class MSLE extends Perda{
       int amostras = previsto.length;
       double[] derivadas = new double[previsto.length];
       for(int i = 0; i < amostras; i++){
-         derivadas[i] = 2 * (Math.log(1 + real[i]) - Math.log(1 + previsto[i])) / amostras;
+         derivadas[i] = (2.0 / amostras) * (Math.log(1 + previsto[i]) - Math.log(1 + real[i]));
       }
       return derivadas;
    }

@@ -260,7 +260,7 @@ public class Adam extends Otimizador{
          g = grads[i];
          m[id] += (1 - beta1) * (g    - m[id]);
          v[id] += (1 - beta2) + ((g*g - v[id]));  
-         vars[i] += (alfa * m[id]) / (Math.sqrt(v[id]) + epsilon);
+         vars[i] -= (alfa * m[id]) / (Math.sqrt(v[id]) + epsilon);
       
          id++;
       }

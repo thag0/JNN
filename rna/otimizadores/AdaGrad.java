@@ -173,7 +173,7 @@ public class AdaGrad extends Otimizador{
    private int calcular(double[] vars, double[] grads, double[] acumulador, int id){
       for(int i = 0; i < vars.length; i++){
          acumulador[id] += grads[i] * grads[i];
-         vars[i] += (grads[i] * taxaAprendizagem) / (Math.sqrt(ac[id] + epsilon));
+         vars[i] -= (grads[i] * taxaAprendizagem) / (Math.sqrt(ac[id] + epsilon));
          id++;
       }
 

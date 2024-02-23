@@ -20,9 +20,8 @@ public class EntropiaCruzada extends Perda{
       super.verificarDimensoes(previsto, real);
       double[] derivadas = new double[previsto.length];
 
-      //tentando encontrar uma adaptação que funcione
       for(int i = 0; i < previsto.length; i++){
-         derivadas[i] = real[i] - previsto[i];
+         derivadas[i] = -(real[i] - previsto[i]);
       }
       return derivadas;
    }

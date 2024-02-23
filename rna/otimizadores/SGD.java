@@ -171,7 +171,7 @@ public class SGD extends Otimizador{
    private int calcular(double[] vars, double[] grads, double[] m, int id){
       for(int i = 0; i < vars.length; i++){
          m[id] = (m[id] * momentum) - (grads[i] * taxaAprendizagem);
-         vars[i] -= nesterov ? (m[id] * momentum) - (grads[i] * taxaAprendizagem) : m[id];
+         vars[i] += nesterov ? (m[id] * momentum) - (grads[i] * taxaAprendizagem) : m[id];
          id++;
       }
 

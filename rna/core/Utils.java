@@ -164,6 +164,8 @@ public class Utils{
                amostras[i] = new Tensor4D(1, 1, 1, 1);
                amostras[i].editar(0, 0, 0, 0, t.elemento(0, 0, 0, i));
             }
+
+            amostras[i].nome("amostra " + (i+1));//ajudar no debug
          }
 
          elementos = new Object[amostras.length];

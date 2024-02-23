@@ -42,26 +42,34 @@ public class MatrizTeste{
       ged.limparConsole();
       AuxiliarTreino aux = new AuxiliarTreino();
 
-      double[][] entrada = {
-         {0, 0},
-         {0, 1},
-         {1, 0},
-         {1, 1}
-      };
-      double[][] saida = {
-         {0},
-         {1},
-         {1},
-         {0}
+      double[][][][] entrada = {
+         {
+            {
+               {1, 1},
+               {1, 1},
+            }
+         },
+         {
+            {
+               {2, 2},
+               {2, 2},
+            }
+         },
+         {
+            {
+               {3, 3},
+               {3, 3},
+            }
+         },
       };
 
-      Tensor4D treinoX = new Tensor4D(entrada);
-      Tensor4D treinoY = new Tensor4D(saida);
-   
-      Object[] arr = utils.transformarParaArray(treinoX);
+      Tensor4D tensor = new Tensor4D(entrada);
+      System.out.println("tensor = " + tensor.dimensoesStr() + "\n");
+      Object[] arr = utils.transformarParaArray(tensor);
       
-      for(var tensor :  arr){
-         System.out.println(tensor);
+      for(var elemento : arr){
+         Tensor4D t = (Tensor4D) elemento;
+         t.print(1);
       }
    }
 

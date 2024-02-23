@@ -54,7 +54,7 @@ import rna.treinamento.Treinador;
  * </p>
  * <pre>
  *modelo = Sequencial(new Camada[]{
- *    new Convolucional(new int[]{28, 28, 1}, new int[]{3, 3}, 5),
+ *    new Convolucional(new int[]{1, 28, 28}, new int[]{3, 3}, 5),
  *    new MaxPooling(new int[]{2, 2}),
  *    new Flatten(),
  *    new Densa(50)),
@@ -62,10 +62,6 @@ import rna.treinamento.Treinador;
  *    new Densa(10)),
  *});
  * </pre>
- * No exemplo acima é criada uma convolucional, onde o primeiro parâmetro corresponde
- * ao formato de entrada (altura, largura, profundidade), formato dos filtros (altura, largura),
- * e quantidade de filtros. Também é criada uma camada de max pooling especificando o formato
- * do filtro (largura, altura).
  * <h2>
  *    Compilação
  * </h2>
@@ -76,7 +72,8 @@ import rna.treinamento.Treinador;
  * </p>
  *    Exemplo:
  * <pre>
- * modelo.compilar("sgd", "mse");
+ *modelo.compilar("sgd", "mse");
+ *modelo.compilar(new SGD(0.01, 0.9), "mse");
  * </pre>
  * <h2>
  *    Treinamento
@@ -196,7 +193,7 @@ public class Sequencial extends Modelo implements Cloneable{
     */
    public void add(Camada camada){
       if(camada == null){
-         throw new IllegalArgumentException("Camada fornecida é nula.");
+         throw new IllegalArgumentException("\nCamada fornecida é nula.");
       }
 
       Camada[] antigas = this.camadas;
@@ -219,7 +216,7 @@ public class Sequencial extends Modelo implements Cloneable{
    public Camada sub(){
       if(this.camadas.length < 1){
          throw new IllegalArgumentException(
-            "Não há camadas no modelo."
+            "\nNão há camadas no modelo."
          );
       }
       Camada ultima = camadaSaida();
@@ -231,6 +228,7 @@ public class Sequencial extends Modelo implements Cloneable{
       }
 
       this.compilado = false;
+
       return ultima;
    }
 
@@ -241,10 +239,10 @@ public class Sequencial extends Modelo implements Cloneable{
             "É necessário que a primeira camada seja construída."
          );
       }
+
       if(seedInicial != 0) camadas[0].configurarSeed(seedInicial);
       camadas[0].inicializar();
       camadas[0].configurarId(0);
-
 
       for(int i = 1; i < this.camadas.length; i++){
          camadas[i].construir(camadas[i-1].formatoSaida());
@@ -263,7 +261,7 @@ public class Sequencial extends Modelo implements Cloneable{
 
    @Override
    public void calcularSaida(Object entrada){
-      super.verificarCompilacao();
+      verificarCompilacao();
 
       camadas[0].calcularSaida(entrada);
       for(int i = 1; i < camadas.length; i++){
@@ -273,7 +271,7 @@ public class Sequencial extends Modelo implements Cloneable{
 
    @Override
    public Object[] calcularSaidas(Object[] entradas){
-      super.verificarCompilacao();
+      verificarCompilacao();
 
       double[][] previsoes = new double[entradas.length][];
 
@@ -287,18 +285,18 @@ public class Sequencial extends Modelo implements Cloneable{
   
    @Override
    public Otimizador otimizador(){
+      verificarCompilacao();
       return this.otimizador;
    }
 
    @Override
    public Perda perda(){
+      verificarCompilacao();
       return this.perda;
    }
 
    @Override
    public Camada camada(int id){
-      super.verificarCompilacao();
-   
       if((id < 0) || (id >= camadas.length)){
          throw new IllegalArgumentException(
             "O índice fornecido (" + id + 
@@ -311,33 +309,24 @@ public class Sequencial extends Modelo implements Cloneable{
 
    @Override
    public Camada[] camadas(){
-      super.verificarCompilacao();
       return this.camadas;
    }
 
    @Override
    public Camada camadaSaida(){
-      super.verificarCompilacao();
+      if(camadas.length == 0){
+         throw new UnsupportedOperationException(
+            "\nO modelo não possui camadas adiciondas."
+         );
+      }
+
       return camadas[camadas.length-1];
    }
 
    @Override
    public double[] saidaParaArray(){
-      super.verificarCompilacao();
+      verificarCompilacao();
       return camadaSaida().saidaParaArray();
-   }
-
-   @Override
-   public void copiarDaSaida(double[] arr){
-      double[] saida = saidaParaArray();
-      if(saida.length != arr.length){
-         throw new IllegalArgumentException(
-            "Incompatibilidade de dimensões entre o array fornecido (" + arr.length + 
-            ") e o array gerado pela saída da última camada (" + saida.length + ")."
-         );
-      }
-
-      System.arraycopy(saida, 0, arr, 0, saida.length);
    }
 
    @Override
@@ -351,22 +340,22 @@ public class Sequencial extends Modelo implements Cloneable{
       for(Camada camada : this.camadas){
          parametros += camada.numParametros();
       }
+
       return parametros;
    }
 
    @Override
    public int numCamadas(){
-      super.verificarCompilacao();
       return camadas.length;
    }
 
    @Override
    public void info(){
-      super.verificarCompilacao();
+      verificarCompilacao();
 
       String espacamento = " ".repeat(4);
       StringBuilder sb = new StringBuilder();
-      sb.append(this.nome + " = [\n");
+      sb.append(nome() + " = [\n");
 
       //otimizador
       sb.append(otimizador.info());
@@ -452,7 +441,7 @@ public class Sequencial extends Modelo implements Cloneable{
 
          return clone;
       }catch(Exception e){
-         throw new RuntimeException(e);
+         throw new RuntimeException("\nErro ao clonar modelo: \n" + e);
       }
    }
 }

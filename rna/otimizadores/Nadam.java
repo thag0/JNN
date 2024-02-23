@@ -252,7 +252,7 @@ public class Nadam extends Otimizador{
          
          mChapeu = (beta1 * m[id]) + ((1 - beta1) * g) / forcaB1;
          vChapeu = (beta2 * v[id]) / forcaB2;
-         vars[i] += (mChapeu * taxaAprendizagem) / (Math.sqrt(vChapeu) + epsilon);
+         vars[i] -= (mChapeu * taxaAprendizagem) / (Math.sqrt(vChapeu) + epsilon);
       
          id++;
       }

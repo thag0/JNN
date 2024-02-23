@@ -48,12 +48,12 @@ public class Adadelta extends Otimizador{
    /**
     * Valor padrão para a taxa de decaimento.
     */
-   private static final double PADRAO_RHO = 0.99;
+   private static final double PADRAO_RHO = 0.999;
 
    /**
     * Valor padrão para epsilon.
     */
-   private static final double PADRAO_EPS = 1e-7;
+   private static final double PADRAO_EPS = 1e-6;
 
    /**
     * Constante de decaimento do otimizador.
@@ -187,7 +187,7 @@ public class Adadelta extends Otimizador{
          ac[id] = (rho * ac[id]) + ((1 - rho) * (g*g));
          delta = Math.sqrt(acAt[id] + epsilon) / Math.sqrt(ac[id] + epsilon) * g;
          acAt[id] = (rho * acAt[id]) + ((1 - rho) * (delta * delta));
-         vars[i] += delta;
+         vars[i] -= delta;
          
          id++;
       }

@@ -730,19 +730,6 @@ public class RedeNeural extends Modelo implements Cloneable{
       return this.camadaSaida().saidaParaArray();
    }
 
-   @Override
-   public void copiarDaSaida(double[] arr){
-      double[] saida = this.saidaParaArray();
-      if(saida.length != arr.length){
-         throw new IllegalArgumentException(
-            "Incompatibilidade de dimensões entre o array fornecido (" + arr.length + 
-            ") e o array gerado pela saída da última camada (" + saida.length + ")."
-         );
-      }
-
-      System.arraycopy(saida, 0, arr, 0, saida.length);
-   }
-
    /**
     * Retorna o array que representa a estrutura da Rede Neural. Nele cada elemento 
     * indica uma camada da rede e cada valor contido nesse elemento indica a 

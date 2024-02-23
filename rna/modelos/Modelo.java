@@ -86,17 +86,11 @@ public abstract class Modelo{
     *    O nome padrão é o mesmo nome da classe.
     * </p>
     * @param nome novo nome da rede.
-    * @throws IllegalArgumentException se o novo nome for nulo ou inválido.
     */
    public void configurarNome(String nome){
-      if(nome == null){
-         throw new IllegalArgumentException("O novo nome não pode ser nulo.");
+      if((nome != null) && (nome.isBlank() == false || nome.isEmpty() == false)){
+         this.nome = nome;
       }
-      if(nome.isBlank() || nome.isEmpty()){
-         throw new IllegalArgumentException("O novo nome não pode estar vazio.");
-      }
-
-      this.nome = nome;
    }
 
    /**
@@ -140,7 +134,7 @@ public abstract class Modelo{
     */
    public void configurarPerda(Perda perda){
       if(perda == null){
-         throw new IllegalArgumentException("A função de perda não pode ser nula.");
+         throw new IllegalArgumentException("\nA função de perda não pode ser nula.");
       }
 
       this.perda = perda;
@@ -168,8 +162,9 @@ public abstract class Modelo{
     */
    public void configurarOtimizador(Otimizador otimizador){
       if(otimizador == null){
-         throw new IllegalArgumentException("O novo otimizador não pode ser nulo.");
+         throw new IllegalArgumentException("\nO novo otimizador não pode ser nulo.");
       }
+
       this.otimizador = otimizador;
    }
 
@@ -201,7 +196,7 @@ public abstract class Modelo{
    protected void verificarCompilacao(){
       if(this.compilado == false){
          throw new IllegalStateException(
-            "O modelo ainda não foi compilado."
+            "\nO modelo ainda não foi compilado."
          );
       }
    }
@@ -236,7 +231,7 @@ public abstract class Modelo{
 
       if(epochs < 1){
          throw new IllegalArgumentException(
-            "O valor de épocas deve ser maior que zero, recebido = " + epochs
+            "\nO valor de épocas deve ser maior que zero, recebido = " + epochs
          );
       }
 
@@ -260,12 +255,12 @@ public abstract class Modelo{
 
       if(epochs < 1){
          throw new IllegalArgumentException(
-            "O valor de epochs (" + epochs + ") não pode ser menor que um"
+            "\nO valor de epochs (" + epochs + ") não pode ser menor que um"
          );
       }
       if(tamLote <= 0 || tamLote > entradas.length){
          throw new IllegalArgumentException(
-            "O valor de tamanho do lote (" + tamLote + ") é inválido."
+            "\nO valor de tamanho do lote (" + tamLote + ") é inválido."
          );
       }
 
@@ -291,14 +286,14 @@ public abstract class Modelo{
  
       if(entrada.length != saida.length){
          throw new IllegalArgumentException(
-            "A quantidade de dados de entrada (" + entrada.length + ") " +
+            "\nA quantidade de dados de entrada (" + entrada.length + ") " +
             "e saída (" + saida.length + ") " + "devem ser iguais."
          );
       }
  
       if(saida instanceof double[][] == false){
          throw new IllegalArgumentException(
-            "A saída deve ser do tipo double[][]" + 
+            "\nA saída deve ser do tipo double[][]" + 
             " recebido " + saida.getClass().getTypeName()
          );
       }
@@ -362,12 +357,20 @@ public abstract class Modelo{
 
    /**
     * Copia os dados de saída da última camada do modelo para o array.
-    * <p>
-    *    Esse método considera que as camadas finais dos modelos são camadas densas.
-    * </p>
     * @param arr array para cópia.
     */
-   public abstract void copiarDaSaida(double[] arr);
+   public void copiarDaSaida(double[] arr){
+      double[] saida = saidaParaArray();
+      
+      if(saida.length != arr.length){
+         throw new IllegalArgumentException(
+            "\nIncompatibilidade de dimensões entre o array fornecido (" + arr.length + 
+            ") e o array gerado pela saída da última camada (" + saida.length + ")."
+         );
+      }
+
+      System.arraycopy(saida, 0, arr, 0, saida.length);
+   }
 
    /**
     * Informa o nome configurado do modelo.

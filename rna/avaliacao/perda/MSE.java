@@ -18,7 +18,7 @@ public class MSE extends Perda{
       int amostras = previsto.length;
       double mse = 0.0;
       for(int i = 0; i < amostras; i++){
-         double d = real[i] - previsto[i];
+         double d = previsto[i] - real[i];
          mse += d * d;
       }
       mse /= amostras;
@@ -33,7 +33,7 @@ public class MSE extends Perda{
       int amostras = previsto.length;
       double[] derivadas = new double[previsto.length];
       for(int i = 0; i < amostras; i++){
-         derivadas[i] = (2 * (real[i] - previsto[i])) / amostras;
+         derivadas[i] = (2 / amostras) * (previsto[i] - real[i]);
       }
 
       return derivadas;

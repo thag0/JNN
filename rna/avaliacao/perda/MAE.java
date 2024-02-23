@@ -18,7 +18,7 @@ public class MAE extends Perda{
       int amostras = previsto.length;
       double mae = 0;
       for(int i = 0; i < amostras; i++){
-         mae += Math.abs(real[i] - previsto[i]);
+         mae += Math.abs(previsto[i] - real[i]);
       }
       mae /= amostras;
       
@@ -31,7 +31,7 @@ public class MAE extends Perda{
 
       double[] derivadas = new double[previsto.length];
       for(int i = 0; i < previsto.length; i++){
-         derivadas[i] = real[i] - previsto[i];
+         derivadas[i] = previsto[i] - real[i];
       }
       return derivadas;
    }

@@ -273,7 +273,7 @@ public class AMSGrad extends Otimizador{
 
 			mChapeu = m[id] / forcaB1;
 			vChapeu = v[id] / forcaB2;
-			vars[i] += (mChapeu * taxaAprendizagem) / (Math.sqrt(vChapeu) + epsilon);
+			vars[i] -= (mChapeu * taxaAprendizagem) / (Math.sqrt(vChapeu) + epsilon);
 
 			id++;
 		}

@@ -18,7 +18,7 @@ public class RMSE extends Perda{
       int amostras = previsto.length;
       double rmse = 0.0;
       for(int i = 0; i < amostras; i++){
-         double d = real[i] - previsto[i];
+         double d = previsto[i] - real[i];
          rmse += d * d;
       }
       rmse /= amostras;
@@ -34,7 +34,7 @@ public class RMSE extends Perda{
       double rmse = this.calcular(previsto, real);
       double[] derivadas = new double[previsto.length];
       for(int i = 0; i < amostras; i++){
-         derivadas[i] = (real[i] - previsto[i]) / (rmse * amostras);
+         derivadas[i] = (previsto[i] - real[i]) / (rmse * amostras);
       }
 
       return derivadas;
