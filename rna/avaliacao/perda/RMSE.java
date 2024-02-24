@@ -31,10 +31,11 @@ public class RMSE extends Perda{
       super.verificarDimensoes(previsto, real);
       
       int amostras = previsto.length;
-      double rmse = this.calcular(previsto, real);
       double[] derivadas = new double[previsto.length];
+      double rrmse = Math.sqrt(calcular(previsto, real));
+
       for(int i = 0; i < amostras; i++){
-         derivadas[i] = (previsto[i] - real[i]) / (rmse * amostras);
+         derivadas[i] = (previsto[i] - real[i]) / (rrmse * amostras);
       }
 
       return derivadas;

@@ -1,7 +1,17 @@
 package rna.avaliacao.perda;
 
-public class EntropiaCruzadaBinaria extends Perda{
+/**
+ * Função de perda Binary Cross Entropy, que é usada em problemas de 
+ * classificação binária. Ela é comumente aplicada quando há apenas duas 
+ * classes possíveis.
+ */
+ public class EntropiaCruzadaBinaria extends Perda{
    double eps = 1e-7;
+
+   /**
+    * Inicializa a função de perda Binary Cross Entropy.
+    */
+   public EntropiaCruzadaBinaria(){}
 
    @Override
    public double calcular(double[] previsto, double[] real){
