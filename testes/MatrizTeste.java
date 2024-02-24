@@ -40,37 +40,13 @@ public class MatrizTeste{
    
    public static void main(String[] args){
       ged.limparConsole();
-      AuxiliarTreino aux = new AuxiliarTreino();
-
-      double[][][][] entrada = {
-         {
-            {
-               {1, 1},
-               {1, 1},
-            }
-         },
-         {
-            {
-               {2, 2},
-               {2, 2},
-            }
-         },
-         {
-            {
-               {3, 3},
-               {3, 3},
-            }
-         },
-      };
-
-      Tensor4D tensor = new Tensor4D(entrada);
-      System.out.println("tensor = " + tensor.dimensoesStr() + "\n");
-      Object[] arr = utils.transformarParaArray(tensor);
       
-      for(var elemento : arr){
-         Tensor4D t = (Tensor4D) elemento;
-         t.print(1);
-      }
+      Tensor4D tensor = new Tensor4D(2, 2, 2, 2);
+      tensor.preencherContador(true);
+      tensor.print(1);
+
+      Tensor4D subTensor = tensor.subTensor1D(0, 1, 0);
+      subTensor.print(1);
    }
 
    /**

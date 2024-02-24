@@ -435,6 +435,21 @@ public class Tensor4D{
    }
 
    /**
+    * Retorna o elemento do tensor de acordo com os índices fornecidos.
+    * @param indices array contendo os índices das dimensões (dim1, dim2, dim3, dim4).
+    * @return valor de acordo com os índices.
+    */
+   public double elemento(int[] indices){
+      if(indices.length != 4){
+         throw new IllegalArgumentException(
+            "\nO tamanho do array de índices deve ser 4, array recebido tem tamanho " + indices.length
+         );
+      }
+
+      return dados[indice(indices[0], indices[1], indices[2], indices[3])];
+   }
+
+   /**
     * Preenche todo o conteúdo do tensor com um valor constante.
     * @param valor valor desejado.
     */
@@ -1052,6 +1067,22 @@ public class Tensor4D{
    }
 
    /**
+    * Edita o conteúdo do tensor para que o valor fornecido esteja
+    * configurado de acordo com os índices fornecidos.
+    * @param indices array contendo os índices das dimensões (dim1, dim2, dim3, dim4).
+    * @param valor valor desejado.
+    */
+   public void editar(int[] indices, double valor){
+      if(indices.length != 4){
+         throw new IllegalArgumentException(
+            "\nO tamanho do array de índices deve ser 4, array recebido tem tamanho " + indices.length
+         );
+      }
+
+      dados[indice(indices[0], indices[1], indices[2], indices[3])] = valor;
+   }
+
+   /**
     * Copia o conteúdo de uma linha do tensor e repete ela na quantidade fornecida.
     * <p>
     *    Exemplo:
@@ -1476,6 +1507,56 @@ public class Tensor4D{
       return res;
    }
 
+   /**
+    * Retorna um novo tensor contendo o conteúdo da dimensão especificada.
+    * @param dim1 índice da primeira dimensão desejada.
+    * @return tensor contendo os sub dados.
+    */
+   public Tensor4D subTensor3D(int dim1){
+      Tensor4D tensor = new Tensor4D(1, d2, d3, d4);
+   
+      int inicio = indice(dim1, 0, 0, 0);      
+      System.arraycopy(this.dados, inicio, tensor.dados, 0, (d2*d3*d4));
+
+      return tensor;
+   }
+
+   /**
+    * Retorna um novo tensor contendo o conteúdo das dimensões especificadas.
+    * @param dim1 índice da primeira dimensão desejada.
+    * @param dim2 índice da segunda dimensão desejada.
+    * @return tensor contendo os sub dados.
+    */
+   public Tensor4D subTensor2D(int dim1, int dim2){
+      Tensor4D tensor = new Tensor4D(1, 1, d3, d4);
+   
+      int inicio = indice(dim1, dim2, 0, 0);      
+      System.arraycopy(this.dados, inicio, tensor.dados, 0, (d3*d4));
+
+      return tensor;
+   }
+
+   /**
+    * Retorna um novo tensor contendo o conteúdo das dimensões especificadas.
+    * @param dim1 índice da primeira dimensão desejada.
+    * @param dim2 índice da segunda dimensão desejada.
+    * @param dim3 índice da terceira dimensão desejada.
+    * @return tensor contendo os sub dados.
+    */
+   public Tensor4D subTensor1D(int dim1, int dim2, int dim3){
+      Tensor4D tensor = new Tensor4D(1, 1, 1, d4);
+   
+      int inicio = indice(dim1, dim2, dim3, 0);      
+      System.arraycopy(this.dados, inicio, tensor.dados, 0, d4);
+
+      return tensor;
+   }
+
+   /**
+    * Monta as informações de exibição do tensor.
+    * @param casas quantidade de casas decimais.
+    * @return string formatada.
+    */
    private String construirPrint(int casas){
       String pad = "   ";
       StringBuilder sb = new StringBuilder();
