@@ -781,28 +781,20 @@ public class OpTensor4D{
       final int numFiltros = kernel.dim1();
       final int profEntrada = kernel.dim2();
 
-      //considerar uma lógica melhor futuramente
-      int numThreads = (profEntrada > 5) ? 1 : 1;
+      int[] idEntrada = {0, 0};
+      int[] idSaida = {0, 0};
+      int[] idKernel = {0, 0};
 
-      ExecutorService exec1 = Executors.newFixedThreadPool(numThreads);
-      exec1.submit(() -> {
-         for(int ent = 0; ent < profEntrada; ent++){
-            for(int fil = 0; fil < numFiltros; fil++){
-               int[] idEntrada = {0, ent};
-               int[] idKernel = {fil, ent};
-               int[] idSaida = {0, fil};
-               correlacao2D(entrada, kernel, saida, idEntrada, idKernel, idSaida, true);
-            }
+      //loop sem paralelização teve melhor resultados do que
+      //usando executores
+      for(int i = 0; i < numFiltros; i++){
+         idKernel[0] = i;
+         idSaida[1] = i;
+         for(int j = 0; j < profEntrada; j++){
+            idEntrada[1] = j;
+            idKernel[1] = j;
+            correlacao2D(entrada, kernel, saida, idEntrada, idKernel, idSaida, true);
          }
-      });
-
-      exec1.shutdown();
-      
-      try{
-         exec1.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-      }catch(Exception e){
-         System.out.println("\nOcorreu um erro de runtime.");
-         throw new RuntimeException(e);
       }
    }
 
@@ -821,6 +813,8 @@ public class OpTensor4D{
       ExecutorService exec1 = Executors.newFixedThreadPool(2);
       ExecutorService exec2 = Executors.newFixedThreadPool(2);
       
+      //paralelização teve os melhores resultados do que loop sequencial
+
       exec1.submit(() -> {
          for(int i = 0; i < numFiltros; i++){
             final int idFiltro = i;

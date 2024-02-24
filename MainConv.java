@@ -8,6 +8,7 @@ import lib.geim.Geim;
 import rna.camadas.*;
 import rna.modelos.Modelo;
 import rna.modelos.Sequencial;
+import rna.otimizadores.SGD;
 import rna.serializacao.Serializador;
 
 public class MainConv{
@@ -77,16 +78,16 @@ public class MainConv{
       int[] formEntrada = {1, 28, 28};
 
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(formEntrada, new int[]{4, 4}, 14, "leaky-relu"),
+         new Convolucional(formEntrada, new int[]{4, 4}, 18, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{3, 3}, 14, "leaky-relu"),
+         new Convolucional(new int[]{4, 4}, 20, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
          new Densa(100, "sigmoid"),
          new Densa(NUM_DIGITOS_TREINO, "softmax")
       });
 
-      modelo.compilar("adam", "entropia-cruzada");
+      modelo.compilar(new SGD(0.001, 0.95), "entropia-cruzada");
 
       return modelo;
    }

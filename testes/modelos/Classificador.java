@@ -7,7 +7,6 @@ import rna.modelos.Sequencial;
 import rna.camadas.Camada;
 import rna.camadas.Densa;
 import rna.camadas.Dropout;
-import rna.core.Tensor4D;
 import lib.ged.Dados;
 import lib.ged.Ged;
 
@@ -36,7 +35,7 @@ public class Classificador{
       int qEntradas = 4;// dados de entrada (features)
       int qSaidas = 3;// classificações (class)
 
-      var treinoX = new Tensor4D((double[][]) ged.separarDadosEntrada(treino, qEntradas));
+      var treinoX = (double[][]) ged.separarDadosEntrada(treino, qEntradas);
       var treinoY = (double[][]) ged.separarDadosSaida(treino, qSaidas);
 
       var testeX = (double[][]) ged.separarDadosEntrada(teste, qEntradas);
@@ -56,7 +55,7 @@ public class Classificador{
       modelo.info();
       
       //treinando e avaliando os resultados
-      modelo.treinar(treinoX, treinoY, 1_000, false);
+      modelo.treinar(treinoX, treinoY, 1_000, 12, false);
       double acc = modelo.avaliador().acuracia(testeX, testeY);
       System.out.println("Acurácia = " + formatarDecimal(acc*100, 4) + "%");
       System.out.println("Perda = " + modelo.avaliar(testeX, testeY));

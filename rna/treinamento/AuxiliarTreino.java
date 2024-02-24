@@ -130,8 +130,8 @@ public class AuxiliarTreino{
       }
 
       int linhas = fim - inicio;
-      Object[] subMatriz = new double[linhas][];
-
+      Object[] subMatriz = new Object[linhas];
+      
       for(int i = 0; i < linhas; i++){
          subMatriz[i] = dados[i + inicio];
       }
