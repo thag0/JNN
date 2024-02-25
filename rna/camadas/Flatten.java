@@ -194,6 +194,9 @@ public class Flatten extends Camada{
    }
 
    /**
+    * <h2>
+    *    Propagação direta através da camada Flatten
+    * </h2>
     * Achata os dados de entrada num formato sequencial.
     * @param entrada dados de entrada que serão processados, objetos aceitos incluem:
     * {@code Tensor4D}, {@code double[][][]} ou {@code double[]}.
@@ -235,6 +238,9 @@ public class Flatten extends Camada{
    }
 
    /**
+    * <h2>
+    *    Propagação reversa através da camada Flatten
+    * </h2>
     * Desserializa os gradientes recebedos de volta para o mesmo formato de entrada.
     * @param gradSeguinte gradientes de entrada da camada seguinte, objetos aceitos incluem:
     * {@code Tensor4D} ou {@code double[]}.

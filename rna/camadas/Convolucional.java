@@ -607,30 +607,34 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override
    protected void configurarNomes(){
-      this.entrada.nome("entrada");
-      this.gradEntrada.nome("gradiente entrada");
-      this.filtros.nome("kernel");
-      this.saida.nome("saída");
-      this.gradFiltros.nome("gradiente kernel");
-      this.somatorio.nome("somatório");
-      this.derivada.nome("derivada");
-      this.gradSaida.nome("gradiente saída");
+      entrada.nome("entrada");
+      gradEntrada.nome("gradiente entrada");
+      filtros.nome("kernel");
+      saida.nome("saída");
+      gradFiltros.nome("gradiente kernel");
+      somatorio.nome("somatório");
+      derivada.nome("derivada");
+      gradSaida.nome("gradiente saída");
 
       if(usarBias){
-         this.bias.nome("bias");
-         this.gradBias.nome("gradiente bias");
+         bias.nome("bias");
+         gradBias.nome("gradiente bias");
       }
    }
 
    /**
-    * Propagação direta dos dados de entrada através da camada convolucional.
-    * Realiza a correlação cruzada entre os filtros da camada e os dados de entrada,
-    * somando os resultados ponderados. Caso a camada tenha configurado o uso do bias, ele
-    * é adicionado após a operação. Por fim é aplicada a função de ativação aos resultados
-    * que serão salvos da saída da camada.
+    * <h2>
+    *    Propagação direta através da camada Convolucional
+    * </h2>
     * <p>
-    *    A expressão que define a saída da camada é dada por:
+    *    Realiza a correlação cruzada entre os dados de entrada e os filtros da 
+    *    camada, somando os resultados ponderados. Caso a camada tenha configurado 
+    *    o uso do bias, ele é adicionado após a operação. Por fim é aplicada a função 
+    *    de ativação aos resultados que serão salvos da saída da camada.
     * </p>
+    * <h3>
+    *    A expressão que define a saída da camada é dada por:
+    * </h3>
     * <pre>
     *somatorio = correlacaoCruzada(filtros, entrada)
     *somatorio.add(bias)
@@ -658,10 +662,10 @@ public class Convolucional extends Camada implements Cloneable{
          double[][][] e = (double[][][]) entrada;
          if(e.length != this.profEntrada || e[0].length != this.largEntrada || e[0][0].length != this.altEntrada){
             throw new IllegalArgumentException(
-               "\nAs dimensões da entrada " + 
+               "\nAs dimensões da entrada recebida " + 
                "(" + e.length + ", " + e[0].length + ", " + e[0][0].length + ") " +
-               "não correspondem as dimensões de entrada da camada Convolucional " + 
-               "(" + this.profEntrada +", " + this.altEntrada + ", " + this.largEntrada + ")"
+               "são incompatíveis com as dimensões da entrada da camada " + 
+               "(" + profEntrada + ", " + altEntrada + ", " + largEntrada + ")"
             );
          }
 
@@ -671,17 +675,18 @@ public class Convolucional extends Camada implements Cloneable{
          Tensor4D e = (Tensor4D) entrada;
          if(this.entrada.comparar3D(e) == false){
             throw new IllegalArgumentException(
-               "\n Dimensões de entrada " + e.dimensoesStr() + 
-               "incompatível com as dimensões da entrada da camada " + this.entrada.dimensoesStr()
+               "\nAs dimensões da entrada recebida " + e.dimensoesStr() + 
+               " são incompatíveis com as dimensões da entrada da camada " + this.entrada.dimensoesStr()
             );
          }
 
          this.entrada.copiar(e, 0);
 
-      }else{         
+      }else{
          throw new IllegalArgumentException(
             "\nOs dados de entrada para a camada Convolucional devem ser " +
-            "do tipo \"double[][][]\" ou \"Tensor4D\" objeto recebido é do tipo \"" + 
+            "do tipo " + this.entrada.getClass().getSimpleName() + 
+            " ou double[][][] objeto recebido é do tipo \"" + 
             entrada.getClass().getTypeName() + "\"."
          );
       }
@@ -702,12 +707,17 @@ public class Convolucional extends Camada implements Cloneable{
    }
 
    /**
-    * Calcula os gradientes da camada para os pesos e bias baseado nos
-    * gradientes fornecidos.
+    * <h2>
+    *    Propagação reversa através da camada Convolucional
+    * </h2>
+    * <p>
+    *    Calcula os gradientes da camada para os filtros e bias baseado nos
+    *    gradientes fornecidos.
+    * </p>
     * <p>
     *    Após calculdos, os gradientes em relação a entrada da camada são
     *    calculados e salvos em {@code gradEntrada} para serem retropropagados 
-    *    para as camadas anteriores da Rede Neural em que a camada estiver.
+    *    para as camadas anteriores do modelo em que a camada estiver.
     * </p>
     * Resultados calculados ficam salvos nas prorpiedades {@code camada.gradFiltros} e
     * {@code camada.gradBias}.
@@ -762,8 +772,8 @@ public class Convolucional extends Camada implements Cloneable{
    public void zerarGradientes(){
       verificarConstrucao();
 
-      gradFiltros.preencher(0);
-      gradBias.preencher(0);
+      gradFiltros.zerar();
+      gradBias.zerar();
    }
 
    /**
@@ -786,17 +796,16 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override
    public boolean temBias(){
-      return this.usarBias;
+      return usarBias;
    }
 
    @Override
    public int numParametros(){
       verificarConstrucao();
 
-      int parametros = 0;
-
-      parametros += filtros.tamanho();
-      if(this.usarBias){
+      int parametros = filtros.tamanho();
+      
+      if(usarBias){
          parametros += bias.tamanho();
       }
 
@@ -812,7 +821,7 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override 
    public int tamanhoSaida(){
-      return this.numFiltros * this.altSaida * this.largSaida;
+      return saida.tamanho();
    }
 
    @Override
@@ -823,21 +832,21 @@ public class Convolucional extends Camada implements Cloneable{
          Convolucional clone = (Convolucional) super.clone();
 
          clone.ativacao = this.ativacao;
-
          clone.usarBias = this.usarBias;
-         if(this.usarBias){
-            clone.bias = this.bias.clone();
-            clone.gradBias = this.gradBias.clone();
-         }
 
          clone.entrada     = this.entrada.clone();
          clone.filtros     = this.filtros.clone();
          clone.gradFiltros = this.gradFiltros.clone();
 
-         clone.somatorio   = somatorio.clone();
-         clone.saida       = saida.clone();
-         clone.gradSaida   = gradSaida.clone();
-         clone.derivada    = derivada.clone();
+         if(this.usarBias){
+            clone.bias     = this.bias.clone();
+            clone.gradBias = this.gradBias.clone();
+         }
+
+         clone.somatorio   = this.somatorio.clone();
+         clone.saida       = this.saida.clone();
+         clone.gradSaida   = this.gradSaida.clone();
+         clone.derivada    = this.derivada.clone();
 
          return clone;
       }catch(Exception e){
@@ -877,9 +886,9 @@ public class Convolucional extends Camada implements Cloneable{
       verificarConstrucao();
 
       return new int[]{
-         this.numFiltros,
-         this.altSaida,
-         this.largSaida
+         numFiltros,
+         altSaida,
+         largSaida
       };
    }
 
@@ -891,34 +900,34 @@ public class Convolucional extends Camada implements Cloneable{
       verificarConstrucao();
 
       return new int[]{
-         this.altFiltro,
-         this.largFiltro
+         altFiltro,
+         largFiltro
       };
    }
 
    @Override
    public double[] obterKernel(){
-      return this.filtros.paraArray();
+      return filtros.paraArray();
    }
 
    @Override
    public double[] obterGradKernel(){
-      return this.gradFiltros.paraArray();
+      return gradFiltros.paraArray();
    }
 
    @Override
    public double[] obterBias(){
-      return this.bias.paraArray();
+      return bias.paraArray();
    }
 
    @Override
    public double[] obterGradBias(){
-      return this.gradBias.paraArray();
+      return gradBias.paraArray();
    }
 
    @Override
    public Object obterGradEntrada(){
-      return this.gradEntrada; 
+      return gradEntrada; 
    }
 
    @Override

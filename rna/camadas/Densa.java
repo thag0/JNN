@@ -375,6 +375,7 @@ public class Densa extends Camada implements Cloneable{
    @Override
    public void inicializar(){
       verificarConstrucao();
+
       iniKernel.inicializar(pesos, 0, 0);
       iniBias.inicializar(bias, 0, 0);
    }
@@ -391,31 +392,37 @@ public class Densa extends Camada implements Cloneable{
 
    @Override
    protected void configurarNomes(){
-      this.entrada.nome("entrada");
-      this.pesos.nome("kernel");
-      this.saida.nome("saida");
-      this.somatorio.nome("somatório");
-      this.derivada.nome("derivada");
-      this.gradSaida.nome("gradiente saída");
-      this.gradEntrada.nome("gradiente entrada");
-      this.gradPesos.nome("gradiente kernel");
+      entrada.nome("entrada");
+      pesos.nome("kernel");
+      saida.nome("saida");
+      somatorio.nome("somatório");
+      derivada.nome("derivada");
+      gradSaida.nome("gradiente saída");
+      gradEntrada.nome("gradiente entrada");
+      gradPesos.nome("gradiente kernel");
 
       if(usarBias){
-         this.bias.nome("bias");
-         this.gradBias.nome("gradiente bias");
+         bias.nome("bias");
+         gradBias.nome("gradiente bias");
       }
    }
 
    /**
-    * Alimenta os dados de entrada para a saída da camada por meio da 
-    * multiplicação matricial entre os pesos da camada e os dados de 
-    * entrada, em seguida é adicionado o bias caso ele seja configurado 
-    * no momento da inicialização.
+    * <h2>
+    *    Propagação direta através da camada Densa
+    * </h2>
     * <p>
-    *    A pressão que define a saída é dada por:
+    *    Alimenta os dados de entrada para a saída da camada por meio da 
+    *    multiplicação matricial entre a entrada recebida da camada e os pesos 
+    *    da camada, em seguida é adicionado o bias caso ele seja configurado 
+    *    no momento da inicialização.
+    * </p>
+    * <p>
+    *    A expressão que define a saída é dada por:
     * </p>
     * <pre>
-    *somatorio = (pesos * entrada) + bias
+    *somatorio = matMult(entrada * pesos)
+    *somatorio.add(bias)
     *saida = ativacao(somatorio)
     * </pre>
     * Após a propagação dos dados, a função de ativação da camada é aplicada
@@ -474,12 +481,17 @@ public class Densa extends Camada implements Cloneable{
    }
 
    /**
-    * Calcula os gradientes da camada para os pesos e bias baseado nos
-    * gradientes fornecidos.
+    * <h2>
+    *    Propagação reversa através da camada Densa
+    * </h2>
+    * <p>
+    *    Calcula os gradientes da camada para os pesos e bias baseado nos
+    *    gradientes fornecidos.
+    * </p>
     * <p>
     *    Após calculdos, os gradientes em relação a entrada da camada são
     *    calculados e salvos em {@code gradEntrada} para serem retropropagados 
-    *    para as camadas anteriores da Rede Neural em que a camada estiver.
+    *    para as camadas anteriores do modelo em que a camada estiver.
     * </p>
     * Resultados calculados ficam salvos nas prorpiedades {@code camada.gradPesos} e
     * {@code camada.gradBias}.
@@ -538,7 +550,7 @@ public class Densa extends Camada implements Cloneable{
 
    @Override
    public Tensor4D saida(){
-      return this.saida;
+      return saida;
    }
 
    /**
@@ -546,9 +558,9 @@ public class Densa extends Camada implements Cloneable{
     * @return quantidade de neurônios presentes na camada.
     */
    public int numNeuronios(){
-      super.verificarConstrucao();
+      verificarConstrucao();
 
-      return this.pesos.dim4();
+      return pesos.dim4();
    }
 
    @Override
@@ -561,9 +573,9 @@ public class Densa extends Camada implements Cloneable{
     * @return tamanho de entrada da camada.
     */
    public int tamanhoEntrada(){
-      super.verificarConstrucao();
+      verificarConstrucao();
 
-      return this.entrada.dim4();
+      return entrada.dim4();
    }
 
    /**
@@ -571,23 +583,22 @@ public class Densa extends Camada implements Cloneable{
     * @return tamanho de saída da camada.
     */
    public int tamanhoSaida(){
-      return this.numNeuronios;
+      return numNeuronios;
    }
 
    @Override
    public boolean temBias(){
-      return this.usarBias;
+      return usarBias;
    }
 
    @Override
    public int numParametros(){
-      super.verificarConstrucao();
+      verificarConstrucao();
 
-      int parametros = 0;
+      int parametros = pesos.tamanho();
       
-      parametros += this.pesos.tamanho();
-      if(this.temBias()){
-         parametros += this.bias.tamanho();
+      if(usarBias){
+         parametros += bias.tamanho();
       }
 
       return parametros;
@@ -595,8 +606,9 @@ public class Densa extends Camada implements Cloneable{
 
    @Override
    public double[] saidaParaArray(){
-      super.verificarConstrucao();
-      return this.saida.array1D(0, 0, 0);
+      verificarConstrucao();
+      
+      return saida.paraArray();
    }
 
    /**
@@ -612,14 +624,14 @@ public class Densa extends Camada implements Cloneable{
     * @return buffer formatado contendo as informações da camada.
     */
    public String info(){
-      super.verificarConstrucao();
+      verificarConstrucao();
 
       String buffer = "";
       String espacamento = "    ";
       
       buffer += "\nInfo " + this.getClass().getSimpleName() + " " + this.id + " = [\n";
 
-      buffer += espacamento + "Ativação: " + this.ativacao.getClass().getSimpleName() + "\n";
+      buffer += espacamento + "Ativação: " + this.ativacao.nome() + "\n";
       buffer += espacamento + "Quantidade neurônios: " + this.numNeuronios() + "\n";
       buffer += "\n";
 
@@ -637,7 +649,7 @@ public class Densa extends Camada implements Cloneable{
 
    @Override
    public Densa clonar(){
-      super.verificarConstrucao();
+      verificarConstrucao();
 
       try{
          Densa clone = (Densa) super.clone();
@@ -670,15 +682,15 @@ public class Densa extends Camada implements Cloneable{
     * Calcula o formato de entrada da camada Densa, que é disposto da
     * seguinte forma:
     * <pre>
-    *    formato = (entrada.altura, entrada.largura)
+    *    formato = (altura, largura)
     * </pre>
     * @return formato de entrada da camada.
     */
    @Override
    public int[] formatoEntrada(){
       return new int[]{
-         this.entrada.dim3(), 
-         this.entrada.dim4()
+         entrada.dim3(), 
+         entrada.dim4()
       };
    }
 
@@ -697,34 +709,34 @@ public class Densa extends Camada implements Cloneable{
    @Override
    public int[] formatoSaida(){
       return new int[]{
-         this.saida.dim3(), 
-         this.saida.dim4()
+         saida.dim3(), 
+         saida.dim4()
       };
    }
 
    @Override
    public double[] obterKernel(){
-      return this.pesos.paraArray();
+      return pesos.paraArray();
    }
 
    @Override
    public double[] obterGradKernel(){
-      return this.gradPesos.paraArray();
+      return gradPesos.paraArray();
    }
 
    @Override
    public double[] obterBias(){
-      return this.bias.paraArray();
+      return bias.paraArray();
    }
 
    @Override
    public double[] obterGradBias(){
-      return this.gradBias.paraArray();
+      return gradBias.paraArray();
    }
 
    @Override
    public Object obterGradEntrada(){
-      return this.gradEntrada;
+      return gradEntrada;
    }
 
    @Override
@@ -785,7 +797,7 @@ public class Densa extends Camada implements Cloneable{
    public void zerarGradientes(){
       verificarConstrucao();
 
-      gradPesos.preencher(0);
-      gradBias.preencher(0);
+      gradPesos.zerar();
+      gradBias.zerar();
    }
 }

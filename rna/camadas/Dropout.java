@@ -193,14 +193,16 @@ public class Dropout extends Camada implements Cloneable{
 
    @Override
    protected void configurarNomes(){
-      this.entrada.nome("entrada");
-      this.mascara.nome("máscara");
-      this.saida.nome("saida");
-      this.gradEntrada.nome("gradiente entrada");    
+      entrada.nome("entrada");
+      mascara.nome("máscara");
+      saida.nome("saida");
+      gradEntrada.nome("gradiente entrada");    
    }
 
    /**
-    * Propaga os dados de entrada recebido pela camada de dropout.
+    * <h2>
+    *    Propagação direta através da camada Dropout
+    * </h2>
     * <p>
     *    A máscara de dropout é gerada e utilizada apenas durante o processo
     *    de treinamento, durante isso, cada predição irá gerar uma máscara diferente,
@@ -225,7 +227,7 @@ public class Dropout extends Camada implements Cloneable{
          Tensor4D e = (Tensor4D) entrada;
          if(this.entrada.comparar3D(e) == false){
             throw new IllegalArgumentException(
-               "\n Dimensões de entrada " + e.dimensoesStr() + 
+               "\nDimensões de entrada " + e.dimensoesStr() + 
                "incompatível com as dimensões da entrada da camada " + this.entrada.dimensoesStr()
             );
          }
@@ -277,6 +279,9 @@ public class Dropout extends Camada implements Cloneable{
    }
 
    /**
+    * <h2>
+    *    Propagação reversa através da camada Dropout
+    * </h2>
     * Retropropaga os gradientes da camada suguinte, aplicando a máscara usada
     * no cálculo da saída.
     * <h3>
