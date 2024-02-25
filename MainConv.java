@@ -42,7 +42,7 @@ public class MainConv{
 
       System.out.println("Treinando.");
       t1 = System.nanoTime();
-      modelo.treinar(treinoX, treinoY, EPOCAS_TREINO, true);
+      modelo.treinar(treinoX, treinoY, EPOCAS_TREINO, 16, true);
       t2 = System.nanoTime();
 
       long tempoDecorrido = t2 - t1;
@@ -63,7 +63,7 @@ public class MainConv{
       final var testeY = criarRotulosMNIST(NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
       System.out.println(
          "Teste -> perda: " + modelo.avaliar(testeX, testeY) + 
-         " - acurácia: " + (modelo.avaliador().acuracia(testeX, testeY) * 100) + "%"
+         " - acurácia: " + formatarDecimal((modelo.avaliador().acuracia(testeX, testeY) * 100), 4) + "%"
       );
       
       exportarHistorico(modelo, caminhoHistorico);
@@ -83,7 +83,7 @@ public class MainConv{
          new Convolucional(new int[]{4, 4}, 20, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(100, "sigmoid"),
+         new Densa(120, "sigmoid"),
          new Densa(NUM_DIGITOS_TREINO, "softmax")
       });
 
@@ -93,9 +93,9 @@ public class MainConv{
    }
 
    /**
-    * 
-    * @param modelo
-    * @param caminho
+    * Salva o modelo num arquivo externo.
+    * @param modelo instância de um modelo sequencial.
+    * @param caminho caminho de destino.
     */
    static void salvarModelo(Sequencial modelo, String caminho){
       System.out.println("Salvando modelo.");

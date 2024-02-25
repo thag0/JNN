@@ -81,7 +81,7 @@ public class MainImg{
          new Densa(saidas, "sigmoid")
       });
 
-      modelo.compilar("sgd", "rmse");
+      modelo.compilar("sgd", "mse");
       modelo.configurarHistorico(calcularHistorico);
 
       return modelo;
@@ -98,7 +98,7 @@ public class MainImg{
     */
    static long treinoEmPainel(Modelo modelo, int altura, int largura, double[][] entradas, double[][] saidas){
       final int fps = 6000;
-      int epocasPorFrame = 50;
+      int epocasPorFrame = 40;
 
       //acelerar o processo de desenho
       //bom em situações de janelas muito grandes

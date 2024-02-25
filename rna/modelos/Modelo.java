@@ -216,6 +216,14 @@ public abstract class Modelo{
    public abstract Object[] calcularSaidas(Object[] entradas);
 
    /**
+    * Zera os gradientes acumulados do modelo.
+    * <p>
+    *    Apenas gradientes de camadas treináveis serão zerados.
+    * </p>
+    */
+   public abstract void zerarGradientes();
+
+   /**
     * Treina o modelo de acordo com as configurações predefinidas.
     * <p>
     *    Certifique-se de configurar adequadamente o modelo para obter os 

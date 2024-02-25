@@ -587,6 +587,13 @@ public class RedeNeural extends Modelo implements Cloneable{
       return previsoes;
    }
 
+   @Override
+   public void zerarGradientes(){
+      for(int i = 0; i < camadas.length; i++){
+         camadas[i].zerarGradientes();
+      }
+   }
+
    /**
     * Método alternativo no treino da rede neural usando diferenciação finita (finite difference), 
     * que calcula a "derivada" da função de custo levando a rede ao mínimo local dela. É importante 

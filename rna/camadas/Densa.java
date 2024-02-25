@@ -163,22 +163,6 @@ public class Densa extends Camada implements Cloneable{
     * </pre>
     */
    public Tensor4D gradBias;
-   
-   /**
-    * Auxiliar no treino em lotes.
-    * <p>
-    *    Tensor de gradiente para os pesos usado como acumulador
-    * </p>
-    */
-   public Tensor4D gradAcPesos;
-
-   /**
-    * Auxiliar no treino em lotes.
-    * <p>
-    *    Tensor de gradiente para os bias usado como acumulador
-    * </p>
-    */
-   public Tensor4D gradAcBias;
 
    /**
     * Matriz coluna contendo os valores de derivada da função de ativação.
@@ -363,26 +347,22 @@ public class Densa extends Camada implements Cloneable{
       }
 
       //inicializações
-      this.entrada = new Tensor4D(1, 1, 1, this.tamEntrada);
-      this.saida =   new Tensor4D(1, 1, 1, this.numNeuronios);
-      this.pesos = new Tensor4D(1, 1, this.tamEntrada, this.numNeuronios);
+      this.entrada =    new Tensor4D(1, 1, 1, this.tamEntrada);
+      this.saida =      new Tensor4D(1, 1, 1, this.numNeuronios);
+      this.pesos =      new Tensor4D(1, 1, this.tamEntrada, this.numNeuronios);
+      this.gradPesos =  new Tensor4D(pesos.dimensoes());
 
       if(usarBias){
-         this.bias =       new Tensor4D(this.saida);
-         this.gradBias =   new Tensor4D(this.saida);
-         this.gradAcBias = new Tensor4D(this.saida);
+         this.bias =     new Tensor4D(saida.dimensoes());
+         this.gradBias = new Tensor4D(saida.dimensoes());
       }
 
-      this.somatorio =   new Tensor4D(this.saida);
-      this.derivada =    new Tensor4D(this.saida);
-      this.gradSaida =   new Tensor4D(this.saida);
+      this.somatorio =   new Tensor4D(saida.dimensoes());
+      this.derivada =    new Tensor4D(saida.dimensoes());
+      this.gradSaida =   new Tensor4D(saida.dimensoes());
       this.gradEntrada = new Tensor4D(1, 1, this.entrada.dim3(), this.entrada.dim4());
-
-      this.gradPesos =   new Tensor4D(this.pesos);
-      this.gradAcPesos = new Tensor4D(this.pesos);
-
       
-      this.treinavel = true;
+      this.treinavel = true;//camada pode ser treinada.
       this.construida = true;//camada pode ser usada.
    }
 
@@ -419,12 +399,10 @@ public class Densa extends Camada implements Cloneable{
       this.gradSaida.nome("gradiente saída");
       this.gradEntrada.nome("gradiente entrada");
       this.gradPesos.nome("gradiente kernel");
-      this.gradAcPesos.nome("acumulador gradiente pesos");  
 
       if(usarBias){
          this.bias.nome("bias");
          this.gradBias.nome("gradiente bias");
-         this.gradAcBias.nome("acumulador gradiente Bias");
       }
    }
 
@@ -539,17 +517,18 @@ public class Densa extends Camada implements Cloneable{
 
       //backward
       ativacao.derivada(this);
+
+      //gradiente temporário para usar como acumulador.
+      Tensor4D tempGrad = new Tensor4D(gradPesos.dimensoes());
       
       optensor.matMult(
-         optensor.matTranspor(this.entrada, 0, 0),
-         derivada,
-         gradPesos,
-         0,
-         0
+         optensor.matTranspor(this.entrada, 0, 0), derivada, tempGrad,
+         0, 0
       );
+      gradPesos.add(tempGrad);
 
       if(usarBias){
-         gradBias.copiar(derivada);
+         gradBias.add(derivada);
       }
 
       optensor.matMult(
@@ -671,7 +650,6 @@ public class Densa extends Camada implements Cloneable{
          if(this.usarBias){
             clone.bias = this.bias.clone();
             clone.gradBias = this.gradBias.clone();
-            clone.gradAcBias = this.gradAcBias.clone();
          }
 
          clone.entrada = this.entrada.clone();
@@ -735,11 +713,6 @@ public class Densa extends Camada implements Cloneable{
    }
 
    @Override
-   public double[] obterAcGradKernel(){
-      return this.gradAcPesos.paraArray();    
-   }
-
-   @Override
    public double[] obterBias(){
       return this.bias.paraArray();
    }
@@ -747,11 +720,6 @@ public class Densa extends Camada implements Cloneable{
    @Override
    public double[] obterGradBias(){
       return this.gradBias.paraArray();
-   }
-
-   @Override
-   public double[] obterAcGradBias(){
-      return this.gradAcBias.paraArray();       
    }
 
    @Override
@@ -779,21 +747,6 @@ public class Densa extends Camada implements Cloneable{
    @Override
    public void editarGradienteBias(double[] grads){
       this.gradBias.copiar(grads, 0, 0, 0);
-   }
-
-   @Override
-   public void editarAcGradKernel(double[] acumulador){
-      int cont = 0;
-      for(int i = 0; i < gradAcPesos.dim3(); i++){
-         for(int j = 0; j < gradAcPesos.dim4(); j++){
-            this.gradAcPesos.editar(0, 0, i, j, acumulador[cont++]);
-         }
-      }
-   }
-
-   @Override
-   public void editarAcGradBias(double[] acumulador){
-      this.gradAcBias.copiar(acumulador, 0, 0, 0);
    }
 
    @Override
@@ -829,9 +782,10 @@ public class Densa extends Camada implements Cloneable{
    }
 
    @Override
-   public void zerarAcumuladores(){
-      super.verificarConstrucao();
-      this.gradAcPesos.preencher(0);
-      this.gradAcBias.preencher(0);
+   public void zerarGradientes(){
+      verificarConstrucao();
+
+      gradPesos.preencher(0);
+      gradBias.preencher(0);
    }
 }

@@ -265,7 +265,7 @@ public class Flatten extends Camada{
          );
       }
    }
-
+   
    @Override
    public Tensor4D saida(){
       verificarConstrucao();

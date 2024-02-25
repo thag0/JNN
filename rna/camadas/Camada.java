@@ -139,7 +139,7 @@ public abstract class Camada{
     */
    public void configurarAtivacao(Object ativacao){
       throw new UnsupportedOperationException(
-         "\nImplementar configuração da função de ativação da camada " + this.getClass().getTypeName() + "."
+         "\nImplementar configuração da função de ativação da camada " + nome() + "."
       );
    }
 
@@ -168,7 +168,7 @@ public abstract class Camada{
     */
    public void configurarBias(boolean usarBias){
       throw new UnsupportedOperationException(
-         "\nImplementar configuração de bias da camada " + this.getClass().getTypeName() + "."
+         "\nImplementar configuração de bias da camada " + nome() + "."
       );     
    }
 
@@ -188,7 +188,7 @@ public abstract class Camada{
     */
    public void configurarSeed(long seed){
       throw new UnsupportedOperationException(
-         "\nImplementar configuração de seed da camada " + this.getClass().getTypeName() + "."
+         "\nImplementar configuração de seed da camada " + nome() + "."
       ); 
    }
 
@@ -233,7 +233,7 @@ public abstract class Camada{
     */
    public Ativacao obterAtivacao(){
       throw new UnsupportedOperationException(
-         "\nImplementar retorno da função de ativação da camada " + this.getClass().getTypeName() + "."
+         "\nImplementar retorno da função de ativação da camada " + nome() + "."
       );
    }
    
@@ -269,7 +269,7 @@ public abstract class Camada{
     */
    public double[] saidaParaArray(){
       throw new UnsupportedOperationException(
-         "\nImplementar retorno de saída para array da camada" + this.getClass().getTypeName() + "."
+         "\nImplementar retorno de saída para array da camada" + nome() + "."
       );   
    }
 
@@ -279,7 +279,7 @@ public abstract class Camada{
     */
    public int tamanhoSaida(){
       throw new UnsupportedOperationException(
-         "\nImplementar retorno de tamanho da saída da camada " + this.getClass().getTypeName() + "."
+         "\nImplementar retorno de tamanho da saída da camada " + nome() + "."
       );        
    }
 
@@ -299,7 +299,7 @@ public abstract class Camada{
     */
    public boolean temBias(){
       throw new UnsupportedOperationException(
-         "\nImplementar uso do bias na camada " + this.getClass().getTypeName() + "."
+         "\nImplementar uso do bias na camada " + nome() + "."
       );  
    }
 
@@ -313,7 +313,7 @@ public abstract class Camada{
     */
    public double[] obterKernel(){
       throw new UnsupportedOperationException(
-         "\nImplementar retorno do kernel da camada " + this.getClass().getTypeName() + "."
+         "\nImplementar retorno do kernel da camada " + nome() + "."
       );       
    }
 
@@ -324,22 +324,7 @@ public abstract class Camada{
     */
    public double[] obterGradKernel(){
       throw new UnsupportedOperationException(
-         "\nImplementar retorno do gradiente para o kernel da camada" + this.getClass().getTypeName() + "."
-      );       
-   }
-
-   /**
-    * Retorna um array contendo os elementos acumuladores para o kernel presente na camada.
-    * <p>
-    *    O kernel de uma camada inclui seus atributos mais importantes, como
-    *    os pesos de uma camada densa, ou os filtros de uma camada convolucional.
-    * </p>
-    * Necessário para o treino em lotes.
-    * @return acumulador para o kernel da camada.
-    */
-   public double[] obterAcGradKernel(){
-      throw new UnsupportedOperationException(
-         "\nImplementar retorno do acumulador para o kernel da camada " + this.getClass().getTypeName() + "."
+         "\nImplementar retorno do gradiente para o kernel da camada" + nome() + "."
       );       
    }
 
@@ -354,7 +339,7 @@ public abstract class Camada{
     */
    public double[] obterBias(){
       throw new UnsupportedOperationException(
-         "\nImplementar retorno do bias da camada " + this.getClass().getTypeName() + "."
+         "\nImplementar retorno do bias da camada " + nome() + "."
       );        
    }
 
@@ -365,18 +350,7 @@ public abstract class Camada{
     */
    public double[] obterGradBias(){
       throw new UnsupportedOperationException(
-         "\nImplementar retorno do gradiente para o bias da camada" + this.getClass().getTypeName() + "."
-      );        
-   }
-
-   /**
-    * Retorna um array contendo os elementos usados para armazenar o valor
-    * dos acumuladores para os bias da camada.
-    * @return acumuladores para os bias da camada.
-    */
-   public double[] obterAcGradBias(){
-      throw new UnsupportedOperationException(
-         "\nImplementar retorno do acumulador para o bias da camada" + this.getClass().getTypeName() + "."
+         "\nImplementar retorno do gradiente para o bias da camada" + nome() + "."
       );        
    }
 
@@ -387,7 +361,7 @@ public abstract class Camada{
     */
    public Object obterGradEntrada(){
       throw new UnsupportedOperationException(
-         "\nImplementar retorno do gradiente de entrada da camada " + this.getClass().getTypeName() + "."
+         "\nImplementar retorno do gradiente de entrada da camada " + nome() + "."
       );     
    }
 
@@ -398,7 +372,7 @@ public abstract class Camada{
     */
    public void editarGradienteKernel(double[] grads){
       throw new UnsupportedOperationException(
-         "\nImplementar edição do gradiente para o kernel para a camada " + this.getClass().getTypeName() + "."
+         "\nImplementar edição do gradiente para o kernel para a camada " + nome() + "."
       );
    }
 
@@ -409,19 +383,8 @@ public abstract class Camada{
     */
    public void editarKernel(double[] kernel){
       throw new UnsupportedOperationException(
-         "\nImplementar edição do kernel para a camada " + this.getClass().getTypeName() + "."
+         "\nImplementar edição do kernel para a camada " + nome() + "."
       );
-   }
-
-   /**
-    * Ajusta os valores do acumulador do kernel usando os valores contidos no array
-    * fornecido.
-    * @param acumulador novos valores do acumulador.
-    */
-   public void editarAcGradKernel(double[] acumulador){
-      throw new UnsupportedOperationException(
-         "\nImplementar edição do acumulador do kernel para a camada " + this.getClass().getTypeName() + "."
-      );      
    }
 
    /**
@@ -431,7 +394,7 @@ public abstract class Camada{
     */
    public void editarGradienteBias(double[] grads){
       throw new UnsupportedOperationException(
-         "\nImplementar edição do gradiente para o bias para a camada " + this.getClass().getTypeName() + "."
+         "\nImplementar edição do gradiente para o bias para a camada " + nome() + "."
       );
    }
 
@@ -442,27 +405,16 @@ public abstract class Camada{
     */
    public void editarBias(double[] bias){
       throw new UnsupportedOperationException(
-         "\nImplementar edição do bias para a camada " + this.getClass().getTypeName() + "."
+         "\nImplementar edição do bias para a camada " + nome() + "."
       );
    }
 
    /**
-    * Ajusta os valores do acumulador do bias usando os valores contidos no array
-    * fornecido.
-    * @param  acumulador valores do acumulador.
+    * Zera os gradientes para os kernels e bias da camada.
     */
-   public void editarAcGradBias(double[] acumulador){
+   public void zerarGradientes(){
       throw new UnsupportedOperationException(
-         "\nImplementar edição do acumulador do bias para a camada " + this.getClass().getTypeName() + "."
-      );      
-   }
-
-   /**
-    * Zera os acumudalores de gradientes para os kernels e bias da camada.
-    */
-   public void zerarAcumuladores(){
-      throw new UnsupportedOperationException(
-         "\nImplementar reset para acumuladores da camada " + this.getClass().getTypeName() + "."
+         "\nImplementar reset para acumuladores da camada " + nome() + "."
       );
    }
 
@@ -472,7 +424,7 @@ public abstract class Camada{
     */
    public Camada clonar(){
       throw new IllegalArgumentException(
-         "\nImplementar clonagem para a camada " + this.getClass().getTypeName() + "." 
+         "\nImplementar clonagem para a camada " + nome() + "." 
       );
    }
 

@@ -20,7 +20,7 @@ public class Benchmark{
       ged.limparConsole();
 
       convForward();
-      testarForward();
+      convBackward();
    }
 
    /**

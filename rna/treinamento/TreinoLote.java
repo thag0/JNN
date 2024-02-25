@@ -81,94 +81,29 @@ class TreinoLote{
             int fimIndice = Math.min(i + tamLote, numAmostras);
             Object[] entradaLote = aux.obterSubMatriz(amostras, i, fimIndice);
             Object[] saidaLote = aux.obterSubMatriz(saidas, i, fimIndice);
-
-            //reiniciar gradiente do lote
-            zerarGradientesAcumulados(camadas);
+            
+            modelo.zerarGradientes();//zerar gradientes para o acumular pelo lote
             for(int j = 0; j < entradaLote.length; j++){
                double[] saidaAmostra = (double[]) saidaLote[j];
-
                modelo.calcularSaida(entradaLote[j]);
+
                if(this.calcularHistorico){
                   perdaEpoca += perda.calcular(modelo.saidaParaArray(), saidaAmostra);
                }
 
-               backpropagationLote(camadas, perda, saidaAmostra);
+               aux.backpropagation(camadas, perda, saidaAmostra);
             }
 
-            //normalizar gradientes para enviar pro otimizador
-            calcularMediaGradientesLote(camadas, entradaLote.length);
             otimizador.atualizar(camadas);
+         }
+
+         if(logs && (e % 5 == 0)){
+            System.out.println("Época " +  e + "/" + epochs + " -> perda: " + (double)(perdaEpoca/numAmostras));
          }
 
          //feedback de avanço da rede
          if(calcularHistorico){
-            historico.add((perdaEpoca/tamLote));
-         }
-      }
-   }
-
-   /**
-    * Realiza a retropropagação de gradientes de cada camada para a atualização de pesos.
-    * <p>
-    *    Os gradientes iniciais são calculados usando a derivada da função de perda, com eles
-    *    calculados, são retropropagados da última a primeira camada da rede.
-    * </p>
-    * Ao final os gradientes calculados são adicionados aos acumuladores para o lote.
-    * @param camadas conjunto de camadas do modelo.
-    * @param perda função de perda do modelo.
-    * @param real saída real que será usada para calcular os erros e gradientes.
-    */
-   void backpropagationLote(Camada[] camadas, Perda perda, double[] real){
-      aux.backpropagation(camadas, perda, real);
-
-      for(Camada camada : camadas){
-         if(camada.treinavel == false) continue;
-
-         double[] gradK = camada.obterGradKernel();
-         double[] acK   = camada.obterAcGradKernel();
-         oparr.add(acK, gradK, acK);
-         camada.editarAcGradKernel(acK);
-
-         if(camada.temBias()){
-            double[] gradB = camada.obterGradBias();
-            double[] acB   = camada.obterAcGradBias();
-            oparr.add(acB, gradB, acB);
-            camada.editarAcGradBias(acB);
-         }     
-      }
-   }
-
-   /**
-    * Zera todos os acumuladores de gradientes das camadas (para kernels e bias)
-    * para iniciar o treinamento de um lote.
-    * @param camadas conjunto de camadas do modelo.
-    */
-   void zerarGradientesAcumulados(Camada[] camadas){
-      for(Camada camada : camadas){
-         if(camada.treinavel == false) continue;
-         camada.zerarAcumuladores();
-      }
-   }
-
-   /**
-    * 
-    * @param camadas conjunto de camadas do modelo.
-    * @param tamLote tamanho do lote usado para o treino.
-    */
-   void calcularMediaGradientesLote(Camada[] camadas, int tamLote){
-      double tamanho = (double)tamLote;
-
-      for(Camada camada : camadas){
-         if(camada.treinavel == false) continue;
-         
-         double[] acKernel = camada.obterAcGradKernel();
-         oparr.divEscalar(acKernel, tamanho, acKernel);
-         camada.editarGradienteKernel(acKernel);
-
-         if(camada.temBias()){
-            double[] acBias = camada.obterAcGradBias();
-            oparr.divEscalar(acBias, tamanho, acBias);
-            camada.editarGradienteBias(acBias);
+            historico.add((perdaEpoca/numAmostras));
          }
       }
    }

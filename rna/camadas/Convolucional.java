@@ -747,13 +747,23 @@ public class Convolucional extends Camada implements Cloneable{
       gradEntrada.preencher(0);
 
       //backward
-      optensor.convBackward(this.entrada, filtros, derivada, gradFiltros, gradEntrada);
+      Tensor4D tempGrad = new Tensor4D(gradFiltros.dimensoes());
+      optensor.convBackward(this.entrada, filtros, derivada, tempGrad, gradEntrada);
+      gradFiltros.add(tempGrad);
 
       if(usarBias){
          for(int i = 0; i < numFiltros; i++){
-            gradBias.editar(0, 0, 0, i, derivada.somarElementos2D(0, i));
+            gradBias.add(0, 0, 0, i, derivada.somarElementos2D(0, i));
          }
       }
+   }
+
+   @Override
+   public void zerarGradientes(){
+      verificarConstrucao();
+
+      gradFiltros.preencher(0);
+      gradBias.preencher(0);
    }
 
    /**
