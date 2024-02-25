@@ -31,13 +31,16 @@ public class TesteTreino{
       Tensor4D treinoX = new Tensor4D(entrada);
 
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Densa(2, 3, "tanh"),
+         new Densa(2, 3, "sigmoid"),
          new Densa(1, "sigmoid")
       });
       
-      modelo.compilar(new SGD(0.00001, 0.9999), "mse");
+      modelo.compilar(new SGD(0.00001, 0.99995), "mse");
       modelo.treinar(treinoX, saida, 10_000, false);
       verificar(entrada, saida, modelo);
+
+      double perda = modelo.avaliar(entrada, saida);
+      System.out.println("\nPerda: " + perda + "\n");
    }
 
    static void verificar(Object entrada, double[][] saida, Sequencial modelo){

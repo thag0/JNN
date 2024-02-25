@@ -3,6 +3,7 @@ package rna.modelos;
 import rna.avaliacao.Avaliador;
 import rna.avaliacao.perda.Perda;
 import rna.camadas.Camada;
+import rna.core.Utils;
 import rna.otimizadores.Otimizador;
 import rna.treinamento.Treinador;
 
@@ -258,17 +259,12 @@ public abstract class Modelo{
     * @param tamLote tamanho do lote de treinamento.
     * @param logs logs para perda durante as épocas de treinamento.
     */
-   public void treinar(Object[] entradas, Object[] saidas, int epochs, int tamLote, boolean logs){
+   public void treinar(Object entradas, Object[] saidas, int epochs, int tamLote, boolean logs){
       verificarCompilacao();
 
       if(epochs < 1){
          throw new IllegalArgumentException(
             "\nO valor de epochs (" + epochs + ") não pode ser menor que um"
-         );
-      }
-      if(tamLote <= 0 || tamLote > entradas.length){
-         throw new IllegalArgumentException(
-            "\nO valor de tamanho do lote (" + tamLote + ") é inválido."
          );
       }
 
@@ -289,12 +285,17 @@ public abstract class Modelo{
     * @param saida dados de saída correspondente as entradas fornecidas.
     * @return valor de perda do modelo.
     */
-   public double avaliar(Object[] entrada, Object[] saida){
+   public double avaliar(Object entrada, Object[] saida){
       verificarCompilacao();
+
+      //por enquanto uma instância local
+      Utils utils = new Utils();
+      Object[] amostras = utils.transformarParaArray(entrada);
+
  
-      if(entrada.length != saida.length){
+      if(amostras.length != saida.length){
          throw new IllegalArgumentException(
-            "\nA quantidade de dados de entrada (" + entrada.length + ") " +
+            "\nA quantidade de dados de entrada (" + amostras.length + ") " +
             "e saída (" + saida.length + ") " + "devem ser iguais."
          );
       }
@@ -305,12 +306,12 @@ public abstract class Modelo{
             " recebido " + saida.getClass().getTypeName()
          );
       }
- 
+
       double[][] s = (double[][]) saida;
-      int n = entrada.length;
+      int n = amostras.length;
       double soma = 0;
       for(int i = 0; i < n; i++){
-         calcularSaida(entrada[i]);
+         calcularSaida(amostras[i]);
          soma += perda.calcular(saidaParaArray(), s[i]);
       }
 

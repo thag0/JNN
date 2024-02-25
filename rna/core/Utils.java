@@ -176,6 +176,6 @@ public class Utils{
          );
       }
 
-      return elementos;
+      return elementos.clone();
    }
 }

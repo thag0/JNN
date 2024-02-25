@@ -6,6 +6,7 @@ import lib.ged.Dados;
 import lib.ged.Ged;
 import lib.geim.Geim;
 import rna.camadas.*;
+import rna.core.Tensor4D;
 import rna.modelos.Modelo;
 import rna.modelos.Sequencial;
 import rna.otimizadores.SGD;
@@ -29,7 +30,7 @@ public class MainConv{
    public static void main(String[] args){
       ged.limparConsole();
       
-      final var treinoX = carregarDadosMNIST(caminhoTreino, NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO);
+      final var treinoX = new Tensor4D(carregarDadosMNIST(caminhoTreino, NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO));
       final var treinoY = criarRotulosMNIST(NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO);
 
       Sequencial modelo = criarModelo();
@@ -87,7 +88,7 @@ public class MainConv{
          new Densa(NUM_DIGITOS_TREINO, "softmax")
       });
 
-      modelo.compilar(new SGD(0.001, 0.95), "entropia-cruzada");
+      modelo.compilar(new SGD(0.01, 0.9), "entropia-cruzada");
 
       return modelo;
    }

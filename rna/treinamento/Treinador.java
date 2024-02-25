@@ -79,7 +79,7 @@ public class Treinador{
     * @param tamLote tamanho do lote.
     * @param logs logs para perda durante as épocas de treinamento.
     */
-   public void treino(Modelo modelo, Object[] entradas, Object[] saidas, int epochs, int tamLote, boolean logs){
+   public void treino(Modelo modelo, Object entradas, Object[] saidas, int epochs, int tamLote, boolean logs){
       executar(modelo, entradas, saidas, epochs, tamLote, logs);
    }
 

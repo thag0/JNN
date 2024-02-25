@@ -70,17 +70,18 @@ class TreinoLote{
       Perda perda = modelo.perda();
 
       Object[] amostras = utils.transformarParaArray(entradas);
+      Object[] rotulos = utils.transformarParaArray(saidas);
       int numAmostras = amostras.length;
 
       double perdaEpoca;
       for(int e = 1; e <= epochs; e++){
-         aux.embaralharDados(amostras, saidas);
+         aux.embaralharDados(amostras, rotulos);
          perdaEpoca = 0;
 
          for(int i = 0; i < numAmostras; i += tamLote){
             int fimIndice = Math.min(i + tamLote, numAmostras);
             Object[] entradaLote = aux.obterSubMatriz(amostras, i, fimIndice);
-            Object[] saidaLote = aux.obterSubMatriz(saidas, i, fimIndice);
+            Object[] saidaLote = aux.obterSubMatriz(rotulos, i, fimIndice);
             
             modelo.zerarGradientes();//zerar gradientes para o acumular pelo lote
             for(int j = 0; j < entradaLote.length; j++){
