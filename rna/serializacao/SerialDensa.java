@@ -44,7 +44,7 @@ class SerialDensa{
          bw.newLine();
          
          //função de ativação
-         bw.write(String.valueOf(camada.obterAtivacao().getClass().getSimpleName()));
+         bw.write(String.valueOf(camada.ativacao().getClass().getSimpleName()));
          bw.newLine();
 
          //bias

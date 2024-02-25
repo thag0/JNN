@@ -41,12 +41,7 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
       
-      Tensor4D tensor = new Tensor4D(2, 2, 2, 2);
-      tensor.preencherContador(true);
-      tensor.print(1);
-
-      Tensor4D subTensor = tensor.subTensor1D(0, 1, 0);
-      subTensor.print(1);
+      Convolucional conv = new Convolucional(new int[]{2, 2},1);
    }
 
    /**

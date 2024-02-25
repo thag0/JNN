@@ -4,12 +4,17 @@ import rna.ativacoes.Ativacao;
 
 /**
  * <h2>
- *    Modelo base para a representação de uma Camada individual
- *    dentro da biblioteca
+ *    Camada base
  * </h2>
  * <p>
  *    A classe camada serve apenas de molde para criação de novas
  *    camadas e não pode ser especificamente instanciada nem utilizada.
+ * </p>
+ * <p>
+ *    Não é recomendado fazer atribuições ou alterações diretamente dos
+ *    atributos de camadas filhas fora da biblioteca, eles estão publicos
+ *    apenas pela facilidade de manuseio. Para estes é recomendado usar
+ *    os métodos propostos pelas camadas.
  * </p>
  * <p>
  *    As partes mais importantes de uma camada são {@code calcularSaida()} e 
@@ -29,7 +34,7 @@ import rna.ativacoes.Ativacao;
  *    entradas para retropropagar para camadas anteriores usadas pelos modelos.
  * </p>
  * <h2>
- * Existem dois detalhes importantes na implementação das camadas.
+ *    Existem dois detalhes importantes na implementação das camadas.
  * </h2>
  * <ul>
  *    <li>
@@ -231,7 +236,7 @@ public abstract class Camada{
     * Retorna a função de ativação configurada pela camada.
     * @return função de ativação da camada.
     */
-   public Ativacao obterAtivacao(){
+   public Ativacao ativacao(){
       throw new UnsupportedOperationException(
          "\nImplementar retorno da função de ativação da camada " + nome() + "."
       );
@@ -311,7 +316,7 @@ public abstract class Camada{
     * </p>
     * @return kernel da camada.
     */
-   public double[] obterKernel(){
+   public double[] kernel(){
       throw new UnsupportedOperationException(
          "\nImplementar retorno do kernel da camada " + nome() + "."
       );       
@@ -322,7 +327,7 @@ public abstract class Camada{
     * dos gradientes para os kernels da camada.
     * @return gradientes para os kernels da camada.
     */
-   public double[] obterGradKernel(){
+   public double[] gradKernel(){
       throw new UnsupportedOperationException(
          "\nImplementar retorno do gradiente para o kernel da camada" + nome() + "."
       );       
@@ -337,7 +342,7 @@ public abstract class Camada{
     * </p>
     * @return bias da camada.
     */
-   public double[] obterBias(){
+   public double[] bias(){
       throw new UnsupportedOperationException(
          "\nImplementar retorno do bias da camada " + nome() + "."
       );        
@@ -348,7 +353,7 @@ public abstract class Camada{
     * dos gradientes para os bias da camada.
     * @return gradientes para os bias da camada.
     */
-   public double[] obterGradBias(){
+   public double[] gradBias(){
       throw new UnsupportedOperationException(
          "\nImplementar retorno do gradiente para o bias da camada" + nome() + "."
       );        
@@ -359,7 +364,7 @@ public abstract class Camada{
     * de camada, esse gradiente pode assumir diferentes tipos de objetos.
     * @return gradiente de entrada da camada.
     */
-   public Object obterGradEntrada(){
+   public Object gradEntrada(){
       throw new UnsupportedOperationException(
          "\nImplementar retorno do gradiente de entrada da camada " + nome() + "."
       );     
@@ -414,7 +419,7 @@ public abstract class Camada{
     */
    public void zerarGradientes(){
       throw new UnsupportedOperationException(
-         "\nImplementar reset para acumuladores da camada " + nome() + "."
+         "\nImplementar reset para gradientes da camada " + nome() + "."
       );
    }
 
@@ -433,6 +438,6 @@ public abstract class Camada{
     * @return nome da camada.
     */
    public String nome(){
-      return this.getClass().getSimpleName();
+      return getClass().getSimpleName();
    }
 }

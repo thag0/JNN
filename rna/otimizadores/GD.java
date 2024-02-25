@@ -75,16 +75,16 @@ public class GD extends Otimizador{
       for(Camada camada : camadas){
          if(camada.treinavel == false) continue;
 
-         double[] kernel = camada.obterKernel();
-         double[] gradK = camada.obterGradKernel();
+         double[] kernel = camada.kernel();
+         double[] gradK = camada.gradKernel();
          
          opArr.multEscalar(gradK, taxaAprendizagem, gradK);
          opArr.sub(kernel, gradK, kernel);
          camada.editarKernel(kernel);
 
          if(camada.temBias()){
-            double[] bias = camada.obterBias();
-            double[] gradB = camada.obterGradBias();
+            double[] bias = camada.bias();
+            double[] gradB = camada.gradBias();
             
             opArr.multEscalar(gradB, taxaAprendizagem, gradB);
             opArr.sub(bias, gradB, bias);

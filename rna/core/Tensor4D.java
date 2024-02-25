@@ -278,10 +278,13 @@ public class Tensor4D{
             "recebido " + dimensoes().length + "."
          );
       }
-      if((dimensoes[0] < 1) || (dimensoes[1] < 1) || (dimensoes[2] < 1) || (dimensoes[3] < 1)){
-         throw new IllegalArgumentException(
-            "\nOs valores de dimensões devem ser maiores que zero."
-         );
+
+      for(int i = 0; i < dimensoes.length; i++){
+         if(dimensoes[i] < 1){
+            throw new IllegalArgumentException(
+               "\nOs valores de dimensões devem ser maiores que zero."
+            );
+         }
       }
       
       this.d1 = 1;

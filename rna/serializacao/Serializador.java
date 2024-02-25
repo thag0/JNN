@@ -120,7 +120,7 @@ public class Serializador{
          //funções de ativação
          Densa[] camadas = rede.camadas();
          for(int i = 0; i < camadas.length; i++){
-            writer.write(camadas[i].obterAtivacao().getClass().getSimpleName());
+            writer.write(camadas[i].ativacao().getClass().getSimpleName());
             writer.write(" ");
          }
          writer.newLine();

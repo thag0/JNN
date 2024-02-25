@@ -785,7 +785,7 @@ public class Convolucional extends Camada implements Cloneable{
    }
 
    @Override
-   public Ativacao obterAtivacao(){
+   public Ativacao ativacao(){
       return this.ativacao;
    }
 
@@ -906,27 +906,27 @@ public class Convolucional extends Camada implements Cloneable{
    }
 
    @Override
-   public double[] obterKernel(){
+   public double[] kernel(){
       return filtros.paraArray();
    }
 
    @Override
-   public double[] obterGradKernel(){
+   public double[] gradKernel(){
       return gradFiltros.paraArray();
    }
 
    @Override
-   public double[] obterBias(){
+   public double[] bias(){
       return bias.paraArray();
    }
 
    @Override
-   public double[] obterGradBias(){
+   public double[] gradBias(){
       return gradBias.paraArray();
    }
 
    @Override
-   public Object obterGradEntrada(){
+   public Object gradEntrada(){
       return gradEntrada; 
    }
 

@@ -895,7 +895,7 @@ public class RedeNeural extends Modelo implements Cloneable{
       for(int i = 0; i < this.camadas.length; i++){
          sb.append(
             espacamento + "Ativação camada " + i + ": " + 
-            this.camadas[i].obterAtivacao().getClass().getSimpleName() + "\n"
+            this.camadas[i].ativacao().getClass().getSimpleName() + "\n"
          );
       }
 

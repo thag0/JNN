@@ -203,7 +203,7 @@ public class Conv{
          Camada atual = modelo.camada(id);
          Camada proxima = modelo.camada(id+1);
          t = medirTempo(() -> {
-            atual.calcularGradiente(proxima.obterGradEntrada());
+            atual.calcularGradiente(proxima.gradEntrada());
          });
          total += t;
 
@@ -234,7 +234,7 @@ public class Conv{
       //backward simples
       modelo.camadaSaida().calcularGradiente(new Tensor4D(grad));
       for(int i = modelo.numCamadas()-2; i >= 0; i--){
-         modelo.camada(i).calcularGradiente(modelo.camada(i+1).obterGradEntrada());
+         modelo.camada(i).calcularGradiente(modelo.camada(i+1).gradEntrada());
       }
 
       long t = System.nanoTime();

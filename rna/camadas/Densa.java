@@ -564,7 +564,7 @@ public class Densa extends Camada implements Cloneable{
    }
 
    @Override
-   public Ativacao obterAtivacao(){
+   public Ativacao ativacao(){
       return this.ativacao;
    }
 
@@ -715,27 +715,27 @@ public class Densa extends Camada implements Cloneable{
    }
 
    @Override
-   public double[] obterKernel(){
+   public double[] kernel(){
       return pesos.paraArray();
    }
 
    @Override
-   public double[] obterGradKernel(){
+   public double[] gradKernel(){
       return gradPesos.paraArray();
    }
 
    @Override
-   public double[] obterBias(){
+   public double[] bias(){
       return bias.paraArray();
    }
 
    @Override
-   public double[] obterGradBias(){
+   public double[] gradBias(){
       return gradBias.paraArray();
    }
 
    @Override
-   public Object obterGradEntrada(){
+   public Object gradEntrada(){
       return gradEntrada;
    }
 

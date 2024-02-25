@@ -4,6 +4,8 @@ import java.text.DecimalFormat;
 
 import rna.modelos.Modelo;
 import rna.modelos.Sequencial;
+import rna.otimizadores.Otimizador;
+import rna.otimizadores.SGD;
 import rna.camadas.Camada;
 import rna.camadas.Densa;
 import lib.ged.Dados;
@@ -47,7 +49,8 @@ public class Classificador{
          new Densa(qSaidas, "softmax")
       });
 
-      modelo.compilar("sgd", "entropiacruzada");
+      Otimizador otm = new SGD(0.01);
+      modelo.compilar(otm, "entropia-cruzada");
       modelo.configurarHistorico(true);
       modelo.info();
       

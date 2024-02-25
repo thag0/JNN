@@ -488,7 +488,7 @@ public class MaxPooling extends Camada{
    }
 
    @Override
-   public Tensor4D obterGradEntrada(){
+   public Tensor4D gradEntrada(){
       verificarConstrucao();
       return this.gradEntrada;
    }

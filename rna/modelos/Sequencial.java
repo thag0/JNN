@@ -369,7 +369,7 @@ public class Sequencial extends Modelo implements Cloneable{
       sb.append("\n");
 
       //função de perda
-      sb.append(espacamento + "Perda: " + this.perda.nome());
+      sb.append(espacamento + "Perda: " + perda.nome());
       sb.append("\n\n");
 
       //camadas
@@ -401,13 +401,10 @@ public class Sequencial extends Modelo implements Cloneable{
          formSaida += ")";
 
          //função de ativação
-         String ativacao = "";
+         String ativacao = "n/a";
          try{
-            ativacao = camada.obterAtivacao().nome();
-         }catch(Exception exception){
-            ativacao = "n/a";
-         }
-
+            ativacao = camada.ativacao().nome();
+         }catch(Exception exception){}
 
          String parametros = String.valueOf(camada.numParametros());
 
@@ -418,7 +415,7 @@ public class Sequencial extends Modelo implements Cloneable{
          );
       }
 
-      String params = String.format("%,d", this.numParametros());
+      String params = String.format("%,d", numParametros());
       sb.append("\n" + espacamento + "Parâmetros treináveis: " + params + "\n");
       sb.append("]\n");
 

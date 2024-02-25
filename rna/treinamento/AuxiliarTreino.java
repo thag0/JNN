@@ -58,7 +58,7 @@ public class AuxiliarTreino{
       Tensor4D g = new Tensor4D(gradPrev);
       saida.calcularGradiente(g);
       for(int i = camadas.length-2; i >= 0; i--){
-         camadas[i].calcularGradiente(camadas[i+1].obterGradEntrada());
+         camadas[i].calcularGradiente(camadas[i+1].gradEntrada());
       }
    }
 

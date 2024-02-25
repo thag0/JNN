@@ -324,7 +324,7 @@ public class Flatten extends Camada{
    }
 
    @Override
-   public Object obterGradEntrada(){
+   public Object gradEntrada(){
       verificarConstrucao();
       return this.gradEntrada;
    }

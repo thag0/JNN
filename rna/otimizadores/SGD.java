@@ -40,6 +40,21 @@ import rna.camadas.Camada;
 public class SGD extends Otimizador{
 
    /**
+    * Taxa de aprendizagem padrão do otimizador.
+    */
+   private static final double PADRAO_TA = 0.01;
+
+   /**
+    * Taxa de momentum padrão do otimizador.
+    */
+   private static final double PADRAO_MOMENTUM = 0.0;
+
+   /**
+    * Uso do acelerador de nesterov padrão.
+    */
+   private static final boolean PADRAO_NESTEROV = false;
+
+   /**
     * Valor de taxa de aprendizagem do otimizador.
     */
    private double taxaAprendizagem;
@@ -96,7 +111,7 @@ public class SGD extends Otimizador{
     * @param m taxa de momentum do otimizador.
     */
    public SGD(double tA, double m){
-      this(tA, m, false);
+      this(tA, m, PADRAO_NESTEROV);
    }
 
    /**
@@ -105,7 +120,7 @@ public class SGD extends Otimizador{
     * @param tA taxa de aprendizagem do otimizador.
     */
    public SGD(double tA){
-      this(tA, 0, false);
+      this(tA, PADRAO_MOMENTUM, PADRAO_NESTEROV);
    }
 
    /**
@@ -116,7 +131,7 @@ public class SGD extends Otimizador{
     * </p>
     */
    public SGD(){
-      this(0.01, 0.9, false);
+      this(PADRAO_TA, PADRAO_MOMENTUM, PADRAO_NESTEROV);
    }
 
    @Override
@@ -127,9 +142,9 @@ public class SGD extends Otimizador{
       for(Camada camada : camadas){
          if(camada.treinavel == false) continue;
 
-         nKernel += camada.obterKernel().length;
+         nKernel += camada.kernel().length;
          if(camada.temBias()){
-            nBias += camada.obterBias().length;
+            nBias += camada.bias().length;
          }         
       }
 
@@ -146,14 +161,14 @@ public class SGD extends Otimizador{
       for(Camada camada : camadas){
          if(camada.treinavel == false) continue;
 
-         double[] kernel = camada.obterKernel();
-         double[] gradK = camada.obterGradKernel();
+         double[] kernel = camada.kernel();
+         double[] gradK = camada.gradKernel();
          idKernel = calcular(kernel, gradK, m, idKernel);
          camada.editarKernel(kernel);
 
          if(camada.temBias()){
-            double[] bias = camada.obterBias();
-            double[] gradB = camada.obterGradBias();
+            double[] bias = camada.bias();
+            double[] gradB = camada.gradBias();
             idBias = calcular(bias, gradB, mb, idBias);
             camada.editarBias(bias);
          }

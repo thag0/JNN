@@ -372,7 +372,7 @@ public class Dropout extends Camada implements Cloneable{
    }
 
    @Override
-   public Tensor4D obterGradEntrada(){
+   public Tensor4D gradEntrada(){
       verificarConstrucao();
       return this.gradEntrada;
    }
