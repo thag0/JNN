@@ -12,7 +12,7 @@ import rna.camadas.Camada;
  *    O Adadelta funciona usando a seguinte expressão:
  * </p>
  * <pre>
- *    v += delta
+ *    v -= delta
  * </pre>
  * Onde delta é dado por:
  * <pre>

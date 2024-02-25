@@ -19,7 +19,7 @@ import rna.camadas.Camada;
  *    O Adam funciona usando a seguinte expressão:
  * </p>
  * <pre>
- *var += (alfa * m) / ((√ v) + eps)
+ *var -= (alfa * m) / ((√ v) + eps)
  * </pre>
  * Onde:
  * <p>

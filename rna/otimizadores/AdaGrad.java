@@ -19,7 +19,7 @@ import rna.core.OpArray;
  *    O Adagrad funciona usando a seguinte expressão:
  * </p>
  * <pre>
- *    v += (tA * g) / (√ ac + eps)
+ *    v -= (tA * g) / (√ ac + eps)
  * </pre>
  * Onde:
  * <p>

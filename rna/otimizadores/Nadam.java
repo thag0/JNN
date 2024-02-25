@@ -17,7 +17,7 @@ import rna.camadas.Camada;
  *    O Nadam funciona usando a seguinte expressão:
  * </p>
  * <pre>
- *    v += (tA * mc) / ((√ vc) + eps)
+ *    v -= (tA * mc) / ((√ vc) + eps)
  * </pre>
  * Onde:
  * <p>

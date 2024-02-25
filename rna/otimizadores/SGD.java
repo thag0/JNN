@@ -15,8 +15,8 @@ import rna.camadas.Camada;
  * </p>
  * <pre>
  *m = (m * M) - (g * tA)
- *v -= m // apenas com momentum
- *v -= (M * m) - (g * tA) // com nesterov
+ *v += m // apenas com momentum
+ *v += (M * m) - (g * tA) // com nesterov
  * </pre>
  * Onde:
  * <p>

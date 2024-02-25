@@ -13,7 +13,7 @@ import rna.core.OpArray;
  *    O Gradiente descendente funciona usando a seguinte expressão:
  * </p>
  * <pre>
- *    v += g * tA
+ *    v -= g * tA
  * </pre>
  * Onde:
  * <p>

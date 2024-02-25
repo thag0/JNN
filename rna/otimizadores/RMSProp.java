@@ -20,7 +20,7 @@ import rna.camadas.Camada;
  * </p>
  * <pre>
  *ac = (rho * ac) + ((1- rho) * g²);
- *v += (g * tA) / ((√ ac) + eps)
+ *v -= (g * tA) / ((√ ac) + eps)
  * </pre>
  * Onde:
  * <p>
