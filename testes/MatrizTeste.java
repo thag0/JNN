@@ -11,9 +11,11 @@ import lib.geim.Geim;
 import rna.avaliacao.perda.EntropiaCruzada;
 import rna.avaliacao.perda.EntropiaCruzadaBinaria;
 import rna.camadas.AvgPooling;
+import rna.camadas.Camada;
 import rna.camadas.Convolucional;
 import rna.camadas.Densa;
 import rna.camadas.Dropout;
+import rna.camadas.Entrada;
 import rna.camadas.Flatten;
 import rna.camadas.MaxPooling;
 import rna.core.Mat;
@@ -25,6 +27,7 @@ import rna.core.Utils;
 import rna.inicializadores.AleatorioPositivo;
 import rna.inicializadores.Inicializador;
 import rna.inicializadores.Zeros;
+import rna.modelos.Sequencial;
 import rna.inicializadores.GlorotUniforme;
 import rna.inicializadores.Identidade;
 import rna.treinamento.AuxiliarTreino;
@@ -41,7 +44,15 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
       
-      Convolucional conv = new Convolucional(new int[]{2, 2},1);
+      Sequencial modelo = new Sequencial(new Camada[]{
+         new Entrada(28, 28),
+         new Convolucional(new int[]{3, 3}, 1),
+         new Flatten(),
+         new Densa(2)
+      });
+
+      modelo.compilar("sgd", "mse");
+      modelo.info();
    }
 
    /**

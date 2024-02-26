@@ -3,6 +3,7 @@ package rna.modelos;
 import rna.avaliacao.Avaliador;
 import rna.avaliacao.perda.Perda;
 import rna.camadas.Camada;
+import rna.camadas.Entrada;
 import rna.core.Dicionario;
 import rna.otimizadores.Otimizador;
 import rna.treinamento.Treinador;
@@ -168,6 +169,7 @@ public class Sequencial extends Modelo implements Cloneable{
             "O conjunto de camadas fornecido é nulo."
          );
       }
+
       for(int i = 0; i < camadas.length; i++){
          if(camadas[i] == null){
             throw new IllegalArgumentException(
@@ -176,8 +178,16 @@ public class Sequencial extends Modelo implements Cloneable{
          }
       }
 
-      this.camadas = camadas;
-      this.compilado = false;
+      this.camadas = new Camada[0];
+      add(camadas[0]);
+
+      for(int i = 1; i < camadas.length; i++){
+         if(camadas[i] instanceof Entrada == false){
+            add(camadas[i]);
+         }
+      }
+
+      compilado = false;
    }
 
    /**
@@ -196,15 +206,15 @@ public class Sequencial extends Modelo implements Cloneable{
          throw new IllegalArgumentException("\nCamada fornecida é nula.");
       }
 
-      Camada[] antigas = this.camadas;
-      this.camadas = new Camada[antigas.length + 1];
-
+      Camada[] antigas = camadas;
+      camadas = new Camada[antigas.length + 1];
       for(int i = 0; i < antigas.length; i++){
-         this.camadas[i] = antigas[i];
+         camadas[i] = antigas[i];
       }
-      this.camadas[this.camadas.length-1] = camada;
 
-      this.compilado = false;
+      camadas[camadas.length-1] = camada;
+
+      compilado = false;
    }
 
    /**
@@ -214,35 +224,50 @@ public class Sequencial extends Modelo implements Cloneable{
     * camada disponível.
     */
    public Camada sub(){
-      if(this.camadas.length < 1){
+      if(camadas.length < 1){
          throw new IllegalArgumentException(
             "\nNão há camadas no modelo."
          );
       }
       Camada ultima = camadaSaida();
 
-      Camada[] novas = this.camadas;
-      this.camadas = new Camada[this.camadas.length-1];
-      for(int i = 0; i < this.camadas.length; i++){
-         this.camadas[i] = novas[i];
+      Camada[] novas = camadas;
+      camadas = new Camada[camadas.length-1];
+      for(int i = 0; i < camadas.length; i++){
+         camadas[i] = novas[i];
       }
 
-      this.compilado = false;
+      compilado = false;
 
       return ultima;
    }
 
    @Override
    public void compilar(Object otimizador, Object perda){
-      if(camadas[0].construida == false){
-         throw new IllegalArgumentException(
-            "É necessário que a primeira camada seja construída."
-         );
-      }
+      if(camadas[0] instanceof Entrada){
+         int[] formato = camadas[0].formatoSaida();
 
-      if(seedInicial != 0) camadas[0].configurarSeed(seedInicial);
-      camadas[0].inicializar();
-      camadas[0].configurarId(0);
+         //remover camada de entrada do modelo
+         Camada[] temp = camadas;
+         camadas = new Camada[camadas.length-1];
+         for(int i = 0; i < camadas.length; i++){
+            camadas[i] = temp[i + 1];
+         }
+
+         camadas[0].construir(formato);
+      
+      }else{
+         if(camadas[0].construida == false){
+            throw new IllegalArgumentException(
+               "\nÉ necessário que a primeira camada (" + camadas[0].nome() +
+               ") seja construída."
+            );
+         }
+
+         if(seedInicial != 0) camadas[0].configurarSeed(seedInicial);
+         camadas[0].inicializar();
+         camadas[0].configurarId(0);
+      }
 
       for(int i = 1; i < this.camadas.length; i++){
          camadas[i].construir(camadas[i-1].formatoSaida());
@@ -251,12 +276,13 @@ public class Sequencial extends Modelo implements Cloneable{
          camadas[i].configurarId(i);
       }
       
-      Dicionario dic = new Dicionario();
-      this.perda = dic.obterPerda(perda);
-      this.otimizador = dic.obterOtimizador(otimizador);
+      Dicionario dicio = new Dicionario();
+      this.perda = dicio.obterPerda(perda);
+      this.otimizador = dicio.obterOtimizador(otimizador);
 
       this.otimizador.construir(camadas);
-      this.compilado = true;
+      
+      compilado = true;//modelo pode ser usado.
    }
 
    @Override
@@ -273,6 +299,7 @@ public class Sequencial extends Modelo implements Cloneable{
    public Object[] calcularSaidas(Object[] entradas){
       verificarCompilacao();
 
+      //implementar uma melhor generalização futuramente
       double[][] previsoes = new double[entradas.length][];
 
       for(int i = 0; i < previsoes.length; i++){
@@ -338,13 +365,13 @@ public class Sequencial extends Modelo implements Cloneable{
 
    @Override
    public String nome(){
-      return this.nome;
+      return nome;
    }
 
    @Override
    public int numParametros(){
       int parametros = 0;
-      for(Camada camada : this.camadas){
+      for(Camada camada : camadas){
          parametros += camada.numParametros();
       }
 
