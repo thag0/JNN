@@ -20,7 +20,7 @@ public class MainConv{
    static final int NUM_DIGITOS_TESTE  = NUM_DIGITOS_TREINO;
    static final int NUM_AMOSTRAS_TREINO = 200;
    static final int NUM_AMOSTRAS_TESTE  = 100;
-   static final int EPOCAS_TREINO = 30;
+   static final int EPOCAS_TREINO = 25;
 
    static final String caminhoTreino = "/dados/mnist/treino/";
    static final String caminhoTeste = "/dados/mnist/teste/";
@@ -78,16 +78,16 @@ public class MainConv{
    static Sequencial criarModelo(){
       Sequencial modelo = new Sequencial(new Camada[]{
          new Entrada(28, 28),
-         new Convolucional(new int[]{4, 4}, 18, "leaky-relu"),
+         new Convolucional(new int[]{4, 4}, 16, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{4, 4}, 22, "leaky-relu"),
+         new Convolucional(new int[]{4, 4}, 24, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
          new Densa(130, "sigmoid"),
          new Densa(NUM_DIGITOS_TREINO, "softmax")
       });
 
-      modelo.compilar(new SGD(0.001, 0.95), "entropia-cruzada");
+      modelo.compilar(new SGD(0.01, 0.5), "entropia-cruzada");
 
       return modelo;
    }

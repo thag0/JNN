@@ -76,12 +76,13 @@ public class MainImg{
 
    static Modelo criarSequencial(int entradas, int saidas){
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Densa(entradas, 8, "sigmoid"),
-         new Densa(8, "sigmoid"),
+         new Entrada(entradas),
+         new Densa(8, "tanh"),
+         new Densa(8, "tanh"),
          new Densa(saidas, "sigmoid")
       });
 
-      modelo.compilar("sgd", "mse");
+      modelo.compilar(new SGD(0.001, 0.99), "mse");
       modelo.configurarHistorico(calcularHistorico);
 
       return modelo;
@@ -98,12 +99,12 @@ public class MainImg{
     */
    static long treinoEmPainel(Modelo modelo, int altura, int largura, double[][] entradas, double[][] saidas){
       final int fps = 6000;
-      int epocasPorFrame = 40;
+      int epocasPorFrame = 30;
 
       //acelerar o processo de desenho
       //bom em situações de janelas muito grandes
       int n = Runtime.getRuntime().availableProcessors();
-      int numThreads = (n > 1) ? (int)(n * 0.5) : 1;
+      int numThreads = (n > 1) ? (int)(n * 0.25) : 1;
 
       JanelaTreino jt = new JanelaTreino(largura, altura, escalaRender, numThreads);
       jt.desenharTreino(modelo, 0);

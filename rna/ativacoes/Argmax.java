@@ -1,6 +1,6 @@
 package rna.ativacoes;
 
-import rna.camadas.Densa;
+import rna.core.Tensor4D;
 
 /**
  * Implementação da função de ativação Argmax para uso 
@@ -16,26 +16,55 @@ public class Argmax extends Ativacao{
     *    convertidas para zero, fazendo a camada classificar uma única saída com
     *    base no maior valor.
     * </p>
+    * <p>
+    *    A ativação atua em cada linha do tensor individualmente
+    * </p>
+    * Exemplo:
+    * <pre>
+    * tensor = [[[
+    *    [1, 2, 3], 
+    *    [2, 3, 1], 
+    *    [3, 1, 2], 
+    *]]]
+    *
+    *argmax.calcular(tensor, tensor);
+    *
+    *tensor = [[[
+    *    [0, 0, 1], 
+    *    [0, 1, 0], 
+    *    [1, 0, 0], 
+    *]]]
+    * </pre>
     */
-   public Argmax(){
-
-   }
+   public Argmax(){}
 
    @Override
-   public void calcular(Densa camada){
-      int indiceMaximo = 0;
-      double valorMaximo = camada.somatorio.elemento(0, 0, 0, 0);
+   public void calcular(Tensor4D entrada, Tensor4D saida){
+      int canais = entrada.dim1();
+      int profundidade = entrada.dim2();
+      int linhas = entrada.dim3();
+      int colunas = entrada.dim4();
+      int maxId;
+      double maxVal;
+   
+      for(int can = 0; can < canais; can++){
+         for(int prof = 0; prof < profundidade; prof++){
+            for(int lin = 0; lin < linhas; lin++){
+               maxId = 0;
+               maxVal = entrada.elemento(can, prof, lin, 0);
 
-      int colunas = camada.somatorio.dim4();
-      for(int i = 1; i < colunas; i++){
-         if(camada.somatorio.elemento(0, 0, 0, i) > valorMaximo){
-            indiceMaximo = i;
-            valorMaximo = camada.somatorio.elemento(0, 0, 0, i);
+               for(int col = 1; col < colunas; col++){
+                  if(entrada.elemento(can, prof, lin, col) > maxVal){
+                     maxId = col;
+                     maxVal = entrada.elemento(can, prof, lin, col);
+                  }
+               }
+         
+               for(int col = 0; col < colunas; col++){
+                  saida.editar(can, prof, lin, col, ((col == maxId) ? 1 : 0));
+               }
+            }
          }
-      }
-
-      for(int i = 0; i < colunas; i++){
-         camada.saida.editar(0, 0, 0, i, ((i == indiceMaximo) ? 1 : 0));
       }
    }
 }

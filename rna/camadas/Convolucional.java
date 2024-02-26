@@ -703,7 +703,7 @@ public class Convolucional extends Camada implements Cloneable{
          }
       }
 
-      ativacao.calcular(this);
+      ativacao.calcular(somatorio, saida);
    }
 
    /**

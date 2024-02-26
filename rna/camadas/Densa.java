@@ -361,6 +361,8 @@ public class Densa extends Camada implements Cloneable{
       this.derivada =    new Tensor4D(saida.dimensoes());
       this.gradSaida =   new Tensor4D(saida.dimensoes());
       this.gradEntrada = new Tensor4D(1, 1, this.entrada.dim3(), this.entrada.dim4());
+
+      configurarNomes();
       
       this.treinavel = true;//camada pode ser treinada.
       this.construida = true;//camada pode ser usada.
@@ -473,11 +475,11 @@ public class Densa extends Camada implements Cloneable{
       //feedforward
       optensor.matMult(this.entrada, pesos, somatorio, 0, 0);
 
-      if(this.usarBias){
+      if(usarBias){
          somatorio.add(bias);
       }
 
-      ativacao.calcular(this);
+      ativacao.calcular(somatorio, saida);
    }
 
    /**

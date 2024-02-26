@@ -4,7 +4,7 @@ import java.util.function.DoubleUnaryOperator;
 
 import rna.camadas.Convolucional;
 import rna.camadas.Densa;
-import rna.core.Mat;
+import rna.core.Tensor4D;
 
 /**
  * Classe base para a implementação das funções de ativação.
@@ -40,34 +40,12 @@ public abstract class Ativacao{
    /**
     * Função de ativação.
     */
-   private DoubleUnaryOperator fx;
+   protected DoubleUnaryOperator fx;
 
    /**
     * Derivada da função de ativação.
     */
-   private DoubleUnaryOperator dx;
-
-   /**
-    * Executa a função de ativação para cada elemento da entrada.
-    * @param entrada matriz com os dados de entrada.
-    * @param fx função de ativação desejada.
-    * @param saida resultado das ativações.
-    */
-   protected void aplicarFx(Mat entrada, Mat saida){
-      saida.aplicarFuncao(entrada, fx);
-   }
-
-   /**
-    * Executa a derivada da função de ativação para cada elemento da entrada.
-    * @param entrada matriz com os valores de gradientes da camada.
-    * @param entrada matriz com os dados de entrada.
-    * @param fx derivada de função de ativação desejada.
-    * @param saida resultado das derivadas.
-    */
-   protected void aplicarDx(Mat gradientes, Mat entrada, Mat saida){
-      saida.aplicarFuncao(entrada, dx);
-      saida.mult(gradientes);
-   }
+   protected DoubleUnaryOperator dx;
 
    /**
     * Configura a função de ativação e sua derivada para uso.
@@ -85,97 +63,90 @@ public abstract class Ativacao{
    }
 
    /**
-    * Calcula o resultado da ativação de acordo com a função configurada
-    * <p>
-    *    O resultado da ativação da camada é salvo na propriedade {@code camada.saida}.
-    * </p>
-    * @param camada camada densa usada.
+    * Calcula o resultado da ativação de acordo com a função configurada.
+    * @param entrada tensor de entrada.
+    * @param saida tensor de destino.
     */
-   public void calcular(Densa camada){
-      int linhas = camada.somatorio.dim3();
-      int colunas = camada.somatorio.dim4();
-      for(int i = 0; i < linhas; i++){
-         for(int j = 0; j < colunas; j++){
-            camada.saida.editar(0, 0, i, j, (
-               fx.applyAsDouble(camada.somatorio.elemento(0, 0, i, j)
-            )));
+   public void calcular(Tensor4D entrada, Tensor4D saida){
+      if(entrada.comparar4D(saida) == false){
+         throw new IllegalArgumentException(
+            "\nAs dimensões do tensor de entrada " + entrada.dimensoesStr() +
+            " e saída " + saida.dimensoesStr() + " devem ser iguais."
+         );
+      }
+
+      int dim1 = entrada.dim1();
+      int dim2 = entrada.dim2();
+      int dim3 = entrada.dim3();
+      int dim4 = entrada.dim4();
+      for(int i = 0; i < dim1; i++){
+         for(int j = 0; j < dim2; j++){
+            for(int k = 0; k < dim3; k++){
+               for(int l = 0; l < dim4; l++){
+                  saida.editar(i, j, k, l, (
+                     fx.applyAsDouble(entrada.elemento(i, j, k, l))
+                  ));
+               }
+            }
          }
       }
    }
 
    /**
-    * Calcula o resultado da derivada da função de ativação de acordo com a 
-    * função configurada
+    * Calcula o resultado da derivada da função de ativação de acordo 
+    * com a função configurada
+    * @param entrada tensor de entrada.
+    * @param entrada tensor com os gradientes.
+    * @param saida tensor de destino.
+    */
+   public void derivada(Tensor4D entrada, Tensor4D gradiente, Tensor4D saida){
+      if(entrada.comparar4D(saida) == false){
+         throw new IllegalArgumentException(
+            "\nAs dimensões do tensor de entrada " + entrada.dimensoesStr() +
+            " e saída " + saida.dimensoesStr() + " devem ser iguais."
+         );
+      }
+
+      int dim1 = entrada.dim1();
+      int dim2 = entrada.dim2();
+      int dim3 = entrada.dim3();
+      int dim4 = entrada.dim4();
+      double e, g;
+      for(int i = 0; i < dim1; i++){
+         for(int j = 0; j < dim2; j++){
+            for(int k = 0; k < dim3; k++){
+               for(int l = 0; l < dim4; l++){
+                  e = entrada.elemento(i, j, k, l);
+                  g = gradiente.elemento(i, j, k, l);
+                  saida.editar(i, j, k, l, (
+                     dx.applyAsDouble(e) * g
+                  ));
+               }
+            }
+         }
+      }
+   }
+
+   /**
+    * Implementação especifíca para camadas densas.
     * <p>
-    *    O resultado da derivada da camada é salvo na propriedade {@code camada.derivada}.
+    *    Função criada para dar suporte a ativações especiais.
     * </p>
-    * @param camada camada densa usada.
+    * @param camada camada densa.
     */
    public void derivada(Densa camada){
-      double grad, entrada;
-      int linhas = camada.somatorio.dim3();
-      int colunas = camada.somatorio.dim4();
-
-      for(int i = 0; i < linhas; i++){
-         for(int j = 0; j < colunas; j++){
-            entrada = camada.somatorio.elemento(0, 0, i, j);
-            grad = camada.gradSaida.elemento(0, 0, i, j);
-            camada.derivada.editar(0, 0, i, j, (
-               dx.applyAsDouble(entrada) * grad
-            ));
-         }
-      }
-   }
-
-
-   /**
-    * Calcula o resultado da ativação de acordo com a função configurada
-    * <p>
-    *    O resultado da ativação da camada é salvo na propriedade {@code camada.saida}.
-    * </p>
-    * @param camada camada convolucional usada.
-    */
-   public void calcular(Convolucional camada){
-      int prof = camada.somatorio.dim2();
-      int altura = camada.somatorio.dim3();
-      int largura = camada.somatorio.dim4();
-
-      for(int i = 0; i < prof; i++){
-         for(int j = 0; j < altura; j++){
-            for(int k = 0; k < largura; k++){
-               camada.saida.editar(0, i, j, k, (
-                  fx.applyAsDouble(camada.somatorio.elemento(0, i, j, k))
-               ));
-            }
-         }
-      }
+      derivada(camada.somatorio, camada.gradSaida, camada.derivada);
    }
 
    /**
-    * Calcula o resultado da derivada da função de ativação de acordo com a 
-    * função configurada
+    * Implementação especifíca para camadas convolucionais.
     * <p>
-    *    O resultado da derivada da camada é salvo na propriedade {@code camada.derivada}.
+    *    Função criada para dar suporte a ativações especiais.
     * </p>
-    * @param camada camada convolucional usada.
+    * @param camada camada convolucional.
     */
    public void derivada(Convolucional camada){
-      int prof = camada.somatorio.dim2();
-      int altura = camada.somatorio.dim3();
-      int largura = camada.somatorio.dim4();
-      double entrada, grad;
-
-      for(int i = 0; i < prof; i++){
-         for(int j = 0; j < altura; j++){
-            for(int k = 0; k < largura; k++){
-               entrada = camada.somatorio.elemento(0, i, j, k);
-               grad = camada.gradSaida.elemento(0, i, j, k);
-               camada.derivada.editar(0, i, j, k, (
-                  dx.applyAsDouble(entrada) * grad
-               ));
-            }
-         }
-      }
+      derivada(camada.somatorio, camada.gradSaida, camada.derivada);
    }
 
    /**

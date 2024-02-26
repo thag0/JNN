@@ -8,6 +8,9 @@ import java.util.concurrent.TimeUnit;
 import lib.ged.Dados;
 import lib.ged.Ged;
 import lib.geim.Geim;
+import rna.ativacoes.Argmax;
+import rna.ativacoes.Ativacao;
+import rna.ativacoes.Softmax;
 import rna.avaliacao.perda.EntropiaCruzada;
 import rna.avaliacao.perda.EntropiaCruzadaBinaria;
 import rna.camadas.AvgPooling;
@@ -44,15 +47,22 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
       
-      Sequencial modelo = new Sequencial(new Camada[]{
-         new Entrada(28, 28),
-         new Convolucional(new int[]{3, 3}, 1),
-         new Flatten(),
-         new Densa(2)
+      Tensor4D tensor = new Tensor4D(new double[][]{
+         {0.1, 0.2, 0.3},
+      });
+      Tensor4D grad = new Tensor4D(new double[][]{
+         {1, 2, 3},
       });
 
-      modelo.compilar("sgd", "mse");
-      modelo.info();
+      Densa densa = new Densa(3, 3, "softmax");
+      densa.somatorio.copiar(tensor);
+      densa.calcularGradiente(grad);
+      densa.derivada.print(2);
+
+      Tensor4D saida = new Tensor4D(grad.dimensoes());
+      Ativacao atv = new Softmax();
+      atv.derivada(tensor, grad, saida);
+      saida.print(2);
    }
 
    /**
