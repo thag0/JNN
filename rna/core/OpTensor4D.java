@@ -785,16 +785,29 @@ public class OpTensor4D{
       int[] idSaida = {0, 0};
       int[] idKernel = {0, 0};
 
-      //loop sem paralelização teve melhor resultados do que
-      //usando executores
-      for(int i = 0; i < numFiltros; i++){
-         idKernel[0] = i;
-         idSaida[1] = i;
-         for(int j = 0; j < profEntrada; j++){
-            idEntrada[1] = j;
-            idKernel[1] = j;
-            correlacao2D(entrada, kernel, saida, idEntrada, idKernel, idSaida, true);
-         }
+      //verificar melhores alternativas depois
+      int numThreads = (profEntrada > 5) ? 3 : 1;
+      ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+      
+      for(int f = 0; f < numFiltros; f++){
+         final int filtro = f;
+         executor.execute(() -> {
+            for(int e = 0; e < profEntrada; e++){
+               idEntrada[1] = e;
+               idKernel[0] = filtro;
+               idKernel[1] = e;
+               idSaida[1] = filtro;
+               correlacao2D(entrada, kernel, saida, idEntrada, idKernel, idSaida, true);
+            }
+         });
+      }
+
+      executor.shutdown();
+
+      try{
+         executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+      }catch(Exception excep){
+         throw new RuntimeException(excep);
       }
    }
 

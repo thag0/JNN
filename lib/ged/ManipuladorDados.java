@@ -436,6 +436,7 @@ class ManipuladorDados{
       //salvar numa estrutura separada
       Dados dadosFiltados = new Dados();
       dadosFiltados.atribuir(conteudoFiltrado);
+      dadosFiltados.editarNome(dados.nome());
 
       return dadosFiltados;
    }
@@ -460,6 +461,7 @@ class ManipuladorDados{
 
       Dados dadosFiltados = new Dados();
       dadosFiltados.atribuir(conteudoFiltrado);
+      dadosFiltados.editarNome(dados.nome());
 
       return dadosFiltados;
    }

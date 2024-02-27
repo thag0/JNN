@@ -47,22 +47,18 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
       
-      Tensor4D tensor = new Tensor4D(new double[][]{
-         {0.1, 0.2, 0.3},
-      });
-      Tensor4D grad = new Tensor4D(new double[][]{
-         {1, 2, 3},
-      });
+      Tensor4D a = new Tensor4D(new int[]{1, 1, 28, 28});
+      Tensor4D b = new Tensor4D(new int[]{1, 1, 3, 3});
+      Tensor4D c = new Tensor4D(1, 1, (a.dim3()-b.dim3()+1), (a.dim4()-b.dim4()+1));
+      
+      a.preencherContador(true);
+      b.preencherContador(true);
 
-      Densa densa = new Densa(3, 3, "softmax");
-      densa.somatorio.copiar(tensor);
-      densa.calcularGradiente(grad);
-      densa.derivada.print(2);
-
-      Tensor4D saida = new Tensor4D(grad.dimensoes());
-      Ativacao atv = new Softmax();
-      atv.derivada(tensor, grad, saida);
-      saida.print(2);
+      long tempo;
+      tempo = medirTempo(() -> optensor.correlacao2D(a, b, c));
+      tempo = medirTempo(() -> optensor.correlacao2D(a, b, c));
+      tempo = medirTempo(() -> optensor.correlacao2D(a, b, c));
+      System.out.println("Tempo: " + TimeUnit.NANOSECONDS.toMillis(tempo) + "ms");
    }
 
    /**

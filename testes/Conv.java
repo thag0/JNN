@@ -36,8 +36,16 @@ public class Conv{
       // testarModelo(modelo, digitos, amostras);
 
       // testarTodosDados(modelo);
-      tempoForward(modelo);//keras += 30ms
-      tempoBackward(modelo);
+      Dados forward = tempoForward(modelo);//keras += 30ms
+      Dados backward = tempoBackward(modelo);
+
+      // forward = ged.filtrar(forward, 1, "Convolucional");
+      // backward = ged.filtrar(backward, 1, "Convolucional");
+      
+      testarForward();
+      
+      forward.imprimir();
+      backward.imprimir();
 
       // testarForward();
       // testarBackward();
@@ -135,7 +143,7 @@ public class Conv{
       return System.nanoTime() - t1;
    }
 
-   static void tempoForward(Sequencial modelo){
+   static Dados tempoForward(Sequencial modelo){
       //arbritário
       double[][] img = imagemParaMatriz("/dados/mnist/teste/1/img_0.jpg");
       double[][][] entrada = new double[1][][];
@@ -150,6 +158,7 @@ public class Conv{
 
       t = medirTempo(() -> modelo.camada(0).calcularSaida(entrada));
       conteudo.add(new String[]{
+         "0",
          modelo.camada(0).nome(),
          String.valueOf(TimeUnit.NANOSECONDS.toMillis(t)) + " ms"        
       });
@@ -164,20 +173,23 @@ public class Conv{
          total += t;
 
          conteudo.add(new String[]{
+            String.valueOf(i),
             modelo.camada(i).nome(),
             String.valueOf(TimeUnit.NANOSECONDS.toMillis(t)) + " ms"        
          });
       }
       conteudo.add(new String[]{
+         "-",
          "Tempo total", 
          String.valueOf(TimeUnit.NANOSECONDS.toMillis(total)) + " ms"
       });
 
       dados.atribuir(conteudo);
-      dados.imprimir();
+      dados.editarNome("tempos forward");
+      return dados;
    }
 
-   static void tempoBackward(Sequencial modelo){
+   static Dados tempoBackward(Sequencial modelo){
       //arbritário
       double[] grad = new double[modelo.saidaParaArray().length];
       grad[0] = 1;
@@ -194,6 +206,7 @@ public class Conv{
 
       t = medirTempo(() -> modelo.camada(n-1).calcularGradiente(new Tensor4D(grad)));
       conteudo.add(new String[]{
+         String.valueOf(n-1),
          modelo.camada(n-1).nome(),
          String.valueOf(TimeUnit.NANOSECONDS.toMillis(t)) + " ms"        
       });
@@ -209,17 +222,20 @@ public class Conv{
          total += t;
 
          conteudo.add(new String[]{
+            String.valueOf(i),
             modelo.camada(i).nome(),
             String.valueOf(TimeUnit.NANOSECONDS.toMillis(t)) + " ms"        
          });
       }
       conteudo.add(new String[]{
+         "-",
          "Tempo total",
          String.valueOf(TimeUnit.NANOSECONDS.toMillis(total)) + " ms"        
       });
 
       dados.atribuir(conteudo);
-      dados.imprimir();
+      dados.editarNome("tempos backward");
+      return dados;
    }
 
    static void tempoOtimizador(Sequencial modelo){
