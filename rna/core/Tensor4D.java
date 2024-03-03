@@ -1569,25 +1569,30 @@ public class Tensor4D{
 
       sb.append(nome + " " + dimensoesStr() + " = [\n");
       for(int i = 0; i < d1; i++){
+
          sb.append(pad + "[\n");
          for(int j = 0; j < d2; j++){
-            sb.append(pad + pad + "[\n");
+            
+            sb.append(pad + pad + "[");
             for(int k = 0; k < d3; k++){
-
-               sb.append(pad + pad + pad + "[");
+               
+               sb.append((k == 0) ? "[" : (pad + pad + " ["));
                for(int l = 0; l < d4; l++){
                   double valor = dados[indice(i, j, k, l)];
                   String formato = String.format("%." + casas + "f", valor);
                   sb.append(valor >= 0 ? "+" : "");//alinhamento de valores negativos e positivos
                   sb.append(formato);
-                  if(l+1 <= d4-1) sb.append(padNum);//não adicionar no último elemento da linha
+                  if(l <= d4-2) sb.append(padNum);//não adicionar no último elemento da linha
                }
-               sb.append("]").append((k+1 <= d3-1) ? ",\n" : "\n");//adicionar virgula quando não for o último array
+               sb.append("]");
+               sb.append((k <= d3-2) ? ",\n" : "");//adicionar virgula quando não for o último array
 
             }
-            sb.append(pad + pad + "]").append((j+1 < d2) ? ",\n" : "\n");
+            if(j <= d3-2) sb.append("]");
+            sb.append((j <= d2-2) ? ",\n\n" : "\n");// separar alinhamento entre arrays 2d
+         
          }
-         sb.append(pad + "]").append((i+1 < d1) ? ",\n" : "\n");
+         sb.append(pad + "]").append((i <= d1) ? ",\n" : "\n");
       }
       sb.append("]\n");
 
