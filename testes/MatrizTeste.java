@@ -47,18 +47,9 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
       
-      Tensor4D a = new Tensor4D(new int[]{1, 1, 28, 28});
-      Tensor4D b = new Tensor4D(new int[]{1, 1, 3, 3});
-      Tensor4D c = new Tensor4D(1, 1, (a.dim3()-b.dim3()+1), (a.dim4()-b.dim4()+1));
-      
-      a.preencherContador(true);
-      b.preencherContador(true);
-
-      long tempo;
-      tempo = medirTempo(() -> optensor.correlacao2D(a, b, c));
-      tempo = medirTempo(() -> optensor.correlacao2D(a, b, c));
-      tempo = medirTempo(() -> optensor.correlacao2D(a, b, c));
-      System.out.println("Tempo: " + TimeUnit.NANOSECONDS.toMillis(tempo) + "ms");
+      Tensor4D tensor = new Tensor4D(1, 2, 2, 2);
+      new GlorotUniforme().inicializar(tensor);
+      System.out.println(tensor);
    }
 
    /**

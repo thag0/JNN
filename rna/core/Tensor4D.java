@@ -1560,8 +1560,9 @@ public class Tensor4D{
     * @param casas quantidade de casas decimais.
     * @return string formatada.
     */
-   private String construirPrint(int casas){
+    private String construirPrint(int casas){
       String pad = "   ";
+      String padNum = "   ";
       StringBuilder sb = new StringBuilder();
 
       casas = (casas >= 0) ? casas : 15;
@@ -1572,14 +1573,17 @@ public class Tensor4D{
          for(int j = 0; j < d2; j++){
             sb.append(pad + pad + "[\n");
             for(int k = 0; k < d3; k++){
-               sb.append(pad + pad + pad);
+
+               sb.append(pad + pad + pad + "[");
                for(int l = 0; l < d4; l++){
                   double valor = dados[indice(i, j, k, l)];
                   String formato = String.format("%." + casas + "f", valor);
-                  sb.append(valor >= 0 ? " " : "");//alinhamento de valores negativos e positivos
-                  sb.append(formato).append("   ");
+                  sb.append(valor >= 0 ? "+" : "");//alinhamento de valores negativos e positivos
+                  sb.append(formato);
+                  if(l+1 <= d4-1) sb.append(padNum);//não adicionar no último elemento da linha
                }
-               sb.append("\n");
+               sb.append("]").append((k+1 <= d3-1) ? ",\n" : "\n");//adicionar virgula quando não for o último array
+
             }
             sb.append(pad + pad + "]").append((j+1 < d2) ? ",\n" : "\n");
          }
@@ -1605,7 +1609,7 @@ public class Tensor4D{
     * Exibe todo o conteúdo do tensor.
     */
    public void print(){
-      print(15);
+      print(10);
    }
 
    @Override
