@@ -1,6 +1,7 @@
 package rna.camadas;
 
 import rna.ativacoes.Ativacao;
+import rna.core.Tensor4D;
 
 /**
  * <h2>
@@ -309,14 +310,34 @@ public abstract class Camada{
    }
 
    /**
+    * Retorna o kernel da camada.
+    * <p>
+    *    O kernel de uma camada inclui seus atributos mais importantes, como
+    *    os pesos de uma camada densa, ou os filtros de uma camada convolucional.
+    * </p>
+    * <p>
+    *    <strong> O kernel só existe em camadas treináveis </strong>.
+    * </p>
+    * @return kernel da camada.
+    */
+   public Tensor4D kernel(){
+      throw new UnsupportedOperationException(
+         "\nImplementar retorno do kernel da camada " + nome() + "."
+      );       
+   }
+
+   /**
     * Retorna um array contendo os elementos do kernel presente na camada.
     * <p>
     *    O kernel de uma camada inclui seus atributos mais importantes, como
     *    os pesos de uma camada densa, ou os filtros de uma camada convolucional.
     * </p>
+    * <p>
+    *    <strong> O kernel só existe em camadas treináveis </strong>.
+    * </p>
     * @return kernel da camada.
     */
-   public double[] kernel(){
+   public double[] kernelParaArray(){
       throw new UnsupportedOperationException(
          "\nImplementar retorno do kernel da camada " + nome() + "."
       );       
@@ -327,10 +348,28 @@ public abstract class Camada{
     * dos gradientes para os kernels da camada.
     * @return gradientes para os kernels da camada.
     */
-   public double[] gradKernel(){
+   public double[] gradKernelParaArray(){
       throw new UnsupportedOperationException(
          "\nImplementar retorno do gradiente para o kernel da camada" + nome() + "."
       );       
+   }
+
+   /**
+    * Retorna o bias da camada.
+    * <p>
+    *    É importante verificar se a camada foi configurada para suportar
+    *    os bias antes de usar os valores retornados por ela. Quando não
+    *    configurados, os bias da camada são nulos.
+    * </p>
+    * <p>
+    *    <strong> O bias só existe em camadas treináveis </strong>.
+    * </p>
+    * @return bias da camada.
+    */
+   public Tensor4D bias(){
+      throw new UnsupportedOperationException(
+         "\nImplementar retorno do bias da camada " + nome() + "."
+      );        
    }
 
    /**
@@ -340,9 +379,12 @@ public abstract class Camada{
     *    os bias antes de usar os valores retornados por ela. Quando não
     *    configurados, os bias da camada são nulos.
     * </p>
+    * <p>
+    *    <strong> O bias só existe em camadas treináveis </strong>.
+    * </p>
     * @return bias da camada.
     */
-   public double[] bias(){
+   public double[] biasParaArray(){
       throw new UnsupportedOperationException(
          "\nImplementar retorno do bias da camada " + nome() + "."
       );        

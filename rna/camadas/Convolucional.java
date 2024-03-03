@@ -906,17 +906,33 @@ public class Convolucional extends Camada implements Cloneable{
    }
 
    @Override
-   public double[] kernel(){
+   public Tensor4D kernel(){
+      return filtros;
+   }
+
+   @Override
+   public double[] kernelParaArray(){
       return filtros.paraArray();
    }
 
    @Override
-   public double[] gradKernel(){
+   public double[] gradKernelParaArray(){
       return gradFiltros.paraArray();
    }
 
    @Override
-   public double[] bias(){
+   public Tensor4D bias(){
+      if(usarBias){
+         return bias;
+      }
+
+      throw new IllegalStateException(
+         "\nA camada " + nome() + " (" + id + ") não possui bias configurado."
+      );
+   }
+
+   @Override
+   public double[] biasParaArray(){
       return bias.paraArray();
    }
 

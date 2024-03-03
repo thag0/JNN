@@ -192,9 +192,9 @@ public class Nadam extends Otimizador{
       for(Camada camada : camadas){
          if(camada.treinavel == false) continue;
 
-         nKernel += camada.kernel().length;
+         nKernel += camada.kernelParaArray().length;
          if(camada.temBias()){
-            nBias += camada.bias().length;
+            nBias += camada.biasParaArray().length;
          }         
       }
 
@@ -217,13 +217,13 @@ public class Nadam extends Otimizador{
       for(Camada camada : camadas){
          if(camada.treinavel == false) continue;
 
-         double[] kernel = camada.kernel();
-         double[] gradK = camada.gradKernel();
+         double[] kernel = camada.kernelParaArray();
+         double[] gradK = camada.gradKernelParaArray();
          idKernel = calcular(kernel, gradK, m, v, forcaB1, forcaB2, idKernel);
          camada.editarKernel(kernel);
          
          if(camada.temBias()){
-            double[] bias = camada.bias();
+            double[] bias = camada.biasParaArray();
             double[] gradB = camada.gradBias();
             idBias = calcular(bias, gradB, mb, vb, forcaB1, forcaB2, idBias);
             camada.editarBias(bias);
