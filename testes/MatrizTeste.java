@@ -47,7 +47,7 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
       
-      Tensor4D tensor = new Tensor4D(1, 2, 2, 2);
+      Tensor4D tensor = new Tensor4D(new int[]{3, 3, 3});
       new GlorotUniforme().inicializar(tensor);
       System.out.println(tensor);
    }

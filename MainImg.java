@@ -82,7 +82,7 @@ public class MainImg{
          new Densa(saidas, "sigmoid")
       });
 
-      modelo.compilar(new SGD(0.001, 0.99), "mse");
+      modelo.compilar(new SGD(0.001, 0.96), "mse");
       modelo.configurarHistorico(calcularHistorico);
 
       return modelo;
