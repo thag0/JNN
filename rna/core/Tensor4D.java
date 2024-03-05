@@ -38,26 +38,9 @@ import java.util.function.DoubleUnaryOperator;
  */
 public class Tensor4D{
 
-   // /**
-   //  * Primeira dimensão do tensor.
-   //  */
-   // private int d1 = 1;
-    
-   // /**
-   //  * Segunda dimensão do tensor.
-   //  */
-   // private int d2 = 1;
-
-   // /**
-   //  * Terceira dimensão do tensor.
-   //  */
-   //  private int d3 = 1;
-
-   // /**
-   //  * Quarta dimensão do tensor
-   //  */
-   // private int d4 = 1;
-
+   /**
+    * Dimensões do tensor (d1, d2, d3, d4).
+    */
    private int[] dimensoes;
 
    /**
