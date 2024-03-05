@@ -41,27 +41,24 @@ public class Tensor4D{
    // /**
    //  * Primeira dimensão do tensor.
    //  */
-   // private int d1;
+   // private int d1 = 1;
     
    // /**
    //  * Segunda dimensão do tensor.
    //  */
-   // private int d2;
+   // private int d2 = 1;
 
    // /**
    //  * Terceira dimensão do tensor.
    //  */
-   //  private int d3;
+   //  private int d3 = 1;
 
    // /**
    //  * Quarta dimensão do tensor
    //  */
-   // private int d4;
+   // private int d4 = 1;
 
-   /**
-    * Array contendo as dimensões do tensor.
-    */
-   private final int[] dimensoes;
+   private int[] dimensoes;
 
    /**
     * Conjunto de elementos do tensor.
@@ -89,10 +86,7 @@ public class Tensor4D{
       }
 
       this.dimensoes = new int[4];
-      this.dimensoes[0] = tensor.dim1();
-      this.dimensoes[1] = tensor.dim2();
-      this.dimensoes[2] = tensor.dim3();
-      this.dimensoes[3] = tensor.dim4();
+      copiarDimensoes(tensor.dimensoes());
       this.dados = new double[tensor.tamanho()];
 
       System.arraycopy(tensor.dados, 0, this.dados, 0, this.dados.length);
@@ -117,11 +111,14 @@ public class Tensor4D{
       }
 
       this.dimensoes = new int[4];
-      dimensoes[0] = tensor.length;
-      dimensoes[1] = tensor[0].length;
-      dimensoes[2] = tensor[0][0].length;
-      dimensoes[3] = tensor[0][0][0].length;
-      this.dados = new double[dimensoes[0] * dimensoes[1] * dimensoes[2] * dimensoes[3]];
+      copiarDimensoes(
+         tensor.length, 
+         tensor[0].length, 
+         tensor[0][0].length, 
+         tensor[0][0][0].length
+      );
+
+      this.dados = new double[dim1()*dim2()*dim3()*dim4()];
 
       copiar(tensor);
    }
@@ -145,11 +142,13 @@ public class Tensor4D{
       }
 
       this.dimensoes = new int[4];
-      dimensoes[0] = 1;
-      dimensoes[1] = tensor.length;
-      dimensoes[2] = tensor[0].length;
-      dimensoes[3] = tensor[0][0].length;
-      this.dados = new double[dimensoes[0] * dimensoes[1] * dimensoes[2] * dimensoes[3]];
+      copiarDimensoes(
+         1,
+         tensor.length,
+         tensor[0].length,
+         tensor[0][0].length
+      );
+      this.dados = new double[dim1()*dim2()*dim3()*dim4()];
 
       copiar(tensor, 0);
    }
@@ -181,11 +180,13 @@ public class Tensor4D{
       }
 
       this.dimensoes = new int[4];
-      dimensoes[0] = 1;
-      dimensoes[1] = 1;
-      dimensoes[2] = matriz.length;
-      dimensoes[3] = matriz[0].length;
-      this.dados = new double[dimensoes[0] * dimensoes[1] * dimensoes[2] * dimensoes[3]];
+      copiarDimensoes(
+         1,
+         1,
+         matriz.length,
+         matriz[0].length
+      );
+      this.dados = new double[dim1()*dim2()*dim3()*dim4()];
 
       copiar(matriz, 0, 0);
    }
@@ -208,11 +209,8 @@ public class Tensor4D{
       }
 
       this.dimensoes = new int[4];
-      dimensoes[0] = 1;
-      dimensoes[1] = 1;
-      dimensoes[2] = 1;
-      dimensoes[3] = array.length;
-      this.dados = new double[dimensoes[0] * dimensoes[1] * dimensoes[2] * dimensoes[3]];
+      copiarDimensoes(1, 1, 1, array.length);
+      this.dados = new double[dim1()*dim2()*dim3()*dim4()];
 
       System.arraycopy(array, 0, this.dados, 0, this.dados.length);
    }
@@ -246,11 +244,7 @@ public class Tensor4D{
       }
 
       this.dimensoes = new int[4];
-      this.dimensoes[0] = dim1;
-      this.dimensoes[1] = dim2;
-      this.dimensoes[2] = dim3;
-      this.dimensoes[3] = dim4;
-
+      copiarDimensoes(dim1, dim2, dim3, dim4);
       this.dados = new double[elementos.length];
       System.arraycopy(elementos, 0, dados, 0, dados.length);
    }
@@ -299,18 +293,23 @@ public class Tensor4D{
       }
 
       this.dimensoes = new int[4];
-      this.dimensoes[0] = 1;
-      this.dimensoes[1] = 1;
-      this.dimensoes[2] = 1;
-      this.dimensoes[3] = 1;
+      copiarDimensoes(dim);
+      this.dados = new double[dim1()*dim2()*dim3()*dim4()];
+   }
 
+   private void copiarDimensoes(int dim1, int dim2, int dim3, int dim4){
+      this.dimensoes[0] = dim1;
+      this.dimensoes[1] = dim2;
+      this.dimensoes[2] = dim3;
+      this.dimensoes[3] = dim4;
+   }
+
+   private void copiarDimensoes(int[] dim){
       int n1 = this.dimensoes.length;
       int n2 = dim.length;
       for(int i = 0; i < n2; i++){
          this.dimensoes[n1 - 1 - i] = dim[n2 - 1 - i];
       }
-
-      this.dados = new double[dimensoes[0] * dimensoes[1] * dimensoes[2] * dimensoes[3]];
    }
 
    /**
@@ -351,10 +350,7 @@ public class Tensor4D{
          );
       }
 
-      dimensoes[0] = dim1;
-      dimensoes[1] = dim2;
-      dimensoes[2] = dim3;
-      dimensoes[3] = dim4;
+      copiarDimensoes(dim1, dim2, dim3, dim4);
    }
 
    /**
@@ -422,7 +418,7 @@ public class Tensor4D{
     * @return índice calculado.
     */
    private int indice(int dim1, int dim2, int dim3, int dim4){
-      return (dim1 * dim2() * dim3() * dim4()) + (dim2 * dim3() * dim4()) + (dim3 * dim4() + dim4);
+      return (dim1 * dim2() * dim3() * dim4()) + (dim2 * dim3() * dim4()) + (dim3 * dim4()) + dim4;
    }
 
    /**
@@ -1511,6 +1507,27 @@ public class Tensor4D{
    }
 
    /**
+    * Retorna um array de quatro dimensões contendo o todo o conteúdo
+    * do tensor.
+    * @return array contendo os elementos.
+    */
+   public double[][][][] array4D(){
+      double[][][][] res = new double[dim1()][dim2()][dim3()][dim4()];
+
+      for(int i = 0; i < dim1(); i++){
+         for(int j = 0; j < dim2(); j++){
+            for(int k = 0; k < dim3(); k++){
+               for(int l = 0; l < dim4(); l++){
+                  res[i][j][k][l] = elemento(i, j, k, l);
+               }
+            }
+         }
+      }
+
+      return res;
+   }
+
+   /**
     * Retorna um novo tensor contendo o conteúdo da dimensão especificada.
     * @param dim1 índice da primeira dimensão desejada.
     * @return tensor contendo os sub dados.
@@ -1632,7 +1649,7 @@ public class Tensor4D{
          String formato = String.format("%." + casas + "f", valor);
          sb.append(valor >= 0 ? "+" : "");
          sb.append(formato);
-         if (l < d4 - 1) sb.append(padNum);
+         if (l < d4-1) sb.append(padNum);
       }
    }
 
@@ -1695,7 +1712,7 @@ public class Tensor4D{
     */
    public int[] dimensoes(){
       return new int[]{
-         dim1(), dim2() ,dim3(), dim4()
+         dim1(), dim2(), dim3(), dim4()
       };
    }
 

@@ -3,6 +3,7 @@ package testes;
 import java.awt.image.BufferedImage;
 import java.nio.Buffer;
 import java.sql.Time;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import lib.ged.Dados;
@@ -46,10 +47,16 @@ public class MatrizTeste{
    
    public static void main(String[] args){
       ged.limparConsole();
+
+      Tensor4D tensor = new Tensor4D(new int[]{2, 2, 2, 2});
+      tensor.nome("amostra");
+      tensor.preencherContador(true);
+      tensor.print(1);
+
+      var res = new Tensor4D(tensor.array1D(1, 0, 0));
+      res.nome("resultado");
+      res.print(1);
       
-      Tensor4D tensor = new Tensor4D(new int[]{3, 3, 3});
-      new GlorotUniforme().inicializar(tensor);
-      System.out.println(tensor);
    }
 
    /**

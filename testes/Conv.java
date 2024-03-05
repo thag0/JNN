@@ -34,22 +34,44 @@ public class Conv{
 
       String nomeModelo = "modelo-convolucional";
       Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + nomeModelo + ".txt");
-      modelo.camada(0).kernel().print(6);
-
+      // modelo.info();
+      // testarAcertosMNIST(modelo);
       // testarTodosDados(modelo);
-      // Dados forward = tempoForward(modelo);//keras += 30ms
-      // Dados backward = tempoBackward(modelo);
 
-      // forward = ged.filtrar(forward, 1, "Convolucional");
-      // backward = ged.filtrar(backward, 1, "Convolucional");
-      
-      // testarForward();
-      
-      // forward.imprimir();
-      // backward.imprimir();
+      Dados forward = tempoForward(modelo);//media 30/40 ms
+      Dados backward = tempoBackward(modelo);//media 20/25 ms
+      forward = ged.filtrar(forward, 1, "Convolucional");
+      backward = ged.filtrar(backward, 1, "Convolucional");
+      forward.imprimir();
+      backward.imprimir();
 
-      // testarForward();
-      // testarBackward();
+      
+      testarForward();
+      testarBackward();
+      
+   }
+
+   static void testarAcertosMNIST(Sequencial modelo){
+      String caminho = "/dados/mnist/teste/";
+      
+      double media = 0;
+      for(int digito = 0; digito < digitos; digito++){
+         double acertos = 0;
+         for(int amostra = 0; amostra < amostras; amostra++){
+            String caminhoImagem = caminho + digito + "/img_" + amostra + ".jpg";
+            Tensor4D img = new Tensor4D(imagemParaMatriz(caminhoImagem));
+            
+            modelo.calcularSaida(img);
+            double[] previsoes = modelo.saidaParaArray();
+            if(maiorIndice(previsoes) == digito){
+               acertos++;
+            }
+         }
+         double porcentagem = acertos / (double)amostras;
+         media += porcentagem;
+         System.out.println("Acertos " + digito + " -> " + porcentagem);
+      }
+      System.out.println("média acertos: " + String.format("%.2f", (media/digitos)*100) + "%");
    }
 
    /**
@@ -83,7 +105,7 @@ public class Conv{
 
       conv.calcularSaida(entrada);
 
-      System.out.println("Forward esperado: " + conv.somatorio.comparar(saidaEsperada));
+      System.out.println("Forward esperado: " + conv.saida.comparar(saidaEsperada));
    }
 
    /**
@@ -115,18 +137,26 @@ public class Conv{
 
       for(int i = 0; i < conv.filtros.dim1(); i++){
          for(int j = 0; j < conv.filtros.dim2(); j++){
-            int[] idDerivada = {0, i};
             int[] idEntrada = {0, j};
-            int[] idKernel = {i, j};
+            int[] idDerivada = {0, i};
             int[] idGradKernel = {i, j};
+            int[] idKernel = {i, j};
             int[] idGradEntrada = {0, j};
             optensor.correlacao2D(entrada, derivada, gradFiltroEsperado, idEntrada, idDerivada, idGradKernel, false);
             optensor.convolucao2DFull(derivada, filtros, gradEntradaEsperado, idDerivada, idKernel, idGradEntrada, true);
          }
       }
 
-      System.out.println("grad entrada esperado: " + conv.gradEntrada.comparar(gradEntradaEsperado));
-      System.out.println("grad filtros esperado: " + conv.gradFiltros.comparar(gradFiltroEsperado));
+      boolean gradF, gradE;
+      gradE = conv.gradEntrada.comparar(gradEntradaEsperado);
+      gradF = conv.gradFiltros.comparar(gradFiltroEsperado);
+
+      if(gradF && gradE){
+         System.out.println("Backward esperado: " + (gradE && gradF));
+      
+      }else{
+         System.out.println("Backward inesperado -> gradFiltro: " + gradF + ", grafEntrada: " + gradE);
+      }
    }
 
    static void testarTodosDados(Sequencial modelo){

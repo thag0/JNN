@@ -758,7 +758,7 @@ public class Convolucional extends Camada implements Cloneable{
 
       //backward
       Tensor4D tempGrad = new Tensor4D(gradFiltros.dimensoes());
-      optensor.convBackward(this.entrada, filtros, derivada, tempGrad, gradEntrada);
+      optensor.convBackward(this.entrada, this.filtros, this.derivada, tempGrad, this.gradEntrada);
       gradFiltros.add(tempGrad);
 
       if(usarBias){
@@ -912,7 +912,7 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override
    public double[] kernelParaArray(){
-      return filtros.paraArray();
+      return kernel().paraArray();
    }
 
    @Override

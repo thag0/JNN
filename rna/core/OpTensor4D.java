@@ -1,9 +1,5 @@
 package rna.core;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
 /**
  * Auxiliar em operação para tensores 4D.
  */
@@ -780,34 +776,15 @@ public class OpTensor4D{
    public void convForward(Tensor4D entrada, Tensor4D kernel, Tensor4D saida){
       final int numFiltros = kernel.dim1();
       final int profEntrada = kernel.dim2();
-
-      int[] idEntrada = {0, 0};
-      int[] idSaida = {0, 0};
-      int[] idKernel = {0, 0};
-
-      //verificar melhores alternativas depois
-      int numThreads = (profEntrada > 5) ? 3 : 1;
-      ExecutorService executor = Executors.newFixedThreadPool(numThreads);
       
-      for(int f = 0; f < numFiltros; f++){
-         final int filtro = f;
-         executor.execute(() -> {
-            for(int e = 0; e < profEntrada; e++){
-               idEntrada[1] = e;
-               idKernel[0] = filtro;
-               idKernel[1] = e;
-               idSaida[1] = filtro;
-               correlacao2D(entrada, kernel, saida, idEntrada, idKernel, idSaida, true);
-            }
-         });
-      }
+      for(int i = 0; i < numFiltros; i++){
+         int[] idSaida = {0, i};
+         for(int j = 0; j < profEntrada; j++){
+            int[] idEntrada = {0, j};
+            int[] idKernel = {i, j};
+            correlacao2D(entrada, kernel, saida, idEntrada, idKernel, idSaida, true);
+         }
 
-      executor.shutdown();
-
-      try{
-         executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-      }catch(Exception excep){
-         throw new RuntimeException(excep);
       }
    }
 
@@ -819,51 +796,20 @@ public class OpTensor4D{
     * @param gradKernel tensor dos gradientes em relação aos filtros.
     * @param gradEntrada tensor com o gradiente de entrada.
     */
-   public void convBackward(Tensor4D entrada, Tensor4D kernel, Tensor4D derivada, Tensor4D gradKernel, Tensor4D gradEntrada){
+    public void convBackward(Tensor4D entrada, Tensor4D kernel, Tensor4D derivada, Tensor4D gradKernel, Tensor4D gradEntrada) {
       int numFiltros = kernel.dim1();
       int profEntrada = kernel.dim2();
-
-      ExecutorService exec1 = Executors.newFixedThreadPool(2);
-      ExecutorService exec2 = Executors.newFixedThreadPool(2);
-      
-      //paralelização teve os melhores resultados do que loop sequencial
-
-      exec1.submit(() -> {
-         for(int i = 0; i < numFiltros; i++){
-            final int idFiltro = i;
-
-            exec2.submit(() -> {
-               int[] idDerivada = {0, idFiltro};
-               int[] idEntrada = {0, 0};
-               int[] idKernel = {idFiltro, 0};
-               int[] idGradKernel = {idFiltro, 0};
-               int[] idGradEntrada = {0, 0};
-               for(int j = 0; j < profEntrada; j++){
-                  idEntrada[1] = j;
-                  idKernel[1] = j;
-                  idGradKernel[1] = j;
-                  idGradEntrada[1] = j;
-                  correlacao2D(entrada, derivada, gradKernel, idEntrada, idDerivada, idGradKernel, false);
-                  convolucao2DFull(derivada, kernel, gradEntrada, idDerivada, idKernel, idGradEntrada, true);
-               }
-            });
-
-            try{
-               exec2.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-            }catch (Exception e){
-               throw new RuntimeException(e);
-            }
-         }
-      });
   
-      exec2.shutdown();
-      exec1.shutdown();
-      
-      try{
-         exec1.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-      }catch(Exception e){
-         System.out.println("\nOcorreu um erro de runtime.");
-         throw new RuntimeException(e);
+      for(int i = 0; i < numFiltros; i++){
+         for(int j = 0; j < profEntrada; j++){
+            int[] idEntrada = {0, j};
+            int[] idDerivada = {0, i};
+            int[] idGradKernel = {i, j};
+            int[] idKernel = {i, j};
+            int[] idGradEntrada = {0, j};
+            correlacao2D(entrada, derivada, gradKernel, idEntrada, idDerivada, idGradKernel, false);
+            convolucao2DFull(derivada, kernel, gradEntrada, idDerivada, idKernel, idGradEntrada, true);
+         }
       }
    }
 }

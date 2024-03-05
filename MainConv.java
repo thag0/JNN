@@ -16,21 +16,21 @@ public class MainConv{
    static Ged ged = new Ged();
    static Geim geim = new Geim();
 
-   static final int NUM_DIGITOS_TREINO = 5;
+   static final int NUM_DIGITOS_TREINO = 10;
    static final int NUM_DIGITOS_TESTE  = NUM_DIGITOS_TREINO;
    static final int NUM_AMOSTRAS_TREINO = 200;
    static final int NUM_AMOSTRAS_TESTE  = 100;
    static final int EPOCAS_TREINO = 25;
 
-   static final String caminhoTreino = "/dados/mnist/treino/";
-   static final String caminhoTeste = "/dados/mnist/teste/";
-   static final String caminhoSaidaModelo = "./dados/modelosMNIST/modelo-convolucional.txt";
-   static final String caminhoHistorico = "historico-perda";
+   static final String CAMINHO_TREINO = "/dados/mnist/treino/";
+   static final String CAMINHO_TESTE = "/dados/mnist/teste/";
+   static final String CAMINHO_SAIDA_MODELO = "./dados/modelosMNIST/modelo-convolucional.txt";
+   static final String CAMINHO_HISTORICO = "historico-perda";
 
    public static void main(String[] args){
       ged.limparConsole();
       
-      final var treinoX = new Tensor4D(carregarDadosMNIST(caminhoTreino, NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO));
+      final var treinoX = new Tensor4D(carregarDadosMNIST(CAMINHO_TREINO, NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO));
       final var treinoY = criarRotulosMNIST(NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO);
 
       Sequencial modelo = criarModelo();
@@ -43,7 +43,11 @@ public class MainConv{
 
       System.out.println("Treinando.");
       t1 = System.nanoTime();
+         Tensor4D filtro = new Tensor4D(((Convolucional) modelo.camada(0)).kernel());
+         Tensor4D grade = new Tensor4D(((Convolucional) modelo.camada(0)).gradEntrada);
          modelo.treinar(treinoX, treinoY, EPOCAS_TREINO, true);
+         System.out.println("Filtro igual: " + filtro.comparar(((Convolucional) modelo.camada(0)).kernel()));
+         System.out.println("gradE igual: " + grade.comparar(((Convolucional) modelo.camada(0)).gradEntrada));
       t2 = System.nanoTime();
 
       long tempoDecorrido = t2 - t1;
@@ -60,16 +64,16 @@ public class MainConv{
       );
 
       System.out.println("\nCarregando dados de teste.");
-      final var testeX = carregarDadosMNIST(caminhoTeste, NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
+      final var testeX = carregarDadosMNIST(CAMINHO_TESTE, NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
       final var testeY = criarRotulosMNIST(NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
       System.out.println(
          "Teste -> perda: " + modelo.avaliar(testeX, testeY) + 
          " - acurácia: " + formatarDecimal((modelo.avaliador().acuracia(testeX, testeY) * 100), 4) + "%"
       );
       
-      exportarHistorico(modelo, caminhoHistorico);
-      salvarModelo(modelo, caminhoSaidaModelo);
-      MainImg.executarComando("python grafico.py " + caminhoHistorico);
+      exportarHistorico(modelo, CAMINHO_HISTORICO);
+      salvarModelo(modelo, CAMINHO_SAIDA_MODELO);
+      MainImg.executarComando("python grafico.py " + CAMINHO_HISTORICO);
    }
 
    /*
@@ -78,15 +82,16 @@ public class MainConv{
    static Sequencial criarModelo(){
       Sequencial modelo = new Sequencial(new Camada[]{
          new Entrada(28, 28),
-         new Convolucional(new int[]{5, 5}, 10, "leaky-relu"),
+         new Convolucional(new int[]{4, 4}, 18, "leaky-relu"),
+         new MaxPooling(new int[]{2, 2}),
+         new Convolucional(new int[]{4, 4}, 22, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(124, "sigmoid"),
+         new Densa(130, "sigmoid"),
          new Densa(NUM_DIGITOS_TREINO, "softmax")
       });
 
-      modelo.compilar(new SGD(0.01, 0.5), "entropia-cruzada");
-
+      modelo.compilar(new SGD(0.001, 0.96), "entropia-cruzada");
       return modelo;
    }
 
