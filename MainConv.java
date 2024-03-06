@@ -43,11 +43,7 @@ public class MainConv{
 
       System.out.println("Treinando.");
       t1 = System.nanoTime();
-         Tensor4D filtro = new Tensor4D(((Convolucional) modelo.camada(0)).kernel());
-         Tensor4D grade = new Tensor4D(((Convolucional) modelo.camada(0)).gradEntrada);
          modelo.treinar(treinoX, treinoY, EPOCAS_TREINO, true);
-         System.out.println("Filtro igual: " + filtro.comparar(((Convolucional) modelo.camada(0)).kernel()));
-         System.out.println("gradE igual: " + grade.comparar(((Convolucional) modelo.camada(0)).gradEntrada));
       t2 = System.nanoTime();
 
       long tempoDecorrido = t2 - t1;
@@ -91,7 +87,7 @@ public class MainConv{
          new Densa(NUM_DIGITOS_TREINO, "softmax")
       });
 
-      modelo.compilar(new SGD(0.001, 0.96), "entropia-cruzada");
+      modelo.compilar(new SGD(0.001, 0.99), "entropia-cruzada");
       return modelo;
    }
 

@@ -774,17 +774,16 @@ public class OpTensor4D{
     * @param saida tensor de destino.
     */
    public void convForward(Tensor4D entrada, Tensor4D kernel, Tensor4D saida){
-      final int numFiltros = kernel.dim1();
-      final int profEntrada = kernel.dim2();
+      int filtros = kernel.dim1();
+      int entradas = kernel.dim2();
       
-      for(int i = 0; i < numFiltros; i++){
+      for(int i = 0; i < filtros; i++){
          int[] idSaida = {0, i};
-         for(int j = 0; j < profEntrada; j++){
+         for(int j = 0; j < entradas; j++){
             int[] idEntrada = {0, j};
             int[] idKernel = {i, j};
             correlacao2D(entrada, kernel, saida, idEntrada, idKernel, idSaida, true);
          }
-
       }
    }
 
@@ -796,18 +795,17 @@ public class OpTensor4D{
     * @param gradKernel tensor dos gradientes em relação aos filtros.
     * @param gradEntrada tensor com o gradiente de entrada.
     */
-    public void convBackward(Tensor4D entrada, Tensor4D kernel, Tensor4D derivada, Tensor4D gradKernel, Tensor4D gradEntrada) {
-      int numFiltros = kernel.dim1();
-      int profEntrada = kernel.dim2();
+   public void convBackward(Tensor4D entrada, Tensor4D kernel, Tensor4D derivada, Tensor4D gradKernel, Tensor4D gradEntrada){
+      int filtros = kernel.dim1();
+      int entradas = kernel.dim2();
   
-      for(int i = 0; i < numFiltros; i++){
-         for(int j = 0; j < profEntrada; j++){
+      for(int i = 0; i < filtros; i++){
+         int[] idDerivada = {0, i};
+         for(int j = 0; j < entradas; j++){
             int[] idEntrada = {0, j};
-            int[] idDerivada = {0, i};
-            int[] idGradKernel = {i, j};
             int[] idKernel = {i, j};
             int[] idGradEntrada = {0, j};
-            correlacao2D(entrada, derivada, gradKernel, idEntrada, idDerivada, idGradKernel, false);
+            correlacao2D(entrada, derivada, gradKernel, idEntrada, idDerivada, idKernel, false);
             convolucao2DFull(derivada, kernel, gradEntrada, idDerivada, idKernel, idGradEntrada, true);
          }
       }

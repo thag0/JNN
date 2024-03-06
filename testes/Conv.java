@@ -32,7 +32,7 @@ public class Conv{
    public static void main(String[] args){
       ged.limparConsole();
 
-      String nomeModelo = "modelo-convolucional";
+      String nomeModelo = "conv-mnist-95";
       Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + nomeModelo + ".txt");
       // modelo.info();
       // testarAcertosMNIST(modelo);
@@ -45,10 +45,8 @@ public class Conv{
       forward.imprimir();
       backward.imprimir();
 
-      
       testarForward();
       testarBackward();
-      
    }
 
    static void testarAcertosMNIST(Sequencial modelo){
@@ -78,14 +76,14 @@ public class Conv{
     * Testar com multithread
     */
    static void testarForward(){
-      int[] formEntrada = {5, 8, 8};
+      int[] formEntrada = {12, 16, 16};
       Inicializador iniKernel = new GlorotUniforme(12345);
       Inicializador iniBias = new Zeros();
-      Convolucional conv = new Convolucional(formEntrada, new int[]{2, 2}, 3, "linear", iniKernel, iniBias);
+      Convolucional conv = new Convolucional(formEntrada, new int[]{3, 3}, 16, "linear", iniKernel, iniBias);
       conv.inicializar();
 
       Tensor4D entrada = new Tensor4D(conv.entrada.dimensoes());
-      entrada.preencherContador(true);
+      entrada.map((x) -> Math.random());
 
       //simulação de propagação dos dados numa camada convolucional sem bias
       Tensor4D filtros = new Tensor4D(conv.filtros);
@@ -112,51 +110,47 @@ public class Conv{
     * Testar com multithread
     */
    static void testarBackward(){
-      int[] formEntrada = {2, 8, 8};
-      Convolucional conv = new Convolucional(formEntrada, new int[]{3, 3}, 4, "linear");
+      int[] formEntrada = {26, 24, 24};
+      Inicializador iniKernel = new GlorotUniforme(12345);
+      Inicializador iniBias = new Zeros();
+      Convolucional conv = new Convolucional(formEntrada, new int[]{3, 3}, 26, "linear", iniKernel, iniBias);
 
-      Tensor4D grad = new Tensor4D(conv.gradSaida);
-
+      
       Tensor4D entrada = new Tensor4D(conv.entrada);
-      entrada.preencherContador(true);
-
+      entrada.map((x) -> Math.random());
+      
       Tensor4D filtros = new Tensor4D(conv.filtros);
-      filtros.preencherContador(true);
+      filtros.map((x) -> Math.random());
       conv.filtros.copiar(filtros);
 
-      Tensor4D derivada = new Tensor4D(conv.derivada);
-      Tensor4D gradFiltroEsperado = new Tensor4D(conv.gradFiltros);
-      Tensor4D gradEntradaEsperado = new Tensor4D(conv.gradEntrada);
-   
+      Tensor4D grad = new Tensor4D(conv.gradSaida);
+      grad.map((x) -> Math.random());
+      
       //backward
       conv.entrada.copiar(entrada);
       conv.calcularGradiente(grad);
 
+      Tensor4D derivada = new Tensor4D(conv.derivada);
+      Tensor4D gradFiltroEsperado = new Tensor4D(conv.gradFiltros);
+      Tensor4D gradEntradaEsperado = new Tensor4D(conv.gradEntrada);
+
       gradEntradaEsperado.preencher(0);
       gradFiltroEsperado.preencher(0);
 
-      for(int i = 0; i < conv.filtros.dim1(); i++){
-         for(int j = 0; j < conv.filtros.dim2(); j++){
+      for(int i = 0; i < filtros.dim1(); i++){
+         for(int j = 0; j < filtros.dim2(); j++){
             int[] idEntrada = {0, j};
             int[] idDerivada = {0, i};
             int[] idGradKernel = {i, j};
             int[] idKernel = {i, j};
             int[] idGradEntrada = {0, j};
             optensor.correlacao2D(entrada, derivada, gradFiltroEsperado, idEntrada, idDerivada, idGradKernel, false);
-            optensor.convolucao2DFull(derivada, filtros, gradEntradaEsperado, idDerivada, idKernel, idGradEntrada, true);
+            optensor.convolucao2DFull(derivada, conv.filtros, gradEntradaEsperado, idDerivada, idKernel, idGradEntrada, true);
          }
       }
 
-      boolean gradF, gradE;
-      gradE = conv.gradEntrada.comparar(gradEntradaEsperado);
-      gradF = conv.gradFiltros.comparar(gradFiltroEsperado);
-
-      if(gradF && gradE){
-         System.out.println("Backward esperado: " + (gradE && gradF));
-      
-      }else{
-         System.out.println("Backward inesperado -> gradFiltro: " + gradF + ", grafEntrada: " + gradE);
-      }
+      System.out.println("backward GradFiltros: " + conv.gradFiltros.comparar(gradFiltroEsperado));
+      System.out.println("backward GradEntrada: " + conv.gradEntrada.comparar(gradEntradaEsperado));
    }
 
    static void testarTodosDados(Sequencial modelo){
