@@ -78,12 +78,13 @@ public class MainConv{
    static Sequencial criarModelo(){
       Sequencial modelo = new Sequencial(new Camada[]{
          new Entrada(28, 28),
-         new Convolucional(new int[]{3, 3}, 16, "leaky-relu"),
+         new Convolucional(new int[]{3, 3}, 14, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{3, 3}, 20, "leaky-relu"),
+         new Convolucional(new int[]{3, 3}, 16, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
          new Densa(126, "sigmoid"),
+         new Dropout(0.3),
          new Densa(NUM_DIGITOS_TREINO, "softmax")
       });
 
