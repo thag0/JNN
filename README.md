@@ -26,9 +26,9 @@ Até o momento o modelo sequencial está lidando perfeitamente bem com os métod
 
 Estou testando os modelos convolucionais no conjunto de dados do MNIST, atualmente estou usando todos os 10 dítigos para treino, onde cada dígito possui 200 amostras.
 
-Esse é o modelo que até agora teve a maior acurárcia entre os testes (92%)
+Esse é exemplo de um modelo usado para classificar os dados do MNIST, com precisão em torno de 92% nos dados de teste.
 
-![modelo-mnist](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/e84701b4-ad04-4c52-8b64-dc7f98da80d1)
+[![modelo-mnist](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/e84701b4-ad04-4c52-8b64-dc7f98da80d1)](https://github.com/thag0/Biblioteca-de-Redes-Neurais/issues/3#issue-2065046003)
 
 Já estou bem satisfeito de ter conseguido esses resultados com o modelo convolucional, mas sempre há espaço para melhorias e quero continuar trabalhando nisso, principalmente acelerando as operações dentro da camada.
 
