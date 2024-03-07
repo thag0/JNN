@@ -22,11 +22,7 @@ public class OpTensor4D{
     * @return resultado da verificação.
     */
    public boolean compararAlturaLargura(Tensor4D a, Tensor4D b){
-      if((a.dim3() != b.dim3()) || (a.dim4() != b.dim4())){
-         return false;
-      }
-
-      return true;
+      return (a.dim3() == b.dim3()) && (a.dim4() == b.dim4());
    }
 
    /**
@@ -477,39 +473,39 @@ public class OpTensor4D{
     * @param entrada tensor com a matriz de entrada.
     * @param kernel tensor com a matriz de kernel.
     * @param saida tensor de destino.
-    * @param idEntrada índice desejado para a entrada (id[0], id[1] ...).
-    * @param idKernel índice desejado para o kernel (id[0], id[1] ...).
-    * @param idSaida índice desejado para a saída (id[0], id[1] ...).
+    * @param idEn índice desejado para a entrada (id[0], id[1] ...).
+    * @param idK índice desejado para o kernel (id[0], id[1] ...).
+    * @param idS índice desejado para a saída (id[0], id[1] ...).
     * @param add verificador para o resultado, se {@code verdadeiro} a matriz de resultados
     * não será zerada antes da operação, se {@code falso} a matriz de resultados será
     * zerada antes da operação.
     */
-   public void correlacao2D(Tensor4D entrada, Tensor4D kernel, Tensor4D saida, int[] idEntrada, int[] idKernel, int[] idSaida, boolean add){
-      if((idEntrada[0] < 0 || idEntrada[0] >= entrada.dim1()) || (idEntrada[1] < 0 || idEntrada[1] >= entrada.dim2())){
+   public void correlacao2D(Tensor4D entrada, Tensor4D kernel, Tensor4D saida, int[] idEn, int[] idK, int[] idS, boolean add){
+      if(!entrada.validarIndice(idEn[0], 0) || !entrada.validarIndice(idEn[0], 0)){
          throw new IllegalArgumentException(
-            "\nÍndices de entrada (" + idEntrada[0] + ", " + idEntrada[1] + ") " +
+            "\nÍndices de entrada (" + idEn[0] + ", " + idEn[1] + ") " +
             "incompatíveis com o tensor de entrada (" + entrada.dim1() + ", " + entrada.dim2() + ")."
          );
       }
-      if((idKernel[0] < 0 || idKernel[0] >= kernel.dim1()) || (idKernel[1] < 0 || idKernel[1] >= kernel.dim2())){
+      if(!kernel.validarIndice(idK[0], 0) || !kernel.validarIndice(idK[0], 0)){
          throw new IllegalArgumentException(
-            "\nÍndices do kernel (" + idKernel[0] + ", " + idKernel[1] + ") " +
+            "\nÍndices do kernel (" + idK[0] + ", " + idK[1] + ") " +
             "incompatíveis com o tensor do kernel (" + kernel.dim1() + ", " + kernel.dim2() + ")."
          );
       }
-      if((idSaida[0] < 0 || idSaida[0] >= saida.dim1()) || (idSaida[1] < 0 || idSaida[1] >= saida.dim2())){
+      if(!saida.validarIndice(idS[0], 0) || !saida.validarIndice(idS[0], 0)){
          throw new IllegalArgumentException(
-            "\nÍndices da saída (" + idSaida[0] + ", " + idSaida[1] + ") " +
+            "\nÍndices da saída (" + idS[0] + ", " + idS[1] + ") " +
             "incompatíveis com o tensor de saída (" + saida.dim1() + ", " + saida.dim2() + ")."
          );
       }
 
-      if(add == false){
-         saida.preencher2D(idSaida[0], idSaida[1] ,0);
+      if(!add){
+         saida.preencher2D(idS[0], idS[1] ,0.0);
       }
 
-      int alturaEsperada = entrada.dim3()-kernel.dim3()+1;
-      int larguraEsperada = entrada.dim4()-kernel.dim4()+1;
+      int alturaEsperada  = entrada.dim3() - kernel.dim3() + 1;
+      int larguraEsperada = entrada.dim4() - kernel.dim4() + 1;
       if(saida.dim3() != alturaEsperada){
          throw new IllegalArgumentException(
             "\nAltura da saída (" + saida.dim3() + 
@@ -525,18 +521,20 @@ public class OpTensor4D{
 
       int alturaKernel = kernel.dim3();
       int larguraKernel = kernel.dim4();
-      for(int i = 0; i < alturaEsperada; i++){
-         for(int j = 0; j < larguraEsperada; j++){
-            double soma = 0.0;
-            for(int m = 0; m < alturaKernel; m++){
-               for(int n = 0; n < larguraKernel; n++){
-                  int posX = i + m;
-                  int posY = j + n;
-                  soma += entrada.elemento(idEntrada[0], idEntrada[1], posX, posY) * 
-                           kernel.elemento(idKernel[0], idKernel[1], m, n);
+      double soma = 0d;
+      int i, j, m, n;
+      int posX;
+      for(i = 0; i < alturaEsperada; i++){
+         for(j = 0; j < larguraEsperada; j++){
+            soma = 0.d;
+            for(m = 0; m < alturaKernel; m++){
+               posX = i + m;
+               for(n = 0; n < larguraKernel; n++){
+                  soma += entrada.elemento(idEn[0], idEn[1], posX, j+n) * 
+                           kernel.elemento(idK[0], idK[1], m, n);
                }
             }
-            saida.add(idSaida[0], idSaida[1], i, j, soma);
+            saida.add(idS[0], idS[1], i, j, soma);
          }
       }
    }
@@ -586,39 +584,39 @@ public class OpTensor4D{
     * @param entrada tensor com a matriz de entrada.
     * @param kernel tensor com a matriz de kernel.
     * @param saida tensor de destino.
-    * @param idEntrada índice desejado para a entrada (id[0], id[1] ...).
-    * @param idKernel índice desejado para o kernel (id[0], id[1] ...).
-    * @param idSaida índice desejado para a saída (id[0], id[1] ...).
+    * @param idEn índice desejado para a entrada (id[0], id[1] ...).
+    * @param idK índice desejado para o kernel (id[0], id[1] ...).
+    * @param idS índice desejado para a saída (id[0], id[1] ...).
     * @param add verificador para o resultado, se {@code verdadeiro} a matriz de resultados
     * não será zerada antes da operação, se {@code falso} a matriz de resultados será
     * zerada antes da operação.
     */
-   public void convolucao2D(Tensor4D entrada, Tensor4D kernel, Tensor4D saida, int[] idEntrada, int[] idKernel, int[] idSaida, boolean add){
-      if((idEntrada[0] < 0 || idEntrada[0] >= entrada.dim1()) || (idEntrada[1] < 0 || idEntrada[1] >= entrada.dim2())){
+   public void convolucao2D(Tensor4D entrada, Tensor4D kernel, Tensor4D saida, int[] idEn, int[] idK, int[] idS, boolean add){
+      if(!entrada.validarIndice(idEn[0], 0) || !entrada.validarIndice(idEn[0], 0)){
          throw new IllegalArgumentException(
-            "\nÍndices de entrada (" + idEntrada[0] + ", " + idEntrada[1] + ") " +
+            "\nÍndices de entrada (" + idEn[0] + ", " + idEn[1] + ") " +
             "incompatíveis com o tensor de entrada (" + entrada.dim1() + ", " + entrada.dim2() + ")."
          );
       }
-      if((idKernel[0] < 0 || idKernel[0] >= kernel.dim1()) || (idKernel[1] < 0 || idKernel[1] >= kernel.dim2())){
+      if(!kernel.validarIndice(idK[0], 0) || !kernel.validarIndice(idK[0], 0)){
          throw new IllegalArgumentException(
-            "\nÍndices do kernel (" + idEntrada[0] + ", " + idEntrada[1] + ") " +
+            "\nÍndices do kernel (" + idEn[0] + ", " + idEn[1] + ") " +
             "incompatíveis com o tensor do kernel (" + entrada.dim1() + ", " + entrada.dim2() + ")."
          );
       }
-      if((idSaida[0] < 0 || idSaida[0] >= saida.dim1()) || (idSaida[1] < 0 || idSaida[1] >= saida.dim2())){
+      if(!saida.validarIndice(idS[0], 0) || !saida.validarIndice(idS[0], 0)){
          throw new IllegalArgumentException(
-            "\nÍndices da saída (" + idEntrada[0] + ", " + idEntrada[1] + ") " +
+            "\nÍndices da saída (" + idEn[0] + ", " + idEn[1] + ") " +
             "incompatíveis com o tensor de saída (" + entrada.dim1() + ", " + entrada.dim2() + ")."
          );
       }
 
-      if(add == false){
-         saida.preencher2D(idSaida[0], idSaida[1] ,0);
+      if(!add){
+         saida.preencher2D(idS[0], idS[1] ,0);
       }
 
-      int alturaEsperada = entrada.dim3()-kernel.dim3()+1;
-      int larguraEsperada = entrada.dim4()-kernel.dim4()+1;
+      int alturaEsperada  = entrada.dim3() - kernel.dim3() + 1;
+      int larguraEsperada = entrada.dim4() - kernel.dim4() + 1;
       if(saida.dim3() != alturaEsperada){
          throw new IllegalArgumentException(
             "\nAltura da saída (" + saida.dim3() + 
@@ -632,22 +630,25 @@ public class OpTensor4D{
          );
       }
 
-      Tensor4D rotacionado = rotacionarMatriz180(kernel, idKernel[0], idKernel[1]);
+      Tensor4D rotacionado = rotacionarMatriz180(kernel, idK[0], idK[1]);
 
       int alturaKernel = rotacionado.dim3();
       int larguraKernel = rotacionado.dim4();
-      for(int i = 0; i < alturaEsperada; i++){
-         for(int j = 0; j < larguraEsperada; j++){
-            double soma = 0.0;
-            for(int m = 0; m < alturaKernel; m++){
-                 for(int n = 0; n < larguraKernel; n++){
-                  int posX = i + m;
-                  int posY = j + n;
-                  soma += entrada.elemento(idEntrada[0], idEntrada[1], posX, posY) * 
-                        rotacionado.elemento(idKernel[0], idKernel[1], m, n);
+      int i, j, m, n;
+      double soma;
+      int posX, posY;
+      for(i = 0; i < alturaEsperada; i++){
+         for(j = 0; j < larguraEsperada; j++){
+            soma = 0.0;
+            for(m = 0; m < alturaKernel; m++){
+               posX = i + m;
+               for(n = 0; n < larguraKernel; n++){
+                  posY = j + n;
+                  soma += entrada.elemento(idEn[0], idEn[1], posX, posY) * 
+                        rotacionado.elemento(idK[0], idK[1], m, n);
                }
             }
-            saida.add(idSaida[0], idSaida[1], i, j, soma);
+            saida.add(idS[0], idS[1], i, j, soma);
          }
       }
    }
@@ -697,39 +698,39 @@ public class OpTensor4D{
     * @param entrada tensor com a matriz de entrada.
     * @param kernel tensor com a matriz de kernel.
     * @param saida tensor de destino.
-    * @param idEntrada índice desejado para a entrada (id[0], id[1] ...).
-    * @param idKernel índice desejado para o kernel (id[0], id[1] ...).
-    * @param idSaida índice desejado para a saída (id[0], id[1] ...).
+    * @param idEn índice desejado para a entrada (id[0], id[1] ...).
+    * @param idK índice desejado para o kernel (id[0], id[1] ...).
+    * @param idS índice desejado para a saída (id[0], id[1] ...).
     * @param add verificador para o resultado, se {@code verdadeiro} a matriz de resultados
     * não será zerada antes da operação, se {@code falso} a matriz de resultados será
     * zerada antes da operação.
     */
-   public void convolucao2DFull(Tensor4D entrada, Tensor4D kernel, Tensor4D saida, int[] idEntrada, int[] idKernel, int[] idSaida, boolean add){
-      if((idEntrada[0] < 0 || idEntrada[0] >= entrada.dim1()) || (idEntrada[1] < 0 || idEntrada[1] >= entrada.dim2())){
+   public void convolucao2DFull(Tensor4D entrada, Tensor4D kernel, Tensor4D saida, int[] idEn, int[] idK, int[] idS, boolean add){
+      if(!entrada.validarIndice(idEn[0], 0) || !entrada.validarIndice(idEn[0], 0)){
          throw new IllegalArgumentException(
-            "\nÍndices de entrada (" + idEntrada[0] + ", " + idEntrada[1] + ") " +
+            "\nÍndices de entrada (" + idEn[0] + ", " + idEn[1] + ") " +
             "incompatíveis com o tensor de entrada (" + entrada.dim1() + ", " + entrada.dim2() + ")."
          );
       }
-      if((idKernel[0] < 0 || idKernel[0] >= kernel.dim1()) || (idKernel[1] < 0 || idKernel[1] >= kernel.dim2())){
+      if(!kernel.validarIndice(idK[0], 0) || !kernel.validarIndice(idK[0], 0)){
          throw new IllegalArgumentException(
-            "\nÍndices do kernel (" + idKernel[0] + ", " + idKernel[1] + ") " +
-            "incompatíveis com o tensor do kernel (" + kernel.dim1() + ", " + kernel.dim2() + ")."
+            "\nÍndices do kernel (" + idEn[0] + ", " + idEn[1] + ") " +
+            "incompatíveis com o tensor do kernel (" + entrada.dim1() + ", " + entrada.dim2() + ")."
          );
       }
-      if((idSaida[0] < 0 || idSaida[0] >= saida.dim1()) || (idSaida[1] < 0 || idSaida[1] >= saida.dim2())){
+      if(!saida.validarIndice(idS[0], 0) || !saida.validarIndice(idS[0], 0)){
          throw new IllegalArgumentException(
-            "\nÍndices da saída (" + idSaida[0] + ", " + idSaida[1] + ") " +
-            "incompatíveis com o tensor de saída (" + saida.dim1() + ", " + saida.dim2() + ")."
+            "\nÍndices da saída (" + idEn[0] + ", " + idEn[1] + ") " +
+            "incompatíveis com o tensor de saída (" + entrada.dim1() + ", " + entrada.dim2() + ")."
          );
       }
 
-      if(add == false){
-         saida.preencher2D(idSaida[0], idSaida[1], 0);
+      if(!add){
+         saida.preencher2D(idS[0], idS[1], 0);
       }
 
-      int alturaEsperada = entrada.dim3()+kernel.dim3()-1;
-      int larguraEsperada = entrada.dim4()+kernel.dim4()-1;
+      int alturaEsperada  = entrada.dim3() + kernel.dim3() - 1;
+      int larguraEsperada = entrada.dim4() + kernel.dim4() - 1;
       if(saida.dim3() != alturaEsperada){
          throw new IllegalArgumentException(
             "\nAltura da saída (" + saida.dim3() + 
@@ -752,17 +753,18 @@ public class OpTensor4D{
          for(j = 0; j < colSaida; j++){
             res = 0;
             for(k = 0; k < linKernel; k++){
+               posX = i - k;
                for(l = 0; l < colKernel; l++){
-                  posX = i - k;
                   posY = j - l;
   
                   if(posX >= 0 && posX < linEntrada && posY >= 0 && posY < colEntrada){
                      res += 
-                        entrada.elemento(idEntrada[0], idEntrada[1], posX, posY) * kernel.elemento(idKernel[0], idKernel[1], k, l);
+                        entrada.elemento(idEn[0], idEn[1], posX, posY) * 
+                        kernel.elemento(idK[0], idK[1], k, l);
                   }
                }
             }
-            saida.add(idSaida[0], idSaida[1], i, j, res);
+            saida.add(idS[0], idS[1], i, j, res);
          }
       }
    }
@@ -776,37 +778,46 @@ public class OpTensor4D{
    public void convForward(Tensor4D entrada, Tensor4D kernel, Tensor4D saida){
       int filtros = kernel.dim1();
       int entradas = kernel.dim2();
-      
+
+      int[] idSaida = {0, 0};
+      int[] idEntrada = {0, 0};
+      int[] idKernel = {0, 0};
       for(int i = 0; i < filtros; i++){
-         int[] idSaida = {0, i};
+         idSaida[1] = i;
+         idKernel[0] = i;
          for(int j = 0; j < entradas; j++){
-            int[] idEntrada = {0, j};
-            int[] idKernel = {i, j};
+            idEntrada[1] = j;
+            idKernel[1] = j;
             correlacao2D(entrada, kernel, saida, idEntrada, idKernel, idSaida, true);
          }
       }
    }
-
+   
    /**
     * Método exluviso para a propagação reversa de camadas convolucionais.
     * @param entrada tensor de entrada da camada.
     * @param kernel tensor dos kernels.
     * @param derivada tensor com os valores de derivada da função de ativação.
-    * @param gradKernel tensor dos gradientes em relação aos filtros.
-    * @param gradEntrada tensor com o gradiente de entrada.
+    * @param gradK tensor dos gradientes em relação aos filtros.
+    * @param gradE tensor com o gradiente de entrada.
     */
-   public void convBackward(Tensor4D entrada, Tensor4D kernel, Tensor4D derivada, Tensor4D gradKernel, Tensor4D gradEntrada){
+   public void convBackward(Tensor4D entrada, Tensor4D kernel, Tensor4D derivada, Tensor4D gradK, Tensor4D gradE){
       int filtros = kernel.dim1();
       int entradas = kernel.dim2();
   
+      int[] idEntrada = {0, 0};
+      int[] idDerivada = {0, 0};
+      int[] idKernel = {0, 0};
+      int[] idGradEntrada = {0, 0};
       for(int i = 0; i < filtros; i++){
-         int[] idDerivada = {0, i};
+         idDerivada[1] = i;
+         idKernel[0] = i;
          for(int j = 0; j < entradas; j++){
-            int[] idEntrada = {0, j};
-            int[] idKernel = {i, j};
-            int[] idGradEntrada = {0, j};
-            correlacao2D(entrada, derivada, gradKernel, idEntrada, idDerivada, idKernel, false);
-            convolucao2DFull(derivada, kernel, gradEntrada, idDerivada, idKernel, idGradEntrada, true);
+            idEntrada[1] = j;
+            idKernel[1] = j;
+            idGradEntrada[1] = j;
+            correlacao2D(entrada, derivada, gradK, idEntrada, idDerivada, idKernel, false);
+            convolucao2DFull(derivada, kernel, gradE, idDerivada, idKernel, idGradEntrada, true);
          }
       }
    }

@@ -48,15 +48,14 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
 
-      Tensor4D tensor = new Tensor4D(new int[]{2, 2, 2, 2});
-      tensor.nome("amostra");
-      tensor.preencherContador(true);
+      Random random = new Random();
+      Tensor4D tensor = new Tensor4D(
+         random.nextInt(1, 4),
+         random.nextInt(1, 4),
+         random.nextInt(1, 4),
+         random.nextInt(1, 4)
+      );
       tensor.print(1);
-
-      var res = new Tensor4D(tensor.array1D(1, 0, 0));
-      res.nome("resultado");
-      res.print(1);
-      
    }
 
    /**

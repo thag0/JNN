@@ -32,7 +32,8 @@ public class Conv{
    public static void main(String[] args){
       ged.limparConsole();
 
-      String nomeModelo = "conv-mnist-95";
+      // String nomeModelo = "conv-mnist-95";
+      String nomeModelo = "modelo-convolucional";
       Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + nomeModelo + ".txt");
       // modelo.info();
       // testarAcertosMNIST(modelo);
@@ -40,8 +41,8 @@ public class Conv{
 
       Dados forward = tempoForward(modelo);//media 30/40 ms
       Dados backward = tempoBackward(modelo);//media 20/25 ms
-      forward = ged.filtrar(forward, 1, "Convolucional");
-      backward = ged.filtrar(backward, 1, "Convolucional");
+      // forward = ged.filtrar(forward, 1, "Convolucional");
+      // backward = ged.filtrar(backward, 1, "Convolucional");
       forward.imprimir();
       backward.imprimir();
 
@@ -114,7 +115,6 @@ public class Conv{
       Inicializador iniKernel = new GlorotUniforme(12345);
       Inicializador iniBias = new Zeros();
       Convolucional conv = new Convolucional(formEntrada, new int[]{3, 3}, 26, "linear", iniKernel, iniBias);
-
       
       Tensor4D entrada = new Tensor4D(conv.entrada);
       entrada.map((x) -> Math.random());
@@ -149,8 +149,15 @@ public class Conv{
          }
       }
 
-      System.out.println("backward GradFiltros: " + conv.gradFiltros.comparar(gradFiltroEsperado));
-      System.out.println("backward GradEntrada: " + conv.gradEntrada.comparar(gradEntradaEsperado));
+      boolean gradE = conv.gradFiltros.comparar(gradFiltroEsperado);
+      boolean gradF = conv.gradEntrada.comparar(gradEntradaEsperado);
+      
+      if(gradE && gradF){
+         System.out.println("Backward esperado: " + (gradE && gradF));
+      
+      }else{
+         System.out.println("Backward inesperado ->  gradFiltro: " +  gradF + ", gradEntrada: " + gradE);
+      }
    }
 
    static void testarTodosDados(Sequencial modelo){

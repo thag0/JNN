@@ -41,15 +41,15 @@ public class Tensor4D{
    /**
     * Dimensões do tensor (d1, d2, d3, d4).
     */
-   private int[] dimensoes;
+   private final int[] dimensoes;
 
    /**
     * Conjunto de elementos do tensor.
     */
-   final double[] dados;
+   private final double[] dados;
 
    /**
-    * Estético com finalidade de debug, nome do tensor.
+    * Estético e com finalidade de debug, nome do tensor.
     */
    private String nome = getClass().getSimpleName();
 
@@ -280,6 +280,13 @@ public class Tensor4D{
       this.dados = new double[dim1()*dim2()*dim3()*dim4()];
    }
 
+   /**
+    * Auxliar para cópia de dimensões para as dimensões do tensor.
+    * @param dim1 tamanho da primeira dimensão.
+    * @param dim2 tamanho da segunda dimensão.
+    * @param dim3 tamanho da terceira dimensão.
+    * @param dim4 tamanho da quarta dimensão.
+    */
    private void copiarDimensoes(int dim1, int dim2, int dim3, int dim4){
       this.dimensoes[0] = dim1;
       this.dimensoes[1] = dim2;
@@ -287,8 +294,16 @@ public class Tensor4D{
       this.dimensoes[3] = dim4;
    }
 
+   /**
+    * Auxliar para cópia de um array de dimensões para as dimensões do tensor.
+    * @param dim array de dimensões.
+    */
    private void copiarDimensoes(int[] dim){
       int n1 = this.dimensoes.length;
+      for(int i = 0; i < n1; i++){
+         this.dimensoes[i] = 1;
+      }
+      
       int n2 = dim.length;
       for(int i = 0; i < n2; i++){
          this.dimensoes[n1 - 1 - i] = dim[n2 - 1 - i];
@@ -346,21 +361,17 @@ public class Tensor4D{
     * <pre>
     *tensor = [
     *  [
-    *    [
-    *       1, 2
-    *       3, 4
-    *    ]
+    *    [[1, 2],
+    *     [3, 4]]
     *  ]  
     *]
     *
-    *int[] novoFormato = {1, 1, 1 4};
+    *int[] novoFormato = {1, 1, 1, 4};
     *tensor.reformatar(novoFormato);
     *
     *tensor = [
     *  [
-    *    [
-    *       1, 2, 3, 4
-    *    ]
+    *    [[1, 2, 3, 4]]
     *  ]  
     *]
     * </pre>
@@ -1409,17 +1420,17 @@ public class Tensor4D{
     * @return array contendo os elementos.
     */
    public double[] array1D(int dim1, int dim2, int dim3){
-      if(dim1 < 0 || dim1 >= dim1()){
+      if(!validarIndice(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );
       }
-      if(dim2 < 0 || dim2 >= dim2()){
+      if(!validarIndice(dim2, dim2())){
          throw new IllegalArgumentException(
             "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
          );
       }
-      if(dim3 < 0 || dim3 >= dim3()){
+      if(!validarIndice(dim3, dim3())){
          throw new IllegalArgumentException(
             "\nÍndice da terceira dimensão (" + dim3 + ") inválido."
          );
@@ -1740,6 +1751,18 @@ public class Tensor4D{
     */
    public String dimensoesStr(){
       return "(" + dim1() + ", " + dim2() + ", " + dim3() + ", " + dim4() + ")";
+   }
+
+   /**
+    * Verifica se o índice fornecido está dentro dos limites da dimensão
+    * do tensor.
+    * @param id índice desejado.
+    * @param dim dimensão desejada.
+    * @return verdadeiro caso o índice seja válido na dimensão fornecida, false
+    * caso contrário.
+    */
+   public boolean validarIndice(int id, int dim){
+      return (dim >= 0 && dim < dimensoes.length) && (id >= 0 && id < dimensoes[dim]);
    }
 
    /**
