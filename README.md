@@ -28,7 +28,7 @@ Estou testando os modelos convolucionais no conjunto de dados do MNIST, atualmen
 
 Esse é exemplo de um modelo usado para classificar os dados do MNIST, com precisão em torno de 92% nos dados de teste.
 
-[![modelo-mnist](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/e84701b4-ad04-4c52-8b64-dc7f98da80d1)](https://github.com/thag0/Biblioteca-de-Redes-Neurais/issues/3#issue-2065046003)
+![arq-conv](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/b19ec142-b612-4340-b041-9d4277d3ab2c)
 
 Já estou bem satisfeito de ter conseguido esses resultados com o modelo convolucional, mas sempre há espaço para melhorias e quero continuar trabalhando nisso, principalmente acelerando as operações dentro da camada.
 
