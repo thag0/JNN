@@ -75,21 +75,7 @@ public abstract class Ativacao{
          );
       }
 
-      int dim1 = entrada.dim1();
-      int dim2 = entrada.dim2();
-      int dim3 = entrada.dim3();
-      int dim4 = entrada.dim4();
-      for(int i = 0; i < dim1; i++){
-         for(int j = 0; j < dim2; j++){
-            for(int k = 0; k < dim3; k++){
-               for(int l = 0; l < dim4; l++){
-                  saida.editar(i, j, k, l, (
-                     fx.applyAsDouble(entrada.elemento(i, j, k, l))
-                  ));
-               }
-            }
-         }
-      }
+      saida.map(entrada, fx);
    }
 
    /**
@@ -135,7 +121,7 @@ public abstract class Ativacao{
     * @param camada camada densa.
     */
    public void derivada(Densa camada){
-      derivada(camada.somatorio, camada.gradSaida, camada.derivada);
+      derivada(camada.somatorio, camada.gradSaida, camada.gradSaida);
    }
 
    /**
@@ -146,7 +132,7 @@ public abstract class Ativacao{
     * @param camada camada convolucional.
     */
    public void derivada(Convolucional camada){
-      derivada(camada.somatorio, camada.gradSaida, camada.derivada);
+      derivada(camada.somatorio, camada.gradSaida, camada.gradSaida);
    }
 
    /**

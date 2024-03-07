@@ -153,18 +153,6 @@ public class Convolucional extends Camada implements Cloneable{
    public Tensor4D saida;
 
    /**
-    * Tensor contendo os valores relativos a derivada da função de
-    * ativação da camada.
-    * <p>
-    *    O formato da derivada é dado por:
-    * </p>
-    * <pre>
-    *    derivada = (1, numFiltros, alturaSaida, larguraSaida)
-    * </pre>
-    */
-   public Tensor4D derivada;
-
-   /**
     * Tensor contendo os valores dos gradientes usados para 
     * a retropropagação para camadas anteriores.
     * <p>
@@ -566,7 +554,6 @@ public class Convolucional extends Camada implements Cloneable{
       this.saida        = new Tensor4D(1, numFiltros, altSaida, largSaida);
       this.gradFiltros  = new Tensor4D(this.filtros);
       this.somatorio    = new Tensor4D(this.saida);
-      this.derivada     = new Tensor4D(this.saida);
       this.gradSaida    = new Tensor4D(this.saida);
 
       if(usarBias){
@@ -613,7 +600,6 @@ public class Convolucional extends Camada implements Cloneable{
       saida.nome("saída");
       gradFiltros.nome("gradiente kernel");
       somatorio.nome("somatório");
-      derivada.nome("derivada");
       gradSaida.nome("gradiente saída");
 
       if(usarBias){
@@ -758,12 +744,12 @@ public class Convolucional extends Camada implements Cloneable{
 
       //backward
       Tensor4D tempGrad = new Tensor4D(gradFiltros.dimensoes());
-      optensor.convBackward(this.entrada, this.filtros, this.derivada, tempGrad, this.gradEntrada);
+      optensor.convBackward(this.entrada, this.filtros, this.gradSaida, tempGrad, this.gradEntrada);
       gradFiltros.add(tempGrad);
 
       if(usarBias){
          for(int i = 0; i < numFiltros; i++){
-            gradBias.add(0, 0, 0, i, derivada.somarElementos2D(0, i));
+            gradBias.add(0, 0, 0, i, gradSaida.somarElementos2D(0, i));
          }
       }
    }
@@ -846,7 +832,6 @@ public class Convolucional extends Camada implements Cloneable{
          clone.somatorio   = this.somatorio.clone();
          clone.saida       = this.saida.clone();
          clone.gradSaida   = this.gradSaida.clone();
-         clone.derivada    = this.derivada.clone();
 
          return clone;
       }catch(Exception e){

@@ -835,6 +835,35 @@ public class Tensor4D{
    }
 
    /**
+    * Aplica a função recebida em todos os elementos do tensor usando
+    * como entrada os valores do tensor recebido.
+    * @param tensor tensor base.
+    * @param funcao função para aplicar no tensor base.
+    */
+   public void map(Tensor4D tensor, DoubleUnaryOperator funcao){
+      if(tensor == null){
+         throw new IllegalArgumentException(
+            "\nTensor fornecido é nulo."
+         );
+      }
+      if(!comparar4D(tensor)){
+         throw new IllegalArgumentException(
+            "\nAs dimensões do tensor fornecido " + tensor.dimensoesStr() +
+            " e as da instância local " + dimensoesStr() + " devem ser iguais."
+         );
+      }
+      if(funcao == null){
+         throw new IllegalArgumentException(
+            "\nFunção recebida é nula."
+         );
+      }
+
+      for(int i = 0; i < dados.length; i++){
+         dados[i] = funcao.applyAsDouble(tensor.dados[i]);
+      }
+   }
+
+   /**
     * Aplica a função recebida em todos os elementos do tensor.
     * @param funcao função desejada.
     */

@@ -165,17 +165,6 @@ public class Densa extends Camada implements Cloneable{
    public Tensor4D gradBias;
 
    /**
-    * Matriz coluna contendo os valores de derivada da função de ativação.
-    * <p>
-    *    O formato da matriz de derivada é definido por:
-    * </p>
-    * <pre>
-    *    gradBias = (1, 1, 1, neuronios)
-    * </pre>
-    */
-   public Tensor4D derivada;
-
-   /**
     * Função de ativação da camada
     */
    private Ativacao ativacao = new Linear();
@@ -358,7 +347,6 @@ public class Densa extends Camada implements Cloneable{
       }
 
       this.somatorio =   new Tensor4D(saida.dimensoes());
-      this.derivada =    new Tensor4D(saida.dimensoes());
       this.gradSaida =   new Tensor4D(saida.dimensoes());
       this.gradEntrada = new Tensor4D(1, 1, this.entrada.dim3(), this.entrada.dim4());
 
@@ -398,7 +386,6 @@ public class Densa extends Camada implements Cloneable{
       pesos.nome("kernel");
       saida.nome("saida");
       somatorio.nome("somatório");
-      derivada.nome("derivada");
       gradSaida.nome("gradiente saída");
       gradEntrada.nome("gradiente entrada");
       gradPesos.nome("gradiente kernel");
@@ -536,17 +523,17 @@ public class Densa extends Camada implements Cloneable{
       Tensor4D tempGrad = new Tensor4D(gradPesos.dimensoes());
       
       optensor.matMult(
-         optensor.matTranspor(this.entrada, 0, 0), derivada, tempGrad,
+         optensor.matTranspor(this.entrada, 0, 0), gradSaida, tempGrad,
          0, 0
       );
       gradPesos.add(tempGrad);
 
       if(usarBias){
-         gradBias.add(derivada);
+         gradBias.add(gradSaida);
       }
 
       optensor.matMult(
-         derivada, optensor.matTranspor(pesos, 0, 0), gradEntrada, 0, 0
+         gradSaida, optensor.matTranspor(pesos, 0, 0), gradEntrada, 0, 0
       );
    }
 
@@ -671,7 +658,6 @@ public class Densa extends Camada implements Cloneable{
          clone.somatorio = this.somatorio.clone();
          clone.saida = this.saida.clone();
          clone.gradSaida = this.gradSaida.clone();
-         clone.derivada = this.derivada.clone();
          clone.gradPesos = this.gradPesos.clone();
 
          return clone;

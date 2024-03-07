@@ -130,7 +130,7 @@ public class Conv{
       conv.entrada.copiar(entrada);
       conv.calcularGradiente(grad);
 
-      Tensor4D derivada = new Tensor4D(conv.derivada);
+      Tensor4D gradSaida = new Tensor4D(conv.gradSaida);
       Tensor4D gradFiltroEsperado = new Tensor4D(conv.gradFiltros);
       Tensor4D gradEntradaEsperado = new Tensor4D(conv.gradEntrada);
 
@@ -144,8 +144,8 @@ public class Conv{
             int[] idGradKernel = {i, j};
             int[] idKernel = {i, j};
             int[] idGradEntrada = {0, j};
-            optensor.correlacao2D(entrada, derivada, gradFiltroEsperado, idEntrada, idDerivada, idGradKernel, false);
-            optensor.convolucao2DFull(derivada, conv.filtros, gradEntradaEsperado, idDerivada, idKernel, idGradEntrada, true);
+            optensor.correlacao2D(entrada, gradSaida, gradFiltroEsperado, idEntrada, idDerivada, idGradKernel, false);
+            optensor.convolucao2DFull(gradSaida, conv.filtros, gradEntradaEsperado, idDerivada, idKernel, idGradEntrada, true);
          }
       }
 
