@@ -99,12 +99,12 @@ public class MainImg{
     */
    static long treinoEmPainel(Modelo modelo, int altura, int largura, double[][] entradas, double[][] saidas){
       final int fps = 6000;
-      int epocasPorFrame = 30;
+      int epocasPorFrame = 25;
 
       //acelerar o processo de desenho
       //bom em situações de janelas muito grandes
       int n = Runtime.getRuntime().availableProcessors();
-      int numThreads = (n > 1) ? (int)(n * 0.25) : 1;
+      int numThreads = (n > 1) ? (int)(n * 0.5) : 2;
 
       JanelaTreino jt = new JanelaTreino(largura, altura, escalaRender, numThreads);
       jt.desenharTreino(modelo, 0);

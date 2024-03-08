@@ -35,22 +35,22 @@ public class OpTensor4D{
    public void copiarMatriz(Tensor4D tensor, Tensor4D destino, int[] dimA, int[] dimB){
       if(tensor.comparar2D(destino) == false){
          throw new IllegalArgumentException(
-            "\nAs duas últimas dimensões do tensor recebido " + tensor.dimensoesStr() +
-            " e de destino " + destino.dimensoesStr() + " devem ser iguais."
+            "\nAs duas últimas dimensões do tensor recebido " + tensor.shapeStr() +
+            " e de destino " + destino.shapeStr() + " devem ser iguais."
          );
       }
 
       if((dimA[0] < 0 || dimA[0] >= tensor.dim1()) || (dimA[1] < 0 || dimA[1] >= tensor.dim2())){
          throw new IllegalArgumentException(
             "\nÍndices do tensor base (" + dimA[0] + ", " + dimA[1] + ") " +
-            "inválidos para o tensor com dimensões " + tensor.dimensoesStr()
+            "inválidos para o tensor com dimensões " + tensor.shapeStr()
          );
       }
 
       if((dimB[0] < 0 || dimB[0] >= destino.dim1()) || (dimB[1] < 0 || dimB[1] >= destino.dim2())){
          throw new IllegalArgumentException(
             "\nÍndices do tensor de destino (" + dimB[0] + ", " + dimB[1] + ") " +
-            "inválidos para o tensor de destino com dimensões " + destino.dimensoesStr()
+            "inválidos para o tensor de destino com dimensões " + destino.shapeStr()
          );
       }
 
@@ -111,13 +111,13 @@ public class OpTensor4D{
 
       if(compararAlturaLargura(a, b) == false){
          throw new IllegalArgumentException(
-            "As dimensões de A " + a.dimensoesStr() + " e B " + b.dimensoesStr() +
+            "As dimensões de A " + a.shapeStr() + " e B " + b.shapeStr() +
             " devem ser iguais compatíveis"
          );
       }
       if(compararAlturaLargura(a, r) == false){
          throw new IllegalArgumentException(
-            "As dimensões de A " + a.dimensoesStr() + " e R " + b.dimensoesStr() +
+            "As dimensões de A " + a.shapeStr() + " e R " + b.shapeStr() +
             " devem ser iguais compatíveis"
          );
       }
@@ -158,7 +158,7 @@ public class OpTensor4D{
 
       if(compararAlturaLargura(a, b) == false){
          throw new IllegalArgumentException(
-            "As dimensões de A " + a.dimensoesStr() + " e B " + b.dimensoesStr() +
+            "As dimensões de A " + a.shapeStr() + " e B " + b.shapeStr() +
             " devem ser iguais compatíveis"
          );
       }
@@ -203,13 +203,13 @@ public class OpTensor4D{
 
       if(compararAlturaLargura(a, b) == false){
          throw new IllegalArgumentException(
-            "As dimensões de A " + a.dimensoesStr() + " e B " + b.dimensoesStr() +
+            "As dimensões de A " + a.shapeStr() + " e B " + b.shapeStr() +
             " devem ser iguais compatíveis"
          );
       }
       if(compararAlturaLargura(a, r) == false){
          throw new IllegalArgumentException(
-            "As dimensões de A " + a.dimensoesStr() + " e R " + b.dimensoesStr() +
+            "As dimensões de A " + a.shapeStr() + " e R " + b.shapeStr() +
             " devem ser iguais compatíveis"
          );
       }
@@ -248,7 +248,7 @@ public class OpTensor4D{
 
       if(compararAlturaLargura(a, b) == false){
          throw new IllegalArgumentException(
-            "As dimensões de A " + a.dimensoesStr() + " e B " + b.dimensoesStr() +
+            "As dimensões de A " + a.shapeStr() + " e B " + b.shapeStr() +
             " devem ser iguais compatíveis"
          );
       }
@@ -355,13 +355,13 @@ public class OpTensor4D{
       
       if(compararAlturaLargura(a, b) == false){
          throw new IllegalArgumentException(
-            "As duas últimas dimensões de A " + a.dimensoesStr() + " e B " + b.dimensoesStr() +
+            "As duas últimas dimensões de A " + a.shapeStr() + " e B " + b.shapeStr() +
             " devem ser compatíveis"
          );
       }
       if(compararAlturaLargura(a, r) == false){
          throw new IllegalArgumentException(
-            "As duas últimas dimensões de A " + a.dimensoesStr() + " e R " + b.dimensoesStr() +
+            "As duas últimas dimensões de A " + a.shapeStr() + " e R " + b.shapeStr() +
             " devem ser compatíveis"
          );
       }
@@ -411,7 +411,7 @@ public class OpTensor4D{
       
       if(compararAlturaLargura(a, b) == false){
          throw new IllegalArgumentException(
-            "As duas últimas dimensões de A " + a.dimensoesStr() + " e B " + b.dimensoesStr() +
+            "As duas últimas dimensões de A " + a.shapeStr() + " e B " + b.shapeStr() +
             " devem ser compatíveis"
          );
       }
@@ -797,28 +797,29 @@ public class OpTensor4D{
     * Método exluviso para a propagação reversa de camadas convolucionais.
     * @param entrada tensor de entrada da camada.
     * @param kernel tensor dos kernels.
-    * @param derivada tensor com os valores de derivada da função de ativação.
+    * @param gradSaida tensor com os valores dos gradientes da camada em relação a sua saída.
     * @param gradK tensor dos gradientes em relação aos filtros.
     * @param gradE tensor com o gradiente de entrada.
     */
-   public void convBackward(Tensor4D entrada, Tensor4D kernel, Tensor4D derivada, Tensor4D gradK, Tensor4D gradE){
+   public void convBackward(Tensor4D entrada, Tensor4D kernel, Tensor4D gradSaida, Tensor4D gradK, Tensor4D gradE){
       int filtros = kernel.dim1();
       int entradas = kernel.dim2();
   
-      int[] idEntrada = {0, 0};
-      int[] idDerivada = {0, 0};
-      int[] idKernel = {0, 0};
-      int[] idGradEntrada = {0, 0};
+      int[] idEn = {0, 0};
+      int[] idGradSaida = {0, 0};
+      int[] idK = {0, 0};
+      int[] idGradEn = {0, 0};
       for(int i = 0; i < filtros; i++){
-         idDerivada[1] = i;
-         idKernel[0] = i;
+         idGradSaida[1] = i;
+         idK[0] = i;
          for(int j = 0; j < entradas; j++){
-            idEntrada[1] = j;
-            idKernel[1] = j;
-            idGradEntrada[1] = j;
-            correlacao2D(entrada, derivada, gradK, idEntrada, idDerivada, idKernel, false);
-            convolucao2DFull(derivada, kernel, gradE, idDerivada, idKernel, idGradEntrada, true);
+            idEn[1] = j;
+            idK[1] = j;
+            idGradEn[1] = j;
+            correlacao2D(entrada, gradSaida, gradK, idEn, idGradSaida, idK, false);
+            convolucao2DFull(gradSaida, kernel, gradE, idGradSaida, idK, idGradEn, true);
          }
       }
+
    }
 }

@@ -139,7 +139,7 @@ public class Utils{
       }else if(entrada instanceof Tensor4D){
          Tensor4D t = (Tensor4D) entrada;
          int idArray = 0;
-         int[] dim = t.dimensoes();
+         int[] dim = t.shape();
 
          for(int i = dim.length-1; i >= 0; i--){
             if(dim[i] > 1) idArray = i;

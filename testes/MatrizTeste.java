@@ -49,12 +49,9 @@ public class MatrizTeste{
       ged.limparConsole();
 
       Random random = new Random();
-      Tensor4D tensor = new Tensor4D(
-         random.nextInt(1, 4),
-         random.nextInt(1, 4),
-         random.nextInt(1, 4),
-         random.nextInt(1, 4)
-      );
+      Tensor4D tensor = new Tensor4D(3);
+      tensor.print(1);
+      tensor = tensor.bloco2D(0, 0, 0, 3);
       tensor.print(1);
    }
 

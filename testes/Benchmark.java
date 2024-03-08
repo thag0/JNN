@@ -50,7 +50,7 @@ public class Benchmark{
       );
       conv.inicializar();
 
-      Tensor4D entrada = new Tensor4D(conv.entrada.dimensoes());
+      Tensor4D entrada = new Tensor4D(conv.entrada.shape());
       entrada.preencherContador(true);
 
       long tempo = 0;
@@ -61,9 +61,9 @@ public class Benchmark{
       String pad = "   ";
 
       sb.append("Config conv = [\n");
-         sb.append(pad).append("filtros: " + conv.filtros.dimensoesStr() + "\n");
-         sb.append(pad).append("entrada: " + conv.entrada.dimensoesStr() + "\n");
-         sb.append(pad).append("saida: " + conv.saida.dimensoesStr() + "\n");
+         sb.append(pad).append("filtros: " + conv.filtros.shapeStr() + "\n");
+         sb.append(pad).append("entrada: " + conv.entrada.shapeStr() + "\n");
+         sb.append(pad).append("saida: " + conv.saida.shapeStr() + "\n");
          sb.append(pad).append("Tempo forward: " + TimeUnit.NANOSECONDS.toMillis(tempo) + "ms\n");
       sb.append("]\n");
 
@@ -102,7 +102,7 @@ public class Benchmark{
       Random rand = new Random(randSeed);
       conv.entrada.map((x) -> rand.nextDouble());
 
-      Tensor4D grad = new Tensor4D(conv.gradSaida.dimensoes());
+      Tensor4D grad = new Tensor4D(conv.gradSaida.shape());
       grad.map((x) -> rand.nextDouble());
 
       long tempo = medirTempo(() -> conv.calcularGradiente(grad));
@@ -112,9 +112,9 @@ public class Benchmark{
       String pad = "   ";
 
       sb.append("Config conv = [\n");
-         sb.append(pad).append("filtros: " + conv.filtros.dimensoesStr() + "\n");
-         sb.append(pad).append("entrada: " + conv.entrada.dimensoesStr() + "\n");
-         sb.append(pad).append("saida: " + conv.saida.dimensoesStr() + "\n");
+         sb.append(pad).append("filtros: " + conv.filtros.shapeStr() + "\n");
+         sb.append(pad).append("entrada: " + conv.entrada.shapeStr() + "\n");
+         sb.append(pad).append("saida: " + conv.saida.shapeStr() + "\n");
          sb.append(pad).append("Tempo backward: " + TimeUnit.NANOSECONDS.toMillis(tempo) + "ms\n");
       sb.append("]\n");
 
@@ -128,7 +128,7 @@ public class Benchmark{
       Convolucional conv = new Convolucional(formEntrada, new int[]{2, 2}, 3, "linear", iniKernel, iniBias);
       conv.inicializar();
 
-      Tensor4D entrada = new Tensor4D(conv.entrada.dimensoes());
+      Tensor4D entrada = new Tensor4D(conv.entrada.shape());
       entrada.preencherContador(true);
 
       //simulação de propagação dos dados numa camada convolucional sem bias

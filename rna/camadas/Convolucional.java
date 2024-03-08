@@ -661,8 +661,8 @@ public class Convolucional extends Camada implements Cloneable{
          Tensor4D e = (Tensor4D) entrada;
          if(this.entrada.comparar3D(e) == false){
             throw new IllegalArgumentException(
-               "\nAs dimensões da entrada recebida " + e.dimensoesStr() + 
-               " são incompatíveis com as dimensões da entrada da camada " + this.entrada.dimensoesStr()
+               "\nAs dimensões da entrada recebida " + e.shapeStr() + 
+               " são incompatíveis com as dimensões da entrada da camada " + this.entrada.shapeStr()
             );
          }
 
@@ -724,7 +724,7 @@ public class Convolucional extends Camada implements Cloneable{
          Tensor4D g = (Tensor4D) gradSeguinte;
          if(gradSaida.comparar3D(g) == false){
             throw new IllegalArgumentException(
-               "\nAs três dimensões finais do tensor recebido " + g.dimensoesStr() +
+               "\nAs três dimensões finais do tensor recebido " + g.shapeStr() +
                "são imcompatíveis as três primeira dimensões do tensor de gradiente"
             );
          }
@@ -743,7 +743,7 @@ public class Convolucional extends Camada implements Cloneable{
       gradEntrada.preencher(0);
 
       //backward
-      Tensor4D tempGrad = new Tensor4D(gradFiltros.dimensoes());
+      Tensor4D tempGrad = new Tensor4D(gradFiltros.shape());
       optensor.convBackward(this.entrada, this.filtros, this.gradSaida, tempGrad, this.gradEntrada);
       gradFiltros.add(tempGrad);
 

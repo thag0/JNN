@@ -339,15 +339,15 @@ public class Densa extends Camada implements Cloneable{
       this.entrada =    new Tensor4D(1, 1, 1, this.tamEntrada);
       this.saida =      new Tensor4D(1, 1, 1, this.numNeuronios);
       this.pesos =      new Tensor4D(1, 1, this.tamEntrada, this.numNeuronios);
-      this.gradPesos =  new Tensor4D(pesos.dimensoes());
+      this.gradPesos =  new Tensor4D(pesos.shape());
 
       if(usarBias){
-         this.bias =     new Tensor4D(saida.dimensoes());
-         this.gradBias = new Tensor4D(saida.dimensoes());
+         this.bias =     new Tensor4D(saida.shape());
+         this.gradBias = new Tensor4D(saida.shape());
       }
 
-      this.somatorio =   new Tensor4D(saida.dimensoes());
-      this.gradSaida =   new Tensor4D(saida.dimensoes());
+      this.somatorio =   new Tensor4D(saida.shape());
+      this.gradSaida =   new Tensor4D(saida.shape());
       this.gradEntrada = new Tensor4D(1, 1, this.entrada.dim3(), this.entrada.dim4());
 
       configurarNomes();
@@ -431,8 +431,8 @@ public class Densa extends Camada implements Cloneable{
          Tensor4D e = (Tensor4D) entrada;
          if(this.entrada.dim4() != e.dim4()){
             throw new IllegalArgumentException(
-               "Dimensões da entrada " + e.dimensoesStr() + " incompatível com entrada da " +
-               "camada Densa " + this.entrada.dimensoesStr()
+               "Dimensões da entrada " + e.shapeStr() + " incompatível com entrada da " +
+               "camada Densa " + this.entrada.shapeStr()
             );
          }
 
@@ -520,7 +520,7 @@ public class Densa extends Camada implements Cloneable{
       ativacao.derivada(this);
 
       //gradiente temporário para usar como acumulador.
-      Tensor4D tempGrad = new Tensor4D(gradPesos.dimensoes());
+      Tensor4D tempGrad = new Tensor4D(gradPesos.shape());
       
       optensor.matMult(
          optensor.matTranspor(this.entrada, 0, 0), gradSaida, tempGrad,

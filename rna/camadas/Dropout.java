@@ -227,8 +227,8 @@ public class Dropout extends Camada implements Cloneable{
          Tensor4D e = (Tensor4D) entrada;
          if(this.entrada.comparar3D(e) == false){
             throw new IllegalArgumentException(
-               "\nDimensões de entrada " + e.dimensoesStr() + 
-               "incompatível com as dimensões da entrada da camada " + this.entrada.dimensoesStr()
+               "\nDimensões de entrada " + e.shapeStr() + 
+               "incompatível com as dimensões da entrada da camada " + this.entrada.shapeStr()
             );
          }
 
@@ -300,8 +300,8 @@ public class Dropout extends Camada implements Cloneable{
          Tensor4D g = (Tensor4D) gradSeguinte;
          if(this.gradEntrada.comparar3D(g) == false){
             throw new IllegalArgumentException(
-               "\nDimensões incompatíveis entre o gradiente recebido " + g.dimensoesStr() +
-               "e o suportado pela camada " + gradEntrada.dimensoesStr()
+               "\nDimensões incompatíveis entre o gradiente recebido " + g.shapeStr() +
+               "e o suportado pela camada " + gradEntrada.shapeStr()
             );
          }
 

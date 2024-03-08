@@ -294,8 +294,8 @@ public class MaxPooling extends Camada{
 
          if(this.entrada.comparar3D(e) == false){
             throw new IllegalArgumentException(
-               "\nDimensões da entrada recebida " + e.dimensoesStr() +
-               " incompatíveis com a entrada da camada " + this.entrada.dimensoesStr()
+               "\nDimensões da entrada recebida " + e.shapeStr() +
+               " incompatíveis com a entrada da camada " + this.entrada.shapeStr()
             );
          }
 

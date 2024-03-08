@@ -70,8 +70,8 @@ public abstract class Ativacao{
    public void calcular(Tensor4D entrada, Tensor4D saida){
       if(entrada.comparar4D(saida) == false){
          throw new IllegalArgumentException(
-            "\nAs dimensões do tensor de entrada " + entrada.dimensoesStr() +
-            " e saída " + saida.dimensoesStr() + " devem ser iguais."
+            "\nAs dimensões do tensor de entrada " + entrada.shapeStr() +
+            " e saída " + saida.shapeStr() + " devem ser iguais."
          );
       }
 
@@ -88,8 +88,8 @@ public abstract class Ativacao{
    public void derivada(Tensor4D entrada, Tensor4D gradiente, Tensor4D saida){
       if(entrada.comparar4D(saida) == false){
          throw new IllegalArgumentException(
-            "\nAs dimensões do tensor de entrada " + entrada.dimensoesStr() +
-            " e saída " + saida.dimensoesStr() + " devem ser iguais."
+            "\nAs dimensões do tensor de entrada " + entrada.shapeStr() +
+            " e saída " + saida.shapeStr() + " devem ser iguais."
          );
       }
 

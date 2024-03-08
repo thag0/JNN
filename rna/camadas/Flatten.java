@@ -211,8 +211,8 @@ public class Flatten extends Camada{
          Tensor4D e = (Tensor4D) entrada;
          if(this.entrada.comparar3D(e) == false){
             throw new IllegalArgumentException(
-               "\nDimensões da entrada recebida " + e.dimensoesStr() +
-               " incompatíveis com a entrada da camada " + this.entrada.dimensoesStr()
+               "\nDimensões da entrada recebida " + e.shapeStr() +
+               " incompatíveis com a entrada da camada " + this.entrada.shapeStr()
             );
          }
 
@@ -253,8 +253,8 @@ public class Flatten extends Camada{
          Tensor4D g = (Tensor4D) gradSeguinte;
          if(g.tamanho() != this.gradEntrada.tamanho()){
             throw new IllegalArgumentException(
-               "\nDimensões do gradiente recebido " + g.dimensoesStr() +
-               "inconpatíveis com o suportado pela camada " + this.gradEntrada.dimensoesStr()
+               "\nDimensões do gradiente recebido " + g.shapeStr() +
+               "inconpatíveis com o suportado pela camada " + this.gradEntrada.shapeStr()
             );
          }
 

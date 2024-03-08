@@ -83,7 +83,7 @@ public class Conv{
       Convolucional conv = new Convolucional(formEntrada, new int[]{3, 3}, 16, "linear", iniKernel, iniBias);
       conv.inicializar();
 
-      Tensor4D entrada = new Tensor4D(conv.entrada.dimensoes());
+      Tensor4D entrada = new Tensor4D(conv.entrada.shape());
       entrada.map((x) -> Math.random());
 
       //simulação de propagação dos dados numa camada convolucional sem bias

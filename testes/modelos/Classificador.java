@@ -8,6 +8,7 @@ import rna.otimizadores.Otimizador;
 import rna.otimizadores.SGD;
 import rna.camadas.Camada;
 import rna.camadas.Densa;
+import rna.camadas.Entrada;
 import lib.ged.Dados;
 import lib.ged.Ged;
 
@@ -44,18 +45,19 @@ public class Classificador{
 
       //criando e configurando a rede neural
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Densa(qEntradas, 8, "sigmoid"),
-         new Densa(8, "sigmoid"),
+         new Entrada(qEntradas),
+         new Densa(9, "sigmoid"),
+         new Densa(9, "sigmoid"),
          new Densa(qSaidas, "softmax")
       });
 
-      Otimizador otm = new SGD(0.01);
+      Otimizador otm = new SGD(0.001, 0.99);
       modelo.compilar(otm, "entropia-cruzada");
       modelo.configurarHistorico(true);
       modelo.info();
       
       //treinando e avaliando os resultados
-      modelo.treinar(treinoX, treinoY, 1_000, 16, false);
+      modelo.treinar(treinoX, treinoY, 150, 32, false);
       double acc = modelo.avaliador().acuracia(testeX, testeY);
       System.out.println("Acurácia = " + formatarDecimal(acc*100, 4) + "%");
       System.out.println("Perda = " + modelo.avaliar(testeX, testeY));
