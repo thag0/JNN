@@ -3,6 +3,9 @@ package rna.core;
 import java.util.function.DoubleUnaryOperator;
 
 /**
+ * <h2>
+ *    Tensor quadridimensional
+ * </h2>
  * Implementação de um array multidimensional (atualmente com no máximo quatro
  * dimentões) com finalidade de simplificar o uso de estrutura de dados dentro
  * da biblioteca.
@@ -14,7 +17,9 @@ import java.util.function.DoubleUnaryOperator;
  *    Algumas operações mais elaboradas podem precisar do auxílio da classe {@code OpTensor4D},
  *    que implementa operações entre vários tensores.
  * </p>
- * Exemplo de criação:
+ * <h2>
+ *    Exemplo de criação:
+ * </h2>
  * <pre>
  *Tensor4D tensor = new Tensor4D(1, 1, 2, 2);
  *Tensor4D tensor = new Tensor4D(new int[]{2, 2});
@@ -74,7 +79,7 @@ public class Tensor4D{
       copiarDimensoes(tensor.shape());
       this.dados = new double[tensor.tamanho()];
 
-      System.arraycopy(tensor.dados, 0, this.dados, 0, this.dados.length);
+      System.arraycopy(tensor.dados, 0, this.dados, 0, tamanho());
    }
 
    /**
@@ -84,7 +89,7 @@ public class Tensor4D{
     *    O formato do tensor criado será:
     * </p>
     * <pre>
-    *    formato = (dim4, dim3, dim2, dim1)
+    *    formato = (dim1, dim2, dim3, dim4)
     * </pre>
     * @param tensor tensor desejado.
     */
@@ -197,7 +202,7 @@ public class Tensor4D{
       copiarDimensoes(1, 1, 1, array.length);
       this.dados = new double[dim1()*dim2()*dim3()*dim4()];
 
-      System.arraycopy(array, 0, this.dados, 0, this.dados.length);
+      System.arraycopy(array, 0, this.dados, 0, array.length);
    }
 
    /**
@@ -257,9 +262,9 @@ public class Tensor4D{
     * das dimensões do tensor (d1, d2, d3, d4)
     */
    public Tensor4D(int... dim){
-      if(dim == null){
+      if(dim.length == 0){
          throw new IllegalArgumentException(
-            "\tArray de dimensões fornecido é nulo."
+            "\nA quantidade de dimensões deve ser maior que zero."
          );
       }
       if(dim.length > 4){
@@ -467,7 +472,7 @@ public class Tensor4D{
     * @param valor valor desejado.
     */
    public void preencher3D(int dim1, double valor){
-      if(!validarIndice(dim1, dim1())){
+      if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );
@@ -487,12 +492,12 @@ public class Tensor4D{
     * @param valor valor desejado.
     */
    public void preencher2D(int dim1, int dim2, double valor){
-      if(!validarIndice(dim1, dim1())){
+      if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );
       }
-      if(!validarIndice(dim2, dim2())){
+      if(!validarDimensao(dim2, dim2())){
          throw new IllegalArgumentException(
             "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
          );
@@ -513,17 +518,17 @@ public class Tensor4D{
     * @param valor valor desejado.
     */
    public void preencher1D(int dim1, int dim2, int dim3, double valor){
-      if(!validarIndice(dim1, dim1())){
+      if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );
       }
-      if(!validarIndice(dim2, dim2())){
+      if(!validarDimensao(dim2, dim2())){
          throw new IllegalArgumentException(
             "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
          );
       }
-      if(!validarIndice(dim3, dim3())){
+      if(!validarDimensao(dim3, dim3())){
          throw new IllegalArgumentException(
             "\nÍndice da terceira dimensão (" + dim3 + ") inválido."
          );
@@ -680,7 +685,7 @@ public class Tensor4D{
          );
       }
 
-      if(!validarIndice(dim1, dim1())){
+      if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 +") inválido."
          );
@@ -713,13 +718,13 @@ public class Tensor4D{
          );
       }
 
-      if(!validarIndice(dim1, dim1())){
+      if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 +") inválido."
          );
       }
 
-      if(!validarIndice(dim2, dim2())){
+      if(!validarDimensao(dim2, dim2())){
          throw new IllegalArgumentException(
             "\nÍndice da segunda dimensão (" + dim2 +") inválido."
          );
@@ -746,19 +751,19 @@ public class Tensor4D{
          );
       }
 
-      if(!validarIndice(dim1, dim1())){
+      if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 +") inválido."
          );
       }
 
-      if(!validarIndice(dim2, dim2())){
+      if(!validarDimensao(dim2, dim2())){
          throw new IllegalArgumentException(
             "\nÍndice da segunda dimensão (" + dim2 +") inválido."
          );
       }
 
-      if(!validarIndice(dim3, dim3())){
+      if(!validarDimensao(dim3, dim3())){
          throw new IllegalArgumentException(
             "\nÍndice da terceira dimensão (" + dim3 +") inválido."
          );
@@ -920,7 +925,7 @@ public class Tensor4D{
     * @param funcao função desejada.
     */
    public void map3D(int dim1, DoubleUnaryOperator funcao){
-      if(!validarIndice(dim1, dim1())){
+      if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );
@@ -946,12 +951,12 @@ public class Tensor4D{
     * @param funcao função desejada.
     */
    public void map2D(int dim1, int dim2, DoubleUnaryOperator funcao){
-      if(!validarIndice(dim1, dim1())){
+      if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );
       }
-      if(!validarIndice(dim2, dim2())){
+      if(!validarDimensao(dim2, dim2())){
          throw new IllegalArgumentException(
             "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
          );
@@ -979,17 +984,17 @@ public class Tensor4D{
     * @param funcao função desejada.
     */
    public void map1D(int dim1, int dim2, int dim3, DoubleUnaryOperator funcao){
-      if(!validarIndice(dim1, dim1())){
+      if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );
       }
-      if(!validarIndice(dim2, dim2())){
+      if(!validarDimensao(dim2, dim2())){
          throw new IllegalArgumentException(
             "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
          );
       }
-      if(!validarIndice(dim3, dim3())){
+      if(!validarDimensao(dim3, dim3())){
          throw new IllegalArgumentException(
             "\nÍndice da terceira dimensão (" + dim3 + ") inválido."
          );
@@ -1028,7 +1033,7 @@ public class Tensor4D{
     * @return soma total.
     */
    public double somarElementos3D(int dim1){
-      if(!validarIndice(dim1, dim1())){
+      if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );
@@ -1053,12 +1058,12 @@ public class Tensor4D{
     * @return soma total.
     */
    public double somarElementos2D(int dim1, int dim2){
-      if(!validarIndice(dim1, dim1())){
+      if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );
       }
-      if(!validarIndice(dim2, dim2())){
+      if(!validarDimensao(dim2, dim2())){
          throw new IllegalArgumentException(
             "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
          );
@@ -1084,17 +1089,17 @@ public class Tensor4D{
     * @return soma total.
     */
    public double somarElementos1D(int dim1, int dim2, int dim3){
-      if(!validarIndice(dim1, dim1())){
+      if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );
       }
-      if(!validarIndice(dim2, dim2())){
+      if(!validarDimensao(dim2, dim2())){
          throw new IllegalArgumentException(
             "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
          );
       }
-      if(!validarIndice(dim3, dim3())){
+      if(!validarDimensao(dim3, dim3())){
          throw new IllegalArgumentException(
             "\nÍndice da terceira dimensão (" + dim3 + ") inválido."
          );
@@ -1169,17 +1174,17 @@ public class Tensor4D{
     * @return novo tensor com o resultado.
     */
    public Tensor4D bloco2D(int dim1, int dim2, int dim3, int quantidade){
-      if(!validarIndice(dim1, dim1())){
+      if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );
       }
-      if(!validarIndice(dim2, dim2())){
+      if(!validarDimensao(dim2, dim2())){
          throw new IllegalArgumentException(
             "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
          );
       }
-      if(!validarIndice(dim3, dim3())){
+      if(!validarDimensao(dim3, dim3())){
          throw new IllegalArgumentException(
             "\nÍndice da terceira dimensão (" + dim3 + ") inválido."
          );
@@ -1208,12 +1213,12 @@ public class Tensor4D{
     * @param dim2 índice da segunda dimensão.
     */
    public void identidade2D(int dim1, int dim2){
-      if(!validarIndice(dim1, dim1())){
+      if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );
       }
-      if(!validarIndice(dim2, dim2())){
+      if(!validarDimensao(dim2, dim2())){
          throw new IllegalArgumentException(
             "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
          );
@@ -1267,12 +1272,12 @@ public class Tensor4D{
     * @param valor valor desejado.
     */
    public void add2D(int dim1, int dim2, double valor){
-      if(!validarIndice(dim1, dim1())){
+      if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );
       }
-      if(!validarIndice(dim2, dim2())){
+      if(!validarDimensao(dim2, dim2())){
          throw new IllegalArgumentException(
             "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
          );
@@ -1326,12 +1331,12 @@ public class Tensor4D{
     * @param valor valor desejado.
     */
    public void sub2D(int dim1, int dim2, double valor){
-      if(!validarIndice(dim1, dim1())){
+      if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );
       }
-      if(!validarIndice(dim2, dim2())){
+      if(!validarDimensao(dim2, dim2())){
          throw new IllegalArgumentException(
             "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
          );
@@ -1385,12 +1390,12 @@ public class Tensor4D{
     * @param valor valor desejado.
     */
    public void mult2D(int dim1, int dim2, double valor){
-      if(!validarIndice(dim1, dim1())){
+      if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );
       }
-      if(!validarIndice(dim2, dim2())){
+      if(!validarDimensao(dim2, dim2())){
          throw new IllegalArgumentException(
             "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
          );
@@ -1448,12 +1453,12 @@ public class Tensor4D{
     * @param valor valor desejado.
     */
    public void div2D(int dim1, int dim2, double valor){
-      if(!validarIndice(dim1, dim1())){
+      if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );
       }
-      if(!validarIndice(dim2, dim2())){
+      if(!validarDimensao(dim2, dim2())){
          throw new IllegalArgumentException(
             "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
          );
@@ -1483,17 +1488,17 @@ public class Tensor4D{
     * @return array contendo os elementos.
     */
    public double[] array1D(int dim1, int dim2, int dim3){
-      if(!validarIndice(dim1, dim1())){
+      if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );
       }
-      if(!validarIndice(dim2, dim2())){
+      if(!validarDimensao(dim2, dim2())){
          throw new IllegalArgumentException(
             "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
          );
       }
-      if(!validarIndice(dim3, dim3())){
+      if(!validarDimensao(dim3, dim3())){
          throw new IllegalArgumentException(
             "\nÍndice da terceira dimensão (" + dim3 + ") inválido."
          );
@@ -1515,12 +1520,12 @@ public class Tensor4D{
     * @return array contendo os elementos.
     */
    public double[][] array2D(int dim1, int dim2){
-      if(!validarIndice(dim1, dim1())){
+      if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );
       }
-      if(!validarIndice(dim2, dim2())){
+      if(!validarDimensao(dim2, dim2())){
          throw new IllegalArgumentException(
             "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
          );
@@ -1544,7 +1549,7 @@ public class Tensor4D{
     * @return array contendo os elementos.
     */
    public double[][][] array3D(int dim1){
-      if(!validarIndice(dim1, dim1())){
+      if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );
@@ -1590,7 +1595,7 @@ public class Tensor4D{
     * @return tensor contendo os sub dados.
     */
    public Tensor4D subTensor3D(int dim1){
-      if(!validarIndice(dim1, dim1())){
+      if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );
@@ -1611,12 +1616,12 @@ public class Tensor4D{
     * @return tensor contendo os sub dados.
     */
    public Tensor4D subTensor2D(int dim1, int dim2){
-      if(!validarIndice(dim1, dim1())){
+      if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );
       }
-      if(!validarIndice(dim2, dim2())){
+      if(!validarDimensao(dim2, dim2())){
          throw new IllegalArgumentException(
             "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
          );
@@ -1638,17 +1643,17 @@ public class Tensor4D{
     * @return tensor contendo os sub dados.
     */
    public Tensor4D subTensor1D(int dim1, int dim2, int dim3){
-      if(!validarIndice(dim1, dim1())){
+      if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
          );
       }
-      if(!validarIndice(dim2, dim2())){
+      if(!validarDimensao(dim2, dim2())){
          throw new IllegalArgumentException(
             "\nÍndice da segunda dimensão (" + dim2 + ") inválido."
          );
       }
-      if(!validarIndice(dim3, dim3())){
+      if(!validarDimensao(dim3, dim3())){
          throw new IllegalArgumentException(
             "\nÍndice da terceira dimensão (" + dim3 + ") inválido."
          );
@@ -1855,11 +1860,20 @@ public class Tensor4D{
     * do tensor.
     * @param id índice desejado.
     * @param dim dimensão desejada.
-    * @return verdadeiro caso o índice seja válido na dimensão fornecida, false
-    * caso contrário.
+    * @return {@code true} caso o índice seja válido, {@code false} caso contrário.
     */
    public boolean validarIndice(int id, int dim){
       return (dim >= 0 && dim < dimensoes.length) && (id >= 0 && id < dimensoes[dim]);
+   }
+
+   /**
+    * Verifica se o índice fornecido está dentro dos limites da dimensão desejada.
+    * @param d dimensão para ser avaliada.
+    * @param dim dimensão correspondente do tensor.
+    * @return {@code true} caso o índice seja válido, {@code false} caso contrário.
+    */
+   public boolean validarDimensao(int d, int dim){
+      return (d >= 0) && (d <= dim);
    }
 
    /**

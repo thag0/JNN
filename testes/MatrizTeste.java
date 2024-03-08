@@ -32,6 +32,7 @@ import rna.inicializadores.AleatorioPositivo;
 import rna.inicializadores.Inicializador;
 import rna.inicializadores.Zeros;
 import rna.modelos.Sequencial;
+import rna.otimizadores.SGD;
 import rna.inicializadores.GlorotUniforme;
 import rna.inicializadores.Identidade;
 import rna.treinamento.AuxiliarTreino;
@@ -48,10 +49,7 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
 
-      Random random = new Random();
-      Tensor4D tensor = new Tensor4D(3);
-      tensor.print(1);
-      tensor = tensor.bloco2D(0, 0, 0, 3);
+      Tensor4D tensor = new Tensor4D(2, 2, 2);
       tensor.print(1);
    }
 
