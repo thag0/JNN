@@ -8,7 +8,17 @@ import java.nio.file.StandardCopyOption;
 public class Renomear{
 
    public static void main(String[] args){
-      String caminho = "./dados/mnist/treino/6";
+      int digitos = 10;
+      for(int i = 0; i < digitos; i++){
+         //renomear pra qualquer coisa porque as vezes buga
+         //e alguns arquivos somem
+         renomearArquivos(i, "Eimg");
+         renomearArquivos(i, "img");
+      }
+   }
+
+   private static void renomearArquivos(int digito, String nome){
+      String caminho = "./dados/mnist/treino/" + digito;
       File diretorio = new File(caminho);
 
       if(diretorio.isDirectory()){
@@ -16,7 +26,7 @@ public class Renomear{
          
          if(arquivos != null){
             for(int i = 0; i < arquivos.length; i++){
-               String novoNome = "img_" + i + ".jpg";
+               String novoNome = nome + "_" + i + ".jpg";
                renomearArquivo(arquivos[i].toPath(), novoNome);
             }
             System.out.println("Renomeação concluída.");
