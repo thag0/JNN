@@ -19,12 +19,12 @@ public class Sigmoid extends Ativacao{
       //mais eficiente
       double[] e = entrada.paraArray();
       double[] g = gradiente.paraArray();
+      double[] s = new double[e.length];
 
       for(int i = 0; i < e.length; i++){
-         e[i] = dx.applyAsDouble(e[i]);
-         e[i] *= g[i];
+         s[i] = dx.applyAsDouble(e[i]) * g[i];
       }
       
-      saida.copiarElementos(e);
+      saida.copiarElementos(s);
    }
 }

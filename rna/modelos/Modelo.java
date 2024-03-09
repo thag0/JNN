@@ -186,8 +186,10 @@ public abstract class Modelo{
     *    Para treinar o modelo deve-se fazer uso da função função {@code treinar()} informando 
     *    os dados necessários para treino.
     * </p>
-    * @param otimizador otimizador usando para ajustar os parâmetros treinavéis do modelo.
-    * @param perda função de perda usada para avaliar o erro do modelo durante o treino.
+    * @param otimizador otimizador usando para ajustar os parâmetros treinavéis do modelo, pode
+    * ser uma {@code String} referente ao nome ou uma {@code instância} já inicializada.
+    * @param perda função de perda usada para avaliar o erro do modelo durante o treino, pode
+    * ser uma {@code String} referente ao nome ou uma {@code instância} já inicializada.
     */
    public abstract void compilar(Object otimizador, Object perda);
 

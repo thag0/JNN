@@ -77,12 +77,12 @@ public class MainImg{
    static Modelo criarSequencial(int entradas, int saidas){
       Sequencial modelo = new Sequencial(new Camada[]{
          new Entrada(entradas),
-         new Densa(8, "sigmoid"),
-         new Densa(8, "sigmoid"),
+         new Densa(8, "tanh"),
+         new Densa(8, "tanh"),
          new Densa(saidas, "sigmoid")
       });
 
-      modelo.compilar(new SGD(0.001, 0.99), "mse");
+      modelo.compilar(new SGD(0.001, 0.96), "mse");
       modelo.configurarHistorico(calcularHistorico);
 
       return modelo;

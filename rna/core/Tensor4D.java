@@ -132,12 +132,7 @@ public class Tensor4D{
       }
 
       this.dimensoes = new int[4];
-      copiarDimensoes(
-         1,
-         tensor.length,
-         tensor[0].length,
-         tensor[0][0].length
-      );
+      copiarDimensoes(tensor.length, tensor[0].length, tensor[0][0].length);
       this.dados = new double[dim1()*dim2()*dim3()*dim4()];
 
       copiar(tensor, 0);
@@ -170,12 +165,7 @@ public class Tensor4D{
       }
 
       this.dimensoes = new int[4];
-      copiarDimensoes(
-         1,
-         1,
-         matriz.length,
-         matriz[0].length
-      );
+      copiarDimensoes(matriz.length, matriz[0].length);
       this.dados = new double[dim1()*dim2()*dim3()*dim4()];
 
       copiar(matriz, 0, 0);
@@ -199,7 +189,7 @@ public class Tensor4D{
       }
 
       this.dimensoes = new int[4];
-      copiarDimensoes(1, 1, 1, array.length);
+      copiarDimensoes(array.length);
       this.dados = new double[dim1()*dim2()*dim3()*dim4()];
 
       System.arraycopy(array, 0, this.dados, 0, array.length);
@@ -288,24 +278,10 @@ public class Tensor4D{
    }
 
    /**
-    * Auxliar para cópia de dimensões para as dimensões do tensor.
-    * @param dim1 tamanho da primeira dimensão.
-    * @param dim2 tamanho da segunda dimensão.
-    * @param dim3 tamanho da terceira dimensão.
-    * @param dim4 tamanho da quarta dimensão.
-    */
-   private void copiarDimensoes(int dim1, int dim2, int dim3, int dim4){
-      this.dimensoes[0] = dim1;
-      this.dimensoes[1] = dim2;
-      this.dimensoes[2] = dim3;
-      this.dimensoes[3] = dim4;
-   }
-
-   /**
     * Auxliar para cópia de um array de dimensões para as dimensões do tensor.
     * @param dim array de dimensões.
     */
-   private void copiarDimensoes(int[] dim){
+   private void copiarDimensoes(int... dim){
       int n1 = this.dimensoes.length;
       for(int i = 0; i < n1; i++){
          this.dimensoes[i] = 1;

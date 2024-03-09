@@ -172,9 +172,11 @@ public class Dropout extends Camada implements Cloneable{
       }
       
       this.entrada =     new Tensor4D(this.formEntrada);
-      this.mascara =     new Tensor4D(this.entrada);
-      this.saida =       new Tensor4D(this.entrada);
-      this.gradEntrada = new Tensor4D(this.entrada);
+      this.mascara =     new Tensor4D(this.entrada.shape());
+      this.saida =       new Tensor4D(this.entrada.shape());
+      this.gradEntrada = new Tensor4D(this.entrada.shape());
+
+      configurarNomes();
       
       this.construida = true;//camada pode ser usada
    }
@@ -246,10 +248,10 @@ public class Dropout extends Camada implements Cloneable{
          );
       }
 
-      if(this.treinando){
+      if(treinando){
          gerarMascaras();
-         this.entrada.mult(mascara);
          saida.copiar(this.entrada);
+         saida.mult(mascara);
 
       }else{
          saida.copiar(this.entrada);
@@ -319,7 +321,7 @@ public class Dropout extends Camada implements Cloneable{
    }
 
    @Override
-   public Object saida(){
+   public Tensor4D saida(){
       verificarConstrucao();
       return this.saida;
    }

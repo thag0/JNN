@@ -544,21 +544,22 @@ public class Convolucional extends Camada implements Cloneable{
          );
       }
 
-      this.altSaida = this.altEntrada - this.altFiltro + 1;
+      //dim -> ((entrada - filtro) / stride) + 1
+      this.altSaida  = this.altEntrada  - this.altFiltro  + 1;
       this.largSaida = this.largEntrada - this.largFiltro + 1;
 
       //inicialização dos parâmetros necessários
-      this.entrada      = new Tensor4D(1, profEntrada, altEntrada, largEntrada);
-      this.gradEntrada  = new Tensor4D(this.entrada);
+      this.entrada      = new Tensor4D(profEntrada, altEntrada, largEntrada);
+      this.gradEntrada  = new Tensor4D(this.entrada.shape());
       this.filtros      = new Tensor4D(numFiltros, profEntrada, altFiltro, largFiltro);
-      this.saida        = new Tensor4D(1, numFiltros, altSaida, largSaida);
-      this.gradFiltros  = new Tensor4D(this.filtros);
-      this.somatorio    = new Tensor4D(this.saida);
-      this.gradSaida    = new Tensor4D(this.saida);
+      this.gradFiltros  = new Tensor4D(filtros.shape());
+      this.saida        = new Tensor4D(numFiltros, altSaida, largSaida);
+      this.somatorio    = new Tensor4D(saida.shape());
+      this.gradSaida    = new Tensor4D(saida.shape());
 
       if(usarBias){
-         this.bias      = new Tensor4D(1, 1, 1, numFiltros);
-         this.gradBias  = new Tensor4D(this.bias);
+         this.bias      = new Tensor4D(numFiltros);
+         this.gradBias  = new Tensor4D(bias.shape());
       }
 
       configurarNomes();
@@ -683,8 +684,9 @@ public class Convolucional extends Camada implements Cloneable{
       optensor.convForward(this.entrada, filtros, somatorio);
       
       if(usarBias){
+         double b;
          for(int i = 0; i < numFiltros; i++){
-            double b = bias.elemento(0, 0, 0, i);
+            b = bias.elemento(0, 0, 0, i);
             somatorio.add2D(0, i, b);
          }
       }
@@ -744,7 +746,7 @@ public class Convolucional extends Camada implements Cloneable{
 
       //backward
       Tensor4D tempGrad = new Tensor4D(gradFiltros.shape());
-      optensor.convBackward(this.entrada, this.filtros, this.gradSaida, tempGrad, this.gradEntrada);
+      optensor.convBackward(entrada, filtros, gradSaida, tempGrad, gradEntrada);
       gradFiltros.add(tempGrad);
 
       if(usarBias){

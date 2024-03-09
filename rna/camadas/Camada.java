@@ -231,7 +231,7 @@ public abstract class Camada{
     * Retorna a saída da camada.
     * @return saída da camada.
     */
-   public abstract Object saida();
+   public abstract Tensor4D saida();
 
    /**
     * Retorna a função de ativação configurada pela camada.

@@ -1,5 +1,7 @@
 package rna.camadas;
 
+import rna.core.Tensor4D;
+
 /**
  * <h2>
  *    Camada de entrada
@@ -16,7 +18,7 @@ package rna.camadas;
  * Exemplo
  * <pre>
  * Sequencial modelo = new Sequencial(Camada[]{
- *    Entrada(1, 28, 28),
+ *    Entrada(28, 28),
  *    Flatten(),
  *    Densa(20, "sigmoid"),
  *    Densa(20, "sigmoid"),
@@ -91,7 +93,7 @@ public class Entrada extends Camada{
    public void calcularGradiente(Object gradSeguinte){}
 
    @Override
-   public Object saida(){
+   public Tensor4D saida(){
       throw new UnsupportedOperationException("\nNão implementado.");
    }
 
@@ -102,7 +104,7 @@ public class Entrada extends Camada{
 
    @Override
    public int[] formatoSaida(){
-      return this.formato;
+      return formatoEntrada();
    }
 
    @Override

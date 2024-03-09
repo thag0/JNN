@@ -336,9 +336,9 @@ public class Densa extends Camada implements Cloneable{
       }
 
       //inicializações
-      this.entrada =    new Tensor4D(1, 1, 1, this.tamEntrada);
-      this.saida =      new Tensor4D(1, 1, 1, this.numNeuronios);
-      this.pesos =      new Tensor4D(1, 1, this.tamEntrada, this.numNeuronios);
+      this.entrada =    new Tensor4D(this.tamEntrada);
+      this.saida =      new Tensor4D(this.numNeuronios);
+      this.pesos =      new Tensor4D(this.tamEntrada, this.numNeuronios);
       this.gradPesos =  new Tensor4D(pesos.shape());
 
       if(usarBias){
@@ -348,7 +348,7 @@ public class Densa extends Camada implements Cloneable{
 
       this.somatorio =   new Tensor4D(saida.shape());
       this.gradSaida =   new Tensor4D(saida.shape());
-      this.gradEntrada = new Tensor4D(1, 1, this.entrada.dim3(), this.entrada.dim4());
+      this.gradEntrada = new Tensor4D(this.entrada.shape());
 
       configurarNomes();
       

@@ -8,8 +8,8 @@ public class TanH extends Ativacao{
       super.construir(
          (x) -> { return (2 / (1 + Math.exp(-2*x))) - 1; }, 
          (x) -> {
-            double tanh = (2 / (1 + Math.exp(-2*x))) - 1;
-            return 1 - (tanh * tanh);
+            double t = (2 / (1 + Math.exp(-2*x))) - 1;
+            return 1 - (t * t);
          }
       );
    }
@@ -18,15 +18,12 @@ public class TanH extends Ativacao{
    public void derivada(Tensor4D entrada, Tensor4D gradiente, Tensor4D saida){
       double[] e = entrada.paraArray();
       double[] g = gradiente.paraArray();
-      
-      //mais rápido
+      double[] s = new double[e.length];
+   
       for(int i = 0; i < e.length; i++){
-         e[i] = dx.applyAsDouble(e[i]);
-      }
-      for(int i = 0; i < e.length; i++){
-         e[i] *= g[i];
+         s[i] = dx.applyAsDouble(e[i]) * g[i];
       }
       
-      saida.copiarElementos(e);
+      saida.copiarElementos(s);
    }
 }

@@ -21,11 +21,17 @@ import rna.core.Utils;
  * Exemplo simples de operação Max Pooling para uma região 2x2 com máscara 2x2:
  * <pre>
  *entrada = [
- *    1, 2
- *    3, 4
+ *  [
+ *    [[1, 2],
+ *     [3, 4]]
+ *  ]
  *]
  * 
- *saida = 4
+ *saida = [
+ *  [
+ *    [[4]]
+ *  ]
+ *]
  * </pre>
  * <p>
  *    A camada de max pooling não possui parâmetros treináveis nem função de ativação.

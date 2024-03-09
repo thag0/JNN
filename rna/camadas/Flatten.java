@@ -177,6 +177,8 @@ public class Flatten extends Camada{
       this.gradEntrada = new Tensor4D(this.entrada);
       this.saida = new Tensor4D(formSaida);
 
+      configurarNomes();
+
       this.construida = true;//camada pode ser usada.
    }
 
