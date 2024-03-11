@@ -244,8 +244,10 @@ public class Sequencial extends Modelo implements Cloneable{
 
    @Override
    public void compilar(Object otimizador, Object perda){
+      int[] formato = {};
+
       if(camadas[0] instanceof Entrada){
-         int[] formato = camadas[0].formatoSaida();
+         formato = camadas[0].formatoSaida();
 
          //remover camada de entrada do modelo
          Camada[] temp = camadas;
@@ -253,8 +255,6 @@ public class Sequencial extends Modelo implements Cloneable{
          for(int i = 0; i < camadas.length; i++){
             camadas[i] = temp[i + 1];
          }
-
-         camadas[0].construir(formato);
       
       }else{
          if(camadas[0].construida == false){
@@ -265,6 +265,13 @@ public class Sequencial extends Modelo implements Cloneable{
          }
       }
 
+      if(camadas.length == 0){
+         throw new IllegalStateException(
+            "\nO modelo não possui camadas para compilar."
+         );
+      }
+
+      camadas[0].construir(formato);
       if(seedInicial != 0) camadas[0].configurarSeed(seedInicial);
       camadas[0].inicializar();
       camadas[0].configurarId(0);

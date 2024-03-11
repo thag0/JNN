@@ -286,9 +286,9 @@ public class MaxPooling extends Camada{
 
    @Override
    protected void configurarNomes(){
-      this.entrada.nome("Entrada");
-      this.gradEntrada.nome("Gradiente entrada");
-      this.saida.nome("Saída");
+      this.entrada.nome("entrada");
+      this.gradEntrada.nome("gradiente entrada");
+      this.saida.nome("saída");
    }
 
    @Override

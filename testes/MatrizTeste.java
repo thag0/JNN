@@ -49,8 +49,12 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
 
-      Tensor4D tensor = new Tensor4D(2, 2, 2);
-      tensor.print(1);
+      Sequencial modelo = new Sequencial();
+      modelo.add(new Entrada(10));
+      modelo.add(new Convolucional(new int[]{2, 2}, 4));
+
+      modelo.compilar("sgd", "mse");
+      modelo.info();
    }
 
    /**

@@ -12,7 +12,7 @@ import rna.modelos.Sequencial;
 import rna.otimizadores.*;
 
 public class MainImg{
-   static final int epocas = 10*1000;
+   static final int epocas = 8*1000;
    static final float escalaRender = 8f;
    static Ged ged = new Ged();
    static Geim geim = new Geim();

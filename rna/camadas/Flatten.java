@@ -152,7 +152,7 @@ public class Flatten extends Camada{
          throw new IllegalArgumentException(
             "O formato de entrada para a camada Flatten deve conter dois " + 
             "elementos (altura, largura), três elementos (profundidade, altura, largura), " +
-            " ou quatro elementos (primeiro desconsiderado)" +
+            " ou quatro elementos (primeiro desconsiderado) " +
             "objeto recebido possui " + formatoEntrada.length + " elementos."
          );
       }
@@ -174,7 +174,7 @@ public class Flatten extends Camada{
       this.formSaida = new int[]{1, 1, 1, tamanho};
 
       this.entrada = new Tensor4D(formEntrada);
-      this.gradEntrada = new Tensor4D(this.entrada);
+      this.gradEntrada = new Tensor4D(this.entrada.shape());
       this.saida = new Tensor4D(formSaida);
 
       configurarNomes();
@@ -192,7 +192,7 @@ public class Flatten extends Camada{
    protected void configurarNomes(){
       this.entrada.nome("entrada");
       this.saida.nome("saída");
-      this.gradEntrada.nome("gradiente Entrada");     
+      this.gradEntrada.nome("gradiente entrada");     
    }
 
    /**
@@ -226,8 +226,7 @@ public class Flatten extends Camada{
 
       }else if(entrada instanceof double[]){
          double[] e = (double[]) entrada;
-         this.saida.copiarElementos(e);
-         return;
+         this.entrada.copiarElementos(e);
       
       }else{
          throw new IllegalArgumentException(
@@ -235,8 +234,7 @@ public class Flatten extends Camada{
          );
       }
 
-      double[] arr = this.entrada.paraArray();
-      saida.copiarElementos(arr);
+      saida.copiarElementos(this.entrada.paraArray());
    }
 
    /**

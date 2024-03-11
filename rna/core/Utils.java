@@ -42,6 +42,33 @@ public class Utils{
    }
 
    /**
+    * Formata as dimensões do array,
+    * <p>
+    *    Exemplo:
+    * </p>
+    * <pre>
+    *int[] arr = {2, 3};
+    *arr.shapeStr == "(2, 3)"
+    * </pre>
+    * @param arr array desejado.
+    * @return formato das dimensões do array
+    */
+   public String shapeStr(int[] arr){
+      StringBuilder sb = new StringBuilder();
+
+      sb.append("(");
+
+      sb.append(arr[0]);
+      for(int i = 1; i < arr.length; i++){
+         sb.append(", " + arr[i]);
+      }
+
+      sb.append(")");
+
+      return sb.toString();
+   }
+
+   /**
     * Desserializa o array no array de matrizes de destino.
     * @param arr array contendo os dados.
     * @param dest destino da cópia

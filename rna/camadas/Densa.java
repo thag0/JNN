@@ -767,7 +767,7 @@ public class Densa extends Camada implements Cloneable{
 
    @Override
    public void editarKernel(double[] kernel){
-      if(kernel.length != this.pesos.tamanho()){
+      if(kernel.length != pesos.tamanho()){
          throw new IllegalArgumentException(
             "A dimensão do kernel fornecido não é igual a quantidade de " +
             "parâmetros para os kernels da camada."
@@ -775,8 +775,8 @@ public class Densa extends Camada implements Cloneable{
       }
 
       int cont = 0;
-      for(int i = 0; i < this.pesos.dim3(); i++){
-         for(int j = 0; j < this.pesos.dim4(); j++){
+      for(int i = 0; i < pesos.dim3(); i++){
+         for(int j = 0; j < pesos.dim4(); j++){
             this.pesos.editar(0, 0, i, j, kernel[cont++]);
          }
       }
