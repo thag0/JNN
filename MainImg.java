@@ -18,7 +18,7 @@ public class MainImg{
    static Geim geim = new Geim();
    static boolean calcularHistorico = true;
    static final String caminhoHistoricoPerda = "historico-perda";
-   static final String caminhoImagem = "/dados/mnist/treino/8/img_0.jpg";
+   static final String caminhoImagem = "/dados/mnist/treino/8/img_294.jpg";
    // static final String caminhoImagem = "/dados/mnist/treino/7/img_1.jpg";
    // static final String caminhoImagem = "/dados/32x32/circulos.png";
 
@@ -77,12 +77,12 @@ public class MainImg{
    static Modelo criarSequencial(int entradas, int saidas){
       Sequencial modelo = new Sequencial(new Camada[]{
          new Entrada(entradas),
-         new Densa(8, "tanh"),
-         new Densa(8, "tanh"),
+         new Densa(8, "sigmoid"),
+         new Densa(8, "sigmoid"),
          new Densa(saidas, "sigmoid")
       });
 
-      modelo.compilar(new SGD(0.001, 0.96), "mse");
+      modelo.compilar(new SGD(0.001, 0.99), "mse");
       modelo.configurarHistorico(calcularHistorico);
 
       return modelo;
@@ -98,7 +98,7 @@ public class MainImg{
     * @return tempo (em nano segundos) do treino.
     */
    static long treinoEmPainel(Modelo modelo, int altura, int largura, double[][] entradas, double[][] saidas){
-      final int fps = 6000;
+      final int fps = 60000;
       int epocasPorFrame = 25;
 
       //acelerar o processo de desenho

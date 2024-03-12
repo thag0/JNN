@@ -420,10 +420,17 @@ public abstract class Modelo{
       return treinador.obterHistorico();
    }
 
+   protected abstract String construirInfo();
+
    /**
     * Mostra as informações sobre o modelo.
     */
    public abstract void info();
+
+   @Override
+   public String toString(){
+      return construirInfo();
+   }
 
    /**
     * Clona as características principais do modelo.

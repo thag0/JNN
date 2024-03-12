@@ -76,18 +76,19 @@ public class MainConv{
     * Criação de modelos para testes.
     */
    static Sequencial criarModelo(){
-      Sequencial modelo = new Sequencial(new Camada[]{
-         new Entrada(28, 28),
-         new Convolucional(new int[]{3, 3}, 16, "leaky-relu"),
-         new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{3, 3}, 20, "leaky-relu"),
-         new MaxPooling(new int[]{2, 2}),
-         new Flatten(),
-         new Densa(128, "sigmoid"),
-         new Densa(NUM_DIGITOS_TREINO, "softmax")
-      });
+      Sequencial modelo = new Sequencial();
 
-      modelo.compilar(new SGD(0.001, 0.99), "entropia-cruzada");
+      modelo.add(new Entrada(28, 28));
+      modelo.add(new Convolucional(new int[]{3, 3}, 16, "leaky-relu"));
+      modelo.add(new MaxPooling(new int[]{2, 2}));
+      modelo.add(new Convolucional(new int[]{3, 3}, 20, "leaky-relu"));
+      modelo.add(new MaxPooling(new int[]{2, 2}));
+      modelo.add(new Flatten());
+      modelo.add(new Densa(126, "sigmoid"));
+      modelo.add(new Densa(NUM_DIGITOS_TREINO, "softmax")); 
+
+      modelo.compilar(new SGD(0.0001, 0.999), "entropia-cruzada");
+      
       return modelo;
    }
 
@@ -194,21 +195,6 @@ public class MainConv{
       valorFormatado = df.format(valor);
 
       return valorFormatado;
-   }
-
-   /**
-    * 
-    * @param sample
-    */
-   static void printImagemMNIST(double[][] sample){
-      for(int y = 0; y < sample.length; y++){
-         for(int x = 0; x < sample[y].length; x++){
-            double v = sample[y][x];
-            if(v < 0.5) System.out.print("    ");
-            else System.out.print((int)(v*100) + " ");
-         }
-         System.out.println();
-      }
    }
 
    /**

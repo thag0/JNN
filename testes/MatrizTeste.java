@@ -31,6 +31,7 @@ import rna.core.Utils;
 import rna.inicializadores.AleatorioPositivo;
 import rna.inicializadores.Inicializador;
 import rna.inicializadores.Zeros;
+import rna.modelos.RedeNeural;
 import rna.modelos.Sequencial;
 import rna.otimizadores.SGD;
 import rna.inicializadores.GlorotUniforme;
@@ -49,9 +50,7 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
 
-      Sequencial modelo = new Sequencial();
-      modelo.add(new Entrada(10));
-      modelo.add(new Convolucional(new int[]{2, 2}, 4));
+      var modelo = new RedeNeural(2, 2, 1);
 
       modelo.compilar("sgd", "mse");
       modelo.info();

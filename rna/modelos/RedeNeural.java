@@ -854,6 +854,44 @@ public class RedeNeural extends Modelo implements Cloneable{
       }
    }
 
+   @Override
+   protected String construirInfo(){
+      StringBuilder sb = new StringBuilder();
+      String pad = "    ";
+      System.out.println(nome() + " = [");
+
+      //otimizador
+      sb.append(this.otimizador.info()).append("\n");
+
+      //perda
+      sb.append(pad + "Perda: " + this.perda.getClass().getSimpleName() + "\n\n");
+
+      //bias
+      sb.append(pad + "Bias = " + this.bias);
+      sb.append("\n\n");
+
+      //ativações
+      for(int i = 0; i < this.camadas.length; i++){
+         sb.append(
+            pad + "Ativação camada " + i + ": " + 
+            this.camadas[i].ativacao().getClass().getSimpleName() + "\n"
+         );
+      }
+
+      //arquitetura
+      sb.append("\n" + pad + "arquitetura = (" + this.arquitetura[0]);
+      for(int i = 1; i < this.arquitetura.length; i++){
+         sb.append(", " + this.arquitetura[i]);
+      }
+      sb.append(")\n");
+
+      sb.append(pad).append("Parâmetros: ").append(numParametros());
+
+      sb.append("\n]\n");
+      
+      return sb.toString();
+   }
+
    /**
     * Exibe algumas informações importantes sobre a Rede Neural, como:
     * <ul>
@@ -875,40 +913,8 @@ public class RedeNeural extends Modelo implements Cloneable{
     */
    @Override
    public void info(){
-      super.verificarCompilacao();
-
-      StringBuilder sb = new StringBuilder();
-      String espacamento = "    ";
-      System.out.println("\nInformações " + this.nome + " = [");
-
-      //perda
-      sb.append(espacamento + "Perda: " + this.perda.getClass().getSimpleName() + "\n\n");
-
-      //otimizador
-      sb.append(this.otimizador.info());
-
-      //bias
-      sb.append("\n" + espacamento + "Bias = " + this.bias);
-      sb.append("\n\n");
-
-      //ativações
-      for(int i = 0; i < this.camadas.length; i++){
-         sb.append(
-            espacamento + "Ativação camada " + i + ": " + 
-            this.camadas[i].ativacao().getClass().getSimpleName() + "\n"
-         );
-      }
-
-      //arquitetura
-      sb.append("\n" + espacamento + "arquitetura = [(" + this.arquitetura[0] + ")");
-      for(int i = 1; i < this.arquitetura.length; i++){
-         sb.append(", " + this.arquitetura[i]);
-      }
-      sb.append("]");
-
-      sb.append("\n]\n");
-
-      System.out.println(sb.toString());
+      verificarCompilacao();
+      System.out.println(construirInfo());
    }
 
    @Override

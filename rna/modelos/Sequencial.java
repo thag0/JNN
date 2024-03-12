@@ -391,10 +391,8 @@ public class Sequencial extends Modelo implements Cloneable{
    }
 
    @Override
-   public void info(){
-      verificarCompilacao();
-
-      String espacamento = " ".repeat(4);
+   protected String construirInfo(){
+      String pad = " ".repeat(4);
       StringBuilder sb = new StringBuilder();
       sb.append(nome() + " = [\n");
 
@@ -403,12 +401,12 @@ public class Sequencial extends Modelo implements Cloneable{
       sb.append("\n");
 
       //função de perda
-      sb.append(espacamento + "Perda: " + perda.nome());
+      sb.append(pad + "Perda: " + perda.nome());
       sb.append("\n\n");
 
       //camadas
       sb.append(
-         espacamento + String.format(
+         pad + String.format(
          "%-23s%-23s%-23s%-23s%-23s\n", "Camada", "Entrada", "Saída", "Ativação", "Parâmetros"
          )
       );
@@ -443,17 +441,23 @@ public class Sequencial extends Modelo implements Cloneable{
          String parametros = String.valueOf(camada.numParametros());
 
          sb.append(
-            espacamento + String.format(
+            pad + String.format(
                "%-23s%-23s%-23s%-23s%-23s\n", nomeCamada, formEntrada, formSaida, ativacao, parametros
             )
          );
       }
 
       String params = String.format("%,d", numParametros());
-      sb.append("\n" + espacamento + "Parâmetros treináveis: " + params + "\n");
+      sb.append("\n" + pad + "Parâmetros treináveis: " + params + "\n");
       sb.append("]\n");
 
-      System.out.println(sb.toString());
+      return sb.toString();
+   }
+
+   @Override
+   public void info(){
+      verificarCompilacao();
+      System.out.println(construirInfo());
    }
 
    @Override
