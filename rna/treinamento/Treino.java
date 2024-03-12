@@ -59,16 +59,16 @@ class Treino{
       Perda perda = modelo.perda();
       
       Object[] amostras = utils.transformarParaArray(entrada);
-      Object[] rolutos = utils.transformarParaArray(saida);
+      Object[] rotulos = utils.transformarParaArray(saida);
       int numAmostras = amostras.length;
 
       double perdaEpoca;
       for(int e = 1; e <= epochs; e++){
-         aux.embaralharDados(amostras, rolutos);
+         aux.embaralharDados(amostras, rotulos);
          perdaEpoca = 0;
          
          for(int i = 0; i < numAmostras; i++){
-            double[] amostraSaida = (double[]) rolutos[i];
+            double[] amostraSaida = (double[]) rotulos[i];
             modelo.calcularSaida(amostras[i]);
             
             //feedback de avanço da rede
