@@ -235,7 +235,7 @@ public class Serializador{
     */
    public RedeNeural lerRedeNeural(String caminho){
       RedeNeural rede = null;
-      Dicionario dicionario = new Dicionario();
+      Dicionario dicio = new Dicionario();
 
       try(BufferedReader br = new BufferedReader(new FileReader(caminho))){
          //arquitetura
@@ -266,7 +266,7 @@ public class Serializador{
          rede.compilar();
 
          for(int i = 0; i < rede.numCamadas(); i++){
-            rede.configurarAtivacao(rede.camada(i), dicionario.obterAtivacao(ativacoesStr[i]));
+            rede.configurarAtivacao(rede.camada(i), dicio.obterAtivacao(ativacoesStr[i]));
          }
 
          for(int i = 0; i < rede.numCamadas(); i++){
@@ -297,12 +297,12 @@ public class Serializador{
     */
    public Sequencial lerSequencial(String caminho){
       Sequencial modelo = new Sequencial();
-      Dicionario dic = new Dicionario();
+      Dicionario dicio = new Dicionario();
 
       try(BufferedReader br = new BufferedReader(new FileReader(caminho))){
          int numCamadas = Integer.parseInt(br.readLine());
-         Otimizador otimizador = dic.obterOtimizador(br.readLine().trim());
-         Perda perda = dic.obterPerda(br.readLine().trim());
+         Otimizador otimizador = dicio.obterOtimizador(br.readLine().trim());
+         Perda perda = dicio.obterPerda(br.readLine().trim());
       
          modelo.configurarOtimizador(otimizador);
          modelo.configurarPerda(perda);

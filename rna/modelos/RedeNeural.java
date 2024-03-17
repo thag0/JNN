@@ -467,19 +467,22 @@ public class RedeNeural extends Modelo implements Cloneable{
 
    @Override
    public void compilar(Object otimizador, Object perda){
-      this.camadas = new Densa[this.arquitetura.length-1];
-      this.camadas[0] = new Densa(this.arquitetura[0], this.arquitetura[1]);
-      this.camadas[0].configurarBias(this.bias);
+      camadas = new Densa[arquitetura.length-1];
+      camadas[0] = new Densa(arquitetura[1]);
+      camadas[0].configurarBias(bias);
+      camadas[0].construir(new int[]{arquitetura[0]});
 
       Dicionario dic = new Dicionario();
-      for(int i = 1; i < this.camadas.length; i++){
-         this.camadas[i] = new Densa(
-            this.camadas[i-1].formatoSaida()[1], this.arquitetura[i+1]
-         );
-         this.camadas[i].configurarBias(this.bias);
-         this.camadas[i].configurarId(i);
-         if(this.seedInicial != 0) this.camadas[i].configurarSeed(this.seedInicial);
-         this.camadas[i].inicializar();
+      for(int i = 1; i < camadas.length; i++){
+         camadas[i] = new Densa(arquitetura[i+1]);
+         camadas[i].configurarBias(bias);
+         camadas[i].construir(camadas[i-1].formatoSaida());
+      }
+
+      for(int i = 0; i < camadas.length; i++){
+         if(seedInicial != 0) camadas[i].configurarSeed(seedInicial);
+         camadas[i].inicializar();
+         camadas[i].configurarId(i);
       }
 
       this.perda = dic.obterPerda(perda);

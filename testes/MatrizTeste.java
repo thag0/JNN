@@ -1,6 +1,7 @@
 package testes;
 
 import java.awt.image.BufferedImage;
+import java.io.Serial;
 import java.nio.Buffer;
 import java.sql.Time;
 import java.util.Random;
@@ -34,6 +35,7 @@ import rna.inicializadores.Zeros;
 import rna.modelos.RedeNeural;
 import rna.modelos.Sequencial;
 import rna.otimizadores.SGD;
+import rna.serializacao.Serializador;
 import rna.inicializadores.GlorotUniforme;
 import rna.inicializadores.Identidade;
 import rna.treinamento.AuxiliarTreino;
@@ -50,10 +52,12 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
 
-      var modelo = new RedeNeural(2, 2, 1);
+      var tensor = new Tensor4D(2, 2, 2, 3);
+      tensor.preencherContador(true);;
+      tensor.print(2);
 
-      modelo.compilar("sgd", "mse");
-      modelo.info();
+      var res = new Tensor4D(tensor.array4D());
+      res.print(1);
    }
 
    /**

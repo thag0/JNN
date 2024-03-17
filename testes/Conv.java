@@ -36,7 +36,7 @@ public class Conv{
       String nomeModelo = "modelo-convolucional";
       Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + nomeModelo + ".txt");
       // modelo.info();
-      // testarAcertosMNIST(modelo);
+      testarAcertosMNIST(modelo);
       // testarTodosDados(modelo);
 
       Dados forward = tempoForward(modelo);//media 30/40 ms

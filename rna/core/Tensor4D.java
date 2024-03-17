@@ -1728,7 +1728,7 @@ public class Tensor4D{
     * Exibe todo o conteúdo do tensor.
     * @param casas quantidade de casas decimais que serão exibidas. Esse
     * valor só {@code será usado caso seja maior que zero}. Por padrão são usadas
-    * 10 casas decimais. A quantidade de casas usadas pode afetar a legibilidade
+    * 8 casas decimais. A quantidade de casas usadas pode afetar a legibilidade
     * do conteúdo.
     */
    public void print(int casas){
@@ -1739,7 +1739,7 @@ public class Tensor4D{
     * Exibe todo o conteúdo do tensor.
     */
    public void print(){
-      print(10);
+      print(8);
    }
 
    @Override
@@ -1749,7 +1749,7 @@ public class Tensor4D{
 
       sb.delete(tamanho-1, tamanho);//remover ultimo "\n"    
       
-      sb.append(" <tipo: " +dados.getClass().getComponentType().getSimpleName() + ">");
+      sb.append(" <tipo: " + dados.getClass().getComponentType().getSimpleName() + ">");
       sb.append(" <hash: " + Integer.toHexString(hashCode()) + ">");
       sb.append("\n");
       

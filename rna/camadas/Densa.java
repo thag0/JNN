@@ -367,7 +367,10 @@ public class Densa extends Camada implements Cloneable{
       verificarConstrucao();
 
       iniKernel.inicializar(pesos, 0, 0);
-      iniBias.inicializar(bias, 0, 0);
+
+      if(usarBias){
+         iniBias.inicializar(bias, 0, 0);
+      }
    }
 
    @Override
@@ -626,7 +629,7 @@ public class Densa extends Camada implements Cloneable{
 
       buffer += espacamento + "Entrada: [" + this.entrada.dim3() + ", " + this.entrada.dim4() + "]\n";
       buffer += espacamento + "Pesos:   [" + this.pesos.dim3() + ", "   + this.pesos.dim4() + "]\n";
-      if(this.temBias()){
+      if(bias != null){
          buffer += espacamento + "Bias:    [" + this.bias.dim3() + ", "   + this.bias.dim4() + "]\n";
       }
       buffer += espacamento + "Saida:   [" + this.saida.dim3() + ", "   + this.saida.dim4() + "]\n";
