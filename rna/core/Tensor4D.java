@@ -785,10 +785,10 @@ public class Tensor4D{
     * @return resultado da verifcação.
     */
    private boolean compararDimensoes(Tensor4D tensor, boolean dim1, boolean dim2, boolean dim3, boolean dim4){
-      if(dim1 && (tensor.dim1() != this.dim1())) return false;
-      if(dim2 && (tensor.dim2() != this.dim2())) return false;
-      if(dim3 && (tensor.dim3() != this.dim3())) return false;
       if(dim4 && (tensor.dim4() != this.dim4())) return false;
+      if(dim3 && (tensor.dim3() != this.dim3())) return false;
+      if(dim2 && (tensor.dim2() != this.dim2())) return false;
+      if(dim1 && (tensor.dim1() != this.dim1())) return false;
 
       return true;
    }
@@ -852,6 +852,13 @@ public class Tensor4D{
    /**
     * Aplica a função recebida em todos os elementos do tensor usando
     * como entrada os valores do tensor recebido.
+    * <p>
+    *    Exemplo:
+    * </p>
+    * <pre>
+    * tensor.map(x -> Math.random());
+    * </pre>
+    * Onde {@code x} representa cada elemento dentro do tensor fornecido.
     * @param tensor tensor base.
     * @param funcao função para aplicar no tensor base.
     */
@@ -880,23 +887,37 @@ public class Tensor4D{
 
    /**
     * Aplica a função recebida em todos os elementos do tensor.
-    * @param funcao função desejada.
+    * <p>
+    *    Exemplo:
+    * </p>
+    * <pre>
+    * tensor.map(x -> Math.random());
+    * </pre>
+    * Onde {@code x} representa cada elemento dentro do tensor.
+    * @param fun função desejada.
     */
-   public void map(DoubleUnaryOperator funcao){
-      if(funcao == null){
+   public void map(DoubleUnaryOperator fun){
+      if(fun == null){
          throw new IllegalArgumentException(
             "\nFunção recebida é nula."
          );
       }
 
       for(int i = 0; i < dados.length; i++){
-         dados[i] = funcao.applyAsDouble(dados[i]);
+         dados[i] = fun.applyAsDouble(dados[i]);
       }
    }
 
    /**
     * Aplica a função recebida em todos os elementos da primeira dimensão
     * do tensor.
+    * <p>
+    *    Exemplo:
+    * </p>
+    * <pre>
+    * tensor.map3D(0, x -> Math.random());
+    * </pre>
+    * Onde {@code x} representa cada elemento dentro do tensor.
     * @param dim1 índice da primeira dimensão.
     * @param funcao função desejada.
     */
@@ -922,6 +943,13 @@ public class Tensor4D{
    /**
     * Aplica a função recebida em todos os elementos da segunda dimensão
     * do tensor.
+    * <p>
+    *    Exemplo:
+    * </p>
+    * <pre>
+    * tensor.map2D(0, 0, x -> Math.random());
+    * </pre>
+    * Onde {@code x} representa cada elemento dentro do tensor.
     * @param dim1 índice da primeira dimensão.
     * @param dim2 índice da segunda dimensão.
     * @param funcao função desejada.
@@ -954,6 +982,13 @@ public class Tensor4D{
    /**
     * Aplica a função recebida em todos os elementos da terceira dimensão
     * do tensor.
+    * <p>
+    *    Exemplo:
+    * </p>
+    * <pre>
+    * tensor.map1D(0, 0, 0, x -> Math.random());
+    * </pre>
+    * Onde {@code x} representa cada elemento dentro do tensor.
     * @param dim1 índice da primeira dimensão.
     * @param dim2 índice da segunda dimensão.
     * @param dim3 índice da terceira dimensão.
