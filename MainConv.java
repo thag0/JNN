@@ -38,16 +38,14 @@ public class MainConv{
       modelo.info();
 
       // treinar e marcar tempo
-      long t1, t2;
-      long horas, minutos, segundos;
+      long tempo, horas, minutos, segundos;
 
       System.out.println("Treinando.");
-      t1 = System.nanoTime();
+      tempo = System.nanoTime();
          modelo.treinar(treinoX, treinoY, EPOCAS_TREINO, 16, true);
-      t2 = System.nanoTime();
+      tempo = System.nanoTime() - tempo;
 
-      long tempoDecorrido = t2 - t1;
-      long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempoDecorrido);
+      long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempo);
       horas = segundosTotais / 3600;
       minutos = (segundosTotais % 3600) / 60;
       segundos = segundosTotais % 60;
@@ -76,16 +74,16 @@ public class MainConv{
     * Criação de modelos para testes.
     */
    static Sequencial criarModelo(){
-      Sequencial modelo = new Sequencial();
-
-      modelo.add(new Entrada(28, 28));
-      modelo.add(new Convolucional(new int[]{3, 3}, 16, "leaky-relu"));
-      modelo.add(new MaxPooling(new int[]{2, 2}));
-      modelo.add(new Convolucional(new int[]{3, 3}, 20, "leaky-relu"));
-      modelo.add(new MaxPooling(new int[]{2, 2}));
-      modelo.add(new Flatten());
-      modelo.add(new Densa(126, "sigmoid"));
-      modelo.add(new Densa(NUM_DIGITOS_TREINO, "softmax")); 
+      Sequencial modelo = new Sequencial(new Camada[]{
+         new Entrada(28, 28),
+         new Convolucional(new int[]{3, 3}, 16, "leaky-relu"),
+         new MaxPooling(new int[]{2, 2}),
+         new Convolucional(new int[]{3, 3}, 20, "leaky-relu"),
+         new MaxPooling(new int[]{2, 2}),
+         new Flatten(),
+         new Densa(126, "sigmoid"),
+         new Densa(NUM_DIGITOS_TREINO, "softmax") 
+      });
 
       modelo.compilar(new SGD(0.0001, 0.999), "entropia-cruzada");
       
