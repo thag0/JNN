@@ -53,7 +53,7 @@ public class Convolucional extends Camada implements Cloneable{
     *    form = (profundidade, altura, largura)
     * </pre>
     */
-   private final int[] formatoEntrada = {1, 1, 1};
+   private final int[] shapeEntrada = {1, 1, 1};
 
    /**
     * Formato de cada filtro da camada convolucional, dado por:
@@ -61,7 +61,7 @@ public class Convolucional extends Camada implements Cloneable{
     *    form = (altura, largura)
     * </pre>
     */
-   private final int[] formatoFiltro = {1, 1};
+   private final int[] shapeFiltro = {1, 1};
 
    /**
     * Formato de saída da camada convolucional, dado por:
@@ -69,7 +69,7 @@ public class Convolucional extends Camada implements Cloneable{
     *    form = (numFiltros, altura, largura)
     * </pre>
     */
-   private final int[] formatoSaida = {1, 1, 1};
+   private final int[] shapeSaida = {1, 1, 1};
 
    /**
     * Tensor contendo os valores de entrada para a camada,
@@ -216,40 +216,40 @@ public class Convolucional extends Camada implements Cloneable{
     *    formFiltro = (altura, largura)
     * </pre>
     * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-    * @param formEntrada formato de entrada da camada.
-    * @param formFiltro formato dos filtros da camada.
-    * @param filtros quantidade de filtros.
+    * @param entrada formato de entrada da camada.
+    * @param filtro formato dos filtros da camada.
+    * @param nFiltros quantidade de filtros.
     * @param ativacao função de ativação.
     * @param iniKernel inicializador para os filtros.
     * @param iniBias inicializador para os bias.
     */
-   public Convolucional(int[] formEntrada, int[] formFiltro, int filtros, String ativacao, Object iniKernel, Object iniBias){
-      this(formFiltro, filtros, ativacao, iniKernel, iniBias);
+   public Convolucional(int[] entrada, int[] filtro, int nFiltros, String ativacao, Object iniKernel, Object iniBias){
+      this(filtro, nFiltros, ativacao, iniKernel, iniBias);
 
-      if(formEntrada == null){
+      if(entrada == null){
          throw new IllegalArgumentException(
             "\nO formato de entrada não pode ser nulo."
          );
       }
 
-      if(formEntrada.length != 3){
+      if(entrada.length != 3){
          throw new IllegalArgumentException(
             "\nO formato de entrada deve conter 3 elementos (altura, largura, profundidade), " +
-            "recebido: " + formEntrada.length
+            "recebido: " + entrada.length
          );
       }
 
-      if(utils.apenasMaiorZero(formEntrada) == false){
+      if(utils.apenasMaiorZero(entrada) == false){
          throw new IllegalArgumentException(
             "\nOs valores do formato de entrada devem ser maiores que zero."
          );
       }
 
-      this.formatoEntrada[0] = formEntrada[0];//profundidade
-      this.formatoEntrada[1] = formEntrada[1];//altura
-      this.formatoEntrada[2] = formEntrada[2];//largura
+      shapeEntrada[0] = entrada[0];//profundidade
+      shapeEntrada[1] = entrada[1];//altura
+      shapeEntrada[2] = entrada[2];//largura
 
-      construir(formEntrada);
+      construir(entrada);
    }
 
    /**
@@ -270,14 +270,14 @@ public class Convolucional extends Camada implements Cloneable{
     *    formFiltro = (altura, largura)
     * </pre>
     * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-    * @param formEntrada formato de entrada da camada.
-    * @param formFiltro formato dos filtros da camada.
-    * @param filtros quantidade de filtros.
+    * @param entrada formato de entrada da camada.
+    * @param filtro formato dos filtros da camada.
+    * @param nFiltros quantidade de filtros.
     * @param ativacao função de ativação.
     * @param iniKernel inicializador para os filtros.
     */
-   public Convolucional(int[] formEntrada, int[] formFiltro, int filtros, String ativacao, Object iniKernel){
-      this(formEntrada, formFiltro, filtros, ativacao, iniKernel, null);
+   public Convolucional(int[] entrada, int[] filtro, int nFiltros, String ativacao, Object iniKernel){
+      this(entrada, filtro, nFiltros, ativacao, iniKernel, null);
    }
 
    /**
@@ -298,13 +298,13 @@ public class Convolucional extends Camada implements Cloneable{
     *    formFiltro = (altura, largura)
     * </pre>
     * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-    * @param formEntrada formato de entrada da camada.
-    * @param formFiltro formato dos filtros da camada.
-    * @param filtros quantidade de filtros.
+    * @param entrada formato de entrada da camada.
+    * @param filtro formato dos filtros da camada.
+    * @param nFiltros quantidade de filtros.
     * @param ativacao função de ativação.
     */
-   public Convolucional(int[] formEntrada, int[] formFiltro, int filtros, String ativacao){
-      this(formEntrada, formFiltro, filtros, ativacao, null, null);
+   public Convolucional(int[] entrada, int[] filtro, int nFiltros, String ativacao){
+      this(entrada, filtro, nFiltros, ativacao, null, null);
    }
 
    /**
@@ -328,12 +328,12 @@ public class Convolucional extends Camada implements Cloneable{
     * <p>
     *    O valor de uso do bias será usado como {@code true} por padrão.
     * <p>
-    * @param formEntrada formato de entrada da camada.
-    * @param formFiltro formato dos filtros da camada.
-    * @param filtros quantidade de filtros.
+    * @param entrada formato de entrada da camada.
+    * @param filtro formato dos filtros da camada.
+    * @param nFiltros quantidade de filtros.
     */
-   public Convolucional(int[] formEntrada, int[] formFiltro, int filtros){
-      this(formEntrada, formFiltro, filtros, null, null, null);
+   public Convolucional(int[] entrada, int[] filtro, int nFiltros){
+      this(entrada, filtro, nFiltros, null, null, null);
    }
 
    /**
@@ -354,44 +354,44 @@ public class Convolucional extends Camada implements Cloneable{
     *    formFiltro = (altura, largura)
     * </pre>
     * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-    * @param formFiltro formato dos filtros da camada.
-    * @param filtros quantidade de filtros.
+    * @param filtro formato dos filtros da camada.
+    * @param nFiltros quantidade de filtros.
     * @param ativacao função de ativação.
     * @param iniKernel inicializador para os filtros.
     * @param iniBias inicializador para os bias.
     */
-   public Convolucional(int[] formFiltro, int filtros, String ativacao, Object iniKernel, Object iniBias){
-      if(formFiltro == null){
+   public Convolucional(int[] filtro, int nFiltros, String ativacao, Object iniKernel, Object iniBias){
+      if(filtro == null){
          throw new IllegalArgumentException(
             "\nO formato do filtro não pode ser nulo."
          );
       }
 
       //formado dos filtros
-      int[] f = (int[]) formFiltro;
-      if(f.length != 2){
+      int[] formFiltro = (int[]) filtro;
+      if(formFiltro.length != 2){
          throw new IllegalArgumentException(
             "\nO formato dos filtros deve conter 2 elementos (altura, largura), " +
-            "recebido: " + f.length
+            "recebido: " + formFiltro.length
          );
       }
-      if(utils.apenasMaiorZero(f) == false){
+      if(utils.apenasMaiorZero(formFiltro) == false){
          throw new IllegalArgumentException(
             "\nOs valores de formato para os filtros devem ser maiores que zero."
          );      
       }
 
-      this.formatoFiltro[0] = f[0];
-      this.formatoFiltro[1] = f[1];
+      shapeFiltro[0] = formFiltro[0];
+      shapeFiltro[1] = formFiltro[1];
 
       //número de filtros
-      if(filtros <= 0){
+      if(nFiltros <= 0){
          throw new IllegalArgumentException(
-            "\nO número de filtro deve ser maior que zero, recebido: " + filtros
+            "\nO número de filtro deve ser maior que zero, recebido: " + nFiltros
          );
       }
 
-      this.formatoSaida[0] = filtros;
+      shapeSaida[0] = nFiltros;
       
       Dicionario dicio = new Dicionario();
       if(ativacao != null) this.ativacao = dicio.obterAtivacao(ativacao);
@@ -417,13 +417,13 @@ public class Convolucional extends Camada implements Cloneable{
     *    formFiltro = (altura, largura)
     * </pre>
     * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-    * @param formFiltro formato dos filtros da camada.
-    * @param filtros quantidade de filtros.
+    * @param filtro formato dos filtros da camada.
+    * @param nFiltros quantidade de filtros.
     * @param ativacao função de ativação.
     * @param iniKernel inicializador para os filtros.
     */
-   public Convolucional(int[] formFiltro, int filtros, String ativacao, Object iniKernel){
-      this(formFiltro, filtros, ativacao, iniKernel, null);
+   public Convolucional(int[] filtro, int nFiltros, String ativacao, Object iniKernel){
+      this(filtro, nFiltros, ativacao, iniKernel, null);
    }
 
    /**
@@ -444,12 +444,12 @@ public class Convolucional extends Camada implements Cloneable{
     *    formFiltro = (altura, largura)
     * </pre>
     * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-    * @param formFiltro formato dos filtros da camada.
-    * @param filtros quantidade de filtros.
+    * @param filtro formato dos filtros da camada.
+    * @param nFiltros quantidade de filtros.
     * @param ativacao função de ativação.
     */
-   public Convolucional(int[] formFiltro, int filtros, String ativacao){
-      this(formFiltro, filtros, ativacao, null, null);
+   public Convolucional(int[] filtro, int nFiltros, String ativacao){
+      this(filtro, nFiltros, ativacao, null, null);
    }
 
    /**
@@ -470,11 +470,11 @@ public class Convolucional extends Camada implements Cloneable{
     *    formFiltro = (altura, largura)
     * </pre>
     * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-    * @param formFiltro formato dos filtros da camada.
-    * @param filtros quantidade de filtros.
+    * @param filtro formato dos filtros da camada.
+    * @param nFiltros quantidade de filtros.
     */
-   public Convolucional(int[] formFiltro, int filtros){
-      this(formFiltro, filtros, null, null, null);
+   public Convolucional(int[] filtro, int nFiltros){
+      this(filtro, nFiltros, null, null, null);
    }
    
    /**
@@ -513,9 +513,9 @@ public class Convolucional extends Camada implements Cloneable{
          );
       }
 
-      formatoEntrada[0] = (fEntrada.length == 4) ? fEntrada[1] : fEntrada[0];//profundidade
-      formatoEntrada[1] = (fEntrada.length == 4) ? fEntrada[2] : fEntrada[1];//altura
-      formatoEntrada[2] = (fEntrada.length == 4) ? fEntrada[3] : fEntrada[2];//largura
+      shapeEntrada[0] = (fEntrada.length == 4) ? fEntrada[1] : fEntrada[0];//profundidade
+      shapeEntrada[1] = (fEntrada.length == 4) ? fEntrada[2] : fEntrada[1];//altura
+      shapeEntrada[2] = (fEntrada.length == 4) ? fEntrada[3] : fEntrada[2];//largura
 
       if(utils.apenasMaiorZero(fEntrada) == false){
          throw new IllegalArgumentException(
@@ -525,29 +525,29 @@ public class Convolucional extends Camada implements Cloneable{
       }
 
       //dim -> ((entrada - filtro) / stride) + 1
-      formatoSaida[1] = this.formatoEntrada[1] - this.formatoFiltro[0] + 1;
-      formatoSaida[2] = this.formatoEntrada[2] - this.formatoFiltro[1] + 1;
+      shapeSaida[1] = shapeEntrada[1] - shapeFiltro[0] + 1;
+      shapeSaida[2] = shapeEntrada[2] - shapeFiltro[1] + 1;
 
-      if(formatoSaida[1] < 1 || formatoSaida[2] < 1){
+      if(shapeSaida[1] < 1 || shapeSaida[2] < 1){
          throw new IllegalArgumentException(
             "\nFormato de entrada " + utils.shapeStr(fEntrada) +
             " e formato dos filtros " + 
-            utils.shapeStr(new int[]{formatoSaida[0], formatoFiltro[0], formatoFiltro[1]}) +
-            " resultam num formato de saída inválido " + utils.shapeStr(formatoSaida)
+            utils.shapeStr(new int[]{shapeSaida[0], shapeFiltro[0], shapeFiltro[1]}) +
+            " resultam num formato de saída inválido " + utils.shapeStr(shapeSaida)
          );
       }
 
       //inicialização dos parâmetros necessários
-      this.entrada      = new Tensor4D(formatoEntrada);
+      this.entrada      = new Tensor4D(shapeEntrada);
       this.gradEntrada  = new Tensor4D(this.entrada.shape());
-      this.filtros      = new Tensor4D(formatoSaida[0], formatoEntrada[0], formatoFiltro[0], formatoFiltro[1]);
+      this.filtros      = new Tensor4D(shapeSaida[0], shapeEntrada[0], shapeFiltro[0], shapeFiltro[1]);
       this.gradFiltros  = new Tensor4D(filtros.shape());
-      this.saida        = new Tensor4D(formatoSaida);
+      this.saida        = new Tensor4D(shapeSaida);
       this.somatorio    = new Tensor4D(saida.shape());
       this.gradSaida    = new Tensor4D(saida.shape());
 
       if(usarBias){
-         this.bias      = new Tensor4D(formatoSaida[0]);
+         this.bias      = new Tensor4D(shapeSaida[0]);
          this.gradBias  = new Tensor4D(bias.shape());
       }
 
@@ -561,8 +561,8 @@ public class Convolucional extends Camada implements Cloneable{
    public void inicializar(){
       verificarConstrucao();
       
-      int numFiltros = formatoSaida[0];
-      int profEntrada = formatoEntrada[0];
+      int numFiltros = shapeSaida[0];
+      int profEntrada = shapeEntrada[0];
       for(int i = 0; i < numFiltros; i++){
          for(int j = 0; j < profEntrada; j++){
             iniKernel.inicializar(filtros, i, j);
@@ -570,7 +570,7 @@ public class Convolucional extends Camada implements Cloneable{
       }
 
       if(usarBias){
-         iniBias.inicializar(bias, 0, 0);
+         iniBias.inicializar(bias, 0, 0, 0);
       }
    }
 
@@ -638,12 +638,12 @@ public class Convolucional extends Camada implements Cloneable{
 
       if(entrada instanceof double[][][]){
          double[][][] e = (double[][][]) entrada;
-         if(e.length != formatoEntrada[0] || e[0].length != formatoEntrada[1] || e[0][0].length != formatoEntrada[2]){
+         if(e.length != shapeEntrada[0] || e[0].length != shapeEntrada[1] || e[0][0].length != shapeEntrada[2]){
             throw new IllegalArgumentException(
                "\nAs dimensões da entrada recebida " + 
                "(" + e.length + ", " + e[0].length + ", " + e[0][0].length + ") " +
                "são incompatíveis com as dimensões da entrada da camada " + 
-               utils.shapeStr(formatoEntrada)
+               utils.shapeStr(shapeEntrada)
             );
          }
 
@@ -676,7 +676,7 @@ public class Convolucional extends Camada implements Cloneable{
       
       if(usarBias){
          double b;
-         int numFiltros = formatoSaida[0];
+         int numFiltros = shapeSaida[0];
          for(int i = 0; i < numFiltros; i++){
             b = bias.elemento(0, 0, 0, i);
             somatorio.add2D(0, i, b);
@@ -742,9 +742,9 @@ public class Convolucional extends Camada implements Cloneable{
       gradFiltros.add(tempGrad);
 
       if(usarBias){
-         int numFiltros = formatoSaida[0];
+         int numFiltros = shapeSaida[0];
          for(int i = 0; i < numFiltros; i++){
-            gradBias.add(0, 0, 0, i, gradSaida.somarElementos2D(0, i));
+            gradBias.add(0, 0, 0, i, gradSaida.somar2D(0, i));
          }
       }
    }
@@ -762,7 +762,7 @@ public class Convolucional extends Camada implements Cloneable{
     * @return quantiadde de filtros presentes na camada.
     */
    public int numFiltros(){
-      return this.formatoSaida[0];
+      return this.shapeSaida[0];
    }
 
    @Override
@@ -847,9 +847,9 @@ public class Convolucional extends Camada implements Cloneable{
       verificarConstrucao();
 
       return new int[]{
-         formatoEntrada[0],
-         formatoEntrada[1],
-         formatoEntrada[2]
+         shapeEntrada[0],
+         shapeEntrada[1],
+         shapeEntrada[2]
       };
    }
  
@@ -866,9 +866,9 @@ public class Convolucional extends Camada implements Cloneable{
       verificarConstrucao();
 
       return new int[]{
-         formatoSaida[0],
-         formatoSaida[1],
-         formatoSaida[2]
+         shapeSaida[0],
+         shapeSaida[1],
+         shapeSaida[2]
       };
    }
 
@@ -880,8 +880,8 @@ public class Convolucional extends Camada implements Cloneable{
       verificarConstrucao();
 
       return new int[]{
-         formatoFiltro[0],
-         formatoFiltro[1],
+         shapeFiltro[0],
+         shapeFiltro[1],
       };
    }
 

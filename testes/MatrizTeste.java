@@ -52,12 +52,12 @@ public class MatrizTeste{
    public static void main(String[] args){
       ged.limparConsole();
 
-      var tensor = new Tensor4D(2, 2, 2, 3);
-      tensor.preencherContador(true);;
-      tensor.print(2);
+      var t1 = new Tensor4D(2, 2);
+      var t2 = new Tensor4D(t1.shape());
 
-      var res = new Tensor4D(tensor.array4D());
-      res.print(1);
+      t2.map((x) -> Math.random());
+
+      System.out.println("T1 == T2: " + (t1.equals(t2)));
    }
 
    /**

@@ -992,7 +992,7 @@ public class Tensor4D{
     * Retorna a soma de todos os elementos do tensor.
     * @return soma total.
     */
-   public double somarElementos(){
+   public double somar(){
       double soma = 0;
       int tam = tamanho();
       for(int i = 0; i < tam; i++){
@@ -1008,7 +1008,7 @@ public class Tensor4D{
     * @param dim1 índice da primeira dimensão do tensor.
     * @return soma total.
     */
-   public double somarElementos3D(int dim1){
+   public double somar3D(int dim1){
       if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
@@ -1033,7 +1033,7 @@ public class Tensor4D{
     * @param dim2 índice da segunda dimensão do tensor.
     * @return soma total.
     */
-   public double somarElementos2D(int dim1, int dim2){
+   public double somar2D(int dim1, int dim2){
       if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
@@ -1064,7 +1064,7 @@ public class Tensor4D{
     * @param dim3 índice da terceira dimensão do tensor.
     * @return soma total.
     */
-   public double somarElementos1D(int dim1, int dim2, int dim3){
+   public double somar1D(int dim1, int dim2, int dim3){
       if(!validarDimensao(dim1, dim1())){
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + dim1 + ") inválido."
@@ -1652,7 +1652,6 @@ public class Tensor4D{
       casas = (casas >= 0) ? casas : 10;
       
       String pad = "   ";
-      String padNum = "   ";
 
       StringBuilder sb = new StringBuilder();
       sb.append(nome).append(" ").append(shapeStr()).append(" = [\n");
@@ -1660,7 +1659,7 @@ public class Tensor4D{
       int d1 = dim1();
       for(int i = 0; i < d1; i++){
          sb.append(pad).append("[\n");
-         formatarD2(sb, casas, pad, padNum, i);
+         formatarD2(sb, casas, pad, i);
          sb.append(pad).append("]").append((i < d1 - 1) ? ",\n" : "\n");
       }
       sb.append("]\n");
@@ -1673,14 +1672,13 @@ public class Tensor4D{
     * @param sb string builder.
     * @param casas quantidade de cadas decimais.
     * @param pad espaçamento.
-    * @param padNum espaçamento entre elementos.
     * @param i índice do contador da primeira dimensão.
     */
-   private void formatarD2(StringBuilder sb, int casas, String pad, String padNum, int i){
+   private void formatarD2(StringBuilder sb, int casas, String pad, int i){
       int d2 = dim2();
       for(int j = 0; j < d2; j++){
          sb.append(pad).append(pad).append("[");
-         formatarDimensao3(sb, casas, pad, padNum, i, j);
+         formatarDimensao3(sb, casas, pad, i, j);
          sb.append("]").append((j < d2 - 1) ? ",\n\n" : "\n");
       }
    }
@@ -1690,15 +1688,14 @@ public class Tensor4D{
     * @param sb string builder.
     * @param casas quantidade de cadas decimais.
     * @param pad espaçamento.
-    * @param padNum espaçamento entre elementos.
     * @param i índice do contador da primeira dimensão.
     * @param j índice do contador da segunda dimensão.
     */
-   private void formatarDimensao3(StringBuilder sb, int casas, String pad, String padNum, int i, int j){
+   private void formatarDimensao3(StringBuilder sb, int casas, String pad, int i, int j){
       int d3 = dim3();
       for(int k = 0; k < d3; k++){
          sb.append((k == 0) ? "[" : (pad + pad + " ["));
-         formatarD4(sb, casas, pad, padNum, i, j, k);
+         formatarD4(sb, casas, pad, i, j, k);
          sb.append("]").append((k < d3 - 1) ? ",\n" : "");
       }
    }
@@ -1708,13 +1705,15 @@ public class Tensor4D{
     * @param sb string builder.
     * @param casas quantidade de cadas decimais.
     * @param pad espaçamento.
-    * @param padNum espaçamento entre elementos.
+    * @param padNum espaçamento entre valores.
     * @param i índice do contador da primeira dimensão.
     * @param j índice do contador da segunda dimensão.
     * @param k índice do contador da terceira dimensão.
     */
-   private void formatarD4(StringBuilder sb, int casas, String pad, String padNum, int i, int j, int k){
+   private void formatarD4(StringBuilder sb, int casas, String pad, int i, int j, int k){
       int d4 = dim4();
+      String padNum = "   ";
+      
       for(int l = 0; l < d4; l++){
          double valor = dados[indice(i, j, k, l)];
          String formato = String.format("%." + casas + "f", valor);
@@ -1742,28 +1741,16 @@ public class Tensor4D{
       print(8);
    }
 
-   @Override
-   public String toString(){
-      StringBuilder sb = new StringBuilder(construirPrint(8));
-      int tamanho = sb.length();
-
-      sb.delete(tamanho-1, tamanho);//remover ultimo "\n"    
-      
-      sb.append(" <tipo: " + dados.getClass().getComponentType().getSimpleName() + ">");
-      sb.append(" <hash: " + Integer.toHexString(hashCode()) + ">");
-      sb.append("\n");
-      
-      return sb.toString();
-   }
-
    /**
     * Configura o nome do tensor.
     * @param nome novo nome.
     */
    public void nome(String nome){
-      String n = nome.trim();
-      if(n != null && !n.isBlank() && !n.isEmpty()){
-         this.nome = n;
+      if(nome != null){
+         nome = nome.trim();
+         if(!nome.isEmpty()){
+            this.nome = nome;
+         }
       }
    }
 
@@ -1865,11 +1852,26 @@ public class Tensor4D{
     * @return clone da instância local.
     */
    public Tensor4D clone(){
-      try{
-         Tensor4D clone = new Tensor4D(this);
-         return clone;
-      }catch(Exception e){
-         throw new RuntimeException(e);
-      }
+      Tensor4D clone = new Tensor4D(this);
+      return clone;
+   }
+
+   @Override
+   public String toString(){
+      StringBuilder sb = new StringBuilder(construirPrint(8));
+      int tamanho = sb.length();
+
+      sb.delete(tamanho-1, tamanho);//remover ultimo "\n"    
+      
+      sb.append(" <tipo: " + dados.getClass().getComponentType().getSimpleName() + ">");
+      sb.append(" <hash: " + Integer.toHexString(hashCode()) + ">");
+      sb.append("\n");
+      
+      return sb.toString();
+   }
+
+   @Override
+   public boolean equals(Object obj){
+      return (obj instanceof Tensor4D) && comparar((Tensor4D) obj);
    }
 }

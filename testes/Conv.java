@@ -32,22 +32,25 @@ public class Conv{
    public static void main(String[] args){
       ged.limparConsole();
 
-      // String nomeModelo = "conv-mnist-95";
-      String nomeModelo = "modelo-convolucional";
+      // String nomeModelo = "mlp-mnist-89";
+      String nomeModelo = "conv-mnist-90-2";
       Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + nomeModelo + ".txt");
+      testarPrevisao(modelo, "3/img_1", true);
+      testarPrevisao(modelo, "3/3_deslocado", true);
+
       // modelo.info();
-      testarAcertosMNIST(modelo);
+      // testarAcertosMNIST(modelo);
       // testarTodosDados(modelo);
 
-      Dados forward = tempoForward(modelo);//media 30/40 ms
-      Dados backward = tempoBackward(modelo);//media 20/25 ms
+      // Dados forward = tempoForward(modelo);//media 30/40 ms
+      // Dados backward = tempoBackward(modelo);//media 20/25 ms
       // forward = ged.filtrar(forward, 1, "Convolucional");
       // backward = ged.filtrar(backward, 1, "Convolucional");
-      forward.imprimir();
-      backward.imprimir();
+      // forward.imprimir();
+      // backward.imprimir();
 
-      testarForward();
-      testarBackward();
+      // testarForward();
+      // testarBackward();
    }
 
    static void testarAcertosMNIST(Sequencial modelo){
