@@ -102,9 +102,9 @@ public abstract class Ativacao{
          for(int j = 0; j < dim2; j++){
             for(int k = 0; k < dim3; k++){
                for(int l = 0; l < dim4; l++){
-                  e = entrada.elemento(i, j, k, l);
-                  g = gradiente.elemento(i, j, k, l);
-                  saida.editar(i, j, k, l, (
+                  e = entrada.get(i, j, k, l);
+                  g = gradiente.get(i, j, k, l);
+                  saida.set(i, j, k, l, (
                      dx.applyAsDouble(e) * g
                   ));
                }

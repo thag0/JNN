@@ -189,7 +189,7 @@ public class Utils{
             
             }else if(idArray == 3){//escalar
                amostras[i] = new Tensor4D(1, 1, 1, 1);
-               amostras[i].editar(0, 0, 0, 0, t.elemento(0, 0, 0, i));
+               amostras[i].set(0, 0, 0, 0, t.get(0, 0, 0, i));
             }
 
             amostras[i].nome("amostra " + (i+1));//ajudar no debug

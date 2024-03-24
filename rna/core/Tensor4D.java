@@ -413,7 +413,7 @@ public class Tensor4D{
     * @param dim4 índice da quarta dimensão.
     * @return valor de acordo com os índices.
     */
-   public double elemento(int dim1, int dim2, int dim3, int dim4){
+   public double get(int dim1, int dim2, int dim3, int dim4){
       return dados[indice(dim1, dim2, dim3, dim4)];
    }
 
@@ -422,7 +422,7 @@ public class Tensor4D{
     * @param indices array contendo os índices das dimensões (dim1, dim2, dim3, dim4).
     * @return valor de acordo com os índices.
     */
-   public double elemento(int[] indices){
+   public double get(int[] indices){
       if(indices.length != 4){
          throw new IllegalArgumentException(
             "\nO tamanho do array de índices deve ser 4, array recebido tem tamanho " + indices.length
@@ -430,6 +430,35 @@ public class Tensor4D{
       }
 
       return dados[indice(indices[0], indices[1], indices[2], indices[3])];
+   }
+
+   /**
+    * Edita o conteúdo do tensor para que o valor fornecido esteja
+    * configurado de acordo com os índices fornecidos.
+    * @param dim1 índice da primeira dimensão.
+    * @param dim2 índice da segunda dimensão.
+    * @param dim3 índice da terceira dimensão.
+    * @param dim4 índice da quarta dimensão.
+    * @param valor valor desejado.
+    */
+   public void set(int dim1, int dim2, int dim3, int dim4, double valor){
+      dados[indice(dim1, dim2, dim3, dim4)] = valor;
+   }
+
+   /**
+    * Edita o conteúdo do tensor para que o valor fornecido esteja
+    * configurado de acordo com os índices fornecidos.
+    * @param indices array contendo os índices das dimensões (dim1, dim2, dim3, dim4).
+    * @param valor valor desejado.
+    */
+   public void set(int[] indices, double valor){
+      if(indices.length != 4){
+         throw new IllegalArgumentException(
+            "\nO tamanho do array de índices deve ser 4, array recebido tem tamanho " + indices.length
+         );
+      }
+
+      dados[indice(indices[0], indices[1], indices[2], indices[3])] = valor;
    }
 
    /**
@@ -542,7 +571,7 @@ public class Tensor4D{
     */
    public void zerar(){
       for(int i = 0; i < dados.length; i++){
-         dados[i] = 0;
+         dados[i] = 0.0d;
       }
    }
 
@@ -1128,35 +1157,6 @@ public class Tensor4D{
    }
 
    /**
-    * Edita o conteúdo do tensor para que o valor fornecido esteja
-    * configurado de acordo com os índices fornecidos.
-    * @param dim1 índice da primeira dimensão.
-    * @param dim2 índice da segunda dimensão.
-    * @param dim3 índice da terceira dimensão.
-    * @param dim4 índice da quarta dimensão.
-    * @param valor valor desejado.
-    */
-   public void editar(int dim1, int dim2, int dim3, int dim4, double valor){
-      dados[indice(dim1, dim2, dim3, dim4)] = valor;
-   }
-
-   /**
-    * Edita o conteúdo do tensor para que o valor fornecido esteja
-    * configurado de acordo com os índices fornecidos.
-    * @param indices array contendo os índices das dimensões (dim1, dim2, dim3, dim4).
-    * @param valor valor desejado.
-    */
-   public void editar(int[] indices, double valor){
-      if(indices.length != 4){
-         throw new IllegalArgumentException(
-            "\nO tamanho do array de índices deve ser 4, array recebido tem tamanho " + indices.length
-         );
-      }
-
-      dados[indice(indices[0], indices[1], indices[2], indices[3])] = valor;
-   }
-
-   /**
     * Copia o conteúdo de uma linha do tensor e repete ela na quantidade fornecida.
     * <p>
     *    Exemplo:
@@ -1206,7 +1206,7 @@ public class Tensor4D{
 
       for(int i = 0; i < quantidade; i++){
          for(int j = 0; j < dim4(); j++){
-            bloco.editar(0, 0, i, j, arr[j]);
+            bloco.set(0, 0, i, j, arr[j]);
          }
       }
 
@@ -1237,7 +1237,7 @@ public class Tensor4D{
 
       for(int i = 0; i < dim3(); i++){
          for(int j = 0; j < dim4(); j++){
-            editar(dim1, dim2, i, j, (i == j ? 1 : 0));
+            set(dim1, dim2, i, j, (i == j ? 1 : 0));
          }
       }
    }
@@ -1591,7 +1591,7 @@ public class Tensor4D{
          for(int j = 0; j < dim2(); j++){
             for(int k = 0; k < dim3(); k++){
                for(int l = 0; l < dim4(); l++){
-                  res[i][j][k][l] = elemento(i, j, k, l);
+                  res[i][j][k][l] = get(i, j, k, l);
                }
             }
          }

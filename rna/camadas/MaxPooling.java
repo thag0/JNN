@@ -346,13 +346,13 @@ public class MaxPooling extends Camada{
 
             for(int lin = linInicio; lin < linFim; lin++){
                for(int col = colInicio; col < colFim; col++){
-                  double valor = entrada.elemento(0, prof, lin, col);
+                  double valor = entrada.get(0, prof, lin, col);
                   if(valor > maxValor){
                      maxValor = valor;
                   }
                }
             }
-            saida.editar(0, prof, i, j, maxValor);
+            saida.set(0, prof, i, j, maxValor);
          }
       }
    }
@@ -405,8 +405,8 @@ public class MaxPooling extends Camada{
             int linMaximo = posicaoMaximo[0];
             int colMaximo = posicaoMaximo[1];
   
-            double valorGradSeguinte = gradSeguinte.elemento(0, prof, i, j);
-            gradEntrada.editar(0, prof, linMaximo, colMaximo, valorGradSeguinte);
+            double valorGradSeguinte = gradSeguinte.get(0, prof, i, j);
+            gradEntrada.set(0, prof, linMaximo, colMaximo, valorGradSeguinte);
          }
       }
    }
@@ -433,8 +433,8 @@ public class MaxPooling extends Camada{
   
       for(int lin = linInicio; lin < linFim; lin++){
          for(int col = colInicio; col < colFim; col++){
-            if(tensor.elemento(0, prof, lin, col) > valMaximo){
-               valMaximo = tensor.elemento(0, prof, lin, col);
+            if(tensor.get(0, prof, lin, col) > valMaximo){
+               valMaximo = tensor.get(0, prof, lin, col);
                posMaximo[0] = lin;
                posMaximo[1] = col;
             }

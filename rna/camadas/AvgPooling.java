@@ -341,12 +341,12 @@ public class AvgPooling extends Camada{
 
             for(int lin = linInicio; lin < linFim; lin++){
                for(int col = colInicio; col < colFim; col++){
-                  soma += entrada.elemento(0, prof, lin, col);
+                  soma += entrada.get(0, prof, lin, col);
                   cont++;
                }
             }
 
-            saida.editar(0, prof, i, j, (soma/cont));
+            saida.set(0, prof, i, j, (soma/cont));
          }
       }
    }
@@ -395,12 +395,12 @@ public class AvgPooling extends Camada{
             int linFim = Math.min(linInicio + formFiltro[0], alturaEntrada);
             int colFim = Math.min(colInicio + formFiltro[1], larguraEntrada);
 
-            double grad = gradSeguinte.elemento(0, prof, i, j);
+            double grad = gradSeguinte.get(0, prof, i, j);
             double mediaGrad = grad / (formFiltro[0] * formFiltro[1]);
 
             for(int lin = linInicio; lin < linFim; lin++){
                for(int col = colInicio; col < colFim; col++){
-                  gradEntrada.editar(0, prof, lin, col, mediaGrad);
+                  gradEntrada.set(0, prof, lin, col, mediaGrad);
                }
             }
          }

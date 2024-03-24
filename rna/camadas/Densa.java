@@ -758,7 +758,7 @@ public class Densa extends Camada implements Cloneable{
       int cont = 0, lin = gradPesos.dim3(), col = gradPesos.dim4();
       for(int i = 0; i < lin; i++){
          for(int j = 0; j < col; j++){
-            gradPesos.editar(0, 0, i, j, grads[cont++]);
+            gradPesos.set(0, 0, i, j, grads[cont++]);
          }
       }
    }
@@ -780,7 +780,7 @@ public class Densa extends Camada implements Cloneable{
       int cont = 0;
       for(int i = 0; i < pesos.dim3(); i++){
          for(int j = 0; j < pesos.dim4(); j++){
-            this.pesos.editar(0, 0, i, j, kernel[cont++]);
+            this.pesos.set(0, 0, i, j, kernel[cont++]);
          }
       }
    }
@@ -796,7 +796,7 @@ public class Densa extends Camada implements Cloneable{
 
       int cont = 0;
       for(int i = 0; i < this.bias.dim4(); i++){
-         this.bias.editar(0, 0, 0, i, bias[cont++]);
+         this.bias.set(0, 0, 0, i, bias[cont++]);
       }
    }
 

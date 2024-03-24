@@ -633,20 +633,20 @@ public class RedeNeural extends Modelo implements Cloneable{
             int colunas = camada.pesos.dim4(); 
             for(int i = 0; i < linhas; i++){
                for(int j = 0; j < colunas; j++){
-                  salvo = camada.pesos.elemento(0, 0, i, j);
+                  salvo = camada.pesos.get(0, 0, i, j);
                   camada.pesos.add(0, 0, i, j, eps);
                   double d = (avaliador().erroMedioQuadrado(entradas, saidas) - custo) / eps;
-                  camada.gradPesos.editar(0, 0, i, j, d);
-                  camada.pesos.editar(0, 0, i, j, salvo);
+                  camada.gradPesos.set(0, 0, i, j, d);
+                  camada.pesos.set(0, 0, i, j, salvo);
                }
             }
             for(int i = 0; i < linhas; i++){
                for(int j = 0; j < colunas; j++){
-                  salvo = camada.bias.elemento(0, 0, i, j);
+                  salvo = camada.bias.get(0, 0, i, j);
                   camada.bias.add(0, 0, i, j, eps);
                   double d = (avaliador().erroMedioQuadrado(entradas, saidas) - custo) / eps;
-                  camada.gradSaida.editar(0, 0, i, j, d);
-                  camada.bias.editar(0, 0, i, j, salvo);    
+                  camada.gradSaida.set(0, 0, i, j, d);
+                  camada.bias.set(0, 0, i, j, salvo);    
                }
             }
          }
@@ -656,14 +656,14 @@ public class RedeNeural extends Modelo implements Cloneable{
             int colunas = camada.pesos.dim4();         
             for(int i = 0; i < linhas; i++){
                for(int j = 0; j < colunas; j++){
-                  camada.pesos.sub(0, 0, i, j, (tA * camada.gradPesos.elemento(0, 0, i, j)));
+                  camada.pesos.sub(0, 0, i, j, (tA * camada.gradPesos.get(0, 0, i, j)));
                }
             }
 
             if(camada.temBias()){
                for(int i = 0; i < linhas; i++){
                   for(int j = 0; j < colunas; j++){
-                     camada.bias.sub(0, 0, i, j, (tA * camada.gradSaida.elemento(0, 0, i, j)));
+                     camada.bias.sub(0, 0, i, j, (tA * camada.gradSaida.get(0, 0, i, j)));
                   }
                }
             }

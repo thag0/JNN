@@ -59,12 +59,12 @@ public class Softmax extends Ativacao{
                double somaExp = 0;
 
                for(int i = 0; i < colunas; i++){
-                  somaExp += Math.exp(entrada.elemento(can, prof, lin, i));
+                  somaExp += Math.exp(entrada.get(can, prof, lin, i));
                }
 
                for(int i = 0; i < colunas; i++){
-                  double s = Math.exp(entrada.elemento(can, prof, lin, i)) / somaExp;
-                  saida.editar(can, prof, lin, i, s);
+                  double s = Math.exp(entrada.get(can, prof, lin, i)) / somaExp;
+                  saida.set(can, prof, lin, i, s);
                }
             }
          }

@@ -51,17 +51,17 @@ public class Argmax extends Ativacao{
          for(int prof = 0; prof < profundidade; prof++){
             for(int lin = 0; lin < linhas; lin++){
                maxId = 0;
-               maxVal = entrada.elemento(can, prof, lin, 0);
+               maxVal = entrada.get(can, prof, lin, 0);
 
                for(int col = 1; col < colunas; col++){
-                  if(entrada.elemento(can, prof, lin, col) > maxVal){
+                  if(entrada.get(can, prof, lin, col) > maxVal){
                      maxId = col;
-                     maxVal = entrada.elemento(can, prof, lin, col);
+                     maxVal = entrada.get(can, prof, lin, col);
                   }
                }
          
                for(int col = 0; col < colunas; col++){
-                  saida.editar(can, prof, lin, col, ((col == maxId) ? 1 : 0));
+                  saida.set(can, prof, lin, col, ((col == maxId) ? 1 : 0));
                }
             }
          }

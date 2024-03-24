@@ -56,8 +56,8 @@ public class OpTensor4D{
 
       for(int i = 0; i < destino.dim3(); i++){
          for(int j = 0; j < destino.dim4(); j++){
-            destino.editar(dimB[0], dimB[1], i, j, (
-               tensor.elemento(dimA[0], dimA[1], i, j)
+            destino.set(dimB[0], dimB[1], i, j, (
+               tensor.get(dimA[0], dimA[1], i, j)
             ));
          }
       }
@@ -75,8 +75,8 @@ public class OpTensor4D{
 
       for(int i = 0; i < tensor.dim3(); i++){
          for(int j = 0; j < tensor.dim4(); j++){
-            t.editar(0, 0, j, i, (
-               tensor.elemento(dim1, dim2, i, j)
+            t.set(0, 0, j, i, (
+               tensor.get(dim1, dim2, i, j)
             ));
          }
       }
@@ -128,7 +128,7 @@ public class OpTensor4D{
       for(int i = 0; i < linhas; i++){
          for(int j = 0; j < colunas; j++){
             r.add(0, idProfundidade, i, j, (
-               b.elemento(0, idProfundidade, i, j)
+               b.get(0, idProfundidade, i, j)
             ));
          }
       }
@@ -167,8 +167,8 @@ public class OpTensor4D{
       Tensor4D res = new Tensor4D(1, 1, linhas, colunas);
       for(int i = 0; i < linhas; i++){
          for(int j = 0; j < colunas; j++){
-            res.editar(0, idProfundidade, i, j, (
-               a.elemento(0, idProfundidade, i, j) + b.elemento(0, idProfundidade, i, j)
+            res.set(0, idProfundidade, i, j, (
+               a.get(0, idProfundidade, i, j) + b.get(0, idProfundidade, i, j)
             ));
          }
       }
@@ -217,8 +217,8 @@ public class OpTensor4D{
       int linhas = r.dim3(), colunas = r.dim4();
       for(int i = 0; i < linhas; i++){
          for(int j = 0; j < colunas; j++){
-            r.editar(0, idProfundidade, i, j, (
-               a.elemento(0, idProfundidade, i, j) - b.elemento(0, idProfundidade, i, j)
+            r.set(0, idProfundidade, i, j, (
+               a.get(0, idProfundidade, i, j) - b.get(0, idProfundidade, i, j)
             ));
          }
       }
@@ -257,8 +257,8 @@ public class OpTensor4D{
       Tensor4D res = new Tensor4D(1, 1, linhas, colunas);
       for(int i = 0; i < linhas; i++){
          for(int j = 0; j < colunas; j++){
-            res.editar(0, idProfundidade, i, j, (
-               a.elemento(0, idProfundidade, i, j) - b.elemento(0, idProfundidade, i, j)
+            res.set(0, idProfundidade, i, j, (
+               a.get(0, idProfundidade, i, j) - b.get(0, idProfundidade, i, j)
             ));
          }
       }
@@ -310,9 +310,9 @@ public class OpTensor4D{
          for(int j = 0; j < rCol; j++){
             res = 0;
             for(int k = 0; k < aCol; k++){
-               res += a.elemento(dim1, dim2, i, k) * b.elemento(dim1, dim2, k, j);
+               res += a.get(dim1, dim2, i, k) * b.get(dim1, dim2, k, j);
             }
-            r.editar(dim1, dim2, i, j, res);
+            r.set(dim1, dim2, i, j, res);
          }
       }
    }
@@ -369,8 +369,8 @@ public class OpTensor4D{
       int linhas = r.dim3(), colunas = r.dim4();
       for(int i = 0; i < linhas; i++){
          for(int j = 0; j < colunas; j++){
-            r.editar(dim1, dim2, i, j, (
-               a.elemento(dim1, dim2, i, j) * b.elemento(dim1, dim2, i, j)
+            r.set(dim1, dim2, i, j, (
+               a.get(dim1, dim2, i, j) * b.get(dim1, dim2, i, j)
             ));
          }
       }
@@ -420,8 +420,8 @@ public class OpTensor4D{
       int linhas = res.dim3(), colunas = res.dim4();
       for(int i = 0; i < linhas; i++){
          for(int j = 0; j < colunas; j++){
-            res.editar(dim1, dim2, i, j, (
-               a.elemento(dim1, dim2, i, j) * b.elemento(dim1, dim2, i, j)
+            res.set(dim1, dim2, i, j, (
+               a.get(dim1, dim2, i, j) * b.get(dim1, dim2, i, j)
             ));
          }
       }
@@ -451,7 +451,7 @@ public class OpTensor4D{
       int cont = 0;
       for(int i = 0; i < tensor.dim3(); i++){
          for(int j = 0; j < tensor.dim4(); j++){
-            arr[cont] = tensor.elemento(dim1, dim2, i, j);
+            arr[cont] = tensor.get(dim1, dim2, i, j);
             cont++;
          }
       }
@@ -459,7 +459,7 @@ public class OpTensor4D{
       cont = 0;
       for(int i = 0; i < tensor.dim3(); i++){
          for(int j = 0; j < tensor.dim4(); j++){
-            invertido.editar(dim1, dim2, i, j, arr[cont]);
+            invertido.set(dim1, dim2, i, j, arr[cont]);
             cont++;
          }
       }
@@ -530,8 +530,8 @@ public class OpTensor4D{
             for(m = 0; m < alturaKernel; m++){
                posX = i + m;
                for(n = 0; n < larguraKernel; n++){
-                  soma += entrada.elemento(idEn[0], idEn[1], posX, j+n) * 
-                           kernel.elemento(idK[0], idK[1], m, n);
+                  soma += entrada.get(idEn[0], idEn[1], posX, j+n) * 
+                           kernel.get(idK[0], idK[1], m, n);
                }
             }
             saida.add(idS[0], idS[1], i, j, soma);
@@ -644,8 +644,8 @@ public class OpTensor4D{
                posX = i + m;
                for(n = 0; n < larguraKernel; n++){
                   posY = j + n;
-                  soma += entrada.elemento(idEn[0], idEn[1], posX, posY) * 
-                        rotacionado.elemento(idK[0], idK[1], m, n);
+                  soma += entrada.get(idEn[0], idEn[1], posX, posY) * 
+                        rotacionado.get(idK[0], idK[1], m, n);
                }
             }
             saida.add(idS[0], idS[1], i, j, soma);
@@ -759,8 +759,8 @@ public class OpTensor4D{
   
                   if(posX >= 0 && posX < linEntrada && posY >= 0 && posY < colEntrada){
                      res += 
-                        entrada.elemento(idEn[0], idEn[1], posX, posY) * 
-                        kernel.elemento(idK[0], idK[1], k, l);
+                        entrada.get(idEn[0], idEn[1], posX, posY) * 
+                        kernel.get(idK[0], idK[1], k, l);
                   }
                }
             }

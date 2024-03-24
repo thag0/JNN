@@ -68,7 +68,7 @@ class SerialConv{
             for(int j = 0; j < camada.filtros.dim2(); j++){
                for(int k = 0; k < camada.filtros.dim3(); k++){
                   for(int l = 0; l < camada.filtros.dim4(); l++){
-                     escreverDado(camada.filtros.elemento(i, j, k, l), tipo, bw);
+                     escreverDado(camada.filtros.get(i, j, k, l), tipo, bw);
                      bw.newLine();
                   }
                }

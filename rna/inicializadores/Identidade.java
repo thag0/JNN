@@ -21,7 +21,7 @@ public class Identidade extends Inicializador{
          for(int p = 0; p < profundidade; p++){
             for(int i = 0; i < tensor.dim3(); i++){
                for(int j = 0; j < tensor.dim4(); j++){
-                  tensor.editar(c, p, i, j, (
+                  tensor.set(c, p, i, j, (
                      (i == j ? 1 : 0)
                   ));
                }
@@ -37,7 +37,7 @@ public class Identidade extends Inicializador{
       for(int p = 0; p < profundidade; p++){
          for(int i = 0; i < tensor.dim3(); i++){
             for(int j = 0; j < tensor.dim4(); j++){
-               tensor.editar(dim1, p, i, j, (
+               tensor.set(dim1, p, i, j, (
                   (i == j ? 1 : 0)
                ));
             }
@@ -49,7 +49,7 @@ public class Identidade extends Inicializador{
    public void inicializar(Tensor4D tensor, int dim1, int dim2){
       for(int i = 0; i < tensor.dim3(); i++){
          for(int j = 0; j < tensor.dim4(); j++){
-            tensor.editar(dim1, dim2, i, j, (
+            tensor.set(dim1, dim2, i, j, (
                (i == j ? 1 : 0)
             ));
          }
@@ -59,7 +59,7 @@ public class Identidade extends Inicializador{
    @Override
    public void inicializar(Tensor4D tensor, int dim1, int dim2, int dim3){
       for(int j = 0; j < tensor.dim4(); j++){
-         tensor.editar(dim1, dim2, dim3, j, (
+         tensor.set(dim1, dim2, dim3, j, (
             (dim3 == j ? 1 : 0)
          ));
       }
