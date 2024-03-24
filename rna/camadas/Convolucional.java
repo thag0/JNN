@@ -551,7 +551,7 @@ public class Convolucional extends Camada implements Cloneable{
          this.gradBias  = new Tensor4D(bias.shape());
       }
 
-      configurarNomes();
+      setNomes();
       
       this.treinavel = true;
       this.construida = true;//camada pode ser usada.
@@ -575,17 +575,17 @@ public class Convolucional extends Camada implements Cloneable{
    }
 
    @Override
-   public void configurarAtivacao(Object ativacao){
+   public void setAtivacao(Object ativacao){
       this.ativacao = new Dicionario().obterAtivacao(ativacao);
    }
 
    @Override
-   public void configurarBias(boolean usarBias){
+   public void setBias(boolean usarBias){
       this.usarBias = usarBias;
    }
 
    @Override
-   protected void configurarNomes(){
+   protected void setNomes(){
       entrada.nome("entrada");
       gradEntrada.nome("gradiente entrada");
       filtros.nome("kernel");

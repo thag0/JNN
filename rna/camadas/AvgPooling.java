@@ -270,7 +270,7 @@ public class AvgPooling extends Camada{
       this.gradEntrada = new Tensor4D(this.entrada);
       this.saida = new Tensor4D(formSaida);
 
-      configurarNomes();
+      setNomes();
 
       this.construida = true;//camada pode ser usada
    }
@@ -279,7 +279,7 @@ public class AvgPooling extends Camada{
    public void inicializar(){}
 
    @Override
-   protected void configurarNomes(){
+   protected void setNomes(){
       this.entrada.nome("Entrada");
       this.gradEntrada.nome("Gradiente entrada");
       this.saida.nome("Saída");

@@ -176,7 +176,7 @@ public class Dropout extends Camada implements Cloneable{
       this.saida =       new Tensor4D(this.entrada.shape());
       this.gradEntrada = new Tensor4D(this.entrada.shape());
 
-      configurarNomes();
+      setNomes();
       
       this.construida = true;//camada pode ser usada
    }
@@ -189,12 +189,12 @@ public class Dropout extends Camada implements Cloneable{
     * camada.
     * @param seed nova seed.
     */
-   public void configurarSeed(long seed){
+   public void setSeed(long seed){
       this.random.setSeed(seed);
    }
 
    @Override
-   protected void configurarNomes(){
+   protected void setNomes(){
       entrada.nome("entrada");
       mascara.nome("máscara");
       saida.nome("saida");

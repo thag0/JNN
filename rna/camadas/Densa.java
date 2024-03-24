@@ -350,14 +350,14 @@ public class Densa extends Camada implements Cloneable{
       this.gradSaida =   new Tensor4D(saida.shape());
       this.gradEntrada = new Tensor4D(this.entrada.shape());
 
-      configurarNomes();
+      setNomes();
       
       this.treinavel = true;//camada pode ser treinada.
       this.construida = true;//camada pode ser usada.
    }
 
    @Override
-   public void configurarSeed(long seed){
+   public void setSeed(long seed){
       this.iniKernel.configurarSeed(seed);
       this.iniBias.configurarSeed(seed);
    }
@@ -374,17 +374,17 @@ public class Densa extends Camada implements Cloneable{
    }
 
    @Override
-   public void configurarAtivacao(Object ativacao){
+   public void setAtivacao(Object ativacao){
       this.ativacao = new Dicionario().obterAtivacao(ativacao);
    }
 
    @Override
-   public void configurarBias(boolean usarBias){
+   public void setBias(boolean usarBias){
       this.usarBias = usarBias;
    }
 
    @Override
-   protected void configurarNomes(){
+   protected void setNomes(){
       entrada.nome("entrada");
       pesos.nome("kernel");
       saida.nome("saida");

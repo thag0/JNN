@@ -276,7 +276,7 @@ public class MaxPooling extends Camada{
       this.gradEntrada = new Tensor4D(this.entrada);
       this.saida = new Tensor4D(formSaida);
 
-      configurarNomes();
+      setNomes();
 
       this.construida = true;//camada pode ser usada
    }
@@ -285,7 +285,7 @@ public class MaxPooling extends Camada{
    public void inicializar(){}
 
    @Override
-   protected void configurarNomes(){
+   protected void setNomes(){
       this.entrada.nome("entrada");
       this.gradEntrada.nome("gradiente entrada");
       this.saida.nome("saída");

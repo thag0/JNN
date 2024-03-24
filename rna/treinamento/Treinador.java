@@ -95,7 +95,7 @@ public class Treinador{
    private void executar(Modelo modelo, Object entradas, Object[] saidas, int epochs, int tamLote, boolean logs){
       // por enquanto só pra uso da camada de dropout
       for(int i = 0; i < modelo.numCamadas(); i++){
-         modelo.camada(i).configurarTreino(true);
+         modelo.camada(i).setTreino(true);
       }
 
       if(tamLote > 1){
@@ -121,7 +121,7 @@ public class Treinador{
       }
 
       for(int i = 0; i < modelo.numCamadas(); i++){
-         modelo.camada(i).configurarTreino(false);
+         modelo.camada(i).setTreino(false);
       }
 
       treino.ultimoUsado = treinoLote.ultimoUsado ? false : true;

@@ -181,7 +181,7 @@ public class RedeNeural extends Modelo implements Cloneable{
       super.verificarCompilacao();
       
       for(Camada camada : this.camadas){
-         camada.configurarAtivacao(ativacao);
+         camada.setAtivacao(ativacao);
       }
    }
 
@@ -219,7 +219,7 @@ public class RedeNeural extends Modelo implements Cloneable{
       super.verificarCompilacao();
       
       for(Camada camada : this.camadas){
-         camada.configurarAtivacao(ativacao);
+         camada.setAtivacao(ativacao);
       }
    }
 
@@ -261,7 +261,7 @@ public class RedeNeural extends Modelo implements Cloneable{
          );
       }
 
-      camada.configurarAtivacao(ativacao);
+      camada.setAtivacao(ativacao);
    }
 
    /**
@@ -302,7 +302,7 @@ public class RedeNeural extends Modelo implements Cloneable{
          );
       }
 
-      camada.configurarAtivacao(ativacao);
+      camada.setAtivacao(ativacao);
    }
 
    /**
@@ -469,20 +469,20 @@ public class RedeNeural extends Modelo implements Cloneable{
    public void compilar(Object otimizador, Object perda){
       camadas = new Densa[arquitetura.length-1];
       camadas[0] = new Densa(arquitetura[1]);
-      camadas[0].configurarBias(bias);
+      camadas[0].setBias(bias);
       camadas[0].construir(new int[]{arquitetura[0]});
 
       Dicionario dic = new Dicionario();
       for(int i = 1; i < camadas.length; i++){
          camadas[i] = new Densa(arquitetura[i+1]);
-         camadas[i].configurarBias(bias);
+         camadas[i].setBias(bias);
          camadas[i].construir(camadas[i-1].formatoSaida());
       }
 
       for(int i = 0; i < camadas.length; i++){
-         if(seedInicial != 0) camadas[i].configurarSeed(seedInicial);
+         if(seedInicial != 0) camadas[i].setSeed(seedInicial);
          camadas[i].inicializar();
-         camadas[i].configurarId(i);
+         camadas[i].setId(i);
       }
 
       this.perda = dic.obterPerda(perda);

@@ -121,7 +121,7 @@ class SerialDensa{
          boolean bias = Boolean.valueOf(br.readLine());
          
          Densa camada = new Densa(saida[1], ativacao);
-         camada.configurarBias(bias);
+         camada.setBias(bias);
          camada.construir(entrada);
          return camada;
       }catch(Exception e){

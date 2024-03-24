@@ -274,7 +274,7 @@ public class Serializador{
             if(nome.equals("Densa")){
                br.readLine();//entrada
                br.readLine();//saida
-               rede.camada(i).configurarAtivacao(br.readLine());
+               rede.camada(i).setAtivacao(br.readLine());
                rede.configurarBias(Boolean.valueOf(br.readLine()));
                auxDensa.lerPesos(rede.camada(i), br);
             }
@@ -344,7 +344,7 @@ public class Serializador{
 
          modelo.compilado = true;
          for(int i = 0; i < modelo.numCamadas(); i++){
-            modelo.camada(i).configurarId(i);
+            modelo.camada(i).setId(i);
          }
          otimizador.construir(modelo.camadas());
 

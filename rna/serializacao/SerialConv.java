@@ -149,8 +149,8 @@ class SerialConv{
          int numFiltros = saida[0];
 
          Convolucional camada = new Convolucional(formFiltro, numFiltros);
-         camada.configurarAtivacao(ativacao);
-         camada.configurarBias(bias);
+         camada.setAtivacao(ativacao);
+         camada.setBias(bias);
          camada.construir(entrada);
 
          return camada;

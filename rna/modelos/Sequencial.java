@@ -277,9 +277,9 @@ public class Sequencial extends Modelo implements Cloneable{
       }
 
       for(int i = 0; i < camadas.length; i++){
-         if(seedInicial != 0) camadas[i].configurarSeed(seedInicial);
+         if(seedInicial != 0) camadas[i].setSeed(seedInicial);
          camadas[i].inicializar();
-         camadas[i].configurarId(i);
+         camadas[i].setId(i);
       }
       
       Dicionario dicio = new Dicionario();

@@ -102,8 +102,7 @@ public abstract class Camada{
    protected void verificarConstrucao(){
       if(this.construida == false){
          throw new IllegalArgumentException(
-            "\nCamada " + this.getClass().getSimpleName() + 
-            " (" + this.id + ") não foi construída."
+            "\nCamada " + nome() + " (id = " + this.id + ") não foi construída."
          );
       }
    }
@@ -143,10 +142,10 @@ public abstract class Camada{
     * @param ativacao nova função de ativação.
     * @throws IllegalArgumentException se a função de ativação fornecida for nula.
     */
-   public void configurarAtivacao(Object ativacao){
+   public void setAtivacao(Object ativacao){
       throw new UnsupportedOperationException(
-         "\nImplementar configuração da função de ativação da camada " + nome() + "."
-      );
+         "\nCamada " + nome() + " não possui configuração de função de ativação."
+      );    
    }
 
    /**
@@ -154,7 +153,7 @@ public abstract class Camada{
     * qual posição a camada está localizada.
     * @param id id da camada.
     */
-   public void configurarId(int id){
+   public void setId(int id){
       if(id < 0){
          throw new IllegalArgumentException(
             "\nO id da camada deve conter um positivo também podendo ser zero, " + 
@@ -172,10 +171,10 @@ public abstract class Camada{
     * </p>
     * @param usarBias uso do bias.
     */
-   public void configurarBias(boolean usarBias){
+   public void setBias(boolean usarBias){
       throw new UnsupportedOperationException(
-         "\nImplementar configuração de bias da camada " + nome() + "."
-      );     
+         "\nCamada " + nome() + " não possui configuração de bias."
+      );    
    }
 
    /**
@@ -183,7 +182,7 @@ public abstract class Camada{
     * @param treinando caso verdadeiro a camada será configurada para
     * treino, caso contrário, será usada para testes/predições.
     */
-   public void configurarTreino(boolean treinando){
+   public void setTreino(boolean treinando){
       this.treinando = true;
    }
 
@@ -192,9 +191,9 @@ public abstract class Camada{
     * camada.
     * @param seed nova seed.
     */
-   public void configurarSeed(long seed){
+   public void setSeed(long seed){
       throw new UnsupportedOperationException(
-         "\nImplementar configuração de seed da camada " + nome() + "."
+         "\nCamada " + nome() + " não possui configuração de seed."
       ); 
    }
 
@@ -202,10 +201,10 @@ public abstract class Camada{
     * Configura os nomes dos tensores usados pela camada, com intuito estético
     * e de debug
     */
-   protected void configurarNomes(){
+   protected void setNomes(){
       throw new UnsupportedOperationException(
-         "\nImplementar configuração de nomes para os tensores da camada " + nome()
-      );
+         "\nCamada " + nome() + " não possui configuração para nomes de atributos."
+      );  
    }
 
    /**
@@ -239,8 +238,8 @@ public abstract class Camada{
     */
    public Ativacao ativacao(){
       throw new UnsupportedOperationException(
-         "\nImplementar retorno da função de ativação da camada " + nome() + "."
-      );
+         "\nCamada " + nome() + " não possui função de ativação."
+      );  
    }
    
    /**
@@ -275,8 +274,8 @@ public abstract class Camada{
     */
    public double[] saidaParaArray(){
       throw new UnsupportedOperationException(
-         "\nImplementar retorno de saída para array da camada" + nome() + "."
-      );   
+         "\nCamada " + nome() + " não possui retorno de saída para array."
+      );    
    }
 
    /**
@@ -285,8 +284,8 @@ public abstract class Camada{
     */
    public int tamanhoSaida(){
       throw new UnsupportedOperationException(
-         "\nImplementar retorno de tamanho da saída da camada " + nome() + "."
-      );        
+         "\nCamada " + nome() + " não possui retorno de tamanho da saída."
+      );      
    }
 
    /**
@@ -305,8 +304,8 @@ public abstract class Camada{
     */
    public boolean temBias(){
       throw new UnsupportedOperationException(
-         "\nImplementar uso do bias na camada " + nome() + "."
-      );  
+         "\nCamada " + nome() + " não possui verificação de bias."
+      );
    }
 
    /**
@@ -322,8 +321,8 @@ public abstract class Camada{
     */
    public Tensor4D kernel(){
       throw new UnsupportedOperationException(
-         "\nImplementar retorno do kernel da camada " + nome() + "."
-      );       
+         "\nCamada " + nome() + " não possui kernel."
+      );
    }
 
    /**
@@ -339,8 +338,8 @@ public abstract class Camada{
     */
    public double[] kernelParaArray(){
       throw new UnsupportedOperationException(
-         "\nImplementar retorno do kernel da camada " + nome() + "."
-      );       
+         "\nCamada " + nome() + " não possui kernel."
+      );  
    }
 
    /**
@@ -350,8 +349,8 @@ public abstract class Camada{
     */
    public double[] gradKernelParaArray(){
       throw new UnsupportedOperationException(
-         "\nImplementar retorno do gradiente para o kernel da camada" + nome() + "."
-      );       
+         "\nCamada " + nome() + " não possui gradiente para kernel."
+      );   
    }
 
    /**
@@ -368,8 +367,8 @@ public abstract class Camada{
     */
    public Tensor4D bias(){
       throw new UnsupportedOperationException(
-         "\nImplementar retorno do bias da camada " + nome() + "."
-      );        
+         "\nCamada " + nome() + " não possui bias."
+      );      
    }
 
    /**
@@ -386,8 +385,8 @@ public abstract class Camada{
     */
    public double[] biasParaArray(){
       throw new UnsupportedOperationException(
-         "\nImplementar retorno do bias da camada " + nome() + "."
-      );        
+         "\nCamada " + nome() + " não possui bias."
+      );    
    }
 
    /**
@@ -397,8 +396,8 @@ public abstract class Camada{
     */
    public double[] gradBias(){
       throw new UnsupportedOperationException(
-         "\nImplementar retorno do gradiente para o bias da camada" + nome() + "."
-      );        
+         "\nCamada " + nome() + " não possui gradiente para bias."
+      );      
    }
 
    /**
@@ -408,19 +407,8 @@ public abstract class Camada{
     */
    public Object gradEntrada(){
       throw new UnsupportedOperationException(
-         "\nImplementar retorno do gradiente de entrada da camada " + nome() + "."
-      );     
-   }
-
-   /**
-    * Ajusta os valores dos gradientes para o kernel usando os valores 
-    * contidos no array fornecido.
-    * @param grads novos valores de gradientes.
-    */
-   public void editarGradienteKernel(double[] grads){
-      throw new UnsupportedOperationException(
-         "\nImplementar edição do gradiente para o kernel para a camada " + nome() + "."
-      );
+         "\nCamada " + nome() + " não possui gradiente de entrada."
+      );    
    }
 
    /**
@@ -430,19 +418,19 @@ public abstract class Camada{
     */
    public void editarKernel(double[] kernel){
       throw new UnsupportedOperationException(
-         "\nImplementar edição do kernel para a camada " + nome() + "."
-      );
+         "\nCamada " + nome() + " não possui edição de kernel."
+      ); 
    }
 
    /**
-    * Ajusta os valores dos gradientes para o bias usando os valores 
+    * Ajusta os valores dos gradientes para o kernel usando os valores 
     * contidos no array fornecido.
     * @param grads novos valores de gradientes.
     */
-   public void editarGradienteBias(double[] grads){
+   public void editarGradienteKernel(double[] grads){
       throw new UnsupportedOperationException(
-         "\nImplementar edição do gradiente para o bias para a camada " + nome() + "."
-      );
+         "\nCamada " + nome() + " não possui edição de gradiente para kernel."
+      );    
    }
 
    /**
@@ -452,8 +440,19 @@ public abstract class Camada{
     */
    public void editarBias(double[] bias){
       throw new UnsupportedOperationException(
-         "\nImplementar edição do bias para a camada " + nome() + "."
-      );
+         "\nCamada " + nome() + " não possui edição de bias."
+      ); 
+   }
+
+   /**
+    * Ajusta os valores dos gradientes para o bias usando os valores 
+    * contidos no array fornecido.
+    * @param grads novos valores de gradientes.
+    */
+   public void editarGradienteBias(double[] grads){
+      throw new UnsupportedOperationException(
+         "\nCamada " + nome() + " não possui edição de gradiente para bias."
+      );  
    }
 
    /**
@@ -461,7 +460,7 @@ public abstract class Camada{
     */
    public void zerarGradientes(){
       throw new UnsupportedOperationException(
-         "\nImplementar reset para gradientes da camada " + nome() + "."
+         "\nCamada " + nome() + " não possui kernel/bias para zerar."
       );
    }
 
@@ -470,8 +469,8 @@ public abstract class Camada{
     * @return clone da camada.
     */
    public Camada clonar(){
-      throw new IllegalArgumentException(
-         "\nImplementar clonagem para a camada " + nome() + "." 
+      throw new UnsupportedOperationException(
+         "\nCamada " + nome() + " não possui suporte para clonagem."
       );
    }
 
