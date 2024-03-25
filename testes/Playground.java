@@ -54,11 +54,8 @@ public class Playground{
 
       var tensor = new Tensor4D(2, 2);
       tensor.preencherContador(true);
+      tensor.reformatar(1, 1, 4, 1);
       tensor.print(0);
-      
-      var valor = tensor.get(0, 0, 1, 1);
-      System.out.println(valor);
-
    }
 
    /**

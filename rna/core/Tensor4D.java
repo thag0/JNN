@@ -305,51 +305,6 @@ public class Tensor4D{
     * <pre>
     *tensor = [
     *  [
-    *    [[1.0, 2.0],
-    *     [3.0, 4.0]]
-    *  ]
-    *]
-    *
-    *tensor.reformatar(1, 1, 1, 4);
-    *
-    *tensor = [
-    *  [
-    *    [[1.0, 2.0, 3.0, 4.0]]
-    *  ]
-    *]
-    * </pre>
-    * @param dim1 novo valor para primeira dimensão.
-    * @param dim2 novo valor para segunda dimensão.
-    * @param dim3 novo valor para terceira dimensão.
-    * @param dim4 novo valor para quarta dimensão.
-    */
-   public void reformatar(int dim1, int dim2, int dim3, int dim4){
-      if((dim1 < 1) || (dim2 < 1) || (dim3 < 1) || (dim4 < 1)){
-         throw new IllegalArgumentException(
-            "\nOs novos valores de dimensões devem ser maiores que zero."
-         );
-      }
-
-      if((dim1*dim2*dim3*dim4) != tamanho()){
-         throw new IllegalArgumentException(
-            "\nA quatidade de elementos com as novas dimensões (" + (dim1*dim2*dim3*dim4) + 
-            ") deve ser igual a quantidade de elementos do tensor (" + tamanho() + ")."
-         );
-      }
-
-      copiarDimensoes(dim1, dim2, dim3, dim4);
-   }
-
-   /**
-    * Configura o novo formato para o tensor.
-    * <p>
-    *    A configuração não altera o conteúdo do tensor, e sim a forma
-    *    como os dados são tratados e acessados.
-    * </p>
-    * Exemplo:
-    * <pre>
-    *tensor = [
-    *  [
     *    [[1, 2],
     *     [3, 4]]
     *  ]  
@@ -366,30 +321,37 @@ public class Tensor4D{
     * </pre>
     * @param indices array contendo os novos índices (dim1, dim2, dim3, dim4).
     */
-   public void reformatar(int[] indices){
-      if(indices == null){
+   public void reformatar(int... indices){
+      if(indices.length == 0 || indices.length > 4){
          throw new IllegalArgumentException(
-            "\nO array de íncides fonecido é nulo."
+            "\nQuantidade de índices deve ser de no máximo 4, recebido " + 
+            indices.length + "."
          );
       }
 
-      if(indices.length == 1){
-         reformatar(1, 1, 1, indices[0]);
-      
-      }else if(indices.length == 2){
-         reformatar(1, 1, indices[0], indices[1]);
-      
-      }else if(indices.length == 2){
-         reformatar(1, indices[0], indices[1], indices[2]);
-      
-      }else if(indices.length == 2){
-         reformatar(indices[0], indices[1], indices[2], indices[3]);
-      
-      }else{
+      //novas dimensões
+      int[] dims = {1, 1, 1, 1};
+
+      int tam1 = dims.length;
+      int tam2 = indices.length;
+      for(int i = 0; i < tam2; i++){
+         dims[tam1 - 1 - i] = indices[tam2 - 1 - i];
+      }
+
+      if((dims[0] < 1) || (dims[1] < 1) || (dims[2] < 1) || (dims[3] < 1)){
          throw new IllegalArgumentException(
-            "\nO array de índices deve conter pelo menos 4 elementos, recebido: " + indices.length
+            "\nOs novos valores de dimensões devem ser maiores que zero."
          );
       }
+
+      if((dims[0]*dims[1]*dims[2]*dims[3]) != tamanho()){
+         throw new IllegalArgumentException(
+            "\nA quatidade de elementos com as novas dimensões (" + (dims[0]*dims[1]*dims[2]*dims[3]) + 
+            ") deve ser igual a quantidade de elementos do tensor (" + tamanho() + ")."
+         );
+      }
+
+      copiarDimensoes(dims[0], dims[1], dims[2], dims[3]);
    }
 
    /**
