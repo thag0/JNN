@@ -36,7 +36,7 @@ public class TesteModelos{
 
       String atv1 = "sigmoid";
       String atv2 = "sigmoid";
-      String otm = "rmsprop";
+      String otm = "adagrad";
       String perda = "mse";
 
       Sequencial seq = new Sequencial(new Camada[]{
