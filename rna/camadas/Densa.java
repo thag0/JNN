@@ -1,6 +1,5 @@
 package rna.camadas;
 
-import lib.ged.Ged;
 import rna.ativacoes.Ativacao;
 import rna.ativacoes.Linear;
 import rna.core.Dicionario;
@@ -322,7 +321,6 @@ public class Densa extends Camada implements Cloneable{
       }
 
       int[] formatoEntrada = (int[]) entrada;
-      new Ged().imprimirArray(formatoEntrada, ("formato entrada id=" + id));
       if(utils.apenasMaiorZero(formatoEntrada) == false){
          throw new IllegalArgumentException(
             "\nOs valores recebidos para o formato de entrada devem ser maiores que zero."
