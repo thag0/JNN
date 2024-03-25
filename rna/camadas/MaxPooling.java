@@ -352,7 +352,7 @@ public class MaxPooling extends Camada{
                   }
                }
             }
-            saida.set(0, prof, i, j, maxValor);
+            saida.set(maxValor, 0, prof, i, j);
          }
       }
    }
@@ -395,7 +395,7 @@ public class MaxPooling extends Camada{
       int larguraGradSeguinte = gradSeguinte.dim4();
   
       for(int i = 0; i < alturaGradSeguinte; i++){
-          for(int j = 0; j < larguraGradSeguinte; j++){
+         for(int j = 0; j < larguraGradSeguinte; j++){
             int linInicio = i * this.stride[0];
             int colInicio = j * this.stride[1];
             int linFim = Math.min(linInicio + this.formFiltro[0], alturaEntrada);
@@ -405,8 +405,8 @@ public class MaxPooling extends Camada{
             int linMaximo = posicaoMaximo[0];
             int colMaximo = posicaoMaximo[1];
   
-            double valorGradSeguinte = gradSeguinte.get(0, prof, i, j);
-            gradEntrada.set(0, prof, linMaximo, colMaximo, valorGradSeguinte);
+            double grad = gradSeguinte.get(0, prof, i, j);
+            gradEntrada.set(grad, 0, prof, linMaximo, colMaximo);
          }
       }
    }

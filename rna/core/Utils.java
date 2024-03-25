@@ -18,9 +18,10 @@ public class Utils{
    public int ultimoIndice(Object arr){
       if(arr instanceof int[]){
          int[] a = (int[]) arr;
-         if(a.length == 1){
-            return 0;
+         if(a.length == 0){
+            throw new IllegalArgumentException("\nArray de tamanho 0.");
          }
+
          return a.length-1;
       }else{
          throw new IllegalArgumentException(
@@ -189,7 +190,7 @@ public class Utils{
             
             }else if(idArray == 3){//escalar
                amostras[i] = new Tensor4D(1, 1, 1, 1);
-               amostras[i].set(0, 0, 0, 0, t.get(0, 0, 0, i));
+               amostras[i].set(t.get(0, 0, 0, i), 0, 0, 0, 0);
             }
 
             amostras[i].nome("amostra " + (i+1));//ajudar no debug

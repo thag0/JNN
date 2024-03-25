@@ -255,6 +255,14 @@ public class Sequencial extends Modelo implements Cloneable{
          for(int i = 0; i < camadas.length; i++){
             camadas[i] = temp[i + 1];
          }
+
+         if(camadas.length == 0){
+            throw new IllegalStateException(
+               "\nO modelo não possui camadas para compilar."
+            );
+         }
+
+         camadas[0].construir(formato);
       
       }else{
          if(camadas[0].construida == false){
@@ -265,19 +273,14 @@ public class Sequencial extends Modelo implements Cloneable{
          }
       }
 
-      if(camadas.length == 0){
-         throw new IllegalStateException(
-            "\nO modelo não possui camadas para compilar."
-         );
-      }
-
-      camadas[0].construir(formato);
-      for(int i = 1; i < camadas.length; i++){
-         camadas[i].construir(camadas[i-1].formatoSaida());
-      }
-
       for(int i = 0; i < camadas.length; i++){
-         if(seedInicial != 0) camadas[i].setSeed(seedInicial);
+         if(i != 0){
+            camadas[i].construir(camadas[i-1].formatoSaida());
+         }
+
+         if(seedInicial != 0){
+            camadas[i].setSeed(seedInicial);
+         }
          camadas[i].inicializar();
          camadas[i].setId(i);
       }

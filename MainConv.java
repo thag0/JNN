@@ -16,7 +16,7 @@ public class MainConv{
    static Ged ged = new Ged();
    static Geim geim = new Geim();
 
-   static final int NUM_DIGITOS_TREINO = 10;
+   static final int NUM_DIGITOS_TREINO = 3;
    static final int NUM_DIGITOS_TESTE  = NUM_DIGITOS_TREINO;
    static final int NUM_AMOSTRAS_TREINO = 300;
    static final int NUM_AMOSTRAS_TESTE  = 100;

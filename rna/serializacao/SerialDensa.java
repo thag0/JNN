@@ -141,7 +141,7 @@ class SerialDensa{
          for(int i = 0; i < linPesos; i++){
             for(int j = 0; j < colPesos; j++){
                double p = Double.parseDouble(br.readLine());
-               camada.pesos.set(0, 0, i, j, p);
+               camada.pesos.set(p, 0, 0, i, j);
             }
          }
          
@@ -149,7 +149,7 @@ class SerialDensa{
             int colBias = camada.bias.dim4();        
             for(int i = 0; i < colBias; i++){
                double b = Double.parseDouble(br.readLine());
-               camada.bias.set(0, 0, 0, i, b);
+               camada.bias.set(b, 0, 0, 0, i);
             }
          }
       }catch(Exception e){

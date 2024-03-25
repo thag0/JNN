@@ -346,7 +346,7 @@ public class AvgPooling extends Camada{
                }
             }
 
-            saida.set(0, prof, i, j, (soma/cont));
+            saida.set((soma/cont), 0, prof, i, j);
          }
       }
    }
@@ -400,7 +400,7 @@ public class AvgPooling extends Camada{
 
             for(int lin = linInicio; lin < linFim; lin++){
                for(int col = colInicio; col < colFim; col++){
-                  gradEntrada.set(0, prof, lin, col, mediaGrad);
+                  gradEntrada.set(mediaGrad, 0, prof, lin, col);
                }
             }
          }

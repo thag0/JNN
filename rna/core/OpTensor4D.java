@@ -56,9 +56,7 @@ public class OpTensor4D{
 
       for(int i = 0; i < destino.dim3(); i++){
          for(int j = 0; j < destino.dim4(); j++){
-            destino.set(dimB[0], dimB[1], i, j, (
-               tensor.get(dimA[0], dimA[1], i, j)
-            ));
+            destino.set(tensor.get(dimA[0], dimA[1], i, j), dimB[0], dimB[1], i, j);
          }
       }
    }
@@ -75,9 +73,7 @@ public class OpTensor4D{
 
       for(int i = 0; i < tensor.dim3(); i++){
          for(int j = 0; j < tensor.dim4(); j++){
-            t.set(0, 0, j, i, (
-               tensor.get(dim1, dim2, i, j)
-            ));
+            t.set(tensor.get(dim1, dim2, i, j), 0, 0, j, i);
          }
       }
 
@@ -167,9 +163,8 @@ public class OpTensor4D{
       Tensor4D res = new Tensor4D(1, 1, linhas, colunas);
       for(int i = 0; i < linhas; i++){
          for(int j = 0; j < colunas; j++){
-            res.set(0, idProfundidade, i, j, (
-               a.get(0, idProfundidade, i, j) + b.get(0, idProfundidade, i, j)
-            ));
+            res.set((a.get(0, idProfundidade, i, j) + b.get(0, idProfundidade, i, j)),
+             0, idProfundidade, i, j);
          }
       }
 
@@ -217,9 +212,8 @@ public class OpTensor4D{
       int linhas = r.dim3(), colunas = r.dim4();
       for(int i = 0; i < linhas; i++){
          for(int j = 0; j < colunas; j++){
-            r.set(0, idProfundidade, i, j, (
-               a.get(0, idProfundidade, i, j) - b.get(0, idProfundidade, i, j)
-            ));
+            r.set((a.get(0, idProfundidade, i, j) - b.get(0, idProfundidade, i, j)), 
+            0, idProfundidade, i, j);
          }
       }
    }
@@ -257,9 +251,8 @@ public class OpTensor4D{
       Tensor4D res = new Tensor4D(1, 1, linhas, colunas);
       for(int i = 0; i < linhas; i++){
          for(int j = 0; j < colunas; j++){
-            res.set(0, idProfundidade, i, j, (
-               a.get(0, idProfundidade, i, j) - b.get(0, idProfundidade, i, j)
-            ));
+            res.set((a.get(0, idProfundidade, i, j) - b.get(0, idProfundidade, i, j)), 
+            0, idProfundidade, i, j);
          }
       }
 
@@ -312,7 +305,7 @@ public class OpTensor4D{
             for(int k = 0; k < aCol; k++){
                res += a.get(dim1, dim2, i, k) * b.get(dim1, dim2, k, j);
             }
-            r.set(dim1, dim2, i, j, res);
+            r.set(res, dim1, dim2, i, j);
          }
       }
    }
@@ -369,9 +362,8 @@ public class OpTensor4D{
       int linhas = r.dim3(), colunas = r.dim4();
       for(int i = 0; i < linhas; i++){
          for(int j = 0; j < colunas; j++){
-            r.set(dim1, dim2, i, j, (
-               a.get(dim1, dim2, i, j) * b.get(dim1, dim2, i, j)
-            ));
+            r.set((a.get(dim1, dim2, i, j) * b.get(dim1, dim2, i, j)), 
+            dim1, dim2, i, j);
          }
       }
    }
@@ -420,9 +412,8 @@ public class OpTensor4D{
       int linhas = res.dim3(), colunas = res.dim4();
       for(int i = 0; i < linhas; i++){
          for(int j = 0; j < colunas; j++){
-            res.set(dim1, dim2, i, j, (
-               a.get(dim1, dim2, i, j) * b.get(dim1, dim2, i, j)
-            ));
+            res.set((a.get(dim1, dim2, i, j) * b.get(dim1, dim2, i, j)), 
+            dim1, dim2, i, j);
          }
       }
 
@@ -459,7 +450,7 @@ public class OpTensor4D{
       cont = 0;
       for(int i = 0; i < tensor.dim3(); i++){
          for(int j = 0; j < tensor.dim4(); j++){
-            invertido.set(dim1, dim2, i, j, arr[cont]);
+            invertido.set(arr[cont], dim1, dim2, i, j);
             cont++;
          }
       }

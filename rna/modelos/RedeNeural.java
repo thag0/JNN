@@ -636,8 +636,8 @@ public class RedeNeural extends Modelo implements Cloneable{
                   salvo = camada.pesos.get(0, 0, i, j);
                   camada.pesos.add(0, 0, i, j, eps);
                   double d = (avaliador().erroMedioQuadrado(entradas, saidas) - custo) / eps;
-                  camada.gradPesos.set(0, 0, i, j, d);
-                  camada.pesos.set(0, 0, i, j, salvo);
+                  camada.gradPesos.set(d, 0, 0, i, j);
+                  camada.pesos.set(salvo, 0, 0, i, j);
                }
             }
             for(int i = 0; i < linhas; i++){
@@ -645,8 +645,8 @@ public class RedeNeural extends Modelo implements Cloneable{
                   salvo = camada.bias.get(0, 0, i, j);
                   camada.bias.add(0, 0, i, j, eps);
                   double d = (avaliador().erroMedioQuadrado(entradas, saidas) - custo) / eps;
-                  camada.gradSaida.set(0, 0, i, j, d);
-                  camada.bias.set(0, 0, i, j, salvo);    
+                  camada.gradSaida.set(d, 0, 0, i, j);
+                  camada.bias.set(salvo, 0, 0, i, j);    
                }
             }
          }

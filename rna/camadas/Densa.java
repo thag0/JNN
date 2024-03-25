@@ -1,5 +1,6 @@
 package rna.camadas;
 
+import lib.ged.Ged;
 import rna.ativacoes.Ativacao;
 import rna.ativacoes.Linear;
 import rna.core.Dicionario;
@@ -321,10 +322,11 @@ public class Densa extends Camada implements Cloneable{
       }
 
       int[] formatoEntrada = (int[]) entrada;
+      new Ged().imprimirArray(formatoEntrada, ("formato entrada id=" + id));
       if(utils.apenasMaiorZero(formatoEntrada) == false){
          throw new IllegalArgumentException(
             "\nOs valores recebidos para o formato de entrada devem ser maiores que zero."
-         );       
+         );
       }
 
       this.tamEntrada = formatoEntrada[utils.ultimoIndice(formatoEntrada)];
@@ -758,7 +760,7 @@ public class Densa extends Camada implements Cloneable{
       int cont = 0, lin = gradPesos.dim3(), col = gradPesos.dim4();
       for(int i = 0; i < lin; i++){
          for(int j = 0; j < col; j++){
-            gradPesos.set(0, 0, i, j, grads[cont++]);
+            gradPesos.set(grads[cont++], 0, 0, i, j);
          }
       }
    }
@@ -780,7 +782,7 @@ public class Densa extends Camada implements Cloneable{
       int cont = 0;
       for(int i = 0; i < pesos.dim3(); i++){
          for(int j = 0; j < pesos.dim4(); j++){
-            this.pesos.set(0, 0, i, j, kernel[cont++]);
+            this.pesos.set(kernel[cont++], 0, 0, i, j);
          }
       }
    }
@@ -796,7 +798,7 @@ public class Densa extends Camada implements Cloneable{
 
       int cont = 0;
       for(int i = 0; i < this.bias.dim4(); i++){
-         this.bias.set(0, 0, 0, i, bias[cont++]);
+         this.bias.set(bias[cont++], 0, 0, 0, i);
       }
    }
 

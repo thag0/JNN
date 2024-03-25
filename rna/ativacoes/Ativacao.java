@@ -104,9 +104,7 @@ public abstract class Ativacao{
                for(int l = 0; l < dim4; l++){
                   e = entrada.get(i, j, k, l);
                   g = gradiente.get(i, j, k, l);
-                  saida.set(i, j, k, l, (
-                     dx.applyAsDouble(e) * g
-                  ));
+                  saida.set((dx.applyAsDouble(e) * g), i, j, k, l);
                }
             }
          }

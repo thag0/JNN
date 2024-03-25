@@ -42,6 +42,8 @@ import java.util.function.DoubleUnaryOperator;
  *    [3.0, 3.0]]]
  *]
  * </pre>
+ * @author Thiago Barroso, acadêmico de Engenharia da Computação pela Universidade Federal do Pará, 
+ * Campus Tucuruí. Fevereiro/2023.
  */
 public class Tensor4D{
 
@@ -407,25 +409,17 @@ public class Tensor4D{
 
    /**
     * Retorna o elemento do tensor de acordo com os índices fornecidos.
-    * @param dim1 índice da primeira dimensão.
-    * @param dim2 índice da segunda dimensão.
-    * @param dim3 índice da terceira dimensão.
-    * @param dim4 índice da quarta dimensão.
+    * <p>
+    *    O formato dos índices deve se dar por: {@code (dim1, dim2, dim3, dim4)}
+    * </p>
+    * @param indices índices desejados para busca.
     * @return valor de acordo com os índices.
     */
-   public double get(int dim1, int dim2, int dim3, int dim4){
-      return dados[indice(dim1, dim2, dim3, dim4)];
-   }
-
-   /**
-    * Retorna o elemento do tensor de acordo com os índices fornecidos.
-    * @param indices array contendo os índices das dimensões (dim1, dim2, dim3, dim4).
-    * @return valor de acordo com os índices.
-    */
-   public double get(int[] indices){
+   public double get(int... indices){
       if(indices.length != 4){
          throw new IllegalArgumentException(
-            "\nO tamanho do array de índices deve ser 4, array recebido tem tamanho " + indices.length
+            "\nA quantidade de índices deve ser igual a 4, recebido " + 
+            indices.length + "."
          );
       }
 
@@ -433,28 +427,18 @@ public class Tensor4D{
    }
 
    /**
-    * Edita o conteúdo do tensor para que o valor fornecido esteja
-    * configurado de acordo com os índices fornecidos.
-    * @param dim1 índice da primeira dimensão.
-    * @param dim2 índice da segunda dimensão.
-    * @param dim3 índice da terceira dimensão.
-    * @param dim4 índice da quarta dimensão.
+    * Edita o valor do tensor usando o valor informado.
+    * <p>
+    *    O formato dos índices deve se dar por: {@code (dim1, dim2, dim3, dim4)}
+    * </p>
+    * @param indices índices para atribuição.
     * @param valor valor desejado.
     */
-   public void set(int dim1, int dim2, int dim3, int dim4, double valor){
-      dados[indice(dim1, dim2, dim3, dim4)] = valor;
-   }
-
-   /**
-    * Edita o conteúdo do tensor para que o valor fornecido esteja
-    * configurado de acordo com os índices fornecidos.
-    * @param indices array contendo os índices das dimensões (dim1, dim2, dim3, dim4).
-    * @param valor valor desejado.
-    */
-   public void set(int[] indices, double valor){
+   public void set(double valor, int... indices){
       if(indices.length != 4){
          throw new IllegalArgumentException(
-            "\nO tamanho do array de índices deve ser 4, array recebido tem tamanho " + indices.length
+            "\nA quantidade de índices deve ser igual a 4, recebido " + 
+            indices.length + "."
          );
       }
 
@@ -1206,7 +1190,7 @@ public class Tensor4D{
 
       for(int i = 0; i < quantidade; i++){
          for(int j = 0; j < dim4(); j++){
-            bloco.set(0, 0, i, j, arr[j]);
+            bloco.set(arr[j], 0, 0, i, j);
          }
       }
 
@@ -1237,7 +1221,7 @@ public class Tensor4D{
 
       for(int i = 0; i < dim3(); i++){
          for(int j = 0; j < dim4(); j++){
-            set(dim1, dim2, i, j, (i == j ? 1 : 0));
+            set((i == j ? 1 : 0), dim1, dim2, i, j);
          }
       }
    }
