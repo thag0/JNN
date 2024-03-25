@@ -313,7 +313,7 @@ public class Dropout extends Camada implements Cloneable{
          throw new IllegalArgumentException(
             "\nGradiente aceito para a camada de Dropout deve ser do tipo " + 
             this.gradEntrada.getClass().getTypeName() +
-            " ,objeto recebido é do tipo \"" + entrada.getClass().getTypeName() + "\"."
+            " ,objeto recebido é do tipo \"" + gradSeguinte.getClass().getTypeName() + "\"."
          );
       }
 
