@@ -211,6 +211,10 @@ public class Dropout extends Camada implements Cloneable{
     *    a máscara será usada como filtro para os dados de entrada e os valores de 
     *    unidades desativadas serão propagados como "0".
     * </p>
+    * <p>
+    *    Caso a camada não esteja {@code treinando}, por padrão a entrada é apenas
+    *    repassada para a saída da camada.
+    * </p>
     * <h3>
     *    Nota
     * </h3>
@@ -286,6 +290,10 @@ public class Dropout extends Camada implements Cloneable{
     * </h2>
     * Retropropaga os gradientes da camada suguinte, aplicando a máscara usada
     * no cálculo da saída.
+    * <p>
+    *    Caso a camada não esteja {@code treinando}, por padrão os gradientes são 
+    *    apenas repassados para o gradiente de entrada da camada.
+    * </p>
     * <h3>
     *    Nota
     * </h3>
@@ -317,7 +325,9 @@ public class Dropout extends Camada implements Cloneable{
          );
       }
 
-      gradEntrada.mult(mascara);
+      if(treinando){
+         gradEntrada.mult(mascara);
+      }
    }
 
    @Override
