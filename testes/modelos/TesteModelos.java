@@ -31,7 +31,7 @@ public class TesteModelos{
       int nEntradas = entrada[0].length;
       int nSaidas = saida[0].length;
       int nOcultas = 3;
-      long seed = 1;
+      long seed = 123456789L;
       int epocas = 10_000;
 
       String atv1 = "sigmoid";
@@ -66,11 +66,9 @@ public class TesteModelos{
       System.out.println();
       for(int i = 0; i < 2; i++){
          for(int j = 0; j < 2; j++){
-            seq.calcularSaida(new double[]{i, j});
-            rna.calcularSaida(new double[]{i, j});
-
-            double[] prevSeq = seq.saidaParaArray();
-            double[] prevRna = rna.saidaParaArray();
+            double[] e = {i, j};
+            double[] prevSeq = seq.calcularSaida(e).paraArray();
+            double[] prevRna = rna.calcularSaida(e).paraArray();
             System.out.println(i + " " + j + " - Rna: " + prevRna[0] + "      \t    Seq: " + prevSeq[0]);
          }
       }

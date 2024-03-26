@@ -97,11 +97,13 @@ public abstract class Ativacao{
       int dim2 = entrada.dim2();
       int dim3 = entrada.dim3();
       int dim4 = entrada.dim4();
+      int i, j, k, l;
       double e, g;
-      for(int i = 0; i < dim1; i++){
-         for(int j = 0; j < dim2; j++){
-            for(int k = 0; k < dim3; k++){
-               for(int l = 0; l < dim4; l++){
+
+      for(i = 0; i < dim1; i++){
+         for(j = 0; j < dim2; j++){
+            for(k = 0; k < dim3; k++){
+               for(l = 0; l < dim4; l++){
                   e = entrada.get(i, j, k, l);
                   g = gradiente.get(i, j, k, l);
                   saida.set((dx.applyAsDouble(e) * g), i, j, k, l);

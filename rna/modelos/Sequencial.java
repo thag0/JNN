@@ -275,6 +275,10 @@ public class Sequencial extends Modelo implements Cloneable{
          camadas[i].inicializar();
          camadas[i].setId(i);
       }
+
+      if(seedInicial != 0){
+         treinador.configurarSeed(seedInicial);
+      }
       
       Dicionario dicio = new Dicionario();
       this.perda = dicio.getPerda(perda);

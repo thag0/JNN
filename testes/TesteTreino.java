@@ -47,10 +47,9 @@ public class TesteTreino{
       Object[] arr = utils.transformarParaArray(entrada);
 
       for(int i = 0; i < arr.length; i++){
-         modelo.calcularSaida(arr[i]);
          System.out.println(
-            "R: " + saida[i][0] + 
-            " P: " + modelo.saidaParaArray()[0]
+            "Real: " + saida[i][0] + ",   " +  
+            "Prev: " + modelo.calcularSaida(arr[i]).get(0, 0, 0, 0)
          );
       }
    }
