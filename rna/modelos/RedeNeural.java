@@ -485,8 +485,8 @@ public class RedeNeural extends Modelo implements Cloneable{
          camadas[i].setId(i);
       }
 
-      this.perda = dic.obterPerda(perda);
-      this.otimizador = dic.obterOtimizador(otimizador);
+      this.perda = dic.getPerda(perda);
+      this.otimizador = dic.getOtimizador(otimizador);
 
       this.otimizador.construir(this.camadas);
 

@@ -394,9 +394,9 @@ public class Convolucional extends Camada implements Cloneable{
       shapeSaida[0] = nFiltros;
       
       Dicionario dicio = new Dicionario();
-      if(ativacao != null) this.ativacao = dicio.obterAtivacao(ativacao);
-      if(iniKernel != null) this.iniKernel = dicio.obterInicializador(iniKernel);
-      if(iniBias != null) this.iniBias = dicio.obterInicializador(iniBias);
+      if(ativacao != null) this.ativacao = dicio.getAtivacao(ativacao);
+      if(iniKernel != null) this.iniKernel = dicio.getInicializador(iniKernel);
+      if(iniBias != null) this.iniBias = dicio.getInicializador(iniBias);
    }
 
    /**
@@ -576,7 +576,7 @@ public class Convolucional extends Camada implements Cloneable{
 
    @Override
    public void setAtivacao(Object ativacao){
-      this.ativacao = new Dicionario().obterAtivacao(ativacao);
+      this.ativacao = new Dicionario().getAtivacao(ativacao);
    }
 
    @Override

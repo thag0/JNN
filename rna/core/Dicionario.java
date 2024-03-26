@@ -73,7 +73,7 @@ public class Dicionario{
     * @param ativacao tipo função de ativação.
     * @return instância da função de ativação lida.
     */
-   public Ativacao obterAtivacao(Object ativacao){
+   public Ativacao getAtivacao(Object ativacao){
       if(ativacao == null){
          throw new IllegalArgumentException(
             "Ativação não pode ser nula."
@@ -118,7 +118,7 @@ public class Dicionario{
     * @param otimizador tipode de otimizador.
     * @return instância do otimizador lido.
     */
-   public Otimizador obterOtimizador(Object otimizador){
+   public Otimizador getOtimizador(Object otimizador){
       if(otimizador == null){
          throw new IllegalArgumentException(
             "Otimizador não pode ser nulo."
@@ -157,7 +157,7 @@ public class Dicionario{
     * @param perda tipo de função de perda.
     * @return instância da função de perda lida.
     */
-   public Perda obterPerda(Object perda){
+   public Perda getPerda(Object perda){
       if(perda == null){
          throw new IllegalArgumentException(
             "Função de perda não pode ser nula."
@@ -193,7 +193,7 @@ public class Dicionario{
     * @param inicializador tipo de inicializador.
     * @return instância do inicializador lido.
     */
-   public Inicializador obterInicializador(Object inicializador){
+   public Inicializador getInicializador(Object inicializador){
       if(inicializador == null){
          throw new IllegalArgumentException(
             "Inicializador não pode ser nulo."

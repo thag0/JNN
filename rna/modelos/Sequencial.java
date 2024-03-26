@@ -286,8 +286,8 @@ public class Sequencial extends Modelo implements Cloneable{
       }
       
       Dicionario dicio = new Dicionario();
-      this.perda = dicio.obterPerda(perda);
-      this.otimizador = dicio.obterOtimizador(otimizador);
+      this.perda = dicio.getPerda(perda);
+      this.otimizador = dicio.getOtimizador(otimizador);
 
       this.otimizador.construir(camadas);
       
@@ -472,8 +472,8 @@ public class Sequencial extends Modelo implements Cloneable{
          clone.nome = "Clone de " + this.nome;
          
          Dicionario dic = new Dicionario();
-         clone.otimizador = dic.obterOtimizador(this.otimizador.getClass().getSimpleName());
-         clone.perda = dic.obterPerda(this.perda.getClass().getSimpleName());
+         clone.otimizador = dic.getOtimizador(this.otimizador.getClass().getSimpleName());
+         clone.perda = dic.getPerda(this.perda.getClass().getSimpleName());
          clone.seedInicial = this.seedInicial;
          clone.treinador = new Treinador();
          

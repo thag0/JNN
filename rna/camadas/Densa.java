@@ -262,9 +262,9 @@ public class Densa extends Camada implements Cloneable{
 
       //usar os valores padrão se necessário
       Dicionario dic = new Dicionario();
-      if(ativacao != null) this.ativacao = dic.obterAtivacao(ativacao);
-      if(iniKernel != null) this.iniKernel = dic.obterInicializador(iniKernel);
-      if(iniBias != null)  this.iniBias = dic.obterInicializador(iniBias);
+      if(ativacao != null) this.ativacao = dic.getAtivacao(ativacao);
+      if(iniKernel != null) this.iniKernel = dic.getInicializador(iniKernel);
+      if(iniBias != null)  this.iniBias = dic.getInicializador(iniBias);
    }
 
    /**
@@ -375,7 +375,7 @@ public class Densa extends Camada implements Cloneable{
 
    @Override
    public void setAtivacao(Object ativacao){
-      this.ativacao = new Dicionario().obterAtivacao(ativacao);
+      this.ativacao = new Dicionario().getAtivacao(ativacao);
    }
 
    @Override
@@ -647,7 +647,7 @@ public class Densa extends Camada implements Cloneable{
          Densa clone = (Densa) super.clone();
 
          clone.optensor = new OpTensor4D();
-         clone.ativacao = new Dicionario().obterAtivacao(this.ativacao.getClass().getSimpleName());
+         clone.ativacao = new Dicionario().getAtivacao(this.ativacao.getClass().getSimpleName());
          clone.treinavel = this.treinavel;
 
          clone.usarBias = this.usarBias;

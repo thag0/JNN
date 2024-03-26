@@ -266,7 +266,7 @@ public class Serializador{
          rede.compilar();
 
          for(int i = 0; i < rede.numCamadas(); i++){
-            rede.configurarAtivacao(rede.camada(i), dicio.obterAtivacao(ativacoesStr[i]));
+            rede.configurarAtivacao(rede.camada(i), dicio.getAtivacao(ativacoesStr[i]));
          }
 
          for(int i = 0; i < rede.numCamadas(); i++){
@@ -301,8 +301,8 @@ public class Serializador{
 
       try(BufferedReader br = new BufferedReader(new FileReader(caminho))){
          int numCamadas = Integer.parseInt(br.readLine());
-         Otimizador otimizador = dicio.obterOtimizador(br.readLine().trim());
-         Perda perda = dicio.obterPerda(br.readLine().trim());
+         Otimizador otimizador = dicio.getOtimizador(br.readLine().trim());
+         Perda perda = dicio.getPerda(br.readLine().trim());
       
          modelo.configurarOtimizador(otimizador);
          modelo.configurarPerda(perda);
