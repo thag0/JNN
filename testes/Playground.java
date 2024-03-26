@@ -52,10 +52,33 @@ public class Playground{
    public static void main(String[] args){
       ged.limparConsole();
 
-      var tensor = new Tensor4D(2, 2);
-      tensor.preencherContador(true);
-      tensor.reformatar(1, 1, 4, 1);
-      tensor.print(0);
+      double[][] entrada = {
+         {0, 0},
+         {0, 1},
+         {1, 0},
+         {1, 1}
+      };
+
+      double[][] saida = {
+         {0},
+         {1},
+         {1},
+         {0}
+      };
+
+      var modelo = new RedeNeural(2, 3, 1);
+
+      modelo.compilar("adagrad", "mse");
+      modelo.configurarAtivacao("sigmoid");
+      
+      modelo.treinar(entrada, saida, 10_000, false);
+      System.out.println("Perda: " + modelo.avaliar(entrada, saida));
+
+      var prev = modelo.calcularSaidas(entrada);
+
+      for(var tensor : prev){
+         tensor.print(4);
+      }
    }
 
    /**

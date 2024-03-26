@@ -150,6 +150,28 @@ public class Utils{
    }
 
    /**
+    * Verifica se o objeto recebido é nulo.
+    * @param obj objeto de comparação.
+    * @param mensagem mensagem personalizada de erro.
+    * @throws NullPointerException caso o objeto seja nulo.
+    */
+   public void validarNaoNulo(Object obj, String mensagem){
+      if(obj == null){
+         String str;
+
+         if(mensagem == null){
+            str = "Objeto recebido é nulo.";
+            
+         }else{
+            mensagem = mensagem.trim();
+            str = mensagem.isEmpty() ? "Objeto recebido é nulo." : mensagem;
+         }
+
+         throw new NullPointerException("\n" + str);
+      }
+   }
+
+   /**
     * Transforma a entrada num array de amostras.
     * <p>
     *    Até o momento criei esse método para usar com os tensores.

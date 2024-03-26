@@ -3,6 +3,7 @@ package rna.modelos;
 import rna.avaliacao.Avaliador;
 import rna.avaliacao.perda.Perda;
 import rna.camadas.Camada;
+import rna.core.Tensor4D;
 import rna.core.Utils;
 import rna.otimizadores.Otimizador;
 import rna.treinamento.Treinador;
@@ -68,6 +69,11 @@ public abstract class Modelo{
     * </p>
     */
    protected Avaliador avaliador = new Avaliador(this);
+
+   /**
+    * Utilitário.
+    */
+   Utils utils = new Utils();
    
    /**
     * Inicializa um modelo vazio, sem implementações de métodos.
@@ -89,8 +95,11 @@ public abstract class Modelo{
     * @param nome novo nome da rede.
     */
    public void configurarNome(String nome){
-      if((nome != null) && (nome.isBlank() == false || nome.isEmpty() == false)){
-         this.nome = nome;
+      if(nome != null){
+         String s = nome.trim();
+         if(!s.isEmpty()){
+            this.nome = s;
+         }
       }
    }
 
@@ -124,8 +133,8 @@ public abstract class Modelo{
     * @param calcular se verdadeiro, o modelo armazenará o histórico de perda durante cada época.
     */
    public void configurarHistorico(boolean calcular){
-      this.calcularHistorico = calcular;
-      this.treinador.configurarHistoricoCusto(calcular);
+      calcularHistorico = calcular;
+      treinador.configurarHistoricoCusto(calcular);
    }
 
    /**
@@ -134,9 +143,7 @@ public abstract class Modelo{
     * @param perda nova função de perda.
     */
    public void configurarPerda(Perda perda){
-      if(perda == null){
-         throw new IllegalArgumentException("\nA função de perda não pode ser nula.");
-      }
+      utils.validarNaoNulo(perda, "A função de perda não pode ser nula.");
 
       this.perda = perda;
    }
@@ -162,9 +169,7 @@ public abstract class Modelo{
     * @param otimizador novo otimizador.
     */
    public void configurarOtimizador(Otimizador otimizador){
-      if(otimizador == null){
-         throw new IllegalArgumentException("\nO novo otimizador não pode ser nulo.");
-      }
+      utils.validarNaoNulo(otimizador, "O novo otimizador não pode ser nulo.");
 
       this.otimizador = otimizador;
    }
@@ -205,18 +210,18 @@ public abstract class Modelo{
    }
 
    /**
-    * Propaga os dados de entrada através das camadas do modelo.
-    * @param entrada dados de entrada que serão processados, o tipo
-    * de dado depende do tipo da camada inicial do modelo.
+    * Alimenta o modelo com os dados de entrada.
+    * @param entrada dados de entrada que serão propagados através do modelo.
+    * @return {@code Tensor} contendo a saída prevista pelo modelo.
     */
-   public abstract void calcularSaida(Object entrada);
+   public abstract Tensor4D calcularSaida(Object entrada);
 
    /**
-    * Propaga os dados de entrada através das camadas do modelo.
-    * @param entradas array contendo multiplas entradas.
-    * @return array contendo as saídas correspondentes.
+    * Alimenta o modelo com vários dados de entrada.
+    * @param entradas array contendo multiplas entradas para testar o modelo.
+    * @return array de {@code Tensor} contendo as previsões correspondentes.
     */
-   public abstract Object[] calcularSaidas(Object[] entradas);
+   public abstract Tensor4D[] calcularSaidas(Object[] entradas);
 
    /**
     * Zera os gradientes acumulados do modelo.
@@ -228,17 +233,16 @@ public abstract class Modelo{
 
    /**
     * Treina o modelo de acordo com as configurações predefinidas.
-    * <p>
-    *    Certifique-se de configurar adequadamente o modelo para obter os 
-    *    melhores resultados.
-    * </p>
     * @param entradas dados de entrada do treino (features).
-    * @param saidas dados de saída correspondente a entrada (class).
+    * @param saidas dados de saída correspondente a entrada (classes).
     * @param epochs quantidade de épocas de treinamento.
     * @param logs logs para perda durante as épocas de treinamento.
     */
    public void treinar(Object entradas, Object[] saidas, int epochs, boolean logs){
       verificarCompilacao();
+
+      utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
+      utils.validarNaoNulo(saidas, "Dados de saida não podem ser nulos.");
 
       if(epochs < 1){
          throw new IllegalArgumentException(
@@ -250,11 +254,8 @@ public abstract class Modelo{
    }
    
    /**
-    * Treina o modelo de acordo com as configurações predefinidas.
-    * <p>
-    *    Certifique-se de configurar adequadamente o modelo para obter os 
-    *    melhores resultados.
-    * </p>
+    * Treina o modelo de acordo com as configurações predefinidas utilizando o
+    * treinamento em lotes.
     * @param entradas dados de entrada do treino (features).
     * @param saidas dados de saída correspondente a entrada (class).
     * @param epochs quantidade de épocas de treinamento.
@@ -263,6 +264,9 @@ public abstract class Modelo{
     */
    public void treinar(Object entradas, Object[] saidas, int epochs, int tamLote, boolean logs){
       verificarCompilacao();
+
+      utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
+      utils.validarNaoNulo(saidas, "Dados de saida não podem ser nulos.");
 
       if(epochs < 1){
          throw new IllegalArgumentException(
@@ -290,10 +294,11 @@ public abstract class Modelo{
    public double avaliar(Object entrada, Object[] saida){
       verificarCompilacao();
 
-      //por enquanto uma instância local
-      Utils utils = new Utils();
-      Object[] amostras = utils.transformarParaArray(entrada);
+      utils.validarNaoNulo(entrada, "Dados de entrada não podem ser nulos.");
+      utils.validarNaoNulo(saida, "Dados de saida não podem ser nulos.");
 
+      //por enquanto uma instância local
+      Object[] amostras = utils.transformarParaArray(entrada);
  
       if(amostras.length != saida.length){
          throw new IllegalArgumentException(
@@ -321,8 +326,11 @@ public abstract class Modelo{
    }
 
    /**
-    * Retorna o avaliador do modelo, ele contém diferentes métodos de métricas úteis
-    * para medir o desempenho da rede.
+    * Retorna o avaliador do modelo, 
+    * <p>
+    *    O avaliador contém diferentes métodos de métricas úteis
+    *    para medir seu desempenho.
+    * </p>
     * @return avaliador do modelo.
     */
    public Avaliador avaliador(){
@@ -330,7 +338,7 @@ public abstract class Modelo{
    }
 
    /**
-    * Retorna o otimizador que está sendo usado para o treino do modelo.
+    * Retorna o otimizador configurado para o treino do modelo modelo.
     * @return otimizador atual do modelo.
     */
    public abstract Otimizador otimizador();
@@ -372,6 +380,8 @@ public abstract class Modelo{
     */
    public void copiarDaSaida(double[] arr){
       double[] saida = saidaParaArray();
+
+      utils.validarNaoNulo(arr, "O array de cópia não pode ser nulo.");
       
       if(saida.length != arr.length){
          throw new IllegalArgumentException(

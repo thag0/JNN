@@ -6,6 +6,7 @@ import rna.avaliacao.perda.Perda;
 import rna.camadas.Camada;
 import rna.camadas.Densa;
 import rna.core.Dicionario;
+import rna.core.Tensor4D;
 import rna.otimizadores.Otimizador;
 import rna.otimizadores.SGD;
 
@@ -507,26 +508,17 @@ public class RedeNeural extends Modelo implements Cloneable{
     * de entrada da rede.
     */
    @Override
-   public void calcularSaida(Object entrada){
-      super.verificarCompilacao();
-      if(entrada instanceof double[] == false){
-         throw new IllegalArgumentException(
-            "A entrada para o modelo RedeNeural deve ser um array do tipo double[]."
-         );
-      }
-      double[] e = (double[]) entrada;
-      if(e.length != this.obterTamanhoEntrada()){
-         throw new IllegalArgumentException(
-            "Dimensões dos dados de entrada (" + e.length + 
-            ") com a camada de entrada (" + this.obterTamanhoEntrada() + 
-            ") incompatíveis."
-         );
-      }
+   public Tensor4D calcularSaida(Object entrada){
+      verificarCompilacao();
 
-      this.camadas[0].calcularSaida(e);
+      utils.validarNaoNulo(entrada, "Dados de entrada não pode ser nulo.");
+
+      this.camadas[0].calcularSaida(entrada);
       for(int i = 1; i < this.camadas.length; i++){
          this.camadas[i].calcularSaida(this.camadas[i-1].saida());
       }
+
+      return camadaSaida().saida().clone();
    }
 
    /**
@@ -545,46 +537,15 @@ public class RedeNeural extends Modelo implements Cloneable{
     * @return matriz contendo os resultados das predições da rede.
     */
    @Override
-   public double[][] calcularSaidas(Object[] entradas){
-      super.verificarCompilacao();
-      if(entradas instanceof double[][] == false){
-         throw new IllegalArgumentException(
-            "As entradas para o modelo RedeNeural devem ser uma matriz do tipo double[][]."
-         );
-      }        
-      
-      double[][] e = (double[][]) entradas;
-      int cols = e[0].length;
-      for(int i = 1; i < entradas.length; i++){
-         if(e[i].length != cols){
-            throw new IllegalArgumentException(
-               "As dimensões dos dados de entrada possuem tamanhos diferentes."
-            );
-         }
-      }
+   public Tensor4D[] calcularSaidas(Object[] entradas){
+      verificarCompilacao();
 
-      int nEntrada = this.obterTamanhoEntrada();
-      if(e[0].length != nEntrada){
-         throw new IllegalArgumentException(
-            "Dimensões dos dados de entrada (" + entradas.length +
-            ") e capacidade de entrada da rede (" + nEntrada + 
-            ") incompatíveis."
-         );
-      }
+      utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
 
-      //dimensões dos dados
-      int nAmostras = entradas.length;
-      int tamEntrada = this.obterTamanhoEntrada();
-      int tamSaida = this.obterTamanhoSaida();
-      double[][] previsoes = new double[nAmostras][tamSaida];
-      double[] entradaRede = new double[tamEntrada];
-      double[] saidaRede = new double[tamSaida];
+      Tensor4D[] previsoes = new Tensor4D[entradas.length];
 
-      for(int i = 0; i < nAmostras; i++){
-         System.arraycopy(entradas[i], 0, entradaRede, 0, e[i].length);
-         this.calcularSaida(entradaRede);
-         System.arraycopy(this.saidaParaArray(), 0, saidaRede, 0, saidaRede.length);
-         System.arraycopy(saidaRede, 0, previsoes[i], 0, saidaRede.length);
+      for(int i = 0; i < previsoes.length; i++){
+         previsoes[i] = calcularSaida(entradas[i]).clone();
       }
 
       return previsoes;

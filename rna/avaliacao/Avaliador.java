@@ -2,6 +2,7 @@ package rna.avaliacao;
 
 import rna.avaliacao.metrica.*;
 import rna.avaliacao.perda.*;
+import rna.core.Tensor4D;
 import rna.modelos.Modelo;
 
 public class Avaliador{
@@ -29,6 +30,35 @@ public class Avaliador{
    }
 
    /**
+    * Transforma o conteúdo de saída em um array double[][].
+    * @param saida
+    * @return
+    */
+   private double[][] saidaParaArray(Object[] saida){
+      double[][] s;
+      if(saida instanceof double[][]){
+         s = (double[][]) saida;
+      
+      }else if(saida instanceof Tensor4D[]){
+         Tensor4D[] arr = (Tensor4D[]) saida;
+         s = new double[arr.length][];
+
+         //por padrão usar só a primeira linha do tensor.
+         for(int i = 0; i < arr.length; i++){
+            s[i] = arr[i].array1D(0, 0, 0);
+         }
+      
+      }else{
+         throw new IllegalArgumentException(
+            "O formato de saída deve ser do tipo double[][] ou Tensor4D, recebido " +
+            saida.getClass().getTypeName()
+         );
+      }
+
+      return s;
+   }
+
+   /**
     * Calcula o erro médio quadrado da rede neural em relação aos dados previstos e reais.
     * @param previsto dados previstos.
     * @param real dados rotulados.
@@ -46,17 +76,12 @@ public class Avaliador{
     * @return valor do erro médio quadrado da rede em relação ao dados fornecidos (custo/perda).
     */
    public double erroMedioQuadrado(Object[] entrada, Object[] saida){
-      double[][] previsoes = (double[][]) modelo.calcularSaidas(entrada);
-      if(saida instanceof double[][] == false){
-         throw new IllegalArgumentException(
-            "O formato de saída deve ser uma matriz do tipo double[][]."
-         );
-      }
-      double[][] s = (double[][]) saida;
+      Tensor4D[] previsoes = modelo.calcularSaidas(entrada);
+      double[][] s = saidaParaArray(saida);
 
       double res = 0;
       for(int i = 0; i < saida.length; i++){
-         res += ema.calcular(previsoes[i], s[i]);
+         res += ema.calcular(previsoes[i].array1D(0, 0, 0), s[i]);
       }
 
       res /= saida.length;
@@ -85,17 +110,12 @@ public class Avaliador{
     * fornecidos (custo/perda).
     */
    public double erroMedioQuadradoLogaritmico(Object[] entrada, Object[] saida){
-      double[][] previsoes = (double[][]) modelo.calcularSaidas(entrada);
-      if(saida instanceof double[][] == false){
-         throw new IllegalArgumentException(
-            "O formato de saída deve ser uma matriz do tipo double[][]."
-         );
-      }
-      double[][] s = (double[][]) saida;
+      Tensor4D[] previsoes = modelo.calcularSaidas(entrada);
+      double[][] s = saidaParaArray(saida);
 
       double res = 0;
       for(int i = 0; i < saida.length; i++){
-         res += emql.calcular(previsoes[i], s[i]);
+         res += emql.calcular(previsoes[i].array1D(0, 0, 0), s[i]);
       }
 
       res /= saida.length;
@@ -120,17 +140,12 @@ public class Avaliador{
     * @return valor do erro médio abosoluto da rede em relação ao dados fornecidos (custo/perda).
     */
    public double erroMedioAbsoluto(Object[] entrada, Object[] saida){
-      double[][] previsoes = (double[][]) modelo.calcularSaidas(entrada);
-      if(saida instanceof double[][] == false){
-         throw new IllegalArgumentException(
-            "O formato de saída deve ser uma matriz do tipo double[][]."
-         );
-      }
-      double[][] s = (double[][]) saida;
+      Tensor4D[] previsoes = modelo.calcularSaidas(entrada);
+      double[][] s = saidaParaArray(saida);
 
       double res = 0;
       for(int i = 0; i < saida.length; i++){
-         res += ema.calcular(previsoes[i], s[i]);
+         res += ema.calcular(previsoes[i].array1D(0, 0, 0), s[i]);
       }
 
       res /= saida.length;
@@ -167,17 +182,12 @@ public class Avaliador{
     * @return entropia cruzada da rede em relação ao dados fornecidos (custo/perda).
     */
    public double entropiaCruzada(Object[] entrada, Object[] saida){  
-      double[][] previsoes = (double[][]) modelo.calcularSaidas(entrada);
-      if(saida instanceof double[][] == false){
-         throw new IllegalArgumentException(
-            "O formato de saída deve ser uma matriz do tipo double[][]."
-         );
-      }
-      double[][] s = (double[][]) saida;
+      Tensor4D[] previsoes = modelo.calcularSaidas(entrada);
+      double[][] s = saidaParaArray(saida);
 
       double res = 0;
       for(int i = 0; i < saida.length; i++){
-         res += ecc.calcular(previsoes[i], s[i]);
+         res += ecc.calcular(previsoes[i].array1D(0, 0, 0), s[i]);
       }
 
       res /= saida.length;
@@ -204,17 +214,12 @@ public class Avaliador{
     * @return valor da entropia cruzada binária.
     */
    public double entropiaCruzadaBinaria(Object[] entrada, Object[] saida){
-      double[][] previsoes = (double[][]) modelo.calcularSaidas(entrada);
-      if(saida instanceof double[][] == false){
-         throw new IllegalArgumentException(
-            "O formato de saída deve ser uma matriz do tipo double[][]."
-         );
-      }
-      double[][] s = (double[][]) saida;
+      Tensor4D[] previsoes = modelo.calcularSaidas(entrada);
+      double[][] s = saidaParaArray(saida);
 
       double res = 0;
       for(int i = 0; i < saida.length; i++){
-         res += ecb.calcular(previsoes[i], s[i]);
+         res += ecb.calcular(previsoes[i].array1D(0, 0, 0), s[i]);
       }
 
       res /= saida.length;

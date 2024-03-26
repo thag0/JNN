@@ -5,6 +5,7 @@ import rna.avaliacao.perda.Perda;
 import rna.camadas.Camada;
 import rna.camadas.Entrada;
 import rna.core.Dicionario;
+import rna.core.Tensor4D;
 import rna.otimizadores.Otimizador;
 import rna.treinamento.Treinador;
 
@@ -164,18 +165,10 @@ public class Sequencial extends Modelo implements Cloneable{
     * ou alguma camada contida seja.
     */
    public Sequencial(Camada[] camadas){
-      if(camadas == null){
-         throw new IllegalArgumentException(
-            "O conjunto de camadas fornecido é nulo."
-         );
-      }
+      utils.validarNaoNulo(camadas, "Conjunto de camadas não pode ser nulo.");
 
       for(int i = 0; i < camadas.length; i++){
-         if(camadas[i] == null){
-            throw new IllegalArgumentException(
-               "O conjunto de camadas fornecido possui uma camada nula, id = " + i
-            );
-         }
+         utils.validarNaoNulo(camadas[i], ("O conjunto de camadas fornecido possui uma camada nula, id = " + i));
       }
 
       this.camadas = new Camada[0];
@@ -202,9 +195,7 @@ public class Sequencial extends Modelo implements Cloneable{
     * @throws IllegalArgumentException se a camada fornecida for nula,
     */
    public void add(Camada camada){
-      if(camada == null){
-         throw new IllegalArgumentException("\nCamada fornecida é nula.");
-      }
+      utils.validarNaoNulo(camada, "Camada não pode ser nula.");
 
       Camada[] antigas = camadas;
       camadas = new Camada[antigas.length + 1];
@@ -295,25 +286,30 @@ public class Sequencial extends Modelo implements Cloneable{
    }
 
    @Override
-   public void calcularSaida(Object entrada){
+   public Tensor4D calcularSaida(Object entrada){
       verificarCompilacao();
+
+      utils.validarNaoNulo(entrada, "Dados de entrada não podem ser nulos.");
 
       camadas[0].calcularSaida(entrada);
       for(int i = 1; i < camadas.length; i++){
          camadas[i].calcularSaida(camadas[i-1].saida());
       }
+
+      return camadaSaida().saida().clone();
    }
 
    @Override
-   public Object[] calcularSaidas(Object[] entradas){
+   public Tensor4D[] calcularSaidas(Object[] entradas){
       verificarCompilacao();
 
+      utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
+
       //implementar uma melhor generalização futuramente
-      double[][] previsoes = new double[entradas.length][];
+      Tensor4D[] previsoes = new Tensor4D[entradas.length];
 
       for(int i = 0; i < previsoes.length; i++){
-         calcularSaida(entradas[i]);
-         previsoes[i] = saidaParaArray().clone();
+         previsoes[i] = calcularSaida(entradas[i]).clone();
       }
 
       return previsoes;
@@ -357,7 +353,7 @@ public class Sequencial extends Modelo implements Cloneable{
 
    @Override
    public Camada camadaSaida(){
-      if(camadas.length == 0){
+      if(camadas.length < 1){
          throw new UnsupportedOperationException(
             "\nO modelo não possui camadas adiciondas."
          );
@@ -379,12 +375,13 @@ public class Sequencial extends Modelo implements Cloneable{
 
    @Override
    public int numParametros(){
-      int parametros = 0;
+      int params = 0;
+
       for(Camada camada : camadas){
-         parametros += camada.numParametros();
+         params += camada.numParametros();
       }
 
-      return parametros;
+      return params;
    }
 
    @Override
@@ -471,15 +468,16 @@ public class Sequencial extends Modelo implements Cloneable{
          clone.calcularHistorico = this.calcularHistorico;
          clone.nome = "Clone de " + this.nome;
          
-         Dicionario dic = new Dicionario();
-         clone.otimizador = dic.getOtimizador(this.otimizador.getClass().getSimpleName());
-         clone.perda = dic.getPerda(this.perda.getClass().getSimpleName());
+         Dicionario dicio = new Dicionario();
+         clone.otimizador = dicio.getOtimizador(otimizador.nome());
+         clone.perda = dicio.getPerda(perda.nome());
          clone.seedInicial = this.seedInicial;
          clone.treinador = new Treinador();
          
-         clone.camadas = new Camada[this.numCamadas()];
-         for(int i = 0; i < this.camadas.length; i++){
-            clone.camadas[i] = this.camada(i).clonar();
+         int nCamadas = numCamadas();
+         clone.camadas = new Camada[nCamadas];
+         for(int i = 0; i < nCamadas; i++){
+            clone.camadas[i] = camada(i).clonar();
          }
          clone.compilado = this.compilado;
 
