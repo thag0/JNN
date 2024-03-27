@@ -24,8 +24,8 @@ public class Conv{
    static OpMatriz opmat = new OpMatriz();
    static OpTensor4D optensor = new OpTensor4D();
    static Serializador serializador = new Serializador();
-   static int amostras = 100;
-   static int digitos = 10;
+   static final int amostras = 100;
+   static final int digitos = 10;
 
    static final String CAMINHO_MODELOS = "./dados/modelosMNIST/";
    
@@ -33,14 +33,14 @@ public class Conv{
       ged.limparConsole();
 
       // String nomeModelo = "mlp-mnist-89";
-      String nomeModelo = "modelo-convolucional";
+      String nomeModelo = "conv-mnist-95";
       Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + nomeModelo + ".txt");
 
       testarPrevisao(modelo, "treino/3/img_1", true);
       testarPrevisao(modelo, "3_deslocado", true);
 
       // modelo.info();
-      // testarAcertosMNIST(modelo);
+      testarAcertosMNIST(modelo);
       // testarTodosDados(modelo);
 
       // Dados forward = tempoForward(modelo);//media 30/40 ms
@@ -55,21 +55,22 @@ public class Conv{
    }
 
    static void testarAcertosMNIST(Sequencial modelo){
-      String caminho = "/dados/mnist/teste/";
+      final String caminho = "/dados/mnist/teste/";
       
       double media = 0;
       for(int digito = 0; digito < digitos; digito++){
+
          double acertos = 0;
          for(int amostra = 0; amostra < amostras; amostra++){
             String caminhoImagem = caminho + digito + "/img_" + amostra + ".jpg";
             Tensor4D img = new Tensor4D(imagemParaMatriz(caminhoImagem));
             
-            modelo.calcularSaida(img);
-            double[] previsoes = modelo.saidaParaArray();
+            double[] previsoes = modelo.calcularSaida(img).paraArray();
             if(maiorIndice(previsoes) == digito){
                acertos++;
             }
          }
+
          double porcentagem = acertos / (double)amostras;
          media += porcentagem;
          System.out.println("Acertos " + digito + " -> " + porcentagem);
@@ -108,7 +109,7 @@ public class Conv{
 
       conv.calcularSaida(entrada);
 
-      System.out.println("Forward esperado: " + conv.saida.comparar(saidaEsperada));
+      System.out.println("Forward esperado: " + conv.saida().comparar(saidaEsperada));
    }
 
    /**
