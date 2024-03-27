@@ -1,6 +1,6 @@
 package rna.ativacoes;
 
-import rna.core.Tensor4D;
+import rna.camadas.Densa;
 
 public class TanH extends Ativacao{
 
@@ -15,15 +15,17 @@ public class TanH extends Ativacao{
    }
 
    @Override
-   public void derivada(Tensor4D entrada, Tensor4D gradiente, Tensor4D saida){
-      double[] e = entrada.paraArray();
-      double[] g = gradiente.paraArray();
-      double[] s = new double[e.length];
-   
-      for(int i = 0; i < e.length; i++){
-         s[i] = dx.applyAsDouble(e[i]) * g[i];
+   public void derivada(Densa densa){
+      //aproveitar os resultados pre calculados
+
+      double[] e = densa.saida.paraArray();
+      double[] g = densa.gradSaida.paraArray();
+      double[] d = new double[e.length];
+
+      for(int i = 0; i < d.length; i++){
+         d[i] = (1 - (e[i]*e[i])) * g[i];
       }
-      
-      saida.copiarElementos(s);
+
+      densa.gradSaida.copiarElementos(d);
    }
 }

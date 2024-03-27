@@ -324,7 +324,7 @@ public class Flatten extends Camada{
    }
 
    @Override
-   public Object gradEntrada(){
+   public Tensor4D gradEntrada(){
       verificarConstrucao();
       return this.gradEntrada;
    }

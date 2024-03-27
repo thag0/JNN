@@ -922,7 +922,7 @@ public class Convolucional extends Camada implements Cloneable{
    }
 
    @Override
-   public Object gradEntrada(){
+   public Tensor4D gradEntrada(){
       return gradEntrada; 
    }
 

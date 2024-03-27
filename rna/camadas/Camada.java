@@ -403,9 +403,9 @@ public abstract class Camada{
    /**
     * Retorna o gradiente de entrada da camada, dependendo do tipo
     * de camada, esse gradiente pode assumir diferentes tipos de objetos.
-    * @return gradiente de entrada da camada.
+    * @return {@code Tensor} contendo o gradiente de entrada da camada.
     */
-   public Object gradEntrada(){
+   public Tensor4D gradEntrada(){
       throw new UnsupportedOperationException(
          "\nCamada " + nome() + " não possui gradiente de entrada."
       );    
