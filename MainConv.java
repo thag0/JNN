@@ -34,7 +34,7 @@ public class MainConv{
       final var treinoY = criarRotulosMNIST(NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO);
 
       Sequencial modelo = criarModelo();
-      modelo.configurarHistorico(true);
+      modelo.setHistorico(true);
       modelo.info();
 
       // treinar e marcar tempo
@@ -81,7 +81,7 @@ public class MainConv{
          new Convolucional(new int[]{3, 3}, 22, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(126, "sigmoid"),
+         new Densa(128, "sigmoid"),
          new Dropout(0.2),
          new Densa(NUM_DIGITOS_TREINO, "softmax") 
       });

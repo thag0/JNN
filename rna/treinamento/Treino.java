@@ -30,7 +30,7 @@ class Treino{
     * Configura a seed inicial do gerador de números aleatórios.
     * @param seed nova seed.
     */
-   public void configurarSeed(long seed){
+   public void setSeed(long seed){
       this.random.setSeed(seed);
       this.aux.configurarSeed(seed);
    }
@@ -40,7 +40,7 @@ class Treino{
     * época de treinamento.
     * @param calcular caso verdadeiro, armazena os valores de custo da rede.
     */
-   public void configurarHistorico(boolean calcular){
+   public void setHistorico(boolean calcular){
       this.calcularHistorico = calcular;
    }
 

@@ -38,7 +38,7 @@ class TreinoLote{
     * Configura a seed inicial do gerador de números aleatórios.
     * @param seed nova seed.
     */
-    public void configurarSeed(long seed){
+    public void setSeed(long seed){
       this.random.setSeed(seed);
       this.aux.configurarSeed(seed);
    }
@@ -48,7 +48,7 @@ class TreinoLote{
     * época de treinamento.
     * @param calcularHistorico true armazena os valores de custo da rede, false não faz nada.
     */
-    public void configurarHistorico(boolean calcularHistorico){
+    public void setHistorico(boolean calcularHistorico){
       this.calcularHistorico = calcularHistorico;
    }
 

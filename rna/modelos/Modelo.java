@@ -94,7 +94,7 @@ public abstract class Modelo{
     * </p>
     * @param nome novo nome da rede.
     */
-   public void configurarNome(String nome){
+   public void setNome(String nome){
       if(nome != null){
          String s = nome.trim();
          if(!s.isEmpty()){
@@ -115,7 +115,7 @@ public abstract class Modelo{
     * </p>
     * @param seed nova seed.
     */
-   public void configurarSeed(long seed){
+   public void setSeed(long seed){
       this.seedInicial = seed;
    }
 
@@ -132,9 +132,9 @@ public abstract class Modelo{
     * </p>
     * @param calcular se verdadeiro, o modelo armazenará o histórico de perda durante cada época.
     */
-   public void configurarHistorico(boolean calcular){
+   public void setHistorico(boolean calcular){
       calcularHistorico = calcular;
-      treinador.configurarHistoricoCusto(calcular);
+      treinador.setHistorico(calcular);
    }
 
    /**
@@ -142,7 +142,7 @@ public abstract class Modelo{
     * de treinamento do modelo.
     * @param perda nova função de perda.
     */
-   public void configurarPerda(Perda perda){
+   public void setPerda(Perda perda){
       utils.validarNaoNulo(perda, "A função de perda não pode ser nula.");
 
       this.perda = perda;
@@ -168,7 +168,7 @@ public abstract class Modelo{
     * </ol>
     * @param otimizador novo otimizador.
     */
-   public void configurarOtimizador(Otimizador otimizador){
+   public void setOtimizador(Otimizador otimizador){
       utils.validarNaoNulo(otimizador, "O novo otimizador não pode ser nulo.");
 
       this.otimizador = otimizador;
@@ -202,7 +202,7 @@ public abstract class Modelo{
     * Auxiliar na verificação da compilação do modelo.
     */
    protected void verificarCompilacao(){
-      if(this.compilado == false){
+      if(!compilado){
          throw new IllegalStateException(
             "\nO modelo ainda não foi compilado."
          );
@@ -427,7 +427,7 @@ public abstract class Modelo{
     * @return array contendo o valor de perda durante cada época de treinamento do modelo.
     */
    public double[] historico(){
-      return treinador.obterHistorico();
+      return treinador.historico();
    }
 
    protected abstract String construirInfo();

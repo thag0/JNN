@@ -41,19 +41,19 @@ public class Treinador{
     * Configura a seed inicial do gerador de números aleatórios.
     * @param seed nova seed.
     */
-   public void configurarSeed(long seed){
-      this.treino.configurarSeed(seed);
-      this.treinoLote.configurarSeed(seed);
+   public void setSeed(long seed){
+      this.treino.setSeed(seed);
+      this.treinoLote.setSeed(seed);
    }
 
    /**
     * Configura o cálculo para o histórico de perdas durante o treinamento.
-    * @param calcularHistorico calcular ou não o histórico de custo.
+    * @param calcular calcular ou não o histórico de custo.
     */
-   public void configurarHistoricoCusto(boolean calcularHistorico){
-      this.calcularHistorico = calcularHistorico;
-      treino.configurarHistorico(calcularHistorico);
-      treinoLote.configurarHistorico(calcularHistorico);
+   public void setHistorico(boolean calcular){
+      this.calcularHistorico = calcular;
+      treino.setHistorico(calcular);
+      treinoLote.setHistorico(calcular);
    }
 
    /**
@@ -132,7 +132,7 @@ public class Treinador{
     * a cada época de treinamento.
     * @return lista com os custo por época durante a fase de treinamento.
     */
-   public double[] obterHistorico(){
+   public double[] historico(){
       Object[] historico = treino.ultimoUsado ? treino.historico() : treinoLote.historico();
       double[] h = new double[historico.length];
       for(int i = 0; i < h.length; i++){

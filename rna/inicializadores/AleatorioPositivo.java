@@ -36,7 +36,7 @@ public class AleatorioPositivo extends Inicializador{
          );
       }
 
-      super.configurarSeed(seed);
+      super.setSeed(seed);
       this.max = max;
    }
 

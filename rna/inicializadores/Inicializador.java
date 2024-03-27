@@ -39,7 +39,7 @@ public abstract class Inicializador{
     * Configura o início do gerador aleatório.
     * @param seed nova seed de início.
     */
-   public void configurarSeed(long seed){
+   public void setSeed(long seed){
       this.random.setSeed(seed);
    }
 

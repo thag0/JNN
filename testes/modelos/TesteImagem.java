@@ -36,7 +36,7 @@ public class TesteImagem{
          new Densa(7, "sigmoid"),
          new Densa(nSaida, "sigmoid"),
       });
-      modelo.configurarHistorico(true);
+      modelo.setHistorico(true);
       Otimizador otm = new SGD(0.001, 0.995);
       modelo.compilar(otm, new MSE());
       modelo.treinar(dadosEntrada, dadosSaida, 2_000, false);

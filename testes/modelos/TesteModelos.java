@@ -44,11 +44,11 @@ public class TesteModelos{
          new Densa(nOcultas, atv1),
          new Densa(nSaidas, atv2)
       });
-      seq.configurarSeed(seed);
+      seq.setSeed(seed);
       seq.compilar(otm, perda);
       
       RedeNeural rna = new RedeNeural(new int[]{nEntradas, nOcultas, nOcultas, nSaidas});
-      rna.configurarSeed(seed);
+      rna.setSeed(seed);
       rna.compilar(otm, perda);
       rna.configurarAtivacao(atv1);
       rna.configurarAtivacao(rna.camadaSaida(), atv2);

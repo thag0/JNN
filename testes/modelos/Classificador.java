@@ -53,7 +53,7 @@ public class Classificador{
 
       Otimizador otm = new SGD(0.001, 0.99);
       modelo.compilar(otm, "entropia-cruzada");
-      modelo.configurarHistorico(true);
+      modelo.setHistorico(true);
       modelo.info();
       
       //treinando e avaliando os resultados

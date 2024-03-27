@@ -293,7 +293,7 @@ public class Serializador{
     * Lê o arquivo de um modelo {@code Sequencial} serializado e converte numa
     * instância pré configurada.
     * @param caminho caminho onde está saldo o arquivo {@code .txt} do modelo;
-    * @return instância de um modelo {@code Sequencial} a partir do arquivo lido.
+    * @return modelo {@code Sequencial} lido a partir do arquivo.
     */
    public Sequencial lerSequencial(String caminho){
       Sequencial modelo = new Sequencial();
@@ -304,8 +304,8 @@ public class Serializador{
          Otimizador otimizador = dicio.getOtimizador(br.readLine().trim());
          Perda perda = dicio.getPerda(br.readLine().trim());
       
-         modelo.configurarOtimizador(otimizador);
-         modelo.configurarPerda(perda);
+         modelo.setOtimizador(otimizador);
+         modelo.setPerda(perda);
          for(int i = 0; i < numCamadas; i++){
             String nome = br.readLine();
             

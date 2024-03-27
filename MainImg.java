@@ -69,7 +69,7 @@ public class MainImg{
       modelo.compilar(otm, "mse");
       modelo.configurarAtivacao("tanh");
       modelo.configurarAtivacao(modelo.camadaSaida(), "sigmoid");
-      modelo.configurarHistorico(calcularHistorico);
+      modelo.setHistorico(calcularHistorico);
       
       return modelo;
    }
@@ -83,7 +83,7 @@ public class MainImg{
       });
 
       modelo.compilar(new SGD(0.001, 0.99), "mse");
-      modelo.configurarHistorico(calcularHistorico);
+      modelo.setHistorico(calcularHistorico);
 
       return modelo;
    }

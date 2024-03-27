@@ -33,7 +33,7 @@ public class Conv{
       ged.limparConsole();
 
       // String nomeModelo = "mlp-mnist-89";
-      String nomeModelo = "conv-mnist-95";
+      String nomeModelo = "modelo-convolucional";
       Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + nomeModelo + ".txt");
 
       testarPrevisao(modelo, "treino/3/img_1", true);
@@ -309,14 +309,13 @@ public class Conv{
       System.out.println("Acurácia: " + (acuraria * 100) + "%");
    }
 
-   static void testarPrevisao(Sequencial modelo, String imagemTeste, boolean prob){
+   static void testarPrevisao(Sequencial modelo, String caminhoImagem, boolean prob){
       double[][][] entrada = new double[1][][];
       String extensao = ".jpg";
-      entrada[0] = imagemParaMatriz("/dados/mnist/" + imagemTeste + extensao);
-      modelo.calcularSaida(entrada);
-      double[] previsao = modelo.saidaParaArray();
+      entrada[0] = imagemParaMatriz("/dados/mnist/" + caminhoImagem + extensao);
+      double[] previsao = modelo.calcularSaida(entrada).paraArray();
       
-      System.out.print("\nTestando: " + imagemTeste + extensao);
+      System.out.print("\nTestando: " + caminhoImagem + extensao);
       if(prob){
          System.out.println();
          for(int i = 0; i < previsao.length; i++){

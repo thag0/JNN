@@ -363,8 +363,8 @@ public class RedeNeural extends Modelo implements Cloneable{
     * @param otimizador novo otimizador.
     * @throws IllegalArgumentException se o novo otimizador for nulo.
     */
-   public void configurarOtimizador(Otimizador otimizador){
-      super.configurarOtimizador(otimizador);
+   public void setOtimizador(Otimizador otimizador){
+      super.setOtimizador(otimizador);
    }
 
    /**
@@ -487,7 +487,7 @@ public class RedeNeural extends Modelo implements Cloneable{
       }
 
       if(seedInicial != 0){
-         treinador.configurarSeed(seedInicial);
+         treinador.setSeed(seedInicial);
       }
 
       this.perda = dic.getPerda(perda);
@@ -813,7 +813,7 @@ public class RedeNeural extends Modelo implements Cloneable{
    @Override
    public double[] historico(){
       if(this.treinador.calcularHistorico){
-         return this.treinador.obterHistorico();   
+         return this.treinador.historico();   
       
       }else{
          throw new UnsupportedOperationException(

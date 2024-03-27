@@ -277,7 +277,7 @@ public class Sequencial extends Modelo implements Cloneable{
       }
 
       if(seedInicial != 0){
-         treinador.configurarSeed(seedInicial);
+         treinador.setSeed(seedInicial);
       }
       
       Dicionario dicio = new Dicionario();
