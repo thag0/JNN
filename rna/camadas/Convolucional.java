@@ -633,7 +633,7 @@ public class Convolucional extends Camada implements Cloneable{
     * fornecida e a capacidade de entrada da camada.
     */
    @Override
-   public void calcularSaida(Object entrada){
+   public Tensor4D calcularSaida(Object entrada){
       verificarConstrucao();
 
       if(entrada instanceof double[][][]){
@@ -684,6 +684,8 @@ public class Convolucional extends Camada implements Cloneable{
       }
 
       ativacao.calcular(somatorio, saida);
+
+      return saida.clone();
    }
 
    /**
@@ -708,14 +710,14 @@ public class Convolucional extends Camada implements Cloneable{
     *    Caso o gradiente seja um {@code Tensor4D}, é considerada apenas a primeira dimensão 
     *    do tensor.
     * </p>
-    * @param gradSeguinte gradiente da camada seguinte.
+    * @param grad gradiente da camada seguinte.
     */
    @Override
-   public void calcularGradiente(Object gradSeguinte){
+   public Tensor4D calcularGradiente(Object grad){
       verificarConstrucao();
 
-      if(gradSeguinte instanceof Tensor4D){
-         Tensor4D g = (Tensor4D) gradSeguinte;
+      if(grad instanceof Tensor4D){
+         Tensor4D g = (Tensor4D) grad;
          if(gradSaida.comparar3D(g) == false){
             throw new IllegalArgumentException(
                "\nAs três dimensões finais do tensor recebido " + g.shapeStr() +
@@ -729,7 +731,7 @@ public class Convolucional extends Camada implements Cloneable{
          throw new IllegalArgumentException(
             "Os gradientes para a camada Convolucional devem ser " +
             "do tipo \"" + gradSaida.getClass().getTypeName() + 
-            "\", objeto recebido é do tipo \"" + gradSeguinte.getClass().getTypeName() + "\""
+            "\", objeto recebido é do tipo \"" + grad.getClass().getTypeName() + "\""
          );
       }
 
@@ -747,6 +749,8 @@ public class Convolucional extends Camada implements Cloneable{
             gradBias.add(0, 0, 0, i, gradSaida.somar2D(0, i));
          }
       }
+
+      return gradEntrada.clone();
    }
 
    @Override

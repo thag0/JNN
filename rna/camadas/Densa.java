@@ -427,7 +427,7 @@ public class Densa extends Camada implements Cloneable{
     * da capacidade de entrada da camada.
     */
    @Override
-   public void calcularSaida(Object entrada){
+   public Tensor4D calcularSaida(Object entrada){
       verificarConstrucao();
 
       if(entrada instanceof Tensor4D){
@@ -470,6 +470,8 @@ public class Densa extends Camada implements Cloneable{
       }
 
       ativacao.calcular(somatorio, saida);
+
+      return saida.clone();
    }
 
    /**
@@ -487,35 +489,35 @@ public class Densa extends Camada implements Cloneable{
     * </p>
     * Resultados calculados ficam salvos nas prorpiedades {@code camada.gradPesos} e
     * {@code camada.gradBias}.
-    * @param gradSeguinte gradiente da camada seguinte, deve ser um objeto do tipo 
+    * @param grad gradiente da camada seguinte, deve ser um objeto do tipo 
     * {@code Tensor4D} ou {@code double[]}.
     */
    @Override
-   public void calcularGradiente(Object gradSeguinte){
+   public Tensor4D calcularGradiente(Object grad){
       verificarConstrucao();
 
-      if(gradSeguinte instanceof double[]){
-         double[] grad = (double[]) gradSeguinte;
-         if(grad.length != gradSaida.dim4()){
+      if(grad instanceof double[]){
+         double[] g = (double[]) grad;
+         if(g.length != gradSaida.dim4()){
             throw new IllegalArgumentException(
-               "\nTamanho do gradiente recebido (" + grad.length + ") incompatível com o " +
+               "\nTamanho do gradiente recebido (" + g.length + ") incompatível com o " +
                "suportado pela camada Densa (" + gradSaida.dim4() + ")."
             );
          }
 
-         gradSaida.copiar(grad, 0, 0, 0);
+         gradSaida.copiar(g, 0, 0, 0);
       
-      }else if(gradSeguinte instanceof Tensor4D){
-         Tensor4D grad = (Tensor4D) gradSeguinte;
+      }else if(grad instanceof Tensor4D){
+         Tensor4D g = (Tensor4D) grad;
          gradSaida.copiar(
-            grad.array1D(0, 0, 0),
+            g.array1D(0, 0, 0),
             0, 0, 0
          );
 
       }else{
          throw new IllegalArgumentException(
             "\nO gradiente para a camada Densa deve ser do tipo " + this.gradSaida.getClass() +
-            " ou \"double[]\", objeto recebido é do tipo \"" + gradSeguinte.getClass().getTypeName() + "\""
+            " ou \"double[]\", objeto recebido é do tipo \"" + grad.getClass().getTypeName() + "\""
          );
       }
 
@@ -538,6 +540,8 @@ public class Densa extends Camada implements Cloneable{
       optensor.matMult(
          gradSaida, optensor.matTranspor(pesos, 0, 0), gradEntrada, 0, 0
       );
+
+      return gradEntrada.clone();
    }
 
    @Override

@@ -292,7 +292,7 @@ public class MaxPooling extends Camada{
    }
 
    @Override
-   public void calcularSaida(Object entrada){
+   public Tensor4D calcularSaida(Object entrada){
       verificarConstrucao();
 
       if(entrada instanceof Tensor4D){
@@ -321,6 +321,8 @@ public class MaxPooling extends Camada{
       for(int i = 0; i < profundidade; i++){
          aplicar(this.entrada, this.saida, i);
       }
+
+      return saida.clone();
    }
 
    /**
@@ -358,11 +360,11 @@ public class MaxPooling extends Camada{
    }
 
    @Override
-   public void calcularGradiente(Object gradSeguinte){
+   public Tensor4D calcularGradiente(Object grad){
       verificarConstrucao();
 
-      if(gradSeguinte instanceof Tensor4D){
-         Tensor4D g = (Tensor4D) gradSeguinte;
+      if(grad instanceof Tensor4D){
+         Tensor4D g = (Tensor4D) grad;
          int profundidade = formEntrada[1];   
          for(int i = 0; i < profundidade; i++){
             gradMaxPool(this.entrada, g, this.gradEntrada, i);
@@ -370,10 +372,12 @@ public class MaxPooling extends Camada{
       
       }else{
          throw new IllegalArgumentException(
-            "Formato de gradiente \" "+ gradSeguinte.getClass().getTypeName() +" \" não " +
+            "Formato de gradiente \" "+ grad.getClass().getTypeName() +" \" não " +
             "suportado para camada de MaxPooling."
          );
       }
+
+      return gradEntrada.clone();
    }
    
    /**

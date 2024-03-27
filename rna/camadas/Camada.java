@@ -213,8 +213,10 @@ public abstract class Camada{
     *    Resultados processados ficam salvos na {@code saída} da camada.
     * </p>
     * @param entrada dados de entrada que serão processados pela camada.
+    * @return {@code Tensor} contendo a saída calculada, que por padrão
+    * é uma cópia da saída calculada para preservar as propriedades da camada.
     */
-   public abstract void calcularSaida(Object entrada);
+   public abstract Tensor4D calcularSaida(Object entrada);
 
    /**
     * Retropropaga os gradientes recebidos para as camadas anteriores.
@@ -223,8 +225,10 @@ public abstract class Camada{
     *    da camada.
     * </p>
     * @param gradSeguinte gradiente da camada seguinte.
+    * @return {@code Tensor} contendo o gradiente de entrada da camada, que por 
+    * padrão é uma cópia da saída calculada para preservar as propriedades da camada.
     */
-   public abstract void calcularGradiente(Object gradSeguinte);
+   public abstract Tensor4D calcularGradiente(Object gradSeguinte);
 
    /**
     * Retorna a saída da camada.

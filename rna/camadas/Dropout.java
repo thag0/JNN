@@ -226,7 +226,7 @@ public class Dropout extends Camada implements Cloneable{
     * ou {@code double[][][]}.
     */
    @Override
-   public void calcularSaida(Object entrada){
+   public Tensor4D calcularSaida(Object entrada){
       verificarConstrucao();
 
       if(entrada instanceof Tensor4D){
@@ -260,6 +260,8 @@ public class Dropout extends Camada implements Cloneable{
       }else{
          saida.copiar(this.entrada);
       }
+
+      return saida.clone();
    }
 
    /**
@@ -300,14 +302,14 @@ public class Dropout extends Camada implements Cloneable{
     * <p>
     *    Serão considerados apenas os gradientes da primeira dimensão do tensor.
     * </p>
-    * @param gradSeguinte gradientes da camada seguiente.
+    * @param grad gradientes da camada seguiente.
     */
    @Override
-   public void calcularGradiente(Object gradSeguinte){
+   public Tensor4D calcularGradiente(Object grad){
       verificarConstrucao();
 
-      if(gradSeguinte instanceof Tensor4D){
-         Tensor4D g = (Tensor4D) gradSeguinte;
+      if(grad instanceof Tensor4D){
+         Tensor4D g = (Tensor4D) grad;
          if(this.gradEntrada.comparar3D(g) == false){
             throw new IllegalArgumentException(
                "\nDimensões incompatíveis entre o gradiente recebido " + g.shapeStr() +
@@ -321,13 +323,15 @@ public class Dropout extends Camada implements Cloneable{
          throw new IllegalArgumentException(
             "\nGradiente aceito para a camada de Dropout deve ser do tipo " + 
             this.gradEntrada.getClass().getTypeName() +
-            " ,objeto recebido é do tipo \"" + gradSeguinte.getClass().getTypeName() + "\"."
+            " ,objeto recebido é do tipo \"" + grad.getClass().getTypeName() + "\"."
          );
       }
 
       if(treinando){
          gradEntrada.mult(mascara);
       }
+
+      return gradEntrada.clone();
    }
 
    @Override

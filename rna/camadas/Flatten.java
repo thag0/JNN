@@ -206,7 +206,7 @@ public class Flatten extends Camada{
     * pela camada.
     */
    @Override
-   public void calcularSaida(Object entrada){
+   public Tensor4D calcularSaida(Object entrada){
       verificarConstrucao();
 
       if(entrada instanceof Tensor4D){
@@ -235,6 +235,8 @@ public class Flatten extends Camada{
       }
 
       saida.copiarElementos(this.entrada.paraArray());
+
+      return saida.clone();
    }
 
    /**
@@ -242,15 +244,15 @@ public class Flatten extends Camada{
     *    Propagação reversa através da camada Flatten
     * </h2>
     * Desserializa os gradientes recebedos de volta para o mesmo formato de entrada.
-    * @param gradSeguinte gradientes de entrada da camada seguinte, objetos aceitos incluem:
+    * @param grad gradientes de entrada da camada seguinte, objetos aceitos incluem:
     * {@code Tensor4D} ou {@code double[]}.
     */
    @Override
-   public void calcularGradiente(Object gradSeguinte){
+   public Tensor4D calcularGradiente(Object grad){
       verificarConstrucao();
 
-      if(gradSeguinte instanceof Tensor4D){
-         Tensor4D g = (Tensor4D) gradSeguinte;
+      if(grad instanceof Tensor4D){
+         Tensor4D g = (Tensor4D) grad;
          if(g.tamanho() != this.gradEntrada.tamanho()){
             throw new IllegalArgumentException(
                "\nDimensões do gradiente recebido " + g.shapeStr() +
@@ -260,16 +262,18 @@ public class Flatten extends Camada{
 
          this.gradEntrada.copiarElementos(g.paraArray());
       
-      }else if(gradSeguinte instanceof double[]){
-         double[] g = (double[]) gradSeguinte;
+      }else if(grad instanceof double[]){
+         double[] g = (double[]) grad;
          gradEntrada.copiarElementos(g);
       
       }else{
          throw new IllegalArgumentException(
             "O gradiente seguinte para a camada Flatten deve ser do tipo \"double[]\" ou \"Tensor4D\", " +
-            "Objeto recebido é do tipo " + gradSeguinte.getClass().getTypeName()
+            "Objeto recebido é do tipo " + grad.getClass().getTypeName()
          );
       }
+
+      return gradEntrada.clone();
    }
    
    @Override
