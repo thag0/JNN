@@ -52,33 +52,9 @@ public class Playground{
    public static void main(String[] args){
       ged.limparConsole();
 
-      double[][] entrada = {
-         {0, 0},
-         {0, 1},
-         {1, 0},
-         {1, 1}
-      };
-
-      double[][] saida = {
-         {0},
-         {1},
-         {1},
-         {0}
-      };
-
-      var modelo = new RedeNeural(2, 3, 1);
-
-      modelo.compilar("adagrad", "mse");
-      modelo.configurarAtivacao("sigmoid");
-      
-      modelo.treinar(entrada, saida, 10_000, false);
-      System.out.println("Perda: " + modelo.avaliar(entrada, saida));
-
-      var prev = modelo.calcularSaidas(entrada);
-
-      for(var tensor : prev){
-         tensor.print(4);
-      }
+      String nomeModelo = "conv-mnist-93";
+      var modelo = new Serializador().lerSequencial("./dados/modelosMNIST/" + nomeModelo + ".txt");
+      modelo.info();
    }
 
    /**

@@ -33,10 +33,11 @@ public class Conv{
       ged.limparConsole();
 
       // String nomeModelo = "mlp-mnist-89";
-      String nomeModelo = "conv-mnist-90-2";
+      String nomeModelo = "modelo-convolucional";
       Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + nomeModelo + ".txt");
-      testarPrevisao(modelo, "3/img_1", true);
-      testarPrevisao(modelo, "3/3_deslocado", true);
+
+      testarPrevisao(modelo, "treino/3/img_1", true);
+      testarPrevisao(modelo, "3_deslocado", true);
 
       // modelo.info();
       // testarAcertosMNIST(modelo);
@@ -310,7 +311,7 @@ public class Conv{
    static void testarPrevisao(Sequencial modelo, String imagemTeste, boolean prob){
       double[][][] entrada = new double[1][][];
       String extensao = ".jpg";
-      entrada[0] = imagemParaMatriz("/dados/mnist/teste/" + imagemTeste + extensao);
+      entrada[0] = imagemParaMatriz("/dados/mnist/" + imagemTeste + extensao);
       modelo.calcularSaida(entrada);
       double[] previsao = modelo.saidaParaArray();
       

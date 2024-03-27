@@ -16,7 +16,7 @@ public class MainConv{
    static Ged ged = new Ged();
    static Geim geim = new Geim();
 
-   static final int NUM_DIGITOS_TREINO = 3;
+   static final int NUM_DIGITOS_TREINO = 10;
    static final int NUM_DIGITOS_TESTE  = NUM_DIGITOS_TREINO;
    static final int NUM_AMOSTRAS_TREINO = 300;
    static final int NUM_AMOSTRAS_TESTE  = 100;
@@ -42,7 +42,7 @@ public class MainConv{
 
       System.out.println("Treinando.");
       tempo = System.nanoTime();
-         modelo.treinar(treinoX, treinoY, EPOCAS_TREINO, 16, true);
+         modelo.treinar(treinoX, treinoY, EPOCAS_TREINO, 32, true);
       tempo = System.nanoTime() - tempo;
 
       long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempo);
@@ -76,16 +76,17 @@ public class MainConv{
    static Sequencial criarModelo(){
       Sequencial modelo = new Sequencial(new Camada[]{
          new Entrada(28, 28),
-         new Convolucional(new int[]{3, 3}, 16, "leaky-relu"),
+         new Convolucional(new int[]{3, 3}, 18, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
          new Convolucional(new int[]{3, 3}, 20, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
          new Densa(126, "sigmoid"),
+         new Dropout(0.2),
          new Densa(NUM_DIGITOS_TREINO, "softmax") 
       });
 
-      modelo.compilar(new SGD(0.0001, 0.999), "entropia-cruzada");
+      modelo.compilar(new SGD(0.01, 0.9), "entropia-cruzada");
       
       return modelo;
    }
