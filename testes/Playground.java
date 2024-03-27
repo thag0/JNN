@@ -52,9 +52,17 @@ public class Playground{
    public static void main(String[] args){
       ged.limparConsole();
 
-      String nomeModelo = "conv-mnist-93";
-      var modelo = new Serializador().lerSequencial("./dados/modelosMNIST/" + nomeModelo + ".txt");
-      modelo.info();
+      var entrada = new Tensor4D(new double[][]{
+         {1, 2, 3, 4},
+         {5, 6, 7, 8}
+      });
+      var mp = new MaxPooling(new int[]{2, 2});
+      mp.construir(entrada.shape());
+
+      mp.calcularSaida(entrada);
+      var saida = mp.saida();
+
+      saida.print(2);
    }
 
    /**

@@ -353,21 +353,21 @@ public class AvgPooling extends Camada{
 
    @Override
    public void calcularGradiente(Object gradSeguinte){
-       verificarConstrucao();
-   
-       if(gradSeguinte instanceof Tensor4D){
-           Tensor4D g = (Tensor4D) gradSeguinte;
-           int profundidade = formEntrada[1];   
-           for(int i = 0; i < profundidade; i++){
-               gradAvgPool(this.entrada, g, this.gradEntrada, i);
-           }
-       
-       }else{
-           throw new IllegalArgumentException(
-               "Formato de gradiente \" "+ gradSeguinte.getClass().getTypeName() +" \" não " +
-               "suportado para camada de AvgPooling."
-           );
-       }
+      verificarConstrucao();
+
+      if(gradSeguinte instanceof Tensor4D){
+         Tensor4D g = (Tensor4D) gradSeguinte;
+         int profundidade = formEntrada[1];   
+         for(int i = 0; i < profundidade; i++){
+            gradAvgPool(this.entrada, g, this.gradEntrada, i);
+         }
+      
+      }else{
+         throw new IllegalArgumentException(
+            "Formato de gradiente \" "+ gradSeguinte.getClass().getTypeName() +" \" não " +
+            "suportado para camada de AvgPooling."
+         );
+      }
    }
 
    /**
