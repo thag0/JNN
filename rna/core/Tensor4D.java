@@ -1834,6 +1834,7 @@ public class Tensor4D{
     */
    public Tensor4D clone(){
       Tensor4D clone = new Tensor4D(this);
+      clone.nome(this.nome());
       return clone;
    }
 
