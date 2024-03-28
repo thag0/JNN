@@ -52,17 +52,20 @@ public class Playground{
    public static void main(String[] args){
       ged.limparConsole();
 
-      var entrada = new Tensor4D(new double[][]{
-         {1, 2, 3, 4},
-         {5, 6, 7, 8}
+      var a = new Tensor4D(new double[][]{
+         {1, 2},
+         {3, 4}
       });
-      var mp = new MaxPooling(new int[]{2, 2});
-      mp.construir(entrada.shape());
 
-      mp.calcularSaida(entrada);
-      var saida = mp.saida();
+      var b = new Tensor4D(new double[][]{
+         {1, 0},
+         {0, 1}
+      });
 
-      saida.print(2);
+      var r = new Tensor4D(2, 2);
+
+      optensor.matMult(a, b, r);
+      r.print(0);
    }
 
    /**

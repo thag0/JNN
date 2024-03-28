@@ -260,52 +260,67 @@ public class OpTensor4D{
    }
 
    /**
-    * Realiza multiplicação matricial entre tensores, como no exemplo.
-    * <pre>
-    *    R[dim1][dim2] = A[dim1][dim2] * B[dim1][dim2]
-    * </pre>
-    * @param a primeiro tensor.
-    * @param b segundo tensor.
-    * @param r tensor de destino do resultado.
-    * @param dim1 índice da primeira dimensão desejada.
-    * @param dim2 índice da segunda dimensão desejada.
+    * Realiza multiplicação matricial entre tensores.
+    * <p>
+    *    Para que a multiplicação ocorra é necessário que:
+    * </p>
+    * <ul>
+    *    <li>
+    *       Todos os tensores tenham os mesmos valores para dim1 e dim2;
+    *    </li>
+    *    <li>
+    *       O valore da quarta dimensão de A seja igual a terceira dimensão de B {@code (a.dim4 == b.dim3)};
+    *    </li>
+    *    <li>
+    *       O tensor de saída tenha e terceira e quarta dimensão iguais a {@code (a.dim3, b.dim4)}
+    *    </li>
+    * </ul>
+    * Caso nenhum desses critérios seja atendido, é lançada uma exceção.
+    * @param a primeiro {@code Tensor}.
+    * @param b segundo {@code Tensor}.
+    * @param r {@code Tensor} de destino do resultado.
     */
-   public void matMult(Tensor4D a, Tensor4D b, Tensor4D r, int dim1, int dim2){
-      int ad1 = a.dim1(), ad2 = a.dim2();
-      int bd1 = b.dim1(), bd2 = b.dim2();
-      int rd1 = r.dim1(), rd2 = r.dim2();
-   
-      if(
-         (dim1 < 0 || dim1 >= ad1) || 
-         (dim1 < 0 || dim1 >= bd1) || 
-         (dim1 < 0 || dim1 >= rd1)
-         ){
+   public void matMult(Tensor4D a, Tensor4D b, Tensor4D r){
+      if(((a.dim1() != b.dim1()) || (a.dim1() != r.dim1())) ||
+         ((a.dim2() != b.dim2()) || (a.dim2() != r.dim2()))){
          throw new IllegalArgumentException(
-            "\nTodos os tensores fornecidos devem conter o índice de primeira dimensão válido."
+            "\nOs tensores A e B devem possuir os mesmos valores para " +
+            "as duas primeiras dimensões, recebido A = " 
+            + a.shapeStr() + " e B = " + b.shapeStr() 
          );
       }
-
-      if(
-         (dim1 < 0 || dim1 >= ad2) || 
-         (dim1 < 0 || dim1 >= bd2) || 
-         (dim1 < 0 || dim1 >= rd2)
-         ){
+      if((a.dim4() != b.dim3())){
          throw new IllegalArgumentException(
-            "\nTodos os tensores fornecidos devem conter o índice de segunda dimensão válido."
+            "\nA quarta dimensão de A (" + a.dim4() + ") deve" +
+            " ser igual a terceira dimensão de B (" + b.dim3() +")"
+         );
+      }
+      if(r.dim3() != a.dim3() || r.dim4() != b.dim4()){
+         throw new IllegalArgumentException(
+            "\nTensor de resultado contém as duas últimas dimensões inesperadas, " +
+            "esperado (" + a.dim3() + ", " + b.dim4() + ")" + " mas possui (" +
+            r.dim3() + ", " + r.dim4() + ")"
          );
       }
 
       int rLin = r.dim3(), rCol = r.dim4();
       int aCol = a.dim4();
-      double res = 0;
+      int aDim1 = a.dim1(), aDim2 = a.dim2();
 
-      for(int i = 0; i < rLin; i++){
-         for(int j = 0; j < rCol; j++){
-            res = 0;
-            for(int k = 0; k < aCol; k++){
-               res += a.get(dim1, dim2, i, k) * b.get(dim1, dim2, k, j);
+      //loop pelas primeiras dimensões
+      for(int d1 = 0; d1 < aDim1; d1++){
+         for(int d2 = 0; d2 < aDim2; d2++){
+            
+            //pela pelas duas últimas dimensões (linhas e colunas)
+            for(int i = 0; i < rLin; i++){
+               for(int j = 0; j < rCol; j++){
+                  double res = 0;
+                  for(int k = 0; k < aCol; k++){
+                     res += a.get(d1, d2, i, k) * b.get(d1, d2, k, j);
+                  }
+                  r.set(res, d1, d2, i, j);
+               }
             }
-            r.set(res, dim1, dim2, i, j);
          }
       }
    }
@@ -512,15 +527,14 @@ public class OpTensor4D{
 
       int alturaKernel = kernel.dim3();
       int larguraKernel = kernel.dim4();
-      double soma = 0d;
-      int i, j, m, n;
       int posX;
-      for(i = 0; i < alturaEsperada; i++){
-         for(j = 0; j < larguraEsperada; j++){
-            soma = 0.d;
-            for(m = 0; m < alturaKernel; m++){
+      for(int i = 0; i < alturaEsperada; i++){
+         for(int j = 0; j < larguraEsperada; j++){
+            
+            double soma = 0.0D;
+            for(int m = 0; m < alturaKernel; m++){
                posX = i + m;
-               for(n = 0; n < larguraKernel; n++){
+               for(int n = 0; n < larguraKernel; n++){
                   soma += entrada.get(idEn[0], idEn[1], posX, j+n) * 
                            kernel.get(idK[0], idK[1], m, n);
                }
@@ -735,17 +749,17 @@ public class OpTensor4D{
          );
       }
 
-      int i, j, k, l, posX, posY;
-      double res;
+      int posX, posY;
       int linEntrada = entrada.dim3(), colEntrada = entrada.dim4();
       int linKernel = kernel.dim3(), colKernel = kernel.dim4();
       int linSaida = saida.dim3(), colSaida = saida.dim4();
-      for(i = 0; i < linSaida; i++){
-         for(j = 0; j < colSaida; j++){
-            res = 0;
-            for(k = 0; k < linKernel; k++){
+      for(int i = 0; i < linSaida; i++){
+         for(int j = 0; j < colSaida; j++){
+            
+            double res = 0;
+            for(int k = 0; k < linKernel; k++){
                posX = i - k;
-               for(l = 0; l < colKernel; l++){
+               for(int l = 0; l < colKernel; l++){
                   posY = j - l;
   
                   if(posX >= 0 && posX < linEntrada && posY >= 0 && posY < colEntrada){

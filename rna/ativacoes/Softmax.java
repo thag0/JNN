@@ -87,9 +87,7 @@ public class Softmax extends Ativacao{
             0, 
             0
          ), 
-         camada.gradSaida,
-         0,
-         0
+         camada.gradSaida
       );
    }
 

@@ -1630,7 +1630,7 @@ public class Tensor4D{
     * @return string formatada.
     */
    private String construirPrint(int casas){
-      casas = (casas >= 0) ? casas : 10;
+      casas = (casas >= 0) ? casas : 8;
       
       String pad = "   ";
 
@@ -1757,7 +1757,7 @@ public class Tensor4D{
    }
 
    /**
-    * Retorna a primeira dimensão do tensor.
+    * Retorna o tamanho da primeira dimensão do tensor.
     * @return primeira dimensão do tensor.
     */
    public int dim1(){
@@ -1765,7 +1765,7 @@ public class Tensor4D{
    }
 
    /**
-    * Retorna a segunda dimensão do tensor.
+    * Retorna o tamanho da segunda dimensão do tensor.
     * @return segunda dimensão do tensor.
     */
    public int dim2(){
@@ -1773,7 +1773,7 @@ public class Tensor4D{
    }
 
    /**
-    * Retorna a terceira dimensão do tensor.
+    * Retorna o tamanho da terceira dimensão do tensor.
     * @return terceira dimensão do tensor.
     */
    public int dim3(){
@@ -1781,7 +1781,7 @@ public class Tensor4D{
    }
 
    /**
-    * Retorna a quarta dimensão do tensor.
+    * Retorna o tamanho da quarta dimensão do tensor.
     * @return quarta dimensão do tensor.
     */
    public int dim4(){
