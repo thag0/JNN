@@ -670,7 +670,9 @@ public class Convolucional extends Camada implements Cloneable{
       }
 
       //feedforward
-      somatorio.preencher(0);
+
+      //zerar os valores calculados anteiormente
+      somatorio.preencher(0.0d);
 
       optensor.convForward(this.entrada, filtros, somatorio);
       
@@ -736,10 +738,11 @@ public class Convolucional extends Camada implements Cloneable{
       }
 
       ativacao.derivada(this);
-      gradEntrada.preencher(0);
-
+      
       //backward
       Tensor4D tempGrad = new Tensor4D(gradFiltros.shape());
+      gradEntrada.preencher(0.0d);
+
       optensor.convBackward(entrada, filtros, gradSaida, tempGrad, gradEntrada);
       gradFiltros.add(tempGrad);
 

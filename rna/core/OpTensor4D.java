@@ -777,9 +777,6 @@ public class OpTensor4D{
       int filtros = kernel.dim1();
       int entradas = kernel.dim2();
 
-      //limpar valor contido na saída para acumular os resultados corretamente
-      saida.preencher(0);
-
       int[] idSaida = {0, 0};
       int[] idEntrada = {0, 0};
       int[] idKernel = {0, 0};
@@ -805,9 +802,6 @@ public class OpTensor4D{
    public void convBackward(Tensor4D entrada, Tensor4D kernel, Tensor4D gradSaida, Tensor4D gradK, Tensor4D gradE){
       int filtros = kernel.dim1();
       int entradas = kernel.dim2();
-  
-      //limpar valor contido no gradiente para acumular
-      gradE.preencher(0.0);
 
       int[] idEn = {0, 0};
       int[] idGradSaida = {0, 0};
@@ -821,7 +815,6 @@ public class OpTensor4D{
             idEn[1] = j;
             idK[1] = j;
             idGradEn[1] = j;
-            gradK.preencher2D(idK[0], idK[1], 0.0);
             correlacao2D(entrada, gradSaida, gradK, idEn, idGradSaida, idK);
             convolucao2DFull(gradSaida, kernel, gradE, idGradSaida, idK, idGradEn);
          }

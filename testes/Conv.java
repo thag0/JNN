@@ -36,8 +36,8 @@ public class Conv{
       String nomeModelo = "modelo-convolucional";
       Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + nomeModelo + ".txt");
 
-      // testarPrevisao(modelo, "treino/3/img_1", true);
-      // testarPrevisao(modelo, "3_deslocado", true);
+      testarPrevisao(modelo, "treino/3/img_1", true);
+      testarPrevisao(modelo, "3_deslocado", true);
 
       // modelo.info();
       // testarAcertosMNIST(modelo);
