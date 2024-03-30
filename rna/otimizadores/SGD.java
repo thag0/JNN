@@ -47,7 +47,7 @@ public class SGD extends Otimizador{
    /**
     * Taxa de momentum padrão do otimizador.
     */
-   private static final double PADRAO_MOMENTUM = 0.0;
+   private static final double PADRAO_MOMENTUM = 0.9;
 
    /**
     * Uso do acelerador de nesterov padrão.

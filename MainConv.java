@@ -9,7 +9,6 @@ import rna.camadas.*;
 import rna.core.Tensor4D;
 import rna.modelos.Modelo;
 import rna.modelos.Sequencial;
-import rna.otimizadores.SGD;
 import rna.serializacao.Serializador;
 
 public class MainConv{
@@ -86,7 +85,7 @@ public class MainConv{
          new Densa(NUM_DIGITOS_TREINO, "softmax") 
       });
 
-      modelo.compilar(new SGD(0.01, 0.9), "entropia-cruzada");
+      modelo.compilar("sgd", "entropia-cruzada");
       
       return modelo;
    }
