@@ -36,8 +36,8 @@ public class Conv{
       String nomeModelo = "modelo-convolucional";
       Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + nomeModelo + ".txt");
 
-      testarPrevisao(modelo, "treino/3/img_1", true);
-      testarPrevisao(modelo, "3_deslocado", true);
+      // testarPrevisao(modelo, "treino/3/img_1", true);
+      // testarPrevisao(modelo, "3_deslocado", true);
 
       // modelo.info();
       // testarAcertosMNIST(modelo);
@@ -142,23 +142,21 @@ public class Conv{
 
       gradEntradaEsperado.preencher(0);
       gradFiltroEsperado.preencher(0);
-
-      gradEntradaEsperado.preencher(0.0);
       for(int i = 0; i < filtros.dim1(); i++){
          for(int j = 0; j < filtros.dim2(); j++){
-            gradFiltroEsperado.preencher2D(i, j, 0.0);
             int[] idEntrada = {0, j};
             int[] idDerivada = {0, i};
             int[] idGradKernel = {i, j};
             int[] idKernel = {i, j};
             int[] idGradEntrada = {0, j};
+            gradFiltroEsperado.preencher2D(idKernel[0], idKernel[1], 0.0);
             optensor.correlacao2D(entrada, gradSaida, gradFiltroEsperado, idEntrada, idDerivada, idGradKernel);
             optensor.convolucao2DFull(gradSaida, conv.filtros, gradEntradaEsperado, idDerivada, idKernel, idGradEntrada);
          }
       }
 
-      boolean gradE = conv.gradFiltros.comparar(gradFiltroEsperado);
-      boolean gradF = conv.gradEntrada.comparar(gradEntradaEsperado);
+      boolean gradF = conv.gradFiltros.equals(gradFiltroEsperado);
+      boolean gradE = conv.gradEntrada.equals(gradEntradaEsperado);
       
       if(gradE && gradF){
          System.out.println("Backward esperado: " + (gradE && gradF));

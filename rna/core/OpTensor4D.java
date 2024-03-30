@@ -816,13 +816,12 @@ public class OpTensor4D{
       for(int i = 0; i < filtros; i++){
          idGradSaida[1] = i;
          idK[0] = i;
+         //limpar qualquer valor contido no gradiente
          for(int j = 0; j < entradas; j++){
-            //limpar qualquer valor contido no gradiente
-            gradSaida.preencher2D(idGradSaida[0], idGradSaida[1], 0.0);
-
             idEn[1] = j;
             idK[1] = j;
             idGradEn[1] = j;
+            gradK.preencher2D(idK[0], idK[1], 0.0);
             correlacao2D(entrada, gradSaida, gradK, idEn, idGradSaida, idK);
             convolucao2DFull(gradSaida, kernel, gradE, idGradSaida, idK, idGradEn);
          }
