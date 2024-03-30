@@ -52,13 +52,19 @@ public class Playground{
    public static void main(String[] args){
       ged.limparConsole();
 
-      Ativacao atv = new Softmax();
+      var a = new Tensor4D(new double[][]{
+         {1, 2}, 
+         {3, 4}
+      });
+      var b = new Tensor4D(new double[][]{
+         {5, 6}, 
+         {7, 8}
+      });
+      var r = new Tensor4D(a.shape());
+      r.preencher(0.0);
 
-      Tensor4D tensor = new Tensor4D(2, 2, 2);
-
-      tensor.preencherContador(true);
-      
-      System.out.println(tensor.subTensor2D(0 ,0));
+      optensor.matHadamard(a, b, r);
+      r.print(1);
    }
 
    /**

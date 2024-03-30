@@ -50,8 +50,8 @@ public class Conv{
       // forward.imprimir();
       // backward.imprimir();
 
-      // testarForward();
-      // testarBackward();
+      testarForward();
+      testarBackward();
    }
 
    static void testarAcertosMNIST(Sequencial modelo){
@@ -97,13 +97,14 @@ public class Conv{
       int[] idEntrada = {0, 0};
       int[] idKernel = {0, 0};
       int[] idSaida = {0, 0};
+      saidaEsperada.preencher(0.0);
       for(int i = 0; i < filtros.dim1(); i++){
          idSaida[1] = i;
          for(int j = 0; j < filtros.dim2(); j++){
             idEntrada[1] = j;
             idKernel[0] = i;
             idKernel[1] = j;
-            optensor.correlacao2D(entrada, filtros, saidaEsperada, idEntrada, idKernel, idSaida, true);
+            optensor.correlacao2D(entrada, filtros, saidaEsperada, idEntrada, idKernel, idSaida);
          }
       }
 
@@ -142,15 +143,17 @@ public class Conv{
       gradEntradaEsperado.preencher(0);
       gradFiltroEsperado.preencher(0);
 
+      gradEntradaEsperado.preencher(0.0);
       for(int i = 0; i < filtros.dim1(); i++){
          for(int j = 0; j < filtros.dim2(); j++){
+            gradFiltroEsperado.preencher2D(i, j, 0.0);
             int[] idEntrada = {0, j};
             int[] idDerivada = {0, i};
             int[] idGradKernel = {i, j};
             int[] idKernel = {i, j};
             int[] idGradEntrada = {0, j};
-            optensor.correlacao2D(entrada, gradSaida, gradFiltroEsperado, idEntrada, idDerivada, idGradKernel, false);
-            optensor.convolucao2DFull(gradSaida, conv.filtros, gradEntradaEsperado, idDerivada, idKernel, idGradEntrada, true);
+            optensor.correlacao2D(entrada, gradSaida, gradFiltroEsperado, idEntrada, idDerivada, idGradKernel);
+            optensor.convolucao2DFull(gradSaida, conv.filtros, gradEntradaEsperado, idDerivada, idKernel, idGradEntrada);
          }
       }
 

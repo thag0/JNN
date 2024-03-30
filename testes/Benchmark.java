@@ -137,13 +137,14 @@ public class Benchmark{
       int[] idEntrada = {0, 0};
       int[] idKernel = {0, 0};
       int[] idSaida = {0, 0};
+      saidaEsperada.preencher(0.0);
       for(int i = 0; i < filtros.dim1(); i++){
          idSaida[1] = i;
          for(int j = 0; j < filtros.dim2(); j++){
             idEntrada[1] = j;
             idKernel[0] = i;
             idKernel[1] = j;
-            optensor.correlacao2D(entrada, filtros, saidaEsperada, idEntrada, idKernel, idSaida, true);
+            optensor.correlacao2D(entrada, filtros, saidaEsperada, idEntrada, idKernel, idSaida);
          }
       }
 
