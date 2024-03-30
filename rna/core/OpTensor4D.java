@@ -8,7 +8,7 @@ public class OpTensor4D{
    /**
     * Auxiliar na opeação com arrays.
     */
-   OpArray oparr = new OpArray();
+   private OpArray oparr = new OpArray();
    
    /**
     * Auxiliar em operação para tensores 4D.
@@ -17,8 +17,8 @@ public class OpTensor4D{
 
    /**
     * Verifica se os tensores possuem a mesma altura (dim3) e largura (dim4).
-    * @param a tensor A.
-    * @param b tensor B.
+    * @param a primeiro {@code Tensor}.
+    * @param b segundo {@code Tensor}.
     * @return resultado da verificação.
     */
    public boolean compararAlturaLargura(Tensor4D a, Tensor4D b){
@@ -27,16 +27,23 @@ public class OpTensor4D{
 
    /**
     * Copia o conteúdo das duas últimas dimensões do tensor para o destino.
-    * @param tensor tensor base.
-    * @param destino tensor de destino da cópia.
+    * @param tensor {@code Tensor} desejado.
+    * @param destino {@code Tensor} de destino da cópia.
     * @param dimA índies das duas primeiras dimensões do tensor base (dim1, dim2)
-    * @param dimA índies das duas primeiras dimensões do tensor de destino (dim1, dim2)
+    * @param dimB índies das duas primeiras dimensões do tensor de destino (dim1, dim2)
     */
    public void copiarMatriz(Tensor4D tensor, Tensor4D destino, int[] dimA, int[] dimB){
       if(tensor.comparar2D(destino) == false){
          throw new IllegalArgumentException(
             "\nAs duas últimas dimensões do tensor recebido " + tensor.shapeStr() +
             " e de destino " + destino.shapeStr() + " devem ser iguais."
+         );
+      }
+
+      if(dimA.length != 2 || dimB.length != 2){
+         throw new IllegalArgumentException(
+            "\nO array para as dimensões do tensor A e B devem conter dois elementos, recebido " +
+            "A = " + dimA.length + ", B = " + dimB.length
          );
       }
 
@@ -56,24 +63,30 @@ public class OpTensor4D{
 
       for(int i = 0; i < destino.dim3(); i++){
          for(int j = 0; j < destino.dim4(); j++){
-            destino.set(tensor.get(dimA[0], dimA[1], i, j), dimB[0], dimB[1], i, j);
+            destino.set(
+               tensor.get(dimA[0], dimA[1], i, j),
+               dimB[0], dimB[1], i, j
+            );
          }
       }
    }
 
    /**
-    * Transpõe o conteúdo da matriz do tensor de acordo com os índices especificados.
-    * @param tensor tensor desejado.
+    * Transpõe o conteúdo matricial contido no tensor de acordo com os índices especificados.
+    * @param tensor {@code Tensor} desejado.
     * @param dim1 índice da primeira dimensão.
     * @param dim2 índice da segunda dimensão.
-    * @return tensor transposto.
+    * @return {@code Tensor} transposto.
     */
    public Tensor4D matTranspor(Tensor4D tensor, int dim1, int dim2){
       Tensor4D t = new Tensor4D(1, 1, tensor.dim4(), tensor.dim3());
 
       for(int i = 0; i < tensor.dim3(); i++){
          for(int j = 0; j < tensor.dim4(); j++){
-            t.set(tensor.get(dim1, dim2, i, j), 0, 0, j, i);
+            t.set(
+               tensor.get(dim1, dim2, i, j),
+               0, 0, j, i
+            );
          }
       }
 
@@ -266,13 +279,13 @@ public class OpTensor4D{
     * </p>
     * <ul>
     *    <li>
-    *       Todos os tensores tenham os mesmos valores para dim1 e dim2;
+    *       Todos os tensores tenham os mesmos valores para {@code dim1 e dim2};
     *    </li>
     *    <li>
-    *       O valore da quarta dimensão de A seja igual a terceira dimensão de B {@code (a.dim4 == b.dim3)};
+    *       O valor da quarta dimensão de A seja igual a terceira dimensão de B {@code (a.dim4 == b.dim3)};
     *    </li>
     *    <li>
-    *       O tensor de saída tenha e terceira e quarta dimensão iguais a {@code (a.dim3, b.dim4)}
+    *       O tensor de saída tenha e terceira e quarta dimensão iguais a {@code (..., ..., a.dim3, b.dim4)}
     *    </li>
     * </ul>
     * Caso nenhum desses critérios seja atendido, é lançada uma exceção.
@@ -487,19 +500,19 @@ public class OpTensor4D{
     * zerada antes da operação.
     */
    public void correlacao2D(Tensor4D entrada, Tensor4D kernel, Tensor4D saida, int[] idEn, int[] idK, int[] idS, boolean add){
-      if(!entrada.validarIndice(idEn[0], 0) || !entrada.validarIndice(idEn[0], 0)){
+      if(!entrada.validarDimensao(entrada.dim1(), idEn[0]) || !entrada.validarDimensao(entrada.dim2(), idEn[1])){
          throw new IllegalArgumentException(
             "\nÍndices de entrada (" + idEn[0] + ", " + idEn[1] + ") " +
             "incompatíveis com o tensor de entrada (" + entrada.dim1() + ", " + entrada.dim2() + ")."
          );
       }
-      if(!kernel.validarIndice(idK[0], 0) || !kernel.validarIndice(idK[0], 0)){
+      if(!kernel.validarDimensao(kernel.dim1(), idK[0]) || !kernel.validarDimensao(kernel.dim2(), idK[1])){
          throw new IllegalArgumentException(
             "\nÍndices do kernel (" + idK[0] + ", " + idK[1] + ") " +
             "incompatíveis com o tensor do kernel (" + kernel.dim1() + ", " + kernel.dim2() + ")."
          );
       }
-      if(!saida.validarIndice(idS[0], 0) || !saida.validarIndice(idS[0], 0)){
+      if(!saida.validarDimensao(saida.dim1(), idS[0]) || !saida.validarDimensao(saida.dim2(), idS[1])){
          throw new IllegalArgumentException(
             "\nÍndices da saída (" + idS[0] + ", " + idS[1] + ") " +
             "incompatíveis com o tensor de saída (" + saida.dim1() + ", " + saida.dim2() + ")."
@@ -597,22 +610,22 @@ public class OpTensor4D{
     * zerada antes da operação.
     */
    public void convolucao2D(Tensor4D entrada, Tensor4D kernel, Tensor4D saida, int[] idEn, int[] idK, int[] idS, boolean add){
-      if(!entrada.validarIndice(idEn[0], 0) || !entrada.validarIndice(idEn[0], 0)){
+      if(!entrada.validarDimensao(entrada.dim1(), idEn[0]) || !entrada.validarDimensao(entrada.dim2(), idEn[1])){
          throw new IllegalArgumentException(
             "\nÍndices de entrada (" + idEn[0] + ", " + idEn[1] + ") " +
             "incompatíveis com o tensor de entrada (" + entrada.dim1() + ", " + entrada.dim2() + ")."
          );
       }
-      if(!kernel.validarIndice(idK[0], 0) || !kernel.validarIndice(idK[0], 0)){
+      if(!kernel.validarDimensao(kernel.dim1(), idK[0]) || !kernel.validarDimensao(kernel.dim2(), idK[1])){
          throw new IllegalArgumentException(
-            "\nÍndices do kernel (" + idEn[0] + ", " + idEn[1] + ") " +
-            "incompatíveis com o tensor do kernel (" + entrada.dim1() + ", " + entrada.dim2() + ")."
+            "\nÍndices do kernel (" + idK[0] + ", " + idK[1] + ") " +
+            "incompatíveis com o tensor do kernel (" + kernel.dim1() + ", " + kernel.dim2() + ")."
          );
       }
-      if(!saida.validarIndice(idS[0], 0) || !saida.validarIndice(idS[0], 0)){
+      if(!saida.validarDimensao(saida.dim1(), idS[0]) || !saida.validarDimensao(saida.dim2(), idS[1])){
          throw new IllegalArgumentException(
-            "\nÍndices da saída (" + idEn[0] + ", " + idEn[1] + ") " +
-            "incompatíveis com o tensor de saída (" + entrada.dim1() + ", " + entrada.dim2() + ")."
+            "\nÍndices da saída (" + idS[0] + ", " + idS[1] + ") " +
+            "incompatíveis com o tensor de saída (" + saida.dim1() + ", " + saida.dim2() + ")."
          );
       }
 
@@ -711,22 +724,22 @@ public class OpTensor4D{
     * zerada antes da operação.
     */
    public void convolucao2DFull(Tensor4D entrada, Tensor4D kernel, Tensor4D saida, int[] idEn, int[] idK, int[] idS, boolean add){
-      if(!entrada.validarIndice(idEn[0], 0) || !entrada.validarIndice(idEn[0], 0)){
+      if(!entrada.validarDimensao(entrada.dim1(), idEn[0]) || !entrada.validarDimensao(entrada.dim2(), idEn[1])){
          throw new IllegalArgumentException(
             "\nÍndices de entrada (" + idEn[0] + ", " + idEn[1] + ") " +
             "incompatíveis com o tensor de entrada (" + entrada.dim1() + ", " + entrada.dim2() + ")."
          );
       }
-      if(!kernel.validarIndice(idK[0], 0) || !kernel.validarIndice(idK[0], 0)){
+      if(!kernel.validarDimensao(kernel.dim1(), idK[0]) || !kernel.validarDimensao(kernel.dim2(), idK[1])){
          throw new IllegalArgumentException(
-            "\nÍndices do kernel (" + idEn[0] + ", " + idEn[1] + ") " +
-            "incompatíveis com o tensor do kernel (" + entrada.dim1() + ", " + entrada.dim2() + ")."
+            "\nÍndices do kernel (" + idK[0] + ", " + idK[1] + ") " +
+            "incompatíveis com o tensor do kernel (" + kernel.dim1() + ", " + kernel.dim2() + ")."
          );
       }
-      if(!saida.validarIndice(idS[0], 0) || !saida.validarIndice(idS[0], 0)){
+      if(!saida.validarDimensao(saida.dim1(), idS[0]) || !saida.validarDimensao(saida.dim2(), idS[1])){
          throw new IllegalArgumentException(
-            "\nÍndices da saída (" + idEn[0] + ", " + idEn[1] + ") " +
-            "incompatíveis com o tensor de saída (" + entrada.dim1() + ", " + entrada.dim2() + ")."
+            "\nÍndices da saída (" + idS[0] + ", " + idS[1] + ") " +
+            "incompatíveis com o tensor de saída (" + saida.dim1() + ", " + saida.dim2() + ")."
          );
       }
 

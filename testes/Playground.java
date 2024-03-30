@@ -54,18 +54,11 @@ public class Playground{
 
       Ativacao atv = new Softmax();
 
-      Tensor4D tensor = new Tensor4D(new double[][]{
-         {1, 2},
-         {3, 4}
-      });
+      Tensor4D tensor = new Tensor4D(2, 2, 2);
 
       tensor.preencherContador(true);
       
-      for(double valor : tensor){
-         valor = 10;
-      }
-
-      tensor.print(4);
+      System.out.println(tensor.subTensor2D(0 ,0));
    }
 
    /**
