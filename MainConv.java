@@ -20,7 +20,7 @@ public class MainConv{
    static final int NUM_DIGITOS_TESTE  = NUM_DIGITOS_TREINO;
    static final int NUM_AMOSTRAS_TREINO = 300;
    static final int NUM_AMOSTRAS_TESTE  = 100;
-   static final int EPOCAS_TREINO = 15;
+   static final int EPOCAS_TREINO = 16;
 
    static final String CAMINHO_TREINO = "/dados/mnist/treino/";
    static final String CAMINHO_TESTE = "/dados/mnist/teste/";
@@ -82,7 +82,7 @@ public class MainConv{
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
          new Densa(128, "sigmoid"),
-         new Dropout(0.2),
+         new Dropout(0.25),
          new Densa(NUM_DIGITOS_TREINO, "softmax") 
       });
 

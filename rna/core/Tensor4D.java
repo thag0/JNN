@@ -1,5 +1,6 @@
 package rna.core;
 
+import java.util.Iterator;
 import java.util.function.DoubleUnaryOperator;
 
 /**
@@ -45,7 +46,7 @@ import java.util.function.DoubleUnaryOperator;
  * @author Thiago Barroso, acadêmico de Engenharia da Computação pela Universidade Federal do Pará, 
  * Campus Tucuruí. Fevereiro/2023.
  */
-public class Tensor4D{
+public class Tensor4D implements Iterable<Double>{
 
    /**
     * Dimensões do tensor (d1, d2, d3, d4).
@@ -184,17 +185,7 @@ public class Tensor4D{
     * @param array array desejado.
     */
    public Tensor4D(double[] array){
-      if(array == null){
-         throw new IllegalArgumentException(
-            "\nO array fornecido é nulo."
-         );
-      }
-
-      this.dimensoes = new int[4];
-      copiarDimensoes(array.length);
-      this.dados = new double[dim1()*dim2()*dim3()*dim4()];
-
-      System.arraycopy(array, 0, this.dados, 0, array.length);
+      this(1, 1, 1, array.length, array);
    }
 
    /**
@@ -1632,7 +1623,7 @@ public class Tensor4D{
    private String construirPrint(int casas){
       casas = (casas >= 0) ? casas : 8;
       
-      String pad = "   ";
+      String pad = " ".repeat(3);
 
       StringBuilder sb = new StringBuilder();
       sb.append(nome).append(" ").append(shapeStr()).append(" = [\n");
@@ -1855,5 +1846,37 @@ public class Tensor4D{
    @Override
    public boolean equals(Object obj){
       return (obj instanceof Tensor4D) && comparar((Tensor4D) obj);
+   }
+
+   @Override
+   public Iterator<Double> iterator(){
+      return new Tensor4DIterator();
+   }
+
+   /**
+    * Iterador para usar com o tensor, usando para percorrer
+    * os elementos do tensor sequencialmente.
+    */
+   public class Tensor4DIterator implements Iterator<Double>{
+      
+      /**
+       * Contador do índice atual.
+       */
+      private int indice = 0;
+
+      @Override
+      public boolean hasNext(){
+         return indice < tamanho();
+      }
+
+      @Override
+      public Double next(){
+         return dados[indice++];
+      }
+
+      @Override
+      public void remove(){
+         throw new UnsupportedOperationException();
+      }
    }
 }
