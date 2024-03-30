@@ -61,9 +61,11 @@ public class Playground{
 
       tensor.preencherContador(true);
       
-      for(var val : tensor){
-         System.out.println(val);
+      for(double valor : tensor){
+         valor = 10;
       }
+
+      tensor.print(4);
    }
 
    /**
