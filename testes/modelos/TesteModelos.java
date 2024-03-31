@@ -61,7 +61,7 @@ public class TesteModelos{
 
       System.out.println("Perda Seq: " + perdaSeq);
       System.out.println("Perda Rna: " + perdaRna);
-      System.out.println("Diferença RNA - SEQ = " + (perdaRna - perdaSeq));
+      System.out.println("Diferença RNA - SEQ = " + (perdaRna - perdaSeq));//esperado 0
       
       System.out.println();
       for(int i = 0; i < 2; i++){

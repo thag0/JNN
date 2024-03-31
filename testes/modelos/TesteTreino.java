@@ -36,7 +36,7 @@ public class TesteTreino{
          new Densa(1, "sigmoid")
       });
       
-      modelo.compilar(new SGD(0.0001, 0.9995), "mse");
+      modelo.compilar(new SGD(0.00001, 0.9999), "mse");
       modelo.treinar(treinoX, saida, 20_000, false);
       verificar(entrada, saida, modelo);
 
@@ -46,11 +46,12 @@ public class TesteTreino{
 
    static void verificar(Object entrada, double[][] saida, Sequencial modelo){
       Object[] arr = utils.transformarParaArray(entrada);
-
+      var preds = modelo.forwards(arr);
+      
       for(int i = 0; i < arr.length; i++){
          System.out.println(
             "Real: " + saida[i][0] + ",   " +  
-            "Prev: " + modelo.forward(arr[i]).get(0, 0, 0, 0)
+            "Prev: " + preds[i].get(0, 0, 0, 0)
          );
       }
    }
