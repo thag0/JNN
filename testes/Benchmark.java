@@ -19,8 +19,12 @@ public class Benchmark{
       Ged ged = new Ged();
       ged.limparConsole();
 
-      convForward();
-      convBackward();
+      int[] formEntrada = {32, 26, 26};
+      int[] formFitlro = {3, 3};
+      int filtros = 64;
+
+      convForward(formEntrada, formFitlro, filtros);
+      convBackward(formEntrada, formFitlro, filtros);
    }
 
    /**
@@ -30,15 +34,7 @@ public class Benchmark{
     *    diferentes cenários de estresse da camada.
     * </p>
     */
-   static void convForward(){
-      final int tamFiltro = 3;
-      final int numFiltros = 16;
-      final int tamEntrada = 26;
-      final int profEntrada = 16;
-
-      final int[] formatoEntrada = {profEntrada, tamEntrada, tamEntrada};
-      final int[] formatoFiltro = {tamFiltro, tamFiltro};
-
+   static void convForward(int[] formatoEntrada, int[] formatoFiltro, int filtros){
       String ativacao = "sigmoid";
 
       final long seed = 123456789;
@@ -46,7 +42,7 @@ public class Benchmark{
       final Inicializador iniBias = new GlorotNormal(seed);
 
       Convolucional conv = new Convolucional(
-         formatoEntrada, formatoFiltro, numFiltros, ativacao, iniKernel, iniBias
+         formatoEntrada, formatoFiltro, filtros, ativacao, iniKernel, iniBias
       );
       conv.inicializar();
 
@@ -77,15 +73,7 @@ public class Benchmark{
     *    diferentes cenários de estresse da camada.
     * </p>
     */
-   static void convBackward(){
-      final int tamFiltro = 3;
-      final int numFiltros = 64;
-      final int tamEntrada = 28;
-      final int profEntrada = 16;
-
-      final int[] formatoEntrada = {profEntrada, tamEntrada, tamEntrada};
-      final int[] formatoFiltro = {tamFiltro, tamFiltro};
-
+   static void convBackward(int[] formatoEntrada, int[] formatoFiltro, int filtros){
       String ativacao = "sigmoid";
 
       final long seed = 123456789;
@@ -93,7 +81,7 @@ public class Benchmark{
       final Inicializador iniBias = new GlorotNormal(seed);
 
       Convolucional conv = new Convolucional(
-         formatoEntrada, formatoFiltro, numFiltros, ativacao, iniKernel, iniBias
+         formatoEntrada, formatoFiltro, filtros, ativacao, iniKernel, iniBias
       );
       conv.inicializar();
 

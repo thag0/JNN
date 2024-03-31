@@ -519,17 +519,17 @@ public class OpTensor4D{
 
       int alturaKernel = kernel.dim3();
       int larguraKernel = kernel.dim4();
-      int posX;
       for(int i = 0; i < altEsperada; i++){
          for(int j = 0; j < largEsperada; j++){
             
-            double soma = 0.0D;
-            for(int m = 0; m < alturaKernel; m++){
-               posX = i + m;
-               for(int n = 0; n < larguraKernel; n++){
-                  soma += entradaLocal[posX][j+n] * kernelLocal[m][n];
+            double soma = 0.0;
+            for(int k = 0; k < alturaKernel; k++){
+               int posX = i+k;
+               for(int l = 0; l < larguraKernel; l++){
+                  soma += entradaLocal[posX][j+l] * kernelLocal[k][l];
                }
             }
+
             saida.add(idS[0], idS[1], i, j, soma);
          }
       }
@@ -723,41 +723,35 @@ public class OpTensor4D{
          );
       }
 
-      int alturaEsperada  = entrada.dim3() + kernel.dim3() - 1;
-      int larguraEsperada = entrada.dim4() + kernel.dim4() - 1;
-      if(saida.dim3() != alturaEsperada){
+      int altEsp  = entrada.dim3() + kernel.dim3() - 1;
+      int largEsp = entrada.dim4() + kernel.dim4() - 1;
+      if(saida.dim3() != altEsp || saida.dim4() != largEsp){
          throw new IllegalArgumentException(
-            "\nAltura da saída (" + saida.dim3() + 
-            ") íncompatível com o valor esperado (" + alturaEsperada + ")."
-         );
-      }
-      if(saida.dim4() != larguraEsperada){
-         throw new IllegalArgumentException(
-            "\nAltura da saída (" + saida.dim4() + 
-            ") íncompatível com o valor esperado (" + larguraEsperada + ")."
+            "\nDimensões de saída inconpatíveis, esperado (" + altEsp + ", " + largEsp + ")" +
+            ", recebido (" + saida.dim3() + ", " + saida.dim4() + ")."
          );
       }
 
-      int posX, posY;
       int linEntrada = entrada.dim3(), colEntrada = entrada.dim4();
       int linKernel = kernel.dim3(), colKernel = kernel.dim4();
       int linSaida = saida.dim3(), colSaida = saida.dim4();
+      double[][] entradaData = entrada.array2D(idEn[0], idEn[1]);
+      double[][] kernelData = kernel.array2D(idK[0], idK[1]);
+      
       for(int i = 0; i < linSaida; i++){
          for(int j = 0; j < colSaida; j++){
-            
+
             double res = 0;
             for(int k = 0; k < linKernel; k++){
-               posX = i - k;
+               int posX = i - k;
                for(int l = 0; l < colKernel; l++){
-                  posY = j - l;
-  
+                  int posY = j - l;
                   if(posX >= 0 && posX < linEntrada && posY >= 0 && posY < colEntrada){
-                     res += 
-                        entrada.get(idEn[0], idEn[1], posX, posY) * 
-                        kernel.get(idK[0], idK[1], k, l);
+                     res += entradaData[posX][posY] * kernelData[k][l];
                   }
                }
             }
+            
             saida.add(idS[0], idS[1], i, j, res);
          }
       }
@@ -776,6 +770,7 @@ public class OpTensor4D{
       int[] idSaida = {0, 0};
       int[] idEntrada = {0, 0};
       int[] idKernel = {0, 0};
+
       for(int i = 0; i < filtros; i++){
          idSaida[1] = i;
          idKernel[0] = i;
@@ -803,10 +798,10 @@ public class OpTensor4D{
       int[] idGradSaida = {0, 0};
       int[] idK = {0, 0};
       int[] idGradEn = {0, 0};
+
       for(int i = 0; i < filtros; i++){
          idGradSaida[1] = i;
          idK[0] = i;
-         //limpar qualquer valor contido no gradiente
          for(int j = 0; j < entradas; j++){
             idEn[1] = j;
             idK[1] = j;
@@ -815,6 +810,5 @@ public class OpTensor4D{
             convolucao2DFull(gradSaida, kernel, gradE, idGradSaida, idK, idGradEn);
          }
       }
-
    }
 }
