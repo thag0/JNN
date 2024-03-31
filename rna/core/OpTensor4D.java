@@ -505,33 +505,29 @@ public class OpTensor4D{
          );
       }
 
-      int alturaEsperada  = entrada.dim3() - kernel.dim3() + 1;
-      int larguraEsperada = entrada.dim4() - kernel.dim4() + 1;
-      if(saida.dim3() != alturaEsperada){
+      int altEsperada  = entrada.dim3() - kernel.dim3() + 1;
+      int largEsperada = entrada.dim4() - kernel.dim4() + 1;
+      if(saida.dim3() != altEsperada || saida.dim4() != largEsperada){
          throw new IllegalArgumentException(
-            "\nAltura da saída (" + saida.dim3() + 
-            ") íncompatível com o valor esperado (" + alturaEsperada + ")."
+            "\nDimensões de saída inconpatíveis, esperado (" + altEsperada + ", " + largEsperada + ")" +
+            ", recebido (" + saida.dim3() + ", " + saida.dim4() + ")."
          );
       }
-      if(saida.dim4() != larguraEsperada){
-         throw new IllegalArgumentException(
-            "\nAltura da saída (" + saida.dim4() + 
-            ") íncompatível com o valor esperado (" + larguraEsperada + ")."
-         );
-      }
+
+      double[][] entradaLocal = entrada.array2D(idEn[0], idEn[1]);
+      double[][] kernelLocal = kernel.array2D(idK[0], idK[1]);
 
       int alturaKernel = kernel.dim3();
       int larguraKernel = kernel.dim4();
       int posX;
-      for(int i = 0; i < alturaEsperada; i++){
-         for(int j = 0; j < larguraEsperada; j++){
+      for(int i = 0; i < altEsperada; i++){
+         for(int j = 0; j < largEsperada; j++){
             
             double soma = 0.0D;
             for(int m = 0; m < alturaKernel; m++){
                posX = i + m;
                for(int n = 0; n < larguraKernel; n++){
-                  soma += entrada.get(idEn[0], idEn[1], posX, j+n) * 
-                           kernel.get(idK[0], idK[1], m, n);
+                  soma += entradaLocal[posX][j+n] * kernelLocal[m][n];
                }
             }
             saida.add(idS[0], idS[1], i, j, soma);

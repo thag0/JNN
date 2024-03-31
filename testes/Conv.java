@@ -40,7 +40,7 @@ public class Conv{
       testarPrevisao(modelo, "3_deslocado", true);
 
       // modelo.info();
-      // testarAcertosMNIST(modelo);
+      testarAcertosMNIST(modelo);
       // testarTodosDados(modelo);
 
       // Dados forward = tempoForward(modelo);//media 30/40 ms

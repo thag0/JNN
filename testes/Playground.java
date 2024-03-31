@@ -53,18 +53,22 @@ public class Playground{
       ged.limparConsole();
 
       var a = new Tensor4D(new double[][]{
-         {1, 2}, 
-         {3, 4}
+         {1, 6, 2},
+         {5, 3, 1},
+         {7, 0, 4}
       });
       var b = new Tensor4D(new double[][]{
-         {5, 6}, 
-         {7, 8}
+         {1, 2}, 
+         {-1, 0}
       });
-      var r = new Tensor4D(a.shape());
+
+      var r = new Tensor4D(2, 2);
       r.preencher(0.0);
 
-      optensor.matHadamard(a, b, r);
-      r.print(1);
+      optensor.correlacao2D(a, b, r);
+      r.print(1); 
+      optensor.correlacao2D(a, b, r);
+      r.print(1); 
    }
 
    /**

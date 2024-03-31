@@ -118,18 +118,35 @@ public class Benchmark{
          sb.append(pad).append("Tempo backward: " + TimeUnit.NANOSECONDS.toMillis(tempo) + "ms\n");
       sb.append("]\n");
 
-      System.out.println(sb.toString());      
+      System.out.println(sb.toString());
+      
+      testarForward();
+      testarBackward();
    }
 
+   /**
+    * Calcula o tempo de execução (nanosegundos) de uma função
+    * @param func função desejada.
+    * @return tempo de processamento.
+    */
+   static long medirTempo(Runnable func){
+      long t = System.nanoTime();
+      func.run();
+      return System.nanoTime() - t;
+   }
+
+   /**
+    * Testar com multithread
+    */
    static void testarForward(){
-      int[] formEntrada = {5, 8, 8};
+      int[] formEntrada = {12, 16, 16};
       Inicializador iniKernel = new GlorotUniforme(12345);
       Inicializador iniBias = new Zeros();
-      Convolucional conv = new Convolucional(formEntrada, new int[]{2, 2}, 3, "linear", iniKernel, iniBias);
+      Convolucional conv = new Convolucional(formEntrada, new int[]{3, 3}, 16, "linear", iniKernel, iniBias);
       conv.inicializar();
 
       Tensor4D entrada = new Tensor4D(conv.entrada.shape());
-      entrada.preencherContador(true);
+      entrada.map((x) -> Math.random());
 
       //simulação de propagação dos dados numa camada convolucional sem bias
       Tensor4D filtros = new Tensor4D(conv.filtros);
@@ -150,17 +167,59 @@ public class Benchmark{
 
       conv.forward(entrada);
 
-      System.out.println("Forward esperado: " + conv.somatorio.comparar(saidaEsperada));
+      System.out.println("Forward esperado: " + conv.saida().comparar(saidaEsperada));
    }
 
    /**
-    * Calcula o tempo de execução (nanosegundos) de uma função
-    * @param func função desejada.
-    * @return tempo de processamento.
+    * Testar com multithread
     */
-   static long medirTempo(Runnable func){
-      long t = System.nanoTime();
-      func.run();
-      return System.nanoTime() - t;
+   static void testarBackward(){
+      int[] formEntrada = {26, 24, 24};
+      Inicializador iniKernel = new GlorotUniforme(12345);
+      Inicializador iniBias = new Zeros();
+      Convolucional conv = new Convolucional(formEntrada, new int[]{3, 3}, 26, "linear", iniKernel, iniBias);
+      
+      Tensor4D entrada = new Tensor4D(conv.entrada);
+      entrada.map((x) -> Math.random());
+      
+      Tensor4D filtros = new Tensor4D(conv.filtros);
+      filtros.map((x) -> Math.random());
+      conv.filtros.copiar(filtros);
+
+      Tensor4D grad = new Tensor4D(conv.gradSaida);
+      grad.map((x) -> Math.random());
+      
+      //backward
+      conv.entrada.copiar(entrada);
+      conv.backward(grad);
+
+      Tensor4D gradSaida = new Tensor4D(conv.gradSaida);
+      Tensor4D gradFiltroEsperado = new Tensor4D(conv.gradFiltros);
+      Tensor4D gradEntradaEsperado = new Tensor4D(conv.gradEntrada);
+
+      gradEntradaEsperado.preencher(0);
+      gradFiltroEsperado.preencher(0);
+      for(int i = 0; i < filtros.dim1(); i++){
+         for(int j = 0; j < filtros.dim2(); j++){
+            int[] idEntrada = {0, j};
+            int[] idDerivada = {0, i};
+            int[] idGradKernel = {i, j};
+            int[] idKernel = {i, j};
+            int[] idGradEntrada = {0, j};
+            gradFiltroEsperado.preencher2D(idKernel[0], idKernel[1], 0.0);
+            optensor.correlacao2D(entrada, gradSaida, gradFiltroEsperado, idEntrada, idDerivada, idGradKernel);
+            optensor.convolucao2DFull(gradSaida, conv.filtros, gradEntradaEsperado, idDerivada, idKernel, idGradEntrada);
+         }
+      }
+
+      boolean gradF = conv.gradFiltros.equals(gradFiltroEsperado);
+      boolean gradE = conv.gradEntrada.equals(gradEntradaEsperado);
+      
+      if(gradE && gradF){
+         System.out.println("Backward esperado: " + (gradE && gradF));
+      
+      }else{
+         System.out.println("Backward inesperado ->  gradFiltro: " +  gradF + ", gradEntrada: " + gradE);
+      }
    }
 }
