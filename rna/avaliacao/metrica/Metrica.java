@@ -93,7 +93,7 @@ abstract class Metrica{
       double[] saidaRede = new double[rede.camadaSaida().tamanhoSaida()];
 
       for(int i = 0; i < arrEntrada.length; i++){
-         rede.calcularSaida(arrEntrada[i]);
+         rede.forward(arrEntrada[i]);
          saidaRede = rede.saidaParaArray();
 
          int real = this.indiceMaiorValor(s[i]);

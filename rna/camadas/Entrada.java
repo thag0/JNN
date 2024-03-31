@@ -87,16 +87,16 @@ public class Entrada extends Camada{
    public void inicializar(){}
 
    @Override
-   public Tensor4D calcularSaida(Object entrada){
+   public Tensor4D forward(Object entrada){
       throw new UnsupportedOperationException(
-         "\nCamada " + nome() + " não cálculo de saída."
+         "\nCamada " + nome() + " não possui cálculo de saída."
       );
    }
 
    @Override
-   public Tensor4D calcularGradiente(Object gradSeguinte){
+   public Tensor4D backward(Object grad){
       throw new UnsupportedOperationException(
-         "\nCamada " + nome() + " não cálculo de gradientes."
+         "\nCamada " + nome() + " não possui cálculo de gradientes."
       );
    }
 

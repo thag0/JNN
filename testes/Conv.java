@@ -65,7 +65,7 @@ public class Conv{
             String caminhoImagem = caminho + digito + "/img_" + amostra + ".jpg";
             Tensor4D img = new Tensor4D(imagemParaMatriz(caminhoImagem));
             
-            double[] previsoes = modelo.calcularSaida(img).paraArray();
+            double[] previsoes = modelo.forward(img).paraArray();
             if(maiorIndice(previsoes) == digito){
                acertos++;
             }
@@ -108,7 +108,7 @@ public class Conv{
          }
       }
 
-      conv.calcularSaida(entrada);
+      conv.forward(entrada);
 
       System.out.println("Forward esperado: " + conv.saida().comparar(saidaEsperada));
    }
@@ -134,7 +134,7 @@ public class Conv{
       
       //backward
       conv.entrada.copiar(entrada);
-      conv.calcularGradiente(grad);
+      conv.backward(grad);
 
       Tensor4D gradSaida = new Tensor4D(conv.gradSaida);
       Tensor4D gradFiltroEsperado = new Tensor4D(conv.gradFiltros);
@@ -194,7 +194,7 @@ public class Conv{
       dados.editarNome("Tempos Forward");
       ArrayList<String[]> conteudo = new ArrayList<>();
 
-      t = medirTempo(() -> modelo.camada(0).calcularSaida(entrada));
+      t = medirTempo(() -> modelo.camada(0).forward(entrada));
       conteudo.add(new String[]{
          "0",
          modelo.camada(0).nome(),
@@ -206,7 +206,7 @@ public class Conv{
          Camada atual = modelo.camada(i);
          Camada anterior = modelo.camada(i-1);
          t = medirTempo(() -> {
-            atual.calcularSaida(anterior.saida());
+            atual.forward(anterior.saida());
          });
          total += t;
 
@@ -242,7 +242,7 @@ public class Conv{
       dados.editarNome("Tempos Backward");
       ArrayList<String[]> conteudo = new ArrayList<>();
 
-      t = medirTempo(() -> modelo.camada(n-1).calcularGradiente(new Tensor4D(grad)));
+      t = medirTempo(() -> modelo.camada(n-1).backward(new Tensor4D(grad)));
       conteudo.add(new String[]{
          String.valueOf(n-1),
          modelo.camada(n-1).nome(),
@@ -255,7 +255,7 @@ public class Conv{
          Camada atual = modelo.camada(id);
          Camada proxima = modelo.camada(id+1);
          t = medirTempo(() -> {
-            atual.calcularGradiente(proxima.gradEntrada());
+            atual.backward(proxima.gradEntrada());
          });
          total += t;
 
@@ -287,9 +287,9 @@ public class Conv{
       }
 
       //backward simples
-      modelo.camadaSaida().calcularGradiente(new Tensor4D(grad));
+      modelo.camadaSaida().backward(new Tensor4D(grad));
       for(int i = modelo.numCamadas()-2; i >= 0; i--){
-         modelo.camada(i).calcularGradiente(modelo.camada(i+1).gradEntrada());
+         modelo.camada(i).backward(modelo.camada(i+1).gradEntrada());
       }
 
       long t = System.nanoTime();
@@ -311,10 +311,9 @@ public class Conv{
    }
 
    static void testarPrevisao(Sequencial modelo, String caminhoImagem, boolean prob){
-      double[][][] entrada = new double[1][][];
       String extensao = ".jpg";
-      entrada[0] = imagemParaMatriz("/dados/mnist/" + caminhoImagem + extensao);
-      double[] previsao = modelo.calcularSaida(entrada).paraArray();
+      var entrada = new Tensor4D(imagemParaMatriz("/dados/mnist/" + caminhoImagem + extensao));
+      double[] previsao = modelo.forward(entrada).paraArray();
       
       System.out.print("\nTestando: " + caminhoImagem + extensao);
       if(prob){

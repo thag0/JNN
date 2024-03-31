@@ -54,7 +54,7 @@ public class Benchmark{
       entrada.preencherContador(true);
 
       long tempo = 0;
-      tempo = medirTempo(() -> conv.calcularSaida(entrada));
+      tempo = medirTempo(() -> conv.forward(entrada));
    
       //resultados
       StringBuilder sb = new StringBuilder();
@@ -105,7 +105,7 @@ public class Benchmark{
       Tensor4D grad = new Tensor4D(conv.gradSaida.shape());
       grad.map((x) -> rand.nextDouble());
 
-      long tempo = medirTempo(() -> conv.calcularGradiente(grad));
+      long tempo = medirTempo(() -> conv.backward(grad));
 
       //resultados
       StringBuilder sb = new StringBuilder();
@@ -148,7 +148,7 @@ public class Benchmark{
          }
       }
 
-      conv.calcularSaida(entrada);
+      conv.forward(entrada);
 
       System.out.println("Forward esperado: " + conv.somatorio.comparar(saidaEsperada));
    }

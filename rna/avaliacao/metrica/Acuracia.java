@@ -18,7 +18,7 @@ public class Acuracia extends Metrica{
          int numAmostras = arrEntrada.length;
          
       for(int i = 0; i < numAmostras; i++){
-         rede.calcularSaida(arrEntrada[i]);
+         rede.forward(arrEntrada[i]);
 
          int indiceCalculado = super.indiceMaiorValor(rede.saidaParaArray());
          int indiceEsperado = super.indiceMaiorValor((double[])saida[i]);

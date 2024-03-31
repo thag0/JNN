@@ -112,7 +112,7 @@ class GerenciadorArquivos{
                   entrada[0] = (double)x / (larguraImagem-1);
                   entrada[1] = (double)y / (alturaImagem-1);
                
-                  redes[id].calcularSaida(entrada);
+                  redes[id].forward(entrada);
                
                   saida[0] = redes[id].saidaParaArray()[0] * 255;
 
@@ -183,7 +183,7 @@ class GerenciadorArquivos{
                   entrada[0] = (double)x / (larguraImagem-1);
                   entrada[1] = (double)y / (alturaImagem-1);
                
-                  redes[id].calcularSaida(entrada);
+                  redes[id].forward(entrada);
                   double[] s = redes[id].saidaParaArray();
                
                   saida[0] = s[0] * 255;

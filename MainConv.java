@@ -41,7 +41,7 @@ public class MainConv{
 
       System.out.println("Treinando.");
       tempo = System.nanoTime();
-         modelo.treinar(treinoX, treinoY, EPOCAS_TREINO, 32, true);
+         modelo.treinar(treinoX, treinoY, EPOCAS_TREINO, true);
       tempo = System.nanoTime() - tempo;
 
       long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempo);
@@ -81,7 +81,7 @@ public class MainConv{
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
          new Densa(128, "sigmoid"),
-         new Dropout(0.2),
+         new Dropout(0.3),
          new Densa(NUM_DIGITOS_TREINO, "softmax") 
       });
 
@@ -128,7 +128,7 @@ public class MainConv{
       System.out.println("\nTestando: " + imagemTeste);
       double[][][] teste1 = new double[1][][];
       teste1[0] = imagemParaMatriz("/dados/mnist/teste/" + imagemTeste + ".jpg");
-      modelo.calcularSaida(teste1);
+      modelo.forwards(teste1);
       double[] previsao = modelo.saidaParaArray();
       for(int i = 0; i < previsao.length; i++){
          System.out.println("Prob: " + i + ": " + (int)(previsao[i]*100) + "%");

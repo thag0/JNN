@@ -49,7 +49,7 @@ public class PainelTreino extends JPanel{
             for(x = 0; x < this.largura; x++){
                entradaRede[0] = (double)x / this.largura;
                entradaRede[1] = (double)y / this.altura;
-               modelo.calcularSaida(entradaRede);
+               modelo.forward(entradaRede);
 
                double[] saida = modelo.saidaParaArray();
                int cinza = (int)(saida[0] * 255);
@@ -67,7 +67,7 @@ public class PainelTreino extends JPanel{
             for(x = 0; x < this.largura; x++){
                entradaRede[0] = (double)x / this.largura;
                entradaRede[1] = (double)y / this.altura;
-               modelo.calcularSaida(entradaRede);
+               modelo.forward(entradaRede);
 
                double[] saida = modelo.saidaParaArray();
                r = (int)(saida[0] * 255);
@@ -133,7 +133,7 @@ public class PainelTreino extends JPanel{
             entrada[0] = (double) x / this.largura;
             entrada[1] = (double) y / this.altura;
 
-            modelo.calcularSaida(entrada);
+            modelo.forward(entrada);
             modelo.copiarDaSaida(saida);
             
             cinza = (int)(saida[0] * 255);
@@ -157,7 +157,7 @@ public class PainelTreino extends JPanel{
             entrada[0] = (double) x / this.largura;
             entrada[1] = (double) y / this.altura;
             
-            modelo.calcularSaida(entrada);
+            modelo.forward(entrada);
             modelo.copiarDaSaida(saida);
 
             r = (int) (saida[0] * 255);

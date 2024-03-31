@@ -9,14 +9,12 @@ import rna.core.Tensor4D;
 import rna.otimizadores.Otimizador;
 import rna.treinamento.Treinador;
 
-//implementar serialização do modelo
-
 /**
  * <h1>
  *    Modelo sequencial de camadas
  * </h1>
  * <p>
- *    Uma api simples para criação de modelos de redes neurais, funciona
+ *    Uma interface simples para criação de modelos de redes neurais,
  *    empilhando camadas em sequência que podem ser customizáveis.
  * </p>
  * <h2>
@@ -24,25 +22,30 @@ import rna.treinamento.Treinador;
  * </h2>
  * <p>
  *    Para qualquer modelo novo, é sempre necessário informar o formato
- *    de entrada da primeira camada contida nele.
+ *    de entrada da primeira camada contida nele. Caso não seja de interesse,
+ *    é possível adicionar a camada {@code Entrada} que contém o formato desejado.
  * </p>
  * <p>
- *    Exemplo de criação de modelos:
+ *    Exemplos:
  * </p>
  * <pre>
  *modelo = Sequencial();
  *modelo.add(new Densa(2, 3));
  *modelo.add(new Densa(2));
- * </pre>
- * Ou se preferir
- * <pre>
+ *
  *modelo = Sequencial(new Camada[]{
- *    new Densa(2, 3)),
- *    new Densa(2))
+ *    new Densa(2, 3),
+ *    new Densa(2)
+ *});
+ *
+ *modelo = Sequencial(new Camada[]{
+ *    new Entrada(2),
+ *    new Densa(3),
+ *    new Densa(2)
  *});
  * </pre>
- * O modelo sequencial não é limitado apenas a camadas densas, podem empilhar camadas
- * compatívels com {@code rna.camadas}, algumas camadas dispoíveis incluem:
+ * O modelo sequencial não é limitado apenas a camadas densas, podendo empilhar camadas
+ * compatívels que herdam de {@code rna.Camada}, algumas camadas dispoíveis incluem:
  * <ul>
  *    <li> Densa; </li>
  *    <li> Convolucional; </li>
@@ -56,35 +59,54 @@ import rna.treinamento.Treinador;
  * </p>
  * <pre>
  *modelo = Sequencial(new Camada[]{
- *    new Convolucional(new int[]{1, 28, 28}, new int[]{3, 3}, 5),
+ *    new Entrada(28, 28),
+ *    new Convolucional(new int[]{3, 3}, 5),
  *    new MaxPooling(new int[]{2, 2}),
  *    new Flatten(),
- *    new Densa(50)),
- *    new Dropout(0.3)),
- *    new Densa(10)),
+ *    new Densa(50),
+ *    new Dropout(0.3),
+ *    new Densa(10),
  *});
  * </pre>
  * <h2>
  *    Compilação
  * </h2>
  * <p>
- *    Para poder usar o modelo é necessário compilá-lo, informando parâmetros 
- *    função de perda, otimizador e inicializador para os kernels (inicializador
- *    de bias é opcional).
+ *    Para poder usar o modelo é necessário compilá-lo, informando qual otimizador
+ *    e função de perda serão utilizados pelo modelo.
  * </p>
  *    Exemplo:
  * <pre>
  *modelo.compilar("sgd", "mse");
- *modelo.compilar(new SGD(0.01, 0.9), "mse");
+ *modelo.compilar(new SGD(0.01, 0.9), new MSE());
  * </pre>
+ * <h2>
+ *    Predições
+ * </h2>
+ * <p>
+ *    Obter os resultados previstos pelo medelo pode ser facilmente feito apenas o alimentando
+ *    com dados de entrada. Os dados dados de entrada para maior facilidade de manipulação podem
+ *    ser instâncias de um {@code Tensor4D} (tanto únicas, quanto arrays), mas o modelo não é
+ *    limitado a isso, sendo necesário apenas saber se a camada inicial possui suporte para o
+ *    dado fornecido.
+ * </p>
+ * <p>
+ *    Exemplo:
+ * </p>
+ * <pre>
+ *Tensor4D entrada = ...;
+ *Tensor4D pred = modelo.forward(entrada);//Obtendo uma única predição
+ *
+ *Tensor4D[] entradas = ...;
+ *Tensor4D[] preds = modelo.forwards(entrada);//Obtendo várias predições
+ *</pre>
  * <h2>
  *    Treinamento
  * </h2>
  * <p>
  *    Modelos sequenciais podem ser facilmente treinados usando o método {@code treinar},
  *    onde é apenas necessário informar os dados de entrada, saída e a quantidade de épocas 
- *    desejada para treinar. A entrada pode variar dependendo da primeira camada que for 
- *    adicionada ao modelo.
+ *    desejada para treinar.
  * </p>
  * Exemplo:
  * <pre>
@@ -290,21 +312,21 @@ public class Sequencial extends Modelo implements Cloneable{
    }
 
    @Override
-   public Tensor4D calcularSaida(Object entrada){
+   public Tensor4D forward(Object entrada){
       verificarCompilacao();
 
       utils.validarNaoNulo(entrada, "Dados de entrada não podem ser nulos.");
 
-      camadas[0].calcularSaida(entrada);
+      camadas[0].forward(entrada);
       for(int i = 1; i < camadas.length; i++){
-         camadas[i].calcularSaida(camadas[i-1].saida());
+         camadas[i].forward(camadas[i-1].saida());
       }
 
       return camadaSaida().saida().clone();
    }
 
    @Override
-   public Tensor4D[] calcularSaidas(Object[] entradas){
+   public Tensor4D[] forwards(Object[] entradas){
       verificarCompilacao();
 
       utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
@@ -313,7 +335,7 @@ public class Sequencial extends Modelo implements Cloneable{
       Tensor4D[] previsoes = new Tensor4D[entradas.length];
 
       for(int i = 0; i < previsoes.length; i++){
-         previsoes[i] = calcularSaida(entradas[i]).clone();
+         previsoes[i] = forward(entradas[i]).clone();
       }
 
       return previsoes;

@@ -69,7 +69,7 @@ class Treino{
          
          for(int i = 0; i < numAmostras; i++){
             double[] amostraSaida = (double[]) rotulos[i];
-            modelo.calcularSaida(amostras[i]);
+            modelo.forward(amostras[i]);
             
             //feedback de avanço da rede
             if(calcularHistorico){

@@ -18,21 +18,21 @@ import rna.core.Tensor4D;
  *    os métodos propostos pelas camadas.
  * </p>
  * <p>
- *    As partes mais importantes de uma camada são {@code calcularSaida()} e 
- *    {@code calcularGradiente()} onde são implementados os métodos básicos 
- *    também conhecidos como "forward" e "backward". 
+ *    As partes mais importantes de uma camada são {@code forward()} e 
+ *    {@code backward()} onde são implementados os métodos básicos para
+ *    propagação e retropropagação de dados.
  * </p>
  * <p>
- *    Para a parte de propagação direta (calcular saída ou forward) os dados
- *    recebidos de entrada são processados de acordo com cada regra individual
- *    de cada camada e ao final os resultados são salvos em sua saída.
+ *    Para a parte de propagação direta (ou forward) os dados recebidos de entrada 
+ *    são processados de acordo com cada regra individual de cada camada e ao final 
+ *    os resultados são salvos em sua saída.
  * </p>
  * <p>
- *    Na propagação reversa (calcular gradiente ou backward) são recebidos os 
- *    gradientes da camada anterior e cada camada irá fazer seu processamento 
- *    para calcular os próprios gradientes para seus atributos treináveis. Aqui 
- *    cada camada tem o adicional de calcular os gradientes em relação as suas 
- *    entradas para retropropagar para camadas anteriores usadas pelos modelos.
+ *    Na propagação reversa (ou backward) são recebidos os gradientes da camada 
+ *    anterior e cada camada irá fazer seu processamento para calcular os próprios 
+ *    gradientes para seus atributos treináveis. Aqui cada camada tem o adicional 
+ *    de calcular os gradientes em relação as suas entradas para retropropagar para 
+ *    camadas anteriores usadas pelos modelos.
  * </p>
  * <h2>
  *    Existem dois detalhes importantes na implementação das camadas.
@@ -216,7 +216,7 @@ public abstract class Camada{
     * @return {@code Tensor} contendo a saída calculada, que por padrão
     * é uma cópia da saída calculada para preservar as propriedades da camada.
     */
-   public abstract Tensor4D calcularSaida(Object entrada);
+   public abstract Tensor4D forward(Object entrada);
 
    /**
     * Retropropaga os gradientes recebidos para as camadas anteriores.
@@ -224,11 +224,11 @@ public abstract class Camada{
     *    Resultados processados ficam salvos no {@code gradiente de entrada} 
     *    da camada.
     * </p>
-    * @param gradSeguinte gradiente da camada seguinte.
+    * @param grad gradiente da camada seguinte.
     * @return {@code Tensor} contendo o gradiente de entrada da camada, que por 
     * padrão é uma cópia da saída calculada para preservar as propriedades da camada.
     */
-   public abstract Tensor4D calcularGradiente(Object gradSeguinte);
+   public abstract Tensor4D backward(Object grad);
 
    /**
     * Retorna a saída da camada.

@@ -633,7 +633,7 @@ public class Convolucional extends Camada implements Cloneable{
     * fornecida e a capacidade de entrada da camada.
     */
    @Override
-   public Tensor4D calcularSaida(Object entrada){
+   public Tensor4D forward(Object entrada){
       verificarConstrucao();
 
       if(entrada instanceof double[][][]){
@@ -715,7 +715,7 @@ public class Convolucional extends Camada implements Cloneable{
     * @param grad gradiente da camada seguinte.
     */
    @Override
-   public Tensor4D calcularGradiente(Object grad){
+   public Tensor4D backward(Object grad){
       verificarConstrucao();
 
       if(grad instanceof Tensor4D){

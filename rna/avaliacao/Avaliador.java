@@ -76,7 +76,7 @@ public class Avaliador{
     * @return valor do erro médio quadrado da rede em relação ao dados fornecidos (custo/perda).
     */
    public double erroMedioQuadrado(Object[] entrada, Object[] saida){
-      Tensor4D[] previsoes = modelo.calcularSaidas(entrada);
+      Tensor4D[] previsoes = modelo.forwards(entrada);
       double[][] s = saidaParaArray(saida);
 
       double res = 0;
@@ -110,7 +110,7 @@ public class Avaliador{
     * fornecidos (custo/perda).
     */
    public double erroMedioQuadradoLogaritmico(Object[] entrada, Object[] saida){
-      Tensor4D[] previsoes = modelo.calcularSaidas(entrada);
+      Tensor4D[] previsoes = modelo.forwards(entrada);
       double[][] s = saidaParaArray(saida);
 
       double res = 0;
@@ -140,7 +140,7 @@ public class Avaliador{
     * @return valor do erro médio abosoluto da rede em relação ao dados fornecidos (custo/perda).
     */
    public double erroMedioAbsoluto(Object[] entrada, Object[] saida){
-      Tensor4D[] previsoes = modelo.calcularSaidas(entrada);
+      Tensor4D[] previsoes = modelo.forwards(entrada);
       double[][] s = saidaParaArray(saida);
 
       double res = 0;
@@ -182,7 +182,7 @@ public class Avaliador{
     * @return entropia cruzada da rede em relação ao dados fornecidos (custo/perda).
     */
    public double entropiaCruzada(Object[] entrada, Object[] saida){  
-      Tensor4D[] previsoes = modelo.calcularSaidas(entrada);
+      Tensor4D[] previsoes = modelo.forwards(entrada);
       double[][] s = saidaParaArray(saida);
 
       double res = 0;
@@ -214,7 +214,7 @@ public class Avaliador{
     * @return valor da entropia cruzada binária.
     */
    public double entropiaCruzadaBinaria(Object[] entrada, Object[] saida){
-      Tensor4D[] previsoes = modelo.calcularSaidas(entrada);
+      Tensor4D[] previsoes = modelo.forwards(entrada);
       double[][] s = saidaParaArray(saida);
 
       double res = 0;

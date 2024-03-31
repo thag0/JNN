@@ -67,8 +67,8 @@ public class TesteModelos{
       for(int i = 0; i < 2; i++){
          for(int j = 0; j < 2; j++){
             double[] e = {i, j};
-            double[] prevSeq = seq.calcularSaida(e).paraArray();
-            double[] prevRna = rna.calcularSaida(e).paraArray();
+            double[] prevSeq = seq.forward(e).paraArray();
+            double[] prevRna = rna.forward(e).paraArray();
             System.out.println(i + " " + j + " - Rna: " + prevRna[0] + "      \t    Seq: " + prevSeq[0]);
          }
       }

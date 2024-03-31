@@ -292,7 +292,7 @@ public class MaxPooling extends Camada{
    }
 
    @Override
-   public Tensor4D calcularSaida(Object entrada){
+   public Tensor4D forward(Object entrada){
       verificarConstrucao();
 
       if(entrada instanceof Tensor4D){
@@ -360,7 +360,7 @@ public class MaxPooling extends Camada{
    }
 
    @Override
-   public Tensor4D calcularGradiente(Object grad){
+   public Tensor4D backward(Object grad){
       verificarConstrucao();
 
       if(grad instanceof Tensor4D){

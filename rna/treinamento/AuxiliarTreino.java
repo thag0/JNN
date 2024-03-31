@@ -56,9 +56,9 @@ public class AuxiliarTreino{
       double[] gradPrev = perda.derivada(previsto, real);
 
       Tensor4D g = new Tensor4D(gradPrev);
-      saida.calcularGradiente(g);
+      saida.backward(g);
       for(int i = camadas.length-2; i >= 0; i--){
-         camadas[i].calcularGradiente(camadas[i+1].gradEntrada());
+         camadas[i].backward(camadas[i+1].gradEntrada());
       }
    }
 

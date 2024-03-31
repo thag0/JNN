@@ -87,7 +87,7 @@ public class Classificador{
             entradaRede[j] = dadosEntrada[i][j];
          }
 
-         rede.calcularSaida(entradaRede);
+         rede.forward(entradaRede);
          saidaRede = rede.saidaParaArray();
 
          //apenas formatação

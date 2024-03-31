@@ -226,7 +226,7 @@ public class Dropout extends Camada implements Cloneable{
     * ou {@code double[][][]}.
     */
    @Override
-   public Tensor4D calcularSaida(Object entrada){
+   public Tensor4D forward(Object entrada){
       verificarConstrucao();
 
       if(entrada instanceof Tensor4D){
@@ -305,7 +305,7 @@ public class Dropout extends Camada implements Cloneable{
     * @param grad gradientes da camada seguiente.
     */
    @Override
-   public Tensor4D calcularGradiente(Object grad){
+   public Tensor4D backward(Object grad){
       verificarConstrucao();
 
       if(grad instanceof Tensor4D){

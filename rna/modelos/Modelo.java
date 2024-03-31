@@ -214,14 +214,14 @@ public abstract class Modelo{
     * @param entrada dados de entrada que serão propagados através do modelo.
     * @return {@code Tensor} contendo a saída prevista pelo modelo.
     */
-   public abstract Tensor4D calcularSaida(Object entrada);
+   public abstract Tensor4D forward(Object entrada);
 
    /**
     * Alimenta o modelo com vários dados de entrada.
     * @param entradas array contendo multiplas entradas para testar o modelo.
     * @return array de {@code Tensor} contendo as previsões correspondentes.
     */
-   public abstract Tensor4D[] calcularSaidas(Object[] entradas);
+   public abstract Tensor4D[] forwards(Object[] entradas);
 
    /**
     * Zera os gradientes acumulados do modelo.
@@ -318,7 +318,7 @@ public abstract class Modelo{
       int n = amostras.length;
       double soma = 0;
       for(int i = 0; i < n; i++){
-         calcularSaida(amostras[i]);
+         forward(amostras[i]);
          soma += perda.calcular(saidaParaArray(), s[i]);
       }
 
