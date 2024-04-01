@@ -665,7 +665,7 @@ public class Tensor4D implements Iterable<Double>{
    }
 
    /**
-    * Copia apenas os dados contidos no array, sem levar em considerasão
+    * Copia apenas os dados contidos no array, sem levar em consideração
     * as dimensões do tensor.
     * <p>
     *    Ainda é necessário que a quantidade de elementos do array seja igual
@@ -922,12 +922,56 @@ public class Tensor4D implements Iterable<Double>{
     */
    public double somar(){
       double soma = 0;
-      int tam = tamanho();
-      for(int i = 0; i < tam; i++){
-         soma += dados[i];
+      
+      for(double val : dados){
+         soma += val;
       }
 
       return soma;
+   }
+
+   /**
+    * Retorna a média de todos os elementos do tensor.
+    * @return média entre os valores do tensor.
+    */
+   public double media(){
+      double soma = 0;
+
+      for(double val : dados){
+         soma += val;
+      }
+
+      return soma / tamanho();
+   }
+
+   /**
+    * Retorna o valor máximo contido no tensor.
+    * @return valor máximo.
+    */
+   public double maximo(){
+      double max = dados[0];
+
+      int tam = tamanho();
+      for(int i = 1; i < tam; i++){
+         if(dados[i] > max) max = dados[i];
+      }
+
+      return max;
+   }
+
+   /**
+    * Retorna o valor minimo contido no tensor.
+    * @return valor minimo.
+    */
+   public double minimo(){
+      double min = dados[0];
+
+      int tam = tamanho();
+      for(int i = 1; i < tam; i++){
+         if(dados[i] < min) min = dados[i];
+      }
+
+      return min;
    }
 
    /**

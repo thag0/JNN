@@ -40,12 +40,12 @@ public class Convolucional extends Camada implements Cloneable{
    /**
     * Operador de tensores para a camada.
     */
-   OpTensor4D optensor = new OpTensor4D();
+   private OpTensor4D optensor = new OpTensor4D();
 
    /**
     * Utilitário.
     */
-   Utils utils = new Utils();
+   private Utils utils = new Utils();
 
    /**
     * Formato de entrada da camada convolucional, dado por:
@@ -81,7 +81,7 @@ public class Convolucional extends Camada implements Cloneable{
     *    entrada = (1, profundidade, altura, largura)
     * </pre>
     */
-   public Tensor4D entrada;
+   private Tensor4D entrada;
 
    /**
     * Tensor contendo os filtros (ou kernels)
@@ -93,7 +93,7 @@ public class Convolucional extends Camada implements Cloneable{
     *    entrada = (numFiltros, profundidadeEntrada, alturaFiltro, larguraFiltro)
     * </pre>
     */
-   public Tensor4D filtros;
+   private Tensor4D filtros;
 
    /**
     * Tensor contendo os bias (vieses) para cada valor de 
@@ -105,7 +105,7 @@ public class Convolucional extends Camada implements Cloneable{
     *    bias = (1, 1, 1, numFiltros)
     * </pre>
     */
-   public Tensor4D bias;
+   private Tensor4D bias;
 
    /**
     * Auxiliar na verificação de uso do bias.
@@ -121,6 +121,9 @@ public class Convolucional extends Camada implements Cloneable{
     * <pre>
     *    somatorio = (1, numeroFiltros, alturaSaida, larguraSaida)
     * </pre>
+    * <p>
+    *    Atributo visível devido as funções de ativação.
+    * </p>
     */
    public Tensor4D somatorio;
    
@@ -133,7 +136,7 @@ public class Convolucional extends Camada implements Cloneable{
     *    saida = (1, numeroFiltros, alturaSaida, larguraSaida)
     * </pre>
     */
-   public Tensor4D saida;
+   private Tensor4D saida;
 
    /**
     * Tensor contendo os valores dos gradientes usados para 
@@ -145,7 +148,7 @@ public class Convolucional extends Camada implements Cloneable{
     *    gradEntrada = (1, profEntrada, alturaEntrada, larguraEntrada)
     * </pre>
     */
-   public Tensor4D gradEntrada;
+   private Tensor4D gradEntrada;
 
    /**
     * Tensor contendo os valores dos gradientes relativos a saída
@@ -156,6 +159,9 @@ public class Convolucional extends Camada implements Cloneable{
     * <pre>
     *    gradSaida = (1, numFiltros, alturaSaida, larguraSaida)
     * </pre>
+    * <p>
+    *    Atributo visível devido as funções de ativação.
+    * </p>
     */
    public Tensor4D gradSaida;
 
@@ -169,7 +175,7 @@ public class Convolucional extends Camada implements Cloneable{
     * gradFiltros = (numFiltros, profundidadeEntrada, alturaFiltro, larguraFiltro)
     * </pre>
     */
-   public Tensor4D gradFiltros;
+   private Tensor4D gradFiltros;
 
    /**
     * Tensor contendo os valores dos gradientes relativos a cada
@@ -181,12 +187,12 @@ public class Convolucional extends Camada implements Cloneable{
     *    gradBias = (1, 1, 1, numFiltros)
     * </pre>
     */
-   public Tensor4D gradBias;
+   private Tensor4D gradBias;
 
    /**
     * Função de ativação da camada.
     */
-   Ativacao ativacao = new Linear();
+   private Ativacao ativacao = new Linear();
 
    /**
     * Inicializador para os filtros da camada.
@@ -900,6 +906,11 @@ public class Convolucional extends Camada implements Cloneable{
    @Override
    public double[] kernelParaArray(){
       return kernel().paraArray();
+   }
+
+   @Override
+   public Tensor4D gradKernel(){
+      return gradFiltros;
    }
 
    @Override

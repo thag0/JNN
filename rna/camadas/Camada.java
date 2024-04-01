@@ -347,6 +347,19 @@ public abstract class Camada{
    }
 
    /**
+    * Retorna o gradiente do kernel da camada.
+    * <p>
+    *    <strong> O gradiente do kernel só existe em camadas treináveis </strong>.
+    * </p>
+    * @return gradiente do kernel da camada.
+    */
+   public Tensor4D gradKernel(){
+      throw new UnsupportedOperationException(
+         "\nCamada " + nome() + " não possui gradiente de kernel."
+      );
+   }
+
+   /**
     * Retorna um array contendo os elementos usados para armazenar o valor
     * dos gradientes para os kernels da camada.
     * @return gradientes para os kernels da camada.

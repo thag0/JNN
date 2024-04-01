@@ -63,12 +63,10 @@ public class Playground{
       });
 
       var r = new Tensor4D(2, 2);
-      r.preencher(0.0);
 
-      optensor.correlacao2D(a, b, r);
-      r.print(1); 
-      optensor.correlacao2D(a, b, r);
-      r.print(1); 
+      Convolucional conv;
+
+      System.out.println(b.somar());
    }
 
    /**

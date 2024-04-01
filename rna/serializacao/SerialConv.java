@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import rna.camadas.Convolucional;
+import rna.core.Tensor4D;
 
 /**
  * Utilitário usado para serialização e desserialização de camadas Convolucionais.
@@ -64,11 +65,12 @@ class SerialConv{
          bw.newLine();
 
          //filtros
-         for(int i = 0; i < camada.filtros.dim1(); i++){
-            for(int j = 0; j < camada.filtros.dim2(); j++){
-               for(int k = 0; k < camada.filtros.dim3(); k++){
-                  for(int l = 0; l < camada.filtros.dim4(); l++){
-                     escreverDado(camada.filtros.get(i, j, k, l), tipo, bw);
+         Tensor4D filtros = camada.kernel();
+         for(int i = 0; i < filtros.dim1(); i++){
+            for(int j = 0; j < filtros.dim2(); j++){
+               for(int k = 0; k < filtros.dim3(); k++){
+                  for(int l = 0; l < filtros.dim4(); l++){
+                     escreverDado(filtros.get(i, j, k, l), tipo, bw);
                      bw.newLine();
                   }
                }
@@ -76,7 +78,7 @@ class SerialConv{
          }
          
          if(camada.temBias()){
-            double[] bias = camada.bias.paraArray();
+            double[] bias = camada.bias().paraArray();
             for(double valor : bias){
                escreverDado(valor, tipo, bw);
                bw.newLine();               
@@ -166,7 +168,7 @@ class SerialConv{
     */
    public void lerPesos(Convolucional camada, BufferedReader br){
       try{
-         int tamKernel = camada.filtros.tamanho();
+         int tamKernel = camada.kernel().tamanho();
          double[] arrKernel = new double[tamKernel];
 
          for(int i = 0; i < tamKernel; i++){
@@ -176,7 +178,7 @@ class SerialConv{
          camada.editarKernel(arrKernel);
          
          if(camada.temBias()){
-            int tamBias = camada.bias.tamanho();
+            int tamBias = camada.bias().tamanho();
             double[] arrBias = new double[tamBias];
 
             for(int i = 0; i < tamBias; i++){
