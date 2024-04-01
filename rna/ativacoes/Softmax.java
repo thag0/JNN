@@ -74,7 +74,7 @@ public class Softmax extends Ativacao{
    @Override
    public void derivada(Densa camada){
       int n = camada.somatorio.dim4();
-      Tensor4D tmp = camada.saida.bloco2D(0, 0, 0, n);
+      Tensor4D tmp = camada.saida().bloco2D(0, 0, 0, n);
       Tensor4D ident = new Tensor4D(1, 1, n, camada.somatorio.dim4());
       ident.identidade2D(0, 0);
       Tensor4D transp = optensor.matTranspor(tmp, 0, 0);

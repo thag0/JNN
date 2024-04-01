@@ -84,6 +84,7 @@ public class Convolucional extends Camada implements Cloneable{
    private Tensor4D entrada;
 
    /**
+    * <h3> Não alterar </h3>
     * Tensor contendo os filtros (ou kernels)
     * da camada.
     * <p>
@@ -93,9 +94,10 @@ public class Convolucional extends Camada implements Cloneable{
     *    entrada = (numFiltros, profundidadeEntrada, alturaFiltro, larguraFiltro)
     * </pre>
     */
-   private Tensor4D filtros;
+   public Tensor4D filtros;
 
    /**
+    * <h3> Não alterar </h3>
     * Tensor contendo os bias (vieses) para cada valor de 
     * saída da camada.
     * <p>
@@ -105,7 +107,7 @@ public class Convolucional extends Camada implements Cloneable{
     *    bias = (1, 1, 1, numFiltros)
     * </pre>
     */
-   private Tensor4D bias;
+   public Tensor4D bias;
 
    /**
     * Auxiliar na verificação de uso do bias.
@@ -113,6 +115,7 @@ public class Convolucional extends Camada implements Cloneable{
    private boolean usarBias = true;
 
    /**
+    * <h3> Não alterar </h3>
     * Tensor contendo valores resultantes do cálculo de correlação cruzada
     * entre a entrada e os filtros, com o bias adicionado (se houver).
     * <p>
@@ -128,6 +131,7 @@ public class Convolucional extends Camada implements Cloneable{
    public Tensor4D somatorio;
    
    /**
+    * <h3> Não alterar </h3>
     * Tensor contendo os valores de saídas da camada.
     * <p>
     *    O formato da saída é dado por:
@@ -139,6 +143,7 @@ public class Convolucional extends Camada implements Cloneable{
    private Tensor4D saida;
 
    /**
+    * <h3> Não alterar </h3>
     * Tensor contendo os valores dos gradientes usados para 
     * a retropropagação para camadas anteriores.
     * <p>
@@ -151,6 +156,7 @@ public class Convolucional extends Camada implements Cloneable{
    private Tensor4D gradEntrada;
 
    /**
+    * <h3> Não alterar </h3>
     * Tensor contendo os valores dos gradientes relativos a saída
     * da camada.
     * <p>
@@ -166,6 +172,7 @@ public class Convolucional extends Camada implements Cloneable{
    public Tensor4D gradSaida;
 
    /**
+    * <h3> Não alterar </h3>
     * Tensor contendo os valores dos gradientes relativos a cada
     * filtro da camada.
     * <p>
@@ -175,9 +182,10 @@ public class Convolucional extends Camada implements Cloneable{
     * gradFiltros = (numFiltros, profundidadeEntrada, alturaFiltro, larguraFiltro)
     * </pre>
     */
-   private Tensor4D gradFiltros;
+   public Tensor4D gradFiltros;
 
    /**
+    * <h3> Não alterar </h3>
     * Tensor contendo os valores dos gradientes relativos a cada
     * bias da camada.
     * <p>
@@ -187,7 +195,7 @@ public class Convolucional extends Camada implements Cloneable{
     *    gradBias = (1, 1, 1, numFiltros)
     * </pre>
     */
-   private Tensor4D gradBias;
+   public Tensor4D gradBias;
 
    /**
     * Função de ativação da camada.

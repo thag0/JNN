@@ -18,7 +18,7 @@ public class TanH extends Ativacao{
    public void derivada(Densa densa){
       //aproveitar os resultados pre calculados
 
-      double[] e = densa.saida.paraArray();
+      double[] e = densa.saida().paraArray();
       double[] g = densa.gradSaida.paraArray();
       double[] d = new double[e.length];
 

@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import rna.camadas.Densa;
+import rna.core.Tensor4D;
 
 class SerialDensa{
 
@@ -51,14 +52,14 @@ class SerialDensa{
          bw.write(String.valueOf(camada.temBias()));
          bw.newLine();
          
-         double[] pesos = camada.pesos.paraArray();
+         double[] pesos = camada.kernelParaArray();
          for(int i = 0; i < pesos.length; i++){
             escreverDado(pesos[i], tipo, bw);
             bw.newLine();
          }
 
          if(camada.temBias()){
-            double[] bias = camada.bias.paraArray();
+            double[] bias = camada.biasParaArray();
             for(int i = 0; i < bias.length; i++){
                escreverDado(bias[i], tipo, bw);
                bw.newLine();
@@ -135,21 +136,22 @@ class SerialDensa{
     * @param br leitor de buffer.
     */
    public void lerPesos(Densa camada, BufferedReader br){
-      try{ 
-         int linPesos = camada.pesos.dim3();
-         int colPesos = camada.pesos.dim4();        
+      try{
+         Tensor4D pesos = camada.kernel();
+         int linPesos = pesos.dim3();
+         int colPesos = pesos.dim4();        
          for(int i = 0; i < linPesos; i++){
             for(int j = 0; j < colPesos; j++){
                double p = Double.parseDouble(br.readLine());
-               camada.pesos.set(p, 0, 0, i, j);
+               camada.kernel().set(p, 0, 0, i, j);
             }
          }
          
          if(camada.temBias()){
-            int colBias = camada.bias.dim4();        
+            int colBias = camada.bias().dim4();        
             for(int i = 0; i < colBias; i++){
                double b = Double.parseDouble(br.readLine());
-               camada.bias.set(b, 0, 0, 0, i);
+               camada.bias().set(b, 0, 0, 0, i);
             }
          }
       }catch(Exception e){

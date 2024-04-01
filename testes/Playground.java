@@ -63,7 +63,6 @@ public class Playground{
       });
 
       var r = new Tensor4D(2, 2);
-
       Convolucional conv;
 
       System.out.println(b.somar());

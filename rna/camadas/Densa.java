@@ -48,7 +48,7 @@ public class Densa extends Camada implements Cloneable{
    /**
     * Variável controlador para o tamanho de entrada da camada densa.
     */
-    private int tamEntrada;
+   private int tamEntrada;
     
    /**
     * Variável controlador para a quantidade de neurônios (unidades) 
@@ -59,6 +59,7 @@ public class Densa extends Camada implements Cloneable{
    //core
 
    /**
+    * <h3> Não alterar </h3>
     * Tensor contendo os valores dos pesos de cada conexão da
     * entrada com a saída da camada.
     * <p>
@@ -81,6 +82,7 @@ public class Densa extends Camada implements Cloneable{
    public Tensor4D pesos;
 
    /**
+    * <h3> Não alterar </h3>
     * Tensor contendo os viéses da camada, seu formato se dá por:
     * <pre>
     * b = (1, 1, 1, neuronios)
@@ -91,7 +93,7 @@ public class Densa extends Camada implements Cloneable{
    /**
     * Auxiliar na verificação do uso do bias na camada.
     */
-   boolean usarBias = true;
+   private boolean usarBias = true;
 
    // auxiliares
 
@@ -101,9 +103,10 @@ public class Densa extends Camada implements Cloneable{
     *    entrada = (1, 1, 1, tamEntrada)
     * </pre>
     */
-   public Tensor4D entrada;
+   private Tensor4D entrada;
 
    /**
+    * <h3> Não alterar </h3>
     * Tensor contendo os valores de resultado da multiplicação matricial entre
     * os pesos e a entrada da camada adicionados com o bias, seu formato se dá por:
     * <pre>
@@ -120,9 +123,10 @@ public class Densa extends Camada implements Cloneable{
     *    saida = (1, 1, 1, neuronios)
     * </pre>
     */
-   public Tensor4D saida;
+   private Tensor4D saida;
    
    /**
+    * <h3> Não alterar </h3>
     * Tensor contendo os valores de gradientes de cada neurônio da 
     * camada, seu formato se dá por:
     * <pre>
@@ -140,9 +144,10 @@ public class Densa extends Camada implements Cloneable{
     *    gradEntrada = (1, 1, 1, tamEntrada)
     * </pre>
     */
-   public Tensor4D gradEntrada;
+   private Tensor4D gradEntrada;
 
    /**
+    * <h3> Não alterar </h3>
     * Tensor contendo os valores dos gradientes para os pesos da camada.
     * <p>
     *    O formato da matriz de gradiente dos pesos é definido por:
@@ -154,6 +159,7 @@ public class Densa extends Camada implements Cloneable{
    public Tensor4D gradPesos;
 
    /**
+    * <h3> Não alterar </h3>
     * Tensor contendo os valores dos gradientes para os bias da camada.
     * <p>
     *    O formato da matriz de gradientes dos bias é definido por:
@@ -716,6 +722,11 @@ public class Densa extends Camada implements Cloneable{
    @Override
    public double[] kernelParaArray(){
       return pesos.paraArray();
+   }
+
+   @Override
+   public Tensor4D gradKernel(){
+      return gradPesos;
    }
 
    @Override
