@@ -201,7 +201,6 @@ public class Benchmark{
             int[] idGradKernel = {i, j};
             int[] idKernel = {i, j};
             int[] idGradEntrada = {0, j};
-            gradFiltroEsperado.preencher2D(idKernel[0], idKernel[1], 0.0);
             optensor.correlacao2D(entrada, gradSaida, gradFiltroEsperado, idEntrada, idDerivada, idGradKernel);
             optensor.convolucao2DFull(gradSaida, filtros, gradEntradaEsperado, idDerivada, idKernel, idGradEntrada);
          }

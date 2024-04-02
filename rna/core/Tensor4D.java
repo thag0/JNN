@@ -1740,7 +1740,7 @@ public class Tensor4D implements Iterable<Double>{
     * Iterador para usar com o tensor, usando para percorrer
     * os elementos do tensor sequencialmente.
     */
-   public class Tensor4DIterator implements Iterator<Double>{
+   class Tensor4DIterator implements Iterator<Double>{
       
       /**
        * Contador do índice atual.

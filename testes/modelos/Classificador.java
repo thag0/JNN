@@ -46,18 +46,18 @@ public class Classificador{
       //criando e configurando a rede neural
       Sequencial modelo = new Sequencial(new Camada[]{
          new Entrada(qEntradas),
-         new Densa(9, "sigmoid"),
-         new Densa(9, "sigmoid"),
+         new Densa(10, "sigmoid"),
+         new Densa(10, "sigmoid"),
          new Densa(qSaidas, "softmax")
       });
 
-      Otimizador otm = new SGD(0.001, 0.99);
+      Otimizador otm = new SGD(0.01, 0.9);
       modelo.compilar(otm, "entropia-cruzada");
       modelo.setHistorico(true);
-      modelo.info();
+      // modelo.info();
       
       //treinando e avaliando os resultados
-      modelo.treinar(treinoX, treinoY, 150, 32, false);
+      modelo.treinar(treinoX, treinoY, 150, 16, false);
       double acc = modelo.avaliador().acuracia(testeX, testeY);
       System.out.println("Acurácia = " + formatarDecimal(acc*100, 4) + "%");
       System.out.println("Perda = " + modelo.avaliar(testeX, testeY));

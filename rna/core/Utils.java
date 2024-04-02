@@ -184,7 +184,9 @@ public class Utils{
       Object[] elementos = new Object[0];
 
       if(entrada instanceof Object[]){
-         elementos = (Object[]) entrada;
+         Object[] arr = (Object[]) entrada;
+         //clone para corrigir inconsistências
+         elementos = arr.clone();
       
       }else if(entrada instanceof Tensor4D){
          Tensor4D t = (Tensor4D) entrada;
@@ -215,7 +217,7 @@ public class Utils{
                amostras[i].set(t.get(0, 0, 0, i), 0, 0, 0, 0);
             }
 
-            amostras[i].nome("amostra " + (i+1));//ajudar no debug
+            amostras[i].nome("amostra " + i);//ajudar no debug
          }
 
          elementos = new Object[amostras.length];
@@ -226,6 +228,6 @@ public class Utils{
          );
       }
 
-      return elementos.clone();
+      return elementos;
    }
 }

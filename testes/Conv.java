@@ -37,8 +37,8 @@ public class Conv{
       String nomeModelo = "modelo-convolucional";
       Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + nomeModelo + ".txt");
 
-      testarPrevisao(modelo, "treino/3/img_1", true);
-      testarPrevisao(modelo, "3_deslocado", true);
+      testarPrevisao(modelo, "treino/3/img_1", false);
+      testarPrevisao(modelo, "3_deslocado", false);
 
       // modelo.info();
       // testarAcertosMNIST(modelo);
@@ -323,7 +323,7 @@ public class Conv{
             System.out.println("Prob: " + i + ": " + (int)(previsao[i]*100) + "%");
          }
       }else{
-         System.out.print(" -> Prev: " + maiorIndice(previsao));
+         System.out.println(" -> Prev: " + maiorIndice(previsao));
       }
 
    }

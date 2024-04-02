@@ -317,12 +317,12 @@ public class Sequencial extends Modelo implements Cloneable{
 
       utils.validarNaoNulo(entrada, "Dados de entrada não podem ser nulos.");
 
-      camadas[0].forward(entrada);
+      Tensor4D prev = camadas[0].forward(entrada);
       for(int i = 1; i < camadas.length; i++){
-         camadas[i].forward(camadas[i-1].saida());
+         prev = camadas[i].forward(prev);
       }
 
-      return camadaSaida().saida().clone();
+      return prev;
    }
 
    @Override
@@ -331,14 +331,13 @@ public class Sequencial extends Modelo implements Cloneable{
 
       utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
 
-      //implementar uma melhor generalização futuramente
-      Tensor4D[] previsoes = new Tensor4D[entradas.length];
+      Tensor4D[] prevs = new Tensor4D[entradas.length];
 
-      for(int i = 0; i < previsoes.length; i++){
-         previsoes[i] = forward(entradas[i]).clone();
+      for(int i = 0; i < prevs.length; i++){
+         prevs[i] = forward(entradas[i]);
       }
 
-      return previsoes;
+      return prevs;
    }
   
    @Override

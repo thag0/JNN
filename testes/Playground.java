@@ -57,15 +57,7 @@ public class Playground{
          {5, 3, 1},
          {7, 0, 4}
       });
-      var b = new Tensor4D(new double[][]{
-         {1, 2}, 
-         {-1, 0}
-      });
 
-      var r = new Tensor4D(2, 2);
-      Convolucional conv;
-
-      System.out.println(b.somar());
    }
 
    /**

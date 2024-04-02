@@ -517,12 +517,12 @@ public class RedeNeural extends Modelo implements Cloneable{
 
       utils.validarNaoNulo(entrada, "Dados de entrada não pode ser nulo.");
 
-      this.camadas[0].forward(entrada);
-      for(int i = 1; i < this.camadas.length; i++){
-         this.camadas[i].forward(this.camadas[i-1].saida());
+      Tensor4D prev = camadas[0].forward(entrada);
+      for(int i = 1; i < camadas.length; i++){
+         prev = camadas[i].forward(prev);
       }
 
-      return camadaSaida().saida().clone();
+      return prev;
    }
 
    /**
@@ -549,7 +549,7 @@ public class RedeNeural extends Modelo implements Cloneable{
       Tensor4D[] previsoes = new Tensor4D[entradas.length];
 
       for(int i = 0; i < previsoes.length; i++){
-         previsoes[i] = forward(entradas[i]).clone();
+         previsoes[i] = forward(entradas[i]);
       }
 
       return previsoes;
