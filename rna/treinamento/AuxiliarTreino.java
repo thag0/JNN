@@ -50,15 +50,12 @@ public class AuxiliarTreino{
     * @param perda função de perda configurada para o modelo.
     * @param real saída real que será usada para calcular os erros e gradientes.
     */
-   public void backpropagation(Camada[] camadas, Perda perda, double[] real){
-      Camada saida = camadas[camadas.length-1];
-      double[] previsto = saida.saidaParaArray();
-      double[] gradPrev = perda.derivada(previsto, real);
+   public void backpropagation(Camada[] camadas, Perda perda, double[] prev, double[] real){
+      double[] deriv = perda.derivada(prev, real);
 
-      Tensor4D g = new Tensor4D(gradPrev);
-      saida.backward(g);
-      for(int i = camadas.length-2; i >= 0; i--){
-         camadas[i].backward(camadas[i+1].gradEntrada());
+      Tensor4D grad = new Tensor4D(deriv);
+      for(int i = camadas.length-1; i >= 0; i--){
+         grad = camadas[i].backward(grad);
       }
    }
 

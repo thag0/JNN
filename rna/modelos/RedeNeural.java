@@ -563,6 +563,13 @@ public class RedeNeural extends Modelo implements Cloneable{
    }
 
    @Override
+   public void treino(boolean treinando){
+      for(Camada camada : camadas){
+         camada.setTreino(treinando);
+      }
+   }
+
+   @Override
    public Otimizador otimizador(){
       return this.otimizador;
    }

@@ -4,6 +4,7 @@ import lib.ged.Dados;
 import lib.ged.Ged;
 import rna.camadas.Camada;
 import rna.camadas.Densa;
+import rna.camadas.Entrada;
 import rna.core.OpMatriz;
 import rna.modelos.*;
 
@@ -40,7 +41,8 @@ public class TesteModelos{
       String perda = "mse";
 
       Sequencial seq = new Sequencial(new Camada[]{
-         new Densa(nEntradas, nOcultas, atv1),
+         new Entrada(nEntradas),
+         new Densa(nOcultas, atv1),
          new Densa(nOcultas, atv1),
          new Densa(nSaidas, atv2)
       });

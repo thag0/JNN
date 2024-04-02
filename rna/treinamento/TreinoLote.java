@@ -92,7 +92,7 @@ class TreinoLote{
                   perdaEpoca += perda.calcular(modelo.saidaParaArray(), saidaAmostra);
                }
 
-               aux.backpropagation(camadas, perda, saidaAmostra);
+               aux.backpropagation(camadas, perda, modelo.saidaParaArray(), saidaAmostra);
             }
 
             otimizador.atualizar(camadas);

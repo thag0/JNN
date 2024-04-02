@@ -77,7 +77,7 @@ class Treino{
             }
             
             modelo.zerarGradientes();
-            backpropagation(camadas, perda, amostraSaida);
+            aux.backpropagation(camadas, perda, modelo.saidaParaArray(), amostraSaida);
             otimizador.atualizar(camadas);
          }
 
@@ -87,23 +87,9 @@ class Treino{
 
          //feedback de avanço da rede
          if(calcularHistorico){
-            historico.add((perdaEpoca/numAmostras));
+            historico.add(perdaEpoca/numAmostras);
          }
       }
-   }
-
-   /**
-    * Realiza a retropropagação de gradientes de cada camada para a atualização de pesos.
-    * <p>
-    *    Os gradientes iniciais são calculados usando a derivada da função de perda, com eles
-    *    calculados, são retropropagados da última a primeira camada da rede.
-    * </p>
-    * @param camadas conjunto de camadas de um modelo.
-    * @param perda função de perda configurada para a Rede Neural.
-    * @param real saída real que será usada para calcular os erros e gradientes.
-    */
-   public void backpropagation(Camada[] camadas, Perda perda, double[] real){
-      aux.backpropagation(camadas, perda, real);
    }
 
    /**

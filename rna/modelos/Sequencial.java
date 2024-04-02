@@ -348,6 +348,13 @@ public class Sequencial extends Modelo implements Cloneable{
    }
 
    @Override
+   public void treino(boolean treinando){
+      for(Camada camada : camadas){
+         camada.setTreino(treinando);
+      }
+   }
+
+   @Override
    public Otimizador otimizador(){
       verificarCompilacao();
       return this.otimizador;

@@ -12,13 +12,13 @@ import rna.modelos.Sequencial;
 import rna.otimizadores.*;
 
 public class MainImg{
-   static final int epocas = 8*1000;
-   static final float escalaRender = 8f;
+   static final int EPOCAS = 8*1000;
+   static final double ESCALA_RENDER = 8;
    static Ged ged = new Ged();
    static Geim geim = new Geim();
    static boolean calcularHistorico = true;
-   static final String caminhoHistoricoPerda = "historico-perda";
-   static final String caminhoImagem = "/dados/mnist/treino/8/img_256.jpg";
+   static final String CAMINHO_HISTORICO = "historico-perda";
+   static final String CAMINHO_IMAGGEM = "/dados/mnist/treino/8/img_256.jpg";
    // static final String caminhoImagem = "/dados/mnist/treino/7/img_1.jpg";
    // static final String caminhoImagem = "/dados/32x32/circulos.png";
 
@@ -27,7 +27,7 @@ public class MainImg{
 
       int tamEntrada = 2;
       int tamSaida = 1;
-      BufferedImage imagem = geim.lerImagem(caminhoImagem);
+      BufferedImage imagem = geim.lerImagem(CAMINHO_IMAGGEM);
       
       double[][] dados;
       if(tamSaida == 1) dados = geim.imagemParaDadosTreinoEscalaCinza(imagem);
@@ -57,8 +57,8 @@ public class MainImg{
       System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
 
       if(calcularHistorico){
-         exportarHistorico(modelo, caminhoHistoricoPerda);
-         executarComando("python grafico.py " + caminhoHistoricoPerda);
+         exportarHistorico(modelo, CAMINHO_HISTORICO);
+         executarComando("python grafico.py " + CAMINHO_HISTORICO);
       }
    }
 
@@ -98,15 +98,15 @@ public class MainImg{
     * @return tempo (em nano segundos) do treino.
     */
    static long treinoEmPainel(Modelo modelo, int altura, int largura, double[][] entradas, double[][] saidas){
-      final int fps = 60000;
-      int epocasPorFrame = 25;
+      final int fps = 600000;
+      int epocasPorFrame = 50;
 
       //acelerar o processo de desenho
       //bom em situações de janelas muito grandes
       int n = Runtime.getRuntime().availableProcessors();
       int numThreads = (n > 1) ? (int)(n * 0.5) : 2;
 
-      JanelaTreino jt = new JanelaTreino(largura, altura, escalaRender, numThreads);
+      JanelaTreino jt = new JanelaTreino(largura, altura, ESCALA_RENDER, numThreads);
       jt.desenharTreino(modelo, 0);
       
       //trabalhar com o tempo de renderização baseado no fps
@@ -116,7 +116,7 @@ public class MainImg{
 
       int i = 0;
       long tempoTreino = System.nanoTime();
-      while(i < epocas && jt.isVisible()){
+      while(i < EPOCAS && jt.isVisible()){
          modelo.treinar(entradas, saidas, epocasPorFrame, false);
          jt.desenharTreino(modelo, i);
          i += epocasPorFrame;

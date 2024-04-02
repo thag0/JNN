@@ -13,7 +13,7 @@ public class JanelaTreino extends JFrame{
    public PainelTreino painelTreino;
    private int numThreads = 1;
 
-   public JanelaTreino(int larguraImagem, int alturaImagem, float escala, int numThreads){
+   public JanelaTreino(int larguraImagem, int alturaImagem, double escala, int numThreads){
       try{
          BufferedImage icone = ImageIO.read(new File("./render/rede-neural.png"));
          setIconImage(icone);

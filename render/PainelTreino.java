@@ -23,7 +23,7 @@ public class PainelTreino extends JPanel{
    int r, b, g, rgb;
    int x, y;
    
-   public PainelTreino(int larguraImagem, int alturaImagem, float escala){
+   public PainelTreino(int larguraImagem, int alturaImagem, double escala){
       this.largura = (int) (larguraImagem*escala);
       this.altura = (int)  (alturaImagem*escala);
 

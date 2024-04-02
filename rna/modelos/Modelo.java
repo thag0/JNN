@@ -278,6 +278,13 @@ public abstract class Modelo{
    }
 
    /**
+    * Configura o modelo para o modo de treino
+    * @param treinando {@code true} caso o modelo deva estar no modo treino,
+    * {@code false} caso contrário.
+    */
+   public abstract void treino(boolean treinando);
+
+   /**
     * Avalia o modelo, calculando o seu valor de perda fazendo uso da função 
     * de perda que foi configurada.
     * <p>
