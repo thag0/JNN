@@ -98,7 +98,7 @@ public class Dicionario{
             case "softplus"   : return new SoftPlus();
             case "swish"      : return new Swish();
             case "tanh"       : return new TanH();
-            case "atan"     : return new Atan();
+            case "atan"       : return new Atan();
    
             default: throw new IllegalArgumentException(
                "Ativação \"" + ativacao + "\" não encontada."
