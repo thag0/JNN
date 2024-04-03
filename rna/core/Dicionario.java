@@ -1,6 +1,6 @@
 package rna.core;
 
-import rna.ativacoes.ArcTan;
+import rna.ativacoes.Atan;
 import rna.ativacoes.Argmax;
 import rna.ativacoes.ELU;
 import rna.ativacoes.Ativacao;
@@ -98,7 +98,7 @@ public class Dicionario{
             case "softplus"   : return new SoftPlus();
             case "swish"      : return new Swish();
             case "tanh"       : return new TanH();
-            case "arctan"     : return new ArcTan();
+            case "atan"     : return new Atan();
    
             default: throw new IllegalArgumentException(
                "Ativação \"" + ativacao + "\" não encontada."

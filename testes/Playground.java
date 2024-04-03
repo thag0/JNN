@@ -58,6 +58,10 @@ public class Playground{
          {7, 0, 4}
       });
 
+      var tensor = new Tensor4D(2, 2, 2);
+      tensor.map(x -> Math.random()*2 - 1);
+      tensor.relu();
+      tensor.print(2);
    }
 
    /**

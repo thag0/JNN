@@ -1463,6 +1463,80 @@ public class Tensor4D implements Iterable<Double>{
    }
 
    /**
+    * Aplica a função de ativação {@code ReLU} em todos os 
+    * elementos do tensor.
+    */
+   public void relu(){
+      map(x -> x > 0 ? x : 0);
+   }
+
+   /**
+    * Aplica a função de ativação {@code Sigmoid} em todos os 
+    * elementos do tensor.
+    */
+   public void sigmoid(){
+      map(x -> 1 / (1 + Math.exp(-x)));
+   }
+
+   /**
+    * Aplica a função de ativação {@code TanH} (Tangente Hiperbólica) 
+    * em todos os elementos do tensor.
+    */
+   public void tanh(){
+      map(x -> 2 / (1 + Math.exp(-2*x)) - 1);
+   }
+
+   /**
+    * Aplica a função de ativação {@code Atan} (Arco Tangente) 
+    * em todos os elementos do tensor.
+    */
+   public void atan(){
+      map(x -> Math.atan(x));
+   }
+
+   /**
+    * Calcula o valor {@code seno} de todos os elementos do tensor.
+    */
+   public void sin(){
+      map(x -> Math.sin(x));
+   }
+
+   /**
+    * Calcula o valor {@code cosseno} de todos os elementos do tensor.
+    */
+   public void cos(){
+      map(x -> Math.cos(x));
+   }
+
+   /**
+    * Calcula o valor {@code tangente} de todos os elementos do tensor.
+    */
+   public void tan(){
+      map(x -> Math.tan(x));
+   }
+
+   /**
+    * Calcula o valor {@code absoluto} de cada elemento do do tensor.
+    */
+   public void abs(){
+      map(x -> Math.abs(x));
+   }
+
+   /**
+    * Calcula o valor {@code exponencial} de cada elemento do do tensor.
+    */
+   public void exp(){
+      map(x -> Math.exp(x));
+   }
+
+   /**
+    * Calcula o valor {@code logaritmo natural} de cada elemento do do tensor.
+    */
+   public void log(){
+      map(x -> Math.log(x));
+   }
+
+   /**
     * Monta as informações de exibição do tensor.
     * @param casas quantidade de casas decimais.
     * @return string formatada.

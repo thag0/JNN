@@ -307,67 +307,6 @@ public class RedeNeural extends Modelo implements Cloneable{
    }
 
    /**
-    * Configura o novo otimizador da Rede Neural com base numa nova instância de otimizador.
-    * <p>
-    *    Configurando o otimizador passando diretamente uma nova instância permite configurar
-    *    os hiperparâmetros do otimizador fora dos valores padrão, o que pode ajudar a
-    *    melhorar o desempenho de aprendizado da Rede Neural em cenário específicos.
-    * </p>
-    * Otimizadores disponíveis.
-    * <ol>
-    *    <li>
-    *       <strong> GradientDescent </strong>: Método clássico de retropropagação de erro e 
-    *       ajuste de pesos para treinamento de Redes Neurais.
-    *    </li>
-    *    <li>
-    *       <strong> SGD (Gradiente Descendente Estocástico) </strong>: Atualiza os pesos 
-    *       usando o conjunto de treino embaralhado a cada época, com adicional de momentum
-    *       e correção de nesterov para a atualização.
-    *    </li>
-    *    <li>
-    *       <strong> AdaGrad </strong>: Um otimizador que adapta a taxa de aprendizado para 
-    *       cada parâmetro da rede com base em iterações anteriores.
-    *    </li>
-    *    <li>
-    *       <strong> RMSProp </strong>: Um otimizador que utiliza a média móvel dos quadrados 
-    *       dos gradientes acumulados para ajustar a taxa de aprendizado.
-    *    </li>
-    *    <li>
-    *       <strong> Adam </strong>: Um otimizador que combina o AdaGrad e o Momentum para 
-    *       convergência rápida e estável.
-    *    </li>
-    *    <li>
-    *       <strong> Nadam </strong>: Possui as mesmas vantagens de se utilizar o adam, com 
-    *       o adicional do acelerador de Nesterov na atualização dos pesos.
-    *    </li>
-    *    <li>
-    *       <strong> AMSGrad </strong>: Um otimizador que mantém um histórico dos valores
-    *       dos gradientes acumulados para evitar a degradação da taxa de aprendizado,
-    *       proporcionando uma convergência mais estável.
-    *    </li>
-    *    <li>
-    *       <strong> Adamax </strong>: Um otimizador que é uma variação do Adam e
-    *       mantém o máximo absoluto dos valores dos gradientes acumulados em vez de usar
-    *       a média móvel dos quadrados dos gradientes.
-    *    </li>
-    *    <li>
-    *       <strong> Lion </strong>: Esse é particularmente novo e não conheço muito bem. 
-    *    </li>
-    *    <li>
-    *       <strong> Adadelta </strong>: Também é novo pra mim e ainda to testando melhor. 
-    *    </li>
-    * </ol>
-    * <p>
-    *    {@code O otimizador padrão é o SGD}
-    * </p>
-    * @param otimizador novo otimizador.
-    * @throws IllegalArgumentException se o novo otimizador for nulo.
-    */
-   public void setOtimizador(Otimizador otimizador){
-      super.setOtimizador(otimizador);
-   }
-
-   /**
     * Compila o modelo de Rede Neural inicializando as camadas, neurônios e pesos respectivos, 
     * baseado nos valores fornecidos.
     * <p>
