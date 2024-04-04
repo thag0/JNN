@@ -72,6 +72,7 @@ public class Convolucional extends Camada implements Cloneable{
    private final int[] shapeSaida = {1, 1, 1};
 
    /**
+    * <h3> Não alterar </h3>
     * Tensor contendo os valores de entrada para a camada,
     * que serão usados para o processo de feedforward.
     * <p>
@@ -81,7 +82,7 @@ public class Convolucional extends Camada implements Cloneable{
     *    entrada = (1, profundidade, altura, largura)
     * </pre>
     */
-   private Tensor4D entrada;
+   public Tensor4D entrada;
 
    /**
     * <h3> Não alterar </h3>
@@ -140,7 +141,7 @@ public class Convolucional extends Camada implements Cloneable{
     *    saida = (1, numeroFiltros, alturaSaida, larguraSaida)
     * </pre>
     */
-   private Tensor4D saida;
+   public Tensor4D saida;
 
    /**
     * <h3> Não alterar </h3>
@@ -153,7 +154,7 @@ public class Convolucional extends Camada implements Cloneable{
     *    gradEntrada = (1, profEntrada, alturaEntrada, larguraEntrada)
     * </pre>
     */
-   private Tensor4D gradEntrada;
+   public Tensor4D gradEntrada;
 
    /**
     * <h3> Não alterar </h3>
