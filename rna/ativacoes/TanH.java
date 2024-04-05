@@ -15,7 +15,7 @@ public class TanH extends Ativacao{
    }
 
    @Override
-   public void derivada(Densa densa){
+   public void backward(Densa densa){
       //aproveitar os resultados pre calculados
 
       double[] e = densa.saidaParaArray();

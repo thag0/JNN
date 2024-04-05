@@ -39,7 +39,7 @@ public class Argmax extends Ativacao{
    public Argmax(){}
 
    @Override
-   public void calcular(Tensor4D entrada, Tensor4D saida){
+   public void forward(Tensor4D entrada, Tensor4D saida){
       int canais = entrada.dim1();
       int profundidade = entrada.dim2();
       int linhas = entrada.dim3();

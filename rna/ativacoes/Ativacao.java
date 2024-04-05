@@ -64,49 +64,52 @@ public abstract class Ativacao{
 
    /**
     * Calcula o resultado da ativação de acordo com a função configurada.
-    * @param entrada tensor de entrada.
-    * @param saida tensor de destino.
+    * @param entrada {@code Tensor} de entrada.
+    * @param dest {@code Tensor} de destino.
     */
-   public void calcular(Tensor4D entrada, Tensor4D saida){
-      if(entrada.comparar4D(saida) == false){
+   public void forward(Tensor4D entrada, Tensor4D dest){
+      if(entrada.comparar4D(dest) == false){
          throw new IllegalArgumentException(
             "\nAs dimensões do tensor de entrada " + entrada.shapeStr() +
-            " e saída " + saida.shapeStr() + " devem ser iguais."
+            " e saída " + dest.shapeStr() + " devem ser iguais."
          );
       }
 
-      saida.map(entrada, fx);
+      dest.map(entrada, fx);
    }
 
    /**
     * Calcula o resultado da derivada da função de ativação de acordo 
     * com a função configurada
-    * @param entrada tensor de entrada.
-    * @param entrada tensor com os gradientes.
-    * @param saida tensor de destino.
+    * @param entrada {@code Tensor} de entrada.
+    * @param gradiente {@code Tensor} contendo os gradientes.
+    * @param dest {@code Tensor} de destino.
     */
-   public void derivada(Tensor4D entrada, Tensor4D gradiente, Tensor4D saida){
-      if(entrada.comparar4D(saida) == false){
+   public void backward(Tensor4D entrada, Tensor4D gradiente, Tensor4D dest){
+      if(entrada.comparar4D(dest) == false){
          throw new IllegalArgumentException(
             "\nAs dimensões do tensor de entrada " + entrada.shapeStr() +
-            " e saída " + saida.shapeStr() + " devem ser iguais."
+            " e saída " + dest.shapeStr() + " devem ser iguais."
          );
       }
 
-      int dim1 = entrada.dim1();
-      int dim2 = entrada.dim2();
-      int dim3 = entrada.dim3();
-      int dim4 = entrada.dim4();
+      int d1 = entrada.dim1();
+      int d2 = entrada.dim2();
+      int d3 = entrada.dim3();
+      int d4 = entrada.dim4();
       int i, j, k, l;
       double e, g;
 
-      for(i = 0; i < dim1; i++){
-         for(j = 0; j < dim2; j++){
-            for(k = 0; k < dim3; k++){
-               for(l = 0; l < dim4; l++){
+      for(i = 0; i < d1; i++){
+         for(j = 0; j < d2; j++){
+            for(k = 0; k < d3; k++){
+               for(l = 0; l < d4; l++){
                   e = entrada.get(i, j, k, l);
                   g = gradiente.get(i, j, k, l);
-                  saida.set((dx.applyAsDouble(e) * g), i, j, k, l);
+                  dest.set(
+                     (dx.applyAsDouble(e) * g),
+                     i, j, k, l
+                  );
                }
             }
          }
@@ -120,8 +123,9 @@ public abstract class Ativacao{
     * </p>
     * @param camada camada densa.
     */
-   public void derivada(Densa camada){
-      derivada(camada.somatorio, camada.gradSaida, camada.gradSaida);
+   public void backward(Densa camada){
+      //por padrão chamar o método da própria ativação
+      backward(camada.somatorio, camada.gradSaida, camada.gradSaida);
    }
 
    /**
@@ -131,8 +135,9 @@ public abstract class Ativacao{
     * </p>
     * @param camada camada convolucional.
     */
-   public void derivada(Convolucional camada){
-      derivada(camada.somatorio, camada.gradSaida, camada.gradSaida);
+   public void backward(Convolucional camada){
+      //por padrão chamar o método da própria ativação
+      backward(camada.somatorio, camada.gradSaida, camada.gradSaida);
    }
 
    /**

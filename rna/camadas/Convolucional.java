@@ -700,7 +700,7 @@ public class Convolucional extends Camada implements Cloneable{
          }
       }
 
-      ativacao.calcular(somatorio, saida);
+      ativacao.forward(somatorio, saida);
 
       return saida.clone();
    }
@@ -752,7 +752,7 @@ public class Convolucional extends Camada implements Cloneable{
          );
       }
 
-      ativacao.derivada(this);
+      ativacao.backward(this);
       
       //backward
       Tensor4D tempGrad = new Tensor4D(gradFiltros.shape());

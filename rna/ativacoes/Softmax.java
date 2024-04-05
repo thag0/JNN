@@ -47,32 +47,33 @@ public class Softmax extends Ativacao{
    public Softmax(){}
 
    @Override
-   public void calcular(Tensor4D entrada, Tensor4D saida){
-      int canais = entrada.dim1();
-      int profundidade = entrada.dim2();
+   public void forward(Tensor4D entrada, Tensor4D saida){
+      int lote = entrada.dim1();
+      int canais = entrada.dim2();
       int linhas = entrada.dim3();
       int colunas = entrada.dim4();
    
-      for(int can = 0; can < canais; can++){
-         for(int prof = 0; prof < profundidade; prof++){
+      for(int l = 0; l < lote; l++){
+         for(int c = 0; c < canais; c++){
             for(int lin = 0; lin < linhas; lin++){
                double somaExp = 0;
 
-               for(int i = 0; i < colunas; i++){
-                  somaExp += Math.exp(entrada.get(can, prof, lin, i));
+               for(int col = 0; col < colunas; col++){
+                  somaExp += Math.exp(entrada.get(l, c, lin, col));
                }
 
-               for(int i = 0; i < colunas; i++){
-                  double s = Math.exp(entrada.get(can, prof, lin, i)) / somaExp;
-                  saida.set(s, can, prof, lin, i);
+               for(int col = 0; col < colunas; col++){
+                  double s = Math.exp(entrada.get(l, c, lin, col)) / somaExp;
+                  saida.set(s, l, c, lin, col);
                }
             }
          }
       }
+      
    }
 
    @Override
-   public void derivada(Densa camada){
+   public void backward(Densa camada){
       int n = camada.somatorio.dim4();
       Tensor4D tmp = camada.saida().bloco2D(0, 0, 0, n);
       Tensor4D ident = new Tensor4D(1, 1, n, camada.somatorio.dim4());
@@ -92,7 +93,7 @@ public class Softmax extends Ativacao{
    }
 
    @Override
-   public void derivada(Convolucional camada){
+   public void backward(Convolucional camada){
       throw new UnsupportedOperationException(
          "\nSem suporte para derivada " + nome() + " em camadas convolucionais."
       );

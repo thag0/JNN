@@ -478,7 +478,7 @@ public class Densa extends Camada implements Cloneable{
          somatorio.add(bias);
       }
 
-      ativacao.calcular(somatorio, saida);
+      ativacao.forward(somatorio, saida);
 
       return saida.clone();
    }
@@ -531,7 +531,7 @@ public class Densa extends Camada implements Cloneable{
       }
 
       //backward
-      ativacao.derivada(this);
+      ativacao.backward(this);
 
       //gradiente temporário para usar como acumulador.
       Tensor4D tempGrad = new Tensor4D(gradPesos.shape());
