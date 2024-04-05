@@ -93,27 +93,17 @@ public class Treinador{
     * @param logs logs para perda durante as épocas de treinamento.
     */
    private void executar(Modelo modelo, Object entradas, Object[] saidas, int epochs, int tamLote, boolean logs){
-      // por enquanto só pra uso da camada de dropout
       modelo.treino(true);
 
       if(tamLote > 1){
          treinoLote.treinar(
-            modelo,
-            entradas,
-            saidas,
-            epochs,
-            tamLote,
-            logs
+            modelo, entradas, saidas, epochs, tamLote, logs
          );
          treinoLote.ultimoUsado = true;
       
       }else{
          treino.treinar(
-            modelo,
-            entradas, 
-            saidas, 
-            epochs,
-            logs
+            modelo, entradas, saidas, epochs, logs
          );
          treino.ultimoUsado = true;
       }

@@ -40,7 +40,7 @@ class TreinoLote{
     */
     public void setSeed(long seed){
       this.random.setSeed(seed);
-      this.aux.configurarSeed(seed);
+      this.aux.setSeed(seed);
    }
 
    /**

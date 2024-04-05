@@ -1,46 +1,12 @@
 package testes;
 
-import java.awt.image.BufferedImage;
-import java.io.Serial;
-import java.nio.Buffer;
-import java.sql.Time;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
-
-import lib.ged.Dados;
 import lib.ged.Ged;
 import lib.geim.Geim;
-import rna.ativacoes.Argmax;
-import rna.ativacoes.Ativacao;
-import rna.ativacoes.Softmax;
-import rna.avaliacao.perda.EntropiaCruzada;
-import rna.avaliacao.perda.EntropiaCruzadaBinaria;
-import rna.camadas.AvgPooling;
-import rna.camadas.Camada;
-import rna.camadas.Convolucional;
-import rna.camadas.Densa;
-import rna.camadas.Dropout;
-import rna.camadas.Entrada;
-import rna.camadas.Flatten;
-import rna.camadas.MaxPooling;
-import rna.core.Mat;
 import rna.core.OpArray;
 import rna.core.OpMatriz;
 import rna.core.OpTensor4D;
-import rna.core.Tensor4D;
 import rna.core.Utils;
-import rna.inicializadores.AleatorioPositivo;
-import rna.inicializadores.Inicializador;
-import rna.inicializadores.Zeros;
-import rna.modelos.RedeNeural;
-import rna.modelos.Sequencial;
-import rna.otimizadores.SGD;
-import rna.serializacao.Serializador;
-import rna.inicializadores.GlorotUniforme;
-import rna.inicializadores.Identidade;
-import rna.treinamento.AuxiliarTreino;
 
-@SuppressWarnings("unused")
 public class Playground{
    static Ged ged = new Ged();
    static OpArray oparr = new OpArray();
@@ -52,16 +18,6 @@ public class Playground{
    public static void main(String[] args){
       ged.limparConsole();
 
-      var a = new Tensor4D(new double[][]{
-         {1, 6, 2},
-         {5, 3, 1},
-         {7, 0, 4}
-      });
-
-      var tensor = new Tensor4D(2, 2, 2);
-      tensor.map(x -> Math.random()*2 - 1);
-      tensor.relu();
-      tensor.print(2);
    }
 
    /**
@@ -73,6 +29,29 @@ public class Playground{
       long t = System.nanoTime();
       func.run();
       return System.nanoTime() - t;
+   }
+
+   static void conv2D(double[][] in, double[][] f, double[][] dst){
+      int alturaKernel = f.length;
+      int larguraKernel = f[0].length;
+
+      int altEsperada  = in.length    - f.length    + 1;
+      int largEsperada = in[0].length - f[0].length + 1;
+
+      for(int i = 0; i < altEsperada; i++){
+         for(int j = 0; j < largEsperada; j++){
+            
+            double soma = 0.0;
+            for(int k = 0; k < alturaKernel; k++){
+               int posX = i+k;
+               for(int l = 0; l < larguraKernel; l++){
+                  soma += in[posX][j+l] * f[k][l];
+               }
+            }
+
+            dst[i][j] += soma;
+         }
+      }
    }
 
 }

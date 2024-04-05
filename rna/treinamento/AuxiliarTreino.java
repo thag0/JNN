@@ -33,7 +33,7 @@ public class AuxiliarTreino{
     * Configura a seed inicial do gerador de números aleatórios.
     * @param seed nova seed.
     */
-   public void configurarSeed(long seed){
+   public void setSeed(long seed){
       this.random.setSeed(seed);
    }
 
@@ -83,36 +83,6 @@ public class AuxiliarTreino{
          saidas[idAleatorio] = temp;
       }
    }
-   
-   /**
-    * Embaralha os dados da matriz usando o algoritmo Fisher-Yates.
-    * @param entradas matriz com os dados de entrada.
-    * @param saidas matriz com os dados de saída.
-    */
-   void embaralharDados(double[][] entradas, double[][] saidas){
-      int linhas = entradas.length;
-      int colEntrada = entradas[0].length;
-      int colSaida = saidas[0].length;
-  
-      //evitar muitas inicializações
-      double tempEntradas[] = new double[colEntrada];
-      double tempSaidas[] = new double[colSaida];
-      int i, idAleatorio;
-
-      for(i = linhas - 1; i > 0; i--){
-         idAleatorio = random.nextInt(i+1);
-
-         //trocar entradas
-         copiarArray(entradas[i], tempEntradas);
-         copiarArray(entradas[idAleatorio], entradas[i]);
-         copiarArray(tempEntradas, entradas[idAleatorio]);
-
-         //trocar saídas
-         copiarArray(saidas[i], tempSaidas);
-         copiarArray(saidas[idAleatorio], saidas[i]);
-         copiarArray(tempSaidas, saidas[idAleatorio]); 
-      }
-   }
 
    /**
     * Dedicado para treino em lote e multithread em implementações futuras.
@@ -128,26 +98,10 @@ public class AuxiliarTreino{
 
       int linhas = fim - inicio;
       Object[] subMatriz = new Object[linhas];
-      
-      for(int i = 0; i < linhas; i++){
-         subMatriz[i] = dados[i + inicio];
-      }
+
+      System.arraycopy(dados, inicio, subMatriz, 0, linhas);
 
       return subMatriz;
    }
 
-   /**
-    * Copia todo o conteúdo do array fornecido para o destino.
-    * @param arr array contendo os dados.
-    * @param dest destino da cópia.
-    */
-   void copiarArray(double[] arr, double[] dest){
-      if(arr.length != dest.length){
-         throw new IllegalArgumentException(
-            "Os arrays devem conter o mesmo tamanho"
-         );
-      }
-
-      System.arraycopy(arr, 0, dest, 0, dest.length);
-   }
 }
