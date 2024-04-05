@@ -190,12 +190,20 @@ public class Sequencial extends Modelo implements Cloneable{
       utils.validarNaoNulo(camadas, "Conjunto de camadas não pode ser nulo.");
 
       for(int i = 0; i < camadas.length; i++){
-         utils.validarNaoNulo(camadas[i], ("O conjunto de camadas fornecido possui uma camada nula, id = " + i));
+         utils.validarNaoNulo(
+            camadas[i], ("O conjunto de camadas fornecido possui uma camada nula, id = " + i)
+         );
+      }
+
+      if(camadas.length < 1){
+         throw new IllegalArgumentException(
+            "\nCamadas possui tamanho = " + camadas.length + "."
+         );
       }
 
       this.camadas = new Camada[0];
+      
       add(camadas[0]);
-
       for(int i = 1; i < camadas.length; i++){
          if(camadas[i] instanceof Entrada == false){
             add(camadas[i]);
@@ -221,10 +229,8 @@ public class Sequencial extends Modelo implements Cloneable{
 
       Camada[] antigas = camadas;
       camadas = new Camada[antigas.length + 1];
-      for(int i = 0; i < antigas.length; i++){
-         camadas[i] = antigas[i];
-      }
-
+      
+      System.arraycopy(antigas, 0, camadas, 0, antigas.length);
       camadas[camadas.length-1] = camada;
 
       compilado = false;
@@ -246,9 +252,7 @@ public class Sequencial extends Modelo implements Cloneable{
 
       Camada[] novas = camadas;
       camadas = new Camada[camadas.length-1];
-      for(int i = 0; i < camadas.length; i++){
-         camadas[i] = novas[i];
-      }
+      System.arraycopy(novas, 0, camadas, 0, camadas.length);
 
       compilado = false;
 
@@ -265,9 +269,7 @@ public class Sequencial extends Modelo implements Cloneable{
          //remover camada de entrada do modelo
          Camada[] temp = camadas;
          camadas = new Camada[camadas.length-1];
-         for(int i = 0; i < camadas.length; i++){
-            camadas[i] = temp[i + 1];
-         }
+         System.arraycopy(temp, 1, camadas, 0, camadas.length);
 
          if(camadas.length == 0){
             throw new IllegalStateException(

@@ -2,10 +2,15 @@ package testes;
 
 import lib.ged.Ged;
 import lib.geim.Geim;
+import rna.camadas.Camada;
+import rna.camadas.Convolucional;
+import rna.camadas.Densa;
+import rna.camadas.Entrada;
 import rna.core.OpArray;
 import rna.core.OpMatriz;
 import rna.core.OpTensor4D;
 import rna.core.Utils;
+import rna.modelos.Sequencial;
 
 public class Playground{
    static Ged ged = new Ged();
@@ -18,6 +23,17 @@ public class Playground{
    public static void main(String[] args){
       ged.limparConsole();
 
+      Sequencial modelo = new Sequencial(new Camada[]{
+         new Entrada(28, 28),
+         new Convolucional(new int[]{3, 3}, 2),
+         new Densa(2, 2),
+         new Densa(2),
+      });
+      modelo.sub();
+      modelo.sub();
+      modelo.sub();
+      modelo.compilar("sgd", "mse");
+      modelo.info();
    }
 
    /**

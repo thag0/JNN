@@ -18,7 +18,7 @@ public class MainImg{
    static Geim geim = new Geim();
    static boolean calcularHistorico = true;
    static final String CAMINHO_HISTORICO = "historico-perda";
-   static final String CAMINHO_IMAGGEM = "/dados/mnist/treino/8/img_256.jpg";
+   static final String CAMINHO_IMAGGEM = "/dados/mnist/treino/8/img_0.jpg";
    // static final String caminhoImagem = "/dados/mnist/treino/7/img_1.jpg";
    // static final String caminhoImagem = "/dados/32x32/circulos.png";
 
@@ -77,8 +77,8 @@ public class MainImg{
    static Modelo criarSequencial(int entradas, int saidas){
       Sequencial modelo = new Sequencial(new Camada[]{
          new Entrada(entradas),
-         new Densa(8, "tanh"),
-         new Densa(8, "tanh"),
+         new Densa(8, "sigmoid"),
+         new Densa(8, "sigmoid"),
          new Densa(saidas, "sigmoid")
       });
 

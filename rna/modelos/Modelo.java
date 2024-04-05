@@ -20,9 +20,10 @@ public abstract class Modelo{
    /**
     * Nome da instância do modelo.
     */
-   protected String nome = this.getClass().getSimpleName();
+   protected String nome = getClass().getSimpleName();
 
    /**
+    * <h3> Não alterar </h3>
     * Auxiliar no controle da compilação do modelo, ajuda a evitar uso 
     * indevido caso ainda não tenha suas variáveis e dependências inicializadas 
     * previamente.
@@ -34,9 +35,9 @@ public abstract class Modelo{
     */
    protected Perda perda;
 
-    /**
-     * Otimizador usado para ajuste de parâmetros treináveis.
-     */
+   /**
+    * Otimizador usado para ajuste de parâmetros treináveis.
+    */
    protected Otimizador otimizador;
 
    /**
@@ -52,7 +53,7 @@ public abstract class Modelo{
     * Gerenciador de treino do modelo. contém implementações dos 
     * algoritmos de treino para o ajuste de parâmetros treináveis.
     */
-   protected Treinador treinador = new Treinador();
+   protected Treinador treinador;
 
    /**
     * Auxiliar na verificação para o salvamento do histórico
@@ -68,20 +69,21 @@ public abstract class Modelo{
     *    Cada modelo possui seu próprio avaliador.
     * </p>
     */
-   protected Avaliador avaliador = new Avaliador(this);
+   protected Avaliador avaliador;
 
    /**
     * Utilitário.
     */
-   Utils utils = new Utils();
+   Utils utils;
    
    /**
-    * Inicializa um modelo vazio, sem implementações de métodos.
-    * <p>
-    *    Para modelos mais completos, use {@code RedeNeural} ou {@code Sequencial}.
-    * </p>
+    * Inicialização implicita de um modelo.
     */
-   protected Modelo(){}
+   protected Modelo(){
+      treinador = new Treinador();
+      avaliador = new Avaliador(this);
+      utils = new Utils();
+   }
 
    /**
     * <p>
@@ -89,9 +91,6 @@ public abstract class Modelo{
     * </p>
     * O nome é apenas estético e não influencia na performance ou na 
     * usabilidade do modelo.
-    * <p>
-    *    O nome padrão é o mesmo nome da classe.
-    * </p>
     * @param nome novo nome da rede.
     */
    public void setNome(String nome){
@@ -111,7 +110,8 @@ public abstract class Modelo{
     *    parâmetros, buscando encontrar um melhor ajuste para o modelo.
     * </p>
     * <p>
-    *    A configuração de seed deve ser feita antes da compilação do modelo.
+    *    A configuração de seed deve ser feita antes da compilação do modelo para
+    *    surtir efeito.
     * </p>
     * @param seed nova seed.
     */
@@ -120,17 +120,18 @@ public abstract class Modelo{
    }
 
    /**
-    * Define se durante o processo de treinamento, o modelo vai salvar dados relacionados a 
-    * função de custo/perda de cada época.
+    * Define se, durante o processo de treinamento, o modelo irá salvar os dados 
+    * relacionados a função de perda de cada época.
     * <p>
-    *    Calcular a perda é uma operação que pode ser computacionalmente cara dependendo do 
-    *    tamanho do modelo e do conjunto de dados, então deve ser bem avaliado querer habilitar 
-    *    ou não esse recurso.
+    *    Calcular a perda é uma operação que pode ser computacionalmente cara 
+    *    dependendo do tamanho do modelo e do conjunto de dados, então deve ser 
+    *    bem avaliado querer habilitar ou não esse recurso.
     * </p>
     * <p>
     *    {@code O valor padrão é false}
     * </p>
-    * @param calcular se verdadeiro, o modelo armazenará o histórico de perda durante cada época.
+    * @param calcular se verdadeiro, o modelo armazenará o histórico de perda 
+    * durante cada época de treinamento.
     */
    public void setHistorico(boolean calcular){
       calcularHistorico = calcular;
@@ -149,16 +150,18 @@ public abstract class Modelo{
    }
 
    /**
-    * Configura o novo otimizador do modelo com base numa nova instância de otimizador.
+    * Configura o novo otimizador do modelo com base numa nova instância 
+    * de otimizador.
     * <p>
-    *    Configurando o otimizador passando diretamente uma nova instância permite configurar
-    *    os hiperparâmetros do otimizador fora dos valores padrão, o que pode ajudar a
-    *    melhorar o desempenho de aprendizado do modelo em cenários específicos.
+    *    Configurando o otimizador informando diretamente uma nova instância 
+    *    permite configurar os hiperparâmetros do otimizador fora dos valores 
+    *    padrão, o que pode ajudar a melhorar o desempenho de aprendizado do 
+    *    modelo em cenários específicos.
     * </p>
     * Otimizadores disponíveis.
     * <ol>
-    *    <li> GradientDescent  </li>
-    *    <li> SGD (Gradiente Descendente Estocástico) </li>
+    *    <li> GD (Gradient Descent) </li>
+    *    <li> SGD (Stochastic Gradient Descent) </li>
     *    <li> AdaGrad </li>
     *    <li> RMSProp </li>
     *    <li> Adam  </li>
@@ -178,23 +181,25 @@ public abstract class Modelo{
     * Inicializa os parâmetros necessários para cada camada do modelo,
     * além de gerar os valores iniciais para os kernels e bias.
     * <p>
-    *    Caso nenhuma configuração inicial seja feita ou sejam fornecidos apenas 
-    *    nomes referenciando os objetos desejados, o modelo será compilado com os 
-    *    valores padrões. 
+    *    Caso nenhuma configuração inicial seja feita ou sejam fornecidos 
+    *    apenas nomes referenciando os objetos desejados, o modelo será 
+    *    compilado com os valores padrões. 
     * </p>
     * <p>
-    *    Otimizadores podem ser recebidos usando instâncias pré configuradas, essas 
-    *    intâncias dão a liberdade de inicializar o otimizador com valores personalizáveis 
-    *    para seus parâmetros (como taxa de aprendizagem, por exemplo).
+    *    Otimizadores podem ser recebidos usando instâncias pré configuradas, 
+    *    essas intâncias dão a liberdade de inicializar o otimizador com valores
+    *    personalizáveis para seus parâmetros (como taxa de aprendizagem, por exemplo).
     * </p>
     * <p>
-    *    Para treinar o modelo deve-se fazer uso da função função {@code treinar()} informando 
-    *    os dados necessários para treino.
+    *    Para treinar o modelo deve-se fazer uso da função função {@code treinar()} 
+    *    informando os dados necessários para treino.
     * </p>
-    * @param otimizador otimizador usando para ajustar os parâmetros treinavéis do modelo, pode
-    * ser uma {@code String} referente ao nome ou uma {@code instância} já inicializada.
-    * @param perda função de perda usada para avaliar o erro do modelo durante o treino, pode
-    * ser uma {@code String} referente ao nome ou uma {@code instância} já inicializada.
+    * @param otimizador otimizador usando para ajustar os parâmetros treinavéis do 
+    * modelo, pode ser uma {@code String} referente ao nome ou uma {@code instância} 
+    * já inicializada.
+    * @param perda função de perda usada para avaliar o erro do modelo durante o 
+    * treino, pode ser uma {@code String} referente ao nome ou uma {@code instância} 
+    * já inicializada.
     */
    public abstract void compilar(Object otimizador, Object perda);
 
@@ -427,20 +432,24 @@ public abstract class Modelo{
     * Disponibiliza o histórico da função de perda do modelo durante cada época
     * de treinamento.
     * <p>
-    *    O histórico será o do ultimo processo de treinamento usado, seja ele sequencial ou em
-    *    lotes. Sendo assim, por exemplo, caso o treino seja em sua maioria feito pelo modo sequencial
-    *    mas logo depois é usado o treino em lotes, o histórico retornado será o do treinamento em lote.
+    *    O histórico será o do ultimo processo de treinamento usado, seja ele 
+    *    sequencial ou em lotes.
     * </p>
-    * @return array contendo o valor de perda durante cada época de treinamento do modelo.
+    * @return array contendo o valor de perda durante cada época de treinamento 
+    * do modelo.
     */
    public double[] historico(){
       return treinador.historico();
    }
 
+   /**
+    * Gera uma string representando as características do modelo.
+    * @return {@code String} representando o modelo.
+    */
    protected abstract String construirInfo();
 
    /**
-    * Mostra as informações sobre o modelo.
+    * Exibe, via console, as informações do modelo.
     */
    public abstract void info();
 
