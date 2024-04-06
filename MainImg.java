@@ -63,11 +63,11 @@ public class MainImg{
    }
 
    static Modelo criarRna(int entradas, int saidas){
-      Otimizador otm = new SGD(0.0001, 0.9995);
+      Otimizador otm = new SGD(0.001, 0.99);
 
-      RedeNeural modelo = new RedeNeural(entradas, 13, 13, saidas);
+      RedeNeural modelo = new RedeNeural(entradas, 8, 8, saidas);
       modelo.compilar(otm, "mse");
-      modelo.configurarAtivacao("tanh");
+      modelo.configurarAtivacao("sigmoid");
       modelo.configurarAtivacao(modelo.camadaSaida(), "sigmoid");
       modelo.setHistorico(calcularHistorico);
       

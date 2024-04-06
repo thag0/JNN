@@ -420,9 +420,9 @@ public class RedeNeural extends Modelo implements Cloneable{
       }
 
       for(int i = 0; i < camadas.length; i++){
+         camadas[i].setId(i);
          if(seedInicial != 0) camadas[i].setSeed(seedInicial);
          camadas[i].inicializar();
-         camadas[i].setId(i);
       }
 
       if(seedInicial != 0){
@@ -461,7 +461,7 @@ public class RedeNeural extends Modelo implements Cloneable{
          prev = camadas[i].forward(prev);
       }
 
-      return prev;
+      return prev.clone();//preservar a saída do modelo
    }
 
    /**

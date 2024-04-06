@@ -72,7 +72,6 @@ public class Convolucional extends Camada implements Cloneable{
    private final int[] shapeSaida = {1, 1, 1};
 
    /**
-    * <h3> Não alterar </h3>
     * Tensor contendo os valores de entrada para a camada,
     * que serão usados para o processo de feedforward.
     * <p>
@@ -85,7 +84,6 @@ public class Convolucional extends Camada implements Cloneable{
    public Tensor4D entrada;
 
    /**
-    * <h3> Não alterar </h3>
     * Tensor contendo os filtros (ou kernels)
     * da camada.
     * <p>
@@ -98,7 +96,6 @@ public class Convolucional extends Camada implements Cloneable{
    public Tensor4D filtros;
 
    /**
-    * <h3> Não alterar </h3>
     * Tensor contendo os bias (vieses) para cada valor de 
     * saída da camada.
     * <p>
@@ -116,7 +113,6 @@ public class Convolucional extends Camada implements Cloneable{
    private boolean usarBias = true;
 
    /**
-    * <h3> Não alterar </h3>
     * Tensor contendo valores resultantes do cálculo de correlação cruzada
     * entre a entrada e os filtros, com o bias adicionado (se houver).
     * <p>
@@ -132,7 +128,6 @@ public class Convolucional extends Camada implements Cloneable{
    public Tensor4D somatorio;
    
    /**
-    * <h3> Não alterar </h3>
     * Tensor contendo os valores de saídas da camada.
     * <p>
     *    O formato da saída é dado por:
@@ -144,7 +139,6 @@ public class Convolucional extends Camada implements Cloneable{
    public Tensor4D saida;
 
    /**
-    * <h3> Não alterar </h3>
     * Tensor contendo os valores dos gradientes usados para 
     * a retropropagação para camadas anteriores.
     * <p>
@@ -157,7 +151,6 @@ public class Convolucional extends Camada implements Cloneable{
    public Tensor4D gradEntrada;
 
    /**
-    * <h3> Não alterar </h3>
     * Tensor contendo os valores dos gradientes relativos a saída
     * da camada.
     * <p>
@@ -173,7 +166,6 @@ public class Convolucional extends Camada implements Cloneable{
    public Tensor4D gradSaida;
 
    /**
-    * <h3> Não alterar </h3>
     * Tensor contendo os valores dos gradientes relativos a cada
     * filtro da camada.
     * <p>
@@ -186,7 +178,6 @@ public class Convolucional extends Camada implements Cloneable{
    public Tensor4D gradFiltros;
 
    /**
-    * <h3> Não alterar </h3>
     * Tensor contendo os valores dos gradientes relativos a cada
     * bias da camada.
     * <p>
@@ -238,7 +229,7 @@ public class Convolucional extends Camada implements Cloneable{
     * @param iniKernel inicializador para os filtros.
     * @param iniBias inicializador para os bias.
     */
-   public Convolucional(int[] entrada, int[] filtro, int nFiltros, String ativacao, Object iniKernel, Object iniBias){
+   public Convolucional(int[] entrada, int[] filtro, int nFiltros, Object ativacao, Object iniKernel, Object iniBias){
       this(filtro, nFiltros, ativacao, iniKernel, iniBias);
 
       if(entrada == null){
@@ -375,7 +366,7 @@ public class Convolucional extends Camada implements Cloneable{
     * @param iniKernel inicializador para os filtros.
     * @param iniBias inicializador para os bias.
     */
-   public Convolucional(int[] filtro, int nFiltros, String ativacao, Object iniKernel, Object iniBias){
+   public Convolucional(int[] filtro, int nFiltros, Object ativacao, Object iniKernel, Object iniBias){
       if(filtro == null){
          throw new IllegalArgumentException(
             "\nO formato do filtro não pode ser nulo."
@@ -400,7 +391,7 @@ public class Convolucional extends Camada implements Cloneable{
       shapeFiltro[1] = formFiltro[1];
 
       //número de filtros
-      if(nFiltros <= 0){
+      if(nFiltros < 1){
          throw new IllegalArgumentException(
             "\nO número de filtro deve ser maior que zero, recebido: " + nFiltros
          );
