@@ -128,7 +128,7 @@ public class Conv{
       
       Tensor4D filtros = new Tensor4D(conv.kernel().shape());
       filtros.map((x) -> Math.random());
-      conv.editarKernel(filtros.paraArray());
+      conv.setKernel(filtros.paraArray());
 
       Tensor4D grad = new Tensor4D(conv.gradSaida);
       grad.map((x) -> Math.random());

@@ -345,7 +345,7 @@ public class Sequencial extends Modelo implements Cloneable{
    @Override
    public void zerarGradientes(){
       for(int i = 0; i < camadas.length; i++){
-         if(camadas[i].treinavel) camadas[i].zerarGradientes();
+         if(camadas[i].treinavel()) camadas[i].zerarGradientes();
       }
    }
 

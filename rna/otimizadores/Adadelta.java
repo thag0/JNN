@@ -133,7 +133,7 @@ public class Adadelta extends Otimizador{
       int nBias = 0;
       
       for(Camada camada : camadas){
-         if(camada.treinavel == false) continue;
+         if(camada.treinavel() == false) continue;
 
          nKernel += camada.kernelParaArray().length;
          if(camada.temBias()){
@@ -154,18 +154,18 @@ public class Adadelta extends Otimizador{
       
       int idKernel = 0, idBias = 0;
       for(Camada camada : camadas){
-         if(camada.treinavel == false) continue;
+         if(camada.treinavel() == false) continue;
 
          double[] kernel = camada.kernelParaArray();
          double[] gradK = camada.gradKernelParaArray();
          idKernel = calcular(kernel, gradK, ac, acAt, idKernel);
-         camada.editarKernel(kernel);
+         camada.setKernel(kernel);
 
          if(camada.temBias()){
             double[] bias = camada.biasParaArray();
             double[] gradB = camada.gradBias();
             idBias = calcular(bias, gradB, acb, acAtb, idBias);
-            camada.editarBias(bias);
+            camada.setBias(bias);
          }
       }
    }

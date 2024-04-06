@@ -480,7 +480,6 @@ public class Densa extends Camada implements Cloneable{
 
       ativacao.forward(somatorio, saida);
 
-      // return saida.clone();
       return saida;
    }
 
@@ -550,7 +549,6 @@ public class Densa extends Camada implements Cloneable{
          gradSaida, optensor.matTranspor(pesos, 0, 0), gradEntrada
       );
 
-      // return gradEntrada.clone();
       return gradEntrada;
    }
 
@@ -766,7 +764,7 @@ public class Densa extends Camada implements Cloneable{
    }
 
    @Override
-   public void editarGradienteKernel(double[] grads){
+   public void setGradienteKernel(double[] grads){
       if(grads.length != gradPesos.tamanho()){
          throw new IllegalArgumentException(
             "A dimensão dos gradientes fornecidos não é igual a quantidade de " +
@@ -783,12 +781,12 @@ public class Densa extends Camada implements Cloneable{
    }
 
    @Override
-   public void editarGradienteBias(double[] grads){
+   public void setGradienteBias(double[] grads){
       this.gradBias.copiar(grads, 0, 0, 0);
    }
 
    @Override
-   public void editarKernel(double[] kernel){
+   public void setKernel(double[] kernel){
       if(kernel.length != pesos.tamanho()){
          throw new IllegalArgumentException(
             "A dimensão do kernel fornecido não é igual a quantidade de " +
@@ -805,7 +803,7 @@ public class Densa extends Camada implements Cloneable{
    }
 
    @Override
-   public void editarBias(double[] bias){
+   public void setBias(double[] bias){
       if(bias.length != (this.bias.dim4())){
          throw new IllegalArgumentException(
             "A dimensão do bias fornecido (" + bias.length + ") não é igual a quantidade de " +

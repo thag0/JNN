@@ -175,7 +175,7 @@ class SerialConv{
             arrKernel[i] = Double.parseDouble(br.readLine());
          }
 
-         camada.editarKernel(arrKernel);
+         camada.setKernel(arrKernel);
          
          if(camada.temBias()){
             int tamBias = camada.bias().tamanho();
@@ -185,7 +185,7 @@ class SerialConv{
                arrBias[i] = Double.parseDouble(br.readLine());
             }
             
-            camada.editarBias(arrBias);
+            camada.setBias(arrBias);
          }
       }catch(Exception e){
          throw new RuntimeException(e);

@@ -954,7 +954,7 @@ public class Convolucional extends Camada implements Cloneable{
    }
 
    @Override
-   public void editarKernel(double[] kernel){
+   public void setKernel(double[] kernel){
       if(kernel.length != filtros.tamanho()){
          throw new IllegalArgumentException(
             "A dimensão do kernel fornecido (" + kernel.length + ") não é igual a quantidade de " +
@@ -966,7 +966,7 @@ public class Convolucional extends Camada implements Cloneable{
    }
 
    @Override
-   public void editarBias(double[] bias){
+   public void setBias(double[] bias){
       if(bias.length != this.bias.tamanho()){
          throw new IllegalArgumentException(
             "A dimensão do bias fornecido não é igual a quantidade de " +

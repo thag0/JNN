@@ -8,12 +8,12 @@ import rna.core.Tensor4D;
  *    Camada base
  * </h2>
  * <p>
- *    A classe camada serve apenas de molde para criação de novas
- *    camadas e não pode ser especificamente instanciada nem utilizada.
+ *    A classe camada serve de molde para criação de novas camadas e 
+ *    não pode ser especificamente instanciada nem utilizada.
  * </p>
  * <p>
- *    Não é recomendado fazer atribuições ou alterações diretamente dos
- *    atributos de camadas filhas fora da biblioteca, eles estão publicos
+ *    {@code Não é recomendado} fazer atribuições ou alterações diretamente 
+ *    dos atributos de camadas filhas fora da biblioteca, eles estão publicos
  *    apenas pela facilidade de manuseio. Para estes é recomendado usar
  *    os métodos propostos pelas camadas.
  * </p>
@@ -57,7 +57,7 @@ public abstract class Camada{
    /**
     * Controlador para uso dentro dos algoritmos de treino.
     */
-   public boolean treinavel = false;
+   protected boolean treinavel = false;
 
    /**
     * Controlador de construção da camada.
@@ -115,7 +115,7 @@ public abstract class Camada{
 
    /**
     * Configura a função de ativação da camada através de uma instância de 
-    * {@code FuncaoAtivacao} que será usada para ativar seus neurônios.
+    * {@code Ativacao} que será usada para ativar seus neurônios.
     * <p>
     *    Ativações disponíveis:
     * </p>
@@ -139,10 +139,9 @@ public abstract class Camada{
     *    de ativação aumenta a liberdade de personalização dos hiperparâmetros
     *    que algumas funções podem ter.
     * </p>
-    * @param ativacao nova função de ativação.
-    * @throws IllegalArgumentException se a função de ativação fornecida for nula.
+    * @param atv nova função de ativação.
     */
-   public void setAtivacao(Object ativacao){
+   public void setAtivacao(Object atv){
       throw new UnsupportedOperationException(
          "\nCamada " + nome() + " não possui configuração de função de ativação."
       );    
@@ -156,8 +155,7 @@ public abstract class Camada{
    public void setId(int id){
       if(id < 0){
          throw new IllegalArgumentException(
-            "\nO id da camada deve conter um positivo também podendo ser zero, " + 
-            "recebido: " + id
+            "\nId da camada deve ser maior ou igual a zero, recebido: " + id + "."
          );
       }
 
@@ -209,24 +207,15 @@ public abstract class Camada{
 
    /**
     * Propaga os dados de entrada pela camada.
-    * <p>
-    *    Resultados processados ficam salvos na {@code saída} da camada.
-    * </p>
     * @param entrada dados de entrada que serão processados pela camada.
-    * @return {@code Tensor} contendo a saída calculada, que por padrão
-    * é uma cópia da saída calculada para preservar as propriedades da camada.
+    * @return {@code Tensor} contendo a saída calculada pela camada.
     */
    public abstract Tensor4D forward(Object entrada);
 
    /**
     * Retropropaga os gradientes recebidos para as camadas anteriores.
-    * <p>
-    *    Resultados processados ficam salvos no {@code gradiente de entrada} 
-    *    da camada.
-    * </p>
-    * @param grad gradiente da camada seguinte.
-    * @return {@code Tensor} contendo o gradiente de entrada da camada, que por 
-    * padrão é uma cópia da saída calculada para preservar as propriedades da camada.
+    * @param grad gradiente em relação a saída da camada.
+    * @return {@code Tensor} contendo os gradientes em relação a entrada da camada.
     */
    public abstract Tensor4D backward(Object grad);
 
@@ -253,7 +242,7 @@ public abstract class Camada{
     *    camada, que devem estar disposto como:
     * </p>
     * <pre>
-    *    formato = (altura, largura, profundidade ...)
+    *    formato = (profundidade, altura, largura)
     * </pre>
     * @return array contendo os valores das dimensões de entrada da camada.
     */
@@ -266,7 +255,7 @@ public abstract class Camada{
     *    camada, que devem estar disposto como:
     * </p>
     * <pre>
-    *    formato = (altura, largura, profundidade ...)
+    *    formato = (profundidade, altura, largura)
     * </pre>
     * @return array contendo os valores das dimensões de saída da camada.
     */
@@ -433,7 +422,7 @@ public abstract class Camada{
     * fornecido.
     * @param kernel novos valores do kernel.
     */
-   public void editarKernel(double[] kernel){
+   public void setKernel(double[] kernel){
       throw new UnsupportedOperationException(
          "\nCamada " + nome() + " não possui edição de kernel."
       ); 
@@ -444,7 +433,7 @@ public abstract class Camada{
     * contidos no array fornecido.
     * @param grads novos valores de gradientes.
     */
-   public void editarGradienteKernel(double[] grads){
+   public void setGradienteKernel(double[] grads){
       throw new UnsupportedOperationException(
          "\nCamada " + nome() + " não possui edição de gradiente para kernel."
       );    
@@ -455,7 +444,7 @@ public abstract class Camada{
     * fornecido.
     * @param bias novos valores do bias.
     */
-   public void editarBias(double[] bias){
+   public void setBias(double[] bias){
       throw new UnsupportedOperationException(
          "\nCamada " + nome() + " não possui edição de bias."
       ); 
@@ -466,7 +455,7 @@ public abstract class Camada{
     * contidos no array fornecido.
     * @param grads novos valores de gradientes.
     */
-   public void editarGradienteBias(double[] grads){
+   public void setGradienteBias(double[] grads){
       throw new UnsupportedOperationException(
          "\nCamada " + nome() + " não possui edição de gradiente para bias."
       );  
@@ -479,6 +468,15 @@ public abstract class Camada{
       throw new UnsupportedOperationException(
          "\nCamada " + nome() + " não possui kernel/bias para zerar."
       );
+   }
+
+   /**
+    * Verifica se a camada é treinável.
+    * @return {@code true} caso a camada seja treinável, {@code false},
+    * caso contrário.
+    */
+   public boolean treinavel(){
+      return treinavel;
    }
 
    /**

@@ -73,14 +73,14 @@ public class GD extends Otimizador{
       verificarConstrucao();
       
       for(Camada camada : camadas){
-         if(camada.treinavel == false) continue;
+         if(camada.treinavel() == false) continue;
 
          double[] kernel = camada.kernelParaArray();
          double[] gradK = camada.gradKernelParaArray();
          
          opArr.multEscalar(gradK, taxaAprendizagem, gradK);
          opArr.sub(kernel, gradK, kernel);
-         camada.editarKernel(kernel);
+         camada.setKernel(kernel);
 
          if(camada.temBias()){
             double[] bias = camada.biasParaArray();
@@ -88,7 +88,7 @@ public class GD extends Otimizador{
             
             opArr.multEscalar(gradB, taxaAprendizagem, gradB);
             opArr.sub(bias, gradB, bias);
-            camada.editarBias(bias);
+            camada.setBias(bias);
          }
       } 
    }

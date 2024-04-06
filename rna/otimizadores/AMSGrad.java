@@ -206,7 +206,7 @@ public class AMSGrad extends Otimizador{
       int nBias = 0;
       
       for(Camada camada : camadas){
-			if(camada.treinavel == false) continue;
+			if(camada.treinavel() == false) continue;
 
          nKernel += camada.kernelParaArray().length;
          if(camada.temBias()){
@@ -234,18 +234,18 @@ public class AMSGrad extends Otimizador{
 		double forcaB2 = (1 - Math.pow(beta2, interacoes));
 		
 		for(Camada camada : camadas){
-			if(camada.treinavel == false) continue;
+			if(camada.treinavel() == false) continue;
 
 			double[] kernel = camada.kernelParaArray();
 			double[] gradK = camada.gradKernelParaArray();
 			idKernel = calcular(kernel, gradK, m, v, vc, forcaB1, forcaB2, idKernel);
-			camada.editarKernel(kernel);
+			camada.setKernel(kernel);
 
          if(camada.temBias()){
 				double[] bias = camada.biasParaArray();
 				double[] gradB = camada.gradBias();
 				idBias = calcular(bias, gradB, mb, vb, vcb, forcaB1, forcaB2, idBias);
-				camada.editarBias(bias);
+				camada.setBias(bias);
          } 
 		}
   	}
