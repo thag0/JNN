@@ -33,7 +33,7 @@ public class TesteTreino{
       Sequencial modelo = new Sequencial(new Camada[]{
          new Entrada(treinoX.dim4()),
          new Densa(3, "sigmoid"),
-         new Densa(1, "sigmoid")
+         new Densa(1, "sigmoid"),
       });
       
       modelo.compilar(new SGD(0.00001, 0.9999), "mse");

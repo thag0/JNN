@@ -480,7 +480,8 @@ public class Densa extends Camada implements Cloneable{
 
       ativacao.forward(somatorio, saida);
 
-      return saida.clone();
+      // return saida.clone();
+      return saida;
    }
 
    /**
@@ -549,7 +550,8 @@ public class Densa extends Camada implements Cloneable{
          gradSaida, optensor.matTranspor(pesos, 0, 0), gradEntrada
       );
 
-      return gradEntrada.clone();
+      // return gradEntrada.clone();
+      return gradEntrada;
    }
 
    @Override

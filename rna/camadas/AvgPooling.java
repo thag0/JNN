@@ -316,7 +316,7 @@ public class AvgPooling extends Camada{
          aplicar(this.entrada, this.saida, i);
       }
 
-      return saida.clone();
+      return saida;
    }
 
    /**
@@ -371,7 +371,7 @@ public class AvgPooling extends Camada{
          );
       }
 
-      return gradEntrada.clone();
+      return gradEntrada;
    }
 
    /**

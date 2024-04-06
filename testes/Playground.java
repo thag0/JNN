@@ -2,12 +2,9 @@ package testes;
 
 import lib.ged.Ged;
 import lib.geim.Geim;
-import rna.ativacoes.Ativacao;
-import rna.ativacoes.Softmax;
 import rna.core.OpArray;
 import rna.core.OpMatriz;
 import rna.core.OpTensor4D;
-import rna.core.Tensor4D;
 import rna.core.Utils;
 
 public class Playground{
@@ -21,14 +18,6 @@ public class Playground{
    public static void main(String[] args){
       ged.limparConsole();
 
-      Ativacao atv = new Softmax();
-      Tensor4D tensor = new Tensor4D(new double[][]{
-         {1, 2, 3},
-         {1, 2, 3}
-      });
-      atv.forward(tensor, tensor);
-
-      tensor.print(4);
    }
 
    /**

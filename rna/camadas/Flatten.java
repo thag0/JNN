@@ -236,7 +236,7 @@ public class Flatten extends Camada{
 
       saida.copiarElementos(this.entrada.paraArray());
 
-      return saida.clone();
+      return saida;
    }
 
    /**
@@ -273,7 +273,7 @@ public class Flatten extends Camada{
          );
       }
 
-      return gradEntrada.clone();
+      return gradEntrada;
    }
    
    @Override

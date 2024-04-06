@@ -261,7 +261,7 @@ public class Dropout extends Camada implements Cloneable{
          saida.copiar(this.entrada);
       }
 
-      return saida.clone();
+      return saida;
    }
 
    /**
@@ -282,7 +282,7 @@ public class Dropout extends Camada implements Cloneable{
     */
    private void gerarMascaras(){
       mascara.map3D(0, (x) -> {
-         return (random.nextDouble() >= taxa) ? (1 / (1-taxa)) : 0;
+         return (random.nextDouble() >= taxa) ? (1 / (1 - taxa)) : 0;
       });
    }
 
@@ -331,7 +331,7 @@ public class Dropout extends Camada implements Cloneable{
          gradEntrada.mult(mascara);
       }
 
-      return gradEntrada.clone();
+      return gradEntrada;
    }
 
    @Override

@@ -322,7 +322,7 @@ public class MaxPooling extends Camada{
          aplicar(this.entrada, this.saida, i);
       }
 
-      return saida.clone();
+      return saida;
    }
 
    /**
@@ -377,7 +377,7 @@ public class MaxPooling extends Camada{
          );
       }
 
-      return gradEntrada.clone();
+      return gradEntrada;
    }
    
    /**

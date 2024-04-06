@@ -702,7 +702,7 @@ public class Convolucional extends Camada implements Cloneable{
 
       ativacao.forward(somatorio, saida);
 
-      return saida.clone();
+      return saida;
    }
 
    /**
@@ -768,7 +768,7 @@ public class Convolucional extends Camada implements Cloneable{
          }
       }
 
-      return gradEntrada.clone();
+      return gradEntrada;
    }
 
    @Override
