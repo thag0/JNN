@@ -73,7 +73,7 @@ public class MainConv{
     * Criação de modelos para testes.
     */
    static Sequencial criarModelo(){
-      Sequencial modelo = new Sequencial(new Camada[]{
+      Sequencial modelo = new Sequencial(
          new Entrada(28, 28),
          new Convolucional(new int[]{3, 3}, 18, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
@@ -83,7 +83,7 @@ public class MainConv{
          new Densa(128, "sigmoid"),
          new Dropout(0.3),
          new Densa(NUM_DIGITOS_TREINO, "softmax") 
-      });
+      );
 
       modelo.compilar("sgd", "entropia-cruzada");
       

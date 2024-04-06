@@ -58,7 +58,7 @@ import rna.treinamento.Treinador;
  *    Exemplo:
  * </p>
  * <pre>
- *modelo = Sequencial(new Camada[]{
+ *modelo = Sequencial(
  *    new Entrada(28, 28),
  *    new Convolucional(new int[]{3, 3}, 5),
  *    new MaxPooling(new int[]{2, 2}),
@@ -66,7 +66,7 @@ import rna.treinamento.Treinador;
  *    new Densa(50),
  *    new Dropout(0.3),
  *    new Densa(10),
- *});
+ *);
  * </pre>
  * <h2>
  *    Compilação
@@ -182,11 +182,11 @@ public class Sequencial extends Modelo implements Cloneable{
     *    É necessário especificar o formato de entrada da primeira camada
     *    do modelo.
     * </p>
-    * @param camadas camadas que serão usadas pelo modelo.
+    * @param camadas conjunto de camadas que serão usadas pelo modelo.
     * @throws IllegalArgumentException caso o conjunto de camadas seja nulo
     * ou alguma camada contida seja.
     */
-   public Sequencial(Camada[] camadas){
+   public Sequencial(Camada... camadas){
       utils.validarNaoNulo(camadas, "Conjunto de camadas não pode ser nulo.");
 
       for(int i = 0; i < camadas.length; i++){
@@ -197,7 +197,7 @@ public class Sequencial extends Modelo implements Cloneable{
 
       if(camadas.length < 1){
          throw new IllegalArgumentException(
-            "\nCamadas possui tamanho = " + camadas.length + "."
+            "\nCamadas fornecidas possuem tamanho = " + camadas.length + "."
          );
       }
 
