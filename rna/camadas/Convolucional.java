@@ -224,13 +224,13 @@ public class Convolucional extends Camada implements Cloneable{
     * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
     * @param entrada formato de entrada da camada.
     * @param filtro formato dos filtros da camada.
-    * @param nFiltros quantidade de filtros.
+    * @param filtros quantidade de filtros.
     * @param ativacao função de ativação.
     * @param iniKernel inicializador para os filtros.
     * @param iniBias inicializador para os bias.
     */
-   public Convolucional(int[] entrada, int[] filtro, int nFiltros, Object ativacao, Object iniKernel, Object iniBias){
-      this(filtro, nFiltros, ativacao, iniKernel, iniBias);
+   public Convolucional(int[] entrada, int[] filtro, int filtros, Object ativacao, Object iniKernel, Object iniBias){
+      this(filtro, filtros, ativacao, iniKernel, iniBias);
 
       if(entrada == null){
          throw new IllegalArgumentException(
@@ -278,12 +278,12 @@ public class Convolucional extends Camada implements Cloneable{
     * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
     * @param entrada formato de entrada da camada.
     * @param filtro formato dos filtros da camada.
-    * @param nFiltros quantidade de filtros.
+    * @param filtros quantidade de filtros.
     * @param ativacao função de ativação.
     * @param iniKernel inicializador para os filtros.
     */
-   public Convolucional(int[] entrada, int[] filtro, int nFiltros, String ativacao, Object iniKernel){
-      this(entrada, filtro, nFiltros, ativacao, iniKernel, null);
+   public Convolucional(int[] entrada, int[] filtro, int filtros, String ativacao, Object iniKernel){
+      this(entrada, filtro, filtros, ativacao, iniKernel, null);
    }
 
    /**
@@ -306,11 +306,11 @@ public class Convolucional extends Camada implements Cloneable{
     * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
     * @param entrada formato de entrada da camada.
     * @param filtro formato dos filtros da camada.
-    * @param nFiltros quantidade de filtros.
+    * @param filtros quantidade de filtros.
     * @param ativacao função de ativação.
     */
-   public Convolucional(int[] entrada, int[] filtro, int nFiltros, String ativacao){
-      this(entrada, filtro, nFiltros, ativacao, null, null);
+   public Convolucional(int[] entrada, int[] filtro, int filtros, String ativacao){
+      this(entrada, filtro, filtros, ativacao, null, null);
    }
 
    /**
@@ -336,10 +336,10 @@ public class Convolucional extends Camada implements Cloneable{
     * <p>
     * @param entrada formato de entrada da camada.
     * @param filtro formato dos filtros da camada.
-    * @param nFiltros quantidade de filtros.
+    * @param filtros quantidade de filtros.
     */
-   public Convolucional(int[] entrada, int[] filtro, int nFiltros){
-      this(entrada, filtro, nFiltros, null, null, null);
+   public Convolucional(int[] entrada, int[] filtro, int filtros){
+      this(entrada, filtro, filtros, null, null, null);
    }
 
    /**
@@ -361,12 +361,12 @@ public class Convolucional extends Camada implements Cloneable{
     * </pre>
     * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
     * @param filtro formato dos filtros da camada.
-    * @param nFiltros quantidade de filtros.
+    * @param filtros quantidade de filtros.
     * @param ativacao função de ativação.
     * @param iniKernel inicializador para os filtros.
     * @param iniBias inicializador para os bias.
     */
-   public Convolucional(int[] filtro, int nFiltros, Object ativacao, Object iniKernel, Object iniBias){
+   public Convolucional(int[] filtro, int filtros, Object ativacao, Object iniKernel, Object iniBias){
       if(filtro == null){
          throw new IllegalArgumentException(
             "\nO formato do filtro não pode ser nulo."
@@ -391,13 +391,13 @@ public class Convolucional extends Camada implements Cloneable{
       shapeFiltro[1] = formFiltro[1];
 
       //número de filtros
-      if(nFiltros < 1){
+      if(filtros < 1){
          throw new IllegalArgumentException(
-            "\nO número de filtro deve ser maior que zero, recebido: " + nFiltros
+            "\nO número de filtro deve ser maior que zero, recebido: " + filtros
          );
       }
 
-      shapeSaida[0] = nFiltros;
+      shapeSaida[0] = filtros;
       
       Dicionario dicio = new Dicionario();
       if(ativacao != null) this.ativacao = dicio.getAtivacao(ativacao);
@@ -424,12 +424,12 @@ public class Convolucional extends Camada implements Cloneable{
     * </pre>
     * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
     * @param filtro formato dos filtros da camada.
-    * @param nFiltros quantidade de filtros.
+    * @param filtros quantidade de filtros.
     * @param ativacao função de ativação.
     * @param iniKernel inicializador para os filtros.
     */
-   public Convolucional(int[] filtro, int nFiltros, String ativacao, Object iniKernel){
-      this(filtro, nFiltros, ativacao, iniKernel, null);
+   public Convolucional(int[] filtro, int filtros, String ativacao, Object iniKernel){
+      this(filtro, filtros, ativacao, iniKernel, null);
    }
 
    /**
@@ -451,11 +451,11 @@ public class Convolucional extends Camada implements Cloneable{
     * </pre>
     * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
     * @param filtro formato dos filtros da camada.
-    * @param nFiltros quantidade de filtros.
+    * @param filtros quantidade de filtros.
     * @param ativacao função de ativação.
     */
-   public Convolucional(int[] filtro, int nFiltros, String ativacao){
-      this(filtro, nFiltros, ativacao, null, null);
+   public Convolucional(int[] filtro, int filtros, String ativacao){
+      this(filtro, filtros, ativacao, null, null);
    }
 
    /**
@@ -477,10 +477,10 @@ public class Convolucional extends Camada implements Cloneable{
     * </pre>
     * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
     * @param filtro formato dos filtros da camada.
-    * @param nFiltros quantidade de filtros.
+    * @param filtros quantidade de filtros.
     */
-   public Convolucional(int[] filtro, int nFiltros){
-      this(filtro, nFiltros, null, null, null);
+   public Convolucional(int[] filtro, int filtros){
+      this(filtro, filtros, null, null, null);
    }
    
    /**
