@@ -2,7 +2,7 @@ package lib.geim;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
@@ -19,26 +19,21 @@ class GerenciadorArquivos{
    public GerenciadorArquivos(){}
 
 
-   public BufferedImage lerImagem(String caminho){
-      BufferedImage imagem = null;
-      
-      File arq = new File(caminho);
-      try{
-         if(!arq.exists()) throw new FileNotFoundException();
-      }catch(FileNotFoundException e){
-         System.out.println("Diretório \" " + caminho + " \" não encontrado.");
-      }
+   public BufferedImage lerImagem(String caminho) {
+      BufferedImage img = null;
       
       try{
-         imagem = ImageIO.read(getClass().getResourceAsStream(caminho));
-      }catch(Exception e){ 
+         img = ImageIO.read(getClass().getResourceAsStream(caminho));
+      
+      }catch(IOException e){
          System.out.println("Erro ao ler a imagem \"" + caminho + "\"");
          e.printStackTrace();
          System.exit(1);
       }
-      
-      return imagem;
+
+      return img;
    }
+  
 
 
    public void exportarPng(Pixel[][] estruturaImagem, String caminho){
