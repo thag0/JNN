@@ -5,6 +5,9 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JPanel;
 
@@ -23,9 +26,9 @@ public class PainelTreino extends JPanel{
    int r, b, g, rgb;
    int x, y;
    
-   public PainelTreino(int larguraImagem, int alturaImagem, double escala){
-      this.largura = (int) (larguraImagem*escala);
-      this.altura = (int)  (alturaImagem*escala);
+   public PainelTreino(int largura, int altura, double escala){
+      this.largura = (int) (largura*escala);
+      this.altura =  (int) (altura*escala);
 
       imagem = new BufferedImage(this.largura, this.altura, BufferedImage.TYPE_INT_RGB);
 
@@ -35,6 +38,8 @@ public class PainelTreino extends JPanel{
       setDoubleBuffered(true);
       setEnabled(true);
       setVisible(true);
+   
+      
    }
 
    public void desenhar(Modelo modelo, int epocasPorFrame){
@@ -83,8 +88,9 @@ public class PainelTreino extends JPanel{
       repaint();
    }
 
-   public void desenharMultithread(Modelo modelo, int epocasPorFrame, int numThreads){
-      Thread[] threads = new Thread[numThreads];
+   public void desenhar(Modelo modelo, int epocasPorFrame, int numThreads){
+      ExecutorService exec = Executors.newFixedThreadPool(numThreads);
+
       Modelo[] clones = new Modelo[numThreads];
       for(int i = 0; i < clones.length; i++){
          clones[i] = modelo.clone();
@@ -100,19 +106,18 @@ public class PainelTreino extends JPanel{
          int fimY = inicioY + alturaPorThread + ((i == numThreads-1) ? restoAltura : 0);
 
          if(nSaida == 1){
-            threads[i] = new Thread(() -> calcularParteImagemEscalaCinza(clones[id], inicioY, fimY));
+            exec.submit(() -> calcularParteCinza(clones[id], inicioY, fimY));
             
          }else if(nSaida == 3){
-            threads[i] = new Thread(() -> calcularParteImagemRGB(clones[id], inicioY, fimY));
+            exec.submit(() -> calcularParteRGB(clones[id], inicioY, fimY));
          }
-
-         threads[i].start();
       }
 
+      exec.shutdown();
+
       try{
-         for(int i = 0; i < numThreads; i++){
-            threads[i].join();
-         }
+         exec.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+
       }catch(Exception e){
          throw new RuntimeException(e);
       }
@@ -121,7 +126,7 @@ public class PainelTreino extends JPanel{
       repaint();
    }
 
-   private void calcularParteImagemEscalaCinza(Modelo modelo, int inicioY, int fimY){
+   private void calcularParteCinza(Modelo modelo, int inicioY, int fimY){
       double[] entrada = new double[2];
       double[] saida = new double[1];
 
@@ -146,7 +151,7 @@ public class PainelTreino extends JPanel{
       }
    }
 
-   private void calcularParteImagemRGB(Modelo modelo, int inicioY, int fimY){
+   private void calcularParteRGB(Modelo modelo, int inicioY, int fimY){
       double[] entrada = new double[2];
       double[] saida = new double[3];
       int r, g, b, rgb;

@@ -104,7 +104,7 @@ public class MainImg{
       //acelerar o processo de desenho
       //bom em situações de janelas muito grandes
       int n = Runtime.getRuntime().availableProcessors();
-      int numThreads = (n > 1) ? (int)(n * 0.5) : 2;
+      int numThreads = (n > 1) ? (int)(n * 0.25) : 2;
 
       JanelaTreino jt = new JanelaTreino(largura, altura, ESCALA_RENDER, numThreads);
       jt.desenharTreino(modelo, 0);

@@ -41,7 +41,7 @@ public class JanelaTreino extends JFrame{
       if(this.numThreads == 1){
          painelTreino.desenhar(modelo, epocasPorFrame);
       }else{
-         painelTreino.desenharMultithread(modelo, epocasPorFrame, this.numThreads);
+         painelTreino.desenhar(modelo, epocasPorFrame, this.numThreads);
       }
    }
 }
