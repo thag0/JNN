@@ -53,7 +53,7 @@ class GerenciadorDadosImagem{
    }
 
 
-   public void configurarCor(Pixel[][] estruturaImagem, int x, int y, int r, int g, int b){
+   public void setCor(Pixel[][] estruturaImagem, int x, int y, int r, int g, int b){
       if(estruturaImagem == null) throw new IllegalArgumentException("A estrutura da imagem é nula");   
       if(y < 0 || y > estruturaImagem.length){
          throw new IllegalArgumentException("O valor x de fornecido está fora de alcance.");
@@ -68,7 +68,7 @@ class GerenciadorDadosImagem{
    }
 
 
-   public int[][] obterVermelho(BufferedImage imagem){
+   public int[][] getVermelho(BufferedImage imagem){
       int largura = imagem.getWidth();
       int altura = imagem.getHeight();
 
@@ -83,7 +83,7 @@ class GerenciadorDadosImagem{
    }
 
 
-   public int[][] obterVerde(BufferedImage imagem){
+   public int[][] getVerde(BufferedImage imagem){
       int largura = imagem.getWidth();
       int altura = imagem.getHeight();
 
@@ -98,7 +98,7 @@ class GerenciadorDadosImagem{
    }
 
 
-   public int[][] obterAzul(BufferedImage imagem){
+   public int[][] getAzul(BufferedImage imagem){
       int largura = imagem.getWidth();
       int altura = imagem.getHeight();
 
@@ -113,7 +113,7 @@ class GerenciadorDadosImagem{
    }
 
 
-   public int[][] obterCinza(BufferedImage imagem){
+   public int[][] getCinza(BufferedImage imagem){
       int largura = imagem.getWidth();
       int altura = imagem.getHeight();
 
@@ -153,7 +153,7 @@ class GerenciadorDadosImagem{
    }
 
 
-   public int[][] obterDadosImagem(BufferedImage imagem){
+   public int[][] getDadosImagem(BufferedImage imagem){
       int largura = imagem.getWidth();
       int altura = imagem.getHeight();
       int informacoes = 1 + 1 + 3;// x + y + r + g + b

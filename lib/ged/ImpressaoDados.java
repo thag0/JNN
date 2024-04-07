@@ -6,9 +6,9 @@ public class ImpressaoDados {
    }
 
 
-   public void imprimirInicio(Dados dados){
+   public void printInicio(Dados dados){
       if(dados.vazio()){
-         dados.imprimir();
+         dados.print();
          return;
       }
       
@@ -17,7 +17,7 @@ public class ImpressaoDados {
       int linPadrao = (shape[0] < 5) ? shape[0] : 5;
 
       if(linPadrao < 5){
-         dados.imprimir();
+         dados.print();
          return;
       }
 

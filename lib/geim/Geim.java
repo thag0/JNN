@@ -19,7 +19,7 @@ public class Geim{
    /**
     * Objeto responsável por fazer operações com imagens.
     * <p>
-    *    Trabalha com imagens no formato {@code Pixel[][];}
+    *    Trabalha com imagens no formato {@code Pixel[][]}.
     * </p>
     */
    public Geim(){
@@ -83,7 +83,7 @@ public class Geim{
     * com o tamanho da estrutura da imagem.
     */
    public void configurarCor(Pixel[][] estruturaImagem, int x, int y, int r, int g, int b){
-      gdi.configurarCor(estruturaImagem, x, y, r, g, b);
+      gdi.setCor(estruturaImagem, x, y, r, g, b);
    }
 
    /**
@@ -92,7 +92,7 @@ public class Geim{
     * @return matriz com o valor de cor vermelha de cada pixel.
     */
    public int[][] obterVermelho(BufferedImage imagem){
-      return gdi.obterVermelho(imagem);
+      return gdi.getVermelho(imagem);
    }
 
    /**
@@ -101,7 +101,7 @@ public class Geim{
     * @return matriz com o valor de cor verde de cada pixel.
     */
    public int[][] obterVerde(BufferedImage imagem){
-      return gdi.obterVerde(imagem);
+      return gdi.getVerde(imagem);
    }
 
    /**
@@ -110,7 +110,7 @@ public class Geim{
     * @return matriz com o valor de cor azul de cada pixel.
     */
    public int[][] obterAzul(BufferedImage imagem){
-      return gdi.obterAzul(imagem);
+      return gdi.getAzul(imagem);
    }
 
    /**
@@ -119,7 +119,7 @@ public class Geim{
     * @return matriz com o valor de escala de cinza de cada pixel.
     */
    public int[][] obterCinza(BufferedImage imagem){
-      return gdi.obterCinza(imagem);
+      return gdi.getCinza(imagem);
    }
 
    /**
@@ -146,8 +146,8 @@ public class Geim{
     * @param estruturaImagem estrutura de dados da imagem.
     * @param caminho caminho relativo, deve conter o nome do arquivo, sem extensão
     */
-   public void exportarImagemPng(Pixel[][] estruturaImagem, String caminho){
-      ga.exportarImagemPng(estruturaImagem, caminho);
+   public void exportarPng(Pixel[][] estruturaImagem, String caminho){
+      ga.exportarPng(estruturaImagem, caminho);
    }
 
    /**
@@ -161,7 +161,7 @@ public class Geim{
     * @return estrutura de dados baseada na imagem.
     */
    public int[][] obterDadosImagem(BufferedImage imagem){
-      return gdi.obterDadosImagem(imagem);
+      return gdi.getDadosImagem(imagem);
    }
 
    /**

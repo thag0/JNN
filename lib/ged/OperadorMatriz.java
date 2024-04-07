@@ -15,7 +15,7 @@ class OperadorMatriz{
 
    }
 
-   public Object vetorizar(Object matriz){
+   public Object paraArray(Object matriz){
       if(matriz instanceof int[][]){
          int[][] m = (int[][]) matriz;
          return vetorizar(m);         
@@ -79,7 +79,7 @@ class OperadorMatriz{
 
    //sublinhas
 
-   public Object obterSubLinhas(Object matriz, int inicio, int fim){
+   public Object obterSubLins(Object matriz, int inicio, int fim){
       if(matriz instanceof int[][]){
          int[][] m = (int[][]) matriz;
          return obterSubLinhas(m, inicio, fim);    
@@ -149,7 +149,7 @@ class OperadorMatriz{
 
    //subcolunas
 
-   public Object obterSubColunas(Object matriz, int inicio, int fim){
+   public Object obterSubCols(Object matriz, int inicio, int fim){
       if(matriz instanceof int[][]){
          int[][] m = (int[][]) matriz;
          return obterSubColunas(m, inicio, fim);    
@@ -280,7 +280,7 @@ class OperadorMatriz{
 
    //identidade
 
-   public void matrizIdentidade(Object matriz){
+   public void matId(Object matriz){
       if(matriz == null){
          throw new IllegalArgumentException("A matriz fornecida não pode ser nula.");
       }
@@ -331,7 +331,7 @@ class OperadorMatriz{
 
    //transposição 
 
-   public Object transporMatriz(Object matriz){
+   public Object matTransp(Object matriz){
       if(matriz instanceof int[][]){
          int[][] m = (int[][]) matriz;
          return transporMatriz(m);
@@ -447,7 +447,7 @@ class OperadorMatriz{
    // OPERAÇÕES MATRICIAIS -------------------------------------
    //soma
 
-   public void somarMatrizes(Object a, Object b, Object r){
+   public void matAdd(Object a, Object b, Object r){
       if(a == null || b == null || r == null){
          throw new IllegalArgumentException("As matrizes fornecidas não podem ser nulas.");
       }
@@ -507,7 +507,7 @@ class OperadorMatriz{
 
    //subtração
 
-   public void subtrairMatrizes(Object a, Object b, Object r){
+   public void matSub(Object a, Object b, Object r){
       if(a == null || b == null || r == null){
          throw new IllegalArgumentException("As matrizes fornecidas não podem ser nulas.");
       }
@@ -568,7 +568,7 @@ class OperadorMatriz{
 
    //multiplicação
 
-   public void multiplicarMatrizes(Object a, Object b, Object r){
+   public void matMult(Object a, Object b, Object r){
       if(a == null || b == null || r == null){
          throw new IllegalArgumentException("As matrizes fornecidas não podem ser nulas.");
       }
@@ -646,7 +646,7 @@ class OperadorMatriz{
 
    //escalar
 
-   public void multilpicarEscalar(Object mat, Number escalar){
+   public void matMultEscalar(Object mat, Number escalar){
       if(mat == null || escalar == null){
          throw new IllegalArgumentException("Os parâmetros fornecidos não podem ser nulos.");
       }

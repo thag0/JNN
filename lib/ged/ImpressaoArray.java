@@ -6,7 +6,7 @@ class ImpressaoArray{
 
    }
 
-   public void imprimirArray(Object array, String nome){
+   public void printArray(Object array, String nome){
       String espacamento = "  ";
 
       if(nome.isEmpty()){
@@ -65,7 +65,7 @@ class ImpressaoArray{
    }
 
    public void imprimirArray(Object array){
-      imprimirArray(array, "");
+      printArray(array, "");
    }
 
 }

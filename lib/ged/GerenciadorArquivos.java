@@ -117,4 +117,32 @@ class GerenciadorArquivos{
       }
    }
 
+
+   public void exportarTxt(Dados dados, String caminho){
+      String separador = " ";
+
+      ArrayList<String[]> conteudo = dados.conteudo();
+
+      try{
+         BufferedWriter bw = new BufferedWriter(new FileWriter(caminho + ".txt"));
+         
+         for(String[] linha : conteudo){
+            for(int i = 0; i < linha.length; i++){
+
+               bw.write(linha[i]);
+               if(i < linha.length - 1){
+                  bw.write(separador);
+               }
+            }
+            bw.newLine();
+         }
+
+         bw.close();
+
+      }catch(Exception e){
+         System.out.println("Houve um erro ao exportar o arquivo.");
+         e.printStackTrace();
+      }
+   }
+
 }

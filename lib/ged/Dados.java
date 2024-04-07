@@ -1045,7 +1045,7 @@ public class Dados{
     *    Caso os dados sejam simétricos, também é exibido o formato do conteúdo.
     * </p>
     */
-   public void imprimir(){
+   public void print(){
       String espacamento = "    ";
 
       if(this.vazio()){

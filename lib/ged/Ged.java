@@ -82,8 +82,8 @@ public class Ged{
     * Exibe pelo console as informações contidas no conteúdo dos dados.
     * @param dados conjunto de dados.
     */
-   public void imprimirDados(Dados dados){
-      dados.imprimir();
+   public void printDados(Dados dados){
+      dados.print();
    }
 
    /**
@@ -91,8 +91,8 @@ public class Ged{
     * em dados muito grandes.
     * @param dados conjunto de dados.
     */
-   public void imprimirInicio(Dados dados){
-      id.imprimirInicio(dados);
+   public void printInicio(Dados dados){
+      id.printInicio(dados);
    }
 
    /**
@@ -100,23 +100,15 @@ public class Ged{
     * <p>
     *    Tipos suportados:
     * </p>
-    * <ul>
-    *    <li>
-    *       int[];
-    *    </li>
-    *    <li>
-    *       float[];
-    *    </li>
-    *    <li>
-    *       double[];
-    *    </li>
-    *    <li>
-    *       String[];
-    *    </li>
-    * </ul>
+    * <pre>
+    *int[];
+    *float[];
+    *double[];
+    *String[];
+    * </pre>
     * @param array array com os dados.
     */
-   public void imprimirArray(Object array){
+   public void prinArray(Object array){
       ia.imprimirArray(array);
    }
 
@@ -125,25 +117,17 @@ public class Ged{
     * <p>
     *    Tipos suportados:
     * </p>
-    * <ul>
-    *    <li>
-    *       int[];
-    *    </li>
-    *    <li>
-    *       float[];
-    *    </li>
-    *    <li>
-    *       double[];
-    *    </li>
-    *    <li>
-    *       String[];
-    *    </li>
-    * </ul>
+    * <pre>
+    *int[];
+    *float[];
+    *double[];
+    *String[];
+    * </pre>
     * @param array array com os dados.
     * @param nome nome personalizado para o array impresso.
     */
-   public void imprimirArray(Object array, String nome){
-      ia.imprimirArray(array, nome);
+   public void printArray(Object array, String nome){
+      ia.printArray(array, nome);
    }
 
    /**
@@ -151,24 +135,16 @@ public class Ged{
     * <p>
     *    Tipos suportados:
     * </p>
-    * <ul>
-    *    <li>
-    *       int[][];
-    *    </li>
-    *    <li>
-    *       float[][];
-    *    </li>
-    *    <li>
-    *       double[][];
-    *    </li>
-    *    <li>
-    *       String[][];
-    *    </li>
-    * </ul>
+    * <pre>
+    *int[];
+    *float[];
+    *double[];
+    *String[];
+    * </pre>
     * @param matriz matriz com os dados.
     */
-   public void imprimirMatriz(Object matriz){
-      im.imprimirMatriz(matriz);
+   public void printMatriz(Object matriz){
+      im.printMatiz(matriz);
    }
 
    /**
@@ -176,25 +152,17 @@ public class Ged{
     * <p>
     *    Tipos suportados:
     * </p>
-    * <ul>
-    *    <li>
-    *       int[][];
-    *    </li>
-    *    <li>
-    *       float[][];
-    *    </li>
-    *    <li>
-    *       double[][];
-    *    </li>
-    *    <li>
-    *       String[][];
-    *    </li>
-    * </ul>
+    * <pre>
+    *int[];
+    *float[];
+    *double[];
+    *String[];
+    * </pre>
     * @param matriz matriz com os dados.
     * @param nome nome personalizado para a matriz impressa.
     */
-   public void imprimirMatriz(Object matriz, String nome){
-      im.imprimirMatriz(matriz, nome);
+   public void printMatriz(Object matriz, String nome){
+      im.printMatriz(matriz, nome);
    }
 
    
@@ -250,8 +218,8 @@ public class Ged{
     * </pre>
     * @param dados conjunto de dados.
     */
-   public void adicionarColuna(Dados dados){
-      md.adicionarColuna(dados);
+   public void addCol(Dados dados){
+      md.addCol(dados);
    }
 
    /**
@@ -276,12 +244,12 @@ public class Ged{
     * ]
     * </pre>
     * @param dados conjunto de dados.
-    * @param indice índice onde a nova coluna será adicionada.
+    * @param id índice onde a nova coluna será adicionada.
     * @throws IllegalArgumentException se o conteúdo dos dados não for simétrico.
     * @throws IllegalArgumentException se o índice fornecido for inválido.
     */
-   public void adicionarColuna(Dados dados, int indice){
-      md.adicionarColuna(dados, indice);
+   public void addCol(Dados dados, int id){
+      md.addCol(dados, id);
    }
 
    /**
@@ -306,8 +274,8 @@ public class Ged{
     * @param dados conjunto de dados.
     * @throws IllegalArgumentException se o conteúdo dos dados não for simétrico.
     */
-   public void adicionarLinha(Dados dados){
-      md.adicionarLinha(dados);
+   public void addLin(Dados dados){
+      md.addLin(dados);
    }
 
    /**
@@ -333,34 +301,34 @@ public class Ged{
     * ]
     * </pre>
     * @param dados conjunto de dados.
-    * @param indice índice onde a nova linha será adicionada.
+    * @param id índice onde a nova linha será adicionada.
     * @throws IllegalArgumentException se o conteúdo dos dados não for simétrico.
     * @throws IllegalArgumentException se o índice fornecido for inválido.
     */
-   public void adicionarLinha(Dados dados, int indice){
-      md.adicionarLinha(dados, indice);
+   public void addLin(Dados dados, int id){
+      md.addLin(dados, id);
    }
 
    /**
     * Remove uma linha inteira do conjunto de dados
     * @param dados conjunto de dados.
-    * @param indice índice da linha que será removida.
+    * @param id índice da linha que será removida.
     * @throws IllegalArgumentException o conteúdo dos dados for nulo.
     * @throws IllegalArgumentException se o indice for inválido.
     */
-   public void removerLinha(Dados dados, int indice){
-      md.removerLinha(dados, indice);
+   public void remLin(Dados dados, int id){
+      md.remLim(dados, id);
    }
 
    /**
     * Remove todas as colunas dos dados de acordo com o índice fornecido.
     * @param dados conjunto de dados.
-    * @param indice índice da coluna que será removida.
+    * @param id índice da coluna que será removida.
     * @throws IllegalArgumentException o conteúdo dos dados for nulo.
     * @throws IllegalArgumentException se o indice for inválido.
     */
-   public void removerColuna(Dados dados, int indice){
-      md.removerColuna(dados, indice);
+   public void remCol(Dados dados, int id){
+      md.remCol(dados, id);
    }
 
    /**
@@ -376,8 +344,8 @@ public class Ged{
     * @throws IllegalArgumentException se o valor de busca for nulo.
     * @throws IllegalArgumentException se o novo valor de substituição for nulo;
     */
-   public void editarValor(Dados dados, int idLinha, int idColuna, String valor){
-      md.editarValor(dados, idLinha, idColuna, valor);
+   public void setValo(Dados dados, int idLinha, int idColuna, String valor){
+      md.setValor(dados, idLinha, idColuna, valor);
    }
 
    /**
@@ -392,8 +360,8 @@ public class Ged{
     * @throws IllegalArgumentException se o valor de busca for nulo.
     * @throws IllegalArgumentException se o novo valor de substituição for nulo;
     */
-   public void editarValor(Dados dados, int idColuna, String busca, String valor){
-      md.editarValor(dados, idColuna, busca, valor);
+   public void setValor(Dados dados, int idColuna, String busca, String valor){
+      md.setValor(dados, idColuna, busca, valor);
    }
 
    /**
@@ -418,16 +386,16 @@ public class Ged{
     * ]
     * </pre>
     * @param dados conjunto de dados.
-    * @param col1 índice da primeira coluna que será trocada.
-    * @param col2 índice da segunda coluna que será trocada.
+    * @param id1 índice da primeira coluna que será trocada.
+    * @param id2 índice da segunda coluna que será trocada.
     * @throws IllegalArgumentException se o conteúdo dos dados estiver nulo.
     * @throws IllegalArgumentException se o conteúdo dos dados não for simétrico.
     * @throws IllegalArgumentException se a o conteúdo dos dados não tiver pelo menos duas colunas.
     * @throws IllegalArgumentException se os índices fornecidos estiverem fora de alcance do tamanho das colunas.
     * @throws IllegalArgumentException se as colunas fornecidas forem iguais.
     */
-   public void trocarColunas(Dados dados, int col1, int col2){
-      md.trocarColunas(dados, col2, col2);
+   public void trocarColunas(Dados dados, int id1, int id2){
+      md.trocarColunas(dados, id1, id2);
    }
 
    /**
@@ -450,8 +418,8 @@ public class Ged{
     * </pre>
     * @param dados conjunto de dados.
     */
-   public void removerNaoNumericos(Dados dados){
-      md.removerNaoNumericos(dados);
+   public void remNaoNumericos(Dados dados){
+      md.remNaoNumericos(dados);
    }
 
    /**
@@ -479,12 +447,12 @@ public class Ged{
     * ]
     * </pre>
     * @param dados conjunto de dados.
-    * @param indice O índice da coluna desejada para categorização.
+    * @param id O índice da coluna desejada para categorização.
     * @throws IllegalArgumentException se o conteúdo dos dados não for simétrico.
     * @throws IllegalArgumentException se o índice fornecido for inválido.
     */
-   public void categorizar(Dados dados, int indice){
-      md.categorizar(dados, indice);
+   public void categorizar(Dados dados, int id){
+      md.categorizar(dados, id);
    }
 
    /**
@@ -557,7 +525,7 @@ public class Ged{
     * @return novo objeto do tipo {@code Dados} conténdo a união por colunas de A com B.
     * @throws IllegalArgumentException caso a quantiade de linhas de A e B sejam diferentes.
     */
-   public Dados unirColunas(Dados a, Dados b){
+   public Dados unirCols(Dados a, Dados b){
       return md.unirColuna(a, b);
    }
 
@@ -582,7 +550,7 @@ public class Ged{
     * </pre>
     * @param dados conjunto de dados.
     */
-   public void removerDuplicadas(Dados dados){
+   public void remDuplicadas(Dados dados){
       md.removerDuplicadas(dados);
    }
 
@@ -647,8 +615,8 @@ public class Ged{
     * @param dados conjunto de dados.
     * @throws IllegalArgumentException se o conteúdo dos dados não for simétrico.
     */
-   public void normalizar(Dados dados, int idCol){
-      dados.normalizar(idCol);
+   public void normalizar(Dados dados, int id){
+      dados.normalizar(id);
    }
 
    /**
@@ -694,13 +662,13 @@ public class Ged{
     * ]
     * </pre>
     * @param dados conjunto de dados.
-    * @param idCol índice da coluna desejada.
+    * @param id índice da coluna desejada.
     * @throws IllegalArgumentException se o conteúdo dos dados for vazio.
     * @throws IllegalArgumentException se o conteúdo dos dados não for simétrico.
     * @throws IllegalArgumentException se o índice da coluna fornecida for inválido.
     */
-   public void capitalizar(Dados dados, int idCol){
-      dados.capitalizar(idCol);
+   public void capitalizar(Dados dados, int id){
+      dados.capitalizar(id);
    }
 
    /**
@@ -787,15 +755,15 @@ public class Ged{
     * ]
     * </pre>
     * @param dados conjunto de dados.
-    * @param idCol índice da coluna desejada.
-    * @param crescente true caso a ordenação deva ser crescente, false caso contrário.
+    * @param id índice da coluna desejada.
+    * @param cres true caso a ordenação deva ser crescente, false caso contrário.
     * @throws IllegalArgumentException se o conteúdo dos dados estiver vazio.
     * @throws IllegalArgumentException se o conteúdo dos dados não forem simétricos.
     * @throws IllegalArgumentException se o índice da coluna for inválido.
     * @throws IllegalArgumentException se a coluna conter valores que não possam ser convertidos para números.
     */
-   public void ordenar(Dados dados, int idCol, boolean crescente){
-      dados.ordenar(idCol, crescente);
+   public void ordenar(Dados dados, int id, boolean cres){
+      dados.ordenar(id, cres);
    }
 
    /**
@@ -822,14 +790,14 @@ public class Ged{
     * ]
     * </pre>
     * @param dados conjunto de dados.
-    * @param idCol índice da coluna para busca.
+    * @param id índice da coluna para busca.
     * @param busca valor de busca desejado.
     * @return novo conjunto de dados contendo apenas as informações filtradas, caso 
     *    não seja encontrado nenhum valor desejado, o conteúdo dos novos dados
     *    estará {@code vazio}.
     */
-   public Dados filtrar(Dados dados, int idCol, String busca){
-      return md.filtrar(dados, idCol, busca);
+   public Dados filtrar(Dados dados, int id, String busca){
+      return md.filtrar(dados, id, busca);
    }
 
    /**
@@ -855,8 +823,8 @@ public class Ged{
     *    <li> {@code !=} </li>
     * </ul>
     * @param dados conjunto de dados.
-    * @param idCol índice da coluna para busca.
-    * @param operador operador desejado.
+    * @param id índice da coluna para busca.
+    * @param op operador desejado.
     * @param valor valor de busca desejado.
     * @return novo conjunto de dados contendo apenas as informações filtradas, caso 
     *    não seja encontrado nenhum valor desejado, o conteúdo dos novos dados
@@ -865,8 +833,8 @@ public class Ged{
     * @throws IllegalArgumentException se o índice da coluna for inválido.
     * @throws IllegalArgumentException se o operador fornecido não for suportado.
     */
-   public Dados filtrar(Dados dados, int idCol, String operador, String valor){
-      return md.filtrar(dados, idCol, operador, valor);
+   public Dados filtrar(Dados dados, int id, String op, String valor){
+      return md.filtrar(dados, id, op, valor);
    }
 
    /**
@@ -904,11 +872,11 @@ public class Ged{
     * Valores de preenchimento como {@code média}, {@code mediana} entre outros, podem 
     * ser obtidos diretamente pelo objeto {@code Dados}.
     * @param dados conjunto de dados.
-    * @param idCol índice da coluna desejada.
+    * @param id índice da coluna desejada.
     * @param valor valor de preenchimento em elementos ausentes.
     */
-   public void preencherAusentes(Dados dados, int idCol, double valor){
-      md.preencherAusentes(dados, idCol, valor);
+   public void preencherAusentes(Dados dados, int id, double valor){
+      md.preencherAusentes(dados, id, valor);
    }
 
    /**
@@ -935,7 +903,7 @@ public class Ged{
     *    {@code Dados}, contendo as linhas e colunas das informações lidas.
     * </p>
     * @param caminho caminho do arquivo, com extensão.
-    * @return objeto do tipo {@code Dados} contendo as informações do arquivo lido.
+    * @return {@code Dados} contendo as informações do arquivo lido.
     * @throws IllegalArgumentException caso não encontre o diretório fornecido.
     * @throws IllegalArgumentException caso arquivo não possua a extensão .csv.
     */
@@ -954,7 +922,7 @@ public class Ged{
     *    {@code Dados}, contendo as linhas e colunas das informações lidas.
     * </p>
     * @param caminho caminho do arquivo, com extensão.
-    * @return objeto do tipo {@code Dados} contendo as informações do arquivo lido.
+    * @return {@code Dados} contendo as informações do arquivo lido.
     * @throws IllegalArgumentException caso não encontre o diretório fornecido.
     * @throws IllegalArgumentException caso arquivo não possua a extensão .txt.
     */
@@ -963,12 +931,21 @@ public class Ged{
    }
 
    /**
-    * Grava o conteúdo do conjunto de dados em um arquivo .csv.
+    * Grava o conteúdo do conjunto de dados em um arquivo {@code .csv}.
     * @param dados conjunto de dados.
-    * @param filePath caminho do arquivo onde os dados serão gravados, excluindo a extensão .csv.
+    * @param caminho caminho do arquivo onde os dados serão gravados, excluindo a extensão .csv.
     */
    public void exportarCsv(Dados dados, String caminho){
-      ga.exportarCsv(dados, caminho);;
+      ga.exportarCsv(dados, caminho);
+   }
+
+   /**
+    * Grava o conteúdo do conjunto de dados em um arquivo {@code .txt}.
+    * @param dados conjunto de dados.
+    * @param caminho caminho do arquivo onde os dados serão gravados, excluindo a extensão .txt.
+    */
+   public void exportarTxt(Dados dados, String caminho){
+      ga.exportarTxt(dados, caminho);
    }
 
    // GERENCIADOR TREINO TESTE ---------------------
@@ -979,7 +956,12 @@ public class Ged{
     *    A alteração irá afetar o conteúdo dos dados recebidos.
     *    Caso queira manter os dados originais, é recomendado fazer uma cópia previamente.
     * </p>
-    * Dados suportados: {@code int[][]}, {@code float[][]}, {@code double[][]}.
+    * Dados suportados: 
+    * <pre>
+    *int[][];
+    *float[][];
+    *double[][];
+    *</pre>
     * @param dados matriz de conjunto de dados.
     */
    public void embaralharDados(Object dados){
@@ -1010,7 +992,11 @@ public class Ged{
     *    7, 8 
     * ]
     * </pre>
-    * Dados suportados: {@code int[][]}, {@code float[][]}, {@code double[][]}.
+    * <pre>
+    *int[][];
+    *float[][];
+    *double[][];
+    *</pre>
     * @param dados conjunto de dados completo.
     * @param colunas quantidade de colunas que serão preservadas, começando pela primeira até o valor fornecido.
     * @return nova matriz de dados apenas com as colunas desejadas.
@@ -1046,7 +1032,11 @@ public class Ged{
     *    8, 9
     * ]
     * </pre>
-    * Dados suportados: {@code int[][]}, {@code float[][]}, {@code double[][]}.
+    * <pre>
+    *int[][];
+    *float[][];
+    *double[][];
+    *</pre>
     * @param dados O conjunto de dados com as informações completas.
     * @param colunas O número de colunas de dados de saída que serão extraídas.
     * @return novo conjunto de dados com apenas as colunas de dados de saída.
@@ -1073,7 +1063,12 @@ public class Ged{
     *int[][] treino = treinoTeste[0];
     *int[][] teste = treinoTeste[1];}
     * </pre>
-    * Dados suportados: {@code int[][]}, {@code float[][]}, {@code double[][]}.
+    * Dados suportados:
+    * <pre>
+    *int[][];
+    *float[][];
+    *double[][];
+    *</pre>
     * @param dados O conjunto de dados completo.
     * @param tamanhoTeste O tamanho relativo do conjunto de teste (entre 0 e 1).
     * @return Um array de duas matrizes contendo os dados de treino e teste, respectivamente.
@@ -1145,12 +1140,17 @@ public class Ged{
     *
     * v = [1, 2, 3, 4, 5, 6, 7, 8, 9]
     * </pre>
-    * Dados suportados: {@code int[][]}, {@code float[][]}, {@code double[][]}.
+    * Dados suportados:
+    * <pre>
+    *int[][];
+    *float[][];
+    *double[][];
+    *</pre>
     * @param matriz matriz com os dados desejados.
     * @return arrays contendo os dados serializados da matriz.
     */
-   public Object matVetorizar(Object matriz){
-      return om.vetorizar(matriz);
+   public Object matParaArray(Object matriz){
+      return om.paraArray(matriz);
    }
 
    /**
@@ -1173,15 +1173,20 @@ public class Ged{
     *    4, 5, 6
     * ]
     * </pre>
-    * Dados suportados: {@code int[][]}, {@code float[][]}, {@code double[][]}.
+    * Dados suportados:
+    * <pre>
+    *int[][];
+    *float[][];
+    *double[][];
+    *</pre>
     * @param dados matriz contendo os dados completos.
     * @param inicio índice inicial do corte (inclusivo).
     * @param fim índice final do corte (exclusivo).
     * @return submatriz contendo o conteúdo da matriz original, com os dados selecionados.
     * @throws IllegalArgumentException se os índices fornecidos forem inválidos.
     */
-   public Object matSublinhas(Object dados, int inicio, int fim){
-      return om.obterSubLinhas(dados, inicio, fim);
+   public Object matSublins(Object dados, int inicio, int fim){
+      return om.obterSubLins(dados, inicio, fim);
    }
 
    /**
@@ -1205,15 +1210,20 @@ public class Ged{
     *    7, 8
     * ]
     * </pre>
-    * Dados suportados: {@code int[][]}, {@code float[][]}, {@code double[][]}.
+    * Dados suportados:
+    * <pre>
+    *int[][];
+    *float[][];
+    *double[][];
+    *</pre>
     * @param dados matriz contendo os dados completos.
     * @param inicio índice inicial do corte (inclusivo).
     * @param fim índice final do corte (exclusivo).
     * @return submatriz contendo o conteúdo da matriz original, com os dados filtrados de acordo
     *    com as colunas indicadas.
     */
-   public Object matSubcolunas(Object dados, int inicio, int fim){
-      return om.obterSubColunas(dados, inicio, fim);
+   public Object matSubcols(Object dados, int inicio, int fim){
+      return om.obterSubCols(dados, inicio, fim);
    }
 
    /**
@@ -1222,7 +1232,12 @@ public class Ged{
     *    O valor de preenchimento é automaticamente convertido para o mesmo 
     *    tipo da matriz fornecida.
     * </p>
-    * Dados suportados: {@code int[][]}, {@code float[][]}, {@code double[][]}.
+    * Dados suportados:
+    * <pre>
+    *int[][];
+    *float[][];
+    *double[][];
+    *</pre>
     * @param matriz matriz com os dados.
     * @param valor valor de preenchimento.
     */
@@ -1240,11 +1255,16 @@ public class Ged{
     *  0, 0, 1
     * ]
     * </pre></p>
-    * Dados suportados: {@code int[][]}, {@code float[][]}, {@code double[][]}.
+    * Dados suportados:
+    * <pre>
+    *int[][];
+    *float[][];
+    *double[][];
+    *</pre>
     * @param matriz matriz base.
     */
-   public void matIdentidade(Object matriz){
-      om.matrizIdentidade(matriz);
+   public void matId(Object matriz){
+      om.matId(matriz);
    }
 
    /**
@@ -1265,8 +1285,8 @@ public class Ged{
     * @param matriz matriz original para transposição
     * @return matriz transposta.
     */
-   public Object matTranspor(Object matriz){
-      return om.transporMatriz(matriz);
+   public Object matTransp(Object matriz){
+      return om.matTransp(matriz);
    }
 
    /**
@@ -1286,14 +1306,19 @@ public class Ged{
     *   3, 3
     * ]
     * </pre></p>
-    * Dados suportados: {@code int[][]}, {@code float[][]}, {@code double[][]}.
+    * Dados suportados:
+    * <pre>
+    *int[][];
+    *float[][];
+    *double[][];
+    *</pre>
     * @param a primeira matriz.
     * @param b segunda matriz.
     * @param r matriz que conterá o resultado.
     * @throws IllegalArgumentException se as dimensões de A, B e R forem incompatíveis.
     */
-   public void matSomar(Object a, Object b, Object r){
-      om.somarMatrizes(a, b, r);
+   public void matAdd(Object a, Object b, Object r){
+      om.matAdd(a, b, r);
    }
 
    /**
@@ -1313,14 +1338,19 @@ public class Ged{
     *   -1, -1
     * ]
     * </pre></p>
-    * Dados suportados: {@code int[][]}, {@code float[][]}, {@code double[][]}.
+    * Dados suportados:
+    * <pre>
+    *int[][];
+    *float[][];
+    *double[][];
+    *</pre>
     * @param a primeira matriz.
     * @param b segunda matriz.
     * @param r matriz que conterá o resultado.
     * @throws IllegalArgumentException se as dimensões de A, B e R forem incompatíveis.
     */
-   public void matSubtrair(Object a, Object b, Object r){
-      om.subtrairMatrizes(a, b, r);
+   public void matSub(Object a, Object b, Object r){
+      om.matSub(a, b, r);
    }
 
    /**
@@ -1339,14 +1369,19 @@ public class Ged{
     *   43.0, 50.0
     * ]
     * </pre></p>
-    * Dados suportados: {@code int[][]}, {@code float[][]}, {@code double[][]}.
+    * Dados suportados:
+    * <pre>
+    *int[][];
+    *float[][];
+    *double[][];
+    *</pre>
     * @param a primeira matriz.
     * @param b segunda matriz.
     * @param r matriz que conterá o resultado.
     * @throws IllegalArgumentException se as dimensões de A, B e R forem incompatíveis.
     */
-   public void matMultiplicar(Object a, Object b, Object r){
-      om.multiplicarMatrizes(a, b, r);
+   public void matMult(Object a, Object b, Object r){
+      om.matMult(a, b, r);
    }
 
    /**
@@ -1368,12 +1403,17 @@ public class Ged{
     *    O valor do escalar é automaticamente convertido para o mesmo 
     *    tipo da matriz fornecida.
     * </p>
-    * Dados suportados: {@code int[][]}, {@code float[][]}, {@code double[][]}.
+    * Dados suportados:
+    * <pre>
+    *int[][];
+    *float[][];
+    *double[][];
+    *</pre>
     * @param matriz matriz contendo os dados.
     * @param escalar escalar para a ultiplicação.
     */
-   public void matMultiplicarEscalar(Object matriz, Number escalar){
-      om.multilpicarEscalar(matriz, escalar);
+   public void matMultEscalar(Object matriz, Number escalar){
+      om.matMultEscalar(matriz, escalar);
    }
 
    /**
@@ -1393,7 +1433,12 @@ public class Ged{
     *   16, 25
     * ]
     * </pre></p>
-    * Dados suportados: {@code int[][]}, {@code float[][]}, {@code double[][]}.
+    * Dados suportados:
+    * <pre>
+    *int[][];
+    *float[][];
+    *double[][];
+    *</pre>
     * @param a primeira matriz.
     * @param b segunda matriz.
     * @param r matriz que conterá o resultado.

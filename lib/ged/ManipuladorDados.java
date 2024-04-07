@@ -17,7 +17,7 @@ class ManipuladorDados{
 
    }
  
-   public void adicionarColuna(Dados dados){
+   public void addCol(Dados dados){
       ArrayList<String[]> conteudo = dados.conteudo();
 
       int nColunas = conteudo.get(0).length;
@@ -36,7 +36,7 @@ class ManipuladorDados{
       dados.atribuir(conteudo);
   }  
 
-   public void adicionarColuna(Dados dados, int indice){
+   public void addCol(Dados dados, int indice){
       if(!dados.simetrico()){
          throw new IllegalArgumentException("O conteúdo dos dados deve ser simético.");
       }
@@ -67,7 +67,7 @@ class ManipuladorDados{
       dados.atribuir(conteudo);
    }
 
-   public void adicionarLinha(Dados dados){
+   public void addLin(Dados dados){
       if(!dados.simetrico()){
          throw new IllegalArgumentException("O conteúdo dos dados deve ser simético.");
       }
@@ -84,7 +84,7 @@ class ManipuladorDados{
       dados.atribuir(conteudo);
    }
 
-   public void adicionarLinha(Dados dados, int indice){
+   public void addLin(Dados dados, int indice){
       if(!dados.simetrico()){
          throw new IllegalArgumentException("O conteúdo dos dados deve ser simético.");
       }
@@ -105,7 +105,7 @@ class ManipuladorDados{
       dados.atribuir(conteudo);
    }
 
-   public void removerLinha(Dados dados, int indice){
+   public void remLim(Dados dados, int indice){
       ArrayList<String[]> conteudo = dados.conteudo();
 
       if(conteudo == null) throw new IllegalArgumentException("O conteúdo dos dados é nulo.");
@@ -117,7 +117,7 @@ class ManipuladorDados{
       dados.atribuir(conteudo);
    }
 
-   public void removerColuna(Dados dados, int indice){
+   public void remCol(Dados dados, int indice){
       ArrayList<String[]> conteudo = dados.conteudo();
 
       if(conteudo == null) throw new IllegalArgumentException("O conteúdo dos dados é nulo.");
@@ -149,7 +149,7 @@ class ManipuladorDados{
       dados.atribuir(conteudo);
    }
 
-   public void editarValor(Dados dados, int idLinha, int idColuna, String novoValor){
+   public void setValor(Dados dados, int idLinha, int idColuna, String novoValor){
       ArrayList<String[]> conteudo = dados.conteudo();
 
       if(conteudo == null) throw new IllegalArgumentException("O conteúdo dos dados é nulo.");
@@ -167,7 +167,7 @@ class ManipuladorDados{
       dados.editarItem(idLinha, idColuna, novoValor);
    }
 
-   public void editarValor(Dados dados, int idColuna, String busca, String novoValor){
+   public void setValor(Dados dados, int idColuna, String busca, String novoValor){
       ArrayList<String[]> conteudo = dados.conteudo();
 
       if(conteudo == null) throw new IllegalArgumentException("O conteúdo dos dados é nulo.");
@@ -202,7 +202,7 @@ class ManipuladorDados{
       dados.atribuir(conteudo);
    }
 
-   public void removerNaoNumericos(Dados dados){
+   public void remNaoNumericos(Dados dados){
       ArrayList<String[]> conteudo = dados.conteudo();
 
       int indiceInicial = 0;

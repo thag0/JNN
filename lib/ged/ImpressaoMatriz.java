@@ -10,11 +10,11 @@ class ImpressaoMatriz{
 
    }
 
-   public void imprimirMatriz(Object matriz){
-      imprimirMatriz(matriz, "");
+   public void printMatiz(Object matriz){
+      printMatriz(matriz, "");
    }
    
-   public void imprimirMatriz(Object matriz, String nome){
+   public void printMatriz(Object matriz, String nome){
       String espacamento = "  ";
 
       if(nome.isEmpty()){

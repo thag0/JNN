@@ -22,7 +22,7 @@ public class Classificador{
       //removendo linha com nomes das categorias
       //tranformando a ultima coluna em categorização binária
       Dados iris = ged.lerCsv("./dados/csv/iris.csv");
-      ged.removerLinha(iris, 0);
+      ged.remLin(iris, 0);
       int[] shape = ged.shapeDados(iris);
       int ultimoIndice = shape[1]-1;
       ged.categorizar(iris, ultimoIndice);
@@ -65,7 +65,7 @@ public class Classificador{
       int[][] matrizConfusao = modelo.avaliador().matrizConfusao(testeX, testeY);
       Dados d = new Dados(matrizConfusao);
       d.editarNome("Matriz de confusão");
-      d.imprimir();
+      d.print();
 
       exportarHistorico(modelo, "historico-perda");
       // compararSaidaRede(modelo, testeX, testeY, "");

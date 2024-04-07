@@ -2,6 +2,7 @@ package lib.geim;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 
 import javax.imageio.ImageIO;
 
@@ -15,13 +16,18 @@ class GerenciadorArquivos{
    /**
     * Contém as implementações de gestão de arquivos do Geim
     */
-   public GerenciadorArquivos(){
-
-   }
+   public GerenciadorArquivos(){}
 
 
    public BufferedImage lerImagem(String caminho){
       BufferedImage imagem = null;
+      
+      File arq = new File(caminho);
+      try{
+         if(!arq.exists()) throw new FileNotFoundException();
+      }catch(FileNotFoundException e){
+         System.out.println("Diretório \" " + caminho + " \" não encontrado.");
+      }
       
       try{
          imagem = ImageIO.read(getClass().getResourceAsStream(caminho));
@@ -35,7 +41,7 @@ class GerenciadorArquivos{
    }
 
 
-   public void exportarImagemPng(Pixel[][] estruturaImagem, String caminho){
+   public void exportarPng(Pixel[][] estruturaImagem, String caminho){
       int alturaImagem = estruturaImagem.length;
       int larguraImagem = estruturaImagem[0].length;
 
@@ -117,7 +123,7 @@ class GerenciadorArquivos{
                   saida[0] = redes[id].saidaParaArray()[0] * 255;
 
                   synchronized(imagemAmpliada){
-                     gdi.configurarCor(imagemAmpliada, x, y, (int)saida[0], (int)saida[0], (int)saida[0]);
+                     gdi.setCor(imagemAmpliada, x, y, (int)saida[0], (int)saida[0], (int)saida[0]);
                   }
                }
             }
@@ -135,7 +141,7 @@ class GerenciadorArquivos{
          e.printStackTrace();
       }
 
-      this.exportarImagemPng(imagemAmpliada, caminho);
+      this.exportarPng(imagemAmpliada, caminho);
    }
 
 
@@ -191,7 +197,7 @@ class GerenciadorArquivos{
                   saida[2] = s[2] * 255;
 
                   synchronized(imagemAmpliada){
-                     gdi.configurarCor(imagemAmpliada, x, y, (int)saida[0], (int)saida[1], (int)saida[2]);
+                     gdi.setCor(imagemAmpliada, x, y, (int)saida[0], (int)saida[1], (int)saida[2]);
                   }
                }
             }
@@ -209,6 +215,6 @@ class GerenciadorArquivos{
          e.printStackTrace();
       }
 
-      this.exportarImagemPng(imagemAmpliada, caminho);
+      this.exportarPng(imagemAmpliada, caminho);
    }
 }
