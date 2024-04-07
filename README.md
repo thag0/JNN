@@ -26,9 +26,9 @@ Até o momento o modelo sequencial está lidando perfeitamente bem com os métod
 
 Estou testando os modelos convolucionais no conjunto de dados do MNIST, atualmente estou usando todos os 10 dítigos para treino, onde cada dígito possui 200 amostras.
 
-Esse é exemplo de um modelo usado para classificar os dados do MNIST, com precisão em torno de 92% nos dados de teste.
+Esse é exemplo de um modelo usado para classificar os dados do MNIST.
 
-![arq-conv](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/b19ec142-b612-4340-b041-9d4277d3ab2c)
+![arq conv](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/260f7848-e564-477b-b296-9c657addff7a)
 
 Já estou bem satisfeito de ter conseguido esses resultados com o modelo convolucional, mas sempre há espaço para melhorias e quero continuar trabalhando nisso, principalmente acelerando as operações dentro da camada.
 
@@ -40,6 +40,6 @@ Por enquanto a implementação mais fácil de fazer foi criar a camada de Dropou
 
 A camada de Dropout é bem simples de usar, basta empilhar entre camadas, como sugere na imagem de exemplo:
 
-![exemplo dropout](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/079fae89-dc01-4ea1-9b62-ef4dc3086200)
+![exemplo-dropout](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/c18f5981-1fe5-49ef-b126-85eebc756e70)
 
 *Exemplo de modelo usando camadas de abandono (dropout), valores arbitrários.*
