@@ -77,8 +77,8 @@ public class Benchmark{
 
       sb.append("Config conv = [\n");
          sb.append(pad).append("filtros: " + conv.kernel().shapeStr() + "\n");
-         sb.append(pad).append("entrada: (" + e[0] + ", " + e[1] + ", " + e[2] + "\n");
-         sb.append(pad).append("saida: (" + s[0] + ", " + s[1] + ", " + s[2] + "\n");
+         sb.append(pad).append("entrada: (" + e[0] + ", " + e[1] + ", " + e[2] + ")\n");
+         sb.append(pad).append("saida: (" + s[0] + ", " + s[1] + ", " + s[2] + ")\n");
          sb.append(pad).append("Tempo forward: " + TimeUnit.NANOSECONDS.toMillis(tempo) + "ms\n");
       sb.append("]\n");
 
@@ -125,8 +125,8 @@ public class Benchmark{
 
       sb.append("Config conv = [\n");
          sb.append(pad).append("filtros: " + conv.kernel().shapeStr() + "\n");
-         sb.append(pad).append("entrada: (" + e[0] + ", " + e[1] + ", " + e[2] + "\n");
-         sb.append(pad).append("saida: (" + s[0] + ", " + s[1] + ", " + s[2] + "\n");
+         sb.append(pad).append("entrada: (" + e[0] + ", " + e[1] + ", " + e[2] + ")\n");
+         sb.append(pad).append("saida: (" + s[0] + ", " + s[1] + ", " + s[2] + ")\n");
          sb.append(pad).append("Tempo backward: " + TimeUnit.NANOSECONDS.toMillis(tempo) + "ms\n");
       sb.append("]\n");
 

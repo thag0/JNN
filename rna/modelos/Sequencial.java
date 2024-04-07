@@ -33,16 +33,16 @@ import rna.treinamento.Treinador;
  *modelo.add(new Densa(2, 3));
  *modelo.add(new Densa(2));
  *
- *modelo = Sequencial(new Camada[]{
+ *modelo = Sequencial(
  *    new Densa(2, 3),
  *    new Densa(2)
- *});
+ *);
  *
- *modelo = Sequencial(new Camada[]{
+ *modelo = Sequencial(
  *    new Entrada(2),
  *    new Densa(3),
  *    new Densa(2)
- *});
+ *);
  * </pre>
  * O modelo sequencial não é limitado apenas a camadas densas, podendo empilhar camadas
  * compatívels que herdam de {@code rna.Camada}, algumas camadas dispoíveis incluem:
@@ -152,7 +152,7 @@ import rna.treinamento.Treinador;
  * @author Thiago Barroso, acadêmico de Engenharia da Computação pela Universidade Federal do Pará, 
  * Campus Tucuruí. Dezembro/2023.
  */
-public class Sequencial extends Modelo implements Cloneable{
+public class Sequencial extends Modelo{
 
    /**
     * Lista de camadas do modelo.
@@ -495,7 +495,7 @@ public class Sequencial extends Modelo implements Cloneable{
    }
 
    @Override
-   public Sequencial clonar(){
+   public Sequencial clone(){
       try{
          Sequencial clone = (Sequencial) super.clone();
 

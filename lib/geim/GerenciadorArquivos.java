@@ -93,7 +93,7 @@ class GerenciadorArquivos{
       Thread[] threads = new Thread[numThreads];
       RedeNeural[] redes = new RedeNeural[numThreads];
       for(int i = 0; i < numThreads; i++){
-         redes[i] = rede.clonar();
+         redes[i] = rede.clone();
       }
 
       int alturaPorThead = alturaImagem / numThreads;
@@ -164,7 +164,7 @@ class GerenciadorArquivos{
       Thread[] threads = new Thread[numThreads];
       RedeNeural[] redes = new RedeNeural[numThreads];
       for(int i = 0; i < numThreads; i++){
-         redes[i] = rede.clonar();
+         redes[i] = rede.clone();
       }
 
       int alturaPorThead = alturaImagem / numThreads;

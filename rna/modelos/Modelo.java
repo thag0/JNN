@@ -15,7 +15,7 @@ import rna.treinamento.Treinador;
  * Contém a inteface para os métodos necessários que são usados
  * para implementação de modelos.
  */
-public abstract class Modelo{
+public abstract class Modelo implements Cloneable{
 
    /**
     * Nome da instância do modelo.
@@ -462,5 +462,14 @@ public abstract class Modelo{
     * Clona as características principais do modelo.
     * @return clone do modelo.
     */
-   public abstract Modelo clonar();
+   @Override
+   public Modelo clone(){
+      try{
+         Modelo clone = (Modelo) super.clone(); 
+         return clone;
+
+      }catch(CloneNotSupportedException e){
+         throw new RuntimeException(e);
+      }
+   }
 }

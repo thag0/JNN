@@ -87,7 +87,7 @@ public class PainelTreino extends JPanel{
       Thread[] threads = new Thread[numThreads];
       Modelo[] clones = new Modelo[numThreads];
       for(int i = 0; i < clones.length; i++){
-         clones[i] = modelo.clonar();
+         clones[i] = modelo.clone();
       }
       
       int alturaPorThread = this.altura / numThreads;

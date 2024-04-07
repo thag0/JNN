@@ -41,7 +41,7 @@ import rna.otimizadores.SGD;
  * @author Thiago Barroso, acadêmico de Engenharia da Computação pela Universidade Federal do Pará, 
  * Campus Tucuruí. Maio/2023.
  */
-public class RedeNeural extends Modelo implements Cloneable{
+public class RedeNeural extends Modelo{
    
    /**
     * Região crítica
@@ -757,7 +757,7 @@ public class RedeNeural extends Modelo implements Cloneable{
    }
 
    @Override
-   public RedeNeural clonar(){
+   public RedeNeural clone(){
       try{
          RedeNeural clone = (RedeNeural) super.clone();
 
