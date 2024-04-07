@@ -12,10 +12,10 @@ import rna.modelos.Sequencial;
 import rna.otimizadores.*;
 
 public class MainImg{
-   static final int EPOCAS = 8*1000;
-   static final double ESCALA_RENDER = 8;
    static Ged ged = new Ged();
    static Geim geim = new Geim();
+   static final int EPOCAS = 8*1000;
+   static final double ESCALA_RENDER = 9;
    static boolean calcularHistorico = true;
    static final String CAMINHO_HISTORICO = "historico-perda";
    static final String CAMINHO_IMAGGEM = "/dados/mnist/treino/8/img_0.jpg";
@@ -131,8 +131,10 @@ public class MainImg{
 
          }catch(Exception e){ }
       }
+
       tempoTreino = System.nanoTime() - tempoTreino;
       jt.dispose();
+      
       return tempoTreino;
    }
 

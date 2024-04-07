@@ -457,5 +457,37 @@ public class AvgPooling extends Camada{
       verificarConstrucao();
       return this.gradEntrada;
    }
+
+   @Override
+   public String info() {
+      verificarConstrucao();
+
+      StringBuilder sb = new StringBuilder();
+      String pad = " ".repeat(4);
+      
+      sb.append(nome() + " (id " + this.id + ") = [\n");
+
+      sb.append(pad + "Entrada: " + utils.shapeStr(formEntrada) + "\n");
+      sb.append(pad + "Filtro: " + utils.shapeStr(formFiltro) + "\n");
+      sb.append(pad + "Strides: " + utils.shapeStr(stride) + "\n");
+      sb.append(pad + "Saída: " + utils.shapeStr(formatoSaida()) + "\n");
+
+      sb.append("]\n");
+
+      return sb.toString();
+   }
+
+   @Override
+   public String toString() {
+      StringBuilder sb = new StringBuilder(info());
+      int tamanho = sb.length();
+
+      sb.delete(tamanho-1, tamanho);//remover ultimo "\n"    
+      
+      sb.append(" <hash: " + Integer.toHexString(hashCode()) + ">");
+      sb.append("\n");
+      
+      return sb.toString();
+   }
    
 }

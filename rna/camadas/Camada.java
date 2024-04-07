@@ -500,4 +500,15 @@ public abstract class Camada{
    public String nome(){
       return getClass().getSimpleName();
    }
+
+   /**
+    * Retorna uma {@code String} contendo um resumo das informações
+    * da camada.
+    * @return informações da camada.
+    */
+   public String info(){
+      throw new UnsupportedOperationException(
+         "\nCamada " + nome() + " não possui exibição de informações."
+      );
+   }
 }

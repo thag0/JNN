@@ -819,6 +819,48 @@ public class Convolucional extends Camada implements Cloneable{
    }
 
    @Override
+   public String info() {
+      verificarConstrucao();
+
+      StringBuilder sb = new StringBuilder();
+      String pad = " ".repeat(4);
+      
+      sb.append(nome() + " (id " + this.id + ") = [\n");
+
+      sb.append(pad + "Ativação: " + ativacao.nome() + "\n");
+      sb.append(pad + "Entrada: " + utils.shapeStr(shapeEntrada) + "\n");
+      sb.append(pad + "Filtros: " + numFiltros() + "\n");
+      sb.append(pad + "Saida: " + utils.shapeStr(shapeSaida) + "\n");
+      sb.append("\n");
+
+      sb.append(pad + "Kernel: " + filtros.shapeStr() + "\n");
+
+      sb.append(pad + "Bias: ");
+      if(temBias()){
+         sb.append("(" + bias.dim3() + ", "   + bias.dim4() + ")\n");
+      }else{
+         sb.append(" N/A\n");
+      }
+
+      sb.append("]\n");
+
+      return sb.toString();
+   }
+
+   @Override
+   public String toString() {
+      StringBuilder sb = new StringBuilder(info());
+      int tamanho = sb.length();
+
+      sb.delete(tamanho-1, tamanho);//remover ultimo "\n"    
+      
+      sb.append(" <hash: " + Integer.toHexString(hashCode()) + ">");
+      sb.append("\n");
+      
+      return sb.toString();
+   }
+
+   @Override
    public Convolucional clone(){
       verificarConstrucao();
 

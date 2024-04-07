@@ -606,40 +606,46 @@ public class Densa extends Camada implements Cloneable{
       return saida.paraArray();
    }
 
-   /**
-    * Indica algumas informações sobre a camada, como:
-    * <ul>
-    *    <li>Id da camada dentro do Modelo em que foi criada.</li>
-    *    <li>Função de ativação.</li>
-    *    <li>Quantidade de neurônios.</li>
-    *    <li>Formato da entrada, pessos, bias e saída.</li>
-    * </ul>
-    * Algumas informações não estarão disponíveis caso a camada não esteja
-    * inicializada.
-    * @return buffer formatado contendo as informações da camada.
-    */
-   public String info(){
+   @Override
+   public String info() {
       verificarConstrucao();
 
-      String buffer = "";
-      String espacamento = "    ";
+      StringBuilder sb = new StringBuilder();
+      String pad = " ".repeat(4);
       
-      buffer += "\nInfo " + this.getClass().getSimpleName() + " " + this.id + " = [\n";
+      sb.append(nome() + " (id " + this.id + ") = [\n");
 
-      buffer += espacamento + "Ativação: " + this.ativacao.nome() + "\n";
-      buffer += espacamento + "Quantidade neurônios: " + this.numNeuronios() + "\n";
-      buffer += "\n";
+      sb.append(pad + "Ativação: " + ativacao.nome() + "\n");
+      sb.append(pad + "Entrada: " + tamanhoEntrada() + "\n");
+      sb.append(pad + "Neurônios: " + numNeuronios() + "\n");
+      sb.append(pad + "Saida: " + tamanhoSaida() + "\n");
+      sb.append("\n");
 
-      buffer += espacamento + "Entrada: [" + this.entrada.dim3() + ", " + this.entrada.dim4() + "]\n";
-      buffer += espacamento + "Pesos:   [" + this.pesos.dim3() + ", "   + this.pesos.dim4() + "]\n";
-      if(bias != null){
-         buffer += espacamento + "Bias:    [" + this.bias.dim3() + ", "   + this.bias.dim4() + "]\n";
+      sb.append(pad + "Pesos:  (" + pesos.dim3() + ", " + pesos.dim4() + ")\n");
+
+      sb.append(pad + "Bias:   ");
+      if(temBias()){
+         sb.append("(" + bias.dim3() + ", "   + bias.dim4() + ")\n");
+      }else{
+         sb.append(" n/a\n");
       }
-      buffer += espacamento + "Saida:   [" + this.saida.dim3() + ", "   + this.saida.dim4() + "]\n";
 
-      buffer += "]\n";
+      sb.append("]\n");
 
-      return buffer;
+      return sb.toString();
+   }
+
+   @Override
+   public String toString() {
+      StringBuilder sb = new StringBuilder(info());
+      int tamanho = sb.length();
+
+      sb.delete(tamanho-1, tamanho);//remover ultimo "\n"    
+      
+      sb.append(" <hash: " + Integer.toHexString(hashCode()) + ">");
+      sb.append("\n");
+      
+      return sb.toString();
    }
 
    @Override
@@ -650,7 +656,7 @@ public class Densa extends Camada implements Cloneable{
          Densa clone = (Densa) super.clone();
 
          clone.optensor = new OpTensor4D();
-         clone.ativacao = new Dicionario().getAtivacao(this.ativacao.getClass().getSimpleName());
+         clone.ativacao = new Dicionario().getAtivacao(this.ativacao.nome());
          clone.treinavel = this.treinavel;
 
          clone.usarBias = this.usarBias;
