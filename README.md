@@ -40,6 +40,6 @@ Por enquanto a implementação mais fácil de fazer foi criar a camada de Dropou
 
 A camada de Dropout é bem simples de usar, basta empilhar entre camadas, como sugere na imagem de exemplo:
 
-![exemplo dropout](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/079fae89-dc01-4ea1-9b62-ef4dc3086200)
+![exemplo-dropout](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/c18f5981-1fe5-49ef-b126-85eebc756e70)
 
 *Exemplo de modelo usando camadas de abandono (dropout), valores arbitrários.*
