@@ -768,7 +768,7 @@ public class RedeNeural extends Modelo{
 
          clone.camadas = new Densa[this.camadas.length];
          for(int i = 0; i < this.camadas.length; i++){
-            clone.camadas[i] = this.camadas[i].clonar();
+            clone.camadas[i] = this.camadas[i].clone();
          }
 
          return clone;

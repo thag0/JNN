@@ -819,7 +819,7 @@ public class Convolucional extends Camada implements Cloneable{
    }
 
    @Override
-   public Convolucional clonar(){
+   public Convolucional clone(){
       verificarConstrucao();
 
       try{

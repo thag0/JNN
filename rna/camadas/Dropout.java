@@ -367,7 +367,7 @@ public class Dropout extends Camada implements Cloneable{
    }
 
    @Override
-   public Dropout clonar(){
+   public Dropout clone(){
       verificarConstrucao();
 
       try{

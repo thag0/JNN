@@ -643,7 +643,7 @@ public class Densa extends Camada implements Cloneable{
    }
 
    @Override
-   public Densa clonar(){
+   public Densa clone(){
       verificarConstrucao();
 
       try{

@@ -483,10 +483,14 @@ public abstract class Camada{
     * Clona as características principais da camada.
     * @return clone da camada.
     */
-   public Camada clonar(){
-      throw new UnsupportedOperationException(
-         "\nCamada " + nome() + " não possui suporte para clonagem."
-      );
+   @Override
+   public Camada clone(){
+      try{
+         return (Camada) super.clone(); 
+
+      }catch(CloneNotSupportedException e){
+         throw new RuntimeException(e);
+      }
    }
 
    /**

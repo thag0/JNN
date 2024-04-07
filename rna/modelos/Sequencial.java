@@ -512,7 +512,7 @@ public class Sequencial extends Modelo{
          int nCamadas = numCamadas();
          clone.camadas = new Camada[nCamadas];
          for(int i = 0; i < nCamadas; i++){
-            clone.camadas[i] = camada(i).clonar();
+            clone.camadas[i] = camada(i).clone();
          }
          clone.compilado = this.compilado;
 
