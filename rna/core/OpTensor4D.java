@@ -524,7 +524,7 @@ public class OpTensor4D{
             
             double soma = 0.0;
             for(int k = 0; k < alturaKernel; k++){
-               int posX = i+k;
+               int posX = i + k;
                for(int l = 0; l < larguraKernel; l++){
                   soma += entradaLocal[posX][j+l] * kernelLocal[k][l];
                }
@@ -735,20 +735,22 @@ public class OpTensor4D{
       int linEntrada = entrada.dim3(), colEntrada = entrada.dim4();
       int linKernel = kernel.dim3(), colKernel = kernel.dim4();
       int linSaida = saida.dim3(), colSaida = saida.dim4();
-      double[][] entradaData = entrada.array2D(idEn[0], idEn[1]);
-      double[][] kernelData = kernel.array2D(idK[0], idK[1]);
-      
-      for(int i = 0; i < linSaida; i++){
-         for(int j = 0; j < colSaida; j++){
+      double[][] entradaLocal = entrada.array2D(idEn[0], idEn[1]);
+      double[][] kernelLocal = kernel.array2D(idK[0], idK[1]);
 
+      
+      for (int i = 0; i < linSaida; i++) {
+         for (int j = 0; j < colSaida; j++) {
+            
             double res = 0;
-            for(int k = 0; k < linKernel; k++){
+            for (int k = 0; k < linKernel; k++) {
                int posX = i - k;
-               for(int l = 0; l < colKernel; l++){
+               if (posX < 0 || posX >= linEntrada) continue;
+               
+               for (int l = 0; l < colKernel; l++) {
                   int posY = j - l;
-                  if(posX >= 0 && posX < linEntrada && posY >= 0 && posY < colEntrada){
-                     res += entradaData[posX][posY] * kernelData[k][l];
-                  }
+                  if (posY < 0 || posY >= colEntrada) continue;
+                  res += entradaLocal[posX][posY] * kernelLocal[k][l];
                }
             }
             
