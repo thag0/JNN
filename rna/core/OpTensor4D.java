@@ -737,24 +737,27 @@ public class OpTensor4D{
       int linSaida = saida.dim3(), colSaida = saida.dim4();
       double[][] entradaLocal = entrada.array2D(idEn[0], idEn[1]);
       double[][] kernelLocal = kernel.array2D(idK[0], idK[1]);
-
       
-      for (int i = 0; i < linSaida; i++) {
-         for (int j = 0; j < colSaida; j++) {
+      int posX, posY;
+      double soma;
+      int i, j, k, l;
+      for (i = 0; i < linSaida; i++) {
+         for (j = 0; j < colSaida; j++) {
             
-            double res = 0;
-            for (int k = 0; k < linKernel; k++) {
-               int posX = i - k;
-               if (posX < 0 || posX >= linEntrada) continue;
-               
-               for (int l = 0; l < colKernel; l++) {
-                  int posY = j - l;
-                  if (posY < 0 || posY >= colEntrada) continue;
-                  res += entradaLocal[posX][posY] * kernelLocal[k][l];
-               }
+            soma = 0;
+            for (k = 0; k < linKernel; k++) {
+               posX = i - k;
+               if (posX >= 0 && posX < linEntrada) {
+                  for (l = 0; l < colKernel; l++) {
+                     posY = j - l;
+                     if (posY >= 0 && posY < colEntrada) {
+                        soma += entradaLocal[posX][posY] * kernelLocal[k][l];
+                     }
+                  }
+               } 
             }
             
-            saida.add(idS[0], idS[1], i, j, res);
+            saida.add(idS[0], idS[1], i, j, soma);
          }
       }
    }
@@ -792,25 +795,26 @@ public class OpTensor4D{
     * @param gradK {@code Tensor} dos gradientes em relação aos filtros.
     * @param gradE {@code Tensor} com o gradiente de entrada.
     */
-   public void convBackward(Tensor4D entrada, Tensor4D kernel, Tensor4D gradSaida, Tensor4D gradK, Tensor4D gradE){
-      int filtros = kernel.dim1();
-      int entradas = kernel.dim2();
+	public void convBackward(Tensor4D entrada, Tensor4D kernel, Tensor4D gradSaida, Tensor4D gradK, Tensor4D gradE){
+		int filtros = kernel.dim1();
+		int entradas = kernel.dim2();
 
-      int[] idEn = {0, 0};
-      int[] idGradSaida = {0, 0};
-      int[] idK = {0, 0};
-      int[] idGradEn = {0, 0};
+		int[] idEn = {0, 0};
+		int[] idGradSaida = {0, 0};
+		int[] idK = {0, 0};
+		int[] idGradEn = {0, 0};
 
-      for(int i = 0; i < filtros; i++){
-         idGradSaida[1] = i;
-         idK[0] = i;
-         for(int j = 0; j < entradas; j++){
-            idEn[1] = j;
-            idK[1] = j;
-            idGradEn[1] = j;
-            correlacao2D(entrada, gradSaida, gradK, idEn, idGradSaida, idK);
-            convolucao2DFull(gradSaida, kernel, gradE, idGradSaida, idK, idGradEn);
-         }
-      }
-   }
+		for (int i = 0; i < filtros; i++) {
+			idGradSaida[1] = i;
+			idK[0] = i;
+			for (int j = 0; j < entradas; j++) {
+				idEn[1] = j;
+				idK[1] = j;
+				idGradEn[1] = j;
+				correlacao2D(entrada, gradSaida, gradK, idEn, idGradSaida, idK);
+				convolucao2DFull(gradSaida, kernel, gradE, idGradSaida, idK, idGradEn);
+			}
+		}
+
+	}
 }

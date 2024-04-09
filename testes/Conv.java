@@ -27,15 +27,15 @@ public class Conv{
    static final int amostras = 100;
    static final int digitos = 10;
 
-   static final String CAMINHO_MODELOS = "./dados/modelosMNIST/";
+   static final String CAMINHO_MODELOS = "./dados/modelos/";
    
    public static void main(String[] args){
       ged.limparConsole();
 
       // String nomeModelo = "mlp-mnist-89";
       // String nomeModelo = "conv-mnist-95-5";
-      String nomeModelo = "modelo-convolucional";
-      Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + nomeModelo + ".txt");
+      String nomeModelo = "modelo-treinado";
+      Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + nomeModelo + ".nn");
 
       testarPrevisao(modelo, "treino/3/img_1", true);
       testarPrevisao(modelo, "3_deslocado", true);
