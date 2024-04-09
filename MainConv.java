@@ -41,7 +41,7 @@ public class MainConv{
 
       System.out.println("Treinando.");
       tempo = System.nanoTime();
-         modelo.treinar(treinoX, treinoY, EPOCAS_TREINO, 12, true);
+         modelo.treinar(treinoX, treinoY, EPOCAS_TREINO, 16, true);
       tempo = System.nanoTime() - tempo;
 
       long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempo);
