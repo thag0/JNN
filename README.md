@@ -1,45 +1,55 @@
-# Biblioteca de Redes Neurais
+# **Biblioteca para manipulação de modelos de Redes Neurais**
 
-Estou adaptando meu modelo de MLP para o formato matricial, com o objetivo de tornar o modelo mais modular para aplicações futuras.
+Criação de uma pequena biblioteca para manipulação de modelos de machine learning com foco em redes neurais artificiais.
 
-Nesse modelo o centro de tudo é a classe Tensor4D que realiza as operações mais importantes dentro da rede, com isso quero tornar o desempenho
-da rede melhor, tentando paralelizar o uso das operações que são usadas a todo momento durante a execução do programa.
+# **Modelo RedeNeural**
 
-Estou conseguindo expandir a modularização da rede, criando uma camada base que é herdada para as novas camadas criadas, ela possui a base das 
-implementações necessárias pro funcionamento de uma camada dentro dos modelos.
+O modelo RedeNeural foi a base da construção de todo esse ambiente, nele que comecei a incorporar os moldes para a biblioteca.
 
-Aos poucos estou adicionando novos tipos de camadas, além de novas funcionalidades para as camadas já existentes.
+Ele é uma implementação focada em Multilayer Perceptrons, onde conta com apenas camadas densas na sua estrutura, o que acaba sendo um pouco limitado dependendo do tipo de problema, pois não traz flexibilidade nas configurações específicas de suas camdas.
 
-# Implementação do modelo Sequencial
+Contudo o modelo tem um ótimo desemepenho nas suas tarefas esperadas, como classificação e regressão, podendo ser uma escolha mais leve e simples dependendo da necessidade.
 
-Estou criando uma api para um modelo sequencial de camadas, ele é uma generalização de um modelo base, assim como na api "RedeNeural", ambos possuem as mesmas implementações de métodos, mas o modelo sequencial tem sua especialidade de trabalhar com diferentes tipos de camadas.
+# **Modelo Sequencial**
 
-Seguindo a ideia de generalização, os otimizadores também sofreram algumas mudanças para poder lidar com multiplos tipos de camadas. Agora lidam com formas vetorizadas dos kernels e bias das camadas, sem se preocupar com a formatação de cada uma em especifico.
+O modelo Sequencial foi criado pensando em uma limitação contida no modelo anterior.
+
+Nele criamos um modelo muito mais modular e personalizável, podendo empilhar quantas camadas forem necessárias. Com isso aumento o grau de liberdade na criação de modelos e expando a disponibilidade de camadas que agora não estão mais restritas apenas à Densa.
 
 ![treino sequencial](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/368c7994-ccc9-4baa-8417-5d67c7e5320c)
 
 *Exemplo de treino com o modelo sequencial, usando o otimizador sgd (Stochastic Gradient Descent) e função de perda mse (Mean Squared Error)*
 
-Até o momento o modelo sequencial está lidando perfeitamente bem com os métodos já criados na primeira api "RedeNeural" as generalizações estão funcionando bem. 
+# **Treinamento de modelos Convolucionais**
 
-# Treinamento de modelos Convolucionais
+Indo além nas problemáticas que podem ser resolvida usando os modelos, fazendo uso do Sequencial, comecei a testar usando o dataset MNIST, que é considerado o "Hello World do Machine Learning".
 
-Estou testando os modelos convolucionais no conjunto de dados do MNIST, atualmente estou usando todos os 10 dítigos para treino, onde cada dígito possui 200 amostras.
+Com a adição de uma nova problemática, surgiu a adição de novos métodos de resolução, com isso desenvolvi novas arquiteturas de camadas para treinar modelos para esse problema. 
 
-Esse é exemplo de um modelo usado para classificar os dados do MNIST.
+Segue um exemplo:
 
 ![arq conv](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/260f7848-e564-477b-b296-9c657addff7a)
 
-Já estou bem satisfeito de ter conseguido esses resultados com o modelo convolucional, mas sempre há espaço para melhorias e quero continuar trabalhando nisso, principalmente acelerando as operações dentro da camada.
+*Modelo convolucional criado para classificar os dígitos do dataset MNIST*
 
-# Regularização
+# **Regularização**
 
-Iniciei um pouco os estudos sobre a regularização e como evitar que os modelos entrem no problema de sobreajuste (overfitting). Inicialmente parti da ideia de que seria mais fácil apenas criar modelos menores (em número de parâmetros e camadas) mas depois pesquisei um pouco mais sobre os métodos de regularização.
+Iniciei um pouco os estudos sobre a regularização e como evitar que os modelos entrem no problema de sobreajuste (Overfitting). Inicialmente parti da ideia de que seria mais fácil apenas criar modelos menores (em número de parâmetros e camadas) mas depois pesquisei um pouco mais sobre os métodos de regularização.
 
-Por enquanto a implementação mais fácil de fazer foi criar a camada de Dropout, que aleatoriamente durante o treinamento desativa algumas unidades para que não tenham contribuição no resultado final.
+Por enquanto a implementação mais fácil de fazer foi criar a camada de Dropout, que aleatoriamente durante o treinamento desliga algumas unidades para que elas não tenham contribuição no resultado final.
 
 A camada de Dropout é bem simples de usar, basta empilhar entre camadas, como sugere na imagem de exemplo:
 
 ![exemplo-dropout](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/c18f5981-1fe5-49ef-b126-85eebc756e70)
 
 *Exemplo de modelo usando camadas de abandono (dropout), valores arbitrários.*
+
+# **Dificuldades**
+
+Excluindo a parte de pesquisa e estudo as maiores dificuldades encontradas até o momento foram:
+
+- **Performance**: Melhorias em nível de código para melhorar a execução dos algoritmos;
+
+- **Multithread**: Melhorias em nível de hardware para tirar proveito de múltiplos processadores do computador. Atualmente tudo roda em single thread;
+
+- **Tensor4D**: Melhorias de performance e maior generalização da classe de tensor que uso dentro do ambiente;
