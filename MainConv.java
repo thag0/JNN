@@ -23,7 +23,7 @@ public class MainConv{
 
    static final String CAMINHO_TREINO = "/dados/mnist/treino/";
    static final String CAMINHO_TESTE = "/dados/mnist/teste/";
-   static final String CAMINHO_SAIDA_MODELO = "./dados/modelosMNIST/modelo-convolucional.nn";
+   static final String CAMINHO_SAIDA_MODELO = "./dados/modelos/modelo-convolucional.nn";
    static final String CAMINHO_HISTORICO = "historico-perda";
 
    public static void main(String[] args){
