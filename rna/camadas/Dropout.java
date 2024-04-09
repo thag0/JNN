@@ -46,7 +46,7 @@ public class Dropout extends Camada implements Cloneable{
     *    entrada = (1, profundidade, altura, largura)
     * </pre>
     */
-   public Tensor4D entrada;
+   public Tensor4D _entrada;
 
    /**
     * Tensores contendo as máscaras que serão usadas durante
@@ -58,7 +58,7 @@ public class Dropout extends Camada implements Cloneable{
     *    mascara = (1, profundidade, altura, largura)
     * </pre>
     */
-   public Tensor4D mascara;
+   public Tensor4D _mascara;
 
    /**
     * Tensor contendo os valores de saída da camada.
@@ -69,7 +69,7 @@ public class Dropout extends Camada implements Cloneable{
     *    saida = (1, profundidade, altura, largura)
     * </pre>
     */
-   public Tensor4D saida;
+   public Tensor4D _saida;
 
    /**
     * Tensor contendo os valores dos gradientes que
@@ -81,7 +81,7 @@ public class Dropout extends Camada implements Cloneable{
     *    gradEntrada = (1, profundidade, altura, largura)
     * </pre>
     */
-   public Tensor4D gradEntrada;
+   public Tensor4D _gradEntrada;
 
    /**
     * Gerador de valores aleatórios.
@@ -171,14 +171,14 @@ public class Dropout extends Camada implements Cloneable{
          );
       }
       
-      this.entrada =     new Tensor4D(this.formEntrada);
-      this.mascara =     new Tensor4D(this.entrada.shape());
-      this.saida =       new Tensor4D(this.entrada.shape());
-      this.gradEntrada = new Tensor4D(this.entrada.shape());
+      this._entrada =     new Tensor4D(this.formEntrada);
+      this._mascara =     new Tensor4D(this._entrada.shape());
+      this._saida =       new Tensor4D(this._entrada.shape());
+      this._gradEntrada = new Tensor4D(this._entrada.shape());
 
       setNomes();
       
-      this.construida = true;//camada pode ser usada
+      this._construida = true;//camada pode ser usada
    }
 
    @Override
@@ -195,10 +195,10 @@ public class Dropout extends Camada implements Cloneable{
 
    @Override
    protected void setNomes(){
-      entrada.nome("entrada");
-      mascara.nome("máscara");
-      saida.nome("saida");
-      gradEntrada.nome("gradiente entrada");    
+      _entrada.nome("entrada");
+      _mascara.nome("máscara");
+      _saida.nome("saida");
+      _gradEntrada.nome("gradiente entrada");    
    }
 
    /**
@@ -231,37 +231,37 @@ public class Dropout extends Camada implements Cloneable{
 
       if(entrada instanceof Tensor4D){
          Tensor4D e = (Tensor4D) entrada;
-         if(this.entrada.comparar3D(e) == false){
+         if(this._entrada.comparar3D(e) == false){
             throw new IllegalArgumentException(
                "\nDimensões de entrada " + e.shapeStr() + 
-               "incompatível com as dimensões da entrada da camada " + this.entrada.shapeStr()
+               "incompatível com as dimensões da entrada da camada " + this._entrada.shapeStr()
             );
          }
 
-         this.entrada.copiar(e, 0);
+         this._entrada.copiar(e, 0);
    
       }else if(entrada instanceof double[][][]){
          double[][][] e = (double[][][]) entrada;
-         this.entrada.copiar(e, 0);
+         this._entrada.copiar(e, 0);
 
       }else{
          throw new IllegalArgumentException(
             "\nEntrada aceita para a camada de Dropout deve ser do tipo " +
-            this.entrada.getClass().getSimpleName() + " ou double[][][]" + 
+            this._entrada.getClass().getSimpleName() + " ou double[][][]" + 
             " , objeto recebido é do tipo \"" + entrada.getClass().getTypeName() + "\"."
          );
       }
 
       if(treinando){
          gerarMascaras();
-         saida.copiar(this.entrada);
-         saida.mult(mascara);
+         _saida.copiar(this._entrada);
+         _saida.mult(_mascara);
 
       }else{
-         saida.copiar(this.entrada);
+         _saida.copiar(this._entrada);
       }
 
-      return saida;
+      return _saida;
    }
 
    /**
@@ -281,7 +281,7 @@ public class Dropout extends Camada implements Cloneable{
     * passado para a saída, nos valores iguais a 0, a entrada será desconsiderada. 
     */
    private void gerarMascaras(){
-      mascara.map3D(0, (x) -> {
+      _mascara.map3D(0, (x) -> {
          return (random.nextDouble() >= taxa) ? (1 / (1 - taxa)) : 0;
       });
    }
@@ -310,34 +310,34 @@ public class Dropout extends Camada implements Cloneable{
 
       if(grad instanceof Tensor4D){
          Tensor4D g = (Tensor4D) grad;
-         if(this.gradEntrada.comparar3D(g) == false){
+         if(this._gradEntrada.comparar3D(g) == false){
             throw new IllegalArgumentException(
                "\nDimensões incompatíveis entre o gradiente recebido " + g.shapeStr() +
-               "e o suportado pela camada " + gradEntrada.shapeStr()
+               "e o suportado pela camada " + _gradEntrada.shapeStr()
             );
          }
 
-         this.gradEntrada.copiar(g);
+         this._gradEntrada.copiar(g);
 
       }else{
          throw new IllegalArgumentException(
             "\nGradiente aceito para a camada de Dropout deve ser do tipo " + 
-            this.gradEntrada.getClass().getTypeName() +
+            this._gradEntrada.getClass().getTypeName() +
             " ,objeto recebido é do tipo \"" + grad.getClass().getTypeName() + "\"."
          );
       }
 
       if(treinando){
-         gradEntrada.mult(mascara);
+         _gradEntrada.mult(_mascara);
       }
 
-      return gradEntrada;
+      return _gradEntrada;
    }
 
    @Override
    public Tensor4D saida(){
       verificarConstrucao();
-      return this.saida;
+      return this._saida;
    }
 
    @Override
@@ -376,10 +376,10 @@ public class Dropout extends Camada implements Cloneable{
          clone.taxa = this.taxa;
          clone.random = new Random();
 
-         clone.entrada = this.entrada.clone();
-         clone.mascara = this.mascara.clone();
-         clone.saida = this.saida.clone();
-         clone.gradEntrada = this.gradEntrada.clone();
+         clone._entrada = this._entrada.clone();
+         clone._mascara = this._mascara.clone();
+         clone._saida = this._saida.clone();
+         clone._gradEntrada = this._gradEntrada.clone();
 
          return clone;
       }catch(Exception e){
@@ -421,6 +421,6 @@ public class Dropout extends Camada implements Cloneable{
    @Override
    public Tensor4D gradEntrada(){
       verificarConstrucao();
-      return this.gradEntrada;
+      return this._gradEntrada;
    }
 }

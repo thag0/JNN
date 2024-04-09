@@ -57,7 +57,7 @@ public class AvgPooling extends Camada{
     *    entrada = (1, profundidade, altura, largura)
     * </pre>
     */
-   public Tensor4D entrada;
+   public Tensor4D _entrada;
 
    /**
     * Tensor contendo os dados de saída da camada.
@@ -77,7 +77,7 @@ public class AvgPooling extends Camada{
     * </pre>
     * Essa relação é válida pra cada canal de entrada.
     */
-   public Tensor4D saida;
+   public Tensor4D _saida;
 
    /**
     * Tensor contendo os gradientes que serão
@@ -89,7 +89,7 @@ public class AvgPooling extends Camada{
     *    entrada = (1, profundidadeEntrada, alturaEntrada, larguraEntrad)
     * </pre>
     */
-   public Tensor4D gradEntrada;
+   public Tensor4D _gradEntrada;
 
    /**
     * Formato do filtro de pooling (altura, largura).
@@ -266,13 +266,13 @@ public class AvgPooling extends Camada{
       formSaida[2] = (formEntrada[2] - formFiltro[0]) / this.stride[0] + 1;//altura
       formSaida[3] = (formEntrada[3] - formFiltro[1]) / this.stride[1] + 1;//largura
       
-      this.entrada = new Tensor4D(formEntrada);
-      this.gradEntrada = new Tensor4D(this.entrada);
-      this.saida = new Tensor4D(formSaida);
+      this._entrada = new Tensor4D(formEntrada);
+      this._gradEntrada = new Tensor4D(this._entrada);
+      this._saida = new Tensor4D(formSaida);
 
       setNomes();
 
-      this.construida = true;//camada pode ser usada
+      this._construida = true;//camada pode ser usada
    }
 
    @Override
@@ -280,9 +280,9 @@ public class AvgPooling extends Camada{
 
    @Override
    protected void setNomes(){
-      this.entrada.nome("Entrada");
-      this.gradEntrada.nome("Gradiente entrada");
-      this.saida.nome("Saída");
+      this._entrada.nome("Entrada");
+      this._gradEntrada.nome("Gradiente entrada");
+      this._saida.nome("Saída");
    }
 
    @Override
@@ -292,18 +292,18 @@ public class AvgPooling extends Camada{
       if(entrada instanceof Tensor4D){
          Tensor4D e = (Tensor4D) entrada;
 
-         if(this.entrada.comparar3D(e) == false){
+         if(this._entrada.comparar3D(e) == false){
             throw new IllegalArgumentException(
                "\nDimensões da entrada recebida " + e.shapeStr() +
-               " incompatíveis com a entrada da camada " + this.entrada.shapeStr()
+               " incompatíveis com a entrada da camada " + this._entrada.shapeStr()
             );
          }
 
-         this.entrada.copiar(e);
+         this._entrada.copiar(e);
          
       }else if(entrada instanceof double[][][]){
          double[][][] e = (double[][][]) entrada;
-         this.entrada.copiar(e, 0);
+         this._entrada.copiar(e, 0);
 
       }else{
          throw new IllegalArgumentException(
@@ -313,10 +313,10 @@ public class AvgPooling extends Camada{
 
       int profundidade = formEntrada[1];
       for(int i = 0; i < profundidade; i++){
-         aplicar(this.entrada, this.saida, i);
+         aplicar(this._entrada, this._saida, i);
       }
 
-      return saida;
+      return _saida;
    }
 
    /**
@@ -361,7 +361,7 @@ public class AvgPooling extends Camada{
          Tensor4D g = (Tensor4D) grad;
          int profundidade = formEntrada[1];   
          for(int i = 0; i < profundidade; i++){
-            gradAvgPool(this.entrada, g, this.gradEntrada, i);
+            gradAvgPool(this._entrada, g, this._gradEntrada, i);
          }
       
       }else{
@@ -371,7 +371,7 @@ public class AvgPooling extends Camada{
          );
       }
 
-      return gradEntrada;
+      return _gradEntrada;
    }
 
    /**
@@ -414,7 +414,7 @@ public class AvgPooling extends Camada{
    @Override
    public Tensor4D saida(){
       verificarConstrucao();
-      return this.saida;
+      return this._saida;
    }
 
    @Override
@@ -455,7 +455,7 @@ public class AvgPooling extends Camada{
    @Override
    public Tensor4D gradEntrada(){
       verificarConstrucao();
-      return this.gradEntrada;
+      return this._gradEntrada;
    }
 
    @Override

@@ -47,7 +47,7 @@ public class Flatten extends Camada{
     *    entrada = (1, profundidade, altura, largura)
     * </pre>
     */
-   public Tensor4D entrada;
+   public Tensor4D _entrada;
    
    /**
     * Tensor contendo os valores dos gradientes usados para 
@@ -59,7 +59,7 @@ public class Flatten extends Camada{
     *    gradEntrada = (1, profundidadeEntrada, alturaEntrada, larguraEntrada)
     * </pre>
     */
-   public Tensor4D gradEntrada;
+   public Tensor4D _gradEntrada;
 
    /**
     * Tensor contendo a saída achatada da camada.
@@ -69,7 +69,7 @@ public class Flatten extends Camada{
     *    total de elementos da entrada.
     * </p>
     */
-   public Tensor4D saida;
+   public Tensor4D _saida;
 
    /**
     * Inicializa uma camada Flatten, que irá achatar a entrada recebida
@@ -173,13 +173,13 @@ public class Flatten extends Camada{
 
       this.formSaida = new int[]{1, 1, 1, tamanho};
 
-      this.entrada = new Tensor4D(formEntrada);
-      this.gradEntrada = new Tensor4D(this.entrada.shape());
-      this.saida = new Tensor4D(formSaida);
+      this._entrada = new Tensor4D(formEntrada);
+      this._gradEntrada = new Tensor4D(this._entrada.shape());
+      this._saida = new Tensor4D(formSaida);
 
       setNomes();
 
-      this.construida = true;//camada pode ser usada.
+      this._construida = true;//camada pode ser usada.
    }
 
    @Override
@@ -190,9 +190,9 @@ public class Flatten extends Camada{
 
    @Override
    protected void setNomes(){
-      this.entrada.nome("entrada");
-      this.saida.nome("saída");
-      this.gradEntrada.nome("gradiente entrada");     
+      this._entrada.nome("entrada");
+      this._saida.nome("saída");
+      this._gradEntrada.nome("gradiente entrada");     
    }
 
    /**
@@ -211,22 +211,22 @@ public class Flatten extends Camada{
 
       if(entrada instanceof Tensor4D){
          Tensor4D e = (Tensor4D) entrada;
-         if(this.entrada.comparar3D(e) == false){
+         if(this._entrada.comparar3D(e) == false){
             throw new IllegalArgumentException(
                "\nDimensões da entrada recebida " + e.shapeStr() +
-               " incompatíveis com a entrada da camada " + this.entrada.shapeStr()
+               " incompatíveis com a entrada da camada " + this._entrada.shapeStr()
             );
          }
 
-         this.entrada.copiar(e.array3D(0), 0);
+         this._entrada.copiar(e.array3D(0), 0);
 
       }else if(entrada instanceof double[][][]){
          double[][][] e = (double[][][]) entrada;
-         this.entrada.copiar(e, 0);
+         this._entrada.copiar(e, 0);
 
       }else if(entrada instanceof double[]){
          double[] e = (double[]) entrada;
-         this.entrada.copiarElementos(e);
+         this._entrada.copiarElementos(e);
       
       }else{
          throw new IllegalArgumentException(
@@ -234,9 +234,9 @@ public class Flatten extends Camada{
          );
       }
 
-      saida.copiarElementos(this.entrada.paraArray());
+      _saida.copiarElementos(this._entrada.paraArray());
 
-      return saida;
+      return _saida;
    }
 
    /**
@@ -253,18 +253,18 @@ public class Flatten extends Camada{
 
       if(grad instanceof Tensor4D){
          Tensor4D g = (Tensor4D) grad;
-         if(g.tamanho() != this.gradEntrada.tamanho()){
+         if(g.tamanho() != this._gradEntrada.tamanho()){
             throw new IllegalArgumentException(
                "\nDimensões do gradiente recebido " + g.shapeStr() +
-               "inconpatíveis com o suportado pela camada " + this.gradEntrada.shapeStr()
+               "inconpatíveis com o suportado pela camada " + this._gradEntrada.shapeStr()
             );
          }
 
-         this.gradEntrada.copiarElementos(g.paraArray());
+         this._gradEntrada.copiarElementos(g.paraArray());
       
       }else if(grad instanceof double[]){
          double[] g = (double[]) grad;
-         gradEntrada.copiarElementos(g);
+         _gradEntrada.copiarElementos(g);
       
       }else{
          throw new IllegalArgumentException(
@@ -273,25 +273,25 @@ public class Flatten extends Camada{
          );
       }
 
-      return gradEntrada;
+      return _gradEntrada;
    }
    
    @Override
    public Tensor4D saida(){
       verificarConstrucao();
-      return this.saida;
+      return this._saida;
    }
 
    @Override
    public double[] saidaParaArray(){
       verificarConstrucao();
-      return this.saida.paraArray();
+      return this._saida.paraArray();
    }
 
    @Override
    public int tamanhoSaida(){
       verificarConstrucao();
-      return this.saida.tamanho();
+      return this._saida.tamanho();
    }
 
    @Override
@@ -330,7 +330,7 @@ public class Flatten extends Camada{
    @Override
    public Tensor4D gradEntrada(){
       verificarConstrucao();
-      return this.gradEntrada;
+      return this._gradEntrada;
    }
 
    @Override

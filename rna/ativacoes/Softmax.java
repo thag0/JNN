@@ -74,21 +74,21 @@ public class Softmax extends Ativacao{
 
    @Override
    public void backward(Densa camada){
-      int n = camada.somatorio.dim4();
+      int n = camada._somatorio.dim4();
       Tensor4D tmp = camada.saida().bloco2D(0, 0, 0, n);
-      Tensor4D ident = new Tensor4D(1, 1, n, camada.somatorio.dim4());
+      Tensor4D ident = new Tensor4D(1, 1, n, camada._somatorio.dim4());
       ident.identidade2D(0, 0);
       Tensor4D transp = optensor.matTranspor(tmp, 0, 0);
 
       optensor.matMult(
-         camada.gradSaida, 
+         camada._gradSaida, 
          optensor.matHadamard(
             tmp,
             optensor.matSub(ident, transp, 0),
             0, 
             0
          ), 
-         camada.gradSaida
+         camada._gradSaida
       );
    }
 

@@ -62,7 +62,7 @@ public abstract class Camada{
    /**
     * Controlador de construção da camada.
     */
-   public boolean construida = false;
+   public boolean _construida = false;
 
    /**
     * Controlador de treino da camada.
@@ -100,7 +100,7 @@ public abstract class Camada{
     * Verificador de inicialização para evitar problemas.
     */
    protected void verificarConstrucao(){
-      if(this.construida == false){
+      if(this._construida == false){
          throw new IllegalArgumentException(
             "\nCamada " + nome() + " (id = " + this.id + ") não foi construída."
          );

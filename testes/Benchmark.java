@@ -111,7 +111,7 @@ public class Benchmark{
       amostra.map((x) -> rand.nextDouble());
       conv.forward(amostra);
 
-      Tensor4D grad = new Tensor4D(conv.gradSaida.shape());
+      Tensor4D grad = new Tensor4D(conv._gradSaida.shape());
       grad.map((x) -> rand.nextDouble());
 
       long tempo = medirTempo(() -> conv.backward(grad));
@@ -195,14 +195,14 @@ public class Benchmark{
       filtros.map((x) -> Math.random());
       conv.setKernel(filtros.paraArray());
 
-      Tensor4D grad = new Tensor4D(conv.gradSaida);
+      Tensor4D grad = new Tensor4D(conv._gradSaida);
       grad.map((x) -> Math.random());
       
       //backward
       conv.forward(entrada);
       Tensor4D gradEntrada = conv.backward(grad);
 
-      Tensor4D gradSaida = new Tensor4D(conv.gradSaida);
+      Tensor4D gradSaida = new Tensor4D(conv._gradSaida);
       Tensor4D gradFiltroEsperado = new Tensor4D(conv.gradKernel().shape());
       Tensor4D gradEntradaEsperado = new Tensor4D(gradEntrada.shape());
 

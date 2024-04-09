@@ -19,13 +19,13 @@ public class TanH extends Ativacao{
       //aproveitar os resultados pre calculados
 
       double[] e = densa.saidaParaArray();
-      double[] g = densa.gradSaida.paraArray();
+      double[] g = densa._gradSaida.paraArray();
       double[] d = new double[e.length];
 
       for(int i = 0; i < d.length; i++){
          d[i] = (1 - (e[i]*e[i])) * g[i];
       }
 
-      densa.gradSaida.copiarElementos(d);
+      densa._gradSaida.copiarElementos(d);
    }
 }

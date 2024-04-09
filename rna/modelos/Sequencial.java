@@ -280,7 +280,7 @@ public class Sequencial extends Modelo{
          camadas[0].construir(formato);
       
       }else{
-         if(camadas[0].construida == false){
+         if(!camadas[0]._construida){
             throw new IllegalArgumentException(
                "\nÉ necessário que a primeira camada (" + camadas[0].nome() +
                ") seja construída."
