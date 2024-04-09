@@ -88,14 +88,14 @@ class TreinoLote{
                double[] saidaAmostra = (double[]) saidaLote[j];
                modelo.forward(entradaLote[j]);
 
-               if(this.calcularHistorico){
+               if(calcularHistorico){
                   perdaEpoca += perda.calcular(modelo.saidaParaArray(), saidaAmostra);
                }
 
                aux.backpropagation(camadas, perda, modelo.saidaParaArray(), saidaAmostra);
             }
 
-            otimizador.atualizar(camadas);
+            otimizador.atualizar(camadas);          
          }
 
          if(logs && (e % 5 == 0)){
@@ -107,6 +107,7 @@ class TreinoLote{
             historico.add((perdaEpoca/numAmostras));
          }
       }
+      
    }
 
    /**
