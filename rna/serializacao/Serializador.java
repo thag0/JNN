@@ -65,39 +65,22 @@ public class Serializador{
    public Serializador(){}
 
    /**
-    * Salva as informações mais essenciais sobre a Rede Neural incluindo arquitetura,
-    * funções de ativação de todas as camadas, bias configurado e o mais importante que
-    * são os pesos de cada neurônio da rede.
+    * Salva um modelo Sequencial em um arquivo externo.
     * <p>
-    *    <strong> Reforçando</strong>: as informações sobre o otimizador e todas suas 
-    *    configurações, treino, nome e outras pequenas coisas que não afetam diretamente 
-    *    o funcionamento da rede serão perdidas.
+    *    Os valores salvos estarão no formato {@code double}.
     * </p>
-    * <p>
-    *    O arquivo deve ser salvo no formato {@code .txt}
-    * </p>
-    * @param rede instância de uma Rede Neural.
-    * @param caminho caminho onde o arquivo da rede será salvo.
+    * @param rede instância de uma {@code Rede Neural}.
+    * @param caminho caminho com nome e extensão do arquivo {@code .nn}.
     */
    public void salvar(RedeNeural rede, String caminho){
       salvar(rede, caminho, "double");
    }
 
    /**
-    * Salva as informações mais essenciais sobre a Rede Neural incluindo arquitetura,
-    * funções de ativação de todas as camadas, bias configurado e o mais importante que
-    * são os pesos de cada neurônio da rede.
-    * <p>
-    *    <strong> Reforçando</strong>: as informações sobre o otimizador e todas suas 
-    *    configurações, treino, nome e outras pequenas coisas que não afetam diretamente 
-    *    o funcionamento da rede serão perdidas.
-    * </p>
-    * <p>
-    *    O arquivo deve ser salvo no formato {@code .txt}
-    * </p>
-    * @param rede instância de uma Rede Neural.
-    * @param caminho caminho onde o arquivo da rede será salvo.
-    * @param tipo tipo de dados salvo (double / float).
+    * Salva um modelo Sequencial em um arquivo externo.
+    * @param rede instância de uma {@code Rede Neural}.
+    * @param caminho caminho com nome e extensão do arquivo {@code .nn}.
+    * @param tipo tipo de valor usado na serialização, exemplo: {@code float} ou {@code double}.
     */
    public void salvar(RedeNeural rede, String caminho, String tipo){
       File arquivo = new File(caminho);
@@ -137,34 +120,28 @@ public class Serializador{
    }
 
    /**
-    * Salva um modelo Sequencial em um arquivo de texto no caminho especificado 
-    * serializando as informações mais importantes do modelo, incluindo o número de 
-    * camadas, otimizador usado, função de perda e os detalhes de cada camada no arquivo.
+    * Salva um modelo Sequencial em um arquivo externo.
     * <p>
-    *    Os valores salvos estarão no formato double.
+    *    Os valores salvos estarão no formato {@code double}.
     * </p>
-    * @param modelo instância de um modelo sequencial.
-    * @param caminho caminho com nome e extensão do arquivo {@code .txt}.
-    * @throws IllegalArgumentException Se o caminho não termina com a extensão ".txt".
+    * @param modelo modelo {@code Sequencial}.
+    * @param caminho caminho com nome e extensão do arquivo {@code .nn}.
     */
    public void salvar(Sequencial modelo, String caminho){
       salvar(modelo, caminho, "double");
    }
 
    /**
-    * Salva um modelo Sequencial em um arquivo de texto no caminho especificado 
-    * serializando as informações mais importantes do modelo, incluindo o número de 
-    * camadas, otimizador usado, função de perda e os detalhes de cada camada no arquivo.
-    * @param modelo instância de um modelo sequencial.
-    * @param caminho caminho com nome e extensão do arquivo (.txt).
-    * @param tipo tipo de valor usado na serialização, exemplo: float ou double.
-    * @throws IllegalArgumentException Se o caminho não termina com a extensão ".txt".
+    * Salva um modelo Sequencial em um arquivo externo.
+    * @param modelo modelo {@code Sequencial}.
+    * @param caminho caminho com nome e extensão do arquivo {@code .nn}.
+    * @param tipo tipo de valor usado na serialização, exemplo: {@code float} ou {@code double}.
     */
    public void salvar(Sequencial modelo, String caminho, String tipo){
       File arquivo = new File(caminho);
-      if(!arquivo.getName().toLowerCase().endsWith(".txt")){
+      if(!arquivo.getName().toLowerCase().endsWith(".nn")){
          throw new IllegalArgumentException(
-            "O caminho especificado não é um arquivo de texto válido."
+            "\nO caminho deve conter a extensão .nn."
          );
       }
 
@@ -215,23 +192,8 @@ public class Serializador{
    /**
     * Lê o arquivo de uma {@code Rede Neural} serializada e converte numa
     * instância pré configurada.
-    * <p>
-    *    Configurações mantidas: 
-    * </p> 
-    * <ul>
-    *    <li>
-    *       Pesos de todos os neurônios da rede.
-    *    </li>
-    *    <li>
-    *       Arquitetura.
-    *    </li>
-    *    <li>
-    *       Funções de ativação de todas as camadas.
-    *    </li>
-    * </ul>
-    * <strong>Demais configurações não são recuperadas</strong>.
-    * @param caminho caminho onde está salvo o arquivo {@code .txt} da Rede Neural.
-    * @return Instância de Rede Neural baseada nas configurações lidas pelo arquivo.
+    * @param caminho caminho onde está salvo o arquivo {@code .nn} do modelo.
+    * @return modelo {@code RedeNeural} baseado no arquivo lido.
     */
    public RedeNeural lerRedeNeural(String caminho){
       RedeNeural rede = null;
@@ -292,7 +254,7 @@ public class Serializador{
    /**
     * Lê o arquivo de um modelo {@code Sequencial} serializado e converte numa
     * instância pré configurada.
-    * @param caminho caminho onde está saldo o arquivo {@code .txt} do modelo;
+    * @param caminho caminho onde está saldo o arquivo {@code .nn} do modelo;
     * @return modelo {@code Sequencial} lido a partir do arquivo.
     */
    public Sequencial lerSequencial(String caminho){

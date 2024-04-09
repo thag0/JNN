@@ -2,7 +2,6 @@ package testes;
 
 import lib.ged.Ged;
 import lib.geim.Geim;
-import rna.camadas.AvgPooling;
 import rna.core.OpArray;
 import rna.core.OpMatriz;
 import rna.core.OpTensor4D;
@@ -19,11 +18,11 @@ public class Playground{
    
    public static void main(String[] args){
       ged.limparConsole();
-
-      AvgPooling mp = new AvgPooling(new int[]{1, 10, 10}, new int[]{2, 2}, new int[]{2, 2});
-      System.out.println(mp);
    }
 
+   /**
+    * Testes
+    */
    static void testeConv2dFull(){
       double[][] a = {
          {1, 6, 2},

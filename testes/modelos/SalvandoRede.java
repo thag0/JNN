@@ -20,20 +20,20 @@ public class SalvandoRede{
    public static void main(String[] args){
       Ged ged = new Ged();
       ged.limparConsole();
-      String caminho = "./modelo-teste.txt";
+      String caminho = "./modelo-teste.nn";
       Serializador serializador = new Serializador();
       
-      Sequencial modelo = ler(caminho);
-      // Sequencial modelo = criar();
+      // Sequencial modelo = ler(caminho);
+      Sequencial modelo = criar();
 
       modelo.info();
 
-      // serializador.salvar(modelo, caminho);
+      serializador.salvar(modelo, caminho);
    }
 
    static Sequencial criar(){
       Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(new int[]{10, 10, 2}, new int[]{3, 3}, 2),
+         new Convolucional(new int[]{2, 10, 10}, new int[]{3, 3}, 2),
       });
 
       modelo.compilar("sgd", "mse");
