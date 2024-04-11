@@ -311,8 +311,9 @@ public class Tensor4D implements Iterable<Double>{
     *]
     * </pre>
     * @param indices array contendo os novos índices (dim1, dim2, dim3, dim4).
+    * @return instância local.
     */
-   public void reformatar(int... indices){
+   public Tensor4D reformatar(int... indices){
       if(indices.length == 0 || indices.length > 4){
          throw new IllegalArgumentException(
             "\nQuantidade de índices deve ser de no máximo 4, recebido " + 
@@ -343,6 +344,8 @@ public class Tensor4D implements Iterable<Double>{
       }
 
       copiarDimensoes(dims[0], dims[1], dims[2], dims[3]);
+      
+      return this;
    }
 
    /**
@@ -401,19 +404,23 @@ public class Tensor4D implements Iterable<Double>{
    /**
     * Preenche todo o conteúdo do tensor com um valor constante.
     * @param valor valor desejado.
+    * @return instância local.
     */
-   public void preencher(double valor){
+   public Tensor4D preencher(double valor){
       for(int i = 0; i < dados.length; i++){
          dados[i] = valor;
       }
+
+      return this;
    }
 
    /**
     * Preenche o conteúdo desejado do tensor com um valor constante.
     * @param dim1 índice da primeira dimensão.
     * @param valor valor desejado.
+    * @return instância local.
     */
-   public void preencher3D(int dim1, double valor){
+   public Tensor4D preencher3D(int dim1, double valor){
       verificarIndiceD1(dim1);
 
       int inicio = indice(dim1, 0, 0, 0);
@@ -421,6 +428,8 @@ public class Tensor4D implements Iterable<Double>{
       for(int i = inicio; i < fim; i++){
          dados[i] = valor;
       }
+
+      return this;
    }
 
    /**
@@ -428,8 +437,9 @@ public class Tensor4D implements Iterable<Double>{
     * @param dim1 índice da primeira dimensão.
     * @param dim2 índice da segunda dimensão.
     * @param valor valor desejado.
+    * @return instância local.
     */
-   public void preencher2D(int dim1, int dim2, double valor){
+   public Tensor4D preencher2D(int dim1, int dim2, double valor){
       verificarIndiceD1(dim1);
       verificarIndiceD2(dim2);
 
@@ -438,6 +448,8 @@ public class Tensor4D implements Iterable<Double>{
       for(int i = inicio; i < fim; i++){
          dados[i] = valor;
       }
+
+      return this;
    }
 
    /**
@@ -446,8 +458,9 @@ public class Tensor4D implements Iterable<Double>{
     * @param dim2 índice da segunda dimensão.
     * @param dim3 índice da terceira dimensão.
     * @param valor valor desejado.
+    * @return instância local.
     */
-   public void preencher1D(int dim1, int dim2, int dim3, double valor){
+   public Tensor4D preencher1D(int dim1, int dim2, int dim3, double valor){
       verificarIndiceD1(dim1);
       verificarIndiceD2(dim2);
       verificarIndiceD3(dim3);
@@ -457,15 +470,18 @@ public class Tensor4D implements Iterable<Double>{
       for(int i = inicio; i < fim; i++){
          dados[i] = valor;
       }
+
+      return this;
    }
 
    /**
     * Preenche o conteúdo do tensor usando um contador iniciado com
     * valor 1 que é alterado a cada elemento.
     * @param crescente contador crescente (1, 2, 3, ...), caso falso o 
-    * contador é decrescente (-1, -2, -3, ...)  
+    * contador é decrescente (-1, -2, -3, ...).
+    * @return instância local.
     */
-   public void preencherContador(boolean crescente){
+   public Tensor4D preencherContador(boolean crescente){
       int tam = tamanho();
       if(crescente){
          for(int i = 0; i < tam; i++){
@@ -477,22 +493,28 @@ public class Tensor4D implements Iterable<Double>{
             dados[i] = tam - i - 1;
          }
       }
+
+      return this;
    }
 
    /**
     * Zera todo o conteúdo o tensor.
+    * @return instância local.
     */
-   public void zerar(){
+   public Tensor4D zerar(){
       for(int i = 0; i < dados.length; i++){
          dados[i] = 0.0d;
       }
+
+      return this;
    }
 
    /**
     * Copia todo o conteúdo do tensor na instância local.
     * @param tensor tensor desejado.
+    * @return instância local.
     */
-   public void copiar(Tensor4D tensor){
+   public Tensor4D copiar(Tensor4D tensor){
       if(!comparar4D(tensor)){
          throw new IllegalArgumentException(
             "\nDimensões " + shapeStr() + " incompatíveis com as do" + 
@@ -501,14 +523,17 @@ public class Tensor4D implements Iterable<Double>{
       }
 
       System.arraycopy(tensor.dados, 0, this.dados, 0, tamanho());
+
+      return this;
    }
 
    /**
     * Copia o conteúdo do tensor na instância local de acordo a dimensão fornecida.
     * @param tensor tensor desejado.
     * @param dim1 índice da primeira dimensão desejada.
+    * @return instância local.
     */
-   public void copiar(Tensor4D tensor, int dim1){
+   public Tensor4D copiar(Tensor4D tensor, int dim1){
       if(!comparar3D(tensor)){
          throw new IllegalArgumentException(
             "\nIncompatibilidade entre as três últimas dimensões do tensor " + shapeStr() +
@@ -518,6 +543,8 @@ public class Tensor4D implements Iterable<Double>{
 
       int inicio = indice(dim1, 0, 0, 0);
       System.arraycopy(tensor.dados, inicio, this.dados, inicio, (dim2() * dim3() * dim4()));
+   
+      return this;
    }
 
    /**
@@ -525,8 +552,9 @@ public class Tensor4D implements Iterable<Double>{
     * @param tensor tensor desejado.
     * @param dim1 índice da primeira dimensão desejada.
     * @param dim2 índice da segunda dimensão desejada.
+    * @return instância local.
     */
-   public void copiar(Tensor4D tensor, int dim1, int dim2){
+   public Tensor4D copiar(Tensor4D tensor, int dim1, int dim2){
       if(!comparar2D(tensor)){
          throw new IllegalArgumentException(
             "\nIncompatibilidade entre as duas últimas dimensões do tensor " + shapeStr() +
@@ -536,6 +564,8 @@ public class Tensor4D implements Iterable<Double>{
 
       int inicio = indice(dim1, dim2, 0, 0);
       System.arraycopy(tensor.dados, inicio, this.dados, inicio, (dim3() * dim4()));
+
+      return this;
    }
 
    /**
@@ -544,8 +574,9 @@ public class Tensor4D implements Iterable<Double>{
     * @param dim1 índice da primeira dimensão desejada.
     * @param dim2 índice da segunda dimensão desejada.
     * @param dim3 índice da terceira dimensão desejada.
+    * @return instância local.
     */
-   public void copiar(Tensor4D tensor, int dim1, int dim2, int dim3){
+   public Tensor4D copiar(Tensor4D tensor, int dim1, int dim2, int dim3){
       if(!comparar1D(tensor)){
          throw new IllegalArgumentException(
             "\nIncompatibilidade entre a última dimensão do tensor " + shapeStr() +
@@ -555,13 +586,16 @@ public class Tensor4D implements Iterable<Double>{
 
       int inicio = indice(dim1, dim2, dim3, 0);
       System.arraycopy(tensor.dados, inicio, this.dados, inicio, dim4());
+   
+      return this;
    }
 
    /**
     * Copia todo o conteúdo do array na instância local.
     * @param arr array desejado.
+    * @return instância local.
     */
-   public void copiar(double[][][][] arr){
+   public Tensor4D copiar(double[][][][] arr){
       if((dim1() != arr.length) ||
          (dim2() != arr[0].length) ||
          (dim3() != arr[0][0].length) ||
@@ -584,14 +618,17 @@ public class Tensor4D implements Iterable<Double>{
             }
          }
       }
+
+      return this;
    }
 
    /**
     * Copia todo o conteúdo do array na instância local.
     * @param arr array desejado.
     * @param dim1 índice da primeira dimensão.
+    * @return instância local.
     */
-   public void copiar(double[][][] arr, int dim1){
+   public Tensor4D copiar(double[][][] arr, int dim1){
       if((dim2() != arr.length) ||
          (dim3() != arr[0].length) ||
          (dim4() != arr[0][0].length)
@@ -613,6 +650,8 @@ public class Tensor4D implements Iterable<Double>{
             }
          }
       }
+
+      return this;
    }
 
    /**
@@ -620,8 +659,9 @@ public class Tensor4D implements Iterable<Double>{
     * @param arr array desejado.
     * @param dim1 índice da primeira dimensão.
     * @param dim2 índice da segunda dimensão.
+    * @return instância local.
     */
-   public void copiar(double[][] arr, int dim1, int dim2){
+   public Tensor4D copiar(double[][] arr, int dim1, int dim2){
       if((dim3() != arr.length) ||
          (dim4() != arr[0].length)
          ){
@@ -639,6 +679,8 @@ public class Tensor4D implements Iterable<Double>{
          int inicio = indice(dim1, dim2, i, 0);
          System.arraycopy(arr[i], 0, dados, inicio, dim4());
       }
+
+      return this;
    }
 
    /**
@@ -647,8 +689,9 @@ public class Tensor4D implements Iterable<Double>{
     * @param dim1 índice da primeira dimensão.
     * @param dim2 índice da segunda dimensão.
     * @param dim3 índice da terceira dimensão.
+    * @return instância local.
     */
-   public void copiar(double[] arr, int dim1, int dim2, int dim3){
+   public Tensor4D copiar(double[] arr, int dim1, int dim2, int dim3){
       if(arr.length != dim4()){
          throw new IllegalArgumentException(
             "\nTamanho do array (" + arr.length + 
@@ -662,6 +705,8 @@ public class Tensor4D implements Iterable<Double>{
 
       int inicio = indice(dim1, dim2, dim3, 0);
       System.arraycopy(arr, 0, dados, inicio, dim4());
+
+      return this;
    }
 
    /**
@@ -672,8 +717,9 @@ public class Tensor4D implements Iterable<Double>{
     *    a quantidade de elementos do tensor.
     * </p>
     * @param elementos array de elementos desejado.
+    * @return instância local.
     */
-   public void copiarElementos(double[] elementos){
+   public Tensor4D copiarElementos(double[] elementos){
       if(elementos == null){
          throw new IllegalArgumentException(
             "\nArray de elementos não pode ser nulo."
@@ -688,6 +734,8 @@ public class Tensor4D implements Iterable<Double>{
       }
 
       System.arraycopy(elementos, 0, dados, 0, tamanho());
+
+      return this;
    }
 
    /**
@@ -776,8 +824,9 @@ public class Tensor4D implements Iterable<Double>{
     * Onde {@code x} representa cada elemento dentro do tensor fornecido.
     * @param tensor tensor base.
     * @param funcao função para aplicar no tensor base.
+    * @return instância local.
     */
-   public void map(Tensor4D tensor, DoubleUnaryOperator funcao){
+   public Tensor4D map(Tensor4D tensor, DoubleUnaryOperator funcao){
       if(tensor == null){
          throw new IllegalArgumentException(
             "\nTensor fornecido é nulo."
@@ -798,6 +847,8 @@ public class Tensor4D implements Iterable<Double>{
       for(int i = 0; i < dados.length; i++){
          dados[i] = funcao.applyAsDouble(tensor.dados[i]);
       }
+
+      return this;
    }
 
    /**
@@ -810,8 +861,9 @@ public class Tensor4D implements Iterable<Double>{
     * </pre>
     * Onde {@code x} representa cada elemento dentro do tensor.
     * @param fun função desejada.
+    * @return instância local.
     */
-   public void map(DoubleUnaryOperator fun){
+   public Tensor4D map(DoubleUnaryOperator fun){
       if(fun == null){
          throw new IllegalArgumentException(
             "\nFunção recebida é nula."
@@ -821,6 +873,8 @@ public class Tensor4D implements Iterable<Double>{
       for(int i = 0; i < dados.length; i++){
          dados[i] = fun.applyAsDouble(dados[i]);
       }
+
+      return this;
    }
 
    /**
@@ -835,8 +889,9 @@ public class Tensor4D implements Iterable<Double>{
     * Onde {@code x} representa cada elemento dentro do tensor.
     * @param dim1 índice da primeira dimensão.
     * @param funcao função desejada.
+    * @return instância local.
     */
-   public void map3D(int dim1, DoubleUnaryOperator funcao){
+   public Tensor4D map3D(int dim1, DoubleUnaryOperator funcao){
       verificarIndiceD1(dim1);
       
       if(funcao == null){
@@ -850,6 +905,8 @@ public class Tensor4D implements Iterable<Double>{
       for(int i = inicio; i < fim; i++){
          dados[i] = funcao.applyAsDouble(dados[i]);
       }
+
+      return this;
    }
 
    /**
@@ -865,8 +922,9 @@ public class Tensor4D implements Iterable<Double>{
     * @param dim1 índice da primeira dimensão.
     * @param dim2 índice da segunda dimensão.
     * @param funcao função desejada.
+    * @return instância local.
     */
-   public void map2D(int dim1, int dim2, DoubleUnaryOperator funcao){
+   public Tensor4D map2D(int dim1, int dim2, DoubleUnaryOperator funcao){
       verificarIndiceD1(dim1);
       verificarIndiceD2(dim2);
 
@@ -881,6 +939,8 @@ public class Tensor4D implements Iterable<Double>{
       for(int i = inicio; i < fim; i++){
          dados[i] = funcao.applyAsDouble(dados[i]);
       }
+
+      return this;
    }
 
    /**
@@ -897,8 +957,9 @@ public class Tensor4D implements Iterable<Double>{
     * @param dim2 índice da segunda dimensão.
     * @param dim3 índice da terceira dimensão.
     * @param funcao função desejada.
+    * @return instância local.
     */
-   public void map1D(int dim1, int dim2, int dim3, DoubleUnaryOperator funcao){
+   public Tensor4D map1D(int dim1, int dim2, int dim3, DoubleUnaryOperator funcao){
       verificarIndiceD1(dim1);
       verificarIndiceD2(dim2);
       verificarIndiceD3(dim3);
@@ -914,6 +975,8 @@ public class Tensor4D implements Iterable<Double>{
       for(int i = inicio; i < fim; i++){
          dados[i] = funcao.applyAsDouble(dados[i]);
       }
+
+      return this;
    }
 
    /**
@@ -1094,8 +1157,9 @@ public class Tensor4D implements Iterable<Double>{
     * </p>
     * @param dim1 índice da primeira dimensão.
     * @param dim2 índice da segunda dimensão.
+    * @return instância local.
     */
-   public void identidade2D(int dim1, int dim2){
+   public Tensor4D identidade2D(int dim1, int dim2){
       verificarIndiceD1(dim1);
       verificarIndiceD2(dim2);
 
@@ -1104,6 +1168,8 @@ public class Tensor4D implements Iterable<Double>{
             set((i == j ? 1 : 0), dim1, dim2, i, j);
          }
       }
+
+      return this;
    }
 
    /**
@@ -1113,8 +1179,9 @@ public class Tensor4D implements Iterable<Double>{
     *    this += tensor
     * </pre>
     * @param tensor tensor com conteúdo.
+    * @return instância local.
     */
-   public void add(Tensor4D tensor){
+   public Tensor4D add(Tensor4D tensor){
       if(comparar4D(tensor) == false){
          throw new IllegalArgumentException(
             "\nDimensões " + shapeStr() + " incompatíveis com as do" + 
@@ -1126,6 +1193,8 @@ public class Tensor4D implements Iterable<Double>{
       for(int i = 0; i < tam; i++){
          dados[i] += tensor.dados[i];
       }
+
+      return this;
    }
 
    /**
@@ -1135,9 +1204,12 @@ public class Tensor4D implements Iterable<Double>{
     * @param d3 índice da terceira dimensão.
     * @param d4 índice da quarta dimensão.
     * @param valor valor desejado.
+    * @return instância local.
     */
-   public void add(int d1, int d2, int d3, int d4, double valor){
+   public Tensor4D add(int d1, int d2, int d3, int d4, double valor){
       dados[indice(d1, d2, d3, d4)] += valor;
+
+      return this;
    }
 
    /**
@@ -1145,8 +1217,9 @@ public class Tensor4D implements Iterable<Double>{
     * @param dim1 índice da primeira dimensão.
     * @param dim2 índice da segunda dimensão.
     * @param valor valor desejado.
+    * @return instância local.
     */
-   public void add2D(int dim1, int dim2, double valor){
+   public Tensor4D add2D(int dim1, int dim2, double valor){
       verificarIndiceD1(dim1);
       verificarIndiceD2(dim2);
 
@@ -1155,6 +1228,8 @@ public class Tensor4D implements Iterable<Double>{
       for(int i = inicio; i < fim; i++){
          dados[i] += valor;
       }
+
+      return this;
    }
 
    /**
@@ -1164,8 +1239,9 @@ public class Tensor4D implements Iterable<Double>{
     *    this -= tensor
     * </pre>
     * @param tensor tensor com conteúdo.
+    * @return instância local.
     */
-   public void sub(Tensor4D tensor){
+   public Tensor4D sub(Tensor4D tensor){
       if(comparar4D(tensor) == false){
          throw new IllegalArgumentException(
             "\nDimensões " + shapeStr() + " incompatíveis com as do" + 
@@ -1177,6 +1253,8 @@ public class Tensor4D implements Iterable<Double>{
       for(int i = 0; i < tam; i++){
          dados[i] -= tensor.dados[i];
       }
+
+      return this;
    }
 
    /**
@@ -1186,9 +1264,11 @@ public class Tensor4D implements Iterable<Double>{
     * @param d3 índice da terceira dimensão.
     * @param d4 índice da quarta dimensão.
     * @param valor valor desejado.
+    * @return instância local.
     */
-   public void sub(int d1, int d2, int d3, int d4, double valor){
+   public Tensor4D sub(int d1, int d2, int d3, int d4, double valor){
       dados[indice(d1, d2, d3, d4)] -= valor;
+      return this;
    }
 
    /**
@@ -1196,8 +1276,9 @@ public class Tensor4D implements Iterable<Double>{
     * @param dim1 índice da primeira dimensão.
     * @param dim2 índice da segunda dimensão.
     * @param valor valor desejado.
+    * @return instância local.
     */
-   public void sub2D(int dim1, int dim2, double valor){
+   public Tensor4D sub2D(int dim1, int dim2, double valor){
       verificarIndiceD1(dim1);
       verificarIndiceD2(dim2);
 
@@ -1206,6 +1287,8 @@ public class Tensor4D implements Iterable<Double>{
       for(int i = inicio; i < fim; i++){
          dados[i] -= valor;
       }
+
+      return this;
    }
 
    /**
@@ -1215,8 +1298,9 @@ public class Tensor4D implements Iterable<Double>{
     *    this *= tensor
     * </pre>
     * @param tensor tensor com conteúdo.
+    * @return instância local.
     */
-   public void mult(Tensor4D tensor){
+   public Tensor4D mult(Tensor4D tensor){
       if(comparar4D(tensor) == false){
          throw new IllegalArgumentException(
             "\nDimensões " + shapeStr() + " incompatíveis com as do" + 
@@ -1228,6 +1312,8 @@ public class Tensor4D implements Iterable<Double>{
       for(int i = 0; i < tam; i++){
          dados[i] *= tensor.dados[i];
       }
+
+      return this;
    }
 
    /**
@@ -1237,9 +1323,12 @@ public class Tensor4D implements Iterable<Double>{
     * @param d3 índice da terceira dimensão.
     * @param d4 índice da quarta dimensão.
     * @param valor valor desejado.
+    * @return instância local.
     */
-   public void mult(int d1, int d2, int d3, int d4, double valor){
+   public Tensor4D mult(int d1, int d2, int d3, int d4, double valor){
       dados[indice(d1, d2, d3, d4)] *= valor;
+
+      return this;
    }
 
    /**
@@ -1247,8 +1336,9 @@ public class Tensor4D implements Iterable<Double>{
     * @param dim1 índice da primeira dimensão.
     * @param dim2 índice da segunda dimensão.
     * @param valor valor desejado.
+    * @return instância local.
     */
-   public void mult2D(int dim1, int dim2, double valor){
+   public Tensor4D mult2D(int dim1, int dim2, double valor){
       verificarIndiceD1(dim1);
       verificarIndiceD2(dim2);
 
@@ -1257,6 +1347,8 @@ public class Tensor4D implements Iterable<Double>{
       for(int i = inicio; i < fim; i++){
          dados[i] *= valor;
       }
+
+      return this;
    }
 
    /**
@@ -1266,8 +1358,9 @@ public class Tensor4D implements Iterable<Double>{
     *    this /= tensor
     * </pre>
     * @param tensor tensor com conteúdo.
+    * @return instância local.
     */
-   public void div(Tensor4D tensor){
+   public Tensor4D div(Tensor4D tensor){
       if(comparar4D(tensor) == false){
          throw new IllegalArgumentException(
             "\nDimensões " + shapeStr() + " incompatíveis com as do" + 
@@ -1279,6 +1372,8 @@ public class Tensor4D implements Iterable<Double>{
       for(int i = 0; i < tam; i++){
          dados[i] /= tensor.dados[i];
       }
+
+      return this;
    }
 
    /**
@@ -1292,9 +1387,12 @@ public class Tensor4D implements Iterable<Double>{
     * @param d3 índice da terceira dimensão.
     * @param d4 índice da quarta dimensão.
     * @param valor valor desejado.
+    * @return instância local.
     */
-   public void div(int d1, int d2, int d3, int d4, double valor){
+   public Tensor4D div(int d1, int d2, int d3, int d4, double valor){
       dados[indice(d1, d2, d3, d4)] /= valor;
+
+      return this;
    }
 
    /**
@@ -1302,8 +1400,9 @@ public class Tensor4D implements Iterable<Double>{
     * @param dim1 índice da primeira dimensão.
     * @param dim2 índice da segunda dimensão.
     * @param valor valor desejado.
+    * @return instância local.
     */
-   public void div2D(int dim1, int dim2, double valor){
+   public Tensor4D div2D(int dim1, int dim2, double valor){
       verificarIndiceD1(dim1);
       verificarIndiceD2(dim2);
 
@@ -1312,6 +1411,8 @@ public class Tensor4D implements Iterable<Double>{
       for(int i = inicio; i < fim; i++){
          dados[i] /= valor;
       }
+
+      return this;
    }
 
    /**
@@ -1319,7 +1420,7 @@ public class Tensor4D implements Iterable<Double>{
     * @return conteúdo do tensor.
     */
    public double[] paraArray(){
-      return this.dados;
+      return this.dados.clone();
    }
 
    /**
@@ -1465,75 +1566,95 @@ public class Tensor4D implements Iterable<Double>{
    /**
     * Aplica a função de ativação {@code ReLU} em todos os 
     * elementos do tensor.
+    * @return instância local.
     */
-   public void relu(){
+   public Tensor4D relu(){
       map(x -> x > 0 ? x : 0);
+      return this;
    }
 
    /**
     * Aplica a função de ativação {@code Sigmoid} em todos os 
     * elementos do tensor.
+    * @return instância local.
     */
-   public void sigmoid(){
+   public Tensor4D sigmoid(){
       map(x -> 1 / (1 + Math.exp(-x)));
+      return this;
    }
 
    /**
     * Aplica a função de ativação {@code TanH} (Tangente Hiperbólica) 
     * em todos os elementos do tensor.
+    * @return instância local.
     */
-   public void tanh(){
+   public Tensor4D tanh(){
       map(x -> 2 / (1 + Math.exp(-2*x)) - 1);
+      return this;
    }
 
    /**
     * Aplica a função de ativação {@code Atan} (Arco Tangente) 
     * em todos os elementos do tensor.
+    * @return instância local.
     */
-   public void atan(){
+   public Tensor4D atan(){
       map(x -> Math.atan(x));
+      return this;
    }
 
    /**
     * Calcula o valor {@code seno} de todos os elementos do tensor.
+    * @return instância local.
     */
-   public void sin(){
+   public Tensor4D sin(){
       map(x -> Math.sin(x));
+      return this;
    }
 
    /**
     * Calcula o valor {@code cosseno} de todos os elementos do tensor.
+    * @return instância local.
     */
-   public void cos(){
+   public Tensor4D cos(){
       map(x -> Math.cos(x));
+      return this;
    }
 
    /**
     * Calcula o valor {@code tangente} de todos os elementos do tensor.
+    * @return instância local.
     */
-   public void tan(){
+   public Tensor4D tan(){
       map(x -> Math.tan(x));
+      return this;
    }
 
    /**
     * Calcula o valor {@code absoluto} de cada elemento do do tensor.
+    * @return instância local.
     */
-   public void abs(){
+   public Tensor4D abs(){
       map(x -> Math.abs(x));
+      return this;
    }
 
    /**
     * Calcula o valor {@code exponencial} de cada elemento do do tensor.
+    * @return instância local.
     */
-   public void exp(){
+   public Tensor4D exp(){
       map(x -> Math.exp(x));
+      return this;
    }
 
    /**
     * Calcula o valor {@code logaritmo natural} de cada elemento do do tensor.
+    * @return instância local.
     */
-   public void log(){
+   public Tensor4D log(){
       map(x -> Math.log(x));
+      return this;
    }
 
    /**
@@ -1617,7 +1738,7 @@ public class Tensor4D implements Iterable<Double>{
    }
 
    /**
-    * Exibe todo o conteúdo do tensor.
+    * Exibe {@code via console} todo o conteúdo do tensor.
     * @param casas quantidade de casas decimais que serão exibidas. Esse
     * valor só {@code será usado caso seja maior que zero}. Por padrão são usadas
     * 8 casas decimais. A quantidade de casas usadas pode afetar a legibilidade
@@ -1628,7 +1749,7 @@ public class Tensor4D implements Iterable<Double>{
    }
 
    /**
-    * Exibe todo o conteúdo do tensor.
+    * Exibe {@code via console} todo o conteúdo do tensor.
     */
    public void print(){
       print(8);
@@ -1637,14 +1758,17 @@ public class Tensor4D implements Iterable<Double>{
    /**
     * Configura o nome do tensor.
     * @param nome novo nome.
+    * @return instância local.
     */
-   public void nome(String nome){
+   public Tensor4D nome(String nome){
       if(nome != null){
          nome = nome.trim();
          if(!nome.isEmpty()){
             this.nome = nome;
          }
       }
+
+      return this;
    }
 
    /**
@@ -1833,7 +1957,9 @@ public class Tensor4D implements Iterable<Double>{
 
       @Override
       public void remove(){
-         throw new UnsupportedOperationException();
+         throw new UnsupportedOperationException(
+            "\nSem suporte."
+         );
       }
    }
 }

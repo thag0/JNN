@@ -18,7 +18,8 @@ public class Playground{
    
    public static void main(String[] args){
       ged.limparConsole();
-      
+      Tensor4D t = new Tensor4D(2, 2);
+      System.out.println(t.map(x -> Math.random()*2 -1).relu());
    }
 
    /**

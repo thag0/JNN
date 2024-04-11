@@ -41,7 +41,7 @@ public class MainConv{
 
       System.out.println("Treinando.");
       tempo = System.nanoTime();
-         modelo.treinar(treinoX, treinoY, EPOCAS_TREINO, 16, true);
+         modelo.treinar(treinoX, treinoY, EPOCAS_TREINO, true);
       tempo = System.nanoTime() - tempo;
 
       long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempo);
@@ -75,9 +75,9 @@ public class MainConv{
    static Sequencial criarModelo(){
       Sequencial modelo = new Sequencial(
          new Entrada(28, 28),
-         new Convolucional(new int[]{3, 3}, 18, "leaky-relu"),
+         new Convolucional(new int[]{3, 3}, 16, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{3, 3}, 20, "leaky-relu"),
+         new Convolucional(new int[]{3, 3}, 22, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
          new Densa(128, "sigmoid"),
