@@ -1564,6 +1564,25 @@ public class Tensor4D implements Iterable<Double>{
    }
 
    /**
+    * Normaliza os valores do tensor dentro do intervalo especificado.
+    * @param min valor mínimo do intervalo.
+    * @param max valor máximo do intervalo.
+    * @return instância local.
+    */
+   public Tensor4D normalizar(double min, double max) {
+      double valMin = minimo();
+      double valMax = maximo();
+
+      double intOriginal = valMax - valMin;
+      double intNovo = max - min;
+      for (int i = 0; i < dados.length; i++) {
+         dados[i] = ((dados[i] - valMin) / intOriginal) * intNovo + min;
+      }
+      
+      return this;
+   }
+
+   /**
     * Aplica a função de ativação {@code ReLU} em todos os 
     * elementos do tensor.
     * @return instância local.

@@ -18,8 +18,20 @@ public class Playground{
    
    public static void main(String[] args){
       ged.limparConsole();
-      Tensor4D t = new Tensor4D(2, 2);
-      System.out.println(t.map(x -> Math.random()*2 -1).relu());
+      Tensor4D t = new Tensor4D(1, 1, 1, 5, new double[]{1, 2, 3, 4, 5});
+
+      t.normalizar(0, 2);
+
+      t.print(2);
+   }
+
+   static void normalizar(Tensor4D tensor){
+      final double min = tensor.minimo(); 
+      final double max = tensor.maximo();
+
+      tensor.map((x) -> {
+         return (x - min) / (max - min);
+      });
    }
 
    /**
