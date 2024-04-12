@@ -121,9 +121,6 @@ public class Convolucional extends Camada implements Cloneable{
     * <pre>
     *    somatorio = (1, numeroFiltros, alturaSaida, larguraSaida)
     * </pre>
-    * <p>
-    *    Atributo visível devido as funções de ativação.
-    * </p>
     */
    public Tensor4D _somatorio;
    
@@ -159,9 +156,6 @@ public class Convolucional extends Camada implements Cloneable{
     * <pre>
     *    gradSaida = (1, numFiltros, alturaSaida, larguraSaida)
     * </pre>
-    * <p>
-    *    Atributo visível devido as funções de ativação.
-    * </p>
     */
    public Tensor4D _gradSaida;
 
