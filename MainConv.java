@@ -19,7 +19,7 @@ public class MainConv{
    static final int NUM_DIGITOS_TESTE  = NUM_DIGITOS_TREINO;
    static final int NUM_AMOSTRAS_TREINO = 400;
    static final int NUM_AMOSTRAS_TESTE  = 100;
-   static final int EPOCAS_TREINO = 10;
+   static final int EPOCAS_TREINO = 20;
 
    static final String CAMINHO_TREINO = "/dados/mnist/treino/";
    static final String CAMINHO_TESTE = "/dados/mnist/teste/";
@@ -75,7 +75,8 @@ public class MainConv{
    static Sequencial criarModelo(){
       Sequencial modelo = new Sequencial(
          new Entrada(28, 28),
-         new Convolucional(new int[]{3, 3}, 16, "leaky-relu"),
+         new Convolucional(new int[]{3, 3}, 20, "leaky-relu"),
+         new Dropout(0.2),
          new MaxPooling(new int[]{2, 2}),
          new Convolucional(new int[]{3, 3}, 22, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
