@@ -677,11 +677,9 @@ public class Convolucional extends Camada implements Cloneable{
       optensor.convForward(this._entrada, _filtros, _somatorio);
       
       if(usarBias){
-         double b;
          int numFiltros = shapeSaida[0];
          for(int i = 0; i < numFiltros; i++){
-            b = _bias.get(0, 0, 0, i);
-            _somatorio.add2D(0, i, b);
+            _somatorio.add2D(0, i, _bias.get(0, 0, 0, i));
          }
       }
 
