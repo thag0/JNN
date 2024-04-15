@@ -749,10 +749,10 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * @return resultado da verifcação.
     */
    private boolean compararDimensoes(Tensor4D tensor, boolean dim1, boolean dim2, boolean dim3, boolean dim4) {
-      if(dim4 && (tensor.dim4() != this.dim4())) return false;
-      if(dim3 && (tensor.dim3() != this.dim3())) return false;
-      if(dim2 && (tensor.dim2() != this.dim2())) return false;
-      if(dim1 && (tensor.dim1() != this.dim1())) return false;
+      if (dim4 && (tensor.dim4() != this.dim4())) return false;
+      if (dim3 && (tensor.dim3() != this.dim3())) return false;
+      if (dim2 && (tensor.dim2() != this.dim2())) return false;
+      if (dim1 && (tensor.dim1() != this.dim1())) return false;
 
       return true;
    }
@@ -829,21 +829,27 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 
    /**
     * Reduz os elementos do tensor aplicando a função de redução recebida.
+    * <p>
+    *    Exemplo:
+    * </p>
+    * <pre>
+    *tensor = {1, 2, 3, 4, 5};
+    *res = tensor.reduce(0, (x, y) -> x+y);//res = 15
+    * </pre>
     * @param in valor inicial.
-    * @param acc função desejada.
+    * @param fun função desejada.
     * @return resultado da redução.
     */
-   public double reduce(double in, DoubleBinaryOperator acc) {
-      if (acc == null) {
+   public double reduce(double in, DoubleBinaryOperator fun) {
+      if (fun == null) {
          throw new IllegalArgumentException(
             "\nFunção de redução não pode ser nula."
          );
       }
 
       double res = in;
-
       for (double val : dados) {
-         res = acc.applyAsDouble(res, val);
+         res = fun.applyAsDouble(res, val);
       }
       
       return res;
@@ -1049,7 +1055,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
       int tam = tamanho();
 
       for (int i = 1; i < tam; i++) {
-         if(dados[i] > max) max = dados[i];
+         if (dados[i] > max) max = dados[i];
       }
 
       return max;
@@ -1766,7 +1772,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * @param i índice do contador da primeira dimensão.
     * @param j índice do contador da segunda dimensão.
     */
-   private void formatarD3(StringBuilder sb, int casas, String pad, int i, int j ){
+   private void formatarD3(StringBuilder sb, int casas, String pad, int i, int j ) {
       int d3 = dim3();
      
       for (int k = 0; k < d3; k++) {
@@ -1918,7 +1924,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * dimensão do tensor.
     * @param id índice desejado.
     */
-   private void verificarIndiceD1(int id){ 
+   private void verificarIndiceD1(int id) { 
       if (!validarDimensao(dim1(), id)) {
          throw new IllegalArgumentException(
             "\nÍndice da primeira dimensão (" + id + ") inválido."
@@ -1944,7 +1950,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * dimensão do tensor.
     * @param id índice desejado.
     */
-   private void verificarIndiceD3(int id){
+   private void verificarIndiceD3(int id) {
       if (!validarDimensao(dim3(), id)) {
          throw new IllegalArgumentException(
             "\nÍndice da terceira dimensão (" + id + ") inválido."
