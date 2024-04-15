@@ -52,12 +52,12 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
    /**
     * Dimensões do tensor (d1, d2, d3, d4).
     */
-   private final int[] dimensoes;
+   private int[] dimensoes;
 
    /**
     * Conjunto de elementos do tensor.
     */
-   private final double[] dados;
+   private double[] dados;
 
    /**
     * Estético e com finalidade de debug, nome do tensor.
@@ -312,7 +312,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     *]
     * </pre>
     * @param indices array contendo os novos índices (dim1, dim2, dim3, dim4).
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D reformatar(int... indices) {
       if (indices.length == 0 || indices.length > 4) {
@@ -405,7 +405,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
    /**
     * Preenche todo o conteúdo do tensor com um valor constante.
     * @param valor valor desejado.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D preencher(double valor) {
       for (int i = 0; i < dados.length; i++) {
@@ -419,7 +419,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * Preenche o conteúdo desejado do tensor com um valor constante.
     * @param dim1 índice da primeira dimensão.
     * @param valor valor desejado.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D preencher3D(int dim1, double valor) {
       verificarIndiceD1(dim1);
@@ -439,7 +439,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * @param dim1 índice da primeira dimensão.
     * @param dim2 índice da segunda dimensão.
     * @param valor valor desejado.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D preencher2D(int dim1, int dim2, double valor) {
       verificarIndiceD1(dim1);
@@ -461,7 +461,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * @param dim2 índice da segunda dimensão.
     * @param dim3 índice da terceira dimensão.
     * @param valor valor desejado.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D preencher1D(int dim1, int dim2, int dim3, double valor) {
       verificarIndiceD1(dim1);
@@ -483,7 +483,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * valor 1 que é alterado a cada elemento.
     * @param cres contador crescente (1, 2, 3, ...), caso falso o 
     * contador é decrescente (-1, -2, -3, ...).
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D preencherContador(boolean cres) {
       int tam = tamanho();
@@ -504,7 +504,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 
    /**
     * Zera todo o conteúdo o tensor.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D zerar() {
       for (int i = 0; i < dados.length; i++) {
@@ -517,7 +517,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
    /**
     * Copia todo o conteúdo do tensor na instância local.
     * @param tensor tensor desejado.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D copiar(Tensor4D tensor) {
       if (!comparar4D(tensor)) {
@@ -536,7 +536,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * Copia o conteúdo do tensor na instância local de acordo a dimensão fornecida.
     * @param tensor tensor desejado.
     * @param dim1 índice da primeira dimensão desejada.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D copiar(Tensor4D tensor, int dim1) {
       if (!comparar3D(tensor)) {
@@ -557,7 +557,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * @param tensor tensor desejado.
     * @param dim1 índice da primeira dimensão desejada.
     * @param dim2 índice da segunda dimensão desejada.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D copiar(Tensor4D tensor, int dim1, int dim2) {
       if (!comparar2D(tensor)) {
@@ -579,7 +579,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * @param dim1 índice da primeira dimensão desejada.
     * @param dim2 índice da segunda dimensão desejada.
     * @param dim3 índice da terceira dimensão desejada.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D copiar(Tensor4D tensor, int dim1, int dim2, int dim3) {
       if (!comparar1D(tensor)) {
@@ -598,7 +598,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
    /**
     * Copia todo o conteúdo do array na instância local.
     * @param arr array desejado.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D copiar(double[][][][] arr) {
       if ((dim1() != arr.length) ||
@@ -630,7 +630,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * Copia todo o conteúdo do array na instância local.
     * @param arr array desejado.
     * @param dim1 índice da primeira dimensão.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D copiar(double[][][] arr, int dim1) {
       if ((dim2() != arr.length) ||
@@ -662,7 +662,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * @param arr array desejado.
     * @param dim1 índice da primeira dimensão.
     * @param dim2 índice da segunda dimensão.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D copiar(double[][] arr, int dim1, int dim2) {
       if ((dim3() != arr.length) || (dim4() != arr[0].length)) {
@@ -690,7 +690,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * @param dim1 índice da primeira dimensão.
     * @param dim2 índice da segunda dimensão.
     * @param dim3 índice da terceira dimensão.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D copiar(double[] arr, int dim1, int dim2, int dim3) {
       if (arr.length != dim4()) {
@@ -718,7 +718,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     *    a quantidade de elementos do tensor.
     * </p>
     * @param elementos array de elementos desejado.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D copiarElementos(double[] elementos) {
       if (elementos == null) {
@@ -828,34 +828,6 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
    }
 
    /**
-    * Reduz os elementos do tensor aplicando a função de redução recebida.
-    * <p>
-    *    Exemplo:
-    * </p>
-    * <pre>
-    *tensor = {1, 2, 3, 4, 5};
-    *res = tensor.reduce(0, (x, y) -> x+y);//res = 15
-    * </pre>
-    * @param in valor inicial.
-    * @param fun função desejada.
-    * @return resultado da redução.
-    */
-   public double reduce(double in, DoubleBinaryOperator fun) {
-      if (fun == null) {
-         throw new IllegalArgumentException(
-            "\nFunção de redução não pode ser nula."
-         );
-      }
-
-      double res = in;
-      for (double val : dados) {
-         res = fun.applyAsDouble(res, val);
-      }
-      
-      return res;
-   }
-
-   /**
     * Aplica a função recebida em todos os elementos do tensor.
     * <p>
     *    Exemplo:
@@ -865,7 +837,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * </pre>
     * Onde {@code x} representa cada elemento dentro do tensor.
     * @param fun função desejada.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D map(DoubleUnaryOperator fun) {
       if (fun == null) {
@@ -882,6 +854,37 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
    }
 
    /**
+    * Reduz os elementos do tensor para um, aplicando a função de recebida.
+    * <p>
+    *    Exemplo:
+    * </p>
+    * <pre>
+    *tensor = {1, 2, 3, 4, 5};
+    *res = tensor.reduce(0, (x, y) -> x+y);//tensor = {15}
+    * </pre>
+    * @param in valor inicial.
+    * @param fun função desejada.
+    * @return instância local alterada.
+    */
+   public Tensor4D reduce(double in, DoubleBinaryOperator fun) {
+      if (fun == null) {
+         throw new IllegalArgumentException(
+            "\nFunção de redução não pode ser nula."
+         );
+      }
+
+      double res = in;
+      for (double val : dados) {
+         res = fun.applyAsDouble(res, val);
+      }
+
+      this.dimensoes = new int[]{1, 1, 1, 1};
+      this.dados = new double[]{ res };
+      
+      return this;
+   }
+
+   /**
     * Aplica a função recebida em todos os elementos do tensor usando
     * como entrada os valores do tensor recebido.
     * <p>
@@ -893,7 +896,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * Onde {@code x} representa cada elemento dentro do tensor fornecido.
     * @param tensor tensor base.
     * @param fun função para aplicar no tensor base.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D map(Tensor4D tensor, DoubleUnaryOperator fun) {
       if (tensor == null) {
@@ -932,7 +935,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * Onde {@code x} representa cada elemento dentro do tensor.
     * @param dim1 índice da primeira dimensão.
     * @param func função desejada.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D map3D(int dim1, DoubleUnaryOperator func) {
       verificarIndiceD1(dim1);
@@ -966,7 +969,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * @param dim1 índice da primeira dimensão.
     * @param dim2 índice da segunda dimensão.
     * @param fun função desejada.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D map2D(int dim1, int dim2, DoubleUnaryOperator fun) {
       verificarIndiceD1(dim1);
@@ -1002,7 +1005,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * @param dim2 índice da segunda dimensão.
     * @param dim3 índice da terceira dimensão.
     * @param fun função desejada.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D map1D(int dim1, int dim2, int dim3, DoubleUnaryOperator fun) {
       verificarIndiceD1(dim1);
@@ -1212,7 +1215,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * </p>
     * @param dim1 índice da primeira dimensão.
     * @param dim2 índice da segunda dimensão.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D identidade(int dim1, int dim2) {
       verificarIndiceD1(dim1);
@@ -1234,7 +1237,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     *    this += tensor
     * </pre>
     * @param tensor tensor com conteúdo.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D add(Tensor4D tensor) {
       if (!comparar4D(tensor)) {
@@ -1259,7 +1262,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * @param d3 índice da terceira dimensão.
     * @param d4 índice da quarta dimensão.
     * @param valor valor desejado.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D add(int d1, int d2, int d3, int d4, double valor) {
       dados[indice(d1, d2, d3, d4)] += valor;
@@ -1271,7 +1274,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * @param dim1 índice da primeira dimensão.
     * @param dim2 índice da segunda dimensão.
     * @param valor valor desejado.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D add2D(int dim1, int dim2, double valor) {
       verificarIndiceD1(dim1);
@@ -1294,7 +1297,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     *    this -= tensor
     * </pre>
     * @param tensor tensor com conteúdo.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D sub(Tensor4D tensor) {
       if (!comparar4D(tensor)) {
@@ -1319,7 +1322,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * @param d3 índice da terceira dimensão.
     * @param d4 índice da quarta dimensão.
     * @param valor valor desejado.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D sub(int d1, int d2, int d3, int d4, double valor) {
       dados[indice(d1, d2, d3, d4)] -= valor;
@@ -1331,7 +1334,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * @param dim1 índice da primeira dimensão.
     * @param dim2 índice da segunda dimensão.
     * @param valor valor desejado.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D sub2D(int dim1, int dim2, double valor) {
       verificarIndiceD1(dim1);
@@ -1354,7 +1357,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     *    this *= tensor
     * </pre>
     * @param tensor tensor com conteúdo.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D mult(Tensor4D tensor) {
       if (!comparar4D(tensor)) {
@@ -1379,7 +1382,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * @param d3 índice da terceira dimensão.
     * @param d4 índice da quarta dimensão.
     * @param valor valor desejado.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D mult(int d1, int d2, int d3, int d4, double valor) {
       dados[indice(d1, d2, d3, d4)] *= valor;
@@ -1391,7 +1394,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * @param dim1 índice da primeira dimensão.
     * @param dim2 índice da segunda dimensão.
     * @param valor valor desejado.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D mult2D(int dim1, int dim2, double valor) {
       verificarIndiceD1(dim1);
@@ -1414,7 +1417,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     *    this /= tensor
     * </pre>
     * @param tensor tensor com conteúdo.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D div(Tensor4D tensor) {
       if (!comparar4D(tensor)) {
@@ -1443,7 +1446,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * @param d3 índice da terceira dimensão.
     * @param d4 índice da quarta dimensão.
     * @param valor valor desejado.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D div(int d1, int d2, int d3, int d4, double valor) {
       dados[indice(d1, d2, d3, d4)] /= valor;
@@ -1455,7 +1458,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * @param dim1 índice da primeira dimensão.
     * @param dim2 índice da segunda dimensão.
     * @param valor valor desejado.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D div2D(int dim1, int dim2, double valor) {
       verificarIndiceD1(dim1);
@@ -1623,7 +1626,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
     * Normaliza os valores do tensor dentro do intervalo especificado.
     * @param min valor mínimo do intervalo.
     * @param max valor máximo do intervalo.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D normalizar(double min, double max) {
       double valMin = minimo();
@@ -1642,7 +1645,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
    /**
     * Aplica a função de ativação {@code ReLU} em todos os 
     * elementos do tensor.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D relu() {
       return map(x -> x > 0 ? x : 0);
@@ -1651,7 +1654,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
    /**
     * Aplica a função de ativação {@code Sigmoid} em todos os 
     * elementos do tensor.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D sigmoid() {
       return map(x -> 1 / (1 + Math.exp(-x)));
@@ -1660,7 +1663,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
    /**
     * Aplica a função de ativação {@code TanH} (Tangente Hiperbólica) 
     * em todos os elementos do tensor.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D tanh() {
       return map(x -> 2 / (1 + Math.exp(-2*x)) - 1);
@@ -1669,7 +1672,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
    /**
     * Aplica a função de ativação {@code Atan} (Arco Tangente) 
     * em todos os elementos do tensor.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D atan() {
       return map(x -> Math.atan(x));
@@ -1677,7 +1680,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 
    /**
     * Calcula o valor {@code seno} de todos os elementos do tensor.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D sin() {
       return map(x -> Math.sin(x));
@@ -1685,7 +1688,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 
    /**
     * Calcula o valor {@code cosseno} de todos os elementos do tensor.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D cos() {
       return map(x -> Math.cos(x));
@@ -1693,7 +1696,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 
    /**
     * Calcula o valor {@code tangente} de todos os elementos do tensor.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D tan() {
       return map(x -> Math.tan(x));
@@ -1701,7 +1704,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 
    /**
     * Calcula o valor {@code absoluto} de cada elemento do do tensor.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D abs() {
       return map(x -> Math.abs(x));
@@ -1709,7 +1712,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 
    /**
     * Calcula o valor {@code exponencial} de cada elemento do do tensor.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D exp() {
       return map(x -> Math.exp(x));
@@ -1717,7 +1720,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 
    /**
     * Calcula o valor {@code logaritmo natural} de cada elemento do do tensor.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D log() {
       return map(x -> Math.log(x));
@@ -1824,7 +1827,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
    /**
     * Configura o nome do tensor.
     * @param nome novo nome.
-    * @return instância local com as alterações.
+    * @return instância local alterada.
     */
    public Tensor4D nome(String nome) {
       if (nome != null) {

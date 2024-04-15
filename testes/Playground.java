@@ -21,7 +21,8 @@ public class Playground{
 
       double[] arr = {1, 2, 3, 4, 5};
       Tensor4D t = new Tensor4D(arr);
-      System.out.println(t.reduce(0, (x, y) -> x+y));
+      
+      System.out.println(t.reduce(1, (x, y) -> x*y).item());
    }
 
    /**
