@@ -5,22 +5,22 @@ import rna.modelos.Modelo;
 public class Acuracia extends Metrica{
 
    @Override
-   public double calcular(Modelo rede, Object entrada, Object[] saida){
+   public double calcular(Modelo modelo, Object entrada, Object[] saida) {
       int acertos = 0;
       
-      if(saida instanceof double[][] == false){
+      if (!(saida instanceof double[][])) {
          throw new IllegalArgumentException(
             "Objeto esperado para saída é double[][], recebido " + saida.getClass().getTypeName()
-            );
-         }
+         );
+      }
          
-         Object[] arrEntrada = utils.transformarParaArray(entrada);
-         int numAmostras = arrEntrada.length;
+      Object[] arrEntrada = utils.transformarParaArray(entrada);
+      int numAmostras = arrEntrada.length;
          
-      for(int i = 0; i < numAmostras; i++){
-         rede.forward(arrEntrada[i]);
+      for (int i = 0; i < numAmostras; i++) {
+         modelo.forward(arrEntrada[i]);
 
-         int indiceCalculado = super.indiceMaiorValor(rede.saidaParaArray());
+         int indiceCalculado = super.indiceMaiorValor(modelo.saidaParaArray());
          int indiceEsperado = super.indiceMaiorValor((double[])saida[i]);
 
          if(indiceCalculado == indiceEsperado){

@@ -8,7 +8,7 @@ import rna.core.Utils;
 import rna.modelos.Modelo;
 import rna.otimizadores.Otimizador;
 
-class Treino{
+class Treino {
    AuxiliarTreino aux = new AuxiliarTreino();
    Utils utils = new Utils();
    Random random = new Random();
@@ -21,8 +21,8 @@ class Treino{
     * Objeto de treino sequencial da rede.
     * @param historico lista de custos da rede durante cada época de treino.
     */
-   public Treino(boolean calcularHistorico){
-      this.historico = new ArrayList<>(0);
+   public Treino(boolean calcularHistorico) {
+      historico = new ArrayList<>(0);
       this.calcularHistorico = calcularHistorico;
    }
 
@@ -30,9 +30,9 @@ class Treino{
     * Configura a seed inicial do gerador de números aleatórios.
     * @param seed nova seed.
     */
-   public void setSeed(long seed){
-      this.random.setSeed(seed);
-      this.aux.setSeed(seed);
+   public void setSeed(long seed) {
+      random.setSeed(seed);
+      aux.setSeed(seed);
    }
 
    /**
@@ -40,8 +40,8 @@ class Treino{
     * época de treinamento.
     * @param calcular caso verdadeiro, armazena os valores de custo da rede.
     */
-   public void setHistorico(boolean calcular){
-      this.calcularHistorico = calcular;
+   public void setHistorico(boolean calcular) {
+      calcularHistorico = calcular;
    }
 
    /**
@@ -53,7 +53,7 @@ class Treino{
     * @param epochs quantidade de épocas de treinamento.
     * @param logs logs para perda durante as épocas de treinamento.
     */
-   public void treinar(Modelo modelo, Object entrada, Object[] saida, int epochs, boolean logs){
+   public void treinar(Modelo modelo, Object entrada, Object[] saida, int epochs, boolean logs) {
       Camada[] camadas = modelo.camadas();
       Otimizador otimizador = modelo.otimizador();
       Perda perda = modelo.perda();
@@ -63,16 +63,16 @@ class Treino{
       int numAmostras = amostras.length;
 
       double perdaEpoca;
-      for(int e = 1; e <= epochs; e++){
+      for (int e = 1; e <= epochs; e++) {
          aux.embaralharDados(amostras, rotulos);
          perdaEpoca = 0;
          
-         for(int i = 0; i < numAmostras; i++){
+         for (int i = 0; i < numAmostras; i++) {
             double[] amostraSaida = (double[]) rotulos[i];
             modelo.forward(amostras[i]);
             
             //feedback de avanço da rede
-            if(calcularHistorico){
+            if (calcularHistorico) {
                perdaEpoca += perda.calcular(modelo.saidaParaArray(), amostraSaida);
             }
             
@@ -81,12 +81,12 @@ class Treino{
             otimizador.atualizar(camadas);
          }
 
-         if(logs && (e % 5 == 0)){
+         if (logs && (e % 5 == 0)) {
             System.out.println("Época " +  e + "/" + epochs + " -> perda: " + (double)(perdaEpoca/numAmostras));
          }
 
          //feedback de avanço da rede
-         if(calcularHistorico){
+         if (calcularHistorico) {
             historico.add(perdaEpoca/numAmostras);
          }
       }
@@ -97,7 +97,7 @@ class Treino{
     * @return histórico de treino.
     */
    public Object[] historico(){
-      return this.historico.toArray();
+      return historico.toArray();
    }
   
 }

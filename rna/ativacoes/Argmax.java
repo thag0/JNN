@@ -6,7 +6,7 @@ import rna.core.Tensor4D;
  * Implementação da função de ativação Argmax para uso 
  * dentro dos modelos.
  */
-public class Argmax extends Ativacao{
+public class Argmax extends Ativacao {
 
    /**
     * Intancia uma nova função de ativação Softmax.
@@ -36,10 +36,10 @@ public class Argmax extends Ativacao{
     *]]]
     * </pre>
     */
-   public Argmax(){}
+   public Argmax() {}
 
    @Override
-   public void forward(Tensor4D entrada, Tensor4D saida){
+   public void forward(Tensor4D entrada, Tensor4D saida) {
       int canais = entrada.dim1();
       int profundidade = entrada.dim2();
       int linhas = entrada.dim3();
@@ -47,21 +47,21 @@ public class Argmax extends Ativacao{
       int maxId;
       double maxVal;
    
-      for(int can = 0; can < canais; can++){
-         for(int prof = 0; prof < profundidade; prof++){
-            for(int lin = 0; lin < linhas; lin++){
+      for (int can = 0; can < canais; can++) {
+         for (int prof = 0; prof < profundidade; prof++) {
+            for (int lin = 0; lin < linhas; lin++) {
                maxId = 0;
                maxVal = entrada.get(can, prof, lin, 0);
 
-               for(int col = 1; col < colunas; col++){
-                  if(entrada.get(can, prof, lin, col) > maxVal){
+               for (int col = 1; col < colunas; col++) {
+                  if (entrada.get(can, prof, lin, col) > maxVal) {
                      maxId = col;
                      maxVal = entrada.get(can, prof, lin, col);
                   }
                }
          
-               for(int col = 0; col < colunas; col++){
-                  saida.set(can, prof, lin, col, ((col == maxId) ? 1 : 0));
+               for (int col = 0; col < colunas; col++) {
+                  saida.set(((col == maxId) ? 1.0d : 0.0d), can, prof, lin, col);
                }
             }
          }

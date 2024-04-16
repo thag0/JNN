@@ -1,16 +1,20 @@
 package rna.core;
 
-public class OpArray{
+public class OpArray {
 
    /**
     * Interface para execução de operação utilizando arrays.
     */
-   public OpArray(){}
+   public OpArray() {}
 
-   public void print(double[] arr){
+   /**
+    * Exibe o conteúdo do array.
+    * @param arr array desejado.
+    */
+   public void print(double[] arr) {
       System.out.println("Array = [");
       System.out.print("  " + arr[0]);
-      for(int i = 1; i < arr.length; i++){
+      for (int i = 1; i < arr.length; i++) {
          System.out.print(", " + arr[i]);
       }
       System.out.println("]");
@@ -21,9 +25,9 @@ public class OpArray{
     * @param arr array.
     * @param val valor desejado.
     */
-   public void preencher(double[] arr, double val){
+   public void preencher(double[] arr, double val) {
       int n = arr.length;
-      for(int i = 0; i < n; i++){
+      for (int i = 0; i < n; i++) {
          arr[i] = val;
       }
    }
@@ -36,10 +40,10 @@ public class OpArray{
     * </pre>
     * @param a primeiro array.
     * @param b segundo array.
-    * @param r array contendo o resultado da soma.
+    * @param dest array contendo o resultado da soma.
     */
-   public void add(double[] a, double[] b, double[] r){
-      if(a.length != b.length){
+   public void add(double[] a, double[] b, double[] dest) {
+      if (a.length != b.length) {
          throw new IllegalArgumentException(
             "As dimensões de A (" + a.length + 
             ") e B (" + b.length +
@@ -47,17 +51,17 @@ public class OpArray{
          );
       }
 
-      if(a.length != r.length){
+      if (a.length != dest.length) {
          throw new IllegalArgumentException(
-            "As dimensões de R (" + r.length + 
+            "As dimensões de R (" + dest.length + 
             ") devem ser iguais as de A e B (" + a.length + ")."
          );      
       }
 
-      System.arraycopy(a, 0, r, 0, r.length);
-      int n = r.length;
-      for(int i = 0; i < n; i++){
-         r[i] += b[i];
+      System.arraycopy(a, 0, dest, 0, dest.length);
+      int n = dest.length;
+      for (int i = 0; i < n; i++) {
+         dest[i] += b[i];
       }
    }
 
@@ -69,10 +73,10 @@ public class OpArray{
     * </pre>
     * @param a primeiro array.
     * @param b segundo array.
-    * @param r array contendo o resultado da subtração.
+    * @param dest array contendo o resultado da subtração.
     */
-   public void sub(double[] a, double[] b, double[] r){
-      if(a.length != b.length){
+   public void sub(double[] a, double[] b, double[] dest) {
+      if (a.length != b.length) {
          throw new IllegalArgumentException(
             "As dimensões de A (" + a.length + 
             ") e B (" + b.length +
@@ -80,17 +84,17 @@ public class OpArray{
          );
       }
 
-      if(a.length != r.length){
+      if (a.length != dest.length) {
          throw new IllegalArgumentException(
-            "As dimensões de R (" + r.length + 
+            "As dimensões de R (" + dest.length + 
             ") devem ser iguais as de A e B (" + a.length + ")."
          );      
       }
 
-      System.arraycopy(a, 0, r, 0, r.length);
-      int n = r.length;
-      for(int i = 0; i < n; i++){
-         r[i] -= b[i];
+      System.arraycopy(a, 0, dest, 0, dest.length);
+      int n = dest.length;
+      for (int i = 0; i < n; i++) {
+         dest[i] -= b[i];
       }
    }
 
@@ -102,10 +106,10 @@ public class OpArray{
     * </pre>
     * @param a primeiro array.
     * @param b segundo array.
-    * @param r array contendo o resultado da multiplicação.
+    * @param dest array contendo o resultado da multiplicação.
     */
-   public void mult(double[] a, double[] b, double[] r){
-      if(a.length != b.length){
+   public void mult(double[] a, double[] b, double[] dest) {
+      if (a.length != b.length) {
          throw new IllegalArgumentException(
             "As dimensões de A (" + a.length + 
             ") e B (" + b.length +
@@ -113,17 +117,17 @@ public class OpArray{
          );
       }
 
-      if(a.length != r.length){
+      if (a.length != dest.length) {
          throw new IllegalArgumentException(
-            "As dimensões de R (" + r.length + 
+            "As dimensões de R (" + dest.length + 
             ") devem ser iguais as de A e B (" + a.length + ")."
          );      
       }
 
-      System.arraycopy(a, 0, r, 0, r.length);
-      int n = r.length;
-      for(int i = 0; i < n; i++){
-         r[i] *= b[i];
+      System.arraycopy(a, 0, dest, 0, dest.length);
+      int n = dest.length;
+      for (int i = 0; i < n; i++) {
+         dest[i] *= b[i];
       }
    }
 
@@ -135,18 +139,18 @@ public class OpArray{
     * </pre>
     * @param a array base.
     * @param e valor usado para dividir os elementos dos array.
-    * @param r array contendo o resultado da divisão.
+    * @param dest array contendo o resultado da divisão.
     */
-   public void divEscalar(double[] a, double e, double[] r){
-      if(a.length != r.length){
+   public void divEscalar(double[] a, double e, double[] dest) {
+      if (a.length != dest.length) {
          throw new IllegalArgumentException(
-            "As dimensões de R (" + r.length + 
+            "As dimensões de R (" + dest.length + 
             ") devem ser iguais as de A e B (" + a.length + ")."
          );      
       }
 
-      for(int i = 0; i < r.length; i++){
-         r[i] = a[i] / e;
+      for (int i = 0; i < dest.length; i++) {
+         dest[i] = a[i] / e;
       }
    }
 
@@ -158,19 +162,19 @@ public class OpArray{
     * </pre>
     * @param a array base.
     * @param e valor usado para multiplicar os elementos dos array.
-    * @param r array contendo o resultado da divisão.
+    * @param dest array contendo o resultado da divisão.
     */
-   public void multEscalar(double[] a, double e, double[] r){
-      if(a.length != r.length){
+   public void multEscalar(double[] a, double e, double[] dest) {
+      if (a.length != dest.length) {
          throw new IllegalArgumentException(
             "As linhas de A (" + a.length + 
-            ") e R (" + r.length + 
+            ") e R (" + dest.length + 
             ") devem ser iguais."
          );
       }
 
-      for(int i = 0; i < r.length; i++){
-         r[i] = a[i] * e;
+      for (int i = 0; i < dest.length; i++) {
+         dest[i] = a[i] * e;
       }     
    }
 
@@ -180,8 +184,8 @@ public class OpArray{
     * @param b segundo array.
     * @return resultado do produto escalar entre A e B.
     */
-   public double produtoEscalar(double[] a, double[] b){
-      if(a.length != b.length){
+   public double produtoEscalar(double[] a, double[] b) {
+      if (a.length != b.length) {
          throw new IllegalArgumentException(
             "As linhas de A (" + a.length + 
             ") e B (" + b.length + 
@@ -189,23 +193,24 @@ public class OpArray{
          );
       }
 
-      double produto = 0;
-      for(int i = 0; i < a.length; i++){
-         produto += a[i] * b[i];
+      double prod = 0;
+      for (int i = 0; i < a.length; i++) {
+         prod += a[i] * b[i];
       }
 
-      return produto;
+      return prod;
    }
 
    /**
     * Inverte todo o conteúdo do array
     * @param arr array base;
     */
-   public void inverter(double[] arr){
+   public void inverter(double[] arr) {
       int inicio = 0;
       int fim = arr.length - 1;
       double temp;
-      while(inicio < fim){
+      
+      while (inicio < fim) {
          temp = arr[inicio];
          arr[inicio] = arr[fim];
          arr[fim] = temp;

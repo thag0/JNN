@@ -152,12 +152,12 @@ import rna.treinamento.Treinador;
  * @author Thiago Barroso, acadêmico de Engenharia da Computação pela Universidade Federal do Pará, 
  * Campus Tucuruí. Dezembro/2023.
  */
-public class Sequencial extends Modelo{
+public class Sequencial extends Modelo {
 
    /**
     * Lista de camadas do modelo.
     */
-   private Camada[] camadas;
+   private Camada[] _camadas;
 
    /**
     * Instancia um modelo sequencial com o conjunto de camadas vazio.
@@ -170,9 +170,9 @@ public class Sequencial extends Modelo{
     *    usando o método {@code add()}.
     * </p>
     */
-   public Sequencial(){
-      this.camadas = new Camada[0];
-      this.compilado = false;
+   public Sequencial() {
+      _camadas = new Camada[0];
+      _compilado = false;
    }
 
    /**
@@ -186,31 +186,29 @@ public class Sequencial extends Modelo{
     * @throws IllegalArgumentException caso o conjunto de camadas seja nulo
     * ou alguma camada contida seja.
     */
-   public Sequencial(Camada... camadas){
+   public Sequencial(Camada... camadas) {
       utils.validarNaoNulo(camadas, "Conjunto de camadas não pode ser nulo.");
 
-      for(int i = 0; i < camadas.length; i++){
+      for (int i = 0; i < camadas.length; i++) {
          utils.validarNaoNulo(
             camadas[i], ("O conjunto de camadas fornecido possui uma camada nula, id = " + i)
          );
       }
 
-      if(camadas.length < 1){
+      if (camadas.length < 1) {
          throw new IllegalArgumentException(
             "\nCamadas fornecidas possuem tamanho = " + camadas.length + "."
          );
       }
 
-      this.camadas = new Camada[0];
+      _camadas = new Camada[0];
       
       add(camadas[0]);
-      for(int i = 1; i < camadas.length; i++){
-         if(camadas[i] instanceof Entrada == false){
-            add(camadas[i]);
-         }
+      for (int i = 1; i < camadas.length; i++) {
+         if (!(camadas[i] instanceof Entrada)) add(camadas[i]);
       }
 
-      compilado = false;
+      _compilado = false;
    }
 
    /**
@@ -224,16 +222,16 @@ public class Sequencial extends Modelo{
     * @param camada nova camada.
     * @throws IllegalArgumentException se a camada fornecida for nula,
     */
-   public void add(Camada camada){
+   public void add(Camada camada) {
       utils.validarNaoNulo(camada, "Camada não pode ser nula.");
 
-      Camada[] antigas = camadas;
-      camadas = new Camada[antigas.length + 1];
+      Camada[] antigas = _camadas;
+      _camadas = new Camada[antigas.length + 1];
       
-      System.arraycopy(antigas, 0, camadas, 0, antigas.length);
-      camadas[camadas.length-1] = camada;
+      System.arraycopy(antigas, 0, _camadas, 0, antigas.length);
+      _camadas[_camadas.length-1] = camada;
 
-      compilado = false;
+      _compilado = false;
    }
 
    /**
@@ -242,101 +240,96 @@ public class Sequencial extends Modelo{
     * @throws IllegalArgumentException caso o modelo já não possua nenhuma 
     * camada disponível.
     */
-   public Camada sub(){
-      if(camadas.length < 1){
+   public Camada rem() {
+      if (_camadas.length < 1) {
          throw new IllegalArgumentException(
             "\nNão há camadas no modelo."
          );
       }
+
       Camada ultima = camadaSaida();
 
-      Camada[] novas = camadas;
-      camadas = new Camada[camadas.length-1];
-      System.arraycopy(novas, 0, camadas, 0, camadas.length);
+      Camada[] novas = _camadas;
+      _camadas = new Camada[_camadas.length-1];
+      System.arraycopy(novas, 0, _camadas, 0, _camadas.length);
 
-      compilado = false;
+      _compilado = false;
 
       return ultima;
    }
 
    @Override
-   public void compilar(Object otimizador, Object perda){
+   public void compilar(Object otimizador, Object perda) {
       int[] formato = {};
 
-      if(camadas[0] instanceof Entrada){
-         formato = camadas[0].formatoSaida();
+      if (_camadas[0] instanceof Entrada) {
+         formato = _camadas[0].formatoSaida();
 
          //remover camada de entrada do modelo
-         Camada[] temp = camadas;
-         camadas = new Camada[camadas.length-1];
-         System.arraycopy(temp, 1, camadas, 0, camadas.length);
+         Camada[] temp = _camadas;
+         _camadas = new Camada[_camadas.length-1];
+         System.arraycopy(temp, 1, _camadas, 0, _camadas.length);
 
-         if(camadas.length == 0){
+         if (_camadas.length == 0) {
             throw new IllegalStateException(
                "\nO modelo não possui camadas para compilar."
             );
          }
 
-         camadas[0].construir(formato);
+         _camadas[0].construir(formato);
       
-      }else{
-         if(!camadas[0]._construida){
+      } else {
+         if (!_camadas[0]._construida) {
             throw new IllegalArgumentException(
-               "\nÉ necessário que a primeira camada (" + camadas[0].nome() +
+               "\nÉ necessário que a primeira camada (" + _camadas[0].nome() +
                ") seja construída."
             );
          }
       }
 
-      for(int i = 0; i < camadas.length; i++){
-         camadas[i].setId(i);
-         
-         if(i != 0){
-            camadas[i].construir(camadas[i-1].formatoSaida());
-         }
+      for (int i = 0; i < _camadas.length; i++) {
+         _camadas[i].setId(i);
 
-         if(seedInicial != 0){
-            camadas[i].setSeed(seedInicial);
-         }
-         camadas[i].inicializar();
+         if (i != 0) _camadas[i].construir(_camadas[i-1].formatoSaida());
+         if (seedInicial != 0) _camadas[i].setSeed(seedInicial);
+
+         _camadas[i].inicializar();
       }
 
-      if(seedInicial != 0){
-         treinador.setSeed(seedInicial);
-      }
+      if (seedInicial != 0) _treinador.setSeed(seedInicial);
       
       Dicionario dicio = new Dicionario();
-      this.perda = dicio.getPerda(perda);
-      this.otimizador = dicio.getOtimizador(otimizador);
+      _perda = dicio.getPerda(perda);
+      _otimizador = dicio.getOtimizador(otimizador);
 
-      this.otimizador.construir(camadas);
+      _otimizador.construir(_camadas);
       
-      compilado = true;//modelo pode ser usado.
+      _compilado = true;//modelo pode ser usado.
    }
 
    @Override
-   public Tensor4D forward(Object entrada){
+   public Tensor4D forward(Object entrada) {
       verificarCompilacao();
 
       utils.validarNaoNulo(entrada, "Dados de entrada não podem ser nulos.");
 
-      Tensor4D prev = camadas[0].forward(entrada);
-      for(int i = 1; i < camadas.length; i++){
-         prev = camadas[i].forward(prev);
+      Tensor4D prev = _camadas[0].forward(entrada);
+      for (int i = 1; i < _camadas.length; i++) {
+         prev = _camadas[i].forward(prev);
       }
 
       return prev.clone();//preservar a saída do modelo
    }
 
    @Override
-   public Tensor4D[] forwards(Object[] entradas){
+   public Tensor4D[] forwards(Object[] entradas) {
       verificarCompilacao();
 
       utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
 
       Tensor4D[] prevs = new Tensor4D[entradas.length];
 
-      for(int i = 0; i < prevs.length; i++){
+      for (int i = 0; i < prevs.length; i++) {
          prevs[i] = forward(entradas[i]);
       }
 
@@ -344,75 +337,75 @@ public class Sequencial extends Modelo{
    }
   
    @Override
-   public void zerarGradientes(){
-      for(int i = 0; i < camadas.length; i++){
-         if(camadas[i].treinavel()) camadas[i].zerarGradientes();
+   public void zerarGradientes() {
+      for (int i = 0; i < _camadas.length; i++) {
+         if (_camadas[i].treinavel()) _camadas[i].zerarGradientes();
       }
    }
 
    @Override
-   public void treino(boolean treinando){
-      for(Camada camada : camadas){
+   public void treino(boolean treinando) {
+      for (Camada camada : _camadas) {
          camada.setTreino(treinando);
       }
    }
 
    @Override
-   public Otimizador otimizador(){
+   public Otimizador otimizador() {
       verificarCompilacao();
-      return this.otimizador;
+      return _otimizador;
    }
 
    @Override
-   public Perda perda(){
+   public Perda perda() {
       verificarCompilacao();
-      return this.perda;
+      return _perda;
    }
 
    @Override
    public Camada camada(int id){
-      if((id < 0) || (id >= camadas.length)){
+      if ((id < 0) || (id >= _camadas.length)) {
          throw new IllegalArgumentException(
             "O índice fornecido (" + id + 
             ") é inválido ou fora de alcance."
          );
       }
    
-      return camadas[id];
+      return _camadas[id];
    }
 
    @Override
-   public Camada[] camadas(){
-      return this.camadas;
+   public Camada[] camadas() {
+      return _camadas;
    }
 
    @Override
-   public Camada camadaSaida(){
-      if(camadas.length < 1){
+   public Camada camadaSaida() {
+      if (_camadas.length < 1) {
          throw new UnsupportedOperationException(
             "\nO modelo não possui camadas adiciondas."
          );
       }
 
-      return camadas[camadas.length-1];
+      return _camadas[_camadas.length-1];
    }
 
    @Override
-   public double[] saidaParaArray(){
+   public double[] saidaParaArray() {
       verificarCompilacao();
       return camadaSaida().saidaParaArray();
    }
 
    @Override
-   public String nome(){
+   public String nome() {
       return nome;
    }
 
    @Override
-   public int numParametros(){
+   public int numParametros() {
       int params = 0;
 
-      for(Camada camada : camadas){
+      for(Camada camada : _camadas) {
          params += camada.numParametros();
       }
 
@@ -420,22 +413,22 @@ public class Sequencial extends Modelo{
    }
 
    @Override
-   public int numCamadas(){
-      return camadas.length;
+   public int numCamadas() {
+      return _camadas.length;
    }
 
    @Override
-   protected String construirInfo(){
+   protected String construirInfo() {
       String pad = " ".repeat(4);
       StringBuilder sb = new StringBuilder();
       sb.append(nome() + " = [\n");
 
       //otimizador
-      sb.append(otimizador.info());
+      sb.append(_otimizador.info());
       sb.append("\n");
 
       //função de perda
-      sb.append(pad + "Perda: " + perda.nome());
+      sb.append(pad + "Perda: " + _perda.nome());
       sb.append("\n\n");
 
       //camadas
@@ -445,7 +438,7 @@ public class Sequencial extends Modelo{
          )
       );
 
-      for(Camada camada : this.camadas){
+      for (Camada camada : this._camadas) {
          int[] e = camada.formatoEntrada();
          int[] s = camada.formatoSaida();
          
@@ -454,23 +447,23 @@ public class Sequencial extends Modelo{
 
          //formato de entrada
          String formEntrada = String.format("(%d", e[0]);
-         for(int i = 1; i < e.length; i++){
+         for (int i = 1; i < e.length; i++) {
             formEntrada += String.format(", %d", e[i]);
          }
          formEntrada += ")";
 
          //formato de saída
          String formSaida = String.format("(%d", s[0]);
-         for(int i = 1; i < s.length; i++){
+         for (int i = 1; i < s.length; i++) {
             formSaida += String.format(", %d", s[i]);
          }
          formSaida += ")";
 
          //função de ativação
          String ativacao = "n/a";
-         try{
+         try {
             ativacao = camada.ativacao().nome();
-         }catch(Exception exception){}
+         } catch (Exception exception) {}
 
          String parametros = String.valueOf(camada.numParametros());
 
@@ -489,35 +482,36 @@ public class Sequencial extends Modelo{
    }
 
    @Override
-   public void info(){
+   public void info() {
       verificarCompilacao();
       System.out.println(construirInfo());
    }
 
    @Override
-   public Sequencial clone(){
-      try{
+   public Sequencial clone() {
+      try {
          Sequencial clone = (Sequencial) super.clone();
 
-         clone.avaliador = new Avaliador(this);
+         clone._avaliador = new Avaliador(this);
          clone.calcularHistorico = this.calcularHistorico;
          clone.nome = "Clone de " + this.nome;
          
          Dicionario dicio = new Dicionario();
-         clone.otimizador = dicio.getOtimizador(otimizador.nome());
-         clone.perda = dicio.getPerda(perda.nome());
+         clone._otimizador = dicio.getOtimizador(_otimizador.nome());
+         clone._perda = dicio.getPerda(_perda.nome());
          clone.seedInicial = this.seedInicial;
-         clone.treinador = new Treinador();
+         clone._treinador = new Treinador();
          
          int nCamadas = numCamadas();
-         clone.camadas = new Camada[nCamadas];
-         for(int i = 0; i < nCamadas; i++){
-            clone.camadas[i] = camada(i).clone();
+         clone._camadas = new Camada[nCamadas];
+         for (int i = 0; i < nCamadas; i++) {
+            clone._camadas[i] = camada(i).clone();
          }
-         clone.compilado = this.compilado;
+         clone._compilado = this._compilado;
 
          return clone;
-      }catch(Exception e){
+      
+      } catch (Exception e) {
          throw new RuntimeException("\nErro ao clonar modelo: \n" + e);
       }
    }

@@ -150,7 +150,7 @@ public class SGD extends Otimizador{
 
       this.m  = new double[nKernel];
       this.mb = new double[nBias];
-      this.construido = true;//otimizador pode ser usado
+      this._construido = true;//otimizador pode ser usado
    }
 
    @Override

@@ -41,7 +41,7 @@ import rna.otimizadores.SGD;
  * @author Thiago Barroso, acadêmico de Engenharia da Computação pela Universidade Federal do Pará, 
  * Campus Tucuruí. Maio/2023.
  */
-public class RedeNeural extends Modelo{
+public class RedeNeural extends Modelo {
    
    /**
     * Região crítica
@@ -49,7 +49,7 @@ public class RedeNeural extends Modelo{
     *    Conjunto de camadas densas (ou fully connected) da Rede Neural.
     * </p>
     */
-   private Densa[] camadas;
+   private Densa[] _camadas;
 
    /**
     * Array contendo a arquitetura de cada camada dentro da Rede Neural.
@@ -63,7 +63,7 @@ public class RedeNeural extends Modelo{
     *    camada densa da Rede Neural.
     * </p>
     */
-   private int[] arquitetura;
+   private int[] _arq;
 
    /**
     * Constante auxiliar que ajuda no controle do bias dentro da rede.
@@ -103,30 +103,30 @@ public class RedeNeural extends Modelo{
     * </p>
     * @author Thiago Barroso, acadêmico de Engenharia da Computação pela Universidade Federal do Pará, 
     * Campus Tucuruí. Maio/2023.
-    * @param arquitetura modelo de arquitetura específico da rede.
+    * @param arq modelo de arquitetura específico da rede.
     * @throws IllegalArgumentException se o array de arquitetura for nulo.
     * @throws IllegalArgumentException se o array de arquitetura não possuir, pelo menos, dois elementos.
     * @throws IllegalArgumentException se os valores fornecidos forem menores que um.
     */
-   public RedeNeural(int... arquitetura){
-      if(arquitetura == null){
-         throw new IllegalArgumentException("A arquitetura fornecida não deve ser nula.");
-      }
-      if(arquitetura.length < 2){
+   public RedeNeural(int... arq) {
+      utils.validarNaoNulo(arq, "A arquitetura fornecida não deve ser nula.");
+
+      if (arq.length < 2) {
          throw new IllegalArgumentException(
-            "A arquitetura fornecida deve conter no mínimo dois elementos (entrada e saída), tamanho recebido = " + arquitetura.length
+            "A arquitetura fornecida deve conter no mínimo dois elementos (entrada e saída), tamanho recebido = " + arq.length
          );
       }
-      for(int i = 0; i < arquitetura.length; i++){
-         if(arquitetura[i] < 1){
+
+      for (int i = 0; i < arq.length; i++) {
+         if (arq[i] < 1) {
             throw new IllegalArgumentException(
                "Os valores de arquitetura fornecidos não devem ser maiores que zero."
             );
          }
       }
 
-      this.arquitetura = arquitetura;
-      this.compilado = false;
+      _arq = arq;
+      _compilado = false;
    }
 
    /**
@@ -144,7 +144,7 @@ public class RedeNeural extends Modelo{
     * </p>
     * @param usarBias novo valor para o uso do bias.
     */
-   public void configurarBias(boolean usarBias){
+   public void configurarBias(boolean usarBias) {
       this.bias = usarBias;
    }
 
@@ -178,10 +178,10 @@ public class RedeNeural extends Modelo{
     * @param ativacao instância da função de ativação.
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
-   public void configurarAtivacao(Ativacao ativacao){
-      super.verificarCompilacao();
+   public void configurarAtivacao(Ativacao ativacao) {
+      verificarCompilacao();
       
-      for(Camada camada : this.camadas){
+      for (Camada camada : _camadas) {
          camada.setAtivacao(ativacao);
       }
    }
@@ -216,10 +216,10 @@ public class RedeNeural extends Modelo{
     * @param ativacao nome da função de ativação.
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
-   public void configurarAtivacao(String ativacao){
-      super.verificarCompilacao();
+   public void configurarAtivacao(String ativacao) {
+      verificarCompilacao();
       
-      for(Camada camada : this.camadas){
+      for (Camada camada : _camadas) {
          camada.setAtivacao(ativacao);
       }
    }
@@ -255,13 +255,8 @@ public class RedeNeural extends Modelo{
     * @param ativacao instância da função de ativação.
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
-   public void configurarAtivacao(Densa camada, Ativacao ativacao){
-      if(camada == null){
-         throw new IllegalArgumentException(
-            "A camada não pode ser nula."
-         );
-      }
-
+   public void configurarAtivacao(Densa camada, Ativacao ativacao) {
+      utils.validarNaoNulo(camada, "A camada não pode ser nula.");
       camada.setAtivacao(ativacao);
    }
 
@@ -296,13 +291,8 @@ public class RedeNeural extends Modelo{
     * @param ativacao nome da função de ativação.
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
-   public void configurarAtivacao(Densa camada, String ativacao){
-      if(camada == null){
-         throw new IllegalArgumentException(
-            "A camada não pode ser nula."
-         );
-      }
-
+   public void configurarAtivacao(Densa camada, String ativacao) {
+      utils.validarNaoNulo(camada, "A camada não pode ser nula.");
       camada.setAtivacao(ativacao);
    }
 
@@ -328,11 +318,12 @@ public class RedeNeural extends Modelo{
     *    Valores de perda e otimizador configurados previamente são mantidos.
     * </p>
     */
-   public void compilar(){
+   public void compilar() {
       //usando valores de configuração prévia, se forem criados.
-      Otimizador o = (this.otimizador == null) ? new SGD() : this.otimizador;
-      Perda p = (this.perda == null) ? new MSE() : this.perda;
-      this.compilar(o, p);
+      Otimizador o = (_otimizador == null) ? new SGD() : _otimizador;
+      Perda p = (_perda == null) ? new MSE() : _perda;
+
+      compilar(o, p);
    }
 
    /**
@@ -358,14 +349,12 @@ public class RedeNeural extends Modelo{
     * @param perda função de perda da Rede Neural usada durante o treinamento.
     * @throws IllegalArgumentException se a função de perda for nula.
     */
-   public void compilar(Perda perda){
-      if(perda == null){
-         throw new IllegalArgumentException("A função de perda não pode ser nula.");
-      }
+   public void compilar(Perda perda) {
+      utils.validarNaoNulo(perda, "A função de perda não pode ser nula.");
 
       //usando valores de configuração prévia, se forem criados
-      Otimizador o = (this.otimizador == null) ? new SGD() : this.otimizador;
-      this.compilar(o, perda);
+      Otimizador o = (_otimizador == null) ? new SGD() : _otimizador;
+      compilar(o, perda);
    }
 
    /**
@@ -391,50 +380,42 @@ public class RedeNeural extends Modelo{
     * @param otimizador otimizador que será usando para o treino da Rede Neural.
     * @throws IllegalArgumentException se o otimizador ou inicializador forem nulos.
     */
-   public void compilar(Otimizador otimizador){
-      if(otimizador == null){
-         throw new IllegalArgumentException("O otimizador fornecido não pode ser nulo.");
-      }
+   public void compilar(Otimizador otimizador) {
+      utils.validarNaoNulo(otimizador, "O otimizador fornecido não pode ser nulo.");
 
       //usando valores de configuração prévia, se forem criados.
-      if(this.perda == null){
-         this.compilar(otimizador, new MSE());
-
-      }else{
-         this.compilar(otimizador, this.perda);
-      }   
+      Perda p = (_perda == null) ? new MSE() : _perda;
+      compilar(otimizador, p);
    }
 
    @Override
-   public void compilar(Object otimizador, Object perda){
-      camadas = new Densa[arquitetura.length-1];
-      camadas[0] = new Densa(arquitetura[1]);
-      camadas[0].setBias(bias);
-      camadas[0].construir(new int[]{arquitetura[0]});
+   public void compilar(Object otimizador, Object perda) {
+      _camadas = new Densa[_arq.length-1];
+      _camadas[0] = new Densa(_arq[1]);
+      _camadas[0].setBias(bias);
+      _camadas[0].construir(new int[]{_arq[0]});
 
       Dicionario dic = new Dicionario();
-      for(int i = 1; i < camadas.length; i++){
-         camadas[i] = new Densa(arquitetura[i+1]);
-         camadas[i].setBias(bias);
-         camadas[i].construir(camadas[i-1].formatoSaida());
+      for (int i = 1; i < _camadas.length; i++) {
+         _camadas[i] = new Densa(_arq[i+1]);
+         _camadas[i].setBias(bias);
+         _camadas[i].construir(_camadas[i-1].formatoSaida());
       }
 
-      for(int i = 0; i < camadas.length; i++){
-         camadas[i].setId(i);
-         if(seedInicial != 0) camadas[i].setSeed(seedInicial);
-         camadas[i].inicializar();
+      for (int i = 0; i < _camadas.length; i++) {
+         _camadas[i].setId(i);
+         if (seedInicial != 0) _camadas[i].setSeed(seedInicial);
+         _camadas[i].inicializar();
       }
 
-      if(seedInicial != 0){
-         treinador.setSeed(seedInicial);
-      }
+      if (seedInicial != 0) _treinador.setSeed(seedInicial);
 
-      this.perda = dic.getPerda(perda);
-      this.otimizador = dic.getOtimizador(otimizador);
+      _perda = dic.getPerda(perda);
+      _otimizador = dic.getOtimizador(otimizador);
 
-      this.otimizador.construir(this.camadas);
+      _otimizador.construir(_camadas);
 
-      this.compilado = true;
+      _compilado = true;
    }
 
    /**
@@ -451,14 +432,14 @@ public class RedeNeural extends Modelo{
     * de entrada da rede.
     */
    @Override
-   public Tensor4D forward(Object entrada){
+   public Tensor4D forward(Object entrada) {
       verificarCompilacao();
 
       utils.validarNaoNulo(entrada, "Dados de entrada não pode ser nulo.");
 
-      Tensor4D prev = camadas[0].forward(entrada);
-      for(int i = 1; i < camadas.length; i++){
-         prev = camadas[i].forward(prev);
+      Tensor4D prev = _camadas[0].forward(entrada);
+      for (int i = 1; i < _camadas.length; i++) {
+         prev = _camadas[i].forward(prev);
       }
 
       return prev.clone();//preservar a saída do modelo
@@ -480,42 +461,42 @@ public class RedeNeural extends Modelo{
     * @return matriz contendo os resultados das predições da rede.
     */
    @Override
-   public Tensor4D[] forwards(Object[] entradas){
+   public Tensor4D[] forwards(Object[] entradas) {
       verificarCompilacao();
 
       utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
 
-      Tensor4D[] previsoes = new Tensor4D[entradas.length];
+      Tensor4D[] prevs = new Tensor4D[entradas.length];
 
-      for(int i = 0; i < previsoes.length; i++){
-         previsoes[i] = forward(entradas[i]);
+      for (int i = 0; i < prevs.length; i++) {
+         prevs[i] = forward(entradas[i]);
       }
 
-      return previsoes;
+      return prevs;
    }
 
    @Override
-   public void zerarGradientes(){
-      for(int i = 0; i < camadas.length; i++){
-         camadas[i].zerarGradientes();
+   public void zerarGradientes() {
+      for (int i = 0; i < _camadas.length; i++) {
+         _camadas[i].zerarGradientes();
       }
    }
 
    @Override
-   public void treino(boolean treinando){
-      for(Camada camada : camadas){
+   public void treino(boolean treinando) {
+      for (Camada camada : _camadas) {
          camada.setTreino(treinando);
       }
    }
 
    @Override
-   public Otimizador otimizador(){
-      return this.otimizador;
+   public Otimizador otimizador() {
+      return _otimizador;
    }
 
    @Override
-   public Perda perda(){
-      return this.perda;
+   public Perda perda() {
+      return _perda;
    }
 
    /**
@@ -527,17 +508,17 @@ public class RedeNeural extends Modelo{
     * das camadas ocultas.
     */
    @Override
-   public Densa camada(int id){
-      super.verificarCompilacao();
+   public Densa camada(int id) {
+      verificarCompilacao();
 
-      if((id < 0) || (id >= this.camadas.length)){
+      if ((id < 0) || (id >= _camadas.length)) {
          throw new IllegalArgumentException(
             "O índice fornecido (" + id + 
             ") é inválido ou fora de alcance."
          );
       }
    
-      return this.camadas[id];
+      return _camadas[id];
    }
 
    /**
@@ -546,9 +527,9 @@ public class RedeNeural extends Modelo{
     * @return conjunto de camadas da rede.
     */
    @Override
-   public Densa[] camadas(){
-      super.verificarCompilacao();
-      return this.camadas;
+   public Densa[] camadas() {
+      verificarCompilacao();
+      return _camadas;
    }
 
    /**
@@ -557,9 +538,9 @@ public class RedeNeural extends Modelo{
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
    @Override
-   public Densa camadaSaida(){
-      super.verificarCompilacao();
-      return this.camadas[this.camadas.length-1];
+   public Densa camadaSaida() {
+      verificarCompilacao();
+      return _camadas[_camadas.length-1];
    }
 
    /**
@@ -571,9 +552,9 @@ public class RedeNeural extends Modelo{
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
    @Override
-   public double[] saidaParaArray(){
-      super.verificarCompilacao();
-      return this.camadaSaida().saidaParaArray();
+   public double[] saidaParaArray() {
+      verificarCompilacao();
+      return camadaSaida().saidaParaArray();
    }
 
    /**
@@ -593,9 +574,9 @@ public class RedeNeural extends Modelo{
     * @return array com a arquitetura da rede.
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
-   public int[] obterArquitetura(){
-      super.verificarCompilacao();
-      return this.arquitetura;
+   public int[] obterArquitetura() {
+      verificarCompilacao();
+      return _arq;
    }
 
    /**
@@ -603,7 +584,7 @@ public class RedeNeural extends Modelo{
     * @return nome específico da rede.
     */
    @Override
-   public String nome(){
+   public String nome() {
       return this.nome;
    }
 
@@ -616,12 +597,13 @@ public class RedeNeural extends Modelo{
     * @return quantiade de parâmetros total da rede.
     */
    @Override
-   public int numParametros(){
-      int parametros = 0;
-      for(Camada camada : this.camadas){
-         parametros += camada.numParametros();
+   public int numParametros() {
+      int params = 0;
+      for (Camada camada : _camadas) {
+         params += camada.numParametros();
       }
-      return parametros;
+
+      return params;
    }
 
    /**
@@ -634,9 +616,9 @@ public class RedeNeural extends Modelo{
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
    @Override
-   public int numCamadas(){
-      super.verificarCompilacao();
-      return this.camadas.length;
+   public int numCamadas() {
+      verificarCompilacao();
+      return _camadas.length;
    }
 
    /**
@@ -645,9 +627,9 @@ public class RedeNeural extends Modelo{
     * @return tamanho de entrada da Rede Neural.
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
-   public int obterTamanhoEntrada(){
-      super.verificarCompilacao();
-      return this.arquitetura[0];
+   public int obterTamanhoEntrada() {
+      verificarCompilacao();
+      return _arq[0];
    }
 
    /**
@@ -656,17 +638,17 @@ public class RedeNeural extends Modelo{
     * @return tamanho de saída da Rede Neural.
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
-   public int obterTamanhoSaida(){
-      super.verificarCompilacao();
-      return this.arquitetura[this.arquitetura.length-1];
+   public int obterTamanhoSaida() {
+      verificarCompilacao();
+      return _arq[_arq.length-1];
    }
 
    /**
     * Retorna o valor de uso do bias da Rede Neural.
     * @return valor de uso do bias da Rede Neural.
     */
-   public boolean temBias(){
-      return this.bias;
+   public boolean temBias() {
+      return bias;
    }
 
    /**
@@ -682,11 +664,11 @@ public class RedeNeural extends Modelo{
     * histórico de custos.
     */
    @Override
-   public double[] historico(){
-      if(this.treinador.calcularHistorico){
-         return this.treinador.historico();   
+   public double[] historico() {
+      if (_treinador.calcularHistorico) {
+         return _treinador.historico();   
       
-      }else{
+      } else {
          throw new UnsupportedOperationException(
             "O histórico de treino da rede deve ser configurado previamente."
          );
@@ -694,33 +676,33 @@ public class RedeNeural extends Modelo{
    }
 
    @Override
-   protected String construirInfo(){
+   protected String construirInfo() {
       StringBuilder sb = new StringBuilder();
       String pad = "    ";
       System.out.println(nome() + " = [");
 
       //otimizador
-      sb.append(this.otimizador.info()).append("\n");
+      sb.append(_otimizador.info()).append("\n");
 
       //perda
-      sb.append(pad + "Perda: " + this.perda.getClass().getSimpleName() + "\n\n");
+      sb.append(pad + "Perda: " + _perda.nome() + "\n\n");
 
       //bias
-      sb.append(pad + "Bias = " + this.bias);
+      sb.append(pad + "Bias = " + bias);
       sb.append("\n\n");
 
       //ativações
-      for(int i = 0; i < this.camadas.length; i++){
+      for (int i = 0; i < _camadas.length; i++) {
          sb.append(
             pad + "Ativação camada " + i + ": " + 
-            this.camadas[i].ativacao().getClass().getSimpleName() + "\n"
+            _camadas[i].ativacao().nome() + "\n"
          );
       }
 
       //arquitetura
-      sb.append("\n" + pad + "arquitetura = (" + this.arquitetura[0]);
-      for(int i = 1; i < this.arquitetura.length; i++){
-         sb.append(", " + this.arquitetura[i]);
+      sb.append("\n" + pad + "arquitetura = (" + _arq[0]);
+      for (int i = 1; i < _arq.length; i++) {
+         sb.append(", " + _arq[i]);
       }
       sb.append(")\n");
 
@@ -751,29 +733,25 @@ public class RedeNeural extends Modelo{
     * @throws IllegalArgumentException se o modelo não foi compilado previamente.
     */
    @Override
-   public void info(){
+   public void info() {
       verificarCompilacao();
       System.out.println(construirInfo());
    }
 
    @Override
-   public RedeNeural clone(){
-      try{
-         RedeNeural clone = (RedeNeural) super.clone();
+   public RedeNeural clone() {
+      RedeNeural clone = (RedeNeural) super.clone();
 
-         clone.arquitetura = this.arquitetura.clone();
-         clone.bias = this.bias;
-         clone.otimizador = this.otimizador;
-         clone.perda = this.perda;
+      clone._arq = this._arq.clone();
+      clone.bias = this.bias;
+      clone._otimizador = this._otimizador;
+      clone._perda = this._perda;
 
-         clone.camadas = new Densa[this.camadas.length];
-         for(int i = 0; i < this.camadas.length; i++){
-            clone.camadas[i] = this.camadas[i].clone();
-         }
-
-         return clone;
-      }catch(Exception e){
-         throw new RuntimeException(e);
+      clone._camadas = new Densa[_camadas.length];
+      for (int i = 0; i < _camadas.length; i++) {
+         clone._camadas[i] = _camadas[i].clone();
       }
+
+      return clone;
    }
 }

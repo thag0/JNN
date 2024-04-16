@@ -26,7 +26,7 @@ import rna.core.Tensor4D;
  * });
  * </pre>
  */
-public class Entrada extends Camada{
+public class Entrada extends Camada {
 
    /**
     * Formato usado para entrada de um modelo.
@@ -53,20 +53,20 @@ public class Entrada extends Camada{
     * </pre>
     * @param formato formato de entrada usado para o modelo em que a camada estiver.
     */
-   public Entrada(int... formato){
-      if(formato == null){
+   public Entrada(int... formato) {
+      if (formato == null) {
          throw new IllegalArgumentException(
             "\nFormato recebido é nulo."
          );
       }
 
-      if(formato.length == 0){
+      if (formato.length == 0) {
          throw new UnsupportedOperationException(
             "\nO formato recebido deve conter ao menos um elemento."
          );
       }
 
-      if(formato.length > 4){
+      if (formato.length > 4) {
          throw new UnsupportedOperationException(
             "\nO suporte dado ao formato de entrada é limitado (por enquanto) a" +
             " quantro elementos, recebido: " + formato.length
@@ -75,50 +75,50 @@ public class Entrada extends Camada{
 
       int n1 = this.formato.length;
       int n2 = formato.length;
-      for(int i = 0; i < n2; i++){
+      for (int i = 0; i < n2; i++) {
          this.formato[n1 - 1 - i] = formato[n2 - 1 - i];
       }
    }
 
    @Override
-   public void construir(Object entrada){}
+   public void construir(Object entrada) {}
 
    @Override
-   public void inicializar(){}
+   public void inicializar() {}
 
    @Override
-   public Tensor4D forward(Object entrada){
+   public Tensor4D forward(Object entrada) {
       throw new UnsupportedOperationException(
          "\nCamada " + nome() + " não possui cálculo de saída."
       );
    }
 
    @Override
-   public Tensor4D backward(Object grad){
+   public Tensor4D backward(Object grad) {
       throw new UnsupportedOperationException(
          "\nCamada " + nome() + " não possui cálculo de gradientes."
       );
    }
 
    @Override
-   public Tensor4D saida(){
+   public Tensor4D saida() {
       throw new UnsupportedOperationException(
          "\nCamada " + nome() + " não possui retorno de saída."
       );
    }
 
    @Override
-   public int[] formatoEntrada(){
+   public int[] formatoEntrada() {
       return this.formato;
    }
 
    @Override
-   public int[] formatoSaida(){
+   public int[] formatoSaida() {
       return formatoEntrada();
    }
 
    @Override
-   public int numParametros(){
+   public int numParametros() {
       return 0;
    }
    

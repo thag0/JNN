@@ -6,7 +6,7 @@ import rna.modelos.Modelo;
  * Disponibilzia uma interface para usar os métodos de treino e treino em
  * lote da Rede Neural.
  */
-public class Treinador{
+public class Treinador {
 
    /**
     * Auxiliar na verificação do cálculo do histórico de custos.
@@ -31,7 +31,7 @@ public class Treinador{
    /**
     * Responsável por organizar os tipos dos modelos.
     */
-   public Treinador(){
+   public Treinador() {
       aux =        new AuxiliarTreino();
       treino =     new Treino(calcularHistorico);
       treinoLote = new TreinoLote(calcularHistorico);
@@ -41,16 +41,16 @@ public class Treinador{
     * Configura a seed inicial do gerador de números aleatórios.
     * @param seed nova seed.
     */
-   public void setSeed(long seed){
-      this.treino.setSeed(seed);
-      this.treinoLote.setSeed(seed);
+   public void setSeed(long seed) {
+      treino.setSeed(seed);
+      treinoLote.setSeed(seed);
    }
 
    /**
     * Configura o cálculo para o histórico de perdas durante o treinamento.
     * @param calcular calcular ou não o histórico de custo.
     */
-   public void setHistorico(boolean calcular){
+   public void setHistorico(boolean calcular) {
       this.calcularHistorico = calcular;
       treino.setHistorico(calcular);
       treinoLote.setHistorico(calcular);
@@ -65,7 +65,7 @@ public class Treinador{
     * @param epochs quantidade de épocas de treinamento.
     * @param logs logs para perda durante as épocas de treinamento.
     */
-   public void treino(Modelo modelo, Object entradas, Object[] saidas, int epochs, boolean logs){
+   public void treino(Modelo modelo, Object entradas, Object[] saidas, int epochs, boolean logs) {
       executar(modelo, entradas, saidas, epochs, 0, logs);
    }
 
@@ -79,7 +79,7 @@ public class Treinador{
     * @param tamLote tamanho do lote.
     * @param logs logs para perda durante as épocas de treinamento.
     */
-   public void treino(Modelo modelo, Object entradas, Object[] saidas, int epochs, int tamLote, boolean logs){
+   public void treino(Modelo modelo, Object entradas, Object[] saidas, int epochs, int tamLote, boolean logs) {
       executar(modelo, entradas, saidas, epochs, tamLote, logs);
    }
 
@@ -92,19 +92,15 @@ public class Treinador{
     * @param tamLote tamanho do lote.
     * @param logs logs para perda durante as épocas de treinamento.
     */
-   private void executar(Modelo modelo, Object entradas, Object[] saidas, int epochs, int tamLote, boolean logs){
+   private void executar(Modelo modelo, Object entradas, Object[] saidas, int epochs, int tamLote, boolean logs) {
       modelo.treino(true);
 
-      if(tamLote > 1){
-         treinoLote.treinar(
-            modelo, entradas, saidas, epochs, tamLote, logs
-         );
+      if (tamLote > 1) {
+         treinoLote.treinar(modelo, entradas, saidas, epochs, tamLote, logs);
          treinoLote.ultimoUsado = true;
       
-      }else{
-         treino.treinar(
-            modelo, entradas, saidas, epochs, logs
-         );
+      } else {
+         treino.treinar(modelo, entradas, saidas, epochs, logs);
          treino.ultimoUsado = true;
       }
 
@@ -118,12 +114,14 @@ public class Treinador{
     * a cada época de treinamento.
     * @return lista com os custo por época durante a fase de treinamento.
     */
-   public double[] historico(){
+   public double[] historico() {
       Object[] historico = treino.ultimoUsado ? treino.historico() : treinoLote.historico();
       double[] h = new double[historico.length];
-      for(int i = 0; i < h.length; i++){
+
+      for (int i = 0; i < h.length; i++) {
          h[i] = (double) historico[i];
       }
+
       return h;
    }
    

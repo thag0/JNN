@@ -24,8 +24,8 @@ import rna.core.Tensor4D;
  *public class ReLU extends Ativacao{
  *  public ReLU(){
  *    super.construir(
- *       (x) -> { return x > 0 ? x : 0; },
- *       (x) -> { return x > 0 ? 1 : 0; }
+ *       (x) -> (x > 0) ? x : 0,
+ *       (x) -> (x > 0) ? 1 : 0
  *    );
  *  }
  *
@@ -35,7 +35,7 @@ import rna.core.Tensor4D;
  *    Novas funções de ativações devem sobrescrever os métodos existentes {@code ativar()} e {@code derivada()}.
  * </p>
  */
-public abstract class Ativacao{
+public abstract class Ativacao {
 
    /**
     * Função de ativação.
@@ -52,12 +52,13 @@ public abstract class Ativacao{
     * @param fx função de ativação.
     * @param dx deriviada da função de ativação
     */
-   public void construir(DoubleUnaryOperator fx, DoubleUnaryOperator dx){
-      if(fx == null){
+   public void construir(DoubleUnaryOperator fx, DoubleUnaryOperator dx) {
+      if (fx == null) {
          throw new IllegalArgumentException(
             "É necessário que ao menos a função de ativação seja configurada, recebido null."
          );
       }
+
       this.fx = fx;
       this.dx = dx;
    }
@@ -67,8 +68,8 @@ public abstract class Ativacao{
     * @param entrada {@code Tensor} de entrada.
     * @param dest {@code Tensor} de destino.
     */
-   public void forward(Tensor4D entrada, Tensor4D dest){
-      if(entrada.comparar4D(dest) == false){
+   public void forward(Tensor4D entrada, Tensor4D dest) {
+      if (!entrada.comparar4D(dest)) {
          throw new IllegalArgumentException(
             "\nAs dimensões do tensor de entrada " + entrada.shapeStr() +
             " e saída " + dest.shapeStr() + " devem ser iguais."
@@ -85,8 +86,8 @@ public abstract class Ativacao{
     * @param gradiente {@code Tensor} contendo os gradientes.
     * @param dest {@code Tensor} de destino.
     */
-   public void backward(Tensor4D entrada, Tensor4D gradiente, Tensor4D dest){
-      if(entrada.comparar4D(dest) == false){
+   public void backward(Tensor4D entrada, Tensor4D gradiente, Tensor4D dest) {
+      if(!entrada.comparar4D(dest)){
          throw new IllegalArgumentException(
             "\nAs dimensões do tensor de entrada " + entrada.shapeStr() +
             " e saída " + dest.shapeStr() + " devem ser iguais."
@@ -100,10 +101,10 @@ public abstract class Ativacao{
       int i, j, k, l;
       double e, g;
 
-      for(i = 0; i < d1; i++){
-         for(j = 0; j < d2; j++){
-            for(k = 0; k < d3; k++){
-               for(l = 0; l < d4; l++){
+      for (i = 0; i < d1; i++) {
+         for (j = 0; j < d2; j++) {
+            for (k = 0; k < d3; k++) {
+               for (l = 0; l < d4; l++) {
                   e = entrada.get(i, j, k, l);
                   g = gradiente.get(i, j, k, l);
                   dest.set(
@@ -123,7 +124,7 @@ public abstract class Ativacao{
     * </p>
     * @param camada camada densa.
     */
-   public void backward(Densa camada){
+   public void backward(Densa camada) {
       //por padrão chamar o método da própria ativação
       backward(camada._somatorio, camada._gradSaida, camada._gradSaida);
    }
@@ -135,7 +136,7 @@ public abstract class Ativacao{
     * </p>
     * @param camada camada convolucional.
     */
-   public void backward(Convolucional camada){
+   public void backward(Convolucional camada) {
       //por padrão chamar o método da própria ativação
       backward(camada._somatorio, camada._gradSaida, camada._gradSaida);
    }
@@ -144,7 +145,7 @@ public abstract class Ativacao{
     * Retorna o nome da função de atvação.
     * @return nome da função de ativação.
     */
-   public String nome(){
+   public String nome() {
       return getClass().getSimpleName();
    }
 }

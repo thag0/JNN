@@ -157,7 +157,7 @@ public class RMSProp extends Otimizador{
 
       this.ac  = new double[nKernel];
       this.acb = new double[nBias];
-      this.construido = true;//otimizador pode ser usado
+      this._construido = true;//otimizador pode ser usado
    }
 
    @Override

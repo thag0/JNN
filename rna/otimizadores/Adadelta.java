@@ -43,7 +43,7 @@ import rna.camadas.Camada;
  *    {@code rho} - constante de decaimento do otimizador.
  * </p>
  */
-public class Adadelta extends Otimizador{
+public class Adadelta extends Otimizador {
 
    /**
     * Valor padrão para a taxa de decaimento.
@@ -91,13 +91,14 @@ public class Adadelta extends Otimizador{
     * @param rho valor de decaimento do otimizador.
     * @param epsilon usado para evitar a divisão por zero.
     */
-   public Adadelta(double rho, double epsilon){
-      if(rho <= 0){
+   public Adadelta(double rho, double epsilon) {
+      if (rho <= 0) {
          throw new IllegalArgumentException(
             "\nTaxa de decaimento (" + rho + "), inválida."
          );
       }
-      if(epsilon <= 0){
+
+      if (epsilon <= 0) {
          throw new IllegalArgumentException(
             "\nEpsilon (" + epsilon + "), inválido."
          );
@@ -113,7 +114,7 @@ public class Adadelta extends Otimizador{
     * @param rho valor de decaimento do otimizador.
     * @param epsilon usado para evitar a divisão por zero.
     */
-   public Adadelta(double rho){
+   public Adadelta(double rho) {
       this(rho, PADRAO_EPS);
    }
 
@@ -123,20 +124,20 @@ public class Adadelta extends Otimizador{
     *    Os hiperparâmetros do Adadelta serão inicializados com os valores padrão.
     * </p>
     */
-   public Adadelta(){
+   public Adadelta() {
       this(PADRAO_RHO, PADRAO_EPS);
    }
 
    @Override
-   public void construir(Camada[] camadas){
+   public void construir(Camada[] camadas) {
       int nKernel = 0;
       int nBias = 0;
       
-      for(Camada camada : camadas){
-         if(camada.treinavel() == false) continue;
+      for (Camada camada : camadas) {
+         if (!camada.treinavel()) continue;
 
          nKernel += camada.kernelParaArray().length;
-         if(camada.temBias()){
+         if (camada.temBias()) {
             nBias += camada.biasParaArray().length;
          }         
       }
@@ -145,23 +146,23 @@ public class Adadelta extends Otimizador{
       this.acAt  = new double[nKernel];
       this.acb = new double[nBias];
       this.acAtb = new double[nBias];
-      this.construido = true;//otimizador pode ser usado
+      this._construido = true;//otimizador pode ser usado
    }
 
    @Override
-   public void atualizar(Camada[] camadas){
+   public void atualizar(Camada[] camadas) {
       verificarConstrucao();
       
       int idKernel = 0, idBias = 0;
-      for(Camada camada : camadas){
-         if(camada.treinavel() == false) continue;
+      for (Camada camada : camadas) {
+         if (!camada.treinavel()) continue;
 
          double[] kernel = camada.kernelParaArray();
          double[] gradK = camada.gradKernelParaArray();
          idKernel = calcular(kernel, gradK, ac, acAt, idKernel);
          camada.setKernel(kernel);
 
-         if(camada.temBias()){
+         if (camada.temBias()) {
             double[] bias = camada.biasParaArray();
             double[] gradB = camada.gradBias();
             idBias = calcular(bias, gradB, acb, acAtb, idBias);
@@ -179,10 +180,10 @@ public class Adadelta extends Otimizador{
     * @param id índice inicial das variáveis dentro do array de momentums.
     * @return índice final após as atualizações.
     */
-   private int calcular(double[] vars, double[] grads, double[] ac, double[] acAt, int id){
+   private int calcular(double[] vars, double[] grads, double[] ac, double[] acAt, int id) {
       double g, delta;
 
-      for(int i = 0; i < vars.length; i++){
+      for (int i = 0; i < vars.length; i++) {
          g = grads[i];
          ac[id] = (rho * ac[id]) + ((1 - rho) * (g*g));
          delta = Math.sqrt(acAt[id] + epsilon) / Math.sqrt(ac[id] + epsilon) * g;
@@ -196,7 +197,7 @@ public class Adadelta extends Otimizador{
    }
 
    @Override
-   public String info(){
+   public String info() {
       super.verificarConstrucao();
       super.construirInfo();
 

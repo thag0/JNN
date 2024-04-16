@@ -10,7 +10,7 @@ package rna.avaliacao.perda;
  *    necessários para a atualização de parâmetros dos modelos.
  * </p>
  */
-public abstract class Perda{
+public abstract class Perda {
 
    /**
     * Calcula a função de perda configurada.
@@ -34,8 +34,8 @@ public abstract class Perda{
     * @param previsto dados previstos.
     * @param real dados rotulados.
     */
-   protected void verificarDimensoes(double[] previsto, double[] real){
-      if(previsto.length != real.length){
+   protected void verificarDimensoes(double[] previsto, double[] real) {
+      if (previsto.length != real.length) {
          throw new IllegalArgumentException(
             "Dimensões de dados previstos (" + previsto.length + 
             ") diferente da dimensão dos dados reais (" + real.length + 
@@ -48,7 +48,7 @@ public abstract class Perda{
     * Retorna o nome da função de perda.
     * @return nome da função de perda.
     */
-   public String nome(){
+   public String nome() {
       return getClass().getSimpleName();
    }
 }

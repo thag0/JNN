@@ -25,7 +25,7 @@ import rna.core.OpArray;
  *    {@code tA} - taxa de aprendizagem do otimizador.
  * </p>
  */
-public class GD extends Otimizador{
+public class GD extends Otimizador {
 
    /**
     * Operador de arrays.
@@ -42,8 +42,8 @@ public class GD extends Otimizador{
     * usando os valores de hiperparâmetros fornecidos.
     * @param tA taxa de aprendizagem do otimizador.
     */
-   public GD(double tA){
-      if(tA <= 0){
+   public GD(double tA) {
+      if (tA <= 0) {
          throw new IllegalArgumentException(
             "\nTaxa de aprendizagem (" + tA + "), inválida."
          );
@@ -58,22 +58,22 @@ public class GD extends Otimizador{
     *    Os hiperparâmetros do GD serão inicializados com os valores padrão.
     * </p>
     */
-   public GD(){
+   public GD() {
       this(0.1);
    }
 
    @Override
-   public void construir(Camada[] camadas){
+   public void construir(Camada[] camadas) {
       //esse otimizador não precisa de parâmetros adicionais
-      this.construido = true;//otimizador pode ser usado
+      this._construido = true;//otimizador pode ser usado
    }
 
    @Override
-   public void atualizar(Camada[] camadas){
+   public void atualizar(Camada[] camadas) {
       verificarConstrucao();
       
-      for(Camada camada : camadas){
-         if(camada.treinavel() == false) continue;
+      for (Camada camada : camadas) {
+         if (!camada.treinavel()) continue;
 
          double[] kernel = camada.kernelParaArray();
          double[] gradK = camada.gradKernelParaArray();
@@ -82,7 +82,7 @@ public class GD extends Otimizador{
          opArr.sub(kernel, gradK, kernel);
          camada.setKernel(kernel);
 
-         if(camada.temBias()){
+         if (camada.temBias()) {
             double[] bias = camada.biasParaArray();
             double[] gradB = camada.gradBias();
             
@@ -94,7 +94,7 @@ public class GD extends Otimizador{
    }
 
    @Override
-   public String info(){
+   public String info() {
       super.verificarConstrucao();
       super.construirInfo();
       

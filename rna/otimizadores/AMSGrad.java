@@ -57,7 +57,7 @@ import rna.camadas.Camada;
  *		conexão do peso que está sendo atualizado.
  * </p>
  */
-public class AMSGrad extends Otimizador{
+public class AMSGrad extends Otimizador {
 
    /**
     * Valor padrão para a taxa de aprendizagem do otimizador.
@@ -140,34 +140,34 @@ public class AMSGrad extends Otimizador{
     * @param tA valor de taxa de aprendizagem.
 	 * @param beta1 decaimento do momento.
 	 * @param beta2 decaimento do momento de segunda ordem.
-	 * @param epsilon usado para evitar a divisão por zero.
+	 * @param eps usado para evitar a divisão por zero.
 	 */
-	public AMSGrad(double tA, double beta1, double beta2, double epsilon){
-      if(tA <= 0){
+	public AMSGrad(double tA, double beta1, double beta2, double eps) {
+      if (tA <= 0) {
          throw new IllegalArgumentException(
             "\nTaxa de aprendizagem (" + tA + "), inválida."
          );
       }
-      if(beta1 <= 0){
+      if (beta1 <= 0) {
          throw new IllegalArgumentException(
             "\nTaxa de decaimento de primeira ordem (" + beta1 + "), inválida."
          );
       }
-      if(beta2 <= 0){
+      if (beta2 <= 0) {
          throw new IllegalArgumentException(
             "\nTaxa de decaimento de segunda ordem (" + beta2 + "), inválida."
          );
       }
-      if(epsilon <= 0){
+      if (eps <= 0) {
          throw new IllegalArgumentException(
-            "\nEpsilon (" + epsilon + "), inválido."
+            "\nEpsilon (" + eps + "), inválido."
          );
       }
 		
 		this.taxaAprendizagem = tA;
 		this.beta1 = beta1;
 		this.beta2 = beta2;
-		this.epsilon = epsilon;
+		this.epsilon = eps;
 	}
 
 	/**
@@ -177,7 +177,7 @@ public class AMSGrad extends Otimizador{
 	 * @param beta1 decaimento do momento.
 	 * @param beta2 decaimento do momento de segunda ordem.
 	 */
-	public AMSGrad(double tA, double beta1, double beta2){
+	public AMSGrad(double tA, double beta1, double beta2) {
       this(tA, beta1, beta2, PADRAO_EPS);
 	}
 
@@ -201,15 +201,15 @@ public class AMSGrad extends Otimizador{
 	}
 
 	@Override
-   public void construir(Camada[] camadas){
+   public void construir(Camada[] camadas) {
       int nKernel = 0;
       int nBias = 0;
       
-      for(Camada camada : camadas){
-			if(camada.treinavel() == false) continue;
+      for (Camada camada : camadas) {
+			if (!camada.treinavel()) continue;
 
          nKernel += camada.kernelParaArray().length;
-         if(camada.temBias()){
+         if (camada.temBias()) {
             nBias += camada.biasParaArray().length;
          }         
       }
@@ -220,11 +220,11 @@ public class AMSGrad extends Otimizador{
       this.mb = new double[nBias];
       this.vb = new double[nBias];
       this.vcb = new double[nBias];
-		this.construido = true;//otimizador pode ser usado
+		this._construido = true;//otimizador pode ser usado
    }
 
 	@Override
-	public void atualizar(Camada[] camadas){
+	public void atualizar(Camada[] camadas) {
 		verificarConstrucao();
 		
 		int idKernel = 0, idBias = 0;
@@ -233,15 +233,15 @@ public class AMSGrad extends Otimizador{
 		double forcaB1 = (1 - Math.pow(beta1, interacoes));
 		double forcaB2 = (1 - Math.pow(beta2, interacoes));
 		
-		for(Camada camada : camadas){
-			if(camada.treinavel() == false) continue;
+		for (Camada camada : camadas) {
+			if (!camada.treinavel()) continue;
 
 			double[] kernel = camada.kernelParaArray();
 			double[] gradK = camada.gradKernelParaArray();
 			idKernel = calcular(kernel, gradK, m, v, vc, forcaB1, forcaB2, idKernel);
 			camada.setKernel(kernel);
 
-         if(camada.temBias()){
+         if (camada.temBias()) {
 				double[] bias = camada.biasParaArray();
 				double[] gradB = camada.gradBias();
 				idBias = calcular(bias, gradB, mb, vb, vcb, forcaB1, forcaB2, idBias);
@@ -262,10 +262,10 @@ public class AMSGrad extends Otimizador{
     * @param id índice inicial das variáveis dentro do array de momentums.
     * @return índice final após as atualizações.
 	 */
-	private int calcular(double[] vars, double[] grads, double[] m, double[] v, double[] vc, double forcaB1, double forcaB2, int id){
+	private int calcular(double[] vars, double[] grads, double[] m, double[] v, double[] vc, double forcaB1, double forcaB2, int id) {
 		double mChapeu, vChapeu, g;
 
-		for(int i = 0; i < vars.length; i++){
+		for (int i = 0; i < vars.length; i++) {
 			g = grads[i];
 			m[id] = (beta1 * m[id]) + ((1 - beta1) * g);
 			v[id] = (beta2 * v[id]) + ((1 - beta2) * (g*g));
@@ -282,7 +282,7 @@ public class AMSGrad extends Otimizador{
 	}
 
 	@Override
-	public String info(){
+	public String info() {
 		super.verificarConstrucao();
       super.construirInfo();
       

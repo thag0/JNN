@@ -12,7 +12,7 @@ import rna.core.Tensor4D;
  * Classe auxiliar no treinamento, faz uso de ferramentas que podem
  * ser compartilhadas entre os diferentes tipos de modelos de treinamento.
  */
-public class AuxiliarTreino{
+public class AuxiliarTreino {
 
    /**
     * Gerador de números aleatórios.
@@ -33,8 +33,8 @@ public class AuxiliarTreino{
     * Configura a seed inicial do gerador de números aleatórios.
     * @param seed nova seed.
     */
-   public void setSeed(long seed){
-      this.random.setSeed(seed);
+   public void setSeed(long seed) {
+      random.setSeed(seed);
    }
 
    /**
@@ -50,11 +50,11 @@ public class AuxiliarTreino{
     * @param perda função de perda configurada para o modelo.
     * @param real saída real que será usada para calcular os erros e gradientes.
     */
-   public void backpropagation(Camada[] camadas, Perda perda, double[] prev, double[] real){
+   public void backpropagation(Camada[] camadas, Perda perda, double[] prev, double[] real) {
       double[] deriv = perda.derivada(prev, real);
 
       Tensor4D grad = new Tensor4D(deriv);
-      for(int i = camadas.length-1; i >= 0; i--){
+      for (int i = camadas.length-1; i >= 0; i--) {
          grad = camadas[i].backward(grad);
       }
    }
@@ -64,12 +64,12 @@ public class AuxiliarTreino{
     * @param entradas matriz com os dados de entrada.
     * @param saidas matriz com os dados de saída.
     */
-   public void embaralharDados(Object[] entradas, Object[] saidas){
+   public void embaralharDados(Object[] entradas, Object[] saidas) {
       int linhas = entradas.length;
       int i, idAleatorio;
 
       Object temp;
-      for(i = linhas - 1; i > 0; i--){
+      for (i = linhas - 1; i > 0; i--) {
          idAleatorio = random.nextInt(i+1);
 
          //trocar entradas
@@ -91,8 +91,8 @@ public class AuxiliarTreino{
     * @param fim índice final do lote.
     * @return lote contendo os dados de acordo com os índices fornecidos.
     */
-   public Object[] obterSubMatriz(Object[] dados, int inicio, int fim){
-      if(inicio < 0 || fim > dados.length || inicio >= fim){
+   public Object[] obterSubMatriz(Object[] dados, int inicio, int fim) {
+      if (inicio < 0 || fim > dados.length || inicio >= fim) {
          throw new IllegalArgumentException("Índices de início ou fim inválidos.");
       }
 

@@ -15,7 +15,7 @@ import rna.treinamento.Treinador;
  * Contém a inteface para os métodos necessários que são usados
  * para implementação de modelos.
  */
-public abstract class Modelo implements Cloneable{
+public abstract class Modelo implements Cloneable {
 
    /**
     * Nome da instância do modelo.
@@ -28,17 +28,17 @@ public abstract class Modelo implements Cloneable{
     * indevido caso ainda não tenha suas variáveis e dependências inicializadas 
     * previamente.
     */
-   public boolean compilado;
+   public boolean _compilado;
 
    /**
     * Função de perda para avaliar o erro durante o treino.
     */
-   protected Perda perda;
+   protected Perda _perda;
 
    /**
     * Otimizador usado para ajuste de parâmetros treináveis.
     */
-   protected Otimizador otimizador;
+   protected Otimizador _otimizador;
 
    /**
     * Ponto inicial para os geradores aleatórios.
@@ -53,7 +53,7 @@ public abstract class Modelo implements Cloneable{
     * Gerenciador de treino do modelo. contém implementações dos 
     * algoritmos de treino para o ajuste de parâmetros treináveis.
     */
-   protected Treinador treinador;
+   protected Treinador _treinador;
 
    /**
     * Auxiliar na verificação para o salvamento do histórico
@@ -69,7 +69,7 @@ public abstract class Modelo implements Cloneable{
     *    Cada modelo possui seu próprio avaliador.
     * </p>
     */
-   protected Avaliador avaliador;
+   protected Avaliador _avaliador;
 
    /**
     * Utilitário.
@@ -79,9 +79,9 @@ public abstract class Modelo implements Cloneable{
    /**
     * Inicialização implicita de um modelo.
     */
-   protected Modelo(){
-      treinador = new Treinador();
-      avaliador = new Avaliador(this);
+   protected Modelo() {
+      _treinador = new Treinador();
+      _avaliador = new Avaliador(this);
       utils = new Utils();
    }
 
@@ -93,12 +93,10 @@ public abstract class Modelo implements Cloneable{
     * usabilidade do modelo.
     * @param nome novo nome da rede.
     */
-   public void setNome(String nome){
-      if(nome != null){
+   public void setNome(String nome) {
+      if (nome != null) {
          String s = nome.trim();
-         if(!s.isEmpty()){
-            this.nome = s;
-         }
+         if (!s.isEmpty()) this.nome = s;
       }
    }
 
@@ -115,8 +113,8 @@ public abstract class Modelo implements Cloneable{
     * </p>
     * @param seed nova seed.
     */
-   public void setSeed(long seed){
-      this.seedInicial = seed;
+   public void setSeed(long seed) {
+      seedInicial = seed;
    }
 
    /**
@@ -130,12 +128,12 @@ public abstract class Modelo implements Cloneable{
     * <p>
     *    {@code O valor padrão é false}
     * </p>
-    * @param calcular se verdadeiro, o modelo armazenará o histórico de perda 
+    * @param calc se verdadeiro, o modelo armazenará o histórico de perda 
     * durante cada época de treinamento.
     */
-   public void setHistorico(boolean calcular){
-      calcularHistorico = calcular;
-      treinador.setHistorico(calcular);
+   public void setHistorico(boolean calc) {
+      calcularHistorico = calc;
+      _treinador.setHistorico(calc);
    }
 
    /**
@@ -143,10 +141,10 @@ public abstract class Modelo implements Cloneable{
     * de treinamento do modelo.
     * @param perda nova função de perda.
     */
-   public void setPerda(Perda perda){
+   public void set_perda(Perda perda) {
       utils.validarNaoNulo(perda, "A função de perda não pode ser nula.");
 
-      this.perda = perda;
+      this._perda = perda;
    }
 
    /**
@@ -169,12 +167,12 @@ public abstract class Modelo implements Cloneable{
     *    <li> AMSGrad </li>
     *    <li> Adadelta </li>
     * </ol>
-    * @param otimizador novo otimizador.
+    * @param otm novo otimizador.
     */
-   public void setOtimizador(Otimizador otimizador){
-      utils.validarNaoNulo(otimizador, "O novo otimizador não pode ser nulo.");
+   public void set_otimizador(Otimizador otm) {
+      utils.validarNaoNulo(otm, "O novo otimizador não pode ser nulo.");
 
-      this.otimizador = otimizador;
+      _otimizador = otm;
    }
 
    /**
@@ -206,8 +204,8 @@ public abstract class Modelo implements Cloneable{
    /**
     * Auxiliar na verificação da compilação do modelo.
     */
-   protected void verificarCompilacao(){
-      if(!compilado){
+   protected void verificarCompilacao() {
+      if (!_compilado) {
          throw new IllegalStateException(
             "\nO modelo ainda não foi compilado."
          );
@@ -243,19 +241,19 @@ public abstract class Modelo implements Cloneable{
     * @param epochs quantidade de épocas de treinamento.
     * @param logs logs para perda durante as épocas de treinamento.
     */
-   public void treinar(Object entradas, Object[] saidas, int epochs, boolean logs){
+   public void treinar(Object entradas, Object[] saidas, int epochs, boolean logs) {
       verificarCompilacao();
 
       utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
       utils.validarNaoNulo(saidas, "Dados de saida não podem ser nulos.");
 
-      if(epochs < 1){
+      if (epochs < 1) {
          throw new IllegalArgumentException(
             "\nO valor de épocas deve ser maior que zero, recebido = " + epochs
          );
       }
 
-      treinador.treino(this, entradas, saidas, epochs, logs);
+      _treinador.treino(this, entradas, saidas, epochs, logs);
    }
    
    /**
@@ -267,19 +265,19 @@ public abstract class Modelo implements Cloneable{
     * @param tamLote tamanho do lote de treinamento.
     * @param logs logs para perda durante as épocas de treinamento.
     */
-   public void treinar(Object entradas, Object[] saidas, int epochs, int tamLote, boolean logs){
+   public void treinar(Object entradas, Object[] saidas, int epochs, int tamLote, boolean logs) {
       verificarCompilacao();
 
       utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
       utils.validarNaoNulo(saidas, "Dados de saida não podem ser nulos.");
 
-      if(epochs < 1){
+      if (epochs < 1) {
          throw new IllegalArgumentException(
             "\nO valor de epochs (" + epochs + ") não pode ser menor que um"
          );
       }
 
-      treinador.treino(this, entradas, saidas, epochs, tamLote, logs);
+      _treinador.treino(this, entradas, saidas, epochs, tamLote, logs);
    }
 
    /**
@@ -303,7 +301,7 @@ public abstract class Modelo implements Cloneable{
     * @param saida dados de saída correspondente as entradas fornecidas.
     * @return valor de perda do modelo.
     */
-   public double avaliar(Object entrada, Object[] saida){
+   public double avaliar(Object entrada, Object[] saida) {
       verificarCompilacao();
 
       utils.validarNaoNulo(entrada, "Dados de entrada não podem ser nulos.");
@@ -312,14 +310,14 @@ public abstract class Modelo implements Cloneable{
       //por enquanto uma instância local
       Object[] amostras = utils.transformarParaArray(entrada);
  
-      if(amostras.length != saida.length){
+      if (amostras.length != saida.length) {
          throw new IllegalArgumentException(
             "\nA quantidade de dados de entrada (" + amostras.length + ") " +
             "e saída (" + saida.length + ") " + "devem ser iguais."
          );
       }
  
-      if(saida instanceof double[][] == false){
+      if (saida instanceof double[][] == false) {
          throw new IllegalArgumentException(
             "\nA saída deve ser do tipo double[][]" + 
             " recebido " + saida.getClass().getTypeName()
@@ -329,9 +327,9 @@ public abstract class Modelo implements Cloneable{
       double[][] s = (double[][]) saida;
       int n = amostras.length;
       double soma = 0;
-      for(int i = 0; i < n; i++){
+      for (int i = 0; i < n; i++) {
          forward(amostras[i]);
-         soma += perda.calcular(saidaParaArray(), s[i]);
+         soma += _perda.calcular(saidaParaArray(), s[i]);
       }
 
       return soma/n;
@@ -345,8 +343,8 @@ public abstract class Modelo implements Cloneable{
     * </p>
     * @return avaliador do modelo.
     */
-   public Avaliador avaliador(){
-      return this.avaliador;
+   public Avaliador avaliador() {
+      return this._avaliador;
    }
 
    /**
@@ -390,12 +388,12 @@ public abstract class Modelo implements Cloneable{
     * Copia os dados de saída da última camada do modelo para o array.
     * @param arr array para cópia.
     */
-   public void copiarDaSaida(double[] arr){
+   public void copiarDaSaida(double[] arr) {
       double[] saida = saidaParaArray();
 
       utils.validarNaoNulo(arr, "O array de cópia não pode ser nulo.");
       
-      if(saida.length != arr.length){
+      if (saida.length != arr.length) {
          throw new IllegalArgumentException(
             "\nIncompatibilidade de dimensões entre o array fornecido (" + arr.length + 
             ") e o array gerado pela saída da última camada (" + saida.length + ")."
@@ -409,7 +407,7 @@ public abstract class Modelo implements Cloneable{
     * Informa o nome configurado do modelo.
     * @return nome do modelo.
     */
-   public String nome(){
+   public String nome() {
       return this.nome;
    }
 
@@ -438,8 +436,8 @@ public abstract class Modelo implements Cloneable{
     * @return array contendo o valor de perda durante cada época de treinamento 
     * do modelo.
     */
-   public double[] historico(){
-      return treinador.historico();
+   public double[] historico() {
+      return _treinador.historico();
    }
 
    /**
@@ -463,12 +461,12 @@ public abstract class Modelo implements Cloneable{
     * @return clone do modelo.
     */
    @Override
-   public Modelo clone(){
-      try{
+   public Modelo clone() {
+      try {
          Modelo clone = (Modelo) super.clone(); 
          return clone;
 
-      }catch(CloneNotSupportedException e){
+      } catch (CloneNotSupportedException e) {
          throw new RuntimeException(e);
       }
    }

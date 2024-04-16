@@ -8,15 +8,15 @@ package rna.ativacoes;
  *    recebido caso ele seja maior que zero, e zero caso contrário.
  * </p>
  */
-public class ReLU extends Ativacao{
+public class ReLU extends Ativacao {
 
    /**
     * Instancia a função de ativação ReLU.
     */
-   public ReLU(){
-      super.construir(
-         (x) -> { return (x > 0) ? x : 0; },
-         (x) -> { return (x > 0) ? 1 : 0; }
+   public ReLU() {
+      construir(
+         x -> (x > 0) ? x : 0,
+         x -> (x > 0) ? 1 : 0
       );
    }
 }

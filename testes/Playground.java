@@ -2,6 +2,7 @@ package testes;
 
 import lib.ged.Ged;
 import lib.geim.Geim;
+import rna.ativacoes.Argmax;
 import rna.core.OpArray;
 import rna.core.OpMatriz;
 import rna.core.OpTensor4D;
@@ -22,7 +23,8 @@ public class Playground{
       double[] arr = {1, 2, 3, 4, 5};
       Tensor4D t = new Tensor4D(arr);
       
-      System.out.println(t.reduce(1, (x, y) -> x*y).item());
+      new Argmax().forward(t, t);
+      t.print(2);
    }
 
    /**

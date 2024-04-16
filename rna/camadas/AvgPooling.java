@@ -31,7 +31,7 @@ import rna.core.Utils;
  *    A camada de avg pooling não possui parâmetros treináveis nem função de ativação.
  * </p>
  */
-public class AvgPooling extends Camada{
+public class AvgPooling extends Camada {
 
    /**
     * Utilitario.
@@ -120,18 +120,16 @@ public class AvgPooling extends Camada{
     * @throws IllegalArgumentException se o formato do filtro não atender as
     * requisições.
     */
-   public AvgPooling(int[] formFiltro){
-      if(formFiltro == null){
-         throw new IllegalArgumentException(
-            "\nO formato do filtro não pode ser nulo."
-         );
-      }
-      if(formFiltro.length != 2){
+   public AvgPooling(int[] formFiltro) {
+      utils.validarNaoNulo(formFiltro, "\nO formato do filtro não pode ser nulo.");
+
+      if (formFiltro.length != 2) {
          throw new IllegalArgumentException(
             "\nO formato do filtro deve conter dois elementos (altura, largura)."
          );
       }
-      if(utils.apenasMaiorZero(formFiltro) == false){
+
+      if (!utils.apenasMaiorZero(formFiltro)) {
          throw new IllegalArgumentException(
             "\nOs valores de dimensões do filtro devem ser maiores que zero."
          );
@@ -157,34 +155,30 @@ public class AvgPooling extends Camada{
     * requisições.
     * @throws IllegalArgumentException se os strides não atenderem as requisições.
     */
-   public AvgPooling(int[] formFiltro, int[] stride){
-      if(formFiltro == null){
-         throw new IllegalArgumentException(
-            "\nO formato do filtro não pode ser nulo."
-         );
-      }
-      if(formFiltro.length != 2){
+   public AvgPooling(int[] formFiltro, int[] stride) {
+      utils.validarNaoNulo(formFiltro, "\nO formato do filtro não pode ser nulo.");
+
+      if (formFiltro.length != 2) {
          throw new IllegalArgumentException(
             "\nO formato do filtro deve conter três elementos (altura, largura)."
          );
       }
-      if(utils.apenasMaiorZero(formFiltro) == false){
+
+      if (!utils.apenasMaiorZero(formFiltro)) {
          throw new IllegalArgumentException(
             "\nOs valores de dimensões do filtro devem ser maiores que zero."
          );
       }
 
-      if(stride == null){
-         throw new IllegalArgumentException(
-            "\nO formato do filtro não pode ser nulo."
-         );
-      }
-      if(stride.length != 2){
+      utils.validarNaoNulo(formFiltro, "\nO formato do filtro não pode ser nulo.");
+
+      if (stride.length != 2) {
          throw new IllegalArgumentException(
             "\nO formato para os strides deve conter dois elementos (altura, largura)."
          );
       }
-      if(utils.apenasMaiorZero(stride) == false){
+
+      if (!utils.apenasMaiorZero(stride)) {
          throw new IllegalArgumentException(
             "\nOs valores para os strides devem ser maiores que zero."
          );
@@ -210,7 +204,7 @@ public class AvgPooling extends Camada{
     * requisições.
     * @throws IllegalArgumentException se os strides não atenderem as requisições.
     */
-   public AvgPooling(int[] formEntrada, int[] formFiltro, int[] stride){
+   public AvgPooling(int[] formEntrada, int[] formFiltro, int[] stride) {
       this(formFiltro, stride);
       construir(formEntrada);
    }
@@ -233,13 +227,10 @@ public class AvgPooling extends Camada{
     * @param entrada formato dos dados de entrada para a camada.
     */
    @Override
-   public void construir(Object entrada){
-      if(entrada == null){
-         throw new IllegalArgumentException(
-            "\nFormato de entrada fornecida para camada " + nome() + " é nulo."
-         );
-      }
-      if(entrada instanceof int[] == false){
+   public void construir(Object entrada) {
+      utils.validarNaoNulo(entrada, "\nFormato de entrada fornecida para camada " + nome() + " é nulo.");
+
+      if (!(entrada instanceof int[])) {
          throw new IllegalArgumentException(
             "\nObjeto esperado para entrada da camada " + nome() + " é do tipo int[], " +
             "objeto recebido é do tipo " + entrada.getClass().getTypeName()
@@ -247,12 +238,13 @@ public class AvgPooling extends Camada{
       }
       
       int[] e = (int[]) entrada;
-      if(e.length == 4){
+      if (e.length == 4) {
          this.formEntrada = new int[]{1, e[1], e[2], e[3]};
       
-      }else if(e.length == 3){
+      } else if (e.length == 3) {
          this.formEntrada = new int[]{1, e[0], e[1], e[2]};
-      }else{         
+      
+      } else {         
          throw new IllegalArgumentException(
             "\nO formato de entrada deve conter três elementos (profundidade, altura, largura) ou " +
             "quatro elementos (primeiro elementos desconsiderado)" +
@@ -266,54 +258,54 @@ public class AvgPooling extends Camada{
       formSaida[2] = (formEntrada[2] - formFiltro[0]) / this.stride[0] + 1;//altura
       formSaida[3] = (formEntrada[3] - formFiltro[1]) / this.stride[1] + 1;//largura
       
-      this._entrada = new Tensor4D(formEntrada);
-      this._gradEntrada = new Tensor4D(this._entrada);
-      this._saida = new Tensor4D(formSaida);
+      _entrada = new Tensor4D(formEntrada);
+      _gradEntrada = new Tensor4D(_entrada);
+      _saida = new Tensor4D(formSaida);
 
       setNomes();
 
-      this._construida = true;//camada pode ser usada
+      _construida = true;//camada pode ser usada
    }
 
    @Override
-   public void inicializar(){}
+   public void inicializar() {}
 
    @Override
-   protected void setNomes(){
-      this._entrada.nome("Entrada");
-      this._gradEntrada.nome("Gradiente entrada");
-      this._saida.nome("Saída");
+   protected void setNomes() {
+      _entrada.nome("Entrada");
+      _gradEntrada.nome("Gradiente entrada");
+      _saida.nome("Saída");
    }
 
    @Override
-   public Tensor4D forward(Object entrada){
+   public Tensor4D forward(Object entrada) {
       verificarConstrucao();
 
-      if(entrada instanceof Tensor4D){
+      if (entrada instanceof Tensor4D) {
          Tensor4D e = (Tensor4D) entrada;
 
-         if(this._entrada.comparar3D(e) == false){
+         if (!(_entrada.comparar3D(e))) {
             throw new IllegalArgumentException(
                "\nDimensões da entrada recebida " + e.shapeStr() +
                " incompatíveis com a entrada da camada " + this._entrada.shapeStr()
             );
          }
 
-         this._entrada.copiar(e);
+         _entrada.copiar(e);
          
-      }else if(entrada instanceof double[][][]){
+      } else if (entrada instanceof double[][][]) {
          double[][][] e = (double[][][]) entrada;
-         this._entrada.copiar(e, 0);
+         _entrada.copiar(e, 0);
 
-      }else{
+      } else {
          throw new IllegalArgumentException(
             "\nTipo de entrada \"" + entrada.getClass().getTypeName() + "\" não suportada."
          );
       }
 
       int profundidade = formEntrada[1];
-      for(int i = 0; i < profundidade; i++){
-         aplicar(this._entrada, this._saida, i);
+      for (int i = 0; i < profundidade; i++) {
+         aplicar(_entrada, _saida, i);
       }
 
       return _saida;
@@ -326,23 +318,23 @@ public class AvgPooling extends Camada{
     * @param saida tensor de destino.
     * @param prof índice de profundidade da operação.
     */
-   private void aplicar(Tensor4D entrada, Tensor4D saida, int prof){
+   private void aplicar(Tensor4D entrada, Tensor4D saida, int prof) {
       int alturaEntrada = entrada.dim3();
       int larguraEntrada = entrada.dim4();
       int alturaSaida = saida.dim3();
       int larguraSaida = saida.dim4();
   
-      for(int i = 0; i < alturaSaida; i++){
-         for(int j = 0; j < larguraSaida; j++){
-            int linInicio = i * this.stride[0];
-            int colInicio = j * this.stride[1];
-            int linFim = Math.min(linInicio + this.formFiltro[0], alturaEntrada);
-            int colFim = Math.min(colInicio + this.formFiltro[1], larguraEntrada);
+      for (int i = 0; i < alturaSaida; i++) {
+         int linInicio = i * stride[0];
+         int linFim = Math.min(linInicio + formFiltro[0], alturaEntrada);
+         for (int j = 0; j < larguraSaida; j++) {
+            int colInicio = j * stride[1];
+            int colFim = Math.min(colInicio + formFiltro[1], larguraEntrada);
             double soma = 0;
             int cont = 0;
 
-            for(int lin = linInicio; lin < linFim; lin++){
-               for(int col = colInicio; col < colFim; col++){
+            for (int lin = linInicio; lin < linFim; lin++) {
+               for (int col = colInicio; col < colFim; col++) {
                   soma += entrada.get(0, prof, lin, col);
                   cont++;
                }
@@ -354,17 +346,17 @@ public class AvgPooling extends Camada{
    }
 
    @Override
-   public Tensor4D backward(Object grad){
+   public Tensor4D backward(Object grad) {
       verificarConstrucao();
 
-      if(grad instanceof Tensor4D){
+      if (grad instanceof Tensor4D) {
          Tensor4D g = (Tensor4D) grad;
          int profundidade = formEntrada[1];   
-         for(int i = 0; i < profundidade; i++){
-            gradAvgPool(this._entrada, g, this._gradEntrada, i);
+         for (int i = 0; i < profundidade; i++) {
+            gradAvgPool(_entrada, g, _gradEntrada, i);
          }
       
-      }else{
+      } else {
          throw new IllegalArgumentException(
             "Formato de gradiente \" "+ grad.getClass().getTypeName() +" \" não " +
             "suportado para camada de AvgPooling."
@@ -386,24 +378,24 @@ public class AvgPooling extends Camada{
     * @param gradEntrada gradiente de entrada da camada de Avg pooling.
     * @param prof índice de profundidade da operação.
     */
-   private void gradAvgPool(Tensor4D entrada, Tensor4D gradSeguinte, Tensor4D gradEntrada, int prof){
+   private void gradAvgPool(Tensor4D entrada, Tensor4D gradSeguinte, Tensor4D gradEntrada, int prof) {
       int alturaEntrada = entrada.dim3();
       int larguraEntrada = entrada.dim4();
       int alturaGradSeguinte = gradSeguinte.dim3();
       int larguraGradSeguinte = gradSeguinte.dim4();
 
-      for(int i = 0; i < alturaGradSeguinte; i++){
-         for(int j = 0; j < larguraGradSeguinte; j++){
-            int linInicio = i * this.stride[0];
-            int colInicio = j * this.stride[1];
-            int linFim = Math.min(linInicio + formFiltro[0], alturaEntrada);
+      for (int i = 0; i < alturaGradSeguinte; i++) {
+         int linInicio = i * stride[0];
+         int linFim = Math.min(linInicio + formFiltro[0], alturaEntrada);
+         for (int j = 0; j < larguraGradSeguinte; j++) {
+            int colInicio = j * stride[1];
             int colFim = Math.min(colInicio + formFiltro[1], larguraEntrada);
 
             double grad = gradSeguinte.get(0, prof, i, j);
             double mediaGrad = grad / (formFiltro[0] * formFiltro[1]);
 
-            for(int lin = linInicio; lin < linFim; lin++){
-               for(int col = colInicio; col < colFim; col++){
+            for (int lin = linInicio; lin < linFim; lin++) {
+               for (int col = colInicio; col < colFim; col++) {
                   gradEntrada.set(mediaGrad, 0, prof, lin, col);
                }
             }
@@ -412,50 +404,56 @@ public class AvgPooling extends Camada{
    }
 
    @Override
-   public Tensor4D saida(){
+   public Tensor4D saida() {
       verificarConstrucao();
-      return this._saida;
+      return _saida;
    }
 
    @Override
-   public int[] formatoSaida(){
+   public int[] formatoSaida() {
       verificarConstrucao();
-      return this.formSaida;
+      return formSaida;
    }
 
    @Override
-   public int[] formatoEntrada(){
+   public int[] formatoEntrada() {
       verificarConstrucao();
-      return this.formEntrada;
+      return formEntrada;
    }
 
    /**
     * Retorna o formato do filtro (altura, largura) usado pela camada.
     * @return formato do filtro da camada.
     */
-   public int[] formatoFiltro(){
+   public int[] formatoFiltro() {
       verificarConstrucao();
-      return this.formFiltro;
+      return new int[]{
+         formFiltro[0],
+         formFiltro[1]
+      };
    }
 
    /**
     * Retorna o formato dos strides (altura, largura) usado pela camada.
     * @return formato dos strides da camada.
     */
-   public int[] formatoStride(){
+   public int[] formatoStride() {
       verificarConstrucao();
-      return this.stride;
+      return new int[]{
+         stride[0],
+         stride[1]
+      };
    }
 
    @Override
-   public int numParametros(){
+   public int numParametros() {
       return 0;
    }
 
    @Override
-   public Tensor4D gradEntrada(){
+   public Tensor4D gradEntrada() {
       verificarConstrucao();
-      return this._gradEntrada;
+      return _gradEntrada;
    }
 
    @Override
@@ -467,10 +465,10 @@ public class AvgPooling extends Camada{
       
       sb.append(nome() + " (id " + this.id + ") = [\n");
 
-      sb.append(pad + "Entrada: " + utils.shapeStr(formEntrada) + "\n");
-      sb.append(pad + "Filtro: " + utils.shapeStr(formFiltro) + "\n");
-      sb.append(pad + "Strides: " + utils.shapeStr(stride) + "\n");
-      sb.append(pad + "Saída: " + utils.shapeStr(formatoSaida()) + "\n");
+      sb.append(pad).append("Entrada: " + utils.shapeStr(formEntrada) + "\n");
+      sb.append(pad).append("Filtro: " + utils.shapeStr(formFiltro) + "\n");
+      sb.append(pad).append("Strides: " + utils.shapeStr(stride) + "\n");
+      sb.append(pad).append("Saída: " + utils.shapeStr(formatoSaida()) + "\n");
 
       sb.append("]\n");
 

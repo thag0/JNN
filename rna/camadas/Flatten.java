@@ -14,7 +14,7 @@ import rna.core.Utils;
  *    A camada de flatten não possui parâmetros treináveis nem função de ativação.
  * </p>
  */
-public class Flatten extends Camada{
+public class Flatten extends Camada {
 
    /**
     * Utilitário.
@@ -78,7 +78,7 @@ public class Flatten extends Camada{
     *    É necessário construir a camada para que ela possa ser usada.
     * </p>
     */
-   public Flatten(){}
+   public Flatten() {}
 
    /**
     * Instancia uma camada Flatten, que irá achatar a entrada recebida
@@ -91,7 +91,7 @@ public class Flatten extends Camada{
     * </pre>
     * @param formEntrada formato dos dados de entrada para a camada.
     */
-   public Flatten(int[] formEntrada){
+   public Flatten(int[] formEntrada) {
       construir(formEntrada);
    }
 
@@ -112,13 +112,10 @@ public class Flatten extends Camada{
     * @param entrada formato de entrada para a camada.
     */
    @Override
-   public void construir(Object entrada){
-      if(entrada == null){
-         throw new IllegalArgumentException(
-            "\nFormato de entrada fornecida para camada Flatten é nulo."
-         );
-      }
-      if(entrada instanceof int[] == false){
+   public void construir(Object entrada) {
+      utils.validarNaoNulo(entrada, "\nFormato de entrada fornecida para camada Flatten é nulo.");
+
+      if (!(entrada instanceof int[])) {
          throw new IllegalArgumentException(
             "\nObjeto esperado para entrada da camada Flatten é do tipo int[], " +
             "objeto recebido é do tipo " + entrada.getClass().getTypeName()
@@ -126,29 +123,29 @@ public class Flatten extends Camada{
       }
 
       int[] formatoEntrada = (int[]) entrada;
-      if(utils.apenasMaiorZero(formatoEntrada) == false){
+      if (!utils.apenasMaiorZero(formatoEntrada)) {
          throw new IllegalArgumentException(
             "\nOs valores do formato de entrada devem ser maiores que zero."
          );
       }
 
       int profundidade, altura, largura;
-      if(formatoEntrada.length == 4){
+      if (formatoEntrada.length == 4) {
          profundidade = formatoEntrada[1];
          altura = formatoEntrada[2];
          largura = formatoEntrada[3];
 
-      }else if(formatoEntrada.length == 3){
+      } else if (formatoEntrada.length == 3) {
          profundidade = formatoEntrada[0];
          altura = formatoEntrada[1];
          largura = formatoEntrada[2];
       
-      }else if(formatoEntrada.length == 2){
+      } else if (formatoEntrada.length == 2) {
          profundidade = 1;
          altura = formatoEntrada[0];
          largura = formatoEntrada[1];
       
-      }else{
+      } else {
          throw new IllegalArgumentException(
             "O formato de entrada para a camada Flatten deve conter dois " + 
             "elementos (altura, largura), três elementos (profundidade, altura, largura), " +
@@ -167,32 +164,32 @@ public class Flatten extends Camada{
       };
 
       int tamanho = 1;
-      for(int i : this.formEntrada){
+      for(int i : this.formEntrada) {
          tamanho *= i;
       }
 
       this.formSaida = new int[]{1, 1, 1, tamanho};
 
-      this._entrada = new Tensor4D(formEntrada);
-      this._gradEntrada = new Tensor4D(this._entrada.shape());
-      this._saida = new Tensor4D(formSaida);
+      _entrada = new Tensor4D(formEntrada);
+      _gradEntrada = new Tensor4D(this._entrada.shape());
+      _saida = new Tensor4D(formSaida);
 
       setNomes();
 
-      this._construida = true;//camada pode ser usada.
+      _construida = true;//camada pode ser usada.
    }
 
    @Override
-   public void inicializar(){}
+   public void inicializar() {}
 
    @Override
-   public void setSeed(long seed){}
+   public void setSeed(long seed) {}
 
    @Override
-   protected void setNomes(){
-      this._entrada.nome("entrada");
-      this._saida.nome("saída");
-      this._gradEntrada.nome("gradiente entrada");     
+   protected void setNomes() {
+      _entrada.nome("entrada");
+      _saida.nome("saída");
+      _gradEntrada.nome("gradiente entrada");     
    }
 
    /**
@@ -206,35 +203,35 @@ public class Flatten extends Camada{
     * pela camada.
     */
    @Override
-   public Tensor4D forward(Object entrada){
+   public Tensor4D forward(Object entrada) {
       verificarConstrucao();
 
-      if(entrada instanceof Tensor4D){
+      if (entrada instanceof Tensor4D) {
          Tensor4D e = (Tensor4D) entrada;
-         if(this._entrada.comparar3D(e) == false){
+         if (!_entrada.comparar3D(e)) {
             throw new IllegalArgumentException(
                "\nDimensões da entrada recebida " + e.shapeStr() +
                " incompatíveis com a entrada da camada " + this._entrada.shapeStr()
             );
          }
 
-         this._entrada.copiar(e.array3D(0), 0);
+         _entrada.copiar(e.array3D(0), 0);
 
-      }else if(entrada instanceof double[][][]){
+      } else if (entrada instanceof double[][][]) {
          double[][][] e = (double[][][]) entrada;
-         this._entrada.copiar(e, 0);
+         _entrada.copiar(e, 0);
 
-      }else if(entrada instanceof double[]){
+      } else if (entrada instanceof double[]) {
          double[] e = (double[]) entrada;
-         this._entrada.copiarElementos(e);
+         _entrada.copiarElementos(e);
       
-      }else{
+      } else {
          throw new IllegalArgumentException(
             "A camada Flatten não suporta entradas do tipo \"" + entrada.getClass().getTypeName() + "\"."
          );
       }
 
-      _saida.copiarElementos(this._entrada.paraArray());
+      _saida.copiarElementos(_entrada.paraArray());
 
       return _saida;
    }
@@ -248,25 +245,25 @@ public class Flatten extends Camada{
     * {@code Tensor4D} ou {@code double[]}.
     */
    @Override
-   public Tensor4D backward(Object grad){
+   public Tensor4D backward(Object grad) {
       verificarConstrucao();
 
-      if(grad instanceof Tensor4D){
+      if (grad instanceof Tensor4D) {
          Tensor4D g = (Tensor4D) grad;
-         if(g.tamanho() != this._gradEntrada.tamanho()){
+         if (g.tamanho() != _gradEntrada.tamanho()) {
             throw new IllegalArgumentException(
                "\nDimensões do gradiente recebido " + g.shapeStr() +
                "inconpatíveis com o suportado pela camada " + this._gradEntrada.shapeStr()
             );
          }
 
-         this._gradEntrada.copiarElementos(g.paraArray());
+         _gradEntrada.copiarElementos(g.paraArray());
       
-      }else if(grad instanceof double[]){
+      } else if (grad instanceof double[]) {
          double[] g = (double[]) grad;
          _gradEntrada.copiarElementos(g);
       
-      }else{
+      } else {
          throw new IllegalArgumentException(
             "O gradiente seguinte para a camada Flatten deve ser do tipo \"double[]\" ou \"Tensor4D\", " +
             "Objeto recebido é do tipo " + grad.getClass().getTypeName()
@@ -277,27 +274,27 @@ public class Flatten extends Camada{
    }
    
    @Override
-   public Tensor4D saida(){
+   public Tensor4D saida() {
       verificarConstrucao();
-      return this._saida;
+      return _saida;
    }
 
    @Override
-   public double[] saidaParaArray(){
+   public double[] saidaParaArray() {
       verificarConstrucao();
-      return this._saida.paraArray();
+      return saida().paraArray();
    }
 
    @Override
-   public int tamanhoSaida(){
+   public int tamanhoSaida() {
       verificarConstrucao();
-      return this._saida.tamanho();
+      return saida().tamanho();
    }
 
    @Override
-   public int[] formatoEntrada(){
+   public int[] formatoEntrada() {
       verificarConstrucao();
-      return this.formEntrada;
+      return formEntrada.clone();
    }
 
    /**
@@ -311,7 +308,7 @@ public class Flatten extends Camada{
     * @return formato de saída da camada
     */
     @Override
-   public int[] formatoSaida(){
+   public int[] formatoSaida() {
       verificarConstrucao();
       
       return new int[]{
@@ -323,14 +320,14 @@ public class Flatten extends Camada{
    }
 
    @Override
-   public int numParametros(){
+   public int numParametros() {
       return 0;
    }
 
    @Override
-   public Tensor4D gradEntrada(){
+   public Tensor4D gradEntrada() {
       verificarConstrucao();
-      return this._gradEntrada;
+      return _gradEntrada;
    }
 
    @Override
@@ -340,10 +337,10 @@ public class Flatten extends Camada{
       StringBuilder sb = new StringBuilder();
       String pad = " ".repeat(4);
       
-      sb.append(nome() + " (id " + this.id + ") = [\n");
+      sb.append(nome() + " (id " + id + ") = [\n");
 
-      sb.append(pad + "Entrada: " + utils.shapeStr(formEntrada) + "\n");
-      sb.append(pad + "Saída: (1, " + tamanhoSaida() + ")\n");
+      sb.append(pad).append("Entrada: " + utils.shapeStr(formEntrada) + "\n");
+      sb.append(pad).append("Saída: (1, " + tamanhoSaida() + ")\n");
 
       sb.append("]\n");
 

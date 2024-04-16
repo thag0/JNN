@@ -10,15 +10,15 @@ package rna.ativacoes;
  *    os valores recebidos.
  * </p>
  */
-public class Linear extends Ativacao{
+public class Linear extends Ativacao {
 
    /**
     * Instancia a função de ativação Linear.
     */
-   public Linear(){
-      super.construir(
-         (x) -> { return x; },
-         (x) -> { return 1; }
+   public Linear() {
+      construir(
+         x -> x,
+         x -> 1
       );
    }
 }

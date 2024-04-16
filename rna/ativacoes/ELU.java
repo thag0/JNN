@@ -8,17 +8,17 @@ package rna.ativacoes;
  *    melhores resultados.
  * </p>
  */
-public class ELU extends Ativacao{
+public class ELU extends Ativacao {
 
    /**
     * Instancia a função de ativação ELU com 
     * seu valor de alfa configurável.
     * @param alfa novo valor alfa.
     */
-   public ELU(double alfa){
-      super.construir(
-         (x) -> { return (x > 0) ? x : alfa * (Math.exp(x) - 1); },
-         (x) -> { return (x > 0) ? 1 : alfa * Math.exp(x); }
+   public ELU(double alfa) {
+      construir(
+         x -> (x > 0) ? x : alfa * (Math.exp(x) - 1),
+         x -> (x > 0) ? 1 : alfa * Math.exp(x)
       );
    }
 
@@ -29,7 +29,7 @@ public class ELU extends Ativacao{
     *    O valor padrão para o alfa é {@code 0.01}.
     * </p>
     */
-   public ELU(){
-      this(0.01);
+   public ELU() {
+      this(0.01d);
    }
 }

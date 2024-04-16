@@ -46,24 +46,25 @@ import rna.otimizadores.SGD;
  * Tradutor para as funções de ativação, otimizadores e funções de pperda 
  * e inicializadores.
  */
-public class Dicionario{
+public class Dicionario {
 
    /**
     * Tradutor para as funções de ativação, otimizadores, funções de perda 
     * e inicializadores.
     */
-   public Dicionario(){}
+   public Dicionario() {}
 
    /**
     * Remove caracteres especiais.
     * @param nome nome de alguma instância que o dicionário lê.
     * @return valor do nome tratado.
     */
-   private String tratarNome(String nome){
+   private String tratarNome(String nome) {
       nome = nome.trim();
       nome = nome.replace("_", "");
       nome = nome.replace("-", "");
       nome = nome.replace(".", "");
+
       return nome;
    }
 
@@ -73,19 +74,19 @@ public class Dicionario{
     * @param ativacao tipo função de ativação.
     * @return instância da função de ativação lida.
     */
-   public Ativacao getAtivacao(Object ativacao){
-      if(ativacao == null){
+   public Ativacao getAtivacao(Object ativacao) {
+      if (ativacao == null) {
          throw new IllegalArgumentException(
             "Ativação não pode ser nula."
          );
       
-      }else if(ativacao instanceof Ativacao){
+      } else if (ativacao instanceof Ativacao) {
          return (Ativacao) ativacao;
       
-      }else if(ativacao instanceof String){
+      } else if (ativacao instanceof String) {
          String nome = (String) ativacao;
          nome = tratarNome(nome);
-         switch(nome.toLowerCase()){
+         switch (nome.toLowerCase()) {
             case "argmax"     : return new Argmax();
             case "elu"        : return new ELU();
             case "gelu"       : return new GELU();
@@ -105,7 +106,7 @@ public class Dicionario{
             );
          }
 
-      }else{
+      } else {
          throw new IllegalArgumentException(
             "Tipo de dado \"" + ativacao.getClass().getTypeName() + "\" não suportado."
          );
@@ -118,18 +119,19 @@ public class Dicionario{
     * @param otimizador tipode de otimizador.
     * @return instância do otimizador lido.
     */
-   public Otimizador getOtimizador(Object otimizador){
-      if(otimizador == null){
+   public Otimizador getOtimizador(Object otimizador) {
+      if (otimizador == null) {
          throw new IllegalArgumentException(
             "Otimizador não pode ser nulo."
          );
-      }else if(otimizador instanceof Otimizador){
+
+      } else if (otimizador instanceof Otimizador) {
          return (Otimizador) otimizador;
 
-      }else if(otimizador instanceof String){
+      } else if (otimizador instanceof String) {
          String nome = (String) otimizador;
          nome = tratarNome(nome);
-         switch(nome.toLowerCase()){
+         switch (nome.toLowerCase()){
             case "adadelta":  return new Adadelta();
             case "adagrad":   return new AdaGrad();
             case "adam":      return new Adam();
@@ -144,7 +146,7 @@ public class Dicionario{
             );
          }
 
-      }else{
+      } else {
          throw new IllegalArgumentException(
             "Tipo de dado \"" + otimizador.getClass().getTypeName() + "\" não suportado."
          );
@@ -157,18 +159,19 @@ public class Dicionario{
     * @param perda tipo de função de perda.
     * @return instância da função de perda lida.
     */
-   public Perda getPerda(Object perda){
-      if(perda == null){
+   public Perda getPerda(Object perda) {
+      if (perda == null) {
          throw new IllegalArgumentException(
             "Função de perda não pode ser nula."
          );
-      }else if(perda instanceof Perda){
+
+      } else if (perda instanceof Perda) {
          return (Perda) perda;
 
-      }else if(perda instanceof String){
+      } else if (perda instanceof String) {
          String nome = (String) perda;
          nome = tratarNome(nome);
-         switch(nome.toLowerCase()){
+         switch (nome.toLowerCase()) {
             case "mse"                    : return new MSE();
             case "mae"                    : return new MAE();
             case "msle"                   : return new MSLE();
@@ -180,7 +183,7 @@ public class Dicionario{
                "Função de perda \"" + perda + "\" não encontada."
             );
          }           
-      }else{
+      } else {
          throw new IllegalArgumentException(
             "Tipo de dado \"" + perda.getClass().getTypeName() + "\" não suportado."
          );
@@ -193,19 +196,19 @@ public class Dicionario{
     * @param inicializador tipo de inicializador.
     * @return instância do inicializador lido.
     */
-   public Inicializador getInicializador(Object inicializador){
-      if(inicializador == null){
+   public Inicializador getInicializador(Object inicializador) {
+      if (inicializador == null) {
          throw new IllegalArgumentException(
             "Inicializador não pode ser nulo."
          );
 
-      }else if(inicializador instanceof Inicializador){
+      } else if (inicializador instanceof Inicializador) {
          return (Inicializador) inicializador;
       
-      }else if(inicializador instanceof String){
+      } else if (inicializador instanceof String) {
          String nome = (String) inicializador;
          nome = tratarNome(nome);
-         switch(nome.toLowerCase()){
+         switch (nome.toLowerCase()) {
             case "aleatorio"           : return new Aleatorio();
             case "aleatoriopositivo"   : return new AleatorioPositivo();
             case "constante"           : return new Constante();
@@ -222,7 +225,7 @@ public class Dicionario{
             );
          }
       
-      }else{
+      } else {
          throw new IllegalArgumentException(
             "Tipo de dado \"" + inicializador.getClass().getTypeName() + "\" não suportado."
          );

@@ -266,8 +266,8 @@ public class Serializador{
          Otimizador otimizador = dicio.getOtimizador(br.readLine().trim());
          Perda perda = dicio.getPerda(br.readLine().trim());
       
-         modelo.setOtimizador(otimizador);
-         modelo.setPerda(perda);
+         modelo.set_otimizador(otimizador);
+         modelo.set_perda(perda);
          for(int i = 0; i < numCamadas; i++){
             String nome = br.readLine();
             
@@ -304,7 +304,7 @@ public class Serializador{
             }
          }
 
-         modelo.compilado = true;
+         modelo._compilado = true;
          for(int i = 0; i < modelo.numCamadas(); i++){
             modelo.camada(i).setId(i);
          }

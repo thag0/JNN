@@ -18,12 +18,12 @@ import rna.camadas.Camada;
  *		especiais, como o coeficiente de momentum por exemplo.
  * </p>
  */
-public abstract class Otimizador{
+public abstract class Otimizador {
 
 	/**
-	 * Informações sobre o otimizador.
+	 * Buffer de informações sobre o otimizador.
 	 */
-	String info;
+	StringBuilder info;
 
 	/**
 	 * Espaçamento para uma melhor formatação das informações do otimizador
@@ -33,13 +33,13 @@ public abstract class Otimizador{
 	/**
 	 * Auxiliar para o controle de inicialização do otimizador.
 	 */
-	protected boolean construido = false;
+	protected boolean _construido = false;
 
 	/**
 	 * Verifica se o otimizador pode ser utilizado.
 	 */
-	protected void verificarConstrucao(){
-		if(this.construido == false){
+	protected void verificarConstrucao() {
+		if(!_construido){
 			throw new IllegalStateException(
 				"\nO otimizador deve ser construído para poder ser usado."
 			);
@@ -67,32 +67,38 @@ public abstract class Otimizador{
  	 * Exibe as opções de configurações do otimizador.
 	 * @return buffer formatado.
 	 */
-	public String info(){
-		return this.info;
+	public String info() {
+		return info.toString();
 	}
 
 	/**
 	 * Inicializa o valor padrão para informações do otimizador, informando
 	 * seu nome como informação inicial.
 	 */
-	protected void construirInfo(){
-		this.info = "";
-		this.info += this.pad +  "Otimizador: " + this.nome() + "\n";
+	protected void construirInfo() {
+		info = new StringBuilder();
+		
+		info.append(pad)
+		.append("Otimizador: ")
+		.append(nome())
+		.append("\n");
 	}
 
 	/**
 	 * Adiciona uma nova linha de informação do otimizador.
 	 * @param info informação adicional do otimizador
 	 */
-	protected void addInfo(String info){
-		this.info += this.pad + info + "\n";
+	protected void addInfo(String info) {
+		this.info.append(pad)
+		.append(info)
+		.append("\n");
 	}
 
 	/**
 	 * Retorna o nome do otimizador.
 	 * @return nome do otimizador.
 	 */
-	public String nome(){
+	public String nome() {
 		return getClass().getSimpleName();
 	}
 }

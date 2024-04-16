@@ -9,7 +9,7 @@ import rna.core.Tensor4D;
  * Classe responsável pelas funções de inicialização dos pesos
  * da Rede Neural.
  */
-public abstract class Inicializador{
+public abstract class Inicializador {
 
    /**
     * Gerador de números pseudo aleatórios compartilhado
@@ -25,13 +25,13 @@ public abstract class Inicializador{
    /**
     * Inicialização com seed aleatória
     */
-   protected Inicializador(){}
+   protected Inicializador() {}
 
    /**
     * Inicialização com seed configurada.
     * @param seed seed. 
     */
-   protected Inicializador(long seed){
+   protected Inicializador(long seed) {
       this.random.setSeed(seed);
    }
 
@@ -39,7 +39,7 @@ public abstract class Inicializador{
     * Configura o início do gerador aleatório.
     * @param seed nova seed de início.
     */
-   public void setSeed(long seed){
+   public void setSeed(long seed) {
       this.random.setSeed(seed);
    }
 
@@ -77,7 +77,7 @@ public abstract class Inicializador{
     * Retorna o nome do inicializador.
     * @return nome do inicializador.
     */
-   public String nome(){
+   public String nome() {
       return getClass().getSimpleName();
    }
 }

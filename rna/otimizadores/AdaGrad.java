@@ -39,7 +39,7 @@ import rna.core.OpArray;
  *    {@code eps} - um valor pequeno para evitar divizões por zero.
  * </p>
  */
-public class AdaGrad extends Otimizador{
+public class AdaGrad extends Otimizador {
 
    /**
     * Valor padrão para a taxa de aprendizagem do otimizador.
@@ -80,22 +80,23 @@ public class AdaGrad extends Otimizador{
     * Inicializa uma nova instância de otimizador <strong> AdaGrad </strong> 
     * usando os valores de hiperparâmetros fornecidos.
     * @param tA valor de taxa de aprendizagem.
-    * @param epsilon usado para evitar a divisão por zero.
+    * @param eps usado para evitar a divisão por zero.
     */
-   public AdaGrad(double tA, double epsilon){
-      if(tA <= 0){
+   public AdaGrad(double tA, double eps) {
+      if (tA <= 0) {
          throw new IllegalArgumentException(
             "\nTaxa de aprendizagem (" + tA + "), inválida."
          );
       }
-      if(epsilon <= 0){
+
+      if (eps <= 0) {
          throw new IllegalArgumentException(
-            "\nEpsilon (" + epsilon + "), inválido."
+            "\nEpsilon (" + eps + "), inválido."
          );
       }
       
       this.taxaAprendizagem = tA;
-      this.epsilon = epsilon;
+      this.epsilon = eps;
    }
 
    /**
@@ -103,7 +104,7 @@ public class AdaGrad extends Otimizador{
     * usando os valores de hiperparâmetros fornecidos.
     * @param tA valor de taxa de aprendizagem.
     */
-   public AdaGrad(double tA){
+   public AdaGrad(double tA) {
       this(tA, PADRAO_EPS);
    }
 
@@ -113,20 +114,20 @@ public class AdaGrad extends Otimizador{
     *    Os hiperparâmetros do AdaGrad serão inicializados com os valores padrão.
     * </p>
     */
-   public AdaGrad(){
+   public AdaGrad() {
       this(PADRAO_TA, PADRAO_EPS);
    }
 
    @Override
-   public void construir(Camada[] camadas){
+   public void construir(Camada[] camadas) {
       int nKernel = 0;
       int nBias = 0;
       
       for(Camada camada : camadas){
-         if(camada.treinavel() == false) continue;
+         if (!camada.treinavel()) continue;
 
          nKernel += camada.kernelParaArray().length;
-         if(camada.temBias()){
+         if (camada.temBias()) {
             nBias += camada.biasParaArray().length;
          }         
       }
@@ -137,23 +138,23 @@ public class AdaGrad extends Otimizador{
 
       opArr.preencher(ac, valorInicial);
       opArr.preencher(acb, valorInicial);
-      this.construido = true;//otimizador pode ser usado
+      this._construido = true;//otimizador pode ser usado
    }
 
    @Override
-   public void atualizar(Camada[] camadas){
+   public void atualizar(Camada[] camadas) {
       verificarConstrucao();
       
       int idKernel = 0, idBias = 0;
-      for(Camada camada : camadas){
-         if(camada.treinavel() == false) continue;
+      for (Camada camada : camadas) {
+         if (!camada.treinavel()) continue;
 
          double[] kernel = camada.kernelParaArray();
          double[] gradK = camada.gradKernelParaArray();
          idKernel = calcular(kernel, gradK, ac, idKernel);
          camada.setKernel(kernel);
          
-         if(camada.temBias()){
+         if (camada.temBias()) {
             double[] bias = camada.biasParaArray();
             double[] gradB = camada.gradBias();
             idBias = calcular(bias, gradB, acb, idBias);
@@ -170,7 +171,7 @@ public class AdaGrad extends Otimizador{
     * @param id índice inicial das variáveis dentro do array de momentums.
     * @return índice final após as atualizações.
     */
-   private int calcular(double[] vars, double[] grads, double[] acumulador, int id){
+   private int calcular(double[] vars, double[] grads, double[] acumulador, int id) {
       for(int i = 0; i < vars.length; i++){
          acumulador[id] += grads[i] * grads[i];
          vars[i] -= (grads[i] * taxaAprendizagem) / (Math.sqrt(ac[id] + epsilon));
@@ -181,7 +182,7 @@ public class AdaGrad extends Otimizador{
    }
 
    @Override
-   public String info(){
+   public String info() {
       super.verificarConstrucao();
       super.construirInfo();
       

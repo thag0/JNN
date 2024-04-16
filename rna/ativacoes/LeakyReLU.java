@@ -8,7 +8,7 @@ package rna.ativacoes;
  *    melhores resultados.
  * </p>
  */
-public class LeakyReLU extends Ativacao{
+public class LeakyReLU extends Ativacao {
 
    /**
     * Instancia a função de ativação LeakyReLU com seu valor de alfa configurável.
@@ -19,10 +19,10 @@ public class LeakyReLU extends Ativacao{
     * </p>
     * @param alfa novo valor alfa.
     */
-   public LeakyReLU(double alfa){
-      super.construir(
-         (x)-> { return (x > 0) ? x : x*alfa; }, 
-         (x)-> { return (x > 0) ? 1 : alfa; }   
+   public LeakyReLU(double alfa) {
+      construir(
+         x -> (x > 0) ? x : x*alfa, 
+         x -> (x > 0) ? 1 : alfa   
       );
    }
 
@@ -37,7 +37,7 @@ public class LeakyReLU extends Ativacao{
     *    O valor padrão para o alfa é {@code 0.01}.
     * </p>
     */
-   public LeakyReLU(){
+   public LeakyReLU() {
       this(0.01);
    }
 }

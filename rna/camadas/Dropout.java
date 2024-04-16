@@ -25,7 +25,7 @@ import rna.core.Utils;
  *    A camada de dropout não possui parâmetros treináveis nem função de ativação.
  * </p>
  */
-public class Dropout extends Camada implements Cloneable{
+public class Dropout extends Camada implements Cloneable {
 
    /**
     * Taxa de abandono usada durante o treinamento.
@@ -99,8 +99,8 @@ public class Dropout extends Camada implements Cloneable{
     * @param taxa taxa de dropout, um valor entre 0 e 1 representando a
     * taxa de abandono da camada.
     */
-   public Dropout(double taxa){
-      if(taxa <= 0 || taxa >= 1){
+   public Dropout(double taxa) {
+      if (taxa <= 0 || taxa >= 1) {
          throw new IllegalArgumentException(
             "\nO valor da taxa de dropout deve estar entre 0 e 1, " + 
             "recebido: " + taxa
@@ -117,14 +117,14 @@ public class Dropout extends Camada implements Cloneable{
     * taxa de abandono da camada.
     * @param seed seed usada para o gerador de números aleatórios da camada.
     */
-   public Dropout(double taxa, long seed){
+   public Dropout(double taxa, long seed) {
       this(taxa);
-      this.random.setSeed(seed);
+      random.setSeed(seed);
    }
 
    @Override
-   public void construir(Object entrada){
-      if(entrada instanceof int[] == false){
+   public void construir(Object entrada) {
+      if (!(entrada instanceof int[])) {
          throw new IllegalArgumentException(
             "\nObjeto esperado para entrada da camada Dropout é do tipo int[], " +
             "objeto recebido é do tipo " + entrada.getClass().getTypeName()
@@ -132,13 +132,13 @@ public class Dropout extends Camada implements Cloneable{
       }
 
       int[] formato = (int[]) entrada;
-      if(utils.apenasMaiorZero(formato) == false){
+      if (!utils.apenasMaiorZero(formato)) {
          throw new IllegalArgumentException(
             "\nOs argumentos do formato de entrada devem ser maiores que zero."
          );
       }
 
-      if(formato.length == 2){
+      if (formato.length == 2) {
          this.formEntrada = new int[]{
             1,
             1,
@@ -146,7 +146,7 @@ public class Dropout extends Camada implements Cloneable{
             formato[1],//largura
          };
 
-      }else if(formato.length == 3){
+      } else if (formato.length == 3) {
          this.formEntrada = new int[]{
             1,
             formato[0],//profundidade
@@ -154,7 +154,7 @@ public class Dropout extends Camada implements Cloneable{
             formato[2],//largura
          };
 
-      }else if(formato.length == 4){
+      } else if (formato.length == 4) {
          this.formEntrada = new int[]{
             1,
             formato[1],//profundidade
@@ -162,7 +162,7 @@ public class Dropout extends Camada implements Cloneable{
             formato[3],//largura
          };
 
-      }else{
+      } else {
          throw new IllegalArgumentException(
             "\nA camada de dropout aceita formatos bidimensionais (altura, largura) " + 
             " tridimensionais (profundidade, altura, largura) " +
@@ -171,30 +171,30 @@ public class Dropout extends Camada implements Cloneable{
          );
       }
       
-      this._entrada =     new Tensor4D(this.formEntrada);
-      this._mascara =     new Tensor4D(this._entrada.shape());
-      this._saida =       new Tensor4D(this._entrada.shape());
-      this._gradEntrada = new Tensor4D(this._entrada.shape());
+      _entrada =     new Tensor4D(this.formEntrada);
+      _mascara =     new Tensor4D(_entrada.shape());
+      _saida =       new Tensor4D(_entrada.shape());
+      _gradEntrada = new Tensor4D(_entrada.shape());
 
       setNomes();
       
-      this._construida = true;//camada pode ser usada
+      _construida = true;//camada pode ser usada
    }
 
    @Override
-   public void inicializar(){}
+   public void inicializar() {}
 
    /**
     * Configura uma seed fixa para geradores de números aleatórios da
     * camada.
     * @param seed nova seed.
     */
-   public void setSeed(long seed){
-      this.random.setSeed(seed);
+   public void setSeed(long seed) {
+      random.setSeed(seed);
    }
 
    @Override
-   protected void setNomes(){
+   protected void setNomes() {
       _entrada.nome("entrada");
       _mascara.nome("máscara");
       _saida.nome("saida");
@@ -226,25 +226,25 @@ public class Dropout extends Camada implements Cloneable{
     * ou {@code double[][][]}.
     */
    @Override
-   public Tensor4D forward(Object entrada){
+   public Tensor4D forward(Object entrada) {
       verificarConstrucao();
 
-      if(entrada instanceof Tensor4D){
+      if (entrada instanceof Tensor4D) {
          Tensor4D e = (Tensor4D) entrada;
-         if(this._entrada.comparar3D(e) == false){
+         if (_entrada.comparar3D(e) == false) {
             throw new IllegalArgumentException(
                "\nDimensões de entrada " + e.shapeStr() + 
                "incompatível com as dimensões da entrada da camada " + this._entrada.shapeStr()
             );
          }
 
-         this._entrada.copiar(e, 0);
+         _entrada.copiar(e, 0);
    
-      }else if(entrada instanceof double[][][]){
+      } else if (entrada instanceof double[][][]) {
          double[][][] e = (double[][][]) entrada;
-         this._entrada.copiar(e, 0);
+         _entrada.copiar(e, 0);
 
-      }else{
+      } else {
          throw new IllegalArgumentException(
             "\nEntrada aceita para a camada de Dropout deve ser do tipo " +
             this._entrada.getClass().getSimpleName() + " ou double[][][]" + 
@@ -252,13 +252,13 @@ public class Dropout extends Camada implements Cloneable{
          );
       }
 
-      if(treinando){
+      if (treinando) {
          gerarMascaras();
-         _saida.copiar(this._entrada);
+         _saida.copiar(_entrada);
          _saida.mult(_mascara);
 
-      }else{
-         _saida.copiar(this._entrada);
+      } else {
+         _saida.copiar(_entrada);
       }
 
       return _saida;
@@ -280,10 +280,10 @@ public class Dropout extends Camada implements Cloneable{
     * Nos valores em que a máscara for igual a 1, o valor de entrada será
     * passado para a saída, nos valores iguais a 0, a entrada será desconsiderada. 
     */
-   private void gerarMascaras(){
-      _mascara.map3D(0, (x) -> {
-         return (random.nextDouble() >= taxa) ? (1 / (1 - taxa)) : 0;
-      });
+   private void gerarMascaras() {
+      _mascara.map3D(0, 
+         x ->  (random.nextDouble() >= taxa) ? (1 / (1 - taxa)) : 0.0d
+      );
    }
 
    /**
@@ -305,21 +305,21 @@ public class Dropout extends Camada implements Cloneable{
     * @param grad gradientes da camada seguiente.
     */
    @Override
-   public Tensor4D backward(Object grad){
+   public Tensor4D backward(Object grad) {
       verificarConstrucao();
 
-      if(grad instanceof Tensor4D){
+      if (grad instanceof Tensor4D) {
          Tensor4D g = (Tensor4D) grad;
-         if(this._gradEntrada.comparar3D(g) == false){
+         if (!_gradEntrada.comparar3D(g)) {
             throw new IllegalArgumentException(
                "\nDimensões incompatíveis entre o gradiente recebido " + g.shapeStr() +
                "e o suportado pela camada " + _gradEntrada.shapeStr()
             );
          }
 
-         this._gradEntrada.copiar(g);
+         _gradEntrada.copiar(g);
 
-      }else{
+      } else {
          throw new IllegalArgumentException(
             "\nGradiente aceito para a camada de Dropout deve ser do tipo " + 
             this._gradEntrada.getClass().getTypeName() +
@@ -327,7 +327,7 @@ public class Dropout extends Camada implements Cloneable{
          );
       }
 
-      if(treinando){
+      if (treinando) {
          _gradEntrada.mult(_mascara);
       }
 
@@ -335,25 +335,24 @@ public class Dropout extends Camada implements Cloneable{
    }
 
    @Override
-   public Tensor4D saida(){
+   public Tensor4D saida() {
       verificarConstrucao();
-      return this._saida;
+      return _saida;
    }
 
    @Override
-   public int[] formatoEntrada(){
+   public int[] formatoEntrada() {
       verificarConstrucao();
-      return this.formEntrada;
+      return formEntrada.clone();
    }
 
    @Override
-   public int[] formatoSaida(){
-      verificarConstrucao();
-      return this.formEntrada;
+   public int[] formatoSaida() {
+      return formatoEntrada();
    }
 
    @Override
-   public int numParametros(){
+   public int numParametros() {
       return 0;
    }
 
@@ -361,16 +360,16 @@ public class Dropout extends Camada implements Cloneable{
     * Retorna a taxa de dropout usada pela camada.
     * @return taxa de dropout da camada.
     */
-   public double taxa(){
+   public double taxa() {
       return this.taxa;
 
    }
 
    @Override
-   public Dropout clone(){
+   public Dropout clone() {
       verificarConstrucao();
 
-      try{
+      try {
          Dropout clone = (Dropout) super.clone();
          clone.formEntrada = this.formEntrada.clone();
          clone.taxa = this.taxa;
@@ -382,7 +381,7 @@ public class Dropout extends Camada implements Cloneable{
          clone._gradEntrada = this._gradEntrada.clone();
 
          return clone;
-      }catch(Exception e){
+      } catch (Exception e) {
          throw new RuntimeException(e);
       }
    }
@@ -396,9 +395,9 @@ public class Dropout extends Camada implements Cloneable{
       
       sb.append(nome() + " (id " + this.id + ") = [\n");
 
-      sb.append(pad + "Taxa: " + taxa() + "\n");
-      sb.append(pad + "Entrada: " + utils.shapeStr(formEntrada) + "\n");
-      sb.append(pad + "Saída: " + utils.shapeStr(formEntrada) + "\n");
+      sb.append(pad).append("Taxa: " + taxa() + "\n");
+      sb.append(pad).append("Entrada: " + utils.shapeStr(formEntrada) + "\n");
+      sb.append(pad).append("Saída: " + utils.shapeStr(formEntrada) + "\n");
 
       sb.append("]\n");
 
@@ -419,8 +418,8 @@ public class Dropout extends Camada implements Cloneable{
    }
 
    @Override
-   public Tensor4D gradEntrada(){
+   public Tensor4D gradEntrada() {
       verificarConstrucao();
-      return this._gradEntrada;
+      return _gradEntrada;
    }
 }

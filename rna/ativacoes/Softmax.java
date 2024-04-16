@@ -9,7 +9,7 @@ import rna.core.Tensor4D;
  * Implementação da função de ativação Softmax para uso
  * dentro dos modelos.
  */
-public class Softmax extends Ativacao{
+public class Softmax extends Ativacao {
 
    /**
     * Operador para tensores.
@@ -44,25 +44,25 @@ public class Softmax extends Ativacao{
     *]]]
     * </pre>
     */
-   public Softmax(){}
+   public Softmax() {}
 
    @Override
-   public void forward(Tensor4D entrada, Tensor4D saida){
+   public void forward(Tensor4D entrada, Tensor4D saida) {
       int lote = entrada.dim1();
       int canais = entrada.dim2();
       int linhas = entrada.dim3();
       int colunas = entrada.dim4();
    
-      for(int l = 0; l < lote; l++){
-         for(int c = 0; c < canais; c++){
-            for(int lin = 0; lin < linhas; lin++){
+      for (int l = 0; l < lote; l++) {
+         for (int c = 0; c < canais; c++) {
+            for (int lin = 0; lin < linhas; lin++) {
                double somaExp = 0;
 
-               for(int col = 0; col < colunas; col++){
+               for (int col = 0; col < colunas; col++) {
                   somaExp += Math.exp(entrada.get(l, c, lin, col));
                }
 
-               for(int col = 0; col < colunas; col++){
+               for (int col = 0; col < colunas; col++) {
                   double s = Math.exp(entrada.get(l, c, lin, col)) / somaExp;
                   saida.set(s, l, c, lin, col);
                }
@@ -73,7 +73,7 @@ public class Softmax extends Ativacao{
    }
 
    @Override
-   public void backward(Densa camada){
+   public void backward(Densa camada) {
       int n = camada._somatorio.dim4();
       Tensor4D tmp = camada.saida().bloco(0, 0, 0, n);
       Tensor4D ident = new Tensor4D(1, 1, n, camada._somatorio.dim4());
@@ -93,7 +93,7 @@ public class Softmax extends Ativacao{
    }
 
    @Override
-   public void backward(Convolucional camada){
+   public void backward(Convolucional camada) {
       throw new UnsupportedOperationException(
          "\nSem suporte para derivada " + nome() + " em camadas convolucionais."
       );
