@@ -52,7 +52,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
    /**
     * Dimensões do tensor (d1, d2, d3, d4).
     */
-   private int[] dimensoes;
+   private final int[] dimensoes;
 
    /**
     * Conjunto de elementos do tensor.
@@ -878,7 +878,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
          res = fun.applyAsDouble(res, val);
       }
 
-      this.dimensoes = new int[]{1, 1, 1, 1};
+      copiarDimensoes(1, 1, 1, 1);
       this.dados = new double[]{ res };
       
       return this;
