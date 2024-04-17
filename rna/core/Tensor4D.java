@@ -547,7 +547,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
       }
 
       int inicio = indice(dim1, 0, 0, 0);
-      System.arraycopy(tensor.dados, inicio, this.dados, inicio, (dim2() * dim3() * dim4()));
+      System.arraycopy(tensor.dados, 0, this.dados, inicio, (dim2() * dim3() * dim4()));
    
       return this;
    }
@@ -568,7 +568,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
       }
 
       int inicio = indice(dim1, dim2, 0, 0);
-      System.arraycopy(tensor.dados, inicio, this.dados, inicio, (dim3() * dim4()));
+      System.arraycopy(tensor.dados, 0, this.dados, inicio, (dim3() * dim4()));
 
       return this;
    }
@@ -590,7 +590,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
       }
 
       int inicio = indice(dim1, dim2, dim3, 0);
-      System.arraycopy(tensor.dados, inicio, this.dados, inicio, dim4());
+      System.arraycopy(tensor.dados, 0, this.dados, inicio, dim4());
    
       return this;
    }

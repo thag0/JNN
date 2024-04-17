@@ -2,7 +2,6 @@ package testes;
 
 import lib.ged.Ged;
 import lib.geim.Geim;
-import rna.ativacoes.Argmax;
 import rna.core.OpArray;
 import rna.core.OpMatriz;
 import rna.core.OpTensor4D;
@@ -20,11 +19,26 @@ public class Playground{
    public static void main(String[] args){
       ged.limparConsole();
 
-      double[] arr = {1, 2, 3, 4, 5};
-      Tensor4D t = new Tensor4D(arr);
-      
-      new Argmax().forward(t, t);
-      t.print(2);
+      double[][][] arr = {
+         {
+            {1, 2},
+            {3, 4},
+         },
+         {
+            {5, 6},
+            {7, 8},
+         }
+      };
+      Tensor4D t1 = new Tensor4D(arr);
+
+      int n = 3;
+      Tensor4D t2 = new Tensor4D(n, t1.dim2(), t1.dim3(), t1.dim4());
+   
+      for (int i = 0; i < n; i++) {
+         t2.copiar(t1, i);
+      }
+
+      t2.print(0);
    }
 
    /**
