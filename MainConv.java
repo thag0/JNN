@@ -28,7 +28,7 @@ public class MainConv {
    static final int NUM_DIGITOS_TESTE  = NUM_DIGITOS_TREINO;
    static final int NUM_AMOSTRAS_TREINO = 400;
    static final int NUM_AMOSTRAS_TESTE  = 100;
-   static final int TREINO_EPOCAS = 15;
+   static final int TREINO_EPOCAS = 20;
    static final int TREINO_LOTE = 1;
    static final boolean TREINO_LOGS = true;
 
@@ -80,7 +80,7 @@ public class MainConv {
       Sequencial modelo = new Sequencial(
          new Entrada(28, 28),
          new Convolucional(new int[]{3, 3}, 18, "leaky-relu"),
-         new Dropout(0.25),
+         new Dropout(0.20),
          new MaxPooling(new int[]{2, 2}),
          new Convolucional(new int[]{3, 3}, 22, "leaky-relu"),
          new MaxPooling(new int[]{2, 2}),
