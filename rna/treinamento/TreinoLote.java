@@ -18,7 +18,7 @@ class TreinoLote {
    OpMatriz opmat = new OpMatriz();
    OpArray oparr = new OpArray();
    Utils utils = new Utils();
-   AuxiliarTreino aux = new AuxiliarTreino();
+   AuxTreino aux = new AuxTreino();
    Random random = new Random();
 
    public boolean calcularHistorico = false;
@@ -107,7 +107,10 @@ class TreinoLote {
          if (calcularHistorico) historico.add((perdaEpoca/numAmostras));
       }
 
-      if (logs) aux.exibirCursor();;      
+      if (logs) {
+         aux.exibirCursor();
+         System.out.println();
+      }      
    }
 
    /**

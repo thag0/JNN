@@ -4,10 +4,9 @@ import java.text.DecimalFormat;
 
 import rna.modelos.Modelo;
 import rna.modelos.Sequencial;
-import rna.otimizadores.Otimizador;
-import rna.otimizadores.SGD;
 import rna.camadas.Camada;
 import rna.camadas.Densa;
+import rna.camadas.Dropout;
 import rna.camadas.Entrada;
 import lib.ged.Dados;
 import lib.ged.Ged;
@@ -46,18 +45,18 @@ public class Classificador{
       //criando e configurando a rede neural
       Sequencial modelo = new Sequencial(new Camada[]{
          new Entrada(qEntradas),
-         new Densa(10, "sigmoid"),
-         new Densa(10, "sigmoid"),
+         new Densa(12, "sigmoid"),
+         new Dropout(0.3),
+         new Densa(12, "sigmoid"),
          new Densa(qSaidas, "softmax")
       });
 
-      Otimizador otm = new SGD(0.01, 0.9);
-      modelo.compilar(otm, "entropia-cruzada");
+      modelo.compilar("sgd", "entropia-cruzada");
       modelo.setHistorico(true);
       // modelo.info();
       
       //treinando e avaliando os resultados
-      modelo.treinar(treinoX, treinoY, 150, 16, false);
+      modelo.treinar(treinoX, treinoY, 160, 16, true);
       double acc = modelo.avaliador().acuracia(testeX, testeY);
       System.out.println("Acurácia = " + formatarDecimal(acc*100, 4) + "%");
       System.out.println("Perda = " + modelo.avaliar(testeX, testeY));

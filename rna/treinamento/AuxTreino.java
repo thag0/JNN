@@ -12,7 +12,7 @@ import rna.core.Tensor4D;
  * Classe auxiliar no treinamento, faz uso de ferramentas que podem
  * ser compartilhadas entre os diferentes tipos de modelos de treinamento.
  */
-public class AuxiliarTreino {
+public class AuxTreino {
 
    /**
     * Gerador de números aleatórios.

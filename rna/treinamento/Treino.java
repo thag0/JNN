@@ -9,7 +9,7 @@ import rna.modelos.Modelo;
 import rna.otimizadores.Otimizador;
 
 class Treino {
-   AuxiliarTreino aux = new AuxiliarTreino();
+   AuxTreino aux = new AuxTreino();
    Utils utils = new Utils();
    Random random = new Random();
 
@@ -90,7 +90,10 @@ class Treino {
          if (calcularHistorico) historico.add(perdaEpoca/numAmostras);
       }
 
-      if (logs) aux.exibirCursor();
+      if (logs) {
+         aux.exibirCursor();
+         System.out.println();
+      } 
    }
 
    /**

@@ -16,7 +16,7 @@ public class Treinador {
    /**
     * Auxiliar para o treinador.
     */
-   AuxiliarTreino aux;
+   AuxTreino aux;
 
    /**
     * Operador do treino sequencial.
@@ -32,7 +32,7 @@ public class Treinador {
     * Responsável por organizar os tipos dos modelos.
     */
    public Treinador() {
-      aux =        new AuxiliarTreino();
+      aux =        new AuxTreino();
       treino =     new Treino(calcularHistorico);
       treinoLote = new TreinoLote(calcularHistorico);
    }
