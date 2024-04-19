@@ -73,6 +73,7 @@ class TreinoLote {
       Object[] rotulos = utils.transformarParaArray(saidas);
       int numAmostras = amostras.length;
 
+      if (logs) aux.esconderCursor();
       double perdaEpoca;
       for (int e = 1; e <= epochs; e++) {
          aux.embaralharDados(amostras, rotulos);
@@ -98,16 +99,15 @@ class TreinoLote {
             otimizador.atualizar(camadas);          
          }
 
-         if (logs && (e % 5 == 0)) {
-            System.out.println("Época " +  e + "/" + epochs + " -> perda: " + (double)(perdaEpoca/numAmostras));
+         if (logs) {
+            aux.exibirLogTreino("Época " +  e + "/" + epochs + " -> perda: " + (double)(perdaEpoca/numAmostras));
          }
 
          //feedback de avanço da rede
-         if (calcularHistorico) {
-            historico.add((perdaEpoca/numAmostras));
-         }
+         if (calcularHistorico) historico.add((perdaEpoca/numAmostras));
       }
-      
+
+      if (logs) aux.exibirCursor();;      
    }
 
    /**

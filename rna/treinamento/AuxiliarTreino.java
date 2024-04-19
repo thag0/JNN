@@ -104,4 +104,26 @@ public class AuxiliarTreino {
       return subMatriz;
    }
 
+   /** 
+    * Esconde o cursor do terminal.
+    */
+   public void esconderCursor() {
+      System.out.print("\033[?25l");
+   }
+
+   /**
+    * Exibe o cursor no terminal.
+    */
+   public void exibirCursor() {
+      System.out.print("\033[?25h");
+   }
+
+   /**
+    * Atualiza as informações do log de treino.
+    * @param log informações desejadas.
+    */
+   public void exibirLogTreino(String log) {
+      System.out.println(log);
+      System.out.print("\033[1A"); // mover pra a linha anterior
+   }
 }
