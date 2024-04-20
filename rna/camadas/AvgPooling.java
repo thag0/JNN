@@ -4,11 +4,11 @@ import rna.core.Tensor4D;
 import rna.core.Utils;
 
 /**
- * <h2>
+ * <h1>
  *    Camada de agrupamento médio
- * </h2>
+ * </h1>
  * <p>
- *    A camada de agrupamento máximo é um componente utilizado para reduzir a 
+ *    A camada de agrupamento médio é um componente utilizado para reduzir a 
  *    dimensionalidade espacial dos dados, preservando as características mais 
  *    importantes para a saída.
  * </p>
@@ -121,7 +121,7 @@ public class AvgPooling extends Camada {
     * requisições.
     */
    public AvgPooling(int[] formFiltro) {
-      utils.validarNaoNulo(formFiltro, "\nO formato do filtro não pode ser nulo.");
+      utils.validarNaoNulo(formFiltro, "O formato do filtro não pode ser nulo.");
 
       if (formFiltro.length != 2) {
          throw new IllegalArgumentException(
@@ -156,7 +156,7 @@ public class AvgPooling extends Camada {
     * @throws IllegalArgumentException se os strides não atenderem as requisições.
     */
    public AvgPooling(int[] formFiltro, int[] stride) {
-      utils.validarNaoNulo(formFiltro, "\nO formato do filtro não pode ser nulo.");
+      utils.validarNaoNulo(formFiltro, "O formato do filtro não pode ser nulo.");
 
       if (formFiltro.length != 2) {
          throw new IllegalArgumentException(
@@ -170,7 +170,7 @@ public class AvgPooling extends Camada {
          );
       }
 
-      utils.validarNaoNulo(formFiltro, "\nO formato do filtro não pode ser nulo.");
+      utils.validarNaoNulo(stride, "O formato dos strides não pode ser nulo.");
 
       if (stride.length != 2) {
          throw new IllegalArgumentException(
@@ -228,7 +228,7 @@ public class AvgPooling extends Camada {
     */
    @Override
    public void construir(Object entrada) {
-      utils.validarNaoNulo(entrada, "\nFormato de entrada fornecida para camada " + nome() + " é nulo.");
+      utils.validarNaoNulo(entrada, "Formato de entrada fornecido para camada " + nome() + " é nulo.");
 
       if (!(entrada instanceof int[])) {
          throw new IllegalArgumentException(

@@ -353,7 +353,7 @@ public class Densa extends Camada implements Cloneable {
 
       setNomes();
       
-      treinavel = true;//camada pode ser treinada.
+      _treinavel = true;//camada pode ser treinada.
       _construida = true;//camada pode ser usada.
    }
 
@@ -651,30 +651,26 @@ public class Densa extends Camada implements Cloneable {
    public Densa clone() {
       verificarConstrucao();
 
-      try {
-         Densa clone = (Densa) super.clone();
+      Densa clone = (Densa) super.clone();
 
-         clone.optensor = new OpTensor4D();
-         clone.ativacao = new Dicionario().getAtivacao(this.ativacao.nome());
-         clone.treinavel = this.treinavel;
+      clone.optensor = new OpTensor4D();
+      clone.ativacao = new Dicionario().getAtivacao(this.ativacao.nome());
+      clone._treinavel = this._treinavel;
 
-         clone.usarBias = this.usarBias;
-         if (this.usarBias) {
-            clone._bias = this._bias.clone();
-            clone._gradBias = this._gradBias.clone();
-         }
-
-         clone._entrada = this._entrada.clone();
-         clone._pesos = this._pesos.clone();
-         clone._somatorio = this._somatorio.clone();
-         clone._saida = this._saida.clone();
-         clone._gradSaida = this._gradSaida.clone();
-         clone._gradPesos = this._gradPesos.clone();
-
-         return clone;
-      } catch(Exception e) {
-         throw new RuntimeException(e);
+      clone.usarBias = this.usarBias;
+      if (this.usarBias) {
+         clone._bias = this._bias.clone();
+         clone._gradBias = this._gradBias.clone();
       }
+
+      clone._entrada = this._entrada.clone();
+      clone._pesos = this._pesos.clone();
+      clone._somatorio = this._somatorio.clone();
+      clone._saida = this._saida.clone();
+      clone._gradSaida = this._gradSaida.clone();
+      clone._gradPesos = this._gradPesos.clone();
+
+      return clone;
    }
 
    /**

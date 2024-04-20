@@ -483,7 +483,7 @@ public class Convolucional extends Camada implements Cloneable {
     */
    @Override
    public void construir(Object entrada) {
-      utils.validarNaoNulo(entrada, "\nFormato de entrada fornecida para camada Convolucional é nulo.");
+      utils.validarNaoNulo(entrada, "Formato de entrada fornecida para camada Convolucional é nulo.");
 
       if (!(entrada instanceof int[])) {
          throw new IllegalArgumentException(
@@ -542,7 +542,7 @@ public class Convolucional extends Camada implements Cloneable {
 
       setNomes();
       
-      treinavel = true;
+      _treinavel = true;
       _construida = true;//camada pode ser usada.
    }
 
@@ -843,30 +843,25 @@ public class Convolucional extends Camada implements Cloneable {
    public Convolucional clone() {
       verificarConstrucao();
 
-      try {
-         Convolucional clone = (Convolucional) super.clone();
+      Convolucional clone = (Convolucional) super.clone();
 
-         clone.ativacao = this.ativacao;
-         clone.usarBias = this.usarBias;
+      clone.ativacao = this.ativacao;
+      clone.usarBias = this.usarBias;
 
-         clone._entrada     = this._entrada.clone();
-         clone._filtros     = this._filtros.clone();
-         clone._gradFiltros = this._gradFiltros.clone();
+      clone._entrada     = this._entrada.clone();
+      clone._filtros     = this._filtros.clone();
+      clone._gradFiltros = this._gradFiltros.clone();
 
-         if (this.usarBias) {
-            clone._bias     = this._bias.clone();
-            clone._gradBias = this._gradBias.clone();
-         }
-
-         clone._somatorio   = this._somatorio.clone();
-         clone._saida       = this._saida.clone();
-         clone._gradSaida   = this._gradSaida.clone();
-
-         return clone;
-
-      } catch (Exception e) {
-         throw new RuntimeException(e);
+      if (this.usarBias) {
+         clone._bias     = this._bias.clone();
+         clone._gradBias = this._gradBias.clone();
       }
+
+      clone._somatorio   = this._somatorio.clone();
+      clone._saida       = this._saida.clone();
+      clone._gradSaida   = this._gradSaida.clone();
+
+      return clone;
    }
 
    /**

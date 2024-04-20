@@ -6,15 +6,16 @@ import rna.core.Tensor4D;
 import rna.core.Utils;
 
 /**
- * <h2>
+ * <h1>
  *    Camada de Abandono
- * </h2>
+ * </h1>
  * <p>
  *    O dropout (abandono) é uma técnica regularizadora usada para evitar
- *    overfitting para modelos muito grandes, melhorando na generalização.
+ *    overfitting para modelos muito grandes, melhorando sua capacidade de 
+ *    generalização.
  * </p>
  * <p>
- *    Durante o treinamento, o dropout "desativa" temporariamente aleatoriamente 
+ *    Durante o treinamento, o dropout "desativa" temporariamente e aleatoriamente 
  *    algumas unidades/neurônios da camada, impedindo que eles contribuam para o 
  *    cálculo da saída. Isso força o modelo a aprender a partir de diferentes 
  *    subconjuntos dos dados em cada iteração, o que ajuda a evitar a dependência 
@@ -102,7 +103,7 @@ public class Dropout extends Camada implements Cloneable {
    public Dropout(double taxa) {
       if (taxa <= 0 || taxa >= 1) {
          throw new IllegalArgumentException(
-            "\nO valor da taxa de dropout deve estar entre 0 e 1, " + 
+            "\nTaxa de dropout deve estar entre 0 e 1, " + 
             "recebido: " + taxa
          );
       }
@@ -138,6 +139,7 @@ public class Dropout extends Camada implements Cloneable {
          );
       }
 
+      //talvez melhorar isso
       if (formato.length == 2) {
          this.formEntrada = new int[]{
             1,
@@ -231,7 +233,7 @@ public class Dropout extends Camada implements Cloneable {
 
       if (entrada instanceof Tensor4D) {
          Tensor4D e = (Tensor4D) entrada;
-         if (_entrada.comparar3D(e) == false) {
+         if (!_entrada.comparar3D(e)) {
             throw new IllegalArgumentException(
                "\nDimensões de entrada " + e.shapeStr() + 
                "incompatível com as dimensões da entrada da camada " + this._entrada.shapeStr()
@@ -252,13 +254,11 @@ public class Dropout extends Camada implements Cloneable {
          );
       }
 
+      _saida.copiar(_entrada);
+
       if (treinando) {
          gerarMascaras();
-         _saida.copiar(_entrada);
          _saida.mult(_mascara);
-
-      } else {
-         _saida.copiar(_entrada);
       }
 
       return _saida;
@@ -327,9 +327,7 @@ public class Dropout extends Camada implements Cloneable {
          );
       }
 
-      if (treinando) {
-         _gradEntrada.mult(_mascara);
-      }
+      if (treinando) _gradEntrada.mult(_mascara);
 
       return _gradEntrada;
    }
@@ -362,28 +360,23 @@ public class Dropout extends Camada implements Cloneable {
     */
    public double taxa() {
       return this.taxa;
-
    }
 
    @Override
    public Dropout clone() {
       verificarConstrucao();
 
-      try {
-         Dropout clone = (Dropout) super.clone();
-         clone.formEntrada = this.formEntrada.clone();
-         clone.taxa = this.taxa;
-         clone.random = new Random();
+      Dropout clone = (Dropout) super.clone();
+      clone.formEntrada = this.formEntrada.clone();
+      clone.taxa = this.taxa;
+      clone.random = new Random();
 
-         clone._entrada = this._entrada.clone();
-         clone._mascara = this._mascara.clone();
-         clone._saida = this._saida.clone();
-         clone._gradEntrada = this._gradEntrada.clone();
+      clone._entrada = this._entrada.clone();
+      clone._mascara = this._mascara.clone();
+      clone._saida = this._saida.clone();
+      clone._gradEntrada = this._gradEntrada.clone();
 
-         return clone;
-      } catch (Exception e) {
-         throw new RuntimeException(e);
-      }
+      return clone;
    }
 
    @Override

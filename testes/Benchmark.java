@@ -37,8 +37,8 @@ public class Benchmark{
       int[] formFitlro = {3, 3};
       int filtros = 32;
 
-      convForward(formEntrada, formFitlro, filtros);
-      convBackward(formEntrada, formFitlro, filtros);
+      convForward(formEntrada, formFitlro, filtros);// 16ms ~ 30ms
+      convBackward(formEntrada, formFitlro, filtros);// 38ms ~ 54ms
       testarForward();
       testarBackward();
    }

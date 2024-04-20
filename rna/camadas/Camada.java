@@ -57,7 +57,7 @@ public abstract class Camada {
    /**
     * Controlador para uso dentro dos algoritmos de treino.
     */
-   protected boolean treinavel = false;
+   protected boolean _treinavel = false;
 
    /**
     * Controlador de construção da camada.
@@ -476,7 +476,7 @@ public abstract class Camada {
     * caso contrário.
     */
    public boolean treinavel() {
-      return treinavel;
+      return _treinavel;
    }
 
    /**
@@ -486,8 +486,7 @@ public abstract class Camada {
    @Override
    public Camada clone() {
       try {
-         return (Camada) super.clone(); 
-
+         return (Camada) super.clone();
       } catch (CloneNotSupportedException e) {
          throw new RuntimeException(e);
       }
