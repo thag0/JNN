@@ -2,6 +2,7 @@ package testes;
 
 import lib.ged.Ged;
 import lib.geim.Geim;
+import rna.camadas.Convolucional;
 import rna.core.OpArray;
 import rna.core.OpMatriz;
 import rna.core.OpTensor4D;
@@ -19,10 +20,18 @@ public class Playground{
    public static void main(String[] args){
       ged.limparConsole();
 
-      double[][] arr = {{1, 2}, {3, 4}};
+      Convolucional conv = new Convolucional(new int[]{1, 10, 10}, new int[]{3, 3}, 2);
+      
+      Tensor4D amostra = new Tensor4D(conv._entrada.shape());
+      amostra.map(x -> Math.random());
+      Tensor4D grad = new Tensor4D(conv._gradSaida.shape());
+      grad.map(x -> Math.random());
 
-      Tensor4D tensor = new Tensor4D(arr);
-      System.out.println(tensor.reduce(0, (x, y) -> x+y));
+      conv.forward(amostra);
+      conv.backward(grad);
+      System.out.println(conv._gradFiltros);
+      conv.backward(grad);
+      System.out.println(conv._gradFiltros);
    }
 
    /**

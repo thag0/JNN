@@ -20,15 +20,15 @@ public class SalvandoRede{
    public static void main(String[] args){
       Ged ged = new Ged();
       ged.limparConsole();
-      String caminho = "./modelo-teste.nn";
+      String caminho = "./dados/modelos/modelo-treinado.nn";
       Serializador serializador = new Serializador();
       
-      // Sequencial modelo = ler(caminho);
-      Sequencial modelo = criar();
+      Sequencial modelo = ler(caminho);
+      // Sequencial modelo = criar();
 
       modelo.info();
 
-      serializador.salvar(modelo, caminho);
+      // serializador.salvar(modelo, caminho);
    }
 
    static Sequencial criar(){
