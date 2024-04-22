@@ -9,7 +9,6 @@ import rna.camadas.*;
 import rna.core.Tensor4D;
 import rna.modelos.Modelo;
 import rna.modelos.Sequencial;
-import rna.otimizadores.SGD;
 import rna.serializacao.Serializador;
 
 public class MainConv {
@@ -29,7 +28,7 @@ public class MainConv {
    static final int NUM_DIGITOS_TESTE  = NUM_DIGITOS_TREINO;
    static final int NUM_AMOSTRAS_TREINO = 400;
    static final int NUM_AMOSTRAS_TESTE  = 100;
-   static final int TREINO_EPOCAS = 12;
+   static final int TREINO_EPOCAS = 10;
    static final int TREINO_LOTE = 12;
    static final boolean TREINO_LOGS = true;
 
@@ -80,17 +79,16 @@ public class MainConv {
    static Sequencial criarModelo() {
       Sequencial modelo = new Sequencial(
          new Entrada(28, 28),
-         new Convolucional(new int[]{3, 3}, 18, "relu"),
+         new Convolucional(new int[]{3, 3}, 18, "selu"),
          new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{3, 3}, 22, "relu"),
+         new Convolucional(new int[]{3, 3}, 22, "selu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(128, "relu"),
+         new Densa(128, "tanh"),
          new Densa(NUM_DIGITOS_TREINO, "softmax")
       );
 
-      // modelo.compilar("sgd", "entropia-cruzada");
-      modelo.compilar(new SGD(0.000001, 0.99), "entropia-cruzada");
+      modelo.compilar("adam", "entropia-cruzada");
       
       return modelo;
    }

@@ -8,6 +8,7 @@ import rna.ativacoes.GELU;
 import rna.ativacoes.LeakyReLU;
 import rna.ativacoes.Linear;
 import rna.ativacoes.ReLU;
+import rna.ativacoes.SELU;
 import rna.ativacoes.Seno;
 import rna.ativacoes.Sigmoid;
 import rna.ativacoes.SoftPlus;
@@ -100,6 +101,7 @@ public class Dicionario {
             case "swish"      : return new Swish();
             case "tanh"       : return new TanH();
             case "atan"       : return new Atan();
+            case "selu"       : return new SELU();
    
             default: throw new IllegalArgumentException(
                "Ativação \"" + ativacao + "\" não encontada."
