@@ -100,6 +100,7 @@ class TreinoLote {
          }
 
          if (logs) {
+            aux.limparLinha();
             aux.exibirLogTreino("Época " +  e + "/" + epochs + " -> perda: " + (double)(perdaEpoca/numAmostras));
          }
 
@@ -110,7 +111,7 @@ class TreinoLote {
       if (logs) {
          aux.exibirCursor();
          System.out.println();
-      }      
+      }
    }
 
    /**

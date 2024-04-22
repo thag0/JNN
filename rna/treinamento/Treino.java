@@ -83,6 +83,7 @@ class Treino {
          }
 
          if (logs) {
+            aux.limparLinha();
             aux.exibirLogTreino("Época " +  e + "/" + epochs + " -> perda: " + (double)(perdaEpoca/numAmostras));
          }
 

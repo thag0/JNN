@@ -126,4 +126,8 @@ public class AuxTreino {
       System.out.println(log);
       System.out.print("\033[1A"); // mover pra a linha anterior
    }
+
+   public void limparLinha() {
+      System.out.print("\033[2K");
+   }
 }
