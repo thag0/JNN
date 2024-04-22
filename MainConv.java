@@ -79,16 +79,16 @@ public class MainConv {
    static Sequencial criarModelo() {
       Sequencial modelo = new Sequencial(
          new Entrada(28, 28),
-         new Convolucional(new int[]{3, 3}, 18, "selu"),
+         new Convolucional(new int[]{3, 3}, 18, "relu"),
          new MaxPooling(new int[]{2, 2}),
-         new Convolucional(new int[]{3, 3}, 22, "selu"),
+         new Convolucional(new int[]{3, 3}, 22, "relu"),
          new MaxPooling(new int[]{2, 2}),
          new Flatten(),
-         new Densa(128, "tanh"),
+         new Densa(128, "sigmoid"),
          new Densa(NUM_DIGITOS_TREINO, "softmax")
       );
 
-      modelo.compilar("adam", "entropia-cruzada");
+      modelo.compilar("sgd", "entropia-cruzada");
       
       return modelo;
    }
