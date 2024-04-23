@@ -190,7 +190,7 @@ public class Densa extends Camada implements Cloneable {
     * @param iniKernel inicializador para os pesos da camada.
     * @param iniBias inicializador para os bias da camada.
     */
-   public Densa(int e, int n, String ativacao, Object iniKernel, Object iniBias) {
+   public Densa(int e, int n, Object ativacao, Object iniKernel, Object iniBias) {
       this(n, ativacao, iniKernel, iniBias);
 
       if (e < 1) {
@@ -217,7 +217,7 @@ public class Densa extends Camada implements Cloneable {
     * @param ativacao função de ativação que será usada pela camada.
     * @param iniKernel inicializador para os pesos da camada.
     */
-   public Densa(int e, int n, String ativacao, Object iniKernel) {
+   public Densa(int e, int n, Object ativacao, Object iniKernel) {
       this(e, n, ativacao, iniKernel, null);
    }
 
@@ -229,7 +229,7 @@ public class Densa extends Camada implements Cloneable {
     * @param n quantidade de neurônios.
     * @param ativacao função de ativação que será usada pela camada.
     */
-   public Densa(int e, int n, String ativacao) {
+   public Densa(int e, int n, Object ativacao) {
       this(e, n, ativacao, null, null);
    }
 
@@ -253,7 +253,7 @@ public class Densa extends Camada implements Cloneable {
     * @param iniKernel inicializador para os pesos da camada.
     * @param iniBias inicializador para os bias da camada.
     */
-   public Densa(int n, String ativacao, Object iniKernel, Object iniBias) {
+   public Densa(int n, Object ativacao, Object iniKernel, Object iniBias) {
       if (n < 1) {
          throw new IllegalArgumentException(
             "A camada deve conter ao menos um neurônio."
@@ -276,7 +276,7 @@ public class Densa extends Camada implements Cloneable {
     * @param ativacao função de ativação que será usada pela camada.
     * @param iniKernel inicializador para os pesos da camada.
     */
-   public Densa(int n, String ativacao, Object iniKernel) {
+   public Densa(int n, Object ativacao, Object iniKernel) {
       this(n, ativacao, iniKernel, null);
    }
 
@@ -287,7 +287,7 @@ public class Densa extends Camada implements Cloneable {
     * @param n quantidade de neurônios.
     * @param ativacao função de ativação que será usada pela camada.
     */
-   public Densa(int n, String ativacao) {
+   public Densa(int n, Object ativacao) {
       this(n, ativacao, null, null);
    }
 

@@ -272,7 +272,7 @@ public class Convolucional extends Camada implements Cloneable {
     * @param ativacao função de ativação.
     * @param iniKernel inicializador para os filtros.
     */
-   public Convolucional(int[] entrada, int[] filtro, int filtros, String ativacao, Object iniKernel) {
+   public Convolucional(int[] entrada, int[] filtro, int filtros, Object ativacao, Object iniKernel) {
       this(entrada, filtro, filtros, ativacao, iniKernel, null);
    }
 
@@ -299,7 +299,7 @@ public class Convolucional extends Camada implements Cloneable {
     * @param filtros quantidade de filtros.
     * @param ativacao função de ativação.
     */
-   public Convolucional(int[] entrada, int[] filtro, int filtros, String ativacao) {
+   public Convolucional(int[] entrada, int[] filtro, int filtros, Object ativacao) {
       this(entrada, filtro, filtros, ativacao, null, null);
    }
 
@@ -415,7 +415,7 @@ public class Convolucional extends Camada implements Cloneable {
     * @param ativacao função de ativação.
     * @param iniKernel inicializador para os filtros.
     */
-   public Convolucional(int[] filtro, int filtros, String ativacao, Object iniKernel) {
+   public Convolucional(int[] filtro, int filtros, Object ativacao, Object iniKernel) {
       this(filtro, filtros, ativacao, iniKernel, null);
    }
 
@@ -441,7 +441,7 @@ public class Convolucional extends Camada implements Cloneable {
     * @param filtros quantidade de filtros.
     * @param ativacao função de ativação.
     */
-   public Convolucional(int[] filtro, int filtros, String ativacao) {
+   public Convolucional(int[] filtro, int filtros, Object ativacao) {
       this(filtro, filtros, ativacao, null, null);
    }
 
@@ -550,9 +550,8 @@ public class Convolucional extends Camada implements Cloneable {
    public void inicializar() {
       verificarConstrucao();
       
-      int numFiltros = shapeSaida[0];
       int profEntrada = shapeEntrada[0];
-      for (int i = 0; i < numFiltros; i++) {
+      for (int i = 0; i < numFiltros(); i++) {
          for (int j = 0; j < profEntrada; j++) {
             iniKernel.inicializar(_filtros, i, j);
          }
@@ -663,11 +662,10 @@ public class Convolucional extends Camada implements Cloneable {
       //zerar os valores calculados anteiormente
       _somatorio.preencher(0.0d);
 
-      optensor.convForward(this._entrada, _filtros, _somatorio);
+      optensor.convForward(_entrada, _filtros, _somatorio);
       
       if (usarBias) {
-         int numFiltros = shapeSaida[0];
-         for (int i = 0; i < numFiltros; i++) {
+         for (int i = 0; i < numFiltros(); i++) {
             _somatorio.add2D(0, i, _bias.get(0, 0, 0, i));
          }
       }
@@ -707,7 +705,7 @@ public class Convolucional extends Camada implements Cloneable {
 
       if (grad instanceof Tensor4D) {
          Tensor4D g = (Tensor4D) grad;
-         if (_gradSaida.comparar3D(g) == false) {
+         if (!_gradSaida.comparar3D(g)) {
             throw new IllegalArgumentException(
                "\nAs três dimensões finais do tensor recebido " + g.shapeStr() +
                "são imcompatíveis as três primeira dimensões do tensor de gradiente"
@@ -734,8 +732,7 @@ public class Convolucional extends Camada implements Cloneable {
       _gradFiltros.add(tempGrad);
 
       if (usarBias) {
-         int numFiltros = shapeSaida[0];
-         for (int i = 0; i < numFiltros; i++) {
+         for (int i = 0; i < numFiltros(); i++) {
             _gradBias.add(0, 0, 0, i, _gradSaida.somar2D(0, i));
          }
       }
@@ -756,6 +753,7 @@ public class Convolucional extends Camada implements Cloneable {
     * @return quantiadde de filtros presentes na camada.
     */
    public int numFiltros() {
+      verificarConstrucao();
       return this.shapeSaida[0];
    }
 
