@@ -6,7 +6,7 @@ import java.io.File;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
-import rna.modelos.RedeNeural;
+import jnn.modelos.RedeNeural;
 
 public class JanelaRede extends JFrame{
 

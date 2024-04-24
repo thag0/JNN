@@ -1,12 +1,14 @@
-# **Biblioteca para manipulação de modelos de Redes Neurais**
+# **Java Neural Networks Library**
 
-Criação de uma pequena biblioteca para manipulação de modelos de machine learning com foco em redes neurais artificiais.
+**Biblioteca para manipulação de modelos de Redes Neurais**
+
+Ecossistema em java para manipulação de modelos de aprendizado de máquina, com foco em redes neurais artificiais.
 
 # **Modelo RedeNeural**
 
 O modelo RedeNeural foi a base da construção de todo esse ambiente, nele que comecei a incorporar os moldes para a biblioteca.
 
-Ele é uma implementação focada em Multilayer Perceptrons, onde conta com apenas camadas densas na sua estrutura, o que acaba sendo um pouco limitado dependendo do tipo de problema, pois não traz flexibilidade nas configurações específicas de suas camdas.
+Ele é uma implementação focada em Multilayer Perceptrons, onde conta com apenas camadas densas na sua estrutura, o que acaba sendo um pouco limitado dependendo do tipo de problema, pois não traz flexibilidade nas configurações específicas de suas camadas.
 
 Contudo o modelo tem um ótimo desemepenho nas suas tarefas esperadas, como classificação e regressão, podendo ser uma escolha mais leve e simples dependendo da necessidade.
 

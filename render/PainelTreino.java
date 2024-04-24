@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.JPanel;
 
-import rna.modelos.Modelo;
+import jnn.modelos.Modelo;
 
 public class PainelTreino extends JPanel{
    final int largura;

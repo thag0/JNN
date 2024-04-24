@@ -2,12 +2,12 @@ package testes.modelos;
 
 import java.text.DecimalFormat;
 
-import rna.modelos.Modelo;
-import rna.modelos.Sequencial;
-import rna.camadas.Camada;
-import rna.camadas.Densa;
-import rna.camadas.Dropout;
-import rna.camadas.Entrada;
+import jnn.camadas.Camada;
+import jnn.camadas.Densa;
+import jnn.camadas.Dropout;
+import jnn.camadas.Entrada;
+import jnn.modelos.Modelo;
+import jnn.modelos.Sequencial;
 import lib.ged.Dados;
 import lib.ged.Ged;
 

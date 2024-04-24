@@ -3,14 +3,14 @@ package testes;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import jnn.camadas.Convolucional;
+import jnn.core.OpTensor4D;
+import jnn.core.Tensor4D;
+import jnn.inicializadores.GlorotNormal;
+import jnn.inicializadores.GlorotUniforme;
+import jnn.inicializadores.Inicializador;
+import jnn.inicializadores.Zeros;
 import lib.ged.Ged;
-import rna.camadas.Convolucional;
-import rna.core.OpTensor4D;
-import rna.core.Tensor4D;
-import rna.inicializadores.GlorotNormal;
-import rna.inicializadores.GlorotUniforme;
-import rna.inicializadores.Inicializador;
-import rna.inicializadores.Zeros;
 
 public class Benchmark{
    static OpTensor4D optensor = new OpTensor4D();

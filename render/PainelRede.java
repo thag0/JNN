@@ -9,8 +9,8 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
-import rna.camadas.Densa;
-import rna.modelos.RedeNeural;
+import jnn.camadas.Densa;
+import jnn.modelos.RedeNeural;
 
 public class PainelRede extends JPanel{
    final int largura;

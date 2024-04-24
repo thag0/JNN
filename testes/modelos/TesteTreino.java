@@ -1,12 +1,12 @@
 package testes.modelos;
 
+import jnn.camadas.*;
+import jnn.core.Tensor4D;
+import jnn.core.Utils;
+import jnn.modelos.*;
+import jnn.otimizadores.SGD;
 import lib.ged.Dados;
 import lib.ged.Ged;
-import rna.camadas.*;
-import rna.core.Tensor4D;
-import rna.core.Utils;
-import rna.modelos.*;
-import rna.otimizadores.SGD;
 
 public class TesteTreino{
    static Ged ged = new Ged();

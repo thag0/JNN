@@ -1,7 +1,8 @@
 package lib.geim;
 
 import java.awt.image.BufferedImage;
-import rna.modelos.RedeNeural;
+
+import jnn.modelos.RedeNeural;
 
 /**
  * <p>

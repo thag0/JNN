@@ -4,19 +4,19 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
+import jnn.camadas.*;
+import jnn.core.OpMatriz;
+import jnn.core.OpTensor4D;
+import jnn.core.Tensor4D;
+import jnn.inicializadores.GlorotUniforme;
+import jnn.inicializadores.Inicializador;
+import jnn.inicializadores.Zeros;
+import jnn.modelos.Sequencial;
+import jnn.otimizadores.Otimizador;
+import jnn.serializacao.Serializador;
 import lib.ged.Dados;
 import lib.ged.Ged;
 import lib.geim.Geim;
-import rna.camadas.*;
-import rna.core.OpMatriz;
-import rna.core.OpTensor4D;
-import rna.core.Tensor4D;
-import rna.inicializadores.GlorotUniforme;
-import rna.inicializadores.Inicializador;
-import rna.inicializadores.Zeros;
-import rna.modelos.Sequencial;
-import rna.otimizadores.Otimizador;
-import rna.serializacao.Serializador;
 
 public class Conv{
    static Ged ged = new Ged();

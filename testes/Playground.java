@@ -1,13 +1,13 @@
 package testes;
 
+import jnn.camadas.Convolucional;
+import jnn.core.OpArray;
+import jnn.core.OpMatriz;
+import jnn.core.OpTensor4D;
+import jnn.core.Tensor4D;
+import jnn.core.Utils;
 import lib.ged.Ged;
 import lib.geim.Geim;
-import rna.camadas.Convolucional;
-import rna.core.OpArray;
-import rna.core.OpMatriz;
-import rna.core.OpTensor4D;
-import rna.core.Tensor4D;
-import rna.core.Utils;
 
 public class Playground{
    static Ged ged = new Ged();

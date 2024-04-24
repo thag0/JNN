@@ -2,18 +2,18 @@ package testes.modelos;
 
 import java.io.Serializable;
 
-import rna.camadas.Convolucional;
+import jnn.ativacoes.Sigmoid;
+import jnn.avaliacao.perda.MSE;
+import jnn.camadas.Camada;
+import jnn.camadas.Convolucional;
+import jnn.camadas.Densa;
+import jnn.inicializadores.GlorotUniforme;
+import jnn.inicializadores.Zeros;
+import jnn.modelos.*;
+import jnn.otimizadores.*;
+import jnn.serializacao.Serializador;
 import lib.ged.Dados;
 import lib.ged.Ged;
-import rna.ativacoes.Sigmoid;
-import rna.avaliacao.perda.MSE;
-import rna.camadas.Camada;
-import rna.camadas.Densa;
-import rna.inicializadores.GlorotUniforme;
-import rna.inicializadores.Zeros;
-import rna.modelos.*;
-import rna.otimizadores.*;
-import rna.serializacao.Serializador;
 
 @SuppressWarnings("unused")
 public class SalvandoRede{

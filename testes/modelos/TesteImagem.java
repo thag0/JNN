@@ -2,14 +2,14 @@ package testes.modelos;
 
 import java.awt.image.BufferedImage;
 
+import jnn.avaliacao.perda.*;
+import jnn.camadas.*;
+import jnn.modelos.Modelo;
+import jnn.modelos.Sequencial;
+import jnn.otimizadores.*;
 import lib.ged.Dados;
 import lib.ged.Ged;
 import lib.geim.Geim;
-import rna.avaliacao.perda.*;
-import rna.camadas.*;
-import rna.otimizadores.*;
-import rna.modelos.Modelo;
-import rna.modelos.Sequencial;
 
 public class TesteImagem{
    public static void main(String[] args){

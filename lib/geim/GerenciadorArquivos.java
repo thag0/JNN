@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import rna.modelos.RedeNeural;
+import jnn.modelos.RedeNeural;
 
 /**
  * Gerenciador de arquivos do Geim

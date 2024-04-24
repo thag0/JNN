@@ -1,12 +1,12 @@
 package testes.modelos;
 
+import jnn.camadas.Camada;
+import jnn.camadas.Densa;
+import jnn.camadas.Entrada;
+import jnn.core.OpMatriz;
+import jnn.modelos.*;
 import lib.ged.Dados;
 import lib.ged.Ged;
-import rna.camadas.Camada;
-import rna.camadas.Densa;
-import rna.camadas.Entrada;
-import rna.core.OpMatriz;
-import rna.modelos.*;
 
 public class TesteModelos{
    static Ged ged = new Ged();

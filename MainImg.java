@@ -2,14 +2,14 @@ import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
 
+import jnn.camadas.*;
+import jnn.modelos.Modelo;
+import jnn.modelos.RedeNeural;
+import jnn.modelos.Sequencial;
+import jnn.otimizadores.*;
 import lib.ged.*;
 import lib.geim.Geim;
 import render.JanelaTreino;
-import rna.camadas.*;
-import rna.modelos.Modelo;
-import rna.modelos.RedeNeural;
-import rna.modelos.Sequencial;
-import rna.otimizadores.*;
 
 public class MainImg{
    static Ged ged = new Ged();
