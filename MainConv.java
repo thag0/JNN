@@ -1,6 +1,5 @@
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -36,8 +35,8 @@ public class MainConv {
    static final boolean TREINO_LOGS = true;
 
    // caminhos de arquivos externos
-   static final String CAMINHO_TREINO = "/dados/mnist/treino/";
-   static final String CAMINHO_TESTE = "/dados/mnist/teste/";
+   static final String CAMINHO_TREINO = "./dados/mnist/treino/";
+   static final String CAMINHO_TESTE = "./dados/mnist/teste/";
    static final String CAMINHO_SAIDA_MODELO = "./dados/modelos/modelo-treinado.nn";
    static final String CAMINHO_HISTORICO = "historico-perda";
 
@@ -169,30 +168,37 @@ public class MainConv {
     */
    static double[][][][] carregarDadosMNIST(String caminho, int amostras, int digitos) {
       final double[][][][] imagens = new double[digitos * amostras][1][][];
-      final int numThreads = Runtime.getRuntime().availableProcessors()/2;
-
+      final int numThreads = Runtime.getRuntime().availableProcessors() / 2;
+  
       try (ExecutorService exec = Executors.newFixedThreadPool(numThreads)) {
          int id = 0;
          for (int i = 0; i < digitos; i++) {
             for (int j = 0; j < amostras; j++) {
                final String caminhoCompleto = caminho + i + "/img_" + j + ".jpg";
                final int indice = id;
+               
                exec.submit(() -> {
-                  double[][] imagem = imagemParaMatriz(caminhoCompleto);
-                  imagens[indice][0] = imagem;
+                  try {
+                     double[][] imagem = imagemParaMatriz(caminhoCompleto);
+                     imagens[indice][0] = imagem;
+                  } catch (Exception e) {
+                     System.out.println(e.getMessage());
+                     System.exit(1);
+                  }
                });
+
                id++;
             }
          }
-      
+  
       } catch (Exception e) {
          System.out.println(e.getMessage());
       }
-
+  
       System.out.println("Imagens carregadas (" + imagens.length + ").");
-
+  
       return imagens;
-   }
+  }
 
    /**
     * Gera os rótulos do conjunto de dados {@code MNIST}.

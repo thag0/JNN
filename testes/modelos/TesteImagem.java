@@ -19,7 +19,7 @@ public class TesteImagem{
       ged.limparConsole();
 
       //importando imagem para treino da rede
-      final String caminho = "/dados/mnist/treino/8/img_0.jpg";
+      final String caminho = "./dados/mnist/treino/8/img_0.jpg";
       BufferedImage imagem = geim.lerImagem(caminho);
       double[][] dados = geim.imagemParaDadosTreinoEscalaCinza(imagem);
       int nEntrada = 2;// posição x y do pixel

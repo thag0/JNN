@@ -3,14 +3,12 @@ package testes.modelos;
 import jnn.camadas.Camada;
 import jnn.camadas.Densa;
 import jnn.camadas.Entrada;
-import jnn.core.OpMatriz;
 import jnn.modelos.*;
 import lib.ged.Dados;
 import lib.ged.Ged;
 
 public class TesteModelos{
    static Ged ged = new Ged();
-   static OpMatriz opm = new OpMatriz();
 
    public static void main(String[] args){
       ged.limparConsole();

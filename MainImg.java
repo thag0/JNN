@@ -18,9 +18,9 @@ public class MainImg{
    static final double ESCALA_RENDER = 9;
    static boolean calcularHistorico = true;
    static final String CAMINHO_HISTORICO = "historico-perda";
-   static final String CAMINHO_IMAGGEM = "/dados/mnist/treino/8/img_0.jpg";
-   // static final String caminhoImagem = "/dados/mnist/treino/7/img_1.jpg";
-   // static final String caminhoImagem = "/dados/32x32/circulos.png";
+   static final String CAMINHO_IMAGGEM = "./dados/mnist/treino/8/img_0.jpg";
+   // static final String caminhoImagem = "./dados/mnist/treino/7/img_1.jpg";
+   // static final String caminhoImagem = "./dados/32x32/circulos.png";
 
    public static void main(String[] args){      
       ged.limparConsole();
