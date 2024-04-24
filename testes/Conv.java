@@ -53,6 +53,8 @@ public class Conv{
 
       testarForward();
       testarBackward();
+
+      tempoOtimizador(modelo);
    }
 
    static void testarAcertosMNIST(Sequencial modelo){
