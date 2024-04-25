@@ -59,9 +59,9 @@ import jnn.camadas.Camada;
  */
 public class AMSGrad extends Otimizador {
 
-   /**
-    * Valor padrão para a taxa de aprendizagem do otimizador.
-    */
+    /**
+	 * Valor padrão para a taxa de aprendizagem do otimizador.
+	 */
 	private static final double PADRAO_TA = 0.001;
 
 	/**
@@ -79,9 +79,9 @@ public class AMSGrad extends Otimizador {
 	 */
 	private static final double PADRAO_EPS = 1e-7;
 
-   /**
-    * Valor de taxa de aprendizagem do otimizador.
-    */
+    /**
+	 * Valor de taxa de aprendizagem do otimizador.
+	 */
 	private double taxaAprendizagem;
 
 	/**
@@ -100,13 +100,13 @@ public class AMSGrad extends Otimizador {
 	private double beta2;
 
    /**
-    * Coeficientes de momentum para os kernels.
-    */
+	 * Coeficientes de momentum para os kernels.
+	 */
 	private double[] m;
 
-   /**
-    * Coeficientes de momentum para os bias.
-    */
+    /**
+	 * Coeficientes de momentum para os bias.
+	 */
 	private double[] mb;
 
 	/**
@@ -137,32 +137,32 @@ public class AMSGrad extends Otimizador {
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> AMSGrad </strong> usando os 
 	 * valores de hiperparâmetros fornecidos.
-    * @param tA valor de taxa de aprendizagem.
+	 * @param tA valor de taxa de aprendizagem.
 	 * @param beta1 decaimento do momento.
 	 * @param beta2 decaimento do momento de segunda ordem.
 	 * @param eps usado para evitar a divisão por zero.
 	 */
 	public AMSGrad(double tA, double beta1, double beta2, double eps) {
-      if (tA <= 0) {
-         throw new IllegalArgumentException(
-            "\nTaxa de aprendizagem (" + tA + "), inválida."
-         );
-      }
-      if (beta1 <= 0) {
-         throw new IllegalArgumentException(
-            "\nTaxa de decaimento de primeira ordem (" + beta1 + "), inválida."
-         );
-      }
-      if (beta2 <= 0) {
-         throw new IllegalArgumentException(
-            "\nTaxa de decaimento de segunda ordem (" + beta2 + "), inválida."
-         );
-      }
-      if (eps <= 0) {
-         throw new IllegalArgumentException(
-            "\nEpsilon (" + eps + "), inválido."
-         );
-      }
+		if (tA <= 0) {
+			throw new IllegalArgumentException(
+			"\nTaxa de aprendizagem (" + tA + "), inválida."
+			);
+		}
+		if (beta1 <= 0) {
+			throw new IllegalArgumentException(
+			"\nTaxa de decaimento de primeira ordem (" + beta1 + "), inválida."
+			);
+		}
+		if (beta2 <= 0) {
+			throw new IllegalArgumentException(
+			"\nTaxa de decaimento de segunda ordem (" + beta2 + "), inválida."
+			);
+		}
+		if (eps <= 0) {
+			throw new IllegalArgumentException(
+			"\nEpsilon (" + eps + "), inválido."
+			);
+		}
 		
 		this.taxaAprendizagem = tA;
 		this.beta1 = beta1;
@@ -173,18 +173,18 @@ public class AMSGrad extends Otimizador {
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> AMSGrad </strong> usando os 
 	 * valores de hiperparâmetros fornecidos.
-    * @param tA valor de taxa de aprendizagem.
+	 * @param tA valor de taxa de aprendizagem.
 	 * @param beta1 decaimento do momento.
 	 * @param beta2 decaimento do momento de segunda ordem.
 	 */
 	public AMSGrad(double tA, double beta1, double beta2) {
-      this(tA, beta1, beta2, PADRAO_EPS);
+	  this(tA, beta1, beta2, PADRAO_EPS);
 	}
 
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> AMSGrad </strong> usando os 
 	 * valores de hiperparâmetros fornecidos.
-    * @param tA valor de taxa de aprendizagem.
+	 * @param tA valor de taxa de aprendizagem.
 	 */
 	public AMSGrad(double tA){
 		this(tA, PADRAO_BETA1, PADRAO_BETA2, PADRAO_EPS);
@@ -201,27 +201,27 @@ public class AMSGrad extends Otimizador {
 	}
 
 	@Override
-   public void construir(Camada[] camadas) {
-      int nKernel = 0;
-      int nBias = 0;
-      
-      for (Camada camada : camadas) {
+	public void construir(Camada[] camadas) {
+		int nKernel = 0;
+		int nBias = 0;
+		
+		for (Camada camada : camadas) {
 			if (!camada.treinavel()) continue;
 
-         nKernel += camada.kernelParaArray().length;
-         if (camada.temBias()) {
-            nBias += camada.biasParaArray().length;
-         }         
-      }
+			nKernel += camada.kernelParaArray().length;
+			if (camada.temBias()) {
+				nBias += camada.biasParaArray().length;
+			}     
+		}
 
-      this.m  = new double[nKernel];
-      this.v  = new double[nKernel];
-      this.vc  = new double[nKernel];
-      this.mb = new double[nBias];
-      this.vb = new double[nBias];
-      this.vcb = new double[nBias];
+		this.m  = new double[nKernel];
+		this.v  = new double[nKernel];
+		this.vc  = new double[nKernel];
+		this.mb = new double[nBias];
+		this.vb = new double[nBias];
+		this.vcb = new double[nBias];
 		this._construido = true;//otimizador pode ser usado
-   }
+	}
 
 	@Override
 	public void atualizar(Camada[] camadas) {
@@ -241,26 +241,26 @@ public class AMSGrad extends Otimizador {
 			idKernel = calcular(kernel, gradK, m, v, vc, forcaB1, forcaB2, idKernel);
 			camada.setKernel(kernel);
 
-         if (camada.temBias()) {
+			if (camada.temBias()) {
 				double[] bias = camada.biasParaArray();
 				double[] gradB = camada.gradBias();
 				idBias = calcular(bias, gradB, mb, vb, vcb, forcaB1, forcaB2, idBias);
 				camada.setBias(bias);
-         } 
+			} 
 		}
-  	}
+	}
 
-   /**
-    * Atualiza as variáveis usando o gradiente pré calculado.
-    * @param vars variáveis que serão atualizadas.
-    * @param grads gradientes das variáveis.
-    * @param m coeficientes de momentum de primeira ordem das variáveis.
-    * @param v coeficientes de momentum de segunda ordem das variáveis.
+    /**
+	 * Atualiza as variáveis usando o gradiente pré calculado.
+	 * @param vars variáveis que serão atualizadas.
+	 * @param grads gradientes das variáveis.
+	 * @param m coeficientes de momentum de primeira ordem das variáveis.
+	 * @param v coeficientes de momentum de segunda ordem das variáveis.
 	 * @param vc coeficientes de momentum de segunda ordem corrigidos.
-    * @param forcaB1 força do decaimento do momentum de primeira ordem.
-    * @param forcaB2 força do decaimento do momentum de segunda ordem.
-    * @param id índice inicial das variáveis dentro do array de momentums.
-    * @return índice final após as atualizações.
+	 * @param forcaB1 força do decaimento do momentum de primeira ordem.
+	 * @param forcaB2 força do decaimento do momentum de segunda ordem.
+	 * @param id índice inicial das variáveis dentro do array de momentums.
+	 * @return índice final após as atualizações.
 	 */
 	private int calcular(double[] vars, double[] grads, double[] m, double[] v, double[] vc, double forcaB1, double forcaB2, int id) {
 		double mChapeu, vChapeu, g;
@@ -284,14 +284,14 @@ public class AMSGrad extends Otimizador {
 	@Override
 	public String info() {
 		super.verificarConstrucao();
-      super.construirInfo();
-      
-      super.addInfo("TaxaAprendizagem: " + this.taxaAprendizagem);
-      super.addInfo("Beta1: " + this.beta1);
-      super.addInfo("Beta2: " + this.beta2);
-      super.addInfo("Epsilon: " + this.epsilon);
+		super.construirInfo();
+	  
+		super.addInfo("TaxaAprendizagem: " + this.taxaAprendizagem);
+		super.addInfo("Beta1: " + this.beta1);
+		super.addInfo("Beta2: " + this.beta2);
+		super.addInfo("Epsilon: " + this.epsilon);
 
-      return super.info();
+		return super.info();
 	}
 
 }

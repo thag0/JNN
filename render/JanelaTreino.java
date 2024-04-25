@@ -8,40 +8,42 @@ import javax.swing.JFrame;
 
 import jnn.modelos.Modelo;
 
-public class JanelaTreino extends JFrame{
+public class JanelaTreino extends JFrame {
 
-   public PainelTreino painelTreino;
-   private int numThreads = 1;
+	public PainelTreino painelTreino;
+	private int numThreads = 1;
 
-   public JanelaTreino(int larguraImagem, int alturaImagem, double escala, int numThreads){
-      try{
-         BufferedImage icone = ImageIO.read(new File("./render/rede-neural.png"));
-         setIconImage(icone);
-      }catch(Exception e){}
+	public JanelaTreino(int larguraImagem, int alturaImagem, double escala, int numThreads) {
+		try {
+			BufferedImage icone = ImageIO.read(new File("./render/rede-neural.png"));
+			setIconImage(icone);
 
-      this.painelTreino = new PainelTreino(larguraImagem, alturaImagem, escala);
-      
-      setTitle("Treinamento rede");
-      add(painelTreino);
-      setVisible(true);
-      pack();
-      setResizable(false);
-      setLocationRelativeTo(null);
+		} catch (Exception e) {}
 
-      if(numThreads < 1){
-         throw new IllegalArgumentException(
-            "O número de threads deve ser maior que zero."
-         );
-      }
-      this.numThreads = numThreads;
-   }
+		this.painelTreino = new PainelTreino(larguraImagem, alturaImagem, escala);
+		
+		setTitle("Treinamento rede");
+		add(painelTreino);
+		setVisible(true);
+		pack();
+		setResizable(false);
+		setLocationRelativeTo(null);
+
+		if (numThreads < 1) {
+			throw new IllegalArgumentException(
+				"O número de threads deve ser maior que zero."
+			);
+		}
+		this.numThreads = numThreads;
+	}
 
 
-   public void desenharTreino(Modelo modelo, int epocasPorFrame){
-      if(this.numThreads == 1){
-         painelTreino.desenhar(modelo, epocasPorFrame);
-      }else{
-         painelTreino.desenhar(modelo, epocasPorFrame, this.numThreads);
-      }
-   }
+	public void desenharTreino(Modelo modelo, int epocasPorFrame) {
+		if (numThreads == 1) {
+			painelTreino.desenhar(modelo, epocasPorFrame);
+		
+		} else {
+			painelTreino.desenhar(modelo, epocasPorFrame, this.numThreads);
+		}
+	}
 }

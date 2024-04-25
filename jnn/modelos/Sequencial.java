@@ -154,365 +154,365 @@ import jnn.treinamento.Treinador;
  */
 public class Sequencial extends Modelo {
 
-   /**
-    * Lista de camadas do modelo.
-    */
-   private Camada[] _camadas;
+	/**
+	 * Lista de camadas do modelo.
+	 */
+	private Camada[] _camadas;
 
-   /**
-    * Instancia um modelo sequencial com o conjunto de camadas vazio.
-    * <p>
-    *    É necessário especificar o formato de entrada da primeira camada
-    *    do modelo.
-    * </p>
-    * <p>
-    *    As camadas do modelo deverão ser adicionadas manualmente
-    *    usando o método {@code add()}.
-    * </p>
-    */
-   public Sequencial() {
-      _camadas = new Camada[0];
-      _compilado = false;
-   }
+	/**
+	 * Instancia um modelo sequencial com o conjunto de camadas vazio.
+	 * <p>
+	 *    É necessário especificar o formato de entrada da primeira camada
+	 *    do modelo.
+	 * </p>
+	 * <p>
+	 *    As camadas do modelo deverão ser adicionadas manualmente
+	 *    usando o método {@code add()}.
+	 * </p>
+	 */
+	public Sequencial() {
+		_camadas = new Camada[0];
+		_compilado = false;
+	}
 
-   /**
-    * Inicializa um modelo sequencial a partir de um conjunto de camadas
-    * definido
-    * <p>
-    *    É necessário especificar o formato de entrada da primeira camada
-    *    do modelo.
-    * </p>
-    * @param camadas conjunto de camadas que serão usadas pelo modelo.
-    * @throws IllegalArgumentException caso o conjunto de camadas seja nulo
-    * ou alguma camada contida seja.
-    */
-   public Sequencial(Camada... camadas) {
-      utils.validarNaoNulo(camadas, "Conjunto de camadas não pode ser nulo.");
+	/**
+	 * Inicializa um modelo sequencial a partir de um conjunto de camadas
+	 * definido
+	 * <p>
+	 *    É necessário especificar o formato de entrada da primeira camada
+	 *    do modelo.
+	 * </p>
+	 * @param camadas conjunto de camadas que serão usadas pelo modelo.
+	 * @throws IllegalArgumentException caso o conjunto de camadas seja nulo
+	 * ou alguma camada contida seja.
+	 */
+	public Sequencial(Camada... camadas) {
+		utils.validarNaoNulo(camadas, "Conjunto de camadas não pode ser nulo.");
 
-      for (int i = 0; i < camadas.length; i++) {
-         utils.validarNaoNulo(
-            camadas[i], ("O conjunto de camadas fornecido possui uma camada nula, id = " + i)
-         );
-      }
+		for (int i = 0; i < camadas.length; i++) {
+			utils.validarNaoNulo(
+				camadas[i], ("O conjunto de camadas fornecido possui uma camada nula, id = " + i)
+			);
+		}
 
-      if (camadas.length < 1) {
-         throw new IllegalArgumentException(
-            "\nCamadas fornecidas possuem tamanho = " + camadas.length + "."
-         );
-      }
+		if (camadas.length < 1) {
+			throw new IllegalArgumentException(
+				"\nCamadas fornecidas possuem tamanho = " + camadas.length + "."
+			);
+		}
 
-      _camadas = new Camada[0];
-      
-      add(camadas[0]);
-      for (int i = 1; i < camadas.length; i++) {
-         if (!(camadas[i] instanceof Entrada)) add(camadas[i]);
-      }
+		_camadas = new Camada[0];
+		
+		add(camadas[0]);
+		for (int i = 1; i < camadas.length; i++) {
+			if (!(camadas[i] instanceof Entrada)) add(camadas[i]);
+		}
 
-      _compilado = false;
-   }
+		_compilado = false;
+	}
 
-   /**
-    * Adiciona uma nova camada ao final da lista de camadas do modelo.
-    * <p>
-    *    Novas camadas não precisam estar construídas, a única excessão
-    *    é caso seja a primeira camada do modelo, ela deve ser construída
-    *    já que é necessário saber o formato de entrada do modelo.
-    * </p>
-    * Ao adicionar novas camadas, o modelo precisará ser compilado novamente.
-    * @param camada nova camada.
-    * @throws IllegalArgumentException se a camada fornecida for nula,
-    */
-   public void add(Camada camada) {
-      utils.validarNaoNulo(camada, "Camada não pode ser nula.");
+	/**
+	 * Adiciona uma nova camada ao final da lista de camadas do modelo.
+	 * <p>
+	 *    Novas camadas não precisam estar construídas, a única excessão
+	 *    é caso seja a primeira camada do modelo, ela deve ser construída
+	 *    já que é necessário saber o formato de entrada do modelo.
+	 * </p>
+	 * Ao adicionar novas camadas, o modelo precisará ser compilado novamente.
+	 * @param camada nova camada.
+	 * @throws IllegalArgumentException se a camada fornecida for nula,
+	 */
+	public void add(Camada camada) {
+		utils.validarNaoNulo(camada, "Camada não pode ser nula.");
 
-      Camada[] antigas = _camadas;
-      _camadas = new Camada[antigas.length + 1];
-      
-      System.arraycopy(antigas, 0, _camadas, 0, antigas.length);
-      _camadas[_camadas.length-1] = camada;
+		Camada[] antigas = _camadas;
+		_camadas = new Camada[antigas.length + 1];
+		
+		System.arraycopy(antigas, 0, _camadas, 0, antigas.length);
+		_camadas[_camadas.length-1] = camada;
 
-      _compilado = false;
-   }
+		_compilado = false;
+	}
 
-   /**
-    * Remove a última camada contida na lista de camadas do modelo.
-    * @return camada removida.
-    * @throws IllegalArgumentException caso o modelo já não possua nenhuma 
-    * camada disponível.
-    */
-   public Camada rem() {
-      if (_camadas.length < 1) {
-         throw new IllegalArgumentException(
-            "\nNão há camadas no modelo."
-         );
-      }
+	/**
+	 * Remove a última camada contida na lista de camadas do modelo.
+	 * @return camada removida.
+	 * @throws IllegalArgumentException caso o modelo já não possua nenhuma 
+	 * camada disponível.
+	 */
+	public Camada rem() {
+		if (_camadas.length < 1) {
+			throw new IllegalArgumentException(
+				"\nNão há camadas no modelo."
+			);
+		}
 
-      Camada ultima = camadaSaida();
+		Camada ultima = camadaSaida();
 
-      Camada[] novas = _camadas;
-      _camadas = new Camada[_camadas.length-1];
-      System.arraycopy(novas, 0, _camadas, 0, _camadas.length);
+		Camada[] novas = _camadas;
+		_camadas = new Camada[_camadas.length-1];
+		System.arraycopy(novas, 0, _camadas, 0, _camadas.length);
 
-      _compilado = false;
+		_compilado = false;
 
-      return ultima;
-   }
+		return ultima;
+	}
 
-   @Override
-   public void compilar(Object otimizador, Object perda) {
-      int[] formato = {};
+	@Override
+	public void compilar(Object otimizador, Object perda) {
+		int[] formato = {};
 
-      if (_camadas[0] instanceof Entrada) {
-         formato = _camadas[0].formatoSaida();
+		if (_camadas[0] instanceof Entrada) {
+			formato = _camadas[0].formatoSaida();
 
-         //remover camada de entrada do modelo
-         Camada[] temp = _camadas;
-         _camadas = new Camada[_camadas.length-1];
-         System.arraycopy(temp, 1, _camadas, 0, _camadas.length);
+			//remover camada de entrada do modelo
+			Camada[] temp = _camadas;
+			_camadas = new Camada[_camadas.length-1];
+			System.arraycopy(temp, 1, _camadas, 0, _camadas.length);
 
-         if (_camadas.length == 0) {
-            throw new IllegalStateException(
-               "\nO modelo não possui camadas para compilar."
-            );
-         }
+			if (_camadas.length == 0) {
+				throw new IllegalStateException(
+					"\nO modelo não possui camadas para compilar."
+				);
+			}
 
-         _camadas[0].construir(formato);
-      
-      } else {
-         if (!_camadas[0]._construida) {
-            throw new IllegalArgumentException(
-               "\nÉ necessário que a primeira camada (" + _camadas[0].nome() +
-               ") seja construída."
-            );
-         }
-      }
+			_camadas[0].construir(formato);
+		
+		} else {
+			if (!_camadas[0]._construida) {
+				throw new IllegalArgumentException(
+					"\nÉ necessário que a primeira camada (" + _camadas[0].nome() +
+					") seja construída."
+				);
+			}
+		}
 
-      for (int i = 0; i < _camadas.length; i++) {
-         _camadas[i].setId(i);
+		for (int i = 0; i < _camadas.length; i++) {
+			_camadas[i].setId(i);
 
-         if (i != 0) _camadas[i].construir(_camadas[i-1].formatoSaida());
-         if (seedInicial != 0) _camadas[i].setSeed(seedInicial);
+			if (i != 0) _camadas[i].construir(_camadas[i-1].formatoSaida());
+			if (seedInicial != 0) _camadas[i].setSeed(seedInicial);
 
-         _camadas[i].inicializar();
-      }
+			_camadas[i].inicializar();
+		}
 
-      if (seedInicial != 0) _treinador.setSeed(seedInicial);
-      
-      Dicionario dicio = new Dicionario();
-      _perda = dicio.getPerda(perda);
-      _otimizador = dicio.getOtimizador(otimizador);
+		if (seedInicial != 0) _treinador.setSeed(seedInicial);
+		
+		Dicionario dicio = new Dicionario();
+		_perda = dicio.getPerda(perda);
+		_otimizador = dicio.getOtimizador(otimizador);
 
-      _otimizador.construir(_camadas);
-      
-      _compilado = true;//modelo pode ser usado.
-   }
+		_otimizador.construir(_camadas);
+		
+		_compilado = true;//modelo pode ser usado.
+	}
 
-   @Override
-   public Tensor4D forward(Object entrada) {
-      verificarCompilacao();
+	@Override
+	public Tensor4D forward(Object entrada) {
+		verificarCompilacao();
 
-      utils.validarNaoNulo(entrada, "Dados de entrada não podem ser nulos.");
+		utils.validarNaoNulo(entrada, "Dados de entrada não podem ser nulos.");
 
-      Tensor4D prev = _camadas[0].forward(entrada);
-      for (int i = 1; i < _camadas.length; i++) {
-         prev = _camadas[i].forward(prev);
-      }
+		Tensor4D prev = _camadas[0].forward(entrada);
+		for (int i = 1; i < _camadas.length; i++) {
+			prev = _camadas[i].forward(prev);
+		}
 
-      return prev.clone();//preservar a saída do modelo
-   }
+		return prev.clone();//preservar a saída do modelo
+	}
 
-   @Override
-   public Tensor4D[] forwards(Object[] entradas) {
-      verificarCompilacao();
+	@Override
+	public Tensor4D[] forwards(Object[] entradas) {
+		verificarCompilacao();
 
-      utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
+		utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
 
-      Tensor4D[] prevs = new Tensor4D[entradas.length];
+		Tensor4D[] prevs = new Tensor4D[entradas.length];
 
-      for (int i = 0; i < prevs.length; i++) {
-         prevs[i] = forward(entradas[i]);
-      }
+		for (int i = 0; i < prevs.length; i++) {
+			prevs[i] = forward(entradas[i]);
+		}
 
-      return prevs;
-   }
+		return prevs;
+	}
   
-   @Override
-   public void zerarGradientes() {
-      for (int i = 0; i < _camadas.length; i++) {
-         if (_camadas[i].treinavel()) _camadas[i].zerarGradientes();
-      }
-   }
+	@Override
+	public void zerarGradientes() {
+		for (int i = 0; i < _camadas.length; i++) {
+			if (_camadas[i].treinavel()) _camadas[i].zerarGradientes();
+		}
+	}
 
-   @Override
-   public void treino(boolean treinando) {
-      for (Camada camada : _camadas) {
-         camada.setTreino(treinando);
-      }
-   }
+	@Override
+	public void treino(boolean treinando) {
+		for (Camada camada : _camadas) {
+			camada.setTreino(treinando);
+		}
+	}
 
-   @Override
-   public Otimizador otimizador() {
-      verificarCompilacao();
-      return _otimizador;
-   }
+	@Override
+	public Otimizador otimizador() {
+		verificarCompilacao();
+		return _otimizador;
+	}
 
-   @Override
-   public Perda perda() {
-      verificarCompilacao();
-      return _perda;
-   }
+	@Override
+	public Perda perda() {
+		verificarCompilacao();
+		return _perda;
+	}
 
-   @Override
-   public Camada camada(int id){
-      if ((id < 0) || (id >= _camadas.length)) {
-         throw new IllegalArgumentException(
-            "O índice fornecido (" + id + 
-            ") é inválido ou fora de alcance."
-         );
-      }
-   
-      return _camadas[id];
-   }
+	@Override
+	public Camada camada(int id){
+		if ((id < 0) || (id >= _camadas.length)) {
+			throw new IllegalArgumentException(
+				"O índice fornecido (" + id + 
+				") é inválido ou fora de alcance."
+			);
+		}
+	
+		return _camadas[id];
+	}
 
-   @Override
-   public Camada[] camadas() {
-      return _camadas;
-   }
+	@Override
+	public Camada[] camadas() {
+		return _camadas;
+	}
 
-   @Override
-   public Camada camadaSaida() {
-      if (_camadas.length < 1) {
-         throw new UnsupportedOperationException(
-            "\nO modelo não possui camadas adiciondas."
-         );
-      }
+	@Override
+	public Camada camadaSaida() {
+		if (_camadas.length < 1) {
+			throw new UnsupportedOperationException(
+				"\nO modelo não possui camadas adiciondas."
+			);
+		}
 
-      return _camadas[_camadas.length-1];
-   }
+		return _camadas[_camadas.length-1];
+	}
 
-   @Override
-   public double[] saidaParaArray() {
-      verificarCompilacao();
-      return camadaSaida().saidaParaArray();
-   }
+	@Override
+	public double[] saidaParaArray() {
+		verificarCompilacao();
+		return camadaSaida().saidaParaArray();
+	}
 
-   @Override
-   public String nome() {
-      return nome;
-   }
+	@Override
+	public String nome() {
+		return nome;
+	}
 
-   @Override
-   public int numParametros() {
-      int params = 0;
+	@Override
+	public int numParametros() {
+		int params = 0;
 
-      for(Camada camada : _camadas) {
-         params += camada.numParametros();
-      }
+		for(Camada camada : _camadas) {
+			params += camada.numParametros();
+		}
 
-      return params;
-   }
+		return params;
+	}
 
-   @Override
-   public int numCamadas() {
-      return _camadas.length;
-   }
+	@Override
+	public int numCamadas() {
+		return _camadas.length;
+	}
 
-   @Override
-   protected String construirInfo() {
-      String pad = " ".repeat(4);
-      StringBuilder sb = new StringBuilder();
-      sb.append(nome() + " = [\n");
+	@Override
+	protected String construirInfo() {
+		String pad = " ".repeat(4);
+		StringBuilder sb = new StringBuilder();
+		sb.append(nome() + " = [\n");
 
-      //otimizador
-      sb.append(_otimizador.info());
-      sb.append("\n");
+		//otimizador
+		sb.append(_otimizador.info());
+		sb.append("\n");
 
-      //função de perda
-      sb.append(pad + "Perda: " + _perda.nome());
-      sb.append("\n\n");
+		//função de perda
+		sb.append(pad + "Perda: " + _perda.nome());
+		sb.append("\n\n");
 
-      //camadas
-      sb.append(
-         pad + String.format(
-         "%-23s%-23s%-23s%-23s%-23s\n", "Camada", "Entrada", "Saída", "Ativação", "Parâmetros"
-         )
-      );
+		//camadas
+		sb.append(
+			pad + String.format(
+			"%-23s%-23s%-23s%-23s%-23s\n", "Camada", "Entrada", "Saída", "Ativação", "Parâmetros"
+			)
+		);
 
-      for (Camada camada : this._camadas) {
-         int[] e = camada.formatoEntrada();
-         int[] s = camada.formatoSaida();
-         
-         //identificador da camada
-         String nomeCamada = camada.id + " - " + camada.nome();
+		for (Camada camada : this._camadas) {
+			int[] e = camada.formatoEntrada();
+			int[] s = camada.formatoSaida();
+			
+			//identificador da camada
+			String nomeCamada = camada.id + " - " + camada.nome();
 
-         //formato de entrada
-         String formEntrada = String.format("(%d", e[0]);
-         for (int i = 1; i < e.length; i++) {
-            formEntrada += String.format(", %d", e[i]);
-         }
-         formEntrada += ")";
+			//formato de entrada
+			String formEntrada = String.format("(%d", e[0]);
+			for (int i = 1; i < e.length; i++) {
+				formEntrada += String.format(", %d", e[i]);
+			}
+			formEntrada += ")";
 
-         //formato de saída
-         String formSaida = String.format("(%d", s[0]);
-         for (int i = 1; i < s.length; i++) {
-            formSaida += String.format(", %d", s[i]);
-         }
-         formSaida += ")";
+			//formato de saída
+			String formSaida = String.format("(%d", s[0]);
+			for (int i = 1; i < s.length; i++) {
+				formSaida += String.format(", %d", s[i]);
+			}
+			formSaida += ")";
 
-         //função de ativação
-         String ativacao = "n/a";
-         try {
-            ativacao = camada.ativacao().nome();
-         } catch (Exception exception) {}
+			//função de ativação
+			String ativacao = "n/a";
+			try {
+				ativacao = camada.ativacao().nome();
+			} catch (Exception exception) {}
 
-         String parametros = String.valueOf(camada.numParametros());
+			String parametros = String.valueOf(camada.numParametros());
 
-         sb.append(
-            pad + String.format(
-               "%-23s%-23s%-23s%-23s%-23s\n", nomeCamada, formEntrada, formSaida, ativacao, parametros
-            )
-         );
-      }
+			sb.append(
+				pad + String.format(
+					"%-23s%-23s%-23s%-23s%-23s\n", nomeCamada, formEntrada, formSaida, ativacao, parametros
+				)
+			);
+		}
 
-      String params = String.format("%,d", numParametros());
-      sb.append("\n" + pad + "Parâmetros treináveis: " + params + "\n");
-      sb.append("]\n");
+		String params = String.format("%,d", numParametros());
+		sb.append("\n" + pad + "Parâmetros treináveis: " + params + "\n");
+		sb.append("]\n");
 
-      return sb.toString();
-   }
+		return sb.toString();
+	}
 
-   @Override
-   public void info() {
-      verificarCompilacao();
-      System.out.println(construirInfo());
-   }
+	@Override
+	public void info() {
+		verificarCompilacao();
+		System.out.println(construirInfo());
+	}
 
-   @Override
-   public Sequencial clone() {
-      try {
-         Sequencial clone = (Sequencial) super.clone();
+	@Override
+	public Sequencial clone() {
+		try {
+			Sequencial clone = (Sequencial) super.clone();
 
-         clone._avaliador = new Avaliador(this);
-         clone.calcularHistorico = this.calcularHistorico;
-         clone.nome = "Clone de " + this.nome;
-         
-         Dicionario dicio = new Dicionario();
-         clone._otimizador = dicio.getOtimizador(_otimizador.nome());
-         clone._perda = dicio.getPerda(_perda.nome());
-         clone.seedInicial = this.seedInicial;
-         clone._treinador = new Treinador();
-         
-         int nCamadas = numCamadas();
-         clone._camadas = new Camada[nCamadas];
-         for (int i = 0; i < nCamadas; i++) {
-            clone._camadas[i] = camada(i).clone();
-         }
-         clone._compilado = this._compilado;
+			clone._avaliador = new Avaliador(this);
+			clone.calcularHistorico = this.calcularHistorico;
+			clone.nome = "Clone de " + this.nome;
+			
+			Dicionario dicio = new Dicionario();
+			clone._otimizador = dicio.getOtimizador(_otimizador.nome());
+			clone._perda = dicio.getPerda(_perda.nome());
+			clone.seedInicial = this.seedInicial;
+			clone._treinador = new Treinador();
+			
+			int nCamadas = numCamadas();
+			clone._camadas = new Camada[nCamadas];
+			for (int i = 0; i < nCamadas; i++) {
+				clone._camadas[i] = camada(i).clone();
+			}
+			clone._compilado = this._compilado;
 
-         return clone;
-      
-      } catch (Exception e) {
-         throw new RuntimeException("\nErro ao clonar modelo: \n" + e);
-      }
-   }
+			return clone;
+		
+		} catch (Exception e) {
+			throw new RuntimeException("\nErro ao clonar modelo: \n" + e);
+		}
+	}
 }

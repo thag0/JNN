@@ -10,13 +10,13 @@ package jnn.ativacoes;
  */
 public class ReLU extends Ativacao {
 
-   /**
-    * Instancia a função de ativação ReLU.
-    */
-   public ReLU() {
-      construir(
-         x -> (x > 0) ? x : 0,
-         x -> (x > 0) ? 1 : 0
-      );
-   }
+	/**
+	 * Instancia a função de ativação ReLU.
+	 */
+	public ReLU() {
+		construir(
+			x -> (x > 0) ? x : 0,
+			x -> (x > 0) ? 1 : 0
+		);
+	}
 }

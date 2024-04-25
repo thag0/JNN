@@ -7,91 +7,91 @@ import jnn.camadas.AvgPooling;
 
 class SerialAvgPool{
 
-   /**
-    * Transforma os dados contidos na camada AvgPooling em
-    * informações sequenciais.
-    * @param camada camada de avg pooling que será serializada.
-    * @param bw escritor de buffer usado para salvar os dados da camada.
-    */
-   public void serializar(AvgPooling camada, BufferedWriter bw){
-      try{
-         //nome da camada pra facilitar
-         bw.write(camada.nome());
-         bw.newLine();
+	/**
+	 * Transforma os dados contidos na camada AvgPooling em
+	 * informações sequenciais.
+	 * @param camada camada de avg pooling que será serializada.
+	 * @param bw escritor de buffer usado para salvar os dados da camada.
+	 */
+	public void serializar(AvgPooling camada, BufferedWriter bw){
+		try{
+			//nome da camada pra facilitar
+			bw.write(camada.nome());
+			bw.newLine();
 
-         //formato de entrada
-         int[] entrada = camada.formatoEntrada();
-         for(int i = 0; i < entrada.length; i++){
-            bw.write(entrada[i] + " ");
-         }
-         bw.newLine();
-         
-         //formato de saída
-         int[] saida = camada.formatoSaida();
-         for(int i = 0; i < saida.length; i++){
-            bw.write(saida[i] + " ");
-         }
-         bw.newLine();
-         
-         //formato do filtro
-         int[] formFiltro = camada.formatoFiltro();
-         for(int i = 0; i < formFiltro.length; i++){
-            bw.write(formFiltro[i] + " ");
-         }
-         bw.newLine();
-         
-         //formato dos strides
-         int[] formStride = camada.formatoStride();
-         for(int i = 0; i < formStride.length; i++){
-            bw.write(formStride[i] + " ");
-         }
-         bw.newLine();
+			//formato de entrada
+			int[] entrada = camada.formatoEntrada();
+			for(int i = 0; i < entrada.length; i++){
+				bw.write(entrada[i] + " ");
+			}
+			bw.newLine();
+			
+			//formato de saída
+			int[] saida = camada.formatoSaida();
+			for(int i = 0; i < saida.length; i++){
+				bw.write(saida[i] + " ");
+			}
+			bw.newLine();
+			
+			//formato do filtro
+			int[] formFiltro = camada.formatoFiltro();
+			for(int i = 0; i < formFiltro.length; i++){
+				bw.write(formFiltro[i] + " ");
+			}
+			bw.newLine();
+			
+			//formato dos strides
+			int[] formStride = camada.formatoStride();
+			for(int i = 0; i < formStride.length; i++){
+				bw.write(formStride[i] + " ");
+			}
+			bw.newLine();
 
-      }catch(Exception e){
-         e.printStackTrace();
-      }
-   }
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
 
-   /**
-    * Lê as informações da camada contida no arquivo.
-    * @param br leitor de buffer.
-    * @return instância de uma camada avg pooling.
-    */
-   public AvgPooling lerConfig(BufferedReader br){
-      try{
-         //formato de entrada
-         String[] sEntrada = br.readLine().split(" ");
-         int[] entrada = new int[sEntrada.length];
-         for(int i = 0; i < sEntrada.length; i++){
-            entrada[i] = Integer.parseInt(sEntrada[i]);
-         }
+	/**
+	 * Lê as informações da camada contida no arquivo.
+	 * @param br leitor de buffer.
+	 * @return instância de uma camada avg pooling.
+	 */
+	public AvgPooling lerConfig(BufferedReader br){
+		try{
+			//formato de entrada
+			String[] sEntrada = br.readLine().split(" ");
+			int[] entrada = new int[sEntrada.length];
+			for(int i = 0; i < sEntrada.length; i++){
+				entrada[i] = Integer.parseInt(sEntrada[i]);
+			}
 
-         //formato de saída
-         String[] sSaida = br.readLine().split(" ");
-         int[] saida = new int[sSaida.length];
-         for(int i = 0; i < sSaida.length; i++){
-            saida[i] = Integer.parseInt(sSaida[i]);
-         }
+			//formato de saída
+			String[] sSaida = br.readLine().split(" ");
+			int[] saida = new int[sSaida.length];
+			for(int i = 0; i < sSaida.length; i++){
+				saida[i] = Integer.parseInt(sSaida[i]);
+			}
 
-         //formato do filtro
-         String[] sFiltro = br.readLine().split(" ");
-         int[] filtro = new int[sFiltro.length];
-         for(int i = 0; i < sFiltro.length; i++){
-            filtro[i] = Integer.parseInt(sFiltro[i]);
-         }
+			//formato do filtro
+			String[] sFiltro = br.readLine().split(" ");
+			int[] filtro = new int[sFiltro.length];
+			for(int i = 0; i < sFiltro.length; i++){
+				filtro[i] = Integer.parseInt(sFiltro[i]);
+			}
 
-         //formato dos strides
-         String[] sStrides = br.readLine().split(" ");
-         int[] strides = new int[sStrides.length];
-         for(int i = 0; i < sStrides.length; i++){
-            strides[i] = Integer.parseInt(sStrides[i]);
-         }
+			//formato dos strides
+			String[] sStrides = br.readLine().split(" ");
+			int[] strides = new int[sStrides.length];
+			for(int i = 0; i < sStrides.length; i++){
+				strides[i] = Integer.parseInt(sStrides[i]);
+			}
 
-         AvgPooling camada = new AvgPooling(filtro, strides);
-         camada.construir(entrada);
-         return camada;
-      }catch(Exception e){
-         throw new RuntimeException(e);
-      }
-   }
+			AvgPooling camada = new AvgPooling(filtro, strides);
+			camada.construir(entrada);
+			return camada;
+		}catch(Exception e){
+			throw new RuntimeException(e);
+		}
+	}
 }

@@ -9,13 +9,13 @@ package jnn.ativacoes;
  */
 public class Seno extends Ativacao {
 
-   /**
-    * Instancia a função de ativação Seno.
-    */
-   public Seno() {
-      construir(
-         x -> Math.sin(x), 
-         x -> Math.cos(x)
-      );
-   }
+	/**
+	 * Instancia a função de ativação Seno.
+	 */
+	public Seno() {
+		construir(
+			x -> Math.sin(x), 
+			x -> Math.cos(x)
+		);
+	}
 }

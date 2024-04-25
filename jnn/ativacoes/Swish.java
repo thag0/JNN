@@ -10,20 +10,20 @@ package jnn.ativacoes;
  */
 public class Swish extends Ativacao {
 
-   /**
-    * Instancia a função de ativação Swish.
-    */
-   public Swish() {
-      construir(
-         x -> x * sigmoid(x), 
-         x -> {
-            double sig = sigmoid(x);
-            return sig + (x * sig * (1 - sig));
-         }
-      );
-   }
+	/**
+	 * Instancia a função de ativação Swish.
+	 */
+	public Swish() {
+		construir(
+			x -> x * sigmoid(x), 
+			x -> {
+				double sig = sigmoid(x);
+				return sig + (x * sig * (1 - sig));
+			}
+		);
+	}
 
-   private double sigmoid(double x) {
-      return 1 / (1 + Math.exp(-x));
-   }
+	private double sigmoid(double x) {
+		return 1 / (1 + Math.exp(-x));
+	}
 }

@@ -10,13 +10,13 @@ package jnn.ativacoes;
  */
 public class Atan extends Ativacao {
 
-   /**
-    * Instancia a função de ativação ArcTangente (atan).
-    */
-   public Atan() {
-      construir(
-         x -> Math.atan(x),
-         x -> 1.0 / (1.0 + (x * x))
-      );
-   }
+	/**
+	 * Instancia a função de ativação ArcTangente (atan).
+	 */
+	public Atan() {
+		construir(
+			x -> Math.atan(x),
+			x -> 1.0 / (1.0 + (x * x))
+		);
+	}
 }

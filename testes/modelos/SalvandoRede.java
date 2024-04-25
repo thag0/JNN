@@ -17,30 +17,30 @@ import lib.ged.Ged;
 
 @SuppressWarnings("unused")
 public class SalvandoRede{
-   public static void main(String[] args){
-      Ged ged = new Ged();
-      ged.limparConsole();
-      String caminho = "./dados/modelos/modelo-treinado.nn";
-      Serializador serializador = new Serializador();
-      
-      Sequencial modelo = ler(caminho);
-      // Sequencial modelo = criar();
+	public static void main(String[] args){
+		Ged ged = new Ged();
+		ged.limparConsole();
+		String caminho = "./dados/modelos/modelo-treinado.nn";
+		Serializador serializador = new Serializador();
+		
+		Sequencial modelo = ler(caminho);
+		// Sequencial modelo = criar();
 
-      modelo.info();
+		modelo.info();
 
-      // serializador.salvar(modelo, caminho);
-   }
+		// serializador.salvar(modelo, caminho);
+	}
 
-   static Sequencial criar(){
-      Sequencial modelo = new Sequencial(new Camada[]{
-         new Convolucional(new int[]{2, 10, 10}, new int[]{3, 3}, 2),
-      });
+	static Sequencial criar(){
+		Sequencial modelo = new Sequencial(new Camada[]{
+			new Convolucional(new int[]{2, 10, 10}, new int[]{3, 3}, 2),
+		});
 
-      modelo.compilar("sgd", "mse");
-      return modelo;
-   }
+		modelo.compilar("sgd", "mse");
+		return modelo;
+	}
 
-   static Sequencial ler(String caminho){
-      return new Serializador().lerSequencial(caminho); 
-   }
+	static Sequencial ler(String caminho){
+		return new Serializador().lerSequencial(caminho); 
+	}
 }

@@ -7,215 +7,240 @@ import java.io.FileInputStream;
 
 import javax.imageio.ImageIO;
 
-import jnn.modelos.RedeNeural;
+import jnn.modelos.Modelo;
 
 /**
  * Gerenciador de arquivos do Geim
  */
-class GerenciadorArquivos{
-   
-   /**
-    * Contém as implementações de gestão de arquivos do Geim
-    */
-   public GerenciadorArquivos(){}
+class GerenciadorArquivos {
+	
+	/**
+	 * Contém as implementações de gestão de arquivos do Geim
+	 */
+	public GerenciadorArquivos() {}
 
-
-   public BufferedImage lerImagem(String caminho) {
-      File arquivo = new File(caminho);
-      if (!arquivo.exists()) {
-         throw new IllegalArgumentException(
-            "Diretório \"" + caminho + "\" não encontrado."
-         );
-      }
+	/**
+	 * 
+	 * @param caminho
+	 * @return
+	 */
+	public BufferedImage lerImagem(String caminho) {
+		File arquivo = new File(caminho);
+		if (!arquivo.exists()) {
+			throw new IllegalArgumentException(
+				"Diretório \"" + caminho + "\" não encontrado."
+			);
+		}
   
-      BufferedImage img = null;
-      
-      try {
-         img = ImageIO.read(new FileInputStream(arquivo));
-      } catch (IOException e) {
-         System.out.println("Erro ao ler a imagem \"" + caminho + "\"");
-         e.printStackTrace();
-      }
+		BufferedImage img = null;
+		
+		try {
+			img = ImageIO.read(new FileInputStream(arquivo));
+		} catch (IOException e) {
+			System.out.println("Erro ao ler a imagem \"" + caminho + "\"");
+			e.printStackTrace();
+		}
   
-      return img;
-   }
+		return img;
+	}
   
+	/**
+	 * 
+	 * @param estruturaImagem
+	 * @param caminho
+	 */
+	public void exportarPng(Pixel[][] estruturaImagem, String caminho) {
+		int alturaImagem = estruturaImagem.length;
+		int larguraImagem = estruturaImagem[0].length;
 
+		BufferedImage imagem = new BufferedImage(larguraImagem, alturaImagem, BufferedImage.TYPE_INT_RGB);
 
-   public void exportarPng(Pixel[][] estruturaImagem, String caminho){
-      int alturaImagem = estruturaImagem.length;
-      int larguraImagem = estruturaImagem[0].length;
+		int r = 0;
+		int g = 0;
+		int b = 0;
+		int rgb = 0;
 
-      BufferedImage imagem = new BufferedImage(larguraImagem, alturaImagem, BufferedImage.TYPE_INT_RGB);
+		for (int y = 0; y < alturaImagem; y++) {
+			for (int x = 0; x < larguraImagem; x++) {
+				r = estruturaImagem[y][x].getR();
+				g = estruturaImagem[y][x].getG();
+				b = estruturaImagem[y][x].getB();
 
-      int r = 0;
-      int g = 0;
-      int b = 0;
-      int rgb = 0;
+				rgb = (r << 16) | (g << 8) | b;
+				imagem.setRGB(x, y, rgb);
+			}
+		}
 
-      for(int y = 0; y < alturaImagem; y++){
-         for(int x = 0; x < larguraImagem; x++){
-            r = estruturaImagem[y][x].getR();
-            g = estruturaImagem[y][x].getG();
-            b = estruturaImagem[y][x].getB();
+		try {
+			File arquivo = new File((caminho + ".png"));
+			ImageIO.write(imagem, "png", arquivo);
 
-            rgb = (r << 16) | (g << 8) | b;
-            imagem.setRGB(x, y, rgb);
-         }
-      }
+		} catch (Exception e) {
+			System.out.println("Erro ao exportar imagem");
+			e.printStackTrace();
+		}
+	}
 
-      try{
-         File arquivo = new File((caminho + ".png"));
-         ImageIO.write(imagem, "png", arquivo);
+	/**
+	 * 
+	 * @param gdi
+	 * @param imagem
+	 * @param modelo
+	 * @param escala
+	 * @param caminho
+	 */
+	public void exportarImagemEscalaCinza(GerenciadorDadosImagem gdi, BufferedImage imagem, Modelo modelo, double escala, String caminho) {
+		if (imagem == null) throw new IllegalArgumentException("A imagem fornecida é nula.");
+		if (escala <= 0) throw new IllegalArgumentException("O valor de escala não pode ser menor que 1.");
+		if (modelo.camadaSaida().tamanhoSaida() != 1) {
+			throw new IllegalArgumentException(
+				"O modelo deve trabalhar apenas com uma unidade na camada de saída para a escala de cinza."
+			);
+		}
 
-      }catch(Exception e){
-         System.out.println("Erro ao exportar imagem");
-         e.printStackTrace();
-      }
-   }
+		int larguraFinal = (int)(imagem.getWidth() * escala);
+		int alturaFinal = (int)(imagem.getHeight() * escala);
 
+		Pixel[][] imagemAmpliada = gdi.gerarEstruturaImagem(larguraFinal, alturaFinal);
+		
+		int alturaImagem = imagemAmpliada.length;
+		int larguraImagem = imagemAmpliada[0].length;
 
-   public void exportarImagemEscalaCinza(GerenciadorDadosImagem gdi, BufferedImage imagem, RedeNeural rede, float escala, String caminho){
-      if(imagem == null) throw new IllegalArgumentException("A imagem fornecida é nula.");
-      if(escala <= 0) throw new IllegalArgumentException("O valor de escala não pode ser menor que 1.");
-      if(rede.obterTamanhoSaida() != 1){
-         throw new IllegalArgumentException("A rede deve trabalhar apenas com um neurônio na camada de saída para a escala de cinza.");
-      }
+		//gerenciar multithread
+		int numThreads = Runtime.getRuntime().availableProcessors();
+		if (numThreads > 1) {
+			//só pra não sobrecarregar o processador
+			numThreads = (int)(numThreads / 2);
+		}
 
-      int larguraFinal = (int)(imagem.getWidth() * escala);
-      int alturaFinal = (int)(imagem.getHeight() * escala);
+		Thread[] threads = new Thread[numThreads];
+		Modelo[] clones = new Modelo[numThreads];
+		for (int i = 0; i < numThreads; i++) {
+			clones[i] = modelo.clone();
+		}
 
-      Pixel[][] imagemAmpliada = gdi.gerarEstruturaImagem(larguraFinal, alturaFinal);
-      
-      int alturaImagem = imagemAmpliada.length;
-      int larguraImagem = imagemAmpliada[0].length;
+		int alturaPorThead = alturaImagem / numThreads;
 
-      //gerenciar multithread
-      int numThreads = Runtime.getRuntime().availableProcessors();
-      if(numThreads > 1){
-         //só pra não sobrecarregar o processador
-         numThreads = (int)(numThreads / 2);
-      }
+		for (int i = 0; i < numThreads; i++) {
+			final int id = i;
+			final int inicio = i * alturaPorThead;
+			final int fim = inicio + alturaPorThead;
+			
+			threads[i] = new Thread(() -> {
+				for (int y = inicio; y < fim; y++) {
+					for (int x = 0; x < larguraImagem; x++) {
+						double[] entrada = new double[2];
+						double[] saida = new double[1];
 
-      Thread[] threads = new Thread[numThreads];
-      RedeNeural[] redes = new RedeNeural[numThreads];
-      for(int i = 0; i < numThreads; i++){
-         redes[i] = rede.clone();
-      }
+						entrada[0] = (double)x / (larguraImagem-1);
+						entrada[1] = (double)y / (alturaImagem-1);
+					
+						clones[id].forward(entrada);
+					
+						saida[0] = clones[id].saidaParaArray()[0] * 255;
 
-      int alturaPorThead = alturaImagem / numThreads;
+						synchronized(imagemAmpliada) {
+							gdi.setCor(imagemAmpliada, x, y, (int)saida[0], (int)saida[0], (int)saida[0]);
+						}
+					}
+				}
+			});
 
-      for(int i = 0; i < numThreads; i++){
-         final int id = i;
-         final int inicio = i * alturaPorThead;
-         final int fim = inicio + alturaPorThead;
-         
-         threads[i] = new Thread(() -> {
-            for(int y = inicio; y < fim; y++){
-               for(int x = 0; x < larguraImagem; x++){
-                  double[] entrada = new double[2];
-                  double[] saida = new double[1];
+			threads[i].start();
+		}
 
-                  entrada[0] = (double)x / (larguraImagem-1);
-                  entrada[1] = (double)y / (alturaImagem-1);
-               
-                  redes[id].forward(entrada);
-               
-                  saida[0] = redes[id].saidaParaArray()[0] * 255;
+		try {
+			for (Thread thread : threads) {
+				thread.join();
+			}
+		} catch(Exception e) {
+			System.out.println("Ocorreu um erro ao tentar salvar a imagem.");
+			e.printStackTrace();
+		}
 
-                  synchronized(imagemAmpliada){
-                     gdi.setCor(imagemAmpliada, x, y, (int)saida[0], (int)saida[0], (int)saida[0]);
-                  }
-               }
-            }
-         });
+		this.exportarPng(imagemAmpliada, caminho);
+	}
 
-         threads[i].start();
-      }
+	/**
+	 * 
+	 * @param gdi
+	 * @param imagem
+	 * @param modelo
+	 * @param escala
+	 * @param caminho
+	 */
+	public void exportarImagemRGB(GerenciadorDadosImagem gdi, BufferedImage imagem, Modelo modelo, double escala, String caminho) {
+		if (imagem == null) throw new IllegalArgumentException("A imagem fornecida é nula.");
+		if (escala <= 0) throw new IllegalArgumentException("O valor de escala não pode ser menor que 1.");
+		if (modelo.camadaSaida().tamanhoSaida() != 3) {
+			throw new IllegalArgumentException(
+				"O modelo deve trabalhar apenas com três neurônios na saída para RGB."
+			);
+		}
 
-      try{
-         for(Thread thread : threads){
-            thread.join();
-         }
-      }catch(Exception e){
-         System.out.println("Ocorreu um erro ao tentar salvar a imagem.");
-         e.printStackTrace();
-      }
+		//estrutura de dados da imagem
+		int larguraFinal = (int)(imagem.getWidth() * escala);
+		int alturaFinal = (int)(imagem.getHeight() * escala);
+		Pixel[][] imagemAmpliada = gdi.gerarEstruturaImagem(larguraFinal, alturaFinal);
+		
+		int alturaImagem = imagemAmpliada.length;
+		int larguraImagem = imagemAmpliada[0].length;
 
-      this.exportarPng(imagemAmpliada, caminho);
-   }
+		//gerenciar multithread
+		int numThreads = Runtime.getRuntime().availableProcessors();
+		if (numThreads > 1) {
+			//só pra não sobrecarregar o processador
+			numThreads = (int)(numThreads / 2);
+		}
 
+		Thread[] threads = new Thread[numThreads];
+		Modelo[] redes = new Modelo[numThreads];
+		for (int i = 0; i < numThreads; i++) {
+			redes[i] = modelo.clone();
+		}
 
-   public void exportarImagemRGB(GerenciadorDadosImagem gdi, BufferedImage imagem, RedeNeural rede, float escala, String caminho){
-      if(imagem == null) throw new IllegalArgumentException("A imagem fornecida é nula.");
-      if(escala <= 0) throw new IllegalArgumentException("O valor de escala não pode ser menor que 1.");
-      if(rede.obterTamanhoSaida() != 3){
-         throw new IllegalArgumentException("A rede deve trabalhar apenas com três neurônios na saída para RGB.");
-      }
+		int alturaPorThead = alturaImagem / numThreads;
 
-      //estrutura de dados da imagem
-      int larguraFinal = (int)(imagem.getWidth() * escala);
-      int alturaFinal = (int)(imagem.getHeight() * escala);
-      Pixel[][] imagemAmpliada = gdi.gerarEstruturaImagem(larguraFinal, alturaFinal);
-      
-      int alturaImagem = imagemAmpliada.length;
-      int larguraImagem = imagemAmpliada[0].length;
+		for (int i = 0; i < numThreads; i++) {
+			final int id = i;
+			final int inicio = i * alturaPorThead;
+			final int fim = inicio + alturaPorThead;
+			
+			threads[i] = new Thread(() -> {
+				for (int y = inicio; y < fim; y++) {
+					for (int x = 0; x < larguraImagem; x++) {
+						double[] entrada = new double[2];
+						double[] saida = new double[3];
 
-      //gerenciar multithread
-      int numThreads = Runtime.getRuntime().availableProcessors();
-      if(numThreads > 1){
-         //só pra não sobrecarregar o processador
-         numThreads = (int)(numThreads / 2);
-      }
+						entrada[0] = (double)x / (larguraImagem-1);
+						entrada[1] = (double)y / (alturaImagem-1);
+					
+						redes[id].forward(entrada);
+						double[] s = redes[id].saidaParaArray();
+					
+						saida[0] = s[0] * 255;
+						saida[1] = s[1] * 255;
+						saida[2] = s[2] * 255;
 
-      Thread[] threads = new Thread[numThreads];
-      RedeNeural[] redes = new RedeNeural[numThreads];
-      for(int i = 0; i < numThreads; i++){
-         redes[i] = rede.clone();
-      }
+						synchronized (imagemAmpliada) {
+							gdi.setCor(imagemAmpliada, x, y, (int)saida[0], (int)saida[1], (int)saida[2]);
+						}
+					}
+				}
+			});
 
-      int alturaPorThead = alturaImagem / numThreads;
+			threads[i].start();
+		}
 
-      for(int i = 0; i < numThreads; i++){
-         final int id = i;
-         final int inicio = i * alturaPorThead;
-         final int fim = inicio + alturaPorThead;
-         
-         threads[i] = new Thread(() -> {
-            for(int y = inicio; y < fim; y++){
-               for(int x = 0; x < larguraImagem; x++){
-                  double[] entrada = new double[2];
-                  double[] saida = new double[3];
+		try {
+			for (Thread thread : threads) {
+				thread.join();
+			}
+		} catch (Exception e) {
+			System.out.println("Ocorreu um erro ao tentar salvar a imagem.");
+			e.printStackTrace();
+		}
 
-                  entrada[0] = (double)x / (larguraImagem-1);
-                  entrada[1] = (double)y / (alturaImagem-1);
-               
-                  redes[id].forward(entrada);
-                  double[] s = redes[id].saidaParaArray();
-               
-                  saida[0] = s[0] * 255;
-                  saida[1] = s[1] * 255;
-                  saida[2] = s[2] * 255;
-
-                  synchronized(imagemAmpliada){
-                     gdi.setCor(imagemAmpliada, x, y, (int)saida[0], (int)saida[1], (int)saida[2]);
-                  }
-               }
-            }
-         });
-
-         threads[i].start();
-      }
-
-      try{
-         for(Thread thread : threads){
-            thread.join();
-         }
-      }catch(Exception e){
-         System.out.println("Ocorreu um erro ao tentar salvar a imagem.");
-         e.printStackTrace();
-      }
-
-      this.exportarPng(imagemAmpliada, caminho);
-   }
+		this.exportarPng(imagemAmpliada, caminho);
+	}
 }

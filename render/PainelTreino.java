@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 
 import jnn.modelos.Modelo;
 
-public class PainelTreino extends JPanel{
+public class PainelTreino extends JPanel {
    final int largura;
    final int altura;
    Modelo modelo;
@@ -26,9 +26,9 @@ public class PainelTreino extends JPanel{
    int r, b, g, rgb;
    int x, y;
    
-   public PainelTreino(int largura, int altura, double escala){
-      this.largura = (int) (largura*escala);
-      this.altura =  (int) (altura*escala);
+   public PainelTreino(int largura, int altura, double escala) {
+      this.largura = (int) (escala * largura);
+      this.altura =  (int) (escala * altura);
 
       imagem = new BufferedImage(this.largura, this.altura, BufferedImage.TYPE_INT_RGB);
 
@@ -38,20 +38,18 @@ public class PainelTreino extends JPanel{
       setDoubleBuffered(true);
       setEnabled(true);
       setVisible(true);
-   
-      
    }
 
-   public void desenhar(Modelo modelo, int epocasPorFrame){
+   public void desenhar(Modelo modelo, int epocasPorFrame) {
       this.modelo = modelo;
       
       int nEntrada = 2;
       int nSaida = modelo.camadaSaida().tamanhoSaida();
       entradaRede = new double[nEntrada];
 
-      if(nSaida == 1){//escala de cinza
-         for(y = 0; y < this.altura; y++){
-            for(x = 0; x < this.largura; x++){
+      if (nSaida == 1) {//escala de cinza
+         for (y = 0; y < this.altura; y++) {
+            for (x = 0; x < this.largura; x++) {
                entradaRede[0] = (double)x / this.largura;
                entradaRede[1] = (double)y / this.altura;
                modelo.forward(entradaRede);
@@ -67,9 +65,9 @@ public class PainelTreino extends JPanel{
             }
          } 
 
-      }else if(nSaida == 3){//rgb
-         for(y = 0; y < this.altura; y++){
-            for(x = 0; x < this.largura; x++){
+      } else if (nSaida == 3) {//rgb
+         for (y = 0; y < this.altura; y++) {
+            for (x = 0; x < this.largura; x++) {
                entradaRede[0] = (double)x / this.largura;
                entradaRede[1] = (double)y / this.altura;
                modelo.forward(entradaRede);
@@ -88,11 +86,11 @@ public class PainelTreino extends JPanel{
       repaint();
    }
 
-   public void desenhar(Modelo modelo, int epocasPorFrame, int numThreads){
+   public void desenhar(Modelo modelo, int epocasPorFrame, int numThreads) {
       ExecutorService exec = Executors.newFixedThreadPool(numThreads);
 
       Modelo[] clones = new Modelo[numThreads];
-      for(int i = 0; i < clones.length; i++){
+      for (int i = 0; i < clones.length; i++) {
          clones[i] = modelo.clone();
       }
       
@@ -100,25 +98,25 @@ public class PainelTreino extends JPanel{
       int restoAltura = this.altura % numThreads;
       int nSaida = modelo.camadaSaida().tamanhoSaida();
 
-      for(int i = 0; i < numThreads; i++){
+      for (int i = 0; i < numThreads; i++) {
          final int id = i;
          int inicioY = i * alturaPorThread;
          int fimY = inicioY + alturaPorThread + ((i == numThreads-1) ? restoAltura : 0);
 
-         if(nSaida == 1){
+         if (nSaida == 1) {
             exec.submit(() -> calcularParteCinza(clones[id], inicioY, fimY));
             
-         }else if(nSaida == 3){
+         } else if(nSaida == 3) {
             exec.submit(() -> calcularParteRGB(clones[id], inicioY, fimY));
          }
       }
 
       exec.shutdown();
 
-      try{
+      try {
          exec.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 
-      }catch(Exception e){
+      } catch (Exception e) {
          throw new RuntimeException(e);
       }
 
@@ -126,15 +124,15 @@ public class PainelTreino extends JPanel{
       repaint();
    }
 
-   private void calcularParteCinza(Modelo modelo, int inicioY, int fimY){
+   private void calcularParteCinza(Modelo modelo, int inicioY, int fimY) {
       double[] entrada = new double[2];
       double[] saida = new double[1];
 
       int r, g, b, rgb, cinza;
       int x, y;
 
-      for(y = inicioY; y < fimY; y++){
-         for(x = 0; x < this.largura; x++){
+      for (y = inicioY; y < fimY; y++) {
+         for (x = 0; x < this.largura; x++) {
             entrada[0] = (double) x / this.largura;
             entrada[1] = (double) y / this.altura;
 
@@ -151,14 +149,14 @@ public class PainelTreino extends JPanel{
       }
    }
 
-   private void calcularParteRGB(Modelo modelo, int inicioY, int fimY){
+   private void calcularParteRGB(Modelo modelo, int inicioY, int fimY) {
       double[] entrada = new double[2];
       double[] saida = new double[3];
       int r, g, b, rgb;
       int x, y;
 
-      for(y = inicioY; y < fimY; y++){
-         for (x = 0; x < this.largura; x++){
+      for (y = inicioY; y < fimY; y++) {
+         for (x = 0; x < this.largura; x++) {
             entrada[0] = (double) x / this.largura;
             entrada[1] = (double) y / this.altura;
             
@@ -175,7 +173,7 @@ public class PainelTreino extends JPanel{
    }
 
    @Override
-   protected void paintComponent(Graphics g){
+   protected void paintComponent(Graphics g) {
       super.paintComponent(g);
       Graphics2D g2 = (Graphics2D) g;
 

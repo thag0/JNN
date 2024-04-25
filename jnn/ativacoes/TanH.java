@@ -12,31 +12,31 @@ import jnn.camadas.Densa;
  */
 public class TanH extends Ativacao {
 
-   /**
-    * Instancia a função de ativação TanH.
-    */
-   public TanH() {
-      construir(
-         x -> (2 / (1 + Math.exp(-2*x))) - 1, 
-         x -> {
-            double t = (2 / (1 + Math.exp(-2*x))) - 1;
-            return 1 - (t * t);
-         }
-      );
-   }
+	/**
+	 * Instancia a função de ativação TanH.
+	 */
+	public TanH() {
+		construir(
+			x -> (2 / (1 + Math.exp(-2*x))) - 1, 
+			x -> {
+				double t = (2 / (1 + Math.exp(-2*x))) - 1;
+				return 1 - (t * t);
+			}
+		);
+	}
 
-   @Override
-   public void backward(Densa densa) {
-      //aproveitar os resultados pre calculados
+	@Override
+	public void backward(Densa densa) {
+		//aproveitar os resultados pre calculados
 
-      double[] e = densa.saidaParaArray();
-      double[] g = densa._gradSaida.paraArray();
-      double[] d = new double[e.length];
+		double[] e = densa.saidaParaArray();
+		double[] g = densa._gradSaida.paraArray();
+		double[] d = new double[e.length];
 
-      for (int i = 0; i < d.length; i++) {
-         d[i] = (1 - (e[i]*e[i])) * g[i];
-      }
+		for (int i = 0; i < d.length; i++) {
+			d[i] = (1 - (e[i]*e[i])) * g[i];
+		}
 
-      densa._gradSaida.copiarElementos(d);
-   }
+		densa._gradSaida.copiarElementos(d);
+	}
 }

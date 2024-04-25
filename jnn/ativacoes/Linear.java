@@ -12,13 +12,13 @@ package jnn.ativacoes;
  */
 public class Linear extends Ativacao {
 
-   /**
-    * Instancia a função de ativação Linear.
-    */
-   public Linear() {
-      construir(
-         x -> x,
-         x -> 1
-      );
-   }
+	/**
+	 * Instancia a função de ativação Linear.
+	 */
+	public Linear() {
+		construir(
+			x -> x,
+			x -> 1
+		);
+	}
 }
