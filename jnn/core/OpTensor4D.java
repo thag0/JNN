@@ -1,5 +1,8 @@
 package jnn.core;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * Auxiliar em operação para tensores 4D.
  */
@@ -804,17 +807,18 @@ public class OpTensor4D {
 
 		// NOTA
 		//essa solução não é definitiva ainda porque nos testes não teve
-		//uma grande melhora, apenas cerca de 4~5% de melhoria no desempenho
+		//uma grande melhora, apenas cerca de 5~6% de melhoria no desempenho
 		//treinando com modelos pequenos e poucas épocas
+		ExecutorService exec = Executors.newFixedThreadPool(1);
 
-		Thread t = new Thread(() -> {
+		exec.submit(() -> {
 			for (int i = 0; i < filtros; i++) {
 				for (int j = 0; j < entradas; j++) {
 					convolucao2DFull(gradSaida, kernel, gradE, new int[]{0, i}, new int[]{i, j}, new int[]{0, j});
 				}
 			}
 		});
-		t.start();
+		exec.shutdown();
 
 		for (int i = 0; i < filtros; i++) {
 			for (int j = 0; j < entradas; j++) {
@@ -822,10 +826,6 @@ public class OpTensor4D {
 			}
 		}
 
-		try {
-			t.join();
-		} catch (InterruptedException e) {
-			System.out.println(e.getMessage());
-		}
+		while (!exec.isTerminated()) {}
 	}
 }
