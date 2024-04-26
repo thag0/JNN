@@ -9,6 +9,7 @@ import lib.ged.Ged;
 import lib.geim.Geim;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class Playground{
 	static Ged ged = new Ged();
@@ -51,7 +52,9 @@ public class Playground{
 		Tensor4D t1 = new Tensor4D(a);
 		Tensor4D t2 = new Tensor4D(b);
 		Tensor4D t3 = new Tensor4D(t1.dim3()+t2.dim3()-1, t1.dim4()+t2.dim4()-1);
-		optensor.convolucao2DFull(t1, t2, t3, new int[]{0, 0}, new int[]{0, 0}, new int[]{0, 0});
+		long tempo = medirTempo(
+			() -> optensor.convolucao2DFull(t1, t2, t3, new int[]{0, 0}, new int[]{0, 0}, new int[]{0, 0})
+		);
 		
 		Tensor4D esperado = new Tensor4D(new double[][]{
 			{1, 8, 14, 4},
@@ -62,6 +65,7 @@ public class Playground{
 
 		t3.print(1);
 		System.out.println("Resultado esperado: " + t3.equals(esperado));
+		System.out.println("Tempo: " + TimeUnit.NANOSECONDS.toMillis(tempo) + "ms");
 	}
 
     /**

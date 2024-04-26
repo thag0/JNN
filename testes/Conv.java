@@ -315,7 +315,7 @@ public class Conv{
 
 	static void testarPrevisao(Sequencial modelo, String caminhoImagem, boolean prob){
 		String extensao = ".jpg";
-		var entrada = new Tensor4D(imagemParaMatriz("/dados/mnist/" + caminhoImagem + extensao));
+		var entrada = new Tensor4D(imagemParaMatriz("./dados/mnist/" + caminhoImagem + extensao));
 		double[] previsao = modelo.forward(entrada).paraArray();
 		
 		System.out.print("\nTestando: " + caminhoImagem + extensao);

@@ -799,25 +799,33 @@ public class OpTensor4D {
 	 * @param gradE {@code Tensor} com o gradiente de entrada.
 	 */
 	public void convBackward(Tensor4D entrada, Tensor4D kernel, Tensor4D gradSaida, Tensor4D gradK, Tensor4D gradE) {
-		int filtros = kernel.dim1();
-		int entradas = kernel.dim2();
+		final int filtros = kernel.dim1();
+		final int entradas = kernel.dim2();
 
-		int[] idEn = {0, 0};
-		int[] idGradSaida = {0, 0};
-		int[] idK = {0, 0};
-		int[] idGradEn = {0, 0};
+		// NOTA
+		//essa solução não é definitiva ainda porque nos testes não teve
+		//uma grande melhora, apenas cerca de 4~5% de melhoria no desempenho
+		//treinando com modelos pequenos e poucas épocas
+
+		Thread t = new Thread(() -> {
+			for (int i = 0; i < filtros; i++) {
+				for (int j = 0; j < entradas; j++) {
+					convolucao2DFull(gradSaida, kernel, gradE, new int[]{0, i}, new int[]{i, j}, new int[]{0, j});
+				}
+			}
+		});
+		t.start();
 
 		for (int i = 0; i < filtros; i++) {
-			idGradSaida[1] = i;
-			idK[0] = i;
 			for (int j = 0; j < entradas; j++) {
-				idEn[1] = j;
-				idK[1] = j;
-				idGradEn[1] = j;
-				correlacao2D(entrada, gradSaida, gradK, idEn, idGradSaida, idK);
-				convolucao2DFull(gradSaida, kernel, gradE, idGradSaida, idK, idGradEn);
+				correlacao2D(entrada, gradSaida, gradK, new int[]{0, j}, new int[]{0, i}, new int[]{i, j});
 			}
 		}
 
+		try {
+			t.join();
+		} catch (InterruptedException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 }
