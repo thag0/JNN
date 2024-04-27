@@ -324,12 +324,12 @@ public abstract class Modelo implements Cloneable {
 			);
 		}
 
+		Tensor4D[] prevs = forwards(amostras);
 		double[][] s = (double[][]) saida;
 		int n = amostras.length;
 		double soma = 0;
 		for (int i = 0; i < n; i++) {
-			forward(amostras[i]);
-			soma += _perda.calcular(saidaParaArray(), s[i]);
+			soma += _perda.calcular(prevs[i].paraArray(), s[i]);
 		}
 
 		return soma/n;

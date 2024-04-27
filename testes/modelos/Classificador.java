@@ -57,7 +57,7 @@ public class Classificador{
 		// modelo.info();
 		
 		//treinando e avaliando os resultados
-		modelo.treinar(treinoX, treinoY, 160, 16, true);
+		modelo.treinar(treinoX, treinoY, 180, 16, true);
 		double acc = modelo.avaliador().acuracia(testeX, testeY);
 		System.out.println("Acurácia = " + formatarDecimal(acc*100, 4) + "%");
 		System.out.println("Perda = " + modelo.avaliar(testeX, testeY));

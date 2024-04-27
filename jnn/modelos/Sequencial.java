@@ -328,9 +328,23 @@ public class Sequencial extends Modelo {
 		utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
 
 		Tensor4D[] prevs = new Tensor4D[entradas.length];
+		Sequencial clone = clone();
 
-		for (int i = 0; i < prevs.length; i++) {
+		Thread t = new Thread(() -> {
+			for (int i = 0; i < prevs.length/2; i++) {
+				prevs[i] = clone.forward(entradas[i]);
+			}
+		});
+		t.start();
+
+		for (int i = prevs.length/2; i < prevs.length; i++) {
 			prevs[i] = forward(entradas[i]);
+		}
+
+		try {
+			t.join();
+		} catch (InterruptedException e) {
+			System.out.println(e.getMessage());
 		}
 
 		return prevs;
