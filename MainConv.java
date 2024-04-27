@@ -31,7 +31,7 @@ public class MainConv {
 	static final int NUM_AMOSTRAS_TREINO = 400;
 	static final int NUM_AMOSTRAS_TESTE  = 100;
 	static final int TREINO_EPOCAS = 5; // += 7min, 5 epocas
-	static final int TREINO_LOTE = 1;
+	static final int TREINO_LOTE = 12;
 	static final boolean TREINO_LOGS = true;
 
 	// caminhos de arquivos externos
@@ -67,6 +67,7 @@ public class MainConv {
 		System.out.println("\nCarregando dados de teste.");
 		final var testeX = carregarDadosMNIST(CAMINHO_TESTE, NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
 		final var testeY = criarRotulosMNIST(NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
+		// System.out.print("Teste -> perda: " + modelo.avaliar(testeX, testeY) + " - ");
 		System.out.print("Teste -> perda: " + modelo.avaliar(testeX, testeY) + " - ");
 		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(testeX, testeY) * 100), 4) + "%");
 

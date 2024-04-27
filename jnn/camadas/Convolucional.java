@@ -842,13 +842,14 @@ public class Convolucional extends Camada implements Cloneable {
 		verificarConstrucao();
 
 		Convolucional clone = (Convolucional) super.clone();
-
-		clone.ativacao = this.ativacao;
-		clone.usarBias = this.usarBias;
+		clone.ativacao 	 = this.ativacao;
+		clone.usarBias   = this.usarBias;
+		clone._treinavel = this._treinavel;
 
 		clone._entrada     = this._entrada.clone();
 		clone._filtros     = this._filtros.clone();
 		clone._gradFiltros = this._gradFiltros.clone();
+		clone._gradEntrada = this._gradEntrada.clone();
 
 		if (this.usarBias) {
 			clone._bias     = this._bias.clone();

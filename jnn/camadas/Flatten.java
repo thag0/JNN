@@ -14,7 +14,7 @@ import jnn.core.Utils;
  *    A camada de flatten não possui parâmetros treináveis nem função de ativação.
  * </p>
  */
-public class Flatten extends Camada {
+public class Flatten extends Camada implements Cloneable{
 
 	/**
 	 * Utilitário.
@@ -358,6 +358,24 @@ public class Flatten extends Camada {
 		sb.append("\n");
 		
 		return sb.toString();
+	}
+
+	@Override
+	public Flatten clone() {
+		Flatten clone = (Flatten) super.clone();
+
+		clone._treinavel = this._treinavel;
+		clone.treinando = this.treinando;
+		clone._construida = this._construida;
+
+		clone.formEntrada = formEntrada.clone();
+		clone.formSaida = formSaida.clone();
+
+		clone._entrada = _entrada.clone();
+		clone._gradEntrada = _gradEntrada.clone();
+		clone._saida = _saida.clone();
+
+		return clone;
 	}
 
 }

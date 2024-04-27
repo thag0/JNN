@@ -37,7 +37,7 @@ import jnn.core.Utils;
  *    A camada de max pooling não possui parâmetros treináveis nem função de ativação.
  * </p>
  */
-public class MaxPooling extends Camada {
+public class MaxPooling extends Camada implements Cloneable{
 
 	/**
 	 * Utilitario.
@@ -525,5 +525,25 @@ public class MaxPooling extends Camada {
 		sb.append("\n");
 		
 		return sb.toString();
+	}
+
+	@Override
+	public MaxPooling clone() {
+		MaxPooling clone = (MaxPooling) super.clone();
+
+		clone._treinavel = this._treinavel;
+		clone.treinando = this.treinando;
+		clone._construida = this._construida;
+
+		clone.formEntrada = this.formEntrada.clone();
+		clone.formFiltro = this.formFiltro.clone();
+		clone.formSaida = this.formSaida.clone();
+		clone.stride = this.stride.clone();
+		
+		clone._entrada = this._entrada.clone();
+		clone._saida = this._saida.clone();
+		clone._gradEntrada = this._gradEntrada.clone();
+
+		return clone;
 	}
 }
