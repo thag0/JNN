@@ -86,7 +86,6 @@ class TreinoLote {
 				
 				modelo.zerarGradientes();//zerar gradientes para o acumular pelo lote
 				for (int j = 0; j < entradaLote.length; j++) {
-					double[] saidaAmostra = (double[]) saidaLote[j];
 					modelo.forward(entradaLote[j]);
 
 					if (calcularHistorico) {
