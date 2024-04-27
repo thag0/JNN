@@ -1,5 +1,6 @@
 package jnn.avaliacao.metrica;
 
+import jnn.core.Tensor4D;
 import jnn.core.Utils;
 import jnn.modelos.Modelo;
 
@@ -81,21 +82,17 @@ abstract class Metrica {
 			);
 		}
 
-		Object[] arrEntrada = utils.transformarParaArray(entradas);
+		Object[] amostras = utils.transformarParaArray(entradas);
 
+		Tensor4D[] prevs = modelo.forwards(amostras);
 		double[][] s = (double[][]) saidas;
 
 		int nClasses = s[0].length;
 		int[][] matriz = new int[nClasses][nClasses];
-		double[] saidaRede = new double[modelo.camadaSaida().tamanhoSaida()];
 
-		for (int i = 0; i < arrEntrada.length; i++) {
-			modelo.forward(arrEntrada[i]);
-			saidaRede = modelo.saidaParaArray();
-
-			int real = this.indiceMaiorValor(s[i]);
-			int previsto = this.indiceMaiorValor(saidaRede);
-
+		for (int i = 0; i < amostras.length; i++) {
+			int real = indiceMaiorValor(s[i]);
+			int previsto = indiceMaiorValor(prevs[i].paraArray());
 			matriz[real][previsto]++;
 		}
 
