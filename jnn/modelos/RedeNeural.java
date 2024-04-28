@@ -465,11 +465,38 @@ public class RedeNeural extends Modelo {
 		verificarCompilacao();
 
 		utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
+		
+		final int tam = entradas.length;
+		final int numThreads = Runtime.getRuntime().availableProcessors()/2;
+		Tensor4D[] prevs = new Tensor4D[tam];
+		RedeNeural[] clones = new RedeNeural[numThreads];
+		Thread[] threads = new Thread[numThreads];
 
-		Tensor4D[] prevs = new Tensor4D[entradas.length];
+		for (int i = 0; i < numThreads; i++) {
+			clones[i] = clone();
+		}
 
-		for (int i = 0; i < prevs.length; i++) {
-			prevs[i] = forward(entradas[i]);
+		int batchSize = tam / numThreads;
+		for (int i = 0; i < numThreads; i++) {
+			final int id = i;
+			final int inicio = i * batchSize;
+			final int fim = (i == numThreads - 1) ? tam : (i + 1) * batchSize;
+	
+			threads[id] = new Thread(() -> {
+				for (int j = inicio; j < fim; j++) {
+					prevs[j] = clones[id].forward(entradas[j]);
+				}
+			});
+			threads[i].start();
+		}
+
+		try {
+			for (Thread t : threads) {
+				t.join();
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			System.exit(1);
 		}
 
 		return prevs;
