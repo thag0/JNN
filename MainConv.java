@@ -31,7 +31,7 @@ public class MainConv {
 	static final int NUM_AMOSTRAS_TREINO = 400;
 	static final int NUM_AMOSTRAS_TESTE  = 100;
 	static final int TREINO_EPOCAS = 1; // += 7min, 5 epocas
-	static final int TREINO_LOTE = 12;
+	static final int TREINO_LOTE = 1;
 	static final boolean TREINO_LOGS = true;
 
 	// caminhos de arquivos externos
@@ -52,7 +52,8 @@ public class MainConv {
 
 		System.out.println("Treinando.");
 		long tempo = System.nanoTime();
-			modelo.treinar(treinoX, treinoY, TREINO_EPOCAS, TREINO_LOTE, TREINO_LOGS);
+			// modelo.treinar(treinoX, treinoY, TREINO_EPOCAS, TREINO_LOTE, TREINO_LOGS);
+			modelo.avaliador().matrizConfusao(treinoX, treinoY);
 		tempo = System.nanoTime() - tempo;
 
 		long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempo);
@@ -61,6 +62,7 @@ public class MainConv {
 		long segundos = segundosTotais % 60;
 
 		System.out.println("\nTempo de treino: " + horas + "h " + minutos + "min " + segundos + "s");
+		System.exit(0);
 		System.out.print("Treino -> perda: " + modelo.avaliar(treinoX, treinoY) + " - ");
 		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(treinoX, treinoY) * 100), 4) + "%");
 

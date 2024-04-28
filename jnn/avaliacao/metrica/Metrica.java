@@ -5,7 +5,7 @@ import jnn.core.Utils;
 import jnn.modelos.Modelo;
 
 /**
- * Classe genérica para cálculos de métricas de avaliação da rede neural.
+ * Classe genérica para cálculos de métricas de avaliação dos modelos.
  * <p>
  *    Novas métricas devem implementar o método {@code calcular()}.
  * </p>
@@ -13,7 +13,7 @@ import jnn.modelos.Modelo;
 abstract class Metrica {
 
 	/**
-	 * Transofar entradas em arrays por enquanto.
+	 * Utilitário.
 	 */
 	Utils utils = new Utils();
 
@@ -26,7 +26,7 @@ abstract class Metrica {
 	 */
 	public double calcular(Modelo rede, Object entrada, Object[] saida) {
 		throw new UnsupportedOperationException(
-			"É necessário implementar a métrica de avaliação da rede."
+			"É necessário implementar a métrica de avaliação do modelo."
 		);
 	}
 
@@ -39,7 +39,7 @@ abstract class Metrica {
 	 */
 	public int[][] calcularMatriz(Modelo rede, Object entrada, double[][] saida) {
 		throw new UnsupportedOperationException(
-			"É necessário implementar a métrica de avaliação da rede."
+			"É necessário implementar a métrica de avaliação do modelo."
 		);
 	}
 
@@ -70,10 +70,10 @@ abstract class Metrica {
 	 *    Auxiliar.
 	 * </p>
 	 * Calcula a matriz de confusão.
-	 * @param modelo
-	 * @param entradas
-	 * @param saidas
-	 * @return
+	 * @param modelo modelo para avaliar.
+	 * @param entradas conjunto de entradas.
+	 * @param saidas conjunto de saídas.
+	 * @return matríz de confusão calculada.
 	 */
 	protected int[][] matrizConfusao(Modelo modelo, Object entradas, Object[] saidas) {
 		if (!(saidas instanceof double[][])) {

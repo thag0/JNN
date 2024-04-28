@@ -453,12 +453,6 @@ public class RedeNeural extends Modelo {
 	 *    com os pesos. No final é aplicado a função de ativação da camada no neurônio e o resultado 
 	 *    fica armazenado na saída dele.
 	 * </p>
-	 * @param entradas dados usados para alimentar a camada de entrada.
-	 * @throws IllegalArgumentException se o modelo não foi compilado previamente.
-	 * @throws IllegalArgumentException se a quantidade de amostras em cada linha dos dados for diferente.
-	 * @throws IllegalArgumentException se o tamanho dos dados de entrada for diferente da capacidade
-	 * de entrada da rede.
-	 * @return matriz contendo os resultados das predições da rede.
 	 */
 	@Override
 	public Tensor4D[] forwards(Object[] entradas) {
@@ -467,7 +461,9 @@ public class RedeNeural extends Modelo {
 		utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
 		
 		final int tam = entradas.length;
-		final int numThreads = Runtime.getRuntime().availableProcessors()/2;
+		int numThreads = Runtime.getRuntime().availableProcessors();
+		if (numThreads > tam) numThreads = tam;
+
 		Tensor4D[] prevs = new Tensor4D[tam];
 		RedeNeural[] clones = new RedeNeural[numThreads];
 		Thread[] threads = new Thread[numThreads];
@@ -476,11 +472,11 @@ public class RedeNeural extends Modelo {
 			clones[i] = clone();
 		}
 
-		int batchSize = tam / numThreads;
+		int lote = tam / numThreads;
 		for (int i = 0; i < numThreads; i++) {
 			final int id = i;
-			final int inicio = i * batchSize;
-			final int fim = (i == numThreads - 1) ? tam : (i + 1) * batchSize;
+			final int inicio = i * lote;
+			final int fim = (i == numThreads - 1) ? tam : (i + 1) * lote;
 	
 			threads[id] = new Thread(() -> {
 				for (int j = inicio; j < fim; j++) {
