@@ -1,5 +1,9 @@
 package jnn.modelos;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 import jnn.avaliacao.Avaliador;
 import jnn.avaliacao.perda.Perda;
 import jnn.camadas.Camada;
@@ -326,37 +330,35 @@ public class Sequencial extends Modelo {
 		verificarCompilacao();
 
 		utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
-		
-		final int tam = entradas.length;
-		int numThreads = Runtime.getRuntime().availableProcessors();
-		if (numThreads > tam) numThreads = tam;
 
-		Tensor4D[] prevs = new Tensor4D[tam];
+		final int numEntradas = entradas.length;
+		int numThreads = Runtime.getRuntime().availableProcessors();
+		if (numThreads > numEntradas) numThreads = numEntradas;
+
+		Tensor4D[] prevs = new Tensor4D[numEntradas];
 		Sequencial[] clones = new Sequencial[numThreads];
-		Thread[] threads = new Thread[numThreads];
+		ExecutorService exec = Executors.newFixedThreadPool(numThreads);
 
 		for (int i = 0; i < numThreads; i++) {
 			clones[i] = clone();
 		}
 
-		int lote = tam / numThreads;
+		int lote = numEntradas / numThreads;
 		for (int i = 0; i < numThreads; i++) {
 			final int id = i;
 			final int inicio = i * lote;
-			final int fim = (i == numThreads - 1) ? tam : (i + 1) * lote;
-	
-			threads[id] = new Thread(() -> {
+			final int fim = (i == numThreads - 1) ? numEntradas : (i + 1) * lote;
+
+			exec.execute(() -> {
 				for (int j = inicio; j < fim; j++) {
 					prevs[j] = clones[id].forward(entradas[j]);
 				}
 			});
-			threads[i].start();
 		}
+		exec.shutdown();
 
 		try {
-			for (Thread t : threads) {
-				t.join();
-			}
+			exec.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 			System.exit(1);
