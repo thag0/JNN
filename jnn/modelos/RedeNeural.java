@@ -1,6 +1,7 @@
 package jnn.modelos;
 
 import jnn.ativacoes.Ativacao;
+import jnn.avaliacao.Avaliador;
 import jnn.avaliacao.perda.MSE;
 import jnn.avaliacao.perda.Perda;
 import jnn.camadas.Camada;
@@ -9,6 +10,7 @@ import jnn.core.Dicionario;
 import jnn.core.Tensor4D;
 import jnn.otimizadores.Otimizador;
 import jnn.otimizadores.SGD;
+import jnn.treinamento.Treinador;
 
 /**
  * <h3>
@@ -765,15 +767,24 @@ public class RedeNeural extends Modelo {
 	public RedeNeural clone() {
 		RedeNeural clone = (RedeNeural) super.clone();
 
+		clone._avaliador = new Avaliador(clone);
+		clone.calcularHistorico = this.calcularHistorico;
+		clone.nome = "Clone de " + nome();
+
 		clone._arq = this._arq.clone();
 		clone.bias = this.bias;
-		clone._otimizador = this._otimizador;
-		clone._perda = this._perda;
+
+		Dicionario dicio = new Dicionario();
+		clone._otimizador = dicio.getOtimizador(_otimizador.nome());
+		clone._perda = dicio.getPerda(_perda.nome());
+		clone.seedInicial = this.seedInicial;
+		clone._treinador = new Treinador();
 
 		clone._camadas = new Densa[_camadas.length];
 		for (int i = 0; i < _camadas.length; i++) {
 			clone._camadas[i] = _camadas[i].clone();
 		}
+		clone._compilado = this._compilado;
 
 		return clone;
 	}

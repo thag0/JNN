@@ -518,30 +518,25 @@ public class Sequencial extends Modelo {
 
 	@Override
 	public Sequencial clone() {
-		try {
-			Sequencial clone = (Sequencial) super.clone();
+		Sequencial clone = (Sequencial) super.clone();
 
-			clone._avaliador = new Avaliador(this);
-			clone.calcularHistorico = this.calcularHistorico;
-			clone.nome = "Clone de " + this.nome;
-			
-			Dicionario dicio = new Dicionario();
-			clone._otimizador = dicio.getOtimizador(_otimizador.nome());
-			clone._perda = dicio.getPerda(_perda.nome());
-			clone.seedInicial = this.seedInicial;
-			clone._treinador = new Treinador();
-			
-			int nCamadas = numCamadas();
-			clone._camadas = new Camada[nCamadas];
-			for (int i = 0; i < nCamadas; i++) {
-				clone._camadas[i] = camada(i).clone();
-			}
-			clone._compilado = this._compilado;
-
-			return clone;
+		clone._avaliador = new Avaliador(clone);
+		clone.calcularHistorico = this.calcularHistorico;
+		clone.nome = "Clone de " + nome();
 		
-		} catch (Exception e) {
-			throw new RuntimeException("\nErro ao clonar modelo: \n" + e);
+		Dicionario dicio = new Dicionario();
+		clone._otimizador = dicio.getOtimizador(_otimizador.nome());
+		clone._perda = dicio.getPerda(_perda.nome());
+		clone.seedInicial = this.seedInicial;
+		clone._treinador = new Treinador();
+		
+		int nCamadas = numCamadas();
+		clone._camadas = new Camada[nCamadas];
+		for (int i = 0; i < nCamadas; i++) {
+			clone._camadas[i] = camada(i).clone();
 		}
+		clone._compilado = this._compilado;
+
+		return clone;
 	}
 }

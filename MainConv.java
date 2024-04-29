@@ -52,8 +52,7 @@ public class MainConv {
 
 		System.out.println("Treinando.");
 		long tempo = System.nanoTime();
-			// modelo.treinar(treinoX, treinoY, TREINO_EPOCAS, TREINO_LOTE, TREINO_LOGS);
-			modelo.avaliador().matrizConfusao(treinoX, treinoY);
+			modelo.treinar(treinoX, treinoY, TREINO_EPOCAS, TREINO_LOTE, TREINO_LOGS);
 		tempo = System.nanoTime() - tempo;
 
 		long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempo);
@@ -62,14 +61,12 @@ public class MainConv {
 		long segundos = segundosTotais % 60;
 
 		System.out.println("\nTempo de treino: " + horas + "h " + minutos + "min " + segundos + "s");
-		System.exit(0);
 		System.out.print("Treino -> perda: " + modelo.avaliar(treinoX, treinoY) + " - ");
 		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(treinoX, treinoY) * 100), 4) + "%");
 
 		System.out.println("\nCarregando dados de teste.");
 		final var testeX = carregarDadosMNIST(CAMINHO_TESTE, NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
 		final var testeY = criarRotulosMNIST(NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
-		// System.out.print("Teste -> perda: " + modelo.avaliar(testeX, testeY) + " - ");
 		System.out.print("Teste -> perda: " + modelo.avaliar(testeX, testeY) + " - ");
 		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(testeX, testeY) * 100), 4) + "%");
 
