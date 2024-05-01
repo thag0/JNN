@@ -396,11 +396,21 @@ public abstract class Camada {
 	}
 
 	/**
+	 * Retorna os gradientes em relação ao bias da camada.
+	 * @return gradientes para os bias da camada.
+	 */
+	public Tensor4D gradBias() {
+		throw new UnsupportedOperationException(
+			"\nCamada " + nome() + " não possui gradiente para bias."
+		);      
+	}
+
+	/**
 	 * Retorna um array contendo os elementos usados para armazenar o valor
 	 * dos gradientes para os bias da camada.
 	 * @return gradientes para os bias da camada.
 	 */
-	public double[] gradBias() {
+	public double[] gradBiasParaArray() {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui gradiente para bias."
 		);      

@@ -123,22 +123,21 @@ public class AdaGrad extends Otimizador {
 		int nKernel = 0;
 		int nBias = 0;
 		
-		for(Camada camada : camadas){
+		for (Camada camada : camadas) {
 			if (!camada.treinavel()) continue;
 
-			nKernel += camada.kernelParaArray().length;
-			if (camada.temBias()) {
-				nBias += camada.biasParaArray().length;
-			}         
+			nKernel += camada.kernel().tamanho();
+			if (camada.temBias()) nBias += camada.bias().tamanho();
 		}
 
 		this.ac  = new double[nKernel];
 		this.acb = new double[nBias];
+		
 		double valorInicial = 0.1;
-
 		opArr.preencher(ac, valorInicial);
 		opArr.preencher(acb, valorInicial);
-		this._construido = true;//otimizador pode ser usado
+		
+		_construido = true;//otimizador pode ser usado
 	}
 
 	@Override
@@ -156,7 +155,7 @@ public class AdaGrad extends Otimizador {
 			
 			if (camada.temBias()) {
 				double[] bias = camada.biasParaArray();
-				double[] gradB = camada.gradBias();
+				double[] gradB = camada.gradBiasParaArray();
 				idBias = calcular(bias, gradB, acb, idBias);
 				camada.setBias(bias);
 			}
@@ -172,7 +171,7 @@ public class AdaGrad extends Otimizador {
 	 * @return índice final após as atualizações.
 	 */
 	private int calcular(double[] vars, double[] grads, double[] acumulador, int id) {
-		for(int i = 0; i < vars.length; i++){
+		for (int i = 0; i < vars.length; i++) {
 			acumulador[id] += grads[i] * grads[i];
 			vars[i] -= (grads[i] * taxaAprendizagem) / (Math.sqrt(ac[id] + epsilon));
 			id++;
@@ -183,11 +182,11 @@ public class AdaGrad extends Otimizador {
 
 	@Override
 	public String info() {
-		super.verificarConstrucao();
-		super.construirInfo();
+		verificarConstrucao();
+		construirInfo();
 		
-		super.addInfo("TaxaAprendizagem: " + this.taxaAprendizagem);
-		super.addInfo("Epsilon: " + this.epsilon);
+		addInfo("TaxaAprendizagem: " + taxaAprendizagem);
+		addInfo("Epsilon: " + epsilon);
 
 		return super.info();
 	}

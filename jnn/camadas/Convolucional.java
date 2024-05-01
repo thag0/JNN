@@ -937,8 +937,13 @@ public class Convolucional extends Camada implements Cloneable {
 	}
 
 	@Override
-	public double[] gradBias() {
-		return _gradBias.paraArray();
+	public Tensor4D gradBias() {
+		return _gradBias;
+	}
+
+	@Override
+	public double[] gradBiasParaArray() {
+		return gradBias().paraArray();
 	}
 
 	@Override

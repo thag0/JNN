@@ -8,7 +8,7 @@ import jnn.camadas.Camada;
  * </h2>
  * Implementação do algoritmo de otimização Adam.
  * <p>
- *    O algoritmo ajusta os pesos da rede neural usando o gradiente descendente 
+ *    O algoritmo ajusta os pesos do modelo usando o gradiente descendente 
  *    com momento e a estimativa adaptativa de momentos de primeira e segunda ordem.
  * </p>
  * <p>
@@ -200,20 +200,19 @@ public class Adam extends Otimizador {
 		int nKernel = 0;
 		int nBias = 0;
 		
-		for(Camada camada : camadas){
+		for (Camada camada : camadas) {
 			if (!camada.treinavel()) continue;
 
-			nKernel += camada.kernelParaArray().length;
-			if (camada.temBias()) {
-				nBias += camada.biasParaArray().length;
-			}         
+			nKernel += camada.kernel().tamanho();
+			if (camada.temBias()) nBias += camada.bias().tamanho();
 		}
 
 		this.m  = new double[nKernel];
 		this.v  = new double[nKernel];
 		this.mb = new double[nBias];
 		this.vb = new double[nBias];
-		this._construido = true;//otimizador pode ser usado
+
+		_construido = true;//otimizador pode ser usado
 	}
 
 	@Override
@@ -236,7 +235,7 @@ public class Adam extends Otimizador {
 			
 			if (camada.temBias()) {
 				double[] bias = camada.biasParaArray();
-				double[] gradB = camada.gradBias();
+				double[] gradB = camada.gradBiasParaArray();
 				idBias = calcular(bias, gradB, mb, vb, alfa, idBias);
 				camada.setBias(bias);
 			}     
@@ -270,13 +269,13 @@ public class Adam extends Otimizador {
 
 	@Override
 	public String info() {
-		super.verificarConstrucao();
-		super.construirInfo();
+		verificarConstrucao();
+		construirInfo();
 		
-		super.addInfo("TaxaAprendizagem: " + this.taxaAprendizagem);
-		super.addInfo("Beta1: " + this.beta1);
-		super.addInfo("Beta2: " + this.beta2);
-		super.addInfo("Epsilon: " + this.epsilon);
+		addInfo("TaxaAprendizagem: " + taxaAprendizagem);
+		addInfo("Beta1: " + beta1);
+		addInfo("Beta2: " + beta2);
+		addInfo("Epsilon: " + epsilon);
 
 		return super.info();
 	}

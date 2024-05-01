@@ -89,23 +89,23 @@ public class Adadelta extends Otimizador {
 	 * Inicializa uma nova instância de otimizador <strong> Adadelta </strong> 
 	 * usando os valores de hiperparâmetros fornecidos.
 	 * @param rho valor de decaimento do otimizador.
-	 * @param epsilon usado para evitar a divisão por zero.
+	 * @param eps pequeno valor usado para evitar a divisão por zero.
 	 */
-	public Adadelta(double rho, double epsilon) {
+	public Adadelta(double rho, double eps) {
 		if (rho <= 0) {
 			throw new IllegalArgumentException(
 				"\nTaxa de decaimento (" + rho + "), inválida."
 			);
 		}
 
-		if (epsilon <= 0) {
+		if (eps <= 0) {
 			throw new IllegalArgumentException(
-				"\nEpsilon (" + epsilon + "), inválido."
+				"\nEpsilon (" + eps + "), inválido."
 			);
 		}
 
 		this.rho = rho;
-		this.epsilon = epsilon;
+		this.epsilon = eps;
 	}
 
 	/**
@@ -136,17 +136,16 @@ public class Adadelta extends Otimizador {
 		for (Camada camada : camadas) {
 			if (!camada.treinavel()) continue;
 
-			nKernel += camada.kernelParaArray().length;
-			if (camada.temBias()) {
-				nBias += camada.biasParaArray().length;
-			}         
+			nKernel += camada.kernel().tamanho();
+			if (camada.temBias()) nBias += camada.bias().tamanho();
 		}
 
 		this.ac  = new double[nKernel];
 		this.acAt  = new double[nKernel];
 		this.acb = new double[nBias];
 		this.acAtb = new double[nBias];
-		this._construido = true;//otimizador pode ser usado
+
+		_construido = true;//otimizador pode ser usado
 	}
 
 	@Override
@@ -164,7 +163,7 @@ public class Adadelta extends Otimizador {
 
 			if (camada.temBias()) {
 				double[] bias = camada.biasParaArray();
-				double[] gradB = camada.gradBias();
+				double[] gradB = camada.gradBiasParaArray();
 				idBias = calcular(bias, gradB, acb, acAtb, idBias);
 				camada.setBias(bias);
 			}
@@ -198,11 +197,11 @@ public class Adadelta extends Otimizador {
 
 	@Override
 	public String info() {
-		super.verificarConstrucao();
-		super.construirInfo();
+		verificarConstrucao();
+		construirInfo();
 
-		super.addInfo("Rho: " + this.rho);
-		super.addInfo("Epsilon: " + this.epsilon);
+		addInfo("Rho: " + rho);
+		addInfo("Epsilon: " + epsilon);
 
 		return super.info();
 	}

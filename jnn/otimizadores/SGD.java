@@ -37,7 +37,7 @@ import jnn.camadas.Camada;
  *    {@code tA} - taxa de aprendizagem do otimizador.
  * </p>
  */
-public class SGD extends Otimizador{
+public class SGD extends Otimizador {
 
 	/**
 	 * Taxa de aprendizagem padrão do otimizador.
@@ -86,14 +86,14 @@ public class SGD extends Otimizador{
 	 * @param m taxa de momentum do otimizador.
 	 * @param nesterov usar acelerador de nesterov.
 	 */
-	public SGD(double tA, double m, boolean nesterov){
-		if(tA <= 0){
+	public SGD(double tA, double m, boolean nesterov) {
+		if (tA <= 0) {
 			throw new IllegalArgumentException(
 				"\nTaxa de aprendizagem (" + tA + "), inválida."
 			);
 		}
 		
-		if(m < 0){         
+		if (m < 0) {         
 			throw new IllegalArgumentException(
 				"\nTaxa de momentum (" + m + "), inválida."
 			);
@@ -110,7 +110,7 @@ public class SGD extends Otimizador{
 	 * @param tA taxa de aprendizagem do otimizador.
 	 * @param m taxa de momentum do otimizador.
 	 */
-	public SGD(double tA, double m){
+	public SGD(double tA, double m) {
 		this(tA, m, PADRAO_NESTEROV);
 	}
 
@@ -119,7 +119,7 @@ public class SGD extends Otimizador{
 	 * Descent (SGD) </strong> usando os valores de hiperparâmetros fornecidos.
 	 * @param tA taxa de aprendizagem do otimizador.
 	 */
-	public SGD(double tA){
+	public SGD(double tA) {
 		this(tA, PADRAO_MOMENTUM, PADRAO_NESTEROV);
 	}
 
@@ -130,22 +130,20 @@ public class SGD extends Otimizador{
 	 *    Os hiperparâmetros do SGD serão inicializados com seus os valores padrão.
 	 * </p>
 	 */
-	public SGD(){
+	public SGD() {
 		this(PADRAO_TA, PADRAO_MOMENTUM, PADRAO_NESTEROV);
 	}
 
 	@Override
-	public void construir(Camada[] camadas){
+	public void construir(Camada[] camadas) {
 		int nKernel = 0;
 		int nBias = 0;
 		
-		for(Camada camada : camadas){
-			if(camada.treinavel() == false) continue;
+		for (Camada camada : camadas) {
+			if (!camada.treinavel()) continue;
 
-			nKernel += camada.kernelParaArray().length;
-			if(camada.temBias()){
-				nBias += camada.biasParaArray().length;
-			}         
+			nKernel += camada.kernel().tamanho();
+			if (camada.temBias()) nBias += camada.bias().tamanho();
 		}
 
 		this.m  = new double[nKernel];
@@ -154,21 +152,21 @@ public class SGD extends Otimizador{
 	}
 
 	@Override
-	public void atualizar(Camada[] camadas){
+	public void atualizar(Camada[] camadas) {
 		verificarConstrucao();
 
 		int idKernel = 0, idBias = 0;
 		for(Camada camada : camadas){
-			if(camada.treinavel() == false) continue;
+			if (!camada.treinavel()) continue;
 
 			double[] kernel = camada.kernelParaArray();
 			double[] gradK = camada.gradKernelParaArray();
 			idKernel = calcular(kernel, gradK, m, idKernel);
 			camada.setKernel(kernel);
 
-			if(camada.temBias()){
+			if (camada.temBias()) {
 				double[] bias = camada.biasParaArray();
-				double[] gradB = camada.gradBias();
+				double[] gradB = camada.gradBiasParaArray();
 				idBias = calcular(bias, gradB, mb, idBias);
 				camada.setBias(bias);
 			}
@@ -183,8 +181,8 @@ public class SGD extends Otimizador{
 	 * @param id índice inicial das variáveis dentro do array de momentums.
 	 * @return índice final após as atualizações.
 	 */
-	private int calcular(double[] vars, double[] grads, double[] m, int id){
-		for(int i = 0; i < vars.length; i++){
+	private int calcular(double[] vars, double[] grads, double[] m, int id) {
+		for (int i = 0; i < vars.length; i++) {
 			m[id] = (m[id] * momentum) - (grads[i] * taxaAprendizagem);
 			vars[i] += nesterov ? (m[id] * momentum) - (grads[i] * taxaAprendizagem) : m[id];
 			id++;
@@ -194,13 +192,13 @@ public class SGD extends Otimizador{
 	}
 
 	@Override
-	public String info(){
-		super.verificarConstrucao();
-		super.construirInfo();
+	public String info() {
+		verificarConstrucao();
+		construirInfo();
 		
-		super.addInfo("TaxaAprendizagem: " + this.taxaAprendizagem);
-		super.addInfo("Momentum: " + this.momentum);
-		super.addInfo("Nesterov: " + this.nesterov);
+		addInfo("TaxaAprendizagem: " + taxaAprendizagem);
+		addInfo("Momentum: " + momentum);
+		addInfo("Nesterov: " + nesterov);
 
 		return super.info();
 	}

@@ -41,7 +41,7 @@ import jnn.camadas.Camada;
  *    {@code rho} - taxa de decaimento do otimizador.
  * </p>
  */
-public class RMSProp extends Otimizador{
+public class RMSProp extends Otimizador {
 
 	/**
 	 * Valor padrão para a taxa de aprendizagem do otimizador.
@@ -88,28 +88,28 @@ public class RMSProp extends Otimizador{
 	 * usando os valores de hiperparâmetros fornecidos.
 	 * @param tA valor de taxa de aprendizagem.
 	 * @param rho fator de decaimento do RMSProp.
-	 * @param epsilon usado para evitar a divisão por zero.
+	 * @param eps usado para evitar a divisão por zero.
 	 */
-	public RMSProp(double tA, double rho, double epsilon){
-		if(tA <= 0){
+	public RMSProp(double tA, double rho, double eps) {
+		if (tA <= 0) {
 			throw new IllegalArgumentException(
 				"\nTaxa de aprendizagem (" + tA + "), inválida."
 			);
 		}
-		if(rho <= 0){
+		if (rho <= 0) {
 			throw new IllegalArgumentException(
 				"\nTaxa de decaimento (" + rho + "), inválida."
 			);
 		}
-		if(epsilon <= 0){
+		if (eps <= 0) {
 			throw new IllegalArgumentException(
-				"\nEpsilon (" + epsilon + "), inválido."
+				"\nEpsilon (" + eps + "), inválido."
 			);
 		}
 
 		this.taxaAprendizagem = tA;
 		this.rho = rho;
-		this.epsilon = epsilon;
+		this.epsilon = eps;
 	}
 
 	/**
@@ -118,7 +118,7 @@ public class RMSProp extends Otimizador{
 	 * @param tA valor de taxa de aprendizagem.
 	 * @param rho fator de decaimento do RMSProp.
 	 */
-	public RMSProp(double tA, double rho){
+	public RMSProp(double tA, double rho) {
 		this(tA, rho, PADRAO_EPS);
 	}
 
@@ -127,7 +127,7 @@ public class RMSProp extends Otimizador{
 	 * usando os valores de hiperparâmetros fornecidos.
 	 * @param tA valor de taxa de aprendizagem.
 	 */
-	public RMSProp(double tA){
+	public RMSProp(double tA) {
 		this(tA, PADRAO_RHO, PADRAO_EPS);
 	}
 
@@ -137,45 +137,44 @@ public class RMSProp extends Otimizador{
 	 *    Os hiperparâmetros do RMSProp serão inicializados com os valores padrão.
 	 * </p>
 	 */
-	public RMSProp(){
+	public RMSProp() {
 		this(PADRAO_TA, PADRAO_RHO, PADRAO_EPS);
 	}
 
 	@Override
-	public void construir(Camada[] camadas){
+	public void construir(Camada[] camadas) {
 		int nKernel = 0;
 		int nBias = 0;
 		
-		for(Camada camada : camadas){
-			if(camada.treinavel() == false) continue;
+		for (Camada camada : camadas) {
+			if (!camada.treinavel()) continue;
 
-			nKernel += camada.kernelParaArray().length;
-			if(camada.temBias()){
-				nBias += camada.biasParaArray().length;
-			}         
+			nKernel += camada.kernel().tamanho();
+			if (camada.temBias()) nBias += camada.bias().tamanho();
 		}
 
 		this.ac  = new double[nKernel];
 		this.acb = new double[nBias];
-		this._construido = true;//otimizador pode ser usado
+		
+		_construido = true;//otimizador pode ser usado
 	}
 
 	@Override
-	public void atualizar(Camada[] camadas){
+	public void atualizar(Camada[] camadas) {
 		verificarConstrucao();
 		
 		int idKernel = 0, idBias = 0;
-		for(Camada camada : camadas){
-			if(camada.treinavel() == false) continue;
+		for (Camada camada : camadas) {
+			if (!camada.treinavel()) continue;
 
 			double[] kernel = camada.kernelParaArray();
 			double[] gradK = camada.gradKernelParaArray();
 			idKernel = calcular(kernel, gradK, ac, idKernel);
 			camada.setKernel(kernel);
 
-			if(camada.temBias()){
+			if (camada.temBias()) {
 				double[] bias = camada.biasParaArray();
-				double[] gradB = camada.gradBias();
+				double[] gradB = camada.gradBiasParaArray();
 				idBias = calcular(bias, gradB, acb, idBias);
 				camada.setBias(bias);
 			}
@@ -190,8 +189,8 @@ public class RMSProp extends Otimizador{
 	 * @param id índice inicial das variáveis dentro do array de momentums.
 	 * @return índice final após as atualizações.
 	 */
-	private int calcular(double[] vars, double[] grads, double[] acumulador, int id){
-		for(int i = 0; i < vars.length; i++){
+	private int calcular(double[] vars, double[] grads, double[] acumulador, int id) {
+		for (int i = 0; i < vars.length; i++) {
 			acumulador[id] = (rho * ac[id]) + ((1- rho) * (grads[i]*grads[i]));
 			vars[i] -= (grads[i] * taxaAprendizagem) / (Math.sqrt(ac[id]) + epsilon);
 			id++;
@@ -201,13 +200,13 @@ public class RMSProp extends Otimizador{
 	}
 
 	@Override
-	public String info(){
-		super.verificarConstrucao();
-		super.construirInfo();
+	public String info() {
+		verificarConstrucao();
+		construirInfo();
 		
-		super.addInfo("TaxaAprendizagem: " + this.taxaAprendizagem);
-		super.addInfo("Rho: " + this.rho);
-		super.addInfo("Epsilon: " + this.epsilon);
+		addInfo("TaxaAprendizagem: " + taxaAprendizagem);
+		addInfo("Rho: " + rho);
+		addInfo("Epsilon: " + epsilon);
 
 		return super.info();
 	}

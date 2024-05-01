@@ -84,7 +84,7 @@ public class GD extends Otimizador {
 
 			if (camada.temBias()) {
 				double[] bias = camada.biasParaArray();
-				double[] gradB = camada.gradBias();
+				double[] gradB = camada.gradBiasParaArray();
 				
 				opArr.multEscalar(gradB, taxaAprendizagem, gradB);
 				opArr.sub(bias, gradB, bias);
@@ -95,10 +95,10 @@ public class GD extends Otimizador {
 
 	@Override
 	public String info() {
-		super.verificarConstrucao();
-		super.construirInfo();
+		verificarConstrucao();
+		construirInfo();
 		
-		super.addInfo("TaxaAprendizagem: " + this.taxaAprendizagem);
+		addInfo("TaxaAprendizagem: " + taxaAprendizagem);
 
 		return super.info();
 	}
