@@ -30,8 +30,8 @@ public class MainConv {
 	static final int NUM_DIGITOS_TESTE  = NUM_DIGITOS_TREINO;
 	static final int NUM_AMOSTRAS_TREINO = 400;
 	static final int NUM_AMOSTRAS_TESTE  = 100;
-	static final int TREINO_EPOCAS = 1; // += 7min, 5 epocas
-	static final int TREINO_LOTE = 1;
+	static final int TREINO_EPOCAS = 10; // += 7min, 5 epocas
+	static final int TREINO_LOTE = 16;
 	static final boolean TREINO_LOGS = true;
 
 	// caminhos de arquivos externos
@@ -90,7 +90,7 @@ public class MainConv {
 			new Densa(NUM_DIGITOS_TREINO, "softmax")
 		);
 
-		modelo.compilar("sgd", "entropia-cruzada");
+		modelo.compilar("adam", "entropia-cruzada");
 		
 		return modelo;
 	}

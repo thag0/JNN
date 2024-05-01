@@ -48,13 +48,13 @@ public class Conv{
 		// Dados backward = tempoBackward(modelo);//media 20/25 ms
 		// forward = ged.filtrar(forward, 1, "Convolucional");
 		// backward = ged.filtrar(backward, 1, "Convolucional");
-		// forward.imprimir();
-		// backward.imprimir();
+		// forward.print();
+		// backward.print();
 
-		testarForward();
-		testarBackward();
+		// testarForward();
+		// testarBackward();
 
-		tempoOtimizador(modelo);
+		// tempoOtimizador(modelo);
 	}
 
 	static void testarAcertosMNIST(Sequencial modelo){
@@ -186,7 +186,7 @@ public class Conv{
 
 	static Dados tempoForward(Sequencial modelo){
 		//arbritário
-		double[][] img = imagemParaMatriz("/dados/mnist/teste/1/img_0.jpg");
+		double[][] img = imagemParaMatriz("./dados/mnist/teste/1/img_0.jpg");
 		double[][][] entrada = new double[1][][];
 		entrada[0] = img;
 
