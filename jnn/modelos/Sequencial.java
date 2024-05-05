@@ -450,17 +450,17 @@ public class Sequencial extends Modelo {
 
 	@Override
 	protected String construirInfo() {
-		String pad = " ".repeat(4);
+		final String pad = " ".repeat(4);
 		StringBuilder sb = new StringBuilder();
-		sb.append(nome() + " = [\n");
+		
+		sb.append(nome()).append(" = [\n");
 
 		//otimizador
-		sb.append(_otimizador.info());
-		sb.append("\n");
+		sb.append(_otimizador.info()).append("\n");
 
 		//função de perda
-		sb.append(pad + "Perda: " + _perda.nome());
-		sb.append("\n\n");
+		sb.append(pad).append("Perda: ").append(_perda.nome());
+		sb.append("\n").append("\n");
 
 		//camadas
 		sb.append(
@@ -469,32 +469,24 @@ public class Sequencial extends Modelo {
 			)
 		);
 
-		for (Camada camada : this._camadas) {
-			int[] e = camada.formatoEntrada();
-			int[] s = camada.formatoSaida();
+		for (Camada camada : _camadas) {
 			
 			//identificador da camada
 			String nomeCamada = camada.id + " - " + camada.nome();
-
+			
 			//formato de entrada
-			String formEntrada = String.format("(%d", e[0]);
-			for (int i = 1; i < e.length; i++) {
-				formEntrada += String.format(", %d", e[i]);
-			}
-			formEntrada += ")";
-
+			String formEntrada = utils.shapeStr(camada.formatoEntrada());
+			
 			//formato de saída
-			String formSaida = String.format("(%d", s[0]);
-			for (int i = 1; i < s.length; i++) {
-				formSaida += String.format(", %d", s[i]);
-			}
-			formSaida += ")";
+			String formSaida = utils.shapeStr(camada.formatoSaida());
 
 			//função de ativação
-			String ativacao = "n/a";
+			String ativacao;
 			try {
 				ativacao = camada.ativacao().nome();
-			} catch (Exception exception) {}
+			} catch (Exception exception) {
+				ativacao = "-";
+			}
 
 			String parametros = String.valueOf(camada.numParametros());
 
@@ -506,8 +498,9 @@ public class Sequencial extends Modelo {
 		}
 
 		String params = String.format("%,d", numParametros());
-		sb.append("\n" + pad + "Parâmetros treináveis: " + params + "\n");
-		sb.append("]\n");
+		sb.append("\n");
+		sb.append(pad).append("Parâmetros treináveis: " + params);
+		sb.append("\n").append("]\n");
 
 		return sb.toString();
 	}
