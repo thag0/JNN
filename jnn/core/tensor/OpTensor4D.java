@@ -581,6 +581,33 @@ public class OpTensor4D {
 	}
 
 	/**
+	 * Realiza a operação de correlação cruzada entre o tensor de entrada e o kernel.
+	 * @param entrada {@code Tensor} contendo os dados de entrada.
+	 * @param kernel {@code Tensor} contendo o filtro que será aplicado à entrada.
+	 * @return {@code Tensor} contendo o resultado.
+	 */
+	public Tensor4D correlacao2D(Tensor4D entrada, Tensor4D kernel) {
+		int alt  = entrada.dim3() - kernel.dim3() + 1;
+		int larg = entrada.dim4() - kernel.dim4() + 1;
+	
+		Tensor4D saida = new Tensor4D(alt, larg);
+	
+		for (int i = 0; i < alt; i++) {
+			for (int j = 0; j < larg; j++) {
+				double soma = 0.0d;
+				for (int k = 0; k < kernel.dim3(); k++) {
+					for (int l = 0; l < kernel.dim4(); l++) {
+						soma += entrada.get(k+i, l+j) * kernel.get(k, l);
+					}
+				}
+				saida.set(soma, i, j);
+			}
+		}
+	
+		return saida;
+	}
+
+	/**
 	 * Realiza a operação de convolução (apenas 2D) entre dois tensores usando
 	 * a dimensão de profundidade desejada.
 	 * <p>
@@ -752,7 +779,7 @@ public class OpTensor4D {
 		for (i = 0; i < linSaida; i++) {
 			for (j = 0; j < colSaida; j++) {
 				
-				soma = 0;
+				soma = 0.0d;
 				for (k = 0; k < linKernel; k++) {
 					posX = i - k;
 					if (posX >= 0 && posX < linEntrada) {
@@ -811,7 +838,7 @@ public class OpTensor4D {
 		//essa solução não é definitiva ainda porque nos testes não teve
 		//uma grande melhora, apenas cerca de 5~6% de melhoria no desempenho
 		//treinando com modelos pequenos e poucas épocas
-		try (ExecutorService exec = Executors.newFixedThreadPool(2)) {
+		try (ExecutorService exec = Executors.newCachedThreadPool()) {
 			exec.execute(() -> {
 				for (int i = 0; i < filtros; i++) {
 					for (int j = 0; j < entradas; j++) {

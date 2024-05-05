@@ -22,17 +22,19 @@ public class Playground{
 	public static void main(String[] args){
 		ged.limparConsole();
 
-		Random random = new Random();
+		Tensor4D entrada = new Tensor4D(new double[][]{
+			{1, 6, 2},
+			{5, 3, 1},
+			{7, 0, 4},
+		});
 
-		int tamanho = random.nextInt(1, 5);
-		int[] dims = new int[tamanho];
-		for (int i = 0; i < dims.length; i++) {
-			dims[i] = random.nextInt(1, 5);
-		}
+		Tensor4D kernel = new Tensor4D(new double[][]{
+			{1, 2},
+			{-1, 0},
+		});
 
-		Tensor4D tensor = new Tensor4D(dims);
-		tensor.preencherContador(true);
-		System.out.println(tensor);
+
+		System.out.println(optensor.correlacao2D(entrada, kernel));
 	}
 
     /**
