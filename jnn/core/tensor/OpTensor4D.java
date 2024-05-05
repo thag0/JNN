@@ -811,23 +811,22 @@ public class OpTensor4D {
 		//essa solução não é definitiva ainda porque nos testes não teve
 		//uma grande melhora, apenas cerca de 5~6% de melhoria no desempenho
 		//treinando com modelos pequenos e poucas épocas
-		ExecutorService exec = Executors.newFixedThreadPool(1);
-
-		exec.submit(() -> {
-			for (int i = 0; i < filtros; i++) {
-				for (int j = 0; j < entradas; j++) {
-					convolucao2DFull(gradSaida, kernel, gradE, new int[]{0, i}, new int[]{i, j}, new int[]{0, j});
+		try (ExecutorService exec = Executors.newFixedThreadPool(2)) {
+			exec.execute(() -> {
+				for (int i = 0; i < filtros; i++) {
+					for (int j = 0; j < entradas; j++) {
+						convolucao2DFull(gradSaida, kernel, gradE, new int[]{0, i}, new int[]{i, j}, new int[]{0, j});
+					}
 				}
-			}
-		});
-		exec.shutdown();
-
-		for (int i = 0; i < filtros; i++) {
-			for (int j = 0; j < entradas; j++) {
-				correlacao2D(entrada, gradSaida, gradK, new int[]{0, j}, new int[]{0, i}, new int[]{i, j});
-			}
+			});
+			
+			exec.execute(() -> {
+				for (int i = 0; i < filtros; i++) {
+					for (int j = 0; j < entradas; j++) {
+						correlacao2D(entrada, gradSaida, gradK, new int[]{0, j}, new int[]{0, i}, new int[]{i, j});
+					}
+				}
+			});
 		}
-
-		while (!exec.isTerminated()) {}
 	}
 }
