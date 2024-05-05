@@ -8,7 +8,6 @@ import jnn.core.tensor.Tensor4D;
 import lib.ged.Ged;
 import lib.geim.Geim;
 
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class Playground{
@@ -22,19 +21,11 @@ public class Playground{
 	public static void main(String[] args){
 		ged.limparConsole();
 
-		Tensor4D entrada = new Tensor4D(new double[][]{
-			{1, 6, 2},
-			{5, 3, 1},
-			{7, 0, 4},
-		});
+		Tensor4D tensor = new Tensor4D(2, 2, 2);
+		// tensor.aplicar(x -> Math.random()*2-1);
+		tensor.preencherContador(true);
 
-		Tensor4D kernel = new Tensor4D(new double[][]{
-			{1, 2},
-			{-1, 0},
-		});
-
-
-		System.out.println(optensor.correlacao2D(entrada, kernel));
+		System.out.println(tensor);
 	}
 
     /**
@@ -65,7 +56,7 @@ public class Playground{
 			{-7, 0, -4, 0}
 		});
 
-		t3.print(1);
+		t3.print();
 		System.out.println("Resultado esperado: " + t3.equals(esperado));
 		System.out.println("Tempo: " + TimeUnit.NANOSECONDS.toMillis(tempo) + "ms");
 	}

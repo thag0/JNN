@@ -55,7 +55,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	/**
 	 * Dimensões do tensor (d1, d2, d3, d4).
 	 */
-	private final int[] dimensoes;
+	private final int[] shape;
 
 	/**
 	 * Conjunto de elementos do tensor.
@@ -82,7 +82,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 			);
 		}
 
-		this.dimensoes = new int[4];
+		this.shape = new int[4];
 		copiarDimensoes(tensor.shape());
 		this.dados = new double[tensor.tamanho()];
 
@@ -108,7 +108,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 			);
 		}
 
-		this.dimensoes = new int[4];
+		this.shape = new int[4];
 		copiarDimensoes(
 			tensor.length,
 			tensor[0].length,
@@ -140,7 +140,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 			);
 		}
 
-		this.dimensoes = new int[4];
+		this.shape = new int[4];
 		copiarDimensoes(tensor.length, tensor[0].length, tensor[0][0].length);
 		this.dados = new double[dim1() * dim2() * dim3() * dim4()];
 
@@ -173,7 +173,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 			}
 		}
 
-		this.dimensoes = new int[4];
+		this.shape = new int[4];
 		copiarDimensoes(matriz.length, matriz[0].length);
 		this.dados = new double[dim1() * dim2() * dim3() * dim4()];
 
@@ -223,7 +223,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 			);
 		}
 
-		this.dimensoes = new int[4];
+		this.shape = new int[4];
 		copiarDimensoes(dim1, dim2, dim3, dim4);
 		this.dados = new double[elementos.length];
 		System.arraycopy(elementos, 0, dados, 0, dados.length);
@@ -275,7 +275,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 			}
 		}
 
-		this.dimensoes = new int[4];
+		this.shape = new int[4];
 		copiarDimensoes(dim);
 		this.dados = new double[dim1() * dim2() * dim3() * dim4()];
 	}
@@ -285,14 +285,14 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @param dim array de dimensões.
 	 */
 	private void copiarDimensoes(int... dim) {
-		int n1 = this.dimensoes.length;
+		int n1 = this.shape.length;
 		for (int i = 0; i < n1; i++) {
-			this.dimensoes[i] = 1;
+			this.shape[i] = 1;
 		}
 
 		int n2 = dim.length;
 		for (int i = 0; i < n2; i++) {
-			this.dimensoes[n1 - 1 - i] = dim[n2 - 1 - i];
+			this.shape[n1 - 1 - i] = dim[n2 - 1 - i];
 		}
 	}
 
@@ -1793,98 +1793,82 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 
 	/**
 	 * Monta as informações de exibição do tensor.
-	 * @param casas quantidade de casas decimais.
 	 * @return string formatada.
 	 */
-	private String construirPrint(int casas) {
-		casas = (casas >= 0) ? casas : 6;
+	private String construirPrint() {
+		final String identacao = " ".repeat(4);
+        int tamMaximo = -1;
+        for (double valor : dados) {
+            int tamValor = String.valueOf(valor).length();
+            if (tamValor > tamMaximo) tamMaximo = tamValor;
+        }
 
-		String pad = " ".repeat(3);
+        StringBuilder sb = new StringBuilder();
 
-		StringBuilder sb = new StringBuilder();
-		sb.append(nome).append(" ").append(shapeStr()).append(" = [\n");
+        int[] indices = new int[shape.length];
+        boolean[] parentesisAbertos = new boolean[shape.length];
 
-		int d1 = dim1();
-		for (int i = 0; i < d1; i++) {
-			sb.append(pad).append("[\n");
-			formatarD2(sb, casas, pad, i);
-			sb.append(pad).append("]").append((i < d1 - 1) ? ",\n" : "\n");
-		}
-		sb.append("]\n");
+		sb.append(nome).append(" ").append(shapeStr()).append(" = [").append("\n");
 
-		return sb.toString();
-	}
+		sb.append(identacao);
+        for (int n = 0; n < tamanho(); n++) {
+            for (int i = 0; i < indices.length; i++) {
+                if (!parentesisAbertos[i]) {
+                    sb.append("[");
+                    parentesisAbertos[i] = true;
+                }
+            }
 
-	/**
-	 * Função exclusiva para formatar a segunda dimensão do tensor.
-	 * @param sb string builder.
-	 * @param casas quantidade de cadas decimais.
-	 * @param pad espaçamento.
-	 * @param i índice do contador da primeira dimensão.
-	 */
-	private void formatarD2(StringBuilder sb, int casas, String pad, int i) {
-		int tam = dimensoes[dimensoes.length - 3];
+            final String valorStr = String.valueOf(get(indices));
+            sb.append(" ".repeat(tamMaximo - valorStr.length()))
+				.append(valorStr);
 
-		for (int j = 0; j < tam; j++) {
-			sb.append(pad).append(pad).append("[");
-			formatarD3(sb, casas, pad, i, j);
-			sb.append("]").append((j < tam - 1) ? ",\n\n" : "\n");
-		}
-	}
+            final int idUltimaDim = shape.length - 1;
+            if (indices[idUltimaDim] < shape[idUltimaDim] - 1) {
+                sb.append(", ");
+            }
 
-	/**
-	 * Função exclusiva para formatar a terceira dimensão do tensor.
-	 * @param sb string builder.
-	 * @param casas quantidade de cadas decimais.
-	 * @param pad espaçamento.
-	 * @param i índice do contador da primeira dimensão.
-	 * @param j índice do contador da segunda dimensão.
-	 */
-	private void formatarD3(StringBuilder sb, int casas, String pad, int i, int j) {
-		int tam = dimensoes[dimensoes.length - 2];
+            boolean qualquerParentesisAberto = false;
+            int numParentesisFechados = 0;
 
-		for (int k = 0; k < tam; k++) {
-			sb.append((k == 0) ? "[" : (pad + pad + " ["));
-			printArray(sb, casas, i, j, k);
-			sb.append("]").append((k < tam - 1) ? ",\n" : "");
-		}
-	}
+            for (int i = indices.length - 1; i >= 0; i--) {
+                indices[i] += 1;
+                if (indices[i] >= shape[i]) {
+                    indices[i] = 0;
 
-	/**
-	 * Função exclusiva para formatar a quarta dimensão do tensor.
-	 * @param sb string builder.
-	 * @param casas quantidade de cadas decimais.
-	 * @param i índice do contador da primeira dimensão.
-	 * @param j índice do contador da segunda dimensão.
-	 * @param k índice do contador da terceira dimensão.
-	 */
-	private void printArray(StringBuilder sb, int casas, int i, int j, int k) {
-		int tam = dimensoes[dimensoes.length - 1];
-		String padNum = "   ";
+                    sb.append("]");
+                    if (i > 0 && indices[i - 1] < shape[i - 1] - 1) {
+                        sb.append(",");
+                    }
 
-		for (int l = 0; l < tam; l++) {
-			double valor = get(i, j, k, l);
-			String formato = String.format("%." + casas + "f", valor);
-			sb.append(valor >= 0 ? "+" : "");
-			sb.append(formato);
-			if (l < tam - 1) sb.append(padNum);
-		}
-	}
+                    parentesisAbertos[i] = false;
+                    qualquerParentesisAberto = true;
+                    numParentesisFechados++;
+                } else {
+                    break;
+                }
+            }
 
-	/**
-	 * Exibe {@code via console} todo o conteúdo do tensor.
-	 * @param casas quantidade de casas decimais que serão exibidas. Esse
-	 * valor só {@code será usado caso seja maior que zero}.
-	 */
-	public void print(int casas) {
-		System.out.println(construirPrint(casas));
+            if (qualquerParentesisAberto) {
+                if (numParentesisFechados > 1) {
+                    sb.append("\n");
+                }
+                sb.append("\n").append(identacao);
+                sb.append(" ".repeat(shape.length - numParentesisFechados));
+            }
+        }
+
+		sb.delete(sb.length()-identacao.length()-1, sb.length()-1);
+		sb.append("]").append("\n");
+
+        return sb.toString().trim();
 	}
 
 	/**
 	 * Exibe {@code via console} todo o conteúdo do tensor.
 	 */
 	public void print() {
-		print(8);
+		System.out.println(construirPrint());
 	}
 
 	/**
@@ -1917,7 +1901,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @return dimensões do tensor.
 	 */
 	public int[] shape() {
-		return dimensoes.clone();
+		return shape.clone();
 	}
 
 	/**
@@ -1928,7 +1912,15 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @return dimensões do tensor em formato de String.
 	 */
 	public String shapeStr() {
-		return "(" + dim1() + ", " + dim2() + ", " + dim3() + ", " + dim4() + ")";
+		StringBuilder sb = new StringBuilder();
+		sb.append("(");
+		for (int i = 0; i < shape.length-1; i++) {
+			sb.append(shape[i]).append(", ");
+		}
+		sb.append(shape[shape.length-1]);
+		sb.append(")");
+
+		return sb.toString();
 	}
 
 	/**
@@ -1936,7 +1928,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @return primeira dimensão do tensor.
 	 */
 	public int dim1() {
-		return dimensoes[0];
+		return shape[0];
 	}
 
 	/**
@@ -1944,7 +1936,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @return segunda dimensão do tensor.
 	 */
 	public int dim2() {
-		return dimensoes[1];
+		return shape[1];
 	}
 
 	/**
@@ -1952,7 +1944,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @return terceira dimensão do tensor.
 	 */
 	public int dim3() {
-		return dimensoes[2];
+		return shape[2];
 	}
 
 	/**
@@ -1960,7 +1952,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @return quarta dimensão do tensor.
 	 */
 	public int dim4() {
-		return dimensoes[3];
+		return shape[3];
 	}
 
 	/**
@@ -2038,10 +2030,11 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder(construirPrint(8));
+		StringBuilder sb = new StringBuilder(construirPrint());
 
 		int tamanho = sb.length();
-		sb.delete(tamanho - 1, tamanho);// remover ultimo "\n"
+		sb.deleteCharAt(tamanho - 1);// remover ultimo "\n"
+		sb.deleteCharAt(tamanho - 2);// remover ultimo "\n"
 
 		sb.append(" <tipo: ")
 			.append(dados.getClass().getComponentType().getSimpleName())
@@ -2051,7 +2044,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 			.append(Integer.toHexString(hashCode()))
 			.append(">");
 		
-		sb.append("\n");
+		sb.append("]\n");
 
 		return sb.toString();
 	}
