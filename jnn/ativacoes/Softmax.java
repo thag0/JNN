@@ -2,8 +2,8 @@ package jnn.ativacoes;
 
 import jnn.camadas.Convolucional;
 import jnn.camadas.Densa;
-import jnn.core.OpTensor4D;
-import jnn.core.Tensor4D;
+import jnn.core.tensor.OpTensor4D;
+import jnn.core.tensor.Tensor4D;
 
 /**
  * Implementação da função de ativação Softmax para uso

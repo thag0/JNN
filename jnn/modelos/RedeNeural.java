@@ -11,7 +11,7 @@ import jnn.avaliacao.perda.Perda;
 import jnn.camadas.Camada;
 import jnn.camadas.Densa;
 import jnn.core.Dicionario;
-import jnn.core.Tensor4D;
+import jnn.core.tensor.Tensor4D;
 import jnn.otimizadores.Otimizador;
 import jnn.otimizadores.SGD;
 import jnn.treinamento.Treinador;

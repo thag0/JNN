@@ -1,6 +1,6 @@
 package jnn.inicializadores;
 
-import jnn.core.Tensor4D;
+import jnn.core.tensor.Tensor4D;
 
 /**
  * Inicializador de valor constante para uso dentro da biblioteca.

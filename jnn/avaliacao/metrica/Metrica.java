@@ -1,7 +1,7 @@
 package jnn.avaliacao.metrica;
 
-import jnn.core.Tensor4D;
 import jnn.core.Utils;
+import jnn.core.tensor.Tensor4D;
 import jnn.modelos.Modelo;
 
 /**

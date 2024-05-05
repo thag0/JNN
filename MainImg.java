@@ -1,5 +1,7 @@
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import jnn.camadas.*;
@@ -148,8 +150,19 @@ public class MainImg {
 		double[] perdas = modelo.historico();
 		double[][] dadosPerdas = new double[perdas.length][1];
 
-		for(int i = 0; i < dadosPerdas.length; i++){
-			dadosPerdas[i][0] = perdas[i];
+		try (ExecutorService exec = Executors.newFixedThreadPool(2)) {
+			exec.execute(() -> {
+				for(int i = 0; i < dadosPerdas.length/2; i++){
+					dadosPerdas[i][0] = perdas[i];
+				}
+			});
+			exec.execute(() -> {
+				for(int i = dadosPerdas.length/2; i < dadosPerdas.length; i++){
+					dadosPerdas[i][0] = perdas[i];
+				}
+			});
+		} catch (Exception e) {
+			throw e;
 		}
 
 		Dados dados = new Dados(dadosPerdas);

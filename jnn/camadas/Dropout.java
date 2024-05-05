@@ -2,8 +2,8 @@ package jnn.camadas;
 
 import java.util.Random;
 
-import jnn.core.Tensor4D;
 import jnn.core.Utils;
+import jnn.core.tensor.Tensor4D;
 
 /**
  * <h1>

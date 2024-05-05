@@ -4,7 +4,7 @@ import java.util.function.DoubleUnaryOperator;
 
 import jnn.camadas.Convolucional;
 import jnn.camadas.Densa;
-import jnn.core.Tensor4D;
+import jnn.core.tensor.Tensor4D;
 
 /**
  * Classe base para a implementação das funções de ativação.

@@ -1,6 +1,6 @@
 package jnn.ativacoes;
 
-import jnn.core.Tensor4D;
+import jnn.core.tensor.Tensor4D;
 
 /**
  * Implementação da função de ativação Argmax para uso 

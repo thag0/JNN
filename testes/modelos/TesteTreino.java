@@ -1,8 +1,8 @@
 package testes.modelos;
 
 import jnn.camadas.*;
-import jnn.core.Tensor4D;
 import jnn.core.Utils;
+import jnn.core.tensor.Tensor4D;
 import jnn.modelos.*;
 import jnn.otimizadores.SGD;
 import lib.ged.Dados;

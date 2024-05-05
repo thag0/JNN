@@ -2,7 +2,7 @@ package jnn.avaliacao;
 
 import jnn.avaliacao.metrica.*;
 import jnn.avaliacao.perda.*;
-import jnn.core.Tensor4D;
+import jnn.core.tensor.Tensor4D;
 import jnn.modelos.Modelo;
 
 /**

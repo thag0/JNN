@@ -1,7 +1,7 @@
 package jnn.camadas;
 
-import jnn.core.Tensor4D;
 import jnn.core.Utils;
+import jnn.core.tensor.Tensor4D;
 
 /**
  * <h1>

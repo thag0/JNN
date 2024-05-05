@@ -1,6 +1,6 @@
 package jnn.avaliacao.metrica;
 
-import jnn.core.Tensor4D;
+import jnn.core.tensor.Tensor4D;
 import jnn.modelos.Modelo;
 
 public class Acuracia extends Metrica{

@@ -5,7 +5,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import jnn.camadas.Convolucional;
-import jnn.core.Tensor4D;
+import jnn.core.tensor.Tensor4D;
 
 /**
  * Utilitário usado para serialização e desserialização de camadas Convolucionais.

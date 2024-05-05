@@ -2,9 +2,9 @@ package testes;
 
 import jnn.core.OpArray;
 import jnn.core.OpMatriz;
-import jnn.core.OpTensor4D;
-import jnn.core.Tensor4D;
 import jnn.core.Utils;
+import jnn.core.tensor.OpTensor4D;
+import jnn.core.tensor.Tensor4D;
 import lib.ged.Ged;
 import lib.geim.Geim;
 

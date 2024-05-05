@@ -6,7 +6,7 @@ import jnn.avaliacao.perda.Perda;
 import jnn.camadas.Camada;
 import jnn.core.OpArray;
 import jnn.core.OpMatriz;
-import jnn.core.Tensor4D;
+import jnn.core.tensor.Tensor4D;
 
 /**
  * Classe auxiliar no treinamento, faz uso de ferramentas que podem

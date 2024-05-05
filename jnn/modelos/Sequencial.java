@@ -9,7 +9,7 @@ import jnn.avaliacao.perda.Perda;
 import jnn.camadas.Camada;
 import jnn.camadas.Entrada;
 import jnn.core.Dicionario;
-import jnn.core.Tensor4D;
+import jnn.core.tensor.Tensor4D;
 import jnn.otimizadores.Otimizador;
 import jnn.treinamento.Treinador;
 

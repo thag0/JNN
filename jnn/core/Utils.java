@@ -1,5 +1,7 @@
 package jnn.core;
 
+import jnn.core.tensor.Tensor4D;
+
 /**
  * Utilitário geral para a biblioteca.
  */

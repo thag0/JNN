@@ -1,7 +1,9 @@
-package jnn.core;
+package jnn.core.tensor;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import jnn.core.OpArray;
 
 /**
  * Auxiliar em operação para tensores 4D.

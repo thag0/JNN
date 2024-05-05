@@ -4,8 +4,8 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import jnn.camadas.Convolucional;
-import jnn.core.OpTensor4D;
-import jnn.core.Tensor4D;
+import jnn.core.tensor.OpTensor4D;
+import jnn.core.tensor.Tensor4D;
 import jnn.inicializadores.GlorotNormal;
 import jnn.inicializadores.GlorotUniforme;
 import jnn.inicializadores.Inicializador;

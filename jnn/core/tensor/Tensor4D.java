@@ -1,4 +1,4 @@
-package jnn.core;
+package jnn.core.tensor;
 
 import java.util.Iterator;
 import java.util.function.DoubleBinaryOperator;

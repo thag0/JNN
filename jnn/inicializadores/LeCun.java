@@ -1,6 +1,6 @@
 package jnn.inicializadores;
 
-import jnn.core.Tensor4D;
+import jnn.core.tensor.Tensor4D;
 
 /**
  * Inicializador LeCun para uso dentro da biblioteca.

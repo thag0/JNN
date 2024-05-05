@@ -6,8 +6,8 @@ import java.util.concurrent.TimeUnit;
 
 import jnn.camadas.*;
 import jnn.core.OpMatriz;
-import jnn.core.OpTensor4D;
-import jnn.core.Tensor4D;
+import jnn.core.tensor.OpTensor4D;
+import jnn.core.tensor.Tensor4D;
 import jnn.inicializadores.GlorotUniforme;
 import jnn.inicializadores.Inicializador;
 import jnn.inicializadores.Zeros;

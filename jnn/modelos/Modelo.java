@@ -3,8 +3,8 @@ package jnn.modelos;
 import jnn.avaliacao.Avaliador;
 import jnn.avaliacao.perda.Perda;
 import jnn.camadas.Camada;
-import jnn.core.Tensor4D;
 import jnn.core.Utils;
+import jnn.core.tensor.Tensor4D;
 import jnn.otimizadores.Otimizador;
 import jnn.treinamento.Treinador;
 

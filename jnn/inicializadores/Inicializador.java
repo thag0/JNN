@@ -3,7 +3,7 @@ package jnn.inicializadores;
 import java.util.Random;
 import java.util.function.DoubleUnaryOperator;
 
-import jnn.core.Tensor4D;
+import jnn.core.tensor.Tensor4D;
 
 /**
  * Classe responsável pelas funções de inicialização dos pesos
