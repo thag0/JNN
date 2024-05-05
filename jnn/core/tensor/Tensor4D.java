@@ -382,14 +382,24 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @return valor de acordo com os índices.
 	 */
 	public double get(int... indices) {
-		if (indices.length != 4) {
-			throw new IllegalArgumentException(
-				"\nA quantidade de índices deve ser igual a 4, recebido " +
-				indices.length + "."
-			);
+		switch (indices.length) {
+			case 1:
+				return dados[indice(0, 0, 0, indices[0])];
+			
+			case 2:
+				return dados[indice(0, 0, indices[0], indices[1])];
+			
+			case 3:
+				return dados[indice(0, indices[0], indices[1], indices[2])];
+			
+			case 4:
+				return dados[indice(indices[0], indices[1], indices[2], indices[3])];
+		
+			default:
+				throw new IndexOutOfBoundsException(
+					STR."\nQuantidade de índices (\{indices.length}) inválida"
+				);
 		}
-
-		return dados[indice(indices[0], indices[1], indices[2], indices[3])];
 	}
 
 	/**
@@ -401,14 +411,28 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @param valor valor desejado.
 	 */
 	public void set(double valor, int... indices) {
-		if (indices.length != 4) {
-			throw new IllegalArgumentException(
-				"\nA quantidade de índices deve ser igual a 4, recebido " +
-				indices.length + "."
-			);
+		switch (indices.length) {
+			case 1:
+				dados[indice(0, 0, 0, indices[0])] = valor;
+				break;
+			
+			case 2:
+				dados[indice(0, 0, indices[0], indices[1])] = valor;
+				break;
+			
+			case 3:
+				dados[indice(0, indices[0], indices[1], indices[2])] = valor;
+				break;
+			
+			case 4:
+				dados[indice(indices[0], indices[1], indices[2], indices[3])] = valor;
+				break;
+		
+			default:
+				throw new IndexOutOfBoundsException(
+					STR."\nQuantidade de índices (\{indices.length}) inválida"
+				);
 		}
-
-		dados[indice(indices[0], indices[1], indices[2], indices[3])] = valor;
 	}
 
 	/**
