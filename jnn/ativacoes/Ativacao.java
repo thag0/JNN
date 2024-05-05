@@ -76,7 +76,7 @@ public abstract class Ativacao {
 			);
 		}
 
-		dest.map(entrada, fx);
+		dest.aplicar(entrada, fx);
 	}
 
 	/**

@@ -733,7 +733,7 @@ public class Convolucional extends Camada implements Cloneable {
 
 		if (usarBias) {
 			for (int i = 0; i < numFiltros(); i++) {
-				_gradBias.add(0, 0, 0, i, _gradSaida.somar2D(0, i));
+				_gradBias.add(0, 0, 0, i, _gradSaida.soma2D(0, i));
 			}
 		}
 

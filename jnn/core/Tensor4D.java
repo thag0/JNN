@@ -60,7 +60,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	/**
 	 * Conjunto de elementos do tensor.
 	 */
-	private double[] dados;
+	private final double[] dados;
 
 	/**
 	 * Nome do tensor.
@@ -71,7 +71,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * Inicializa um tensor com quatro dimensões a partir de outra instância de
 	 * Tensor4D.
 	 * <p>
-	 * O conteúdo do tensor recebido será copiado.
+	 *		O conteúdo do tensor recebido será copiado.
 	 * </p>
 	 * @param tensor tensor desejado.
 	 */
@@ -94,7 +94,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * quadridimensional
 	 * primitivo.
 	 * <p>
-	 * O formato do tensor criado será:
+	 *		O formato do tensor criado será:
 	 * </p>
 	 * <pre>
 	 *    formato = (dim1, dim2, dim3, dim4)
@@ -816,12 +816,10 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @return {@code true} caso sejam iguais, {@code false} caso contrário.
 	 */
 	public boolean comparar(Tensor4D tensor) {
-		if (!comparar4D(tensor))
-			return false;
+		if (!comparar4D(tensor)) return false;
 
 		for (int i = 0; i < dados.length; i++) {
-			if (dados[i] != tensor.dados[i])
-				return false;
+			if (dados[i] != tensor.dados[i]) return false;
 		}
 
 		return true;
@@ -844,15 +842,14 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	/**
 	 * Aplica a função recebida em todos os elementos do tensor.
 	 * <p>
-	 * Exemplo:
+	 *		Exemplo:
 	 * </p>
 	 * <pre>
 	 * tensor.map(x -> Math.random());
 	 * </pre>
-	 * Onde {@code x} representa cada elemento dentro do tensor.
-	 * 
+	 * Onde {@code x} representa cada elemento dentro do tensor local.
 	 * @param fun função desejada.
-	 * @return instância local alterada.
+	 * @return {@code Tensor} contendo o resultado.
 	 */
 	public Tensor4D map(DoubleUnaryOperator fun) {
 		if (fun == null) {
@@ -861,11 +858,13 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 			);
 		}
 
-		for (int i = 0; i < dados.length; i++) {
-			dados[i] = fun.applyAsDouble(dados[i]);
+		Tensor4D t = new Tensor4D(shape());
+
+		for (int i = 0; i < t.tamanho(); i++) {
+			t.dados[i] = fun.applyAsDouble(dados[i]);
 		}
 
-		return this;
+		return t;
 	}
 
 	/**
@@ -879,7 +878,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * </pre>
 	 * @param in valor inicial.
 	 * @param fun função desejada.
-	 * @return instância local alterada.
+	 * @return {@code Tensor} contendo o resultado.
 	 */
 	public Tensor4D reduce(double in, DoubleBinaryOperator fun) {
 		if (fun == null) {
@@ -893,10 +892,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 			res = fun.applyAsDouble(res, val);
 		}
 
-		copiarDimensoes(1, 1, 1, 1);
-		this.dados = new double[] { res };
-
-		return this;
+		return new Tensor4D(new double[]{ res });
 	}
 
 	/**
@@ -906,14 +902,14 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * Exemplo:
 	 * </p>
 	 * <pre>
-	 * tensor.map(x -> Math.random());
+	 * tensor.aplicar(x -> Math.random());
 	 * </pre>
 	 * Onde {@code x} representa cada elemento dentro do tensor fornecido.
 	 * @param tensor tensor base.
 	 * @param fun função para aplicar no tensor base.
 	 * @return instância local alterada.
 	 */
-	public Tensor4D map(Tensor4D tensor, DoubleUnaryOperator fun) {
+	public Tensor4D aplicar(Tensor4D tensor, DoubleUnaryOperator fun) {
 		if (tensor == null) {
 			throw new IllegalArgumentException(
 				"\nTensor fornecido é nulo."
@@ -939,20 +935,47 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	}
 
 	/**
+	 * Aplica a função recebida em todos os elementos do tensor.
+	 * <p>
+	 * Exemplo:
+	 * </p>
+	 * <pre>
+	 * tensor.aplicar(x -> Math.random());
+	 * </pre>
+	 * Onde {@code x} representa cada elemento dentro do tensor.
+	 * 
+	 * @param fun função desejada.
+	 * @return instância local alterada.
+	 */
+	public Tensor4D aplicar(DoubleUnaryOperator fun) {
+		if (fun == null) {
+			throw new IllegalArgumentException(
+				"\nFunção recebida é nula."
+			);
+		}
+
+		for (int i = 0; i < dados.length; i++) {
+			dados[i] = fun.applyAsDouble(dados[i]);
+		}
+
+		return this;
+	}
+
+	/**
 	 * Aplica a função recebida em todos os elementos da primeira dimensão
 	 * do tensor.
 	 * <p>
 	 * Exemplo:
 	 * </p>
 	 * <pre>
-	 * tensor.map3D(0, x -> Math.random());
+	 * tensor.aplicar(0, x -> Math.random());
 	 * </pre>
 	 * Onde {@code x} representa cada elemento dentro do tensor.
 	 * @param dim1 índice da primeira dimensão.
 	 * @param func função desejada.
 	 * @return instância local alterada.
 	 */
-	public Tensor4D map3D(int dim1, DoubleUnaryOperator func) {
+	public Tensor4D aplicar(int dim1, DoubleUnaryOperator func) {
 		verificarIndiceD1(dim1);
 
 		if (func == null) {
@@ -978,7 +1001,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * Exemplo:
 	 * </p>
 	 * <pre>
-	 * tensor.map2D(0, 0, x -> Math.random());
+	 * tensor.aplicar(0, 0, x -> Math.random());
 	 * </pre>
 	 * Onde {@code x} representa cada elemento dentro do tensor.
 	 * @param dim1 índice da primeira dimensão.
@@ -986,7 +1009,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @param fun função desejada.
 	 * @return instância local alterada.
 	 */
-	public Tensor4D map2D(int dim1, int dim2, DoubleUnaryOperator fun) {
+	public Tensor4D aplicar(int dim1, int dim2, DoubleUnaryOperator fun) {
 		verificarIndiceD1(dim1);
 		verificarIndiceD2(dim2);
 
@@ -1013,7 +1036,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * Exemplo:
 	 * </p>
 	 * <pre>
-	 * tensor.map1D(0, 0, 0, x -> Math.random());
+	 * tensor.aplicar(0, 0, 0, x -> Math.random());
 	 * </pre>
 	 * Onde {@code x} representa cada elemento dentro do tensor.
 	 * @param dim1 índice da primeira dimensão.
@@ -1022,7 +1045,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @param fun função desejada.
 	 * @return instância local alterada.
 	 */
-	public Tensor4D map1D(int dim1, int dim2, int dim3, DoubleUnaryOperator fun) {
+	public Tensor4D aplicar(int dim1, int dim2, int dim3, DoubleUnaryOperator fun) {
 		verificarIndiceD1(dim1);
 		verificarIndiceD2(dim2);
 		verificarIndiceD3(dim3);
@@ -1116,7 +1139,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @param dim1 índice da primeira dimensão do tensor.
 	 * @return soma total.
 	 */
-	public double somar3D(int dim1) {
+	public double soma3D(int dim1) {
 		verificarIndiceD1(dim1);
 
 		int inicio = indice(dim1, 0, 0, 0);
@@ -1137,7 +1160,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @param dim2 índice da segunda dimensão do tensor.
 	 * @return soma total.
 	 */
-	public double somar2D(int dim1, int dim2) {
+	public double soma2D(int dim1, int dim2) {
 		verificarIndiceD1(dim1);
 		verificarIndiceD2(dim2);
 
@@ -1160,7 +1183,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @param dim3 índice da terceira dimensão do tensor.
 	 * @return soma total.
 	 */
-	public double somar1D(int dim1, int dim2, int dim3) {
+	public double soma1D(int dim1, int dim2, int dim3) {
 		verificarIndiceD1(dim1);
 		verificarIndiceD2(dim2);
 		verificarIndiceD3(dim3);
@@ -1666,7 +1689,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @return instância local alterada.
 	 */
 	public Tensor4D relu() {
-		return map(x -> x > 0 ? x : 0);
+		return aplicar(x -> x > 0 ? x : 0);
 	}
 
 	/**
@@ -1675,7 +1698,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @return instância local alterada.
 	 */
 	public Tensor4D sigmoid() {
-		return map(x -> 1 / (1 + Math.exp(-x)));
+		return aplicar(x -> 1 / (1 + Math.exp(-x)));
 	}
 
 	/**
@@ -1684,7 +1707,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @return instância local alterada.
 	 */
 	public Tensor4D tanh() {
-		return map(x -> 2 / (1 + Math.exp(-2 * x)) - 1);
+		return aplicar(x -> 2 / (1 + Math.exp(-2 * x)) - 1);
 	}
 
 	/**
@@ -1693,7 +1716,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @return instância local alterada.
 	 */
 	public Tensor4D atan() {
-		return map(x -> Math.atan(x));
+		return aplicar(x -> Math.atan(x));
 	}
 
 	/**
@@ -1701,7 +1724,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @return instância local alterada.
 	 */
 	public Tensor4D sin() {
-		return map(x -> Math.sin(x));
+		return aplicar(x -> Math.sin(x));
 	}
 
 	/**
@@ -1709,7 +1732,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @return instância local alterada.
 	 */
 	public Tensor4D cos() {
-		return map(x -> Math.cos(x));
+		return aplicar(x -> Math.cos(x));
 	}
 
 	/**
@@ -1717,7 +1740,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @return instância local alterada.
 	 */
 	public Tensor4D tan() {
-		return map(x -> Math.tan(x));
+		return aplicar(x -> Math.tan(x));
 	}
 
 	/**
@@ -1725,7 +1748,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @return instância local alterada.
 	 */
 	public Tensor4D abs() {
-		return map(x -> Math.abs(x));
+		return aplicar(x -> Math.abs(x));
 	}
 
 	/**
@@ -1733,7 +1756,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @return instância local alterada.
 	 */
 	public Tensor4D exp() {
-		return map(x -> Math.exp(x));
+		return aplicar(x -> Math.exp(x));
 	}
 
 	/**
@@ -1741,7 +1764,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 * @return instância local alterada.
 	 */
 	public Tensor4D log() {
-		return map(x -> Math.log(x));
+		return aplicar(x -> Math.log(x));
 	}
 
 	/**
@@ -1996,8 +2019,14 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 		int tamanho = sb.length();
 		sb.delete(tamanho - 1, tamanho);// remover ultimo "\n"
 
-		sb.append(" <tipo: " + dados.getClass().getComponentType().getSimpleName() + ">");
-		sb.append(" <hash: " + Integer.toHexString(hashCode()) + ">");
+		sb.append(" <tipo: ")
+			.append(dados.getClass().getComponentType().getSimpleName())
+			.append(">");
+		
+		sb.append(" <hash: ")
+			.append(Integer.toHexString(hashCode()))
+			.append(">");
+		
 		sb.append("\n");
 
 		return sb.toString();

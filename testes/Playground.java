@@ -32,7 +32,7 @@ public class Playground{
 
 		Tensor4D tensor = new Tensor4D(dims);
 		tensor.preencherContador(true);
-		tensor.print(2);
+		System.out.println(tensor);
 	}
 
     /**

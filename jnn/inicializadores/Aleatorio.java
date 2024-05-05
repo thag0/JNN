@@ -75,26 +75,26 @@ public class Aleatorio extends Inicializador {
 
 	@Override
 	public void inicializar(Tensor4D tensor) {
-		tensor.map(x -> super.random.nextDouble(min, max));
+		tensor.aplicar(x -> super.random.nextDouble(min, max));
 	}
 
 	@Override
 	public void inicializar(Tensor4D tensor, int dim1) {
-		tensor.map3D(dim1, 
+		tensor.aplicar(dim1, 
 			x -> super.random.nextDouble(min, max)
 		);
 	}
 
 	@Override
 	public void inicializar(Tensor4D tensor, int dim1, int dim2) {
-		tensor.map2D(dim1, dim2,
+		tensor.aplicar(dim1, dim2,
 			x -> super.random.nextDouble(min, max)
 		);
 	}
 
 	@Override
 	public void inicializar(Tensor4D tensor, int dim1, int dim2, int dim3) {
-		tensor.map1D(dim1, dim2, dim3,
+		tensor.aplicar(dim1, dim2, dim3,
 			x -> super.random.nextDouble(min, max)
 		);
 	}

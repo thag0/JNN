@@ -92,7 +92,7 @@ public class Conv{
 		conv.inicializar();
 
 		Tensor4D entrada = new Tensor4D(conv.formatoEntrada());
-		entrada.map((x) -> Math.random());
+		entrada.aplicar((x) -> Math.random());
 
 		//simulação de propagação dos dados numa camada convolucional sem bias
 		Tensor4D filtros = new Tensor4D(conv.kernel());
@@ -126,14 +126,14 @@ public class Conv{
 		Convolucional conv = new Convolucional(formEntrada, new int[]{3, 3}, 26, "linear", iniKernel, iniBias);
 		
 		Tensor4D entrada = new Tensor4D(conv.formatoEntrada());
-		entrada.map((x) -> Math.random());
+		entrada.aplicar((x) -> Math.random());
 		
 		Tensor4D filtros = new Tensor4D(conv.kernel().shape());
-		filtros.map((x) -> Math.random());
+		filtros.aplicar((x) -> Math.random());
 		conv.setKernel(filtros.paraArray());
 
 		Tensor4D grad = new Tensor4D(conv._gradSaida);
-		grad.map((x) -> Math.random());
+		grad.aplicar((x) -> Math.random());
 		
 		//backward
 		conv.forward(entrada);

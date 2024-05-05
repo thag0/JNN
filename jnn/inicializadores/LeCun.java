@@ -25,14 +25,14 @@ public class LeCun extends Inicializador {
 	public void inicializar(Tensor4D tensor) {
 		double variancia = Math.sqrt(1.0 / tensor.dim3());
 
-		tensor.map(x -> super.random.nextGaussian() * variancia);
+		tensor.aplicar(x -> super.random.nextGaussian() * variancia);
 	}
 
 	@Override
 	public void inicializar(Tensor4D tensor, int dim1) {
 		double variancia = Math.sqrt(1.0 / tensor.dim3());
 
-		tensor.map3D(dim1, 
+		tensor.aplicar(dim1, 
 			x -> super.random.nextGaussian() * variancia
 		);
 	}
@@ -41,7 +41,7 @@ public class LeCun extends Inicializador {
 	public void inicializar(Tensor4D tensor, int dim1, int dim2) {
 		double variancia = Math.sqrt(1.0 / tensor.dim3());
 
-		tensor.map2D(dim1, dim2, 
+		tensor.aplicar(dim1, dim2, 
 			x -> super.random.nextGaussian() * variancia
 		);
 	}
@@ -50,7 +50,7 @@ public class LeCun extends Inicializador {
 	public void inicializar(Tensor4D tensor, int dim1, int dim2, int dim3) {
 		double variancia = Math.sqrt(1.0 / tensor.dim3());
 
-		tensor.map1D(dim1, dim2, dim3, 
+		tensor.aplicar(dim1, dim2, dim3, 
 			x -> super.random.nextGaussian() * variancia
 		);
 	}
