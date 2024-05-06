@@ -5,6 +5,8 @@ import jnn.core.OpMatriz;
 import jnn.core.Utils;
 import jnn.core.tensor.OpTensor4D;
 import jnn.core.tensor.Tensor4D;
+import jnn.modelos.Sequencial;
+import jnn.serializacao.Serializador;
 import lib.ged.Ged;
 import lib.geim.Geim;
 
@@ -21,11 +23,12 @@ public class Playground{
 	public static void main(String[] args){
 		ged.limparConsole();
 
-		Tensor4D tensor = new Tensor4D(2, 2, 2);
-		// tensor.aplicar(x -> Math.random()*2-1);
-		tensor.preencherContador(true);
+		Sequencial modelo = new Serializador().lerSequencial("./dados/modelos/mlp-mnist-89.nn");
+		Tensor4D amostra = new Tensor4D(modelo.camada(0).formatoEntrada());
+		amostra.aplicar(x -> Math.random()*2-1);
 
-		System.out.println(tensor);
+		Tensor4D prev = modelo.forward(amostra);
+		System.out.println(prev.reshape(10, 1).argmax());
 	}
 
     /**

@@ -263,7 +263,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 		if (dim.length > 4) {
 			throw new IllegalArgumentException(
 				"\nA quantidade de dimensões deve conter no máximo quatro elementos, " +
-				"recebido " + shape().length + "."
+				"recebido " + dim.length + "."
 			);
 		}
 
@@ -1158,6 +1158,52 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	}
 
 	/**
+	 * Aplica a função argmax na última dimensão do tensor.
+	 * <p>
+	 * 		Exemplo:
+	 * </p>
+	 * <pre>
+	 *tensor = {
+	 * {1, 2, 3},
+	 * {3, 2, 1},
+	 *}
+	 * 
+	 *argmax = {
+	 * {0, 0, 1},
+	 * {1, 0, 0},
+	 *}
+	 * </pre>
+	 * @return instância local alterada.
+	 */
+	public Tensor4D argmax() {
+		for (int i = 0; i < dim1(); i++) {
+			for (int j = 0; j < dim2(); j++) {
+				for (int k = 0; k < dim3(); k++) {
+					double maxVal = get(i, j, k, 0);
+					int maxId = 0;
+
+					for (int l = 1; l < dim4(); l++) {
+						if (get(i, j, k, l) > maxVal) {
+							maxVal = get(i, j, k, l);
+							maxId = l;
+						}
+					}
+
+					for (int l = 0; l < dim4(); l++) {
+						set(
+							(l == maxId ? 1 : 0),
+							i, j, k, l
+						);
+					}
+
+				}
+			}
+		}
+
+		return this;
+	}
+
+	/**
 	 * Retorna a soma de todos os elementos das últimas três dimensões
 	 * do tensor de acordo com o índice especificado.
 	 * @param dim1 índice da primeira dimensão do tensor.
@@ -1799,7 +1845,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 		final String identacao = " ".repeat(4);
         int tamMaximo = -1;
         for (double valor : dados) {
-            int tamValor = String.valueOf(valor).length();
+            int tamValor = String.format("%f", valor).length();
             if (tamValor > tamMaximo) tamMaximo = tamValor;
         }
 
@@ -1819,7 +1865,7 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
                 }
             }
 
-            final String valorStr = String.valueOf(get(indices));
+            final String valorStr = String.format("%f", get(indices));
             sb.append(" ".repeat(tamMaximo - valorStr.length()))
 				.append(valorStr);
 
@@ -2018,6 +2064,20 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	 */
 	public int tamanho() {
 		return dados.length;
+	}
+
+	/**
+	 * Retoran a quantidade de dimensões do tensor.
+	 * @return quantidade de dimensões do tensor.
+	 */
+	public int numDim() {
+		int dims = 0;
+
+		for (int i = shape.length-1; i >= 0; i--) {
+			if (shape[i] > 1) dims++;
+		}
+
+		return dims;
 	}
 
 	/**
