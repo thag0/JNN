@@ -2067,20 +2067,6 @@ public class Tensor4D implements Cloneable, Iterable<Double> {
 	}
 
 	/**
-	 * Retoran a quantidade de dimensões do tensor.
-	 * @return quantidade de dimensões do tensor.
-	 */
-	public int numDim() {
-		int dims = 0;
-
-		for (int i = shape.length-1; i >= 0; i--) {
-			if (shape[i] > 1) dims++;
-		}
-
-		return dims;
-	}
-
-	/**
 	 * Clona o conteúdo do tensor numa instância separada.
 	 * @return clone da instância local.
 	 */
