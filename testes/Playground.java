@@ -4,6 +4,7 @@ import jnn.core.OpArray;
 import jnn.core.OpMatriz;
 import jnn.core.Utils;
 import jnn.core.tensor.OpTensor4D;
+import jnn.core.tensor.Tensor;
 import jnn.core.tensor.Tensor4D;
 import lib.ged.Ged;
 import lib.geim.Geim;
@@ -21,13 +22,17 @@ public class Playground{
 	public static void main(String[] args){
 		ged.limparConsole();
 
-		Tensor4D tensor = new Tensor4D(2, 2, 2);
-		tensor.preencherContador(true);
+		double[][] arr = {
+			{1, 2},
+			{3, 4},
+		};
 
-		tensor.print();
+		Tensor a = new Tensor(2, 2);
+		a.copiar(arr);
+		System.out.println(a);
 	}
-
-    /**
+    
+	/**
      * Testes
      */
 	static void testeConv2dFull(){
