@@ -43,7 +43,7 @@ import java.util.function.DoubleBinaryOperator;
  * @author Thiago Barroso, acadêmico de Engenharia da Computação pela
  * Universidade Federal do Pará, Campus Tucuruí. Maio/2024.
  */
-public class Tensor implements Iterable<Double> {
+public class Tensor implements Iterable<Variavel> {
     
 	/**
 	 * Dimensões do tensor.
@@ -53,7 +53,7 @@ public class Tensor implements Iterable<Double> {
 	/**
 	 * Conjunto de elementos do tensor.
 	 */
-	private Double[] dados;
+	public Variavel[] dados;
 
 	/**
 	 * Nome do tensor.
@@ -78,7 +78,9 @@ public class Tensor implements Iterable<Double> {
 
         int n = tensor.tamanho();
         this.dados = inicializarDados(n);
-        System.arraycopy(tensor.dados, 0, this.dados, 0, n);
+		for (int i = 0; i < n; i++) {
+			this.dados[i] = tensor.dados[i].clone();
+		}
     }
 
 	/**
@@ -153,23 +155,24 @@ public class Tensor implements Iterable<Double> {
 	}
 
 	/**
-	 * Inicializa um tensor a partir de um array primitivo.
+	 * Inicializa um tensor a partir de um array.
 	 * @param arr array desejado.
 	 */
-    public Tensor(Double[] arr) {
+    public Tensor(Variavel[] arr) {
         shape = new int[]{arr.length};
-        dados = new Double[arr.length];
+        dados = inicializarDados(arr.length);
 		for (int i = 0; i < arr.length; i++) {
-			dados[i] = arr[i];
+			dados[i].set(arr[i]);
 		}
     }
 
 	/**
-	 * 
-	 * @param dados
-	 * @param shape
+	 * Inicializar um tensor a partir de um conjunto de dados e formato
+	 * pré-definidos.
+	 * @param dados conjunto de dados desejado.
+	 * @param shape formato do tensor.
 	 */
-	public Tensor(Double[] dados, int... shape) {
+	public Tensor(double[] dados, int... shape) {
 		int[] s  = copiarShape(shape);
 		int tam = calcularTamanho(s);
 		if (tam != dados.length) {
@@ -181,11 +184,13 @@ public class Tensor implements Iterable<Double> {
 		this.shape = s;
 
 		this.dados = inicializarDados(tam);
-		System.arraycopy(dados, 0, this.dados, 0, dados.length);
+		for (int i = 0; i < tam; i++) {
+			this.dados[i].set(dados[i]);
+		}
 	}
 
     /**
-     * Inicializa um novo tensor a partir de um formato especificado.
+     * Inicializa um novo tensor vazio a partir de um formato especificado.
      * @param shape formato desejado.
      */
     public Tensor(int... shape) {
@@ -201,10 +206,15 @@ public class Tensor implements Iterable<Double> {
         dados = inicializarDados(tam);
     }
 
-	private Double[] inicializarDados(int tamanho) {
-		Double[] d = new Double[tamanho];
+	/**
+	 * Auxiliar na inicialização do conjunto de dados do tensor.
+	 * @param tamanho tamanho desejado.
+	 * @return array de dados alocado.
+	 */
+	private Variavel[] inicializarDados(int tamanho) {
+		Variavel[] d = new Variavel[tamanho];
 		for (int i = 0; i < tamanho; i++) {
-			d[i] = 0.0;
+			d[i] = new Variavel(0.0d);
 		}
 
 		return d;
@@ -331,6 +341,7 @@ public class Tensor implements Iterable<Double> {
         for (int i = 0; i < shape.length; i++) {
             novoShape[i] = shape[shape.length - i - 1];
         }
+		
         Tensor t = new Tensor(novoShape);
 
         int[] idsOriginais = new int[shape.length];
@@ -354,7 +365,12 @@ public class Tensor implements Iterable<Double> {
         return t;
     }
 
-
+	/**
+	 * 
+	 * @param n
+	 * @param ids
+	 * @return
+	 */
 	public Tensor bloco(int n, int... ids) {
 		if (numDim() > 1) {
 			throw new UnsupportedOperationException(
@@ -364,7 +380,7 @@ public class Tensor implements Iterable<Double> {
 
 		int elementos = tamanho();
 
-		Double[] arr = new Double[elementos * n];
+		Variavel[] arr = new Variavel[elementos * n];
 		for (int i = 0; i < n; i++){
 			System.arraycopy(dados, 0, arr, i*elementos, elementos);
 		}
@@ -410,7 +426,7 @@ public class Tensor implements Iterable<Double> {
 	 * @return valor de acordo com os índices.
 	 */
     public double get(int... ids) {
-        return dados[indice(ids)];
+        return dados[indice(ids)].get();
     }
 
 	/**
@@ -419,7 +435,7 @@ public class Tensor implements Iterable<Double> {
 	 * @param valor valor desejado.
 	 */
     public void set(double valor, int... ids) {
-        dados[indice(ids)] = valor;
+        dados[indice(ids)].set(valor);
     }
 
 	/**
@@ -430,7 +446,7 @@ public class Tensor implements Iterable<Double> {
 	public Tensor preencher(double valor) {
 		final int n = tamanho();
 		for (int i = 0; i < n; i++) {
-			dados[i] = valor;
+			dados[i].set(valor);
 		}
 
 		return this;
@@ -448,12 +464,12 @@ public class Tensor implements Iterable<Double> {
 
 		if (cres) {
 			for (int i = 0; i < tam; i++) {
-				dados[i] = (double)i + 1;
+				dados[i].set(i+1);
 			}
 
 		} else {
 			for (int i = 0; i < tam; i++) {
-				dados[i] = (double)tam - i - 1;
+				dados[i].set(tam-i-1);
 			}
 		}
 
@@ -467,7 +483,7 @@ public class Tensor implements Iterable<Double> {
 	public Tensor zerar() {
         final int n = tamanho();
 		for (int i = 0; i < n; i++) {
-			dados[i] = 0.0d;
+			dados[i].set(0.0d);
 		}
 
 		return this;
@@ -526,7 +542,7 @@ public class Tensor implements Iterable<Double> {
 			for (int j = 0; j < d2; j++) {
 				for (int k = 0; k < d3; k++) {
 					for (int l = 0; l < d4; l++) {
-						this.dados[cont++] = arr[i][j][k][l];
+						this.dados[cont++].set(arr[i][j][k][l]);
 					}
 				}
 			}
@@ -566,7 +582,7 @@ public class Tensor implements Iterable<Double> {
 		for (int i = 0; i < d1; i++) {
 			for (int j = 0; j < d2; j++) {
 				for (int k = 0; k < d3; k++) {
-					this.dados[cont++] = arr[i][j][k];
+					this.dados[cont++].set(arr[i][j][k]);
 				}
 			}
 		}
@@ -602,7 +618,7 @@ public class Tensor implements Iterable<Double> {
 		int id = 0;
 		for (int i = 0; i < lin; i++) {
 			for (int j = 0; j < col; j++) {
-				dados[id++] = arr[i][j];
+				dados[id++].set(arr[i][j]);
 			}
 		}
 
@@ -630,7 +646,7 @@ public class Tensor implements Iterable<Double> {
 		}
 
 		for (int i = 0; i < arr.length; i++) {
-			dados[i] = arr[i];
+			dados[i].set(arr[i]);
 		}
 
 		return this;
@@ -646,7 +662,7 @@ public class Tensor implements Iterable<Double> {
 	 * @param elementos array de elementos desejado.
 	 * @return instância local alterada.
 	 */
-	public Tensor copiarElementos(Double[] elementos) {
+	public Tensor copiarElementos(Variavel[] elementos) {
 		if (elementos == null) {
 			throw new IllegalArgumentException(
 				"\nArray de elementos não pode ser nulo."
@@ -690,7 +706,7 @@ public class Tensor implements Iterable<Double> {
 		}
 
 		for (int i = 0; i < elementos.length; i++) {
-			dados[i] = elementos[i];
+			dados[i].set(elementos[i]);
 		}
 		
 		return this;
@@ -715,11 +731,16 @@ public class Tensor implements Iterable<Double> {
 
         int n = tamanho();
         for (int i = 0; i < n; i++) {
-            dados[i] += tensor.dados[i];
+            dados[i].add(tensor.dados[i]);
         }
 
         return this;
     }
+
+	public Tensor add(double valor, int... ids) {
+		dados[indice(ids)].add(valor);
+		return this;
+	}
 
 	/**
 	 * Subtrai todo o conteúdo {@code elemento a elemento} usando o tensor recebido,
@@ -739,7 +760,7 @@ public class Tensor implements Iterable<Double> {
 
         int n = tamanho();
         for (int i = 0; i < n; i++) {
-            dados[i] -= tensor.dados[i];
+            dados[i].sub(tensor.dados[i]);
         }
 
         return this;
@@ -763,7 +784,7 @@ public class Tensor implements Iterable<Double> {
 
         int n = tamanho();
         for (int i = 0; i < n; i++) {
-            dados[i] *= tensor.dados[i];
+            dados[i].mult(tensor.dados[i]);
         }
 
         return this;
@@ -787,59 +808,66 @@ public class Tensor implements Iterable<Double> {
 
         int n = tamanho();
         for (int i = 0; i < n; i++) {
-            dados[i] /= tensor.dados[i];
+            dados[i].div(tensor.dados[i]);
         }
 
         return this;
     }
 
-
 	/**
 	 * Remove as dimensões que tem tamanho igual a 1.
+	 * @param dim índice da dimensão desejada.
+	 * @return instância local, talvez alterada.
 	 */
-	public void squeeze() {
-		if (numDim() == 1) return;// não fazer nada com tensores escalar
-
-		int cont = 0;
-		for (int dim : shape) {
-			if (dim == 1) cont++;
+	public Tensor squeeze(int dim) {
+		if (numDim() == 1) return this; // Não fazer nada com tensores escalares
+	
+		if (dim < 0 || dim >= shape.length) {
+			throw new IllegalArgumentException("\nDimensão especificada inválida");
 		}
 	
-		if (cont == 0) return;// nenhuma dimensão tem tamanho 1
+		if (shape[dim] != 1) {
+			return this; // A dimensão especificada já possui tamanho diferente de 1
+		}
 	
-		int[] novoShape = new int[shape.length - cont];
+		int[] novoShape = new int[shape.length - 1];
 		int id = 0;
-		for (int dim : shape) {
-			if (dim != 1) {
-				novoShape[id++] = dim;
+		for (int i = 0; i < shape.length; i++) {
+			if (i != dim) {
+				novoShape[id++] = shape[i];
 			}
 		}
-
+	
 		shape = novoShape;
+	
+		return this;
 	}
 
 	/**
 	 * Adiciona uma nova dimensão com tamanho 1.
-	 * @param eixo índice da dimensão que será adicionada.
+	 * @param dim índice da dimensão que será adicionada.
+	 * @return instância local alterada.
 	 */
-    public void unsqueeze(int eixo) {
-        if (eixo < 0 || eixo > shape.length) {
+    public Tensor unsqueeze(int dim) {
+        if (dim < 0 || dim > shape.length) {
             throw new IllegalArgumentException(
-				"\nEixo " + eixo + " fora de alcance"
+				"\nEixo " + dim + " fora de alcance"
 			);
         }
         
         int[] novoShape = new int[shape.length + 1];
         
-		for (int i = 0; i < eixo; i++) {
+		for (int i = 0; i < dim; i++) {
             novoShape[i] = shape[i];
         }
-        novoShape[eixo] = 1;
-        for (int i = eixo; i < shape.length; i++) {
+        novoShape[dim] = 1;
+        for (int i = dim; i < shape.length; i++) {
             novoShape[i + 1] = shape[i];
         }
 
         this.shape = novoShape;
+
+		return this;
     }
 
 	/**
@@ -905,7 +933,7 @@ public class Tensor implements Iterable<Double> {
 					idsSlice[j] = indices[j] - idsInicio[j];
 				}
 
-				slice.set(get(indices), idsSlice);
+				slice.dados[indice(idsSlice)] = dados[indice(indices)];
 			}
 		}
 	
@@ -933,7 +961,7 @@ public class Tensor implements Iterable<Double> {
 		}
 
 		for (int i = 0; i < dados.length; i++) {
-			dados[i] = fun.applyAsDouble(dados[i]);
+			dados[i].set(fun.applyAsDouble(dados[i].get()));
 		}
 
 		return this;
@@ -971,7 +999,7 @@ public class Tensor implements Iterable<Double> {
 		}
 
 		for (int i = 0; i < dados.length; i++) {
-			dados[i] = fun.applyAsDouble(tensor.dados[i]);
+			dados[i].set(fun.applyAsDouble(tensor.dados[i].get()));
 		}
 
 		return this;
@@ -1009,7 +1037,7 @@ public class Tensor implements Iterable<Double> {
 		}
 
 		for (int i = 0; i < dados.length; i++) {
-			dados[i] = fun.applyAsDouble(a.dados[i], b.dados[i]);
+			dados[i].set(fun.applyAsDouble(a.dados[i].get(), b.dados[i].get()));
 		}
 
 		return this;
@@ -1044,7 +1072,7 @@ public class Tensor implements Iterable<Double> {
 		int fim = inicio + (d3 * d4);
 
 		for (int i = inicio; i < fim; i++) {
-			dados[i] = fun.applyAsDouble(dados[i]);
+			dados[i].set(fun.applyAsDouble(dados[i].get()));
 		}
 
 		return this;
@@ -1061,7 +1089,7 @@ public class Tensor implements Iterable<Double> {
 			);
 		}
 
-		return dados[0];
+		return dados[0].get();
 	}
 
 	/**
@@ -1086,7 +1114,7 @@ public class Tensor implements Iterable<Double> {
 		Tensor t = new Tensor(shape());
 
 		for (int i = 0; i < t.tamanho(); i++) {
-			t.dados[i] = fun.applyAsDouble(dados[i]);
+			t.dados[i].set(fun.applyAsDouble(dados[i].get()));
 		}
 
 		return t;
@@ -1119,7 +1147,7 @@ public class Tensor implements Iterable<Double> {
 		Tensor t = new Tensor(shape());
 
 		for (int i = 0; i < t.tamanho(); i++) {
-			t.dados[i] = fun.applyAsDouble(dados[i], tensor.dados[i]);
+			t.dados[i].set(fun.applyAsDouble(dados[i].get(), tensor.dados[i].get()));
 		}
 
 		return t;
@@ -1145,12 +1173,12 @@ public class Tensor implements Iterable<Double> {
 			);
 		}
 
-		double res = in;
-		for (double val : dados) {
-			res = fun.applyAsDouble(res, val);
+		Variavel res = new Variavel(in);
+		for (Variavel val : dados) {
+			res.set(fun.applyAsDouble(res.get(), val.get()));
 		}
 
-		return new Tensor(new Double[]{ res });
+		return new Tensor(new Variavel[]{ res });
 	}
 
 	/**
@@ -1162,10 +1190,10 @@ public class Tensor implements Iterable<Double> {
         double soma = 0.0d;
         final int n = tamanho();
         for (int i = 0; i < n; i++) {
-            soma += dados[i];
+            soma += dados[i].get();
         }
 
-        return new Tensor(new Double[]{ soma });
+        return new Tensor(new Variavel[]{ new Variavel(soma) });
     }
 
 	/**
@@ -1175,7 +1203,7 @@ public class Tensor implements Iterable<Double> {
 	 */
 	public Tensor media() {
         double media = soma().item() / tamanho();
-        return new Tensor(new Double[]{ media });
+        return new Tensor(new Variavel[]{ new Variavel(media) });
     }
 
 	/**
@@ -1184,14 +1212,14 @@ public class Tensor implements Iterable<Double> {
 	 * @return {@code Tensor} resultado.
 	 */
 	public Tensor maximo() {
-		double max = dados[0];
+		double max = dados[0].get();
 		final int tam = tamanho();
 
 		for (int i = 1; i < tam; i++) {
-			if (dados[i] > max) max = dados[i];
+			if (dados[i].get() > max) max = dados[i].get();
 		}
 
-		return new Tensor(new Double[] { max });
+		return new Tensor(new Variavel[]{ new Variavel(max) });
 	}
 
 	/**
@@ -1200,14 +1228,14 @@ public class Tensor implements Iterable<Double> {
 	 * @return {@code Tensor} resultado.
 	 */
 	public Tensor minimo() {
-		double min = dados[0];
+		double min = dados[0].get();
 		final int tam = tamanho();
 
 		for (int i = 1; i < tam; i++) {
-			if (dados[i] < min) min = dados[i];
+			if (dados[i].get() < min) min = dados[i].get();
 		}
 
-		return new Tensor(new Double[] { min });
+		return new Tensor(new Variavel[]{ new Variavel(min) });
 	}
 
 	/**
@@ -1215,16 +1243,18 @@ public class Tensor implements Iterable<Double> {
      * elementos da instância local.
 	 * @return {@code Tensor} resultado.
      */
-	public double desvp() {
+	public Tensor desvp() {
 		double media = media().item();
 		double soma = 0.0d;
         final int n = tamanho();
 
 		for (int i = 0; i < n; i++) {
-			soma += Math.pow(dados[i] - media, 2);
+			soma += Math.pow(dados[i].get() - media, 2);
 		}
 
-		return Math.sqrt(soma / tamanho());
+		return new Tensor(new Variavel[]{ 
+			new Variavel(Math.sqrt(soma / tamanho()))
+		});
 	}
 
 	/**
@@ -1242,7 +1272,7 @@ public class Tensor implements Iterable<Double> {
 
         final int n = tamanho();
 		for (int i = 0; i < n; i++) {
-			dados[i] = ((dados[i] - valMin) / intOriginal) * intNovo + min;
+			dados[i].set(((dados[i].get() - valMin) / intOriginal) * intNovo + min);
 		}
 
 		return this;
@@ -1376,7 +1406,7 @@ public class Tensor implements Iterable<Double> {
 		if (!compararShape(tensor)) return false;
 
 		for (int i = 0; i < dados.length; i++) {
-			if (dados[i] != tensor.dados[i]) return false;
+			if (dados[i].get() != tensor.dados[i].get()) return false;
 		}
 
 		return true;
@@ -1412,7 +1442,7 @@ public class Tensor implements Iterable<Double> {
 	 * Retorna o conteúdo do tensor no formato de array
 	 * @return conteúdo do tensor.
 	 */
-	public Double[] paraArray() {
+	public Variavel[] paraArray() {
 		return dados;
 	}
 
@@ -1423,40 +1453,10 @@ public class Tensor implements Iterable<Double> {
 	public double[] paraArrayPrimitivo() {
 		double[] arr = new double[dados.length];
 		for (int i = 0; i < arr.length; i++) {
-			arr[i] = dados[i];
+			arr[i] = dados[i].get();
 		}
 
 		return arr;
-	}
-
-	public double[][] array2D() {
-		if (numDim() > 2) {
-			throw new IllegalArgumentException(
-				"\nO tensor deve conter no máximo duas dimensões."
-			);
-		}
-
-		if (numDim() == 1) {
-			double[][] m = new double[1][shape[0]];
-			for (int i = 0; i < shape[0]; i++) {
-				m[0][i] = dados[i];
-			}
-
-			return m;
-
-		} else {
-			double[][] m = new double[shape[0]][shape[1]];
-			int lin = shape[0];
-			int col = shape[1];
-			int id  = 0;
-			for (int i = 0; i < lin; i++) {
-				for (int j = 0; j < col; j++) {
-					m[i][j] = dados[id++];
-				}
-			}
-			return m;
-
-		}
 	}
 
 	/**
@@ -1500,8 +1500,8 @@ public class Tensor implements Iterable<Double> {
     private String construirPrint() {
 		final String identacao = " ".repeat(4);
         int tamMaximo = -1;
-        for (double valor : dados) {
-            int tamValor = String.format("%f", valor).length();
+        for (Variavel valor : dados) {
+            int tamValor = String.format("%f", valor.get()).length();
             if (tamValor > tamMaximo) tamMaximo = tamValor;
         }
 
@@ -1587,7 +1587,7 @@ public class Tensor implements Iterable<Double> {
 	}
 
 	@Override
-	public Iterator<Double> iterator() {
+	public Iterator<Variavel> iterator() {
 		return new TensorIterator();
 	}
 
@@ -1595,7 +1595,7 @@ public class Tensor implements Iterable<Double> {
 	 * Iterador para usar com o tensor, usando para percorrer
 	 * os elementos do tensor sequencialmente.
 	 */
-	class TensorIterator implements Iterator<Double> {
+	class TensorIterator implements Iterator<Variavel> {
 
 		/**
 		 * Contador do índice atual.
@@ -1608,7 +1608,7 @@ public class Tensor implements Iterable<Double> {
 		}
 
 		@Override
-		public Double next() {
+		public Variavel next() {
 			return dados[indice++];
 		}
 
