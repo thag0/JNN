@@ -83,10 +83,6 @@ public class Tensor implements Iterable<Variavel> {
 		for (int i = 0; i < n; i++) {
 			this.dados[i] = tensor.dados[i].clone();
 		}
-        this.dados = inicializarDados(n);
-		for (int i = 0; i < n; i++) {
-			this.dados[i] = tensor.dados[i].clone();
-		}
     }
 
 	/**
@@ -107,7 +103,6 @@ public class Tensor implements Iterable<Variavel> {
             tensor[0][0][0].length
         };
 
-		this.dados = inicializarDados(shape[0] * shape[1] * shape[2] * shape[3]);
 		this.dados = inicializarDados(shape[0] * shape[1] * shape[2] * shape[3]);
 
 		copiar(tensor);
@@ -130,7 +125,6 @@ public class Tensor implements Iterable<Variavel> {
             tensor[0][0].length,
         };
 
-		this.dados = inicializarDados(shape[0] * shape[1] * shape[2]);
 		this.dados = inicializarDados(shape[0] * shape[1] * shape[2]);
 
 		copiar(tensor);
@@ -156,8 +150,6 @@ public class Tensor implements Iterable<Variavel> {
 			}
 		}
 
-		this.shape = copiarShape(new int[]{mat.length, mat[0].length});
-		this.dados = inicializarDados(mat.length * mat[0].length);
 		this.shape = copiarShape(new int[]{mat.length, mat[0].length});
 		this.dados = inicializarDados(mat.length * mat[0].length);
 
@@ -480,12 +472,10 @@ public class Tensor implements Iterable<Variavel> {
 		if (cres) {
 			for (int i = 0; i < tam; i++) {
 				dados[i].set(i+1);
-				dados[i].set(i+1);
 			}
 
 		} else {
 			for (int i = 0; i < tam; i++) {
-				dados[i].set(tam-i-1);
 				dados[i].set(tam-i-1);
 			}
 		}
@@ -500,7 +490,6 @@ public class Tensor implements Iterable<Variavel> {
 	public Tensor zerar() {
         final int n = tamanho();
 		for (int i = 0; i < n; i++) {
-			dados[i].set(0.0d);
 			dados[i].set(0.0d);
 		}
 
@@ -667,9 +656,6 @@ public class Tensor implements Iterable<Variavel> {
 		for (int i = 0; i < arr.length; i++) {
 			dados[i].set(arr[i]);
 		}
-		for (int i = 0; i < arr.length; i++) {
-			dados[i].set(arr[i]);
-		}
 
 		return this;
     }
@@ -754,12 +740,17 @@ public class Tensor implements Iterable<Variavel> {
         int n = tamanho();
         for (int i = 0; i < n; i++) {
             dados[i].add(tensor.dados[i]);
-            dados[i].add(tensor.dados[i]);
         }
 
         return this;
     }
 
+	/**
+	 * Adiciona o valor informado ao conteúdo do tensor.
+	 * @param valor valor desejado.
+	 * @param ids índices desejados para adição.
+	 * @return instância local alterada.
+	 */
 	public Tensor add(double valor, int... ids) {
 		dados[indice(ids)].add(valor);
 		return this;
@@ -1087,41 +1078,6 @@ public class Tensor implements Iterable<Variavel> {
 	}
 
 	/**
-	 * Aplica a função recebida em todos os elementos do tensor.
-	 * <p>
-	 *      Exemplo:
-	 * </p>
-	 * <pre>
-	 * tensor.aplicar(x -> Math.random());
-	 * </pre>
-	 * Onde {@code x} representa cada elemento dentro do tensor.
-	 * 
-	 * @param fun função desejada.
-	 * @param inicio índice inicial (inclusivo).
-	 * @param fim índice final (exclusivo).
-	 * @return instância local alterada.
-	 */
-    public Tensor aplicar(int d1, int d2, DoubleUnaryOperator fun) {
-		if (fun == null) {
-			throw new IllegalArgumentException(
-				"\nFunção recebida é nula."
-			);
-		}
-
-		int d3 = shape[shape.length-3];
-		int d4 = shape[shape.length-2];
-		
-		int inicio = indice(d1, d2, 0, 0);
-		int fim = inicio + (d3 * d4);
-
-		for (int i = inicio; i < fim; i++) {
-			dados[i].set(fun.applyAsDouble(dados[i].get()));
-		}
-
-		return this;
-	}
-
-	/**
 	 * Retorna o valor contido no tensor, caso ele possua apenas um elemento.
 	 * @return valor contido no tensor.
 	 */
@@ -1316,7 +1272,6 @@ public class Tensor implements Iterable<Variavel> {
         final int n = tamanho();
 		for (int i = 0; i < n; i++) {
 			dados[i].set(((dados[i].get() - valMin) / intOriginal) * intNovo + min);
-			dados[i].set(((dados[i].get() - valMin) / intOriginal) * intNovo + min);
 		}
 
 		return this;
@@ -1451,7 +1406,6 @@ public class Tensor implements Iterable<Variavel> {
 
 		for (int i = 0; i < dados.length; i++) {
 			if (dados[i].get() != tensor.dados[i].get()) return false;
-			if (dados[i].get() != tensor.dados[i].get()) return false;
 		}
 
 		return true;
@@ -1495,7 +1449,7 @@ public class Tensor implements Iterable<Variavel> {
 	 * Retorna o conteúdo do tensor no formato de array
 	 * @return conteúdo do tensor.
 	 */
-	public double[] paraArrayPrimitivo() {
+	public double[] paraArrayDouble() {
 		double[] arr = new double[dados.length];
 		for (int i = 0; i < arr.length; i++) {
 			arr[i] = dados[i].get();

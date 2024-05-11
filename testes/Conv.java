@@ -64,7 +64,7 @@ public class Conv{
 				String caminhoImagem = caminho + digito + "/img_" + amostra + ".jpg";
 				Tensor img = new Tensor(imagemParaMatriz(caminhoImagem));
 				
-				double[] previsoes = modelo.forward(img).paraArrayPrimitivo();
+				double[] previsoes = modelo.forward(img).paraArrayDouble();
 				if(maiorIndice(previsoes) == digito){
 					acertos++;
 				}
