@@ -1,6 +1,7 @@
 package jnn.otimizadores;
 
 import jnn.camadas.Camada;
+import jnn.core.tensor.Variavel;
 
 /**
  * Implementação do otimizador Adadelta.
@@ -68,22 +69,22 @@ public class Adadelta extends Otimizador {
 	/**
 	 * Acumuladores para os pesos.
 	 */
-	private double[] ac;
+	private Variavel[] ac;
 
 	/**
 	 * Acumuladores para os bias.
 	 */
-	private double[] acb;
+	private Variavel[] acb;
 
 	/**
 	 * Acumulador atualizado para os kernels.
 	 */
-	private double[] acAt;
+	private Variavel[] acAt;
 
 	/**
 	 * Acumulador atualizado para os bias.
 	 */
-	private double[] acAtb;
+	private Variavel[] acAtb;
 
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> Adadelta </strong> 
@@ -140,10 +141,10 @@ public class Adadelta extends Otimizador {
 			if (camada.temBias()) nBias += camada.bias().tamanho();
 		}
 
-		this.ac  = new double[nKernel];
-		this.acAt  = new double[nKernel];
-		this.acb = new double[nBias];
-		this.acAtb = new double[nBias];
+		this.ac    = initVars(nKernel);
+		this.acAt  = initVars(nKernel);
+		this.acb   = initVars(nBias);
+		this.acAtb = initVars(nBias);
 
 		_construido = true;//otimizador pode ser usado
 	}
@@ -156,16 +157,14 @@ public class Adadelta extends Otimizador {
 		for (Camada camada : camadas) {
 			if (!camada.treinavel()) continue;
 
-			double[] kernel = camada.kernelParaArray();
-			double[] gradK = camada.gradKernelParaArray();
+			Variavel[] kernel = camada.kernelParaArray();
+			Variavel[] gradK = camada.gradKernelParaArray();
 			idKernel = calcular(kernel, gradK, ac, acAt, idKernel);
-			camada.setKernel(kernel);
 
 			if (camada.temBias()) {
-				double[] bias = camada.biasParaArray();
-				double[] gradB = camada.gradBiasParaArray();
+				Variavel[] bias = camada.biasParaArray();
+				Variavel[] gradB = camada.gradBiasParaArray();
 				idBias = calcular(bias, gradB, acb, acAtb, idBias);
-				camada.setBias(bias);
 			}
 		}
 	}
@@ -179,15 +178,17 @@ public class Adadelta extends Otimizador {
 	 * @param id índice inicial das variáveis dentro do array de momentums.
 	 * @return índice final após as atualizações.
 	 */
-	private int calcular(double[] vars, double[] grads, double[] ac, double[] acAt, int id) {
+	private int calcular(Variavel[] vars, Variavel[] grads, Variavel[] ac, Variavel[] acAt, int id) {
 		double g, delta;
 
 		for (int i = 0; i < vars.length; i++) {
-			g = grads[i];
-			ac[id] = (rho * ac[id]) + ((1 - rho) * (g*g));
-			delta = Math.sqrt(acAt[id] + epsilon) / Math.sqrt(ac[id] + epsilon) * g;
-			acAt[id] = (rho * acAt[id]) + ((1 - rho) * (delta * delta));
-			vars[i] -= delta;
+			g = grads[i].get();
+			ac[id].set((rho * ac[id].get()) + ((1 - rho) * (g*g)));
+			
+			delta = Math.sqrt(acAt[id].get() + epsilon) / Math.sqrt(ac[id].get() + epsilon) * g;
+			acAt[id].set((rho * acAt[id].get()) + ((1 - rho) * (delta * delta)));
+			
+			vars[i].sub(delta);
 			
 			id++;
 		}

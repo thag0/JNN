@@ -4,7 +4,7 @@ import java.util.function.DoubleUnaryOperator;
 
 import jnn.camadas.Convolucional;
 import jnn.camadas.Densa;
-import jnn.core.tensor.Tensor4D;
+import jnn.core.tensor.Tensor;
 
 /**
  * Classe base para a implementação das funções de ativação.
@@ -68,8 +68,8 @@ public abstract class Ativacao {
 	 * @param entrada {@code Tensor} de entrada.
 	 * @param dest {@code Tensor} de destino.
 	 */
-	public void forward(Tensor4D entrada, Tensor4D dest) {
-		if (!entrada.comparar4D(dest)) {
+	public void forward(Tensor entrada, Tensor dest) {
+		if (!entrada.compararShape(dest)) {
 			throw new IllegalArgumentException(
 				"\nAs dimensões do tensor de entrada " + entrada.shapeStr() +
 				" e saída " + dest.shapeStr() + " devem ser iguais."
@@ -83,38 +83,18 @@ public abstract class Ativacao {
 	 * Calcula o resultado da derivada da função de ativação de acordo 
 	 * com a função configurada
 	 * @param entrada {@code Tensor} de entrada.
-	 * @param gradiente {@code Tensor} contendo os gradientes.
+	 * @param grad {@code Tensor} contendo os gradientes.
 	 * @param dest {@code Tensor} de destino.
 	 */
-	public void backward(Tensor4D entrada, Tensor4D gradiente, Tensor4D dest) {
-		if(!entrada.comparar4D(dest)){
+	public void backward(Tensor entrada, Tensor grad, Tensor dest) {
+		if(!entrada.compararShape(dest) && !entrada.compararShape(grad)){
 			throw new IllegalArgumentException(
 				"\nAs dimensões do tensor de entrada " + entrada.shapeStr() +
 				" e saída " + dest.shapeStr() + " devem ser iguais."
 			);
 		}
 
-		int d1 = entrada.dim1();
-		int d2 = entrada.dim2();
-		int d3 = entrada.dim3();
-		int d4 = entrada.dim4();
-		int i, j, k, l;
-		double e, g;
-
-		for (i = 0; i < d1; i++) {
-			for (j = 0; j < d2; j++) {
-				for (k = 0; k < d3; k++) {
-					for (l = 0; l < d4; l++) {
-						e = entrada.get(i, j, k, l);
-						g = gradiente.get(i, j, k, l);
-						dest.set(
-							(dx.applyAsDouble(e) * g),
-							i, j, k, l
-						);
-					}
-				}
-			}
-		}
+		dest.aplicar(entrada, grad, (e, g) -> dx.applyAsDouble(e) * g);
 	}
 
 	/**

@@ -1,6 +1,7 @@
 package jnn.otimizadores;
 
 import jnn.camadas.Camada;
+import jnn.core.tensor.Variavel;
 
 /**
  * Implementação do algoritmo de otimização AMSGrad, que é uma variação do 
@@ -102,32 +103,32 @@ public class AMSGrad extends Otimizador {
     /**
 	 * Coeficientes de momentum para os kernels.
 	 */
-	private double[] m;
+	private Variavel[] m;
 
     /**
 	 * Coeficientes de momentum para os bias.
 	 */
-	private double[] mb;
+	private Variavel[] mb;
 
 	/**
 	 * Coeficientes de momentum de segunda orgem para os kernels.
 	 */
-	private double[] v;
+	private Variavel[] v;
 
 	/**
 	 * Coeficientes de momentum de segunda orgem para os bias.
 	 */
-	private double[] vb;
+	private Variavel[] vb;
 
 	/**
 	 * Coeficientes de momentum de segunda orgem corrigidos para os kernels.
 	 */
-	private double[] vc;
+	private Variavel[] vc;
 
 	/**
 	 * Coeficientes de momentum de segunda orgem corrigidos para os bias.
 	 */
-	private double[] vcb;
+	private Variavel[] vcb;
 
 	/**
 	 * Contador de iterações.
@@ -212,12 +213,12 @@ public class AMSGrad extends Otimizador {
 			if (camada.temBias()) nBias += camada.bias().tamanho();
 		}
 
-		this.m  = new double[nKernel];
-		this.v  = new double[nKernel];
-		this.vc  = new double[nKernel];
-		this.mb = new double[nBias];
-		this.vb = new double[nBias];
-		this.vcb = new double[nBias];
+		this.m   = initVars(nKernel);
+		this.v   = initVars(nKernel);
+		this.vc  = initVars(nKernel);
+		this.mb  = initVars(nBias);
+		this.vb  = initVars(nBias);
+		this.vcb = initVars(nBias);
 
 		_construido = true;//otimizador pode ser usado
 	}
@@ -235,14 +236,14 @@ public class AMSGrad extends Otimizador {
 		for (Camada camada : camadas) {
 			if (!camada.treinavel()) continue;
 
-			double[] kernel = camada.kernelParaArray();
-			double[] gradK = camada.gradKernelParaArray();
+			Variavel[] kernel = camada.kernelParaArray();
+			Variavel[] gradK = camada.gradKernelParaArray();
 			idKernel = calcular(kernel, gradK, m, v, vc, forcaB1, forcaB2, idKernel);
 			camada.setKernel(kernel);
 
 			if (camada.temBias()) {
-				double[] bias = camada.biasParaArray();
-				double[] gradB = camada.gradBiasParaArray();
+				Variavel[] bias = camada.biasParaArray();
+				Variavel[] gradB = camada.gradBiasParaArray();
 				idBias = calcular(bias, gradB, mb, vb, vcb, forcaB1, forcaB2, idBias);
 				camada.setBias(bias);
 			} 
@@ -261,18 +262,24 @@ public class AMSGrad extends Otimizador {
 	 * @param id índice inicial das variáveis dentro do array de momentums.
 	 * @return índice final após as atualizações.
 	 */
-	private int calcular(double[] vars, double[] grads, double[] m, double[] v, double[] vc, double forcaB1, double forcaB2, int id) {
-		double mChapeu, vChapeu, g;
+	private int calcular(Variavel[] vars, Variavel[] grads, Variavel[] m, Variavel[] v, Variavel[] vc, double forcaB1, double forcaB2, int id) {
+		double mChapeu, vChapeu, g, mid, vid, vcid;
 
 		for (int i = 0; i < vars.length; i++) {
-			g = grads[i];
-			m[id] = (beta1 * m[id]) + ((1 - beta1) * g);
-			v[id] = (beta2 * v[id]) + ((1 - beta2) * (g*g));
-			vc[id] = Math.max(vc[id], v[id]);
+			g = grads[i].get();
 
-			mChapeu = m[id] / forcaB1;
-			vChapeu = v[id] / forcaB2;
-			vars[i] -= (mChapeu * taxaAprendizagem) / (Math.sqrt(vChapeu) + epsilon);
+			m[id].set((beta1 * m[id].get()) + ((1 - beta1) * g));
+			v[id].set((beta2 * v[id].get()) + ((1 - beta2) * (g*g)));
+			
+			mid = m[id].get();
+			vid = v[id].get();
+			vcid = vc[id].get();
+
+			vc[id].set(Math.max(vcid, vid));
+
+			mChapeu = mid / forcaB1;
+			vChapeu = vid / forcaB2;
+			vars[i].sub((mChapeu * taxaAprendizagem) / (Math.sqrt(vChapeu) + epsilon));
 
 			id++;
 		}

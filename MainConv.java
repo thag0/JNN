@@ -5,7 +5,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import jnn.camadas.*;
-import jnn.core.tensor.Tensor4D;
+import jnn.core.Utils;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
 import jnn.serializacao.Serializador;
@@ -25,13 +25,18 @@ public class MainConv {
 	 */
 	static Geim geim = new Geim();
 
+	/**
+	 * Utilitário.
+	 */
+	static Utils utils = new Utils();
+
 	// dados de controle
 	static final int NUM_DIGITOS_TREINO = 10;
 	static final int NUM_DIGITOS_TESTE  = NUM_DIGITOS_TREINO;
 	static final int NUM_AMOSTRAS_TREINO = 400;
 	static final int NUM_AMOSTRAS_TESTE  = 100;
 	static final int TREINO_EPOCAS = 10; // += 7min, 5 epocas
-	static final int TREINO_LOTE = 16;
+	static final int TREINO_LOTE = 1;
 	static final boolean TREINO_LOGS = true;
 
 	// caminhos de arquivos externos
@@ -43,12 +48,12 @@ public class MainConv {
 	public static void main(String[] args) {
 		ged.limparConsole();
 		
-		final var treinoX = new Tensor4D(carregarDadosMNIST(CAMINHO_TREINO, NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO));
-		final var treinoY = criarRotulosMNIST(NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO);
+		final var treinoX = utils.array4DParaTensors(carregarDadosMNIST(CAMINHO_TREINO, NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO));
+		final var treinoY = utils.array2DParaTensors(criarRotulosMNIST(NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO));
 
 		Sequencial modelo = criarModelo();
 		modelo.setHistorico(true);
-		modelo.info();
+		modelo.print();
 
 		System.out.println("Treinando.");
 		long tempo = System.nanoTime();
@@ -61,14 +66,14 @@ public class MainConv {
 		long segundos = segundosTotais % 60;
 
 		System.out.println("\nTempo de treino: " + horas + "h " + minutos + "min " + segundos + "s");
-		System.out.print("Treino -> perda: " + modelo.avaliar(treinoX, treinoY) + " - ");
-		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(treinoX, treinoY) * 100), 4) + "%");
+		System.out.print("Treino -> perda: " + modelo.avaliar(treinoX, treinoY).item() + " - ");
+		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(treinoX, treinoY).item() * 100), 4) + "%");
 
 		System.out.println("\nCarregando dados de teste.");
-		final var testeX = carregarDadosMNIST(CAMINHO_TESTE, NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
-		final var testeY = criarRotulosMNIST(NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE);
-		System.out.print("Teste -> perda: " + modelo.avaliar(testeX, testeY) + " - ");
-		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(testeX, testeY) * 100), 4) + "%");
+		final var testeX = utils.array4DParaTensors(carregarDadosMNIST(CAMINHO_TESTE, NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE));
+		final var testeY = utils.array2DParaTensors(criarRotulosMNIST(NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE));
+		System.out.print("Teste -> perda: " + modelo.avaliar(testeX, testeY).item() + " - ");
+		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(testeX, testeY).item() * 100), 4) + "%");
 
 		exportarHistorico(modelo, CAMINHO_HISTORICO);
 		salvarModelo(modelo, CAMINHO_SAIDA_MODELO);
@@ -81,16 +86,16 @@ public class MainConv {
 	static Sequencial criarModelo() {
 		Sequencial modelo = new Sequencial(
 			new Entrada(28, 28),
-			new Convolucional(new int[]{3, 3}, 18, "relu"),
+			new Convolucional(new int[]{3, 3}, 16, "relu"),
 			new MaxPooling(new int[]{2, 2}),
-			new Convolucional(new int[]{3, 3}, 22, "relu"),
+			new Convolucional(new int[]{3, 3}, 20, "relu"),
 			new MaxPooling(new int[]{2, 2}),
 			new Flatten(),
-			new Densa(128, "sigmoid"),
+			new Densa(100, "sigmoid"),
 			new Densa(NUM_DIGITOS_TREINO, "softmax")
 		);
 
-		modelo.compilar("adam", "entropia-cruzada");
+		modelo.compilar("nadam", "entropia-cruzada");
 		
 		return modelo;
 	}
@@ -123,23 +128,6 @@ public class MainConv {
 		}
 
 		return imagem;
-	}
-
-	/**
-	 * Testa as previsões do modelo no formato de probabilidade.
-	 * @param modelo modelo sequencial de camadas.
-	 * @param caminhoImg nome da imagem que deve estar no diretório /minst/teste/
-	 */
-	static void testarPorbabilidade(Sequencial modelo, String caminhoImg) {
-		System.out.println("\nTestando: " + caminhoImg);
-		
-		Tensor4D amostra = new Tensor4D(imagemParaMatriz("./dados/mnist/teste/" + caminhoImg + ".jpg"));
-		Tensor4D prev = modelo.forward(amostra);
-		double[] arr = prev.paraArray();
-
-		for (int i = 0; i < arr.length; i++) {
-			System.out.println("Prob: " + i + ": " + (int)(arr[i]*100) + "%");
-		}
 	}
 
 	/**

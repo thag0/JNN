@@ -4,8 +4,8 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import jnn.camadas.Convolucional;
-import jnn.core.tensor.OpTensor4D;
-import jnn.core.tensor.Tensor4D;
+import jnn.core.tensor.OpTensor;
+import jnn.core.tensor.Tensor;
 import jnn.inicializadores.GlorotNormal;
 import jnn.inicializadores.GlorotUniforme;
 import jnn.inicializadores.Inicializador;
@@ -13,7 +13,7 @@ import jnn.inicializadores.Zeros;
 import lib.ged.Ged;
 
 public class Benchmark{
-	static OpTensor4D optensor = new OpTensor4D();
+	static OpTensor optensor = new OpTensor();
 
 	public static void main(String[] args){
 		Ged ged = new Ged();
@@ -35,12 +35,11 @@ public class Benchmark{
 		// --------------------------------------------------------
 		int[] formEntrada = {16, 26, 26};
 		int[] formFitlro = {3, 3};
-		int filtros = 32;
+		int filtros = 20;
 
 		convForward(formEntrada, formFitlro, filtros);// 16ms ~ 30ms
-		convBackward(formEntrada, formFitlro, filtros);// 38ms ~ 54ms
 		testarForward();
-		testarBackward();
+		// convBackward(formEntrada, formFitlro, filtros);// 38ms ~ 54ms
 	}
 
 	/**
@@ -62,7 +61,7 @@ public class Benchmark{
 		);
 		conv.inicializar();
 
-		Tensor4D entrada = new Tensor4D(conv.formatoEntrada());
+		Tensor entrada = new Tensor(conv.formatoEntrada());
 		entrada.preencherContador(true);
 
 		long tempo = 0;
@@ -107,11 +106,11 @@ public class Benchmark{
 		//preparar dados pra retropropagar
 		long randSeed = 99999;
 		Random rand = new Random(randSeed);
-		Tensor4D amostra = new Tensor4D(conv.formatoEntrada());
+		Tensor amostra = new Tensor(conv.formatoEntrada());
 		amostra.aplicar((x) -> rand.nextDouble());
 		conv.forward(amostra);
 
-		Tensor4D grad = new Tensor4D(conv._gradSaida.shape());
+		Tensor grad = new Tensor(conv._gradSaida.shape());
 		grad.aplicar((x) -> rand.nextDouble());
 
 		long tempo = medirTempo(() -> conv.backward(grad));
@@ -154,80 +153,46 @@ public class Benchmark{
 		Convolucional conv = new Convolucional(formEntrada, new int[]{3, 3}, 16, "linear", iniKernel, iniBias);
 		conv.inicializar();
 
-		Tensor4D entrada = new Tensor4D(conv.formatoEntrada());
+		Tensor entrada = new Tensor(conv.formatoEntrada());
 		entrada.aplicar((x) -> Math.random());
 
 		//simulação de propagação dos dados numa camada convolucional sem bias
-		Tensor4D filtros = new Tensor4D(conv.kernel());
-		Tensor4D saidaEsperada = new Tensor4D(conv.formatoSaida());
-		int[] idEntrada = {0, 0};
-		int[] idKernel = {0, 0};
-		int[] idSaida = {0, 0};
-		saidaEsperada.preencher(0.0);
-		for(int i = 0; i < filtros.dim1(); i++){
-			idSaida[1] = i;
-			for(int j = 0; j < filtros.dim2(); j++){
-				idEntrada[1] = j;
-				idKernel[0] = i;
-				idKernel[1] = j;
-				optensor.correlacao2D(entrada, filtros, saidaEsperada, idEntrada, idKernel, idSaida);
+		Tensor filtros = new Tensor(conv.kernel());
+		Tensor saidaEsperada = new Tensor(conv.formatoSaida());
+		
+		//conv forward single thread
+		int[] shapeE = entrada.shape();
+		int[] shapeK = filtros.shape();
+		int[] shapeS = saidaEsperada.shape();
+
+		int profEntrada = shapeK[1];
+		int altEntrada = shapeE[1];
+		int largEntrada = shapeE[2];
+		int numFiltros = shapeK[0];
+		int altKernel = shapeK[2];
+		int largKernel = shapeK[3];
+		
+		int altSaida = shapeS[1];
+		int largSaida = shapeS[2];
+
+		for (int f = 0; f < numFiltros; f++){
+			for (int e = 0; e < profEntrada; e++) {
+				Tensor entrada2d = entrada.slice(new int[]{e, 0, 0}, new int[]{e+1, altEntrada, largEntrada});
+				entrada2d.squeeze(0);
+
+				Tensor kernel2D = filtros.slice(new int[]{f, e, 0, 0}, new int[]{f+1, e+1, altKernel, largKernel});
+				kernel2D.squeeze(0);
+				kernel2D.squeeze(0);
+
+				Tensor res = optensor.correlacao2D(entrada2d, kernel2D);
+				res.unsqueeze(0);
+				saidaEsperada.slice(new int[]{f, 0, 0}, new int[]{f+1, altSaida, largSaida}).add(res);
 			}
 		}
 
-		conv.forward(entrada);
+		Tensor prev = conv.forward(entrada);
 
-		System.out.println("Forward esperado: " + conv.saida().comparar(saidaEsperada));
+		System.out.println("Forward esperado: " + prev.comparar(saidaEsperada));
 	}
 
-	/**
-	 * Testar com multithread
-	 */
-	static void testarBackward(){
-		int[] formEntrada = {26, 24, 24};
-		Inicializador iniKernel = new GlorotUniforme(12345);
-		Inicializador iniBias = new Zeros();
-		Convolucional conv = new Convolucional(formEntrada, new int[]{3, 3}, 26, "linear", iniKernel, iniBias);
-		
-		Tensor4D entrada = new Tensor4D(conv.formatoEntrada());
-		entrada.aplicar((x) -> Math.random());
-		
-		Tensor4D filtros = new Tensor4D(conv.kernel().shape());
-		filtros.aplicar((x) -> Math.random());
-		conv.setKernel(filtros.paraArray());
-
-		Tensor4D grad = new Tensor4D(conv._gradSaida);
-		grad.aplicar((x) -> Math.random());
-		
-		//backward
-		conv.forward(entrada);
-		Tensor4D gradEntrada = conv.backward(grad);
-
-		Tensor4D gradSaida = new Tensor4D(conv._gradSaida);
-		Tensor4D gradFiltroEsperado = new Tensor4D(conv.gradKernel().shape());
-		Tensor4D gradEntradaEsperado = new Tensor4D(gradEntrada.shape());
-
-		gradEntradaEsperado.preencher(0);
-		gradFiltroEsperado.preencher(0);
-		for(int i = 0; i < filtros.dim1(); i++){
-			for(int j = 0; j < filtros.dim2(); j++){
-				int[] idEntrada = {0, j};
-				int[] idDerivada = {0, i};
-				int[] idGradKernel = {i, j};
-				int[] idKernel = {i, j};
-				int[] idGradEntrada = {0, j};
-				optensor.correlacao2D(entrada, gradSaida, gradFiltroEsperado, idEntrada, idDerivada, idGradKernel);
-				optensor.convolucao2DFull(gradSaida, filtros, gradEntradaEsperado, idDerivada, idKernel, idGradEntrada);
-			}
-		}
-
-		boolean gradF = conv.gradKernel().equals(gradFiltroEsperado);
-		boolean gradE = gradEntrada.equals(gradEntradaEsperado);
-		
-		if(gradE && gradF){
-			System.out.println("Backward esperado: " + (gradE && gradF));
-		
-		}else{
-			System.out.println("Backward inesperado ->  gradFiltro: " +  gradF + ", gradEntrada: " + gradE);
-		}
-	}
 }

@@ -5,6 +5,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import jnn.camadas.*;
+import jnn.core.Utils;
+import jnn.core.tensor.Tensor;
 import jnn.modelos.Modelo;
 import jnn.modelos.RedeNeural;
 import jnn.modelos.Sequencial;
@@ -16,8 +18,9 @@ import render.JanelaTreino;
 public class MainImg {
 	static Ged ged = new Ged();
 	static Geim geim = new Geim();
+	static Utils utils = new Utils();
 	static final int EPOCAS = 8*1000;
-	static final double ESCALA_RENDER = 9;
+	static final double ESCALA_RENDER = 8;
 	static boolean calcularHistorico = true;
 	static final String CAMINHO_HISTORICO = "historico-perda";
 	static final String CAMINHO_IMAGGEM = "./dados/mnist/treino/8/img_0.jpg";
@@ -39,23 +42,26 @@ public class MainImg {
 		double[][] in  = (double[][]) ged.separarDadosEntrada(dados, tamEntrada);
 		double[][] out = (double[][]) ged.separarDadosSaida(dados, tamSaida);
 
+		Tensor[] treinoX = utils.array2DParaTensors(in);
+		Tensor[] treinoY = utils.array2DParaTensors(out);
+
 		Modelo modelo = criarSequencial(tamEntrada, tamSaida);
-		modelo.info();
+		modelo.print();
 
 		//treinar e marcar tempo
 		long horas, minutos, segundos;
 
 		System.out.println("Treinando.");
-		long tempoDecorrido = treinoEmPainel(modelo, imagem.getWidth(), imagem.getHeight(), in, out);
+		long tempoDecorrido = treinoEmPainel(modelo, imagem.getWidth(), imagem.getHeight(), treinoX, treinoY);
 
 		long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempoDecorrido);
 		horas = segundosTotais / 3600;
 		minutos = (segundosTotais % 3600) / 60;
 		segundos = segundosTotais % 60;
 
-		double precisao = (1 - modelo.avaliador().erroMedioQuadrado(in, out))*100;
+		double precisao = (1 - modelo.avaliador().erroMedioQuadrado(treinoX, treinoY).item())*100;
 		System.out.println("Precisão = " + formatarDecimal(precisao, 2) + "%");
-		System.out.println("Perda = " + modelo.avaliar(in, out));
+		System.out.println("Perda = " + modelo.avaliar(treinoX, treinoY).item());
 		System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
 
 		if (calcularHistorico) {
@@ -79,12 +85,12 @@ public class MainImg {
 	static Modelo criarSequencial(int entradas, int saidas) {
 		Sequencial modelo = new Sequencial(new Camada[]{
 			new Entrada(entradas),
-			new Densa(8, "sigmoid"),
-			new Densa(8, "sigmoid"),
+			new Densa(8, "tanh"),
+			new Densa(8, "tanh"),
 			new Densa(saidas, "sigmoid")
 		});
 
-		modelo.compilar(new SGD(0.001, 0.99), "mse");
+		modelo.compilar(new SGD(0.01, 0.9), "mse");
 		modelo.setHistorico(calcularHistorico);
 
 		return modelo;
@@ -99,7 +105,7 @@ public class MainImg {
 	 * @param saidas dados de saída relativos a entrada.
 	 * @return tempo (em nano segundos) do treino.
 	 */
-	static long treinoEmPainel(Modelo modelo, int altura, int largura, double[][] entradas, double[][] saidas) {
+	static long treinoEmPainel(Modelo modelo, int altura, int largura, Tensor[] entradas, Tensor[] saidas) {
 		final int fps = 600000;
 		int epocasPorFrame = 50;
 

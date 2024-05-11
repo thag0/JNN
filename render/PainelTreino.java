@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.JPanel;
 
+import jnn.core.tensor.Variavel;
 import jnn.modelos.Modelo;
 
 public class PainelTreino extends JPanel {
@@ -52,10 +53,11 @@ public class PainelTreino extends JPanel {
             for (x = 0; x < this.largura; x++) {
                entradaRede[0] = (double)x / this.largura;
                entradaRede[1] = (double)y / this.altura;
+
                modelo.forward(entradaRede);
 
-               double[] saida = modelo.saidaParaArray();
-               int cinza = (int)(saida[0] * 255);
+               Variavel[] saida = modelo.saidaParaArray();
+               int cinza = (int)(saida[0].get() * 255);
 
                r = cinza;
                g = cinza;
@@ -72,10 +74,10 @@ public class PainelTreino extends JPanel {
                entradaRede[1] = (double)y / this.altura;
                modelo.forward(entradaRede);
 
-               double[] saida = modelo.saidaParaArray();
-               r = (int)(saida[0] * 255);
-               g = (int)(saida[1] * 255);
-               b = (int)(saida[2] * 255);
+               Variavel[] saida = modelo.saidaParaArray();
+               r = (int)(saida[0].get() * 255);
+               g = (int)(saida[1].get() * 255);
+               b = (int)(saida[2].get() * 255);
                rgb = (r << 16) | (g << 8) | b;
                imagem.setRGB(x, y, rgb);
             }

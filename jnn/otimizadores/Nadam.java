@@ -1,6 +1,7 @@
 package jnn.otimizadores;
 
 import jnn.camadas.Camada;
+import jnn.core.tensor.Variavel;
 
 /**
  * <h2>
@@ -96,22 +97,22 @@ public class Nadam extends Otimizador {
 	/**
 	 * Coeficientes de momentum.
 	 */
-	private double[] m;
+	private Variavel[] m;
 	
 	/**
 	 * Coeficientes de momentum.
 	 */
-	private double[] mb;
+	private Variavel[] mb;
 
 	/**
 	 * Coeficientes de momentum de segunda orgem.
 	 */
-	private double[] v;
+	private Variavel[] v;
 
 	/**
 	 * Coeficientes de momentum de segunda orgem.
 	 */
-	private double[] vb;
+	private Variavel[] vb;
 
 	/**
 	 * Contador de iterações.
@@ -196,10 +197,10 @@ public class Nadam extends Otimizador {
 			if (camada.temBias()) nBias += camada.bias().tamanho();
 		}
 
-		this.m  = new double[nKernel];
-		this.v  = new double[nKernel];
-		this.mb = new double[nBias];
-		this.vb = new double[nBias];
+		this.m  = initVars(nKernel);
+		this.v  = initVars(nKernel);
+		this.mb = initVars(nBias);
+		this.vb = initVars(nBias);
 
 		_construido = true;//otimizador pode ser usado
 	}
@@ -216,16 +217,14 @@ public class Nadam extends Otimizador {
 		for (Camada camada : camadas) {
 			if (!camada.treinavel()) continue;
 
-			double[] kernel = camada.kernelParaArray();
-			double[] gradK = camada.gradKernelParaArray();
+			Variavel[] kernel = camada.kernelParaArray();
+			Variavel[] gradK = camada.gradKernelParaArray();
 			idKernel = calcular(kernel, gradK, m, v, forcaB1, forcaB2, idKernel);
-			camada.setKernel(kernel);
 			
 			if (camada.temBias()) {
-				double[] bias = camada.biasParaArray();
-				double[] gradB = camada.gradBiasParaArray();
+				Variavel[] bias = camada.biasParaArray();
+				Variavel[] gradB = camada.gradBiasParaArray();
 				idBias = calcular(bias, gradB, mb, vb, forcaB1, forcaB2, idBias);
-				camada.setBias(bias);
 			}     
 		}
 	}
@@ -241,17 +240,17 @@ public class Nadam extends Otimizador {
 	 * @param id índice inicial das variáveis dentro do array de momentums.
 	 * @return índice final após as atualizações.
 	 */
-	private int calcular(double[] vars, double[] grads, double[] m, double[] v, double forcaB1, double forcaB2, int id) {
+	private int calcular(Variavel[] vars, Variavel[] grads, Variavel[] m, Variavel[] v, double forcaB1, double forcaB2, int id) {
 		double g, mChapeu, vChapeu;
 		
 		for (int i = 0; i < vars.length; i++) {
-			g = grads[i];
-			m[id] = (beta1 * m[id]) + ((1 - beta1) * g);
-			v[id] = (beta2 * v[id]) + ((1 - beta2) * (g*g));
+			g = grads[i].get();
+			m[id].set((beta1 * m[id].get()) + ((1 - beta1) * g));
+			v[id].set((beta2 * v[id].get()) + ((1 - beta2) * (g*g)));
 			
-			mChapeu = (beta1 * m[id]) + ((1 - beta1) * g) / forcaB1;
-			vChapeu = (beta2 * v[id]) / forcaB2;
-			vars[i] -= (mChapeu * taxaAprendizagem) / (Math.sqrt(vChapeu) + epsilon);
+			mChapeu = (beta1 * m[id].get()) + ((1 - beta1) * g) / forcaB1;
+			vChapeu = (beta2 * v[id].get()) / forcaB2;
+			vars[i].sub((mChapeu * taxaAprendizagem) / (Math.sqrt(vChapeu) + epsilon));
 		
 			id++;
 		}

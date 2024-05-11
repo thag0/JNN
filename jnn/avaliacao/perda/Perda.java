@@ -1,5 +1,7 @@
 package jnn.avaliacao.perda;
 
+import jnn.core.tensor.Tensor;
+
 /**
  * <h2>
  *    Base para implementações de funções de perda
@@ -14,31 +16,37 @@ public abstract class Perda {
 
 	/**
 	 * Calcula a função de perda configurada.
-	 * @param previsto dados previstos.
-	 * @param real dados rotulados.
-	 * @return valor de perda de acordo com a função configurada.
+	 * @param prev {@code Tensor} com dados previstos.
+	 * @param real {@code Tensor} com dados reais.
+	 * @return {@code Tensor} contendo o valor de perda.
 	 */
-	public abstract double calcular(double[] previsto, double[] real);
+	public abstract Tensor calcular(Tensor prev, Tensor real);
 
 	/**
 	 * Calcula a derivada da função de perda configurada.
-	 * @param previsto dados previstos.
-	 * @param real dados rotulados.
-	 * @return valor de derivada de acordo com a função configurada.
+	 * @param prev {@code Tensor} com dados previstos.
+	 * @param real {@code Tensor} com dados reais.
+	 * @return {@code Tensor} contendo os valores de derivada.
 	 */
-	public abstract double[] derivada(double[] previsto, double[] real);
+	public abstract Tensor derivada(Tensor prev, Tensor real);
 
 	/**
-	 * Auxiliar para verificar se os tamanhos dos arrays que serão usados
+	 * Auxiliar para verificar se os tamanhos dos tensores que serão usados
 	 * pelas funções de perda são iguais.
-	 * @param previsto dados previstos.
-	 * @param real dados rotulados.
+	 * @param prev {@code Tensor} com dados previstos.
+	 * @param real {@code Tensor} com dados reais.
 	 */
-	protected void verificarDimensoes(double[] previsto, double[] real) {
-		if (previsto.length != real.length) {
+	protected void verificarDimensoes(Tensor prev, Tensor real) {
+		if (prev.numDim() != 1 || real.numDim() != 1) {
+			throw new UnsupportedOperationException(
+				"\nAmbos os tensores devem ter apenas uma dimensão."
+			);
+		}
+
+		if (prev.tamanho() != real.tamanho()) {
 			throw new IllegalArgumentException(
-				"Dimensões de dados previstos (" + previsto.length + 
-				") diferente da dimensão dos dados reais (" + real.length + 
+				"Dimensões de dados previstos (" + prev.tamanho() + 
+				") diferente da dimensão dos dados reais (" + real.tamanho() + 
 				")"
 			);
 		}

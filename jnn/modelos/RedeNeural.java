@@ -11,7 +11,8 @@ import jnn.avaliacao.perda.Perda;
 import jnn.camadas.Camada;
 import jnn.camadas.Densa;
 import jnn.core.Dicionario;
-import jnn.core.tensor.Tensor4D;
+import jnn.core.tensor.Tensor;
+import jnn.core.tensor.Variavel;
 import jnn.otimizadores.Otimizador;
 import jnn.otimizadores.SGD;
 import jnn.treinamento.Treinador;
@@ -438,12 +439,12 @@ public class RedeNeural extends Modelo {
 	 * de entrada da rede.
 	 */
 	@Override
-	public Tensor4D forward(Object entrada) {
+	public Tensor forward(Object entrada) {
 		verificarCompilacao();
 
 		utils.validarNaoNulo(entrada, "Dados de entrada não pode ser nulo.");
 
-		Tensor4D prev = _camadas[0].forward(entrada);
+		Tensor prev = _camadas[0].forward(entrada);
 		for (int i = 1; i < _camadas.length; i++) {
 			prev = _camadas[i].forward(prev);
 		}
@@ -461,7 +462,7 @@ public class RedeNeural extends Modelo {
 	 * </p>
 	 */
 	@Override
-	public Tensor4D[] forwards(Object[] entradas) {
+	public Tensor[] forwards(Object[] entradas) {
 		verificarCompilacao();
 
 		utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
@@ -470,7 +471,7 @@ public class RedeNeural extends Modelo {
 		int numThreads = Runtime.getRuntime().availableProcessors();
 		if (numThreads > numEntradas) numThreads = numEntradas;
 
-		Tensor4D[] prevs = new Tensor4D[numEntradas];
+		Tensor[] prevs = new Tensor[numEntradas];
 		RedeNeural[] clones = new RedeNeural[numThreads];
 		ExecutorService exec = Executors.newFixedThreadPool(numThreads);
 
@@ -579,7 +580,7 @@ public class RedeNeural extends Modelo {
 	 * @throws IllegalArgumentException se o modelo não foi compilado previamente.
 	 */
 	@Override
-	public double[] saidaParaArray() {
+	public Variavel[] saidaParaArray() {
 		verificarCompilacao();
 		return camadaSaida().saidaParaArray();
 	}
@@ -760,7 +761,7 @@ public class RedeNeural extends Modelo {
 	 * @throws IllegalArgumentException se o modelo não foi compilado previamente.
 	 */
 	@Override
-	public void info() {
+	public void print() {
 		verificarCompilacao();
 		System.out.println(construirInfo());
 	}

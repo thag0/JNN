@@ -2,8 +2,8 @@ package jnn.ativacoes;
 
 import jnn.camadas.Convolucional;
 import jnn.camadas.Densa;
-import jnn.core.tensor.OpTensor4D;
-import jnn.core.tensor.Tensor4D;
+import jnn.core.tensor.OpTensor;
+import jnn.core.tensor.Tensor;
 
 /**
  * Implementação da função de ativação Softmax para uso
@@ -14,7 +14,7 @@ public class Softmax extends Ativacao {
 	/**
 	 * Operador para tensores.
 	 */
-	OpTensor4D optensor = new OpTensor4D();
+	OpTensor optensor = new OpTensor();
 
 	/**
 	 * Instancia a função de ativação Softmax.
@@ -24,72 +24,69 @@ public class Softmax extends Ativacao {
 	 *    permitindo que a unidade com a maior saída tenha uma probabilidade mais
 	 *    alta.
 	 * </p>
-	 * <p>
-	 *    A ativação atua em cada linha do tensor individualmente
-	 * </p>
 	 * Exemplo:
 	 * <pre>
-	 * tensor = [[[
-	 *    [1, 2, 3], 
-	 *    [2, 3, 1], 
-	 *    [3, 1, 2], 
-	 *]]]
+	 * tensor = [
+	 *    [1, 2, 3],
+	 *]
 	 *
-	 *softmax.calcular(tensor, tensor);
+	 *softmax.forward(tensor, tensor);
 	 *
-	 *tensor = [[[
-	 *    [0.1, 0.2, 0.7], 
-	 *    [0.2, 0.7, 0.1], 
-	 *    [0.7, 0.1, 0.2], 
-	 *]]]
+	 *tensor = [
+	 *    [0,090031, 0,244728, 0,665241],
+	 *]
 	 * </pre>
 	 */
 	public Softmax() {}
 
 	@Override
-	public void forward(Tensor4D entrada, Tensor4D saida) {
-		int lote = entrada.dim1();
-		int canais = entrada.dim2();
-		int linhas = entrada.dim3();
-		int colunas = entrada.dim4();
-	
-		for (int l = 0; l < lote; l++) {
-			for (int c = 0; c < canais; c++) {
-				for (int lin = 0; lin < linhas; lin++) {
-					double somaExp = 0;
-
-					for (int col = 0; col < colunas; col++) {
-						somaExp += Math.exp(entrada.get(l, c, lin, col));
-					}
-
-					for (int col = 0; col < colunas; col++) {
-						double s = Math.exp(entrada.get(l, c, lin, col)) / somaExp;
-						saida.set(s, l, c, lin, col);
-					}
-				}
-			}
+	public void forward(Tensor entrada, Tensor saida) {
+		if (entrada.numDim() != saida.numDim()) {
+			throw new IllegalArgumentException(
+				"\nTamanho do tensor de entrada (" + entrada.numDim() + ") " +
+				"deve ser igual ao tamanho do tensor de saída (" + saida.numDim() + ")"
+			);
 		}
-		
+
+		int dims = entrada.numDim();
+		if (dims > 1) {
+			throw new UnsupportedOperationException(
+				"\nSem suporte para tensores com mais de uma dimensão."
+			);
+		}
+
+		double somaExp = 0;
+		int cols = entrada.shape()[0];
+		for (int i = 0; i < cols; i++) {
+			somaExp += Math.exp(entrada.get(i));
+		}
+		for (int i = 0; i < cols; i++) {
+			double s = Math.exp(entrada.get(i)) / somaExp;
+			saida.set(s, i);
+		}
 	}
 
 	@Override
 	public void backward(Densa camada) {
-		int n = camada._somatorio.dim4();
-		Tensor4D tmp = camada.saida().bloco(0, 0, 0, n);
-		Tensor4D ident = new Tensor4D(1, 1, n, camada._somatorio.dim4());
-		ident.identidade(0, 0);
-		Tensor4D transp = optensor.matTranspor(tmp, 0, 0);
+		int n = camada._somatorio.tamanho();
+		Tensor tmp = camada.saida().bloco(n);
+		Tensor ident = new Tensor(n, n);
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				ident.set((i == j ? 1 : 0), i, j);
+			}
+		}
 
-		optensor.matMult(
+		Tensor transp = tmp.transpor();
+
+		Tensor res = optensor.matMult(
 			camada._gradSaida, 
 			optensor.matHadamard(
-				tmp,
-				optensor.matSub(ident, transp, 0),
-				0, 
-				0
-			), 
-			camada._gradSaida
+				tmp, optensor.matSub(ident, transp)
+			)
 		);
+
+		camada._gradSaida.copiar(res);
 	}
 
 	@Override

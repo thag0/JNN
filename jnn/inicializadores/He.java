@@ -1,6 +1,6 @@
 package jnn.inicializadores;
 
-import jnn.core.tensor.Tensor4D;
+import jnn.core.tensor.Tensor;
 
 /**
  * Inicializador He para uso dentro da biblioteca.
@@ -14,36 +14,11 @@ public class He extends Inicializador {
 	public He() {}
 
 	@Override
-	public void inicializar(Tensor4D tensor) {
-		double a = Math.sqrt(2.0 / tensor.dim3());
+	public void inicializar(Tensor tensor) {
+		int fanIn = calcularFans(tensor)[0];
+		double desvP = Math.sqrt(2.0 / fanIn);
 
-		tensor.aplicar(x -> a * super.random.nextGaussian());
+		tensor.aplicar(x -> random.nextGaussian()*desvP);
 	}
 
-	@Override
-	public void inicializar(Tensor4D tensor, int dim1) {
-		double a = Math.sqrt(2.0 / tensor.dim3());
-		
-		tensor.aplicar(dim1, 
-			x ->  a * super.random.nextGaussian()
-		);
-	}
-
-	@Override
-	public void inicializar(Tensor4D tensor, int dim1, int dim2) {
-		double a = Math.sqrt(2.0 / tensor.dim3());
-		
-		tensor.aplicar(dim1, dim2, 
-			x ->  a * super.random.nextGaussian()
-		);
-	}
-
-	@Override
-	public void inicializar(Tensor4D tensor, int dim1, int dim2, int dim3) {
-		double a = Math.sqrt(2.0 / tensor.dim3());
-		
-		tensor.aplicar(dim1, dim2, dim3, 
-			x ->  a * super.random.nextGaussian()
-		);
-	}
 }

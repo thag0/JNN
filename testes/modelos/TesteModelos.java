@@ -1,14 +1,20 @@
 package testes.modelos;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import jnn.camadas.Camada;
 import jnn.camadas.Densa;
 import jnn.camadas.Entrada;
+import jnn.core.Utils;
+import jnn.core.tensor.Tensor;
 import jnn.modelos.*;
 import lib.ged.Dados;
 import lib.ged.Ged;
 
 public class TesteModelos{
 	static Ged ged = new Ged();
+	static Utils utils = new Utils();
 
 	public static void main(String[] args){
 		ged.limparConsole();
@@ -30,12 +36,12 @@ public class TesteModelos{
 		int nEntradas = entrada[0].length;
 		int nSaidas = saida[0].length;
 		int nOcultas = 3;
-		long seed = 123456789L;
+		long seed = 0;
 		int epocas = 10_000;
 
 		String atv1 = "sigmoid";
 		String atv2 = "sigmoid";
-		String otm = "adagrad";
+		String otm = "adam";
 		String perda = "mse";
 
 		Sequencial seq = new Sequencial(new Camada[]{
@@ -53,11 +59,20 @@ public class TesteModelos{
 		rna.configurarAtivacao(atv1);
 		rna.configurarAtivacao(rna.camadaSaida(), atv2);
 		
-		seq.treinar(entrada, saida, epocas, false);
-		rna.treinar(entrada, saida, epocas, false);
+		Tensor[] treinoX = utils.array2DParaTensors(entrada);
+		Tensor[] treinoY = utils.array2DParaTensors(saida);
+		
+		try (ExecutorService exec = Executors.newFixedThreadPool(2)) {
+			exec.execute(() -> {
+				seq.treinar(treinoX.clone(), treinoY.clone(), epocas, false);
+			});
+			exec.execute(() -> {
+				rna.treinar(treinoX.clone(), treinoY.clone(), epocas, false);
+			});
+		} catch (Exception e) {}
 
-		double perdaSeq = seq.avaliador().erroMedioQuadrado(entrada, saida);
-		double perdaRna = rna.avaliador().erroMedioQuadrado(entrada, saida);
+		double perdaSeq = seq.avaliador().erroMedioQuadrado(treinoX, treinoY).item();
+		double perdaRna = rna.avaliador().erroMedioQuadrado(treinoX, treinoY).item();
 
 		System.out.println("Perda Seq: " + perdaSeq);
 		System.out.println("Perda Rna: " + perdaRna);
@@ -67,9 +82,9 @@ public class TesteModelos{
 		for(int i = 0; i < 2; i++){
 			for(int j = 0; j < 2; j++){
 				double[] e = {i, j};
-				double[] prevSeq = seq.forward(e).paraArray();
-				double[] prevRna = rna.forward(e).paraArray();
-				System.out.println(i + " " + j + " - Rna: " + prevRna[0] + "      \t    Seq: " + prevSeq[0]);
+				double prevSeq = seq.forward(e).get(0);
+				double prevRna = rna.forward(e).get(0);
+				System.out.println(i + " " + j + " - Rna: " + prevRna + "      \t    Seq: " + prevSeq);
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 package jnn.ativacoes;
 
 import jnn.camadas.Densa;
+import jnn.core.tensor.Variavel;
 
 /**
  * Implementação da função de ativação Tangente Hiperbólica (TanH) 
@@ -29,12 +30,14 @@ public class TanH extends Ativacao {
 	public void backward(Densa densa) {
 		//aproveitar os resultados pre calculados
 
-		double[] e = densa.saidaParaArray();
-		double[] g = densa._gradSaida.paraArray();
-		double[] d = new double[e.length];
+		Variavel[] t = densa.saidaParaArray();
+		Variavel[] g = densa._gradSaida.paraArray();
+		double[] d = new double[t.length];
 
+		double ti;
 		for (int i = 0; i < d.length; i++) {
-			d[i] = (1 - (e[i]*e[i])) * g[i];
+			ti = t[i].get();
+			d[i] = (1 - (ti*ti)) * g[i].get();
 		}
 
 		densa._gradSaida.copiarElementos(d);

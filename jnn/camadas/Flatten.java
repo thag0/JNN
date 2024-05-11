@@ -1,7 +1,8 @@
 package jnn.camadas;
 
 import jnn.core.Utils;
-import jnn.core.tensor.Tensor4D;
+import jnn.core.tensor.Tensor;
+import jnn.core.tensor.Variavel;
 
 /**
  * <h2>
@@ -32,7 +33,7 @@ public class Flatten extends Camada implements Cloneable{
 	/**
 	 * Array contendo o formato de saida da camada, de acordo com o formato:
 	 * <pre>
-	 *    saida = (1, 1, elementosTotaisEntrada)
+	 *    saida = (elementosTotaisEntrada)
 	 * </pre>
 	 */
 	int[] formSaida;
@@ -44,10 +45,10 @@ public class Flatten extends Camada implements Cloneable{
 	 *    O formato da entrada é dado por:
 	 * </p>
 	 * <pre>
-	 *    entrada = (1, profundidade, altura, largura)
+	 *    entrada = (profundidade, altura, largura)
 	 * </pre>
 	 */
-	public Tensor4D _entrada;
+	public Tensor _entrada;
 	
 	/**
 	 * Tensor contendo os valores dos gradientes usados para 
@@ -56,10 +57,10 @@ public class Flatten extends Camada implements Cloneable{
 	 *    O formato dos gradientes é dado por:
 	 * </p>
 	 * <pre>
-	 *    gradEntrada = (1, profundidadeEntrada, alturaEntrada, larguraEntrada)
+	 *    gradEntrada = (profundidadeEntrada, alturaEntrada, larguraEntrada)
 	 * </pre>
 	 */
-	public Tensor4D _gradEntrada;
+	public Tensor _gradEntrada;
 
 	/**
 	 * Tensor contendo a saída achatada da camada.
@@ -69,7 +70,7 @@ public class Flatten extends Camada implements Cloneable{
 	 *    total de elementos da entrada.
 	 * </p>
 	 */
-	public Tensor4D _saida;
+	public Tensor _saida;
 
 	/**
 	 * Inicializa uma camada Flatten, que irá achatar a entrada recebida
@@ -102,12 +103,12 @@ public class Flatten extends Camada implements Cloneable{
 	 *    cada dimensão de entrada da camada, e deve estar no formato:
 	 * </p>
 	 * <pre>
-	 *    entrada = (1, profundidade, altura, largura)
+	 *    entrada = (profundidade, altura, largura)
 	 * </pre>
 	 * Também pode ser aceito um objeto de entrada contendo apenas dois elementos,
 	 * eles serão formatados como:
 	 * <pre>
-	 *    entrada = (1, 1, altura, largura)
+	 *    entrada = ( altura, largura)
 	 * </pre>
 	 * @param entrada formato de entrada para a camada.
 	 */
@@ -157,7 +158,6 @@ public class Flatten extends Camada implements Cloneable{
 		//inicialização de parâmetros
 
 		this.formEntrada = new int[]{
-			1,
 			profundidade,
 			altura,
 			largura
@@ -168,11 +168,11 @@ public class Flatten extends Camada implements Cloneable{
 			tamanho *= i;
 		}
 
-		this.formSaida = new int[]{1, 1, 1, tamanho};
+		this.formSaida = new int[]{tamanho};
 
-		_entrada = new Tensor4D(formEntrada);
-		_gradEntrada = new Tensor4D(this._entrada.shape());
-		_saida = new Tensor4D(formSaida);
+		_entrada = new Tensor(formEntrada);
+		_gradEntrada = new Tensor(_entrada.shape());
+		_saida = new Tensor(formSaida);
 
 		setNomes();
 
@@ -198,40 +198,30 @@ public class Flatten extends Camada implements Cloneable{
 	 * </h2>
 	 * Achata os dados de entrada num formato sequencial.
 	 * @param entrada dados de entrada que serão processados, objetos aceitos incluem:
-	 * {@code Tensor4D}, {@code double[][][]} ou {@code double[]}.
-	 * @throws IllegalArgumentException caso a entrada fornecida não seja suportada 
-	 * pela camada.
+	 * {@code Tensor}
 	 */
 	@Override
-	public Tensor4D forward(Object entrada) {
+	public Tensor forward(Object entrada) {
 		verificarConstrucao();
 
-		if (entrada instanceof Tensor4D) {
-			Tensor4D e = (Tensor4D) entrada;
-			if (!_entrada.comparar3D(e)) {
+		if (entrada instanceof Tensor) {
+			Tensor e = (Tensor) entrada;
+			if (!_entrada.compararShape(e)) {
 				throw new IllegalArgumentException(
 					"\nDimensões da entrada recebida " + e.shapeStr() +
-					" incompatíveis com a entrada da camada " + this._entrada.shapeStr()
+					" incompatíveis com a entrada da camada " + _entrada.shapeStr()
 				);
 			}
 
-			_entrada.copiar(e.array3D(0), 0);
+			_entrada.copiar(e);
 
-		} else if (entrada instanceof double[][][]) {
-			double[][][] e = (double[][][]) entrada;
-			_entrada.copiar(e, 0);
-
-		} else if (entrada instanceof double[]) {
-			double[] e = (double[]) entrada;
-			_entrada.copiarElementos(e);
-		
 		} else {
 			throw new IllegalArgumentException(
 				"A camada Flatten não suporta entradas do tipo \"" + entrada.getClass().getTypeName() + "\"."
 			);
 		}
 
-		_saida.copiarElementos(_entrada.paraArray());
+		_saida.copiarElementos(_entrada.dados);
 
 		return _saida;
 	}
@@ -242,31 +232,26 @@ public class Flatten extends Camada implements Cloneable{
 	 * </h2>
 	 * Desserializa os gradientes recebedos de volta para o mesmo formato de entrada.
 	 * @param grad gradientes de entrada da camada seguinte, objetos aceitos incluem:
-	 * {@code Tensor4D} ou {@code double[]}.
+	 * {@code Tensor}.
 	 */
 	@Override
-	public Tensor4D backward(Object grad) {
+	public Tensor backward(Object grad) {
 		verificarConstrucao();
 
-		if (grad instanceof Tensor4D) {
-			Tensor4D g = (Tensor4D) grad;
-			if (g.tamanho() != _gradEntrada.tamanho()) {
+		if (grad instanceof Tensor) {
+			Tensor g = (Tensor) grad;
+			if (_gradEntrada.compararShape(g)) {
 				throw new IllegalArgumentException(
 					"\nDimensões do gradiente recebido " + g.shapeStr() +
-					"inconpatíveis com o suportado pela camada " + this._gradEntrada.shapeStr()
+					"inconpatíveis com o suportado pela camada " + _gradEntrada.shapeStr()
 				);
 			}
 
-			_gradEntrada.copiarElementos(g.paraArray());
-		
-		} else if (grad instanceof double[]) {
-			double[] g = (double[]) grad;
-			_gradEntrada.copiarElementos(g);
+			_gradEntrada.copiarElementos(g.dados);
 		
 		} else {
 			throw new IllegalArgumentException(
-				"O gradiente seguinte para a camada Flatten deve ser do tipo \"double[]\" ou \"Tensor4D\", " +
-				"Objeto recebido é do tipo " + grad.getClass().getTypeName()
+				"A camada Flatten não suporta gradientes do tipo \"" + grad.getClass().getTypeName() + "\"."
 			);
 		}
 
@@ -274,13 +259,13 @@ public class Flatten extends Camada implements Cloneable{
 	}
 	
 	@Override
-	public Tensor4D saida() {
+	public Tensor saida() {
 		verificarConstrucao();
 		return _saida;
 	}
 
 	@Override
-	public double[] saidaParaArray() {
+	public Variavel[] saidaParaArray() {
 		verificarConstrucao();
 		return saida().paraArray();
 	}
@@ -313,8 +298,6 @@ public class Flatten extends Camada implements Cloneable{
 		
 		return new int[]{
 			1,
-			1,
-			1,
 			tamanhoSaida()
 		};
 	}
@@ -325,7 +308,7 @@ public class Flatten extends Camada implements Cloneable{
 	}
 
 	@Override
-	public Tensor4D gradEntrada() {
+	public Tensor gradEntrada() {
 		verificarConstrucao();
 		return _gradEntrada;
 	}

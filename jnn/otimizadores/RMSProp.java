@@ -1,6 +1,7 @@
 package jnn.otimizadores;
 
 import jnn.camadas.Camada;
+import jnn.core.tensor.Variavel;
 
 /**
  * <h2>
@@ -76,12 +77,12 @@ public class RMSProp extends Otimizador {
 	/**
 	 * Acumuladores para os kernels
 	 */
-	private double[] ac;
+	private Variavel[] ac;
 
 	/**
 	 * Acumuladores para os bias.
 	 */
-	private double[] acb;
+	private Variavel[] acb;
 
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> RMSProp </strong> 
@@ -153,8 +154,8 @@ public class RMSProp extends Otimizador {
 			if (camada.temBias()) nBias += camada.bias().tamanho();
 		}
 
-		this.ac  = new double[nKernel];
-		this.acb = new double[nBias];
+		this.ac  = initVars(nKernel);
+		this.acb = initVars(nBias);
 		
 		_construido = true;//otimizador pode ser usado
 	}
@@ -167,16 +168,14 @@ public class RMSProp extends Otimizador {
 		for (Camada camada : camadas) {
 			if (!camada.treinavel()) continue;
 
-			double[] kernel = camada.kernelParaArray();
-			double[] gradK = camada.gradKernelParaArray();
+			Variavel[] kernel = camada.kernelParaArray();
+			Variavel[] gradK = camada.gradKernelParaArray();
 			idKernel = calcular(kernel, gradK, ac, idKernel);
-			camada.setKernel(kernel);
 
 			if (camada.temBias()) {
-				double[] bias = camada.biasParaArray();
-				double[] gradB = camada.gradBiasParaArray();
+				Variavel[] bias = camada.biasParaArray();
+				Variavel[] gradB = camada.gradBiasParaArray();
 				idBias = calcular(bias, gradB, acb, idBias);
-				camada.setBias(bias);
 			}
 		}
 	}
@@ -185,19 +184,21 @@ public class RMSProp extends Otimizador {
 	 * Atualiza as variáveis usando o gradiente pré calculado.
 	 * @param vars variáveis que serão atualizadas.
 	 * @param grads gradientes das variáveis.
-	 * @param acumulador acumulador do otimizador.
+	 * @param ac acumulador do otimizador.
 	 * @param id índice inicial das variáveis dentro do array de momentums.
 	 * @return índice final após as atualizações.
 	 */
-	private int calcular(double[] vars, double[] grads, double[] acumulador, int id) {
-		for (int i = 0; i < vars.length; i++) {
-			acumulador[id] = (rho * ac[id]) + ((1- rho) * (grads[i]*grads[i]));
-			vars[i] -= (grads[i] * taxaAprendizagem) / (Math.sqrt(ac[id]) + epsilon);
-			id++;
-		}
+    private int calcular(Variavel[] vars, Variavel[] grads, Variavel[] ac, int id) {
+        double g;
+        for (int i = 0; i < vars.length; i++) {
+            g = grads[i].get();
+            ac[id].set(rho * ac[id].get() + (1 - rho) * g * g);
+            vars[i].sub((g * taxaAprendizagem) / (Math.sqrt(ac[id].get()) + epsilon));
+            id++;
+        }
 
-		return id;
-	}
+        return id;
+    }
 
 	@Override
 	public String info() {

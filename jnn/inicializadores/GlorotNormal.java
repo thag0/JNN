@@ -1,6 +1,6 @@
 package jnn.inicializadores;
 
-import jnn.core.tensor.Tensor4D;
+import jnn.core.tensor.Tensor;
 
 /**
  * Inicializador Glorot normalizado para uso dentro da biblioteca.
@@ -23,36 +23,10 @@ public class GlorotNormal extends Inicializador {
 	}
 
 	@Override
-	public void inicializar(Tensor4D tensor) {
-		double desvio = Math.sqrt(2.0 / (tensor.dim3() + tensor.dim4()));
+	public void inicializar(Tensor tensor) {
+		int[] fans = calcularFans(tensor);
+		double sigma = Math.sqrt(2.0 / (fans[0] + fans[1]));
 
-		tensor.aplicar(x ->  super.random.nextGaussian() * desvio);
-	}
-
-	@Override
-	public void inicializar(Tensor4D tensor, int dim1) {
-		double desvio = Math.sqrt(2.0 / (tensor.dim3() + tensor.dim4()));
-
-		tensor.aplicar(dim1, 
-			x -> super.random.nextGaussian() * desvio
-		);
-	}
-
-	@Override
-	public void inicializar(Tensor4D tensor, int dim1, int dim2) {
-		double desvio = Math.sqrt(2.0 / (tensor.dim3() + tensor.dim4()));
-
-		tensor.aplicar(dim1, dim2,
-			x -> super.random.nextGaussian() * desvio
-		);
-	}
-
-	@Override
-	public void inicializar(Tensor4D tensor, int dim1, int dim2, int dim3) {
-		double desvio = Math.sqrt(2.0 / tensor.dim4());
-
-		tensor.aplicar(dim1, dim2, dim3,
-			x -> super.random.nextGaussian() * desvio
-		);
+		tensor.aplicar(x -> random.nextGaussian() * sigma);
 	}
 }

@@ -1,5 +1,7 @@
 package jnn.avaliacao.perda;
 
+import jnn.core.tensor.Tensor;
+
 /**
  * Função de perda  Mean Squared Logarithmic Error, calcula o 
  * erro médio quadrado logarítmico entre as previsões e os 
@@ -13,28 +15,27 @@ public class MSLE extends Perda {
 	public MSLE() {}
 
 	@Override
-	public double calcular(double[] previsto, double[] real) {
-		super.verificarDimensoes(previsto, real);
-		int tam = previsto.length;
+	public Tensor calcular(Tensor prev, Tensor real) {
+		super.verificarDimensoes(prev, real);
+		int tam = prev.tamanho();
 		
 		double emql = 0;
 		for (int i = 0; i < tam; i++) {
-			double d = Math.log(1 + previsto[i]) - Math.log(1 + real[i]);
+			double d = Math.log(1 +  prev.get(i)) - Math.log(1 + real.get(i));
 			emql += d * d;
 		}
 		
-		return emql/tam;
+		return new Tensor(new double[]{ (emql/tam) }, 1);
 	}
 	
 	@Override
-	public double[] derivada(double[] previsto, double[] real) {
-		super.verificarDimensoes(previsto, real);
+	public Tensor derivada(Tensor prev, Tensor real) {
+		super.verificarDimensoes(prev, real);
+		final int tam = prev.tamanho();
 
-		int tam = previsto.length;
-		double[] derivadas = new double[previsto.length];
-		for (int i = 0; i < tam; i++) {
-			derivadas[i] = (2.0 / tam) * (Math.log(1 + previsto[i]) - Math.log(1 + real[i]));
-		}
-		return derivadas;
+		return prev.map(
+			real,
+			(p, r) -> (2.0 / tam) * (Math.log(1 + p) - Math.log(1 + r))
+		);
 	}
 }

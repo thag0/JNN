@@ -5,12 +5,13 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import jnn.camadas.Convolucional;
-import jnn.core.tensor.Tensor4D;
+import jnn.core.tensor.Tensor;
+import jnn.core.tensor.Variavel;
 
 /**
  * Utilitário usado para serialização e desserialização de camadas Convolucionais.
  */
-class SerialConv{
+class SerialConv {
 
 	public SerialConv(){}
 
@@ -29,29 +30,29 @@ class SerialConv{
 	 * @param camada camada convolucional que será serializada.
 	 * @param bw escritor de buffer usado para salvar os dados da camada.
 	 */
-	public void serializar(Convolucional camada, BufferedWriter bw, String tipo){
-		try{
+	public void serializar(Convolucional camada, BufferedWriter bw, String tipo) {
+		try {
 			//nome da camada pra facilitar
 			bw.write(camada.nome());
 			bw.newLine();
 
 			//formato de entrada
 			int[] entrada = camada.formatoEntrada();
-			for(int i = 0; i < entrada.length; i++){
+			for (int i = 0; i < entrada.length; i++) {
 				bw.write(entrada[i] + " ");
 			}
 			bw.newLine();
 			
 			//formato de saída
 			int[] saida = camada.formatoSaida();
-			for(int i = 0; i < saida.length; i++){
+			for (int i = 0; i < saida.length; i++) {
 				bw.write(saida[i] + " ");
 			}
 			bw.newLine();
 			
 			//formato dos filtros
 			int[] formFiltro = camada.formatoFiltro();
-			for(int i = 0; i < formFiltro.length; i++){
+			for (int i = 0; i < formFiltro.length; i++) {
 				bw.write(formFiltro[i] + " ");
 			}
 			bw.newLine();
@@ -65,11 +66,12 @@ class SerialConv{
 			bw.newLine();
 
 			//filtros
-			Tensor4D filtros = camada.kernel();
-			for(int i = 0; i < filtros.dim1(); i++){
-				for(int j = 0; j < filtros.dim2(); j++){
-					for(int k = 0; k < filtros.dim3(); k++){
-						for(int l = 0; l < filtros.dim4(); l++){
+			Tensor filtros = camada.kernel();
+			int[] shape = filtros.shape();
+			for (int i = 0; i < shape[0]; i++) {
+				for (int j = 0; j < shape[1]; j++) {
+					for (int k = 0; k < shape[2]; k++) {
+						for (int l = 0; l < shape[3]; l++) {
 							escreverDado(filtros.get(i, j, k, l), tipo, bw);
 							bw.newLine();
 						}
@@ -78,13 +80,14 @@ class SerialConv{
 			}
 			
 			if(camada.temBias()){
-				double[] bias = camada.bias().paraArray();
-				for(double valor : bias){
-					escreverDado(valor, tipo, bw);
+				Variavel[] bias = camada.bias().paraArray();
+				for(Variavel valor : bias){
+					escreverDado(valor.get(), tipo, bw);
 					bw.newLine();               
 				}
 			}
-		}catch(Exception e){
+		} catch (Exception e) {
+			System.out.println("\nErro ao serializar camada " + camada.nome());
 			e.printStackTrace();
 		}
 	}
@@ -94,9 +97,8 @@ class SerialConv{
 	 * @param valor valor desejado.
 	 * @param tipo formatação do dado (float, double).
 	 * @param bw escritor de buffer usado.
-	 * @throws IOException
 	 */
-	private void escreverDado(double valor, String tipo, BufferedWriter bw) throws IOException{
+	private void escreverDado(double valor, String tipo, BufferedWriter bw) throws IOException {
 		tipo = tipo.toLowerCase();
 		switch(tipo){
 			case "float":
@@ -119,25 +121,25 @@ class SerialConv{
 	 * filtros e bias ainda não são inicializados.
 	 */
 	public Convolucional lerConfig(BufferedReader br){
-		try{
+		try {
 			//formato de entrada
 			String[] sEntrada = br.readLine().split(" ");
 			int[] entrada = new int[sEntrada.length];
-			for(int i = 0; i < sEntrada.length; i++){
+			for (int i = 0; i < sEntrada.length; i++) {
 				entrada[i] = Integer.parseInt(sEntrada[i]);
 			}
 
 			//formato de saída
 			String[] sSaida = br.readLine().split(" ");
 			int[] saida = new int[sSaida.length];
-			for(int i = 0; i < sSaida.length; i++){
+			for (int i = 0; i < sSaida.length; i++) {
 				saida[i] = Integer.parseInt(sSaida[i]);
 			}
 
 			//formato dos filtros
 			String[] sFiltros = br.readLine().split(" ");
 			int[] formFiltro = new int[sFiltros.length];
-			for(int i = 0; i < sFiltros.length; i++){
+			for (int i = 0; i < sFiltros.length; i++) {
 				formFiltro[i] = Integer.parseInt(sFiltros[i]);
 			}
 			
@@ -146,7 +148,6 @@ class SerialConv{
 
 			//bias
 			boolean bias = Boolean.valueOf(br.readLine());
-			
 
 			int numFiltros = saida[0];
 
@@ -156,7 +157,9 @@ class SerialConv{
 			camada.construir(entrada);
 
 			return camada;
-		}catch(Exception e){
+
+		} catch (Exception e) {
+			System.out.println("\nErro ao ler configurações da camada Convolucional:");
 			throw new RuntimeException(e);
 		}
 	}
@@ -167,27 +170,29 @@ class SerialConv{
 	 * @param br leitor de buffer.
 	 */
 	public void lerPesos(Convolucional camada, BufferedReader br){
-		try{
+		try {
 			int tamKernel = camada.kernel().tamanho();
-			double[] arrKernel = new double[tamKernel];
+			Variavel[] arrKernel = new Variavel[tamKernel];
 
-			for(int i = 0; i < tamKernel; i++){
-				arrKernel[i] = Double.parseDouble(br.readLine());
+			for (int i = 0; i < tamKernel; i++) {
+				arrKernel[i] = new Variavel(Double.parseDouble(br.readLine()));
 			}
 
 			camada.setKernel(arrKernel);
 			
-			if(camada.temBias()){
+			if (camada.temBias()) {
 				int tamBias = camada.bias().tamanho();
-				double[] arrBias = new double[tamBias];
+				Variavel[] arrBias = new Variavel[tamBias];
 
-				for(int i = 0; i < tamBias; i++){
-					arrBias[i] = Double.parseDouble(br.readLine());
+				for (int i = 0; i < tamBias; i++) {
+					arrBias[i] = new Variavel(Double.parseDouble(br.readLine()));
 				}
 				
 				camada.setBias(arrBias);
 			}
-		}catch(Exception e){
+
+		} catch (Exception e) {
+			System.out.println("\nErro ao ler pesos da camada " + camada.nome());
 			throw new RuntimeException(e);
 		}
 	}

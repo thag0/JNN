@@ -9,7 +9,8 @@ import jnn.avaliacao.perda.Perda;
 import jnn.camadas.Camada;
 import jnn.camadas.Entrada;
 import jnn.core.Dicionario;
-import jnn.core.tensor.Tensor4D;
+import jnn.core.tensor.Tensor;
+import jnn.core.tensor.Variavel;
 import jnn.otimizadores.Otimizador;
 import jnn.treinamento.Treinador;
 
@@ -90,7 +91,7 @@ import jnn.treinamento.Treinador;
  * <p>
  *    Obter os resultados previstos pelo medelo pode ser facilmente feito apenas o alimentando
  *    com dados de entrada. Os dados dados de entrada para maior facilidade de manipulação podem
- *    ser instâncias de um {@code Tensor4D} (tanto únicas, quanto arrays), mas o modelo não é
+ *    ser instâncias de um {@code Tensor} (tanto únicas, quanto arrays), mas o modelo não é
  *    limitado a isso, sendo necesário apenas saber se a camada inicial possui suporte para o
  *    dado fornecido.
  * </p>
@@ -98,11 +99,11 @@ import jnn.treinamento.Treinador;
  *    Exemplo:
  * </p>
  * <pre>
- *Tensor4D entrada = ...;
- *Tensor4D pred = modelo.forward(entrada);//Obtendo uma única predição
+ *Tensor entrada = ...;
+ *Tensor pred = modelo.forward(entrada);//Obtendo uma única predição
  *
- *Tensor4D[] entradas = ...;
- *Tensor4D[] preds = modelo.forwards(entrada);//Obtendo várias predições
+ *Tensor[] entradas = ...;
+ *Tensor[] preds = modelo.forwards(entrada);//Obtendo várias predições
  *</pre>
  * <h2>
  *    Treinamento
@@ -312,12 +313,12 @@ public class Sequencial extends Modelo {
 	}
 
 	@Override
-	public Tensor4D forward(Object entrada) {
+	public Tensor forward(Object entrada) {
 		verificarCompilacao();
 
 		utils.validarNaoNulo(entrada, "Dados de entrada não podem ser nulos.");
 
-		Tensor4D prev = _camadas[0].forward(entrada);
+		Tensor prev = _camadas[0].forward(entrada);
 		for (int i = 1; i < _camadas.length; i++) {
 			prev = _camadas[i].forward(prev);
 		}
@@ -326,7 +327,7 @@ public class Sequencial extends Modelo {
 	}
 
 	@Override
-	public Tensor4D[] forwards(Object[] entradas) {
+	public Tensor[] forwards(Object[] entradas) {
 		verificarCompilacao();
 
 		utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
@@ -335,7 +336,7 @@ public class Sequencial extends Modelo {
 		int numThreads = Runtime.getRuntime().availableProcessors();
 		if (numThreads > numEntradas) numThreads = numEntradas;
 
-		Tensor4D[] prevs = new Tensor4D[numEntradas];
+		Tensor[] prevs = new Tensor[numEntradas];
 		Sequencial[] clones = new Sequencial[numThreads];
 		ExecutorService exec = Executors.newFixedThreadPool(numThreads);
 
@@ -422,7 +423,7 @@ public class Sequencial extends Modelo {
 	}
 
 	@Override
-	public double[] saidaParaArray() {
+	public Variavel[] saidaParaArray() {
 		verificarCompilacao();
 		return camadaSaida().saidaParaArray();
 	}
@@ -506,7 +507,7 @@ public class Sequencial extends Modelo {
 	}
 
 	@Override
-	public void info() {
+	public void print() {
 		verificarCompilacao();
 		System.out.println(construirInfo());
 	}

@@ -26,7 +26,7 @@ public class SalvandoRede{
 		Sequencial modelo = ler(caminho);
 		// Sequencial modelo = criar();
 
-		modelo.info();
+		modelo.print();
 
 		// serializador.salvar(modelo, caminho);
 	}

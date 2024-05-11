@@ -5,12 +5,9 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import jnn.camadas.*;
-import jnn.core.OpMatriz;
-import jnn.core.tensor.OpTensor4D;
-import jnn.core.tensor.Tensor4D;
-import jnn.inicializadores.GlorotUniforme;
-import jnn.inicializadores.Inicializador;
-import jnn.inicializadores.Zeros;
+import jnn.core.tensor.OpTensor;
+import jnn.core.tensor.Tensor;
+import jnn.core.tensor.Variavel;
 import jnn.modelos.Sequencial;
 import jnn.otimizadores.Otimizador;
 import jnn.serializacao.Serializador;
@@ -21,8 +18,7 @@ import lib.geim.Geim;
 public class Conv{
 	static Ged ged = new Ged();
 	static Geim geim = new Geim();
-	static OpMatriz opmat = new OpMatriz();
-	static OpTensor4D optensor = new OpTensor4D();
+	static OpTensor optensor = new OpTensor();
 	static Serializador serializador = new Serializador();
 	static final int amostras = 100;
 	static final int digitos = 10;
@@ -38,23 +34,23 @@ public class Conv{
 		Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + nomeModelo + ".nn");
 		// modelo.info();
 
-		// testarPrevisao(modelo, "treino/3/img_1", true);
-		// testarPrevisao(modelo, "3_deslocado", true);
+		testarPrevisao(modelo, "treino/3/img_1", true);
+		testarPrevisao(modelo, "3_deslocado", true);
 
 		// testarAcertosMNIST(modelo);
 		// testarTodosDados(modelo);
 
-		Dados forward = tempoForward(modelo);//media 30/40 ms
-		Dados backward = tempoBackward(modelo);//media 20/25 ms
+		// Dados forward = tempoForward(modelo);//media 30/40 ms
+		// Dados backward = tempoBackward(modelo);//media 20/25 ms
 		// forward = ged.filtrar(forward, 1, "Convolucional");
 		// backward = ged.filtrar(backward, 1, "Convolucional");
-		forward.print();
-		backward.print();
+		// forward.print();
+		// backward.print();
 
 		// testarForward();
 		// testarBackward();
 
-		// tempoOtimizador(modelo);
+		tempoOtimizador(modelo);
 	}
 
 	static void testarAcertosMNIST(Sequencial modelo){
@@ -66,9 +62,9 @@ public class Conv{
 			double acertos = 0;
 			for(int amostra = 0; amostra < amostras; amostra++){
 				String caminhoImagem = caminho + digito + "/img_" + amostra + ".jpg";
-				Tensor4D img = new Tensor4D(imagemParaMatriz(caminhoImagem));
+				Tensor img = new Tensor(imagemParaMatriz(caminhoImagem));
 				
-				double[] previsoes = modelo.forward(img).paraArray();
+				double[] previsoes = modelo.forward(img).paraArrayPrimitivo();
 				if(maiorIndice(previsoes) == digito){
 					acertos++;
 				}
@@ -79,94 +75,6 @@ public class Conv{
 			System.out.println("Acertos " + digito + " -> " + porcentagem);
 		}
 		System.out.println("média acertos: " + String.format("%.2f", (media/digitos)*100) + "%");
-	}
-
-	/**
-	 * Testar com multithread
-	 */
-	static void testarForward(){
-		int[] formEntrada = {12, 16, 16};
-		Inicializador iniKernel = new GlorotUniforme(12345);
-		Inicializador iniBias = new Zeros();
-		Convolucional conv = new Convolucional(formEntrada, new int[]{3, 3}, 16, "linear", iniKernel, iniBias);
-		conv.inicializar();
-
-		Tensor4D entrada = new Tensor4D(conv.formatoEntrada());
-		entrada.aplicar((x) -> Math.random());
-
-		//simulação de propagação dos dados numa camada convolucional sem bias
-		Tensor4D filtros = new Tensor4D(conv.kernel());
-		Tensor4D saidaEsperada = new Tensor4D(conv.formatoSaida());
-		int[] idEntrada = {0, 0};
-		int[] idKernel = {0, 0};
-		int[] idSaida = {0, 0};
-		saidaEsperada.preencher(0.0);
-		for(int i = 0; i < filtros.dim1(); i++){
-			idSaida[1] = i;
-			for(int j = 0; j < filtros.dim2(); j++){
-				idEntrada[1] = j;
-				idKernel[0] = i;
-				idKernel[1] = j;
-				optensor.correlacao2D(entrada, filtros, saidaEsperada, idEntrada, idKernel, idSaida);
-			}
-		}
-
-		conv.forward(entrada);
-
-		System.out.println("Forward esperado: " + conv.saida().comparar(saidaEsperada));
-	}
-
-	/**
-	 * Testar com multithread
-	 */
-	static void testarBackward(){
-		int[] formEntrada = {26, 24, 24};
-		Inicializador iniKernel = new GlorotUniforme(12345);
-		Inicializador iniBias = new Zeros();
-		Convolucional conv = new Convolucional(formEntrada, new int[]{3, 3}, 26, "linear", iniKernel, iniBias);
-		
-		Tensor4D entrada = new Tensor4D(conv.formatoEntrada());
-		entrada.aplicar((x) -> Math.random());
-		
-		Tensor4D filtros = new Tensor4D(conv.kernel().shape());
-		filtros.aplicar((x) -> Math.random());
-		conv.setKernel(filtros.paraArray());
-
-		Tensor4D grad = new Tensor4D(conv._gradSaida);
-		grad.aplicar((x) -> Math.random());
-		
-		//backward
-		conv.forward(entrada);
-		Tensor4D gradEntrada = conv.backward(grad);
-
-		Tensor4D gradSaida = new Tensor4D(conv._gradSaida);
-		Tensor4D gradFiltroEsperado = new Tensor4D(conv.gradKernel().shape());
-		Tensor4D gradEntradaEsperado = new Tensor4D(gradEntrada.shape());
-
-		gradEntradaEsperado.preencher(0);
-		gradFiltroEsperado.preencher(0);
-		for(int i = 0; i < filtros.dim1(); i++){
-			for(int j = 0; j < filtros.dim2(); j++){
-				int[] idEntrada = {0, j};
-				int[] idDerivada = {0, i};
-				int[] idGradKernel = {i, j};
-				int[] idKernel = {i, j};
-				int[] idGradEntrada = {0, j};
-				gradFiltroEsperado.preencher2D(idKernel[0], idKernel[1], 0.0);
-				optensor.correlacao2D(entrada, gradSaida, gradFiltroEsperado, idEntrada, idDerivada, idGradKernel);
-				optensor.convolucao2DFull(gradSaida, filtros, gradEntradaEsperado, idDerivada, idKernel, idGradEntrada);
-			}
-		}
-
-		boolean gradF = conv.gradKernel().equals(gradFiltroEsperado);
-		boolean gradE = gradEntrada.equals(gradEntradaEsperado);
-		
-		if(gradE && gradF){
-			System.out.println("Backward esperado: " + (gradE && gradF));
-		
-		}else{
-			System.out.println("Backward inesperado ->  gradFiltro: " +  gradF + ", gradEntrada: " + gradE);
-		}
 	}
 
 	static void testarTodosDados(Sequencial modelo){
@@ -245,7 +153,9 @@ public class Conv{
 		dados.editarNome("Tempos Backward");
 		ArrayList<String[]> conteudo = new ArrayList<>();
 
-		t = medirTempo(() -> modelo.camada(n-1).backward(new Tensor4D(grad)));
+		Tensor g = new Tensor(grad.length);
+		g.copiarElementos(grad);
+		t = medirTempo(() -> modelo.camada(n-1).backward(g));
 		conteudo.add(new String[]{
 			String.valueOf(n-1),
 			modelo.camada(n-1).nome(),
@@ -283,14 +193,15 @@ public class Conv{
 		Otimizador otm = modelo.otimizador();
 
 		//arbritário
-		double[] grad = new double[modelo.saidaParaArray().length];
+		int tamGrad = modelo.saidaParaArray().length;
+		double[] grad = new double[tamGrad];
 		grad[0] = 1;
 		for(int i = 1; i < grad.length; i++){
 			grad[i] = 0.02;
 		}
 
 		//backward simples
-		modelo.camadaSaida().backward(new Tensor4D(grad));
+		modelo.camadaSaida().backward(new Tensor(grad, tamGrad));
 		for(int i = modelo.numCamadas()-2; i >= 0; i--){
 			modelo.camada(i).backward(modelo.camada(i+1).gradEntrada());
 		}
@@ -304,28 +215,20 @@ public class Conv{
 		);
 	}
 
-	static void testarModelo(Sequencial modelo, int digitos, int amostras){
-		var testeX = carregarDadosMNIST("/dados/mnist/teste/", amostras, digitos);
-		var testeY = criarRotulosMNIST(amostras, digitos);
-
-		double acuraria = modelo.avaliador().acuracia(testeX, testeY);
-		System.out.println("Perda: " + modelo.avaliar(testeX, testeY));
-		System.out.println("Acurácia: " + (acuraria * 100) + "%");
-	}
-
 	static void testarPrevisao(Sequencial modelo, String caminhoImagem, boolean prob){
 		String extensao = ".jpg";
-		var entrada = new Tensor4D(imagemParaMatriz("./dados/mnist/" + caminhoImagem + extensao));
-		double[] previsao = modelo.forward(entrada).paraArray();
+		Tensor entrada = new Tensor(imagemParaMatriz("./dados/mnist/" + caminhoImagem + extensao));
+		entrada.unsqueeze(0);
+		Variavel[] previsao = modelo.forward(entrada).paraArray();
 		
 		System.out.print("\nTestando: " + caminhoImagem + extensao);
 		if(prob){
 			System.out.println();
 			for(int i = 0; i < previsao.length; i++){
-				System.out.println("Prob: " + i + ": " + (int)(previsao[i]*100) + "%");
+				System.out.println("Prob: " + i + ": " + (int)(previsao[i].get()*100) + "%");
 			}
 		}else{
-			System.out.println(" -> Prev: " + maiorIndice(previsao));
+			System.out.println(" -> Prev: " + maiorIndice((previsao)));
 		}
 
 	}
@@ -338,6 +241,20 @@ public class Conv{
 			if(arr[i] > maior){
 				id = i;
 				maior = arr[i];
+			}
+		}
+
+		return id;
+	}
+
+	static int maiorIndice(Variavel[] arr){
+		int id = 0;
+		double maior = arr[0].get();
+
+		for(int i = 1; i < arr.length; i++){
+			if(arr[i].get() > maior){
+				id = i;
+				maior = arr[i].get();
 			}
 		}
 

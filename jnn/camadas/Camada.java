@@ -1,7 +1,8 @@
 package jnn.camadas;
 
 import jnn.ativacoes.Ativacao;
-import jnn.core.tensor.Tensor4D;
+import jnn.core.tensor.Tensor;
+import jnn.core.tensor.Variavel;
 
 /**
  * <h2>
@@ -210,20 +211,20 @@ public abstract class Camada {
 	 * @param entrada dados de entrada que serão processados pela camada.
 	 * @return {@code Tensor} contendo a saída calculada pela camada.
 	 */
-	public abstract Tensor4D forward(Object entrada);
+	public abstract Tensor forward(Object entrada);
 
 	/**
 	 * Retropropaga os gradientes recebidos para as camadas anteriores.
 	 * @param grad gradiente em relação a saída da camada.
 	 * @return {@code Tensor} contendo os gradientes em relação a entrada da camada.
 	 */
-	public abstract Tensor4D backward(Object grad);
+	public abstract Tensor backward(Object grad);
 
 	/**
 	 * Retorna a saída da camada.
 	 * @return saída da camada.
 	 */
-	public abstract Tensor4D saida();
+	public abstract Tensor saida();
 
 	/**
 	 * Retorna a função de ativação configurada pela camada.
@@ -265,7 +266,7 @@ public abstract class Camada {
 	 * Retorna a saída da camada no formato de array.
 	 * @return saída da camada.
 	 */
-	public double[] saidaParaArray() {
+	public Variavel[] saidaParaArray() {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui retorno de saída para array."
 		);    
@@ -312,7 +313,7 @@ public abstract class Camada {
 	 * </p>
 	 * @return kernel da camada.
 	 */
-	public Tensor4D kernel() {
+	public Tensor kernel() {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui kernel."
 		);
@@ -329,7 +330,7 @@ public abstract class Camada {
 	 * </p>
 	 * @return kernel da camada.
 	 */
-	public double[] kernelParaArray() {
+	public Variavel[] kernelParaArray() {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui kernel."
 		);  
@@ -342,7 +343,7 @@ public abstract class Camada {
 	 * </p>
 	 * @return gradiente do kernel da camada.
 	 */
-	public Tensor4D gradKernel() {
+	public Tensor gradKernel() {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui gradiente de kernel."
 		);
@@ -353,7 +354,7 @@ public abstract class Camada {
 	 * dos gradientes para os kernels da camada.
 	 * @return gradientes para os kernels da camada.
 	 */
-	public double[] gradKernelParaArray() {
+	public Variavel[] gradKernelParaArray() {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui gradiente para kernel."
 		);   
@@ -371,7 +372,7 @@ public abstract class Camada {
 	 * </p>
 	 * @return bias da camada.
 	 */
-	public Tensor4D bias() {
+	public Tensor bias() {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui bias."
 		);      
@@ -389,7 +390,7 @@ public abstract class Camada {
 	 * </p>
 	 * @return bias da camada.
 	 */
-	public double[] biasParaArray() {
+	public Variavel[] biasParaArray() {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui bias."
 		);    
@@ -399,7 +400,7 @@ public abstract class Camada {
 	 * Retorna os gradientes em relação ao bias da camada.
 	 * @return gradientes para os bias da camada.
 	 */
-	public Tensor4D gradBias() {
+	public Tensor gradBias() {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui gradiente para bias."
 		);      
@@ -410,7 +411,7 @@ public abstract class Camada {
 	 * dos gradientes para os bias da camada.
 	 * @return gradientes para os bias da camada.
 	 */
-	public double[] gradBiasParaArray() {
+	public Variavel[] gradBiasParaArray() {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui gradiente para bias."
 		);      
@@ -421,7 +422,7 @@ public abstract class Camada {
 	 * de camada, esse gradiente pode assumir diferentes tipos de objetos.
 	 * @return {@code Tensor} contendo o gradiente de entrada da camada.
 	 */
-	public Tensor4D gradEntrada() {
+	public Tensor gradEntrada() {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui gradiente de entrada."
 		);    
@@ -432,7 +433,7 @@ public abstract class Camada {
 	 * fornecido.
 	 * @param kernel novos valores do kernel.
 	 */
-	public void setKernel(double[] kernel) {
+	public void setKernel(Variavel[] kernel) {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui edição de kernel."
 		); 
@@ -443,7 +444,7 @@ public abstract class Camada {
 	 * contidos no array fornecido.
 	 * @param grads novos valores de gradientes.
 	 */
-	public void setGradienteKernel(double[] grads) {
+	public void setGradienteKernel(Variavel[] grads) {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui edição de gradiente para kernel."
 		);    
@@ -454,7 +455,7 @@ public abstract class Camada {
 	 * fornecido.
 	 * @param bias novos valores do bias.
 	 */
-	public void setBias(double[] bias) {
+	public void setBias(Variavel[] bias) {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui edição de bias."
 		); 
@@ -465,7 +466,7 @@ public abstract class Camada {
 	 * contidos no array fornecido.
 	 * @param grads novos valores de gradientes.
 	 */
-	public void setGradienteBias(double[] grads) {
+	public void setGradienteBias(Variavel[] grads) {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui edição de gradiente para bias."
 		);  

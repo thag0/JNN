@@ -1,6 +1,6 @@
 package jnn.inicializadores;
 
-import jnn.core.tensor.Tensor4D;
+import jnn.core.tensor.Tensor;
 
 /**
  * Inicializador Xavier para uso dentro da biblioteca.
@@ -22,36 +22,13 @@ public class GlorotUniforme extends Inicializador {
 	}
 
 	@Override
-	public void inicializar(Tensor4D tensor) {
-		double limite = Math.sqrt(2.0 / (tensor.dim3() + tensor.dim4()));
+	public void inicializar(Tensor tensor) {
+		int[] fans = calcularFans(tensor);
+
+		int fin  = fans[0];
+		int fout = fans[1];
+		double limite = Math.sqrt(2.0 / (fin + fout));
 
 		tensor.aplicar(x -> super.random.nextDouble() * (2.0 * limite) - limite);
-	}
-
-	@Override
-	public void inicializar(Tensor4D tensor, int dim1) {
-		double limite = Math.sqrt(2.0 / (tensor.dim3() + tensor.dim4()));
-
-		tensor.aplicar(dim1, 
-			x ->  super.random.nextDouble() * (2.0 * limite) - limite
-		);
-	}
-
-	@Override
-	public void inicializar(Tensor4D tensor, int dim1, int dim2) {
-		double limite = Math.sqrt(6.0 / (tensor.dim3() + tensor.dim4()));
-
-		tensor.aplicar(dim1, dim2, 
-			x ->  super.random.nextDouble() * (2.0 * limite) - limite
-		);
-	}
-
-	@Override
-	public void inicializar(Tensor4D tensor, int dim1, int dim2, int dim3) {
-		double limite = Math.sqrt(6.0 / tensor.dim4());
-
-		tensor.aplicar(dim1, dim2, dim3, 
-			x ->  super.random.nextDouble() * (2.0 * limite) - limite
-		);
 	}
 }

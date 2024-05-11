@@ -1,6 +1,7 @@
 package jnn.otimizadores;
 
 import jnn.camadas.Camada;
+import jnn.core.tensor.Variavel;
 
 /**
  * <h2>
@@ -72,12 +73,12 @@ public class SGD extends Otimizador {
 	/**
 	 * Coeficientes de momentum para os kernels.
 	 */
-	public double[] m;
+	public Variavel[] m;
 	
 	/**
 	 * Coeficientes de momentum para os bias.
 	 */
-	public double[] mb;
+	public Variavel[] mb;
 
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient 
@@ -146,8 +147,8 @@ public class SGD extends Otimizador {
 			if (camada.temBias()) nBias += camada.bias().tamanho();
 		}
 
-		this.m  = new double[nKernel];
-		this.mb = new double[nBias];
+		this.m  = initVars(nKernel);
+		this.mb = initVars(nBias);
 		this._construido = true;//otimizador pode ser usado
 	}
 
@@ -159,16 +160,14 @@ public class SGD extends Otimizador {
 		for(Camada camada : camadas){
 			if (!camada.treinavel()) continue;
 
-			double[] kernel = camada.kernelParaArray();
-			double[] gradK = camada.gradKernelParaArray();
+			Variavel[] kernel = camada.kernelParaArray();
+			Variavel[] gradK = camada.gradKernelParaArray();
 			idKernel = calcular(kernel, gradK, m, idKernel);
-			camada.setKernel(kernel);
 
 			if (camada.temBias()) {
-				double[] bias = camada.biasParaArray();
-				double[] gradB = camada.gradBiasParaArray();
+				Variavel[] bias = camada.biasParaArray();
+				Variavel[] gradB = camada.gradBiasParaArray();
 				idBias = calcular(bias, gradB, mb, idBias);
-				camada.setBias(bias);
 			}
 		}
 	}
@@ -181,10 +180,14 @@ public class SGD extends Otimizador {
 	 * @param id índice inicial das variáveis dentro do array de momentums.
 	 * @return índice final após as atualizações.
 	 */
-	private int calcular(double[] vars, double[] grads, double[] m, int id) {
+	private int calcular(Variavel[] vars, Variavel[] grads, Variavel[] m, int id) {
+		double mid;
+		double gi;
 		for (int i = 0; i < vars.length; i++) {
-			m[id] = (m[id] * momentum) - (grads[i] * taxaAprendizagem);
-			vars[i] += nesterov ? (m[id] * momentum) - (grads[i] * taxaAprendizagem) : m[id];
+			mid = m[id].get();
+			gi = grads[i].get();
+			m[id].set((mid * momentum) - (gi * taxaAprendizagem));
+			vars[i].add(nesterov ? (mid * momentum) - (gi * taxaAprendizagem) : mid);
 			id++;
 		}
 

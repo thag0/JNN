@@ -27,7 +27,12 @@ import jnn.otimizadores.Otimizador;
  *    possibilitando mais portabilidade de modelos treinados.
  * </p>
  */
-public class Serializador{
+public class Serializador {
+
+	/**
+	 * Formato suportado de leitura e escrita dos modelos.
+	 */
+	private final String formatoModelo = ".nn";
 
 	/**
 	 * Auxiliar na serialização de camadas densas.
@@ -62,7 +67,7 @@ public class Serializador{
 	/**
 	 * Serializador e desserializador de modelos.
 	 */
-	public Serializador(){}
+	public Serializador() {}
 
 	/**
 	 * Salva um modelo Sequencial em um arquivo externo.
@@ -72,7 +77,7 @@ public class Serializador{
 	 * @param rede instância de uma {@code Rede Neural}.
 	 * @param caminho caminho com nome e extensão do arquivo {@code .nn}.
 	 */
-	public void salvar(RedeNeural rede, String caminho){
+	public void salvar(RedeNeural rede, String caminho) {
 		salvar(rede, caminho, "double");
 	}
 
@@ -82,39 +87,41 @@ public class Serializador{
 	 * @param caminho caminho com nome e extensão do arquivo {@code .nn}.
 	 * @param tipo tipo de valor usado na serialização, exemplo: {@code float} ou {@code double}.
 	 */
-	public void salvar(RedeNeural rede, String caminho, String tipo){
+	public void salvar(RedeNeural rede, String caminho, String tipo) {
 		File arquivo = new File(caminho);
-		if(!arquivo.getName().toLowerCase().endsWith(".txt")){
-			throw new IllegalArgumentException("O caminho especificado não é um arquivo de texto válido.");
+		if (!arquivo.getName().toLowerCase().endsWith(formatoModelo)) {
+			throw new IllegalArgumentException(
+				"\nO caminho especificado não é um arquivo de modelo válido."
+			);
 		}
 
-		try(BufferedWriter writer = new BufferedWriter(new FileWriter(arquivo))){
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(arquivo))) {
 			//arquitetura da rede
 			int[] arq = rede.obterArquitetura();
-			for(int i = 0; i < arq.length; i++){
-				writer.write(arq[i] + " ");
+			for (int i = 0; i < arq.length; i++) {
+				bw.write(arq[i] + " ");
 			}
-			writer.newLine();
+			bw.newLine();
 
 			//bias
-			writer.write(Boolean.toString(rede.temBias()));
-			writer.newLine();
+			bw.write(Boolean.toString(rede.temBias()));
+			bw.newLine();
 
 			//funções de ativação
 			Densa[] camadas = rede.camadas();
-			for(int i = 0; i < camadas.length; i++){
-				writer.write(camadas[i].ativacao().getClass().getSimpleName());
-				writer.write(" ");
+			for (int i = 0; i < camadas.length; i++) {
+				bw.write(camadas[i].ativacao().getClass().getSimpleName());
+				bw.write(" ");
 			}
-			writer.newLine();
+			bw.newLine();
 
 			//pesos dos neuronios
-			for(Densa camada : rede.camadas()){
-				auxDensa.serializar(camada, writer, tipo);
+			for (Densa camada : rede.camadas()) {
+				auxDensa.serializar(camada, bw, tipo);
 			}
 
-		}catch(Exception e){
-			System.out.println("Houve um erro ao salvar o arquivo da Rede Neural.");
+		} catch(Exception e) {
+			System.out.println("\nErro ao salvar o arquivo da Rede Neural.");
 			e.printStackTrace();
 		}
 	}
@@ -127,7 +134,7 @@ public class Serializador{
 	 * @param modelo modelo {@code Sequencial}.
 	 * @param caminho caminho com nome e extensão do arquivo {@code .nn}.
 	 */
-	public void salvar(Sequencial modelo, String caminho){
+	public void salvar(Sequencial modelo, String caminho) {
 		salvar(modelo, caminho, "double");
 	}
 
@@ -137,15 +144,15 @@ public class Serializador{
 	 * @param caminho caminho com nome e extensão do arquivo {@code .nn}.
 	 * @param tipo tipo de valor usado na serialização, exemplo: {@code float} ou {@code double}.
 	 */
-	public void salvar(Sequencial modelo, String caminho, String tipo){
+	public void salvar(Sequencial modelo, String caminho, String tipo) {
 		File arquivo = new File(caminho);
-		if(!arquivo.getName().toLowerCase().endsWith(".nn")){
+		if (!arquivo.getName().toLowerCase().endsWith(formatoModelo)) {
 			throw new IllegalArgumentException(
-				"\nO caminho deve conter a extensão .nn."
+				"\nO caminho deve conter a extensão " + formatoModelo
 			);
 		}
 
-		try(BufferedWriter bw = new BufferedWriter(new FileWriter(arquivo))){
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(arquivo))) {
 			//quantidade de camadas
 			bw.write(String.valueOf(modelo.numCamadas()));
 			bw.newLine();
@@ -158,33 +165,33 @@ public class Serializador{
 			bw.write(modelo.perda().nome());
 			bw.newLine();
 
-			for(Camada camada : modelo.camadas()){
-				if(camada instanceof Densa){
+			for (Camada camada : modelo.camadas()) {
+				if (camada instanceof Densa) {
 					auxDensa.serializar((Densa) camada, bw, tipo);
 
-				}else if(camada instanceof Convolucional){
+				} else if (camada instanceof Convolucional) {
 					auxConv.serializar((Convolucional) camada, bw, tipo);
 				
-				}else if(camada instanceof Flatten){
+				} else if (camada instanceof Flatten) {
 					auxFlat.serializar((Flatten) camada, bw);
 				
-				}else if(camada instanceof MaxPooling){
+				} else if (camada instanceof MaxPooling) {
 					auxMaxPool.serializar((MaxPooling) camada, bw);
 
-				}else if(camada instanceof AvgPooling){
+				} else if (camada instanceof AvgPooling) {
 					auxAvgPool.serializar((AvgPooling) camada, bw);
 
-				}else if(camada instanceof Dropout){
+				} else if (camada instanceof Dropout) {
 					auxDropout.serializar((Dropout) camada, bw);
 
-				}else{
+				} else{
 					throw new IllegalArgumentException(
 						"Tipo de camada \"" + camada.getClass().getTypeName() + "\" não suportado."
 					);
 				}
 			}
 		
-		}catch(Exception e){
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -195,21 +202,21 @@ public class Serializador{
 	 * @param caminho caminho onde está salvo o arquivo {@code .nn} do modelo.
 	 * @return modelo {@code RedeNeural} baseado no arquivo lido.
 	 */
-	public RedeNeural lerRedeNeural(String caminho){
+	public RedeNeural lerRedeNeural(String caminho) {
 		RedeNeural rede = null;
 		Dicionario dicio = new Dicionario();
 
-		try(BufferedReader br = new BufferedReader(new FileReader(caminho))){
+		try (BufferedReader br = new BufferedReader(new FileReader(caminho))) {
 			//arquitetura
 			String[] arqStr = br.readLine().split(" ");
 			int[] arq = new int[arqStr.length];
 
-			try{
-				for(int i = 0; i < arqStr.length; i++){
+			try {
+				for (int i = 0; i < arqStr.length; i++) {
 					arq[i] = Integer.parseInt(arqStr[i]);
 				}
-			}catch(Exception e){
-				System.out.println("Ocorreu um erro ao tentar ler os valores de arquitetura");
+			} catch(Exception e) {
+				System.out.println("\nOcorreu um erro ao tentar ler os valores de arquitetura");
 				System.out.println("Verifique se estão corretamente formatados");
 				System.out.println("Cada elemento de arquitetura deve ser separado por espaços");
 				System.out.println("Ex: \"2 3 4\"");
@@ -227,13 +234,13 @@ public class Serializador{
 			rede.configurarBias(bias);
 			rede.compilar();
 
-			for(int i = 0; i < rede.numCamadas(); i++){
+			for (int i = 0; i < rede.numCamadas(); i++) {
 				rede.configurarAtivacao(rede.camada(i), dicio.getAtivacao(ativacoesStr[i]));
 			}
 
-			for(int i = 0; i < rede.numCamadas(); i++){
+			for (int i = 0; i < rede.numCamadas(); i++) {
 				String nome = br.readLine();
-				if(nome.equals("Densa")){
+				if (nome.equals("Densa")) {
 					br.readLine();//entrada
 					br.readLine();//saida
 					rede.camada(i).setAtivacao(br.readLine());
@@ -242,8 +249,8 @@ public class Serializador{
 				}
 			}
 
-		}catch(Exception e){
-			System.out.println("Houve um erro ao ler o arquivo de Rede Neural \""+ caminho + "\".");
+		} catch (Exception e) {
+			System.out.println("\nErro ao ler o arquivo de Rede Neural \""+ caminho + "\".");
 			e.printStackTrace();
 			System.exit(0);
 		}
@@ -257,47 +264,47 @@ public class Serializador{
 	 * @param caminho caminho onde está saldo o arquivo {@code .nn} do modelo;
 	 * @return modelo {@code Sequencial} lido a partir do arquivo.
 	 */
-	public Sequencial lerSequencial(String caminho){
+	public Sequencial lerSequencial(String caminho) {
 		Sequencial modelo = new Sequencial();
 		Dicionario dicio = new Dicionario();
 
-		try(BufferedReader br = new BufferedReader(new FileReader(caminho))){
+		try (BufferedReader br = new BufferedReader(new FileReader(caminho))) {
 			int numCamadas = Integer.parseInt(br.readLine());
 			Otimizador otimizador = dicio.getOtimizador(br.readLine().trim());
 			Perda perda = dicio.getPerda(br.readLine().trim());
 		
-			modelo.set_otimizador(otimizador);
-			modelo.set_perda(perda);
-			for(int i = 0; i < numCamadas; i++){
+			modelo.setOtimizador(otimizador);
+			modelo.setPerda(perda);
+			for (int i = 0; i < numCamadas; i++) {
 				String nome = br.readLine();
 				
-				if(nome.equalsIgnoreCase("densa")){
+				if (nome.equalsIgnoreCase("densa")) {
 					Densa densa = auxDensa.lerConfig(br);
 					auxDensa.lerPesos(densa, br);
 					modelo.add(densa);
 
-				}else if(nome.equalsIgnoreCase("convolucional")){
+				} else if (nome.equalsIgnoreCase("convolucional")) {
 					Convolucional convolucional = auxConv.lerConfig(br);
 					auxConv.lerPesos(convolucional, br);
 					modelo.add(convolucional);
 				
-				}else if(nome.equalsIgnoreCase("flatten")){
+				} else if (nome.equalsIgnoreCase("flatten")) {
 					Flatten flat = auxFlat.lerConfig(br);
 					modelo.add(flat);
 				
-				}else if(nome.equalsIgnoreCase("maxpooling")){
+				} else if (nome.equalsIgnoreCase("maxpooling")) {
 					MaxPooling maxPooling = auxMaxPool.lerConfig(br);
 					modelo.add(maxPooling);
 				
-				}else if(nome.equalsIgnoreCase("avgpooling")){
+				} else if (nome.equalsIgnoreCase("avgpooling")) {
 					AvgPooling avgPooling = auxAvgPool.lerConfig(br);
 					modelo.add(avgPooling);
 
-				}else if(nome.equalsIgnoreCase("dropout")){
+				} else if (nome.equalsIgnoreCase("dropout")) {
 					Dropout dropout = auxDropout.lerConfig(br);
 					modelo.add(dropout);
 
-				}else{
+				} else {
 					throw new IllegalArgumentException(
 						"Tipo de camada \""+ nome +"\" não suportado."
 					);
@@ -305,12 +312,12 @@ public class Serializador{
 			}
 
 			modelo._compilado = true;
-			for(int i = 0; i < modelo.numCamadas(); i++){
+			for (int i = 0; i < modelo.numCamadas(); i++) {
 				modelo.camada(i).setId(i);
 			}
 			otimizador.construir(modelo.camadas());
 
-		}catch(Exception e){
+		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
 

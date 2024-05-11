@@ -54,4 +54,4 @@ Excluindo a parte de pesquisa e estudo as maiores dificuldades encontradas até 
 
 - **Multithread**: Melhorias em nível de hardware para tirar proveito de múltiplos processadores do computador. Atualmente tudo roda em single thread;
 
-- **Tensor4D**: Melhorias de performance e maior generalização da classe de tensor que uso dentro do ambiente;
+- **Tensor**: Melhorias de performance principalmente em modelos convolucionais;

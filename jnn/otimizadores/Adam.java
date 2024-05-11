@@ -1,6 +1,9 @@
 package jnn.otimizadores;
 
 import jnn.camadas.Camada;
+import jnn.core.tensor.Variavel;
+
+//TODO verificar insconsistências quando usado com a ativação Sigmoid
 
 /**
  * <h2>
@@ -106,22 +109,22 @@ public class Adam extends Otimizador {
 	/**
 	 * Coeficientes de momentum para os kernels.
 	 */
-	private double[] m;
+	private Variavel[] m;
 
 	/**
 	 * Coeficientes de momentum para os bias.
 	 */
-	private double[] mb;
+	private Variavel[] mb;
 
 	/**
 	 * Coeficientes de momentum de segunda ordem para os kernels.
 	 */
-	private double[] v;
+	private Variavel[] v;
 
 	/**
 	 * Coeficientes de momentum de segunda ordem para os bias.
 	 */
-	private double[] vb;
+	private Variavel[] vb;
 	
 	/**
 	 * Contador de iterações.
@@ -207,10 +210,10 @@ public class Adam extends Otimizador {
 			if (camada.temBias()) nBias += camada.bias().tamanho();
 		}
 
-		this.m  = new double[nKernel];
-		this.v  = new double[nKernel];
-		this.mb = new double[nBias];
-		this.vb = new double[nBias];
+		this.m  = initVars(nKernel);
+		this.v  = initVars(nKernel);
+		this.mb = initVars(nBias);
+		this.vb = initVars(nBias);
 
 		_construido = true;//otimizador pode ser usado
 	}
@@ -228,14 +231,14 @@ public class Adam extends Otimizador {
 		for (Camada camada : camadas) {
 			if (!camada.treinavel()) continue;
 
-			double[] kernel = camada.kernelParaArray();
-			double[] gradK = camada.gradKernelParaArray();
+			Variavel[] kernel = camada.kernelParaArray();
+			Variavel[] gradK = camada.gradKernelParaArray();
 			idKernel = calcular(kernel, gradK, m, v, alfa, idKernel);
 			camada.setKernel(kernel);
 			
 			if (camada.temBias()) {
-				double[] bias = camada.biasParaArray();
-				double[] gradB = camada.gradBiasParaArray();
+				Variavel[] bias = camada.biasParaArray();
+				Variavel[] gradB = camada.gradBiasParaArray();
 				idBias = calcular(bias, gradB, mb, vb, alfa, idBias);
 				camada.setBias(bias);
 			}     
@@ -252,14 +255,17 @@ public class Adam extends Otimizador {
 	 * @param id índice inicial das variáveis dentro do array de momentums.
 	 * @return índice final após as atualizações.
 	 */
-	private int calcular(double[] vars, double[] grads, double[] m, double[] v, double alfa, int id) {
-		double g;
+	private int calcular(Variavel[] vars, Variavel[] grads, Variavel[] m, Variavel[] v, double alfa, int id) {
+		double g, mid, vid;
 
 		for (int i = 0; i < vars.length; i++) {
-			g = grads[i];
-			m[id] += (1 - beta1) * (g    - m[id]);
-			v[id] += (1 - beta2) + ((g*g - v[id]));  
-			vars[i] -= (alfa * m[id]) / (Math.sqrt(v[id]) + epsilon);
+			g = grads[i].get();
+			mid = m[id].get();
+			vid = v[id].get();
+
+			m[id].add((1 - beta1) * (g    - mid));
+			v[id].add((1 - beta2) + (((g*g) - vid)));  
+			vars[i].sub((alfa * mid) / (Math.sqrt(vid) + epsilon));
 		
 			id++;
 		}

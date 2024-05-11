@@ -4,7 +4,8 @@ import jnn.avaliacao.Avaliador;
 import jnn.avaliacao.perda.Perda;
 import jnn.camadas.Camada;
 import jnn.core.Utils;
-import jnn.core.tensor.Tensor4D;
+import jnn.core.tensor.Tensor;
+import jnn.core.tensor.Variavel;
 import jnn.otimizadores.Otimizador;
 import jnn.treinamento.Treinador;
 
@@ -141,7 +142,7 @@ public abstract class Modelo implements Cloneable {
 	 * de treinamento do modelo.
 	 * @param perda nova função de perda.
 	 */
-	public void set_perda(Perda perda) {
+	public void setPerda(Perda perda) {
 		utils.validarNaoNulo(perda, "A função de perda não pode ser nula.");
 
 		this._perda = perda;
@@ -169,7 +170,7 @@ public abstract class Modelo implements Cloneable {
 	 * </ol>
 	 * @param otm novo otimizador.
 	 */
-	public void set_otimizador(Otimizador otm) {
+	public void setOtimizador(Otimizador otm) {
 		utils.validarNaoNulo(otm, "O novo otimizador não pode ser nulo.");
 
 		_otimizador = otm;
@@ -217,14 +218,14 @@ public abstract class Modelo implements Cloneable {
 	 * @param entrada dados de entrada que serão propagados através do modelo.
 	 * @return {@code Tensor} contendo a saída prevista pelo modelo.
 	 */
-	public abstract Tensor4D forward(Object entrada);
+	public abstract Tensor forward(Object entrada);
 
 	/**
 	 * Alimenta o modelo com vários dados de entrada.
 	 * @param entradas array contendo multiplas entradas para testar o modelo.
 	 * @return array de {@code Tensor} contendo as previsões correspondentes.
 	 */
-	public abstract Tensor4D[] forwards(Object[] entradas);
+	public abstract Tensor[] forwards(Object[] entradas);
 
 	/**
 	 * Zera os gradientes acumulados do modelo.
@@ -241,7 +242,7 @@ public abstract class Modelo implements Cloneable {
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	public void treinar(Object entradas, Object[] saidas, int epochs, boolean logs) {
+	public void treinar(Tensor[] entradas, Tensor[] saidas, int epochs, boolean logs) {
 		verificarCompilacao();
 
 		utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
@@ -253,19 +254,19 @@ public abstract class Modelo implements Cloneable {
 			);
 		}
 
-		_treinador.treino(this, entradas, saidas, epochs, logs);
+		_treinador.treino(this, entradas.clone(), saidas.clone(), epochs, logs);
 	}
 	
 	/**
 	 * Treina o modelo de acordo com as configurações predefinidas utilizando o
 	 * treinamento em lotes.
-	 * @param entradas dados de entrada do treino (features).
-	 * @param saidas dados de saída correspondente a entrada (class).
+	 * @param entradas {@code Tensores} contendos os dados de entrada.
+	 * @param saidas {@code Tensores} contendos os dados de saída (rótulos).
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param tamLote tamanho do lote de treinamento.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	public void treinar(Object entradas, Object[] saidas, int epochs, int tamLote, boolean logs) {
+	public void treinar(Tensor[] entradas, Tensor[] saidas, int epochs, int tamLote, boolean logs) {
 		verificarCompilacao();
 
 		utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
@@ -277,7 +278,7 @@ public abstract class Modelo implements Cloneable {
 			);
 		}
 
-		_treinador.treino(this, entradas, saidas, epochs, tamLote, logs);
+		_treinador.treino(this, entradas.clone(), saidas.clone(), epochs, tamLote, logs);
 	}
 
 	/**
@@ -298,41 +299,30 @@ public abstract class Modelo implements Cloneable {
 	 * modelo.avaliador()
 	 * </pre>
 	 * @param entrada dados de entrada para avaliação.
-	 * @param saida dados de saída correspondente as entradas fornecidas.
+	 * @param real dados de saída correspondente as entradas fornecidas.
 	 * @return valor de perda do modelo.
 	 */
-	public double avaliar(Object entrada, Object[] saida) {
+	public Tensor avaliar(Tensor[] entrada, Tensor[] real) {
 		verificarCompilacao();
 
 		utils.validarNaoNulo(entrada, "Dados de entrada não podem ser nulos.");
-		utils.validarNaoNulo(saida, "Dados de saida não podem ser nulos.");
-
-		//por enquanto uma instância local
-		Object[] amostras = utils.transformarParaArray(entrada);
+		utils.validarNaoNulo(real, "Dados de saida não podem ser nulos.");
  
-		if (amostras.length != saida.length) {
+		if (entrada.length != real.length) {
 			throw new IllegalArgumentException(
-				"\nA quantidade de dados de entrada (" + amostras.length + ") " +
-				"e saída (" + saida.length + ") " + "devem ser iguais."
-			);
-		}
- 
-		if (saida instanceof double[][] == false) {
-			throw new IllegalArgumentException(
-				"\nA saída deve ser do tipo double[][]" + 
-				" recebido " + saida.getClass().getTypeName()
+				"\nA quantidade de dados de entrada (" + entrada.length + ") " +
+				"e saída (" + real.length + ") " + "devem ser iguais."
 			);
 		}
 
-		Tensor4D[] prevs = forwards(amostras);
-		double[][] s = (double[][]) saida;
-		int n = amostras.length;
+		Tensor[] prevs = forwards(entrada);
+		int n = prevs.length;
 		double soma = 0;
 		for (int i = 0; i < n; i++) {
-			soma += _perda.calcular(prevs[i].paraArray(), s[i]);
+			soma += _perda.calcular(prevs[i], real[i]).item();
 		}
 
-		return soma/n;
+		return new Tensor(new double[]{ (soma/n) }, 1);
 	}
 
 	/**
@@ -382,14 +372,14 @@ public abstract class Modelo implements Cloneable {
 	 * Retorna um array contendo a saída serializada do modelo.
 	 * @return saída do modelo.
 	 */
-	public abstract double[] saidaParaArray();
+	public abstract Variavel[] saidaParaArray();
 
 	/**
 	 * Copia os dados de saída da última camada do modelo para o array.
 	 * @param arr array para cópia.
 	 */
 	public void copiarDaSaida(double[] arr) {
-		double[] saida = saidaParaArray();
+		Variavel[] saida = saidaParaArray();
 
 		utils.validarNaoNulo(arr, "O array de cópia não pode ser nulo.");
 		
@@ -400,7 +390,9 @@ public abstract class Modelo implements Cloneable {
 			);
 		}
 
-		System.arraycopy(saida, 0, arr, 0, saida.length);
+		for (int i = 0; i < saida.length; i++) {
+			arr[i] = saida[i].get();
+		}
 	}
 
 	/**
@@ -449,7 +441,7 @@ public abstract class Modelo implements Cloneable {
 	/**
 	 * Exibe, via console, as informações do modelo.
 	 */
-	public abstract void info();
+	public abstract void print();
 
 	@Override
 	public String toString(){

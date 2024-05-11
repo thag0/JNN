@@ -1,32 +1,33 @@
 package jnn.avaliacao.metrica;
 
+import jnn.core.tensor.Tensor;
 import jnn.modelos.Modelo;
 
 public class F1Score extends Metrica{
 	
 	@Override
-	public double calcular(Modelo rede, Object entrada, Object[] saida) {
-		int[][] mat = super.matrizConfusao(rede, entrada, saida);
+	public Tensor calcular(Modelo modelo, Tensor[] entrada, Tensor[] real) {
+		Tensor mat = super.matrizConfusao(modelo, entrada, real);
 		double f1score = f1score(mat);
-		return f1score;
+		return new Tensor(new double[]{ f1score }, 1);
 	}
 
-	private double f1score(int[][] matrizConfusao) {
-		int nClasses = matrizConfusao.length;
+	private double f1score(Tensor mat) {
+		int nClasses = mat.shape()[0];
 
 		double[] precisao = new double[nClasses];
 		double[] recall = new double[nClasses];
 
 		for (int i = 0; i < nClasses; i++) {
-			int vp = matrizConfusao[i][i];//verdadeiro positivo
+			int vp = (int)mat.get(i, i);//verdadeiro positivo
 			int fp = 0;//falso positivo
 			int fn = 0;//falso negativo
 
 
 			for (int j = 0; j < nClasses; j++) {
 				if (j != i) {
-					fp += matrizConfusao[j][i];
-					fn += matrizConfusao[i][j];
+					fp += mat.get(j, i);
+					fn += mat.get(i, j);
 				}
 			}
 

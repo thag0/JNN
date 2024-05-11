@@ -1,7 +1,7 @@
 package jnn.avaliacao.metrica;
 
 import jnn.core.Utils;
-import jnn.core.tensor.Tensor4D;
+import jnn.core.tensor.Tensor;
 import jnn.modelos.Modelo;
 
 /**
@@ -19,25 +19,25 @@ abstract class Metrica {
 
 	/**
 	 * Calcula a métrica de avaliação configurada.
-	 * @param rede rede neural.
-	 * @param entrada dados de entrada.
-	 * @param saida dados de saída relativos a entrada.
-	 * @return valor de avaliação de acordo com a métrica configurada
+	 * @param modelo modelo desejado.
+	 * @param entrada {@code Tensores} com dados de entrada para o modelo.
+	 * @param real {@code Tensores} com dados reais.
+	 * @return {@code Tensor} contendo o resultado.
 	 */
-	public double calcular(Modelo rede, Object entrada, Object[] saida) {
+	public Tensor calcular(Modelo modelo, Tensor[] entrada, Tensor[] saida) {
 		throw new UnsupportedOperationException(
 			"É necessário implementar a métrica de avaliação do modelo."
 		);
 	}
 
 	/**
-	 * Calcula a métrica de avaliação configurada.
-	 * @param rede rede neural.
-	 * @param entrada dados de entrada.
-	 * @param saida dados de saída relativos a entrada.
-	 * @return valor de avaliação de acordo com a métrica configurada
+	 * Calcula a matriz de confusão de acordo com as previsões do modelo.
+	 * @param modelo modelo desejado.
+	 * @param entrada {@code Tensores} com dados de entrada para o modelo.
+	 * @param real {@code Tensores} com dados reais.
+	 * @return {@code Tensor} contendo o resultado.
 	 */
-	public int[][] calcularMatriz(Modelo rede, Object entrada, double[][] saida) {
+	public Tensor calcularMatriz(Modelo modelo, Tensor[] entrada, Tensor[] real) {
 		throw new UnsupportedOperationException(
 			"É necessário implementar a métrica de avaliação do modelo."
 		);
@@ -69,31 +69,79 @@ abstract class Metrica {
 	 * <p>
 	 *    Auxiliar.
 	 * </p>
+	 * Encontra o índice com o maior valor contido no array fornecido
+	 * @param tensor array contendo os dados
+	 * @return índice com o maior valor contido nos dados.
+	 */
+	protected int indiceMaiorValor(Tensor tensor) {
+		if (tensor.numDim() != 1) {
+			throw new UnsupportedOperationException(
+				"\nSem suporte para tensores com mais de uma dimensão."
+			);
+		}
+
+		int maiorId = 0;
+		int n = tensor.shape()[0];
+		double maiorVal = tensor.get(0);
+		for (int i = 1; i < n; i++) {
+			if (tensor.get(i) > maiorVal) {
+				maiorVal = tensor.get(i);
+				maiorId = i;
+			}
+		}
+  
+		return maiorId;
+	}
+
+	/**
+	 * <p>
+	 *    Auxiliar.
+	 * </p>
+	 * Encontra o índice com o maior valor contido no array fornecido
+	 * @param arr array contendo os dados
+	 * @return índice com o maior valor contido nos dados.
+	 */
+	protected int indiceMaiorValor(Double[] arr) {
+		int maiorId = 0;
+		double maiorVal = arr[0];
+  
+		for (int i = 1; i < arr.length; i++) {
+			if (arr[i] > maiorVal) {
+				maiorVal = arr[i];
+				maiorId = i;
+			}
+		}
+  
+		return maiorId;
+	}
+
+	/**
+	 * <p>
+	 *    Auxiliar.
+	 * </p>
 	 * Calcula a matriz de confusão.
 	 * @param modelo modelo para avaliar.
 	 * @param entradas conjunto de entradas.
 	 * @param saidas conjunto de saídas.
 	 * @return matríz de confusão calculada.
 	 */
-	protected int[][] matrizConfusao(Modelo modelo, Object entradas, Object[] saidas) {
-		if (!(saidas instanceof double[][])) {
-			throw new IllegalArgumentException(
-				"Objeto esperado para saída é double[][], recebido " + saidas.getClass().getTypeName()
+	protected Tensor matrizConfusao(Modelo modelo, Tensor[] entrada, Tensor[] saidas) {
+		Tensor[] prevs = modelo.forwards(entrada);
+
+		if (prevs[0].numDim() != 1) {
+			throw new UnsupportedOperationException(
+				"\nO modelo deve prever apenas dados de uma dimensão (arrays)."
 			);
 		}
 
-		Object[] amostras = utils.transformarParaArray(entradas);
+		int nClasses = prevs[0].tamanho();
+		Tensor matriz = new Tensor(nClasses, nClasses);
 
-		Tensor4D[] prevs = modelo.forwards(amostras);
-		double[][] s = (double[][]) saidas;
-
-		int nClasses = s[0].length;
-		int[][] matriz = new int[nClasses][nClasses];
-
-		for (int i = 0; i < amostras.length; i++) {
-			int real = indiceMaiorValor(s[i]);
-			int previsto = indiceMaiorValor(prevs[i].paraArray());
-			matriz[real][previsto]++;
+		for (int i = 0; i < prevs.length; i++) {
+			int previsto = indiceMaiorValor(prevs[i]);
+			int real = indiceMaiorValor(saidas[i]);
+			double val = matriz.get(real, previsto);
+			matriz.set((val += 1), real, previsto);
 		}
 
 		return matriz;

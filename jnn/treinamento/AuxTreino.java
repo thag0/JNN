@@ -5,8 +5,7 @@ import java.util.Random;
 import jnn.avaliacao.perda.Perda;
 import jnn.camadas.Camada;
 import jnn.core.OpArray;
-import jnn.core.OpMatriz;
-import jnn.core.tensor.Tensor4D;
+import jnn.core.tensor.Tensor;
 
 /**
  * Classe auxiliar no treinamento, faz uso de ferramentas que podem
@@ -18,11 +17,6 @@ public class AuxTreino {
 	 * Gerador de números aleatórios.
 	 */
 	Random random = new Random();
-
-	/**
-	 * Operador matricial.
-	 */
-	OpMatriz opmat = new OpMatriz();
 
 	/**
 	 * Operador para arrays.
@@ -48,12 +42,11 @@ public class AuxTreino {
 	 * </p>
 	 * @param camadas conjunto de camadas de um modelo.
 	 * @param perda função de perda configurada para o modelo.
-	 * @param real saída real que será usada para calcular os erros e gradientes.
+	 * @param prev {@code Tensor} contendos os dados previstos.
+	 * @param real {@code Tensor} contendos os dados reais (rotulados).
 	 */
-	public void backpropagation(Camada[] camadas, Perda perda, double[] prev, double[] real) {
-		double[] deriv = perda.derivada(prev, real);
-
-		Tensor4D grad = new Tensor4D(deriv);
+	public void backpropagation(Camada[] camadas, Perda perda, Tensor prev, Tensor real) {
+		Tensor grad = perda.derivada(prev, real);
 		for (int i = camadas.length-1; i >= 0; i--) {
 			grad = camadas[i].backward(grad);
 		}
@@ -64,11 +57,11 @@ public class AuxTreino {
 	 * @param entradas matriz com os dados de entrada.
 	 * @param saidas matriz com os dados de saída.
 	 */
-	public void embaralharDados(Object[] entradas, Object[] saidas) {
+	public void embaralharDados(Tensor[] entradas, Tensor[] saidas) {
 		int linhas = entradas.length;
 		int i, idAleatorio;
 
-		Object temp;
+		Tensor temp;
 		for (i = linhas - 1; i > 0; i--) {
 			idAleatorio = random.nextInt(i+1);
 
@@ -91,13 +84,13 @@ public class AuxTreino {
 	 * @param fim índice final do lote.
 	 * @return lote contendo os dados de acordo com os índices fornecidos.
 	 */
-	public Object[] obterSubMatriz(Object[] dados, int inicio, int fim) {
+	public Tensor[] obterSubMatriz(Tensor[] dados, int inicio, int fim) {
 		if (inicio < 0 || fim > dados.length || inicio >= fim) {
 			throw new IllegalArgumentException("Índices de início ou fim inválidos.");
 		}
 
 		int linhas = fim - inicio;
-		Object[] subMatriz = new Object[linhas];
+		Tensor[] subMatriz = new Tensor[linhas];
 
 		System.arraycopy(dados, inicio, subMatriz, 0, linhas);
 

@@ -1,5 +1,7 @@
 package jnn.avaliacao.perda;
 
+import jnn.core.tensor.Tensor;
+
 /**
  * Função de perda Binary Cross Entropy, que é usada em problemas de 
  * classificação binária. Ela é comumente aplicada quando há apenas duas 
@@ -14,28 +16,29 @@ package jnn.avaliacao.perda;
 	public EntropiaCruzadaBinaria() {}
 
 	@Override
-	public double calcular(double[] previsto, double[] real) {
-		super.verificarDimensoes(previsto, real);
-		int tam = previsto.length;
+	public Tensor calcular(Tensor prev, Tensor real) {
+		super.verificarDimensoes(prev, real);
+		int tam = prev.tamanho();
 
 		double ecb = 0;
+		double p, r;
 		for (int i = 0; i < tam; i++) {
-			ecb += (real[i] * Math.log(previsto[i] + eps)) + (1 - real[i]) * (Math.log(1 - previsto[i] + eps));
+			p = prev.get(i);
+			r = real.get(i);
+			ecb += (r * Math.log(p + eps)) + (1 - r) * (Math.log(1 - p + eps));
 		}
 
-		return -ecb / tam;
+		return new Tensor(new double[]{ (-ecb/tam) });
 	}
 
 	@Override
-	public double[] derivada(double[] previsto, double[] real) {
-		super.verificarDimensoes(previsto, real);
-		double[] derivadas = new double[previsto.length];
-		int tam = derivadas.length;
+	public Tensor derivada(Tensor prev, Tensor real) {
+		super.verificarDimensoes(prev, real);
+		final int tam = prev.tamanho();
 
-		for (int i = 0; i < tam; i++) {
-			derivadas[i] = (((1.0 - real[i]) / (1.0 - previsto[i])) - (real[i] / previsto[i])) / tam;
-		}
-
-		return derivadas;
+		return prev.map(
+			real,
+			(p, r) -> (((1.0 - r) / (1.0 - p)) - (r / p)) / tam
+		);
 	}
 }

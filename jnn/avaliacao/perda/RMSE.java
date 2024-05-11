@@ -1,5 +1,7 @@
 package jnn.avaliacao.perda;
 
+import jnn.core.tensor.Tensor;
+
 /**
  * Função de perda Root Mean Squared Error, calcula a raiz do 
  * erro médio quadrado entre as previsões e os valores reais.
@@ -12,32 +14,29 @@ public class RMSE extends Perda {
 	public RMSE() {}
 
 	@Override
-	public double calcular(double[] previsto, double[] real) {
-		super.verificarDimensoes(previsto, real);
-		int tam = previsto.length;
+	public Tensor calcular(Tensor prev, Tensor real) {
+		super.verificarDimensoes(prev, real);
+		int tam = prev.tamanho();
 		
 		double rmse = 0.0;
 		for (int i = 0; i < tam; i++) {
-			double d = previsto[i] - real[i];
+			double d = prev.get(i) - real.get(i);
 			rmse += d * d;
 		}
 		rmse /= tam;
 		
-		return Math.sqrt(rmse);
+		return new Tensor(new double[]{ Math.sqrt(rmse) }, 1);
 	}
 	 
 	@Override
-	public double[] derivada(double[] previsto, double[] real) {
-		super.verificarDimensoes(previsto, real);
-		int tam = previsto.length;
-		
-		double[] derivadas = new double[previsto.length];
-		double rrmse = Math.sqrt(calcular(previsto, real));
+	public Tensor derivada(Tensor prev, Tensor real) {
+		super.verificarDimensoes(prev, real);
+		final int tam = prev.tamanho();
+		double rrmse = Math.sqrt(calcular(prev, real).item());
 
-		for (int i = 0; i < tam; i++) {
-			derivadas[i] = (previsto[i] - real[i]) / (rrmse * tam);
-		}
-
-		return derivadas;
+		return prev.map(
+			real,
+			(p, r) -> (p - r) / (rrmse * tam)
+		);
 	}
 }

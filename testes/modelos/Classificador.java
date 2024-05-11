@@ -4,8 +4,9 @@ import java.text.DecimalFormat;
 
 import jnn.camadas.Camada;
 import jnn.camadas.Densa;
-import jnn.camadas.Dropout;
 import jnn.camadas.Entrada;
+import jnn.core.Utils;
+import jnn.core.tensor.Tensor;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
 import lib.ged.Dados;
@@ -13,6 +14,7 @@ import lib.ged.Ged;
 
 public class Classificador{
 	static Ged ged = new Ged();
+	static Utils utils = new Utils();
 	
 	public static void main(String[] args){
 		ged.limparConsole();
@@ -36,78 +38,41 @@ public class Classificador{
 		int qEntradas = 4;// dados de entrada (features)
 		int qSaidas = 3;// classificações (class)
 
-		var treinoX = (double[][]) ged.separarDadosEntrada(treino, qEntradas);
-		var treinoY = (double[][]) ged.separarDadosSaida(treino, qSaidas);
-
-		var testeX = (double[][]) ged.separarDadosEntrada(teste, qEntradas);
-		var testeY = (double[][]) ged.separarDadosSaida(teste, qSaidas);
+		var inTreino = (double[][]) ged.separarDadosEntrada(treino, qEntradas);
+		var outTreino = (double[][]) ged.separarDadosSaida(treino, qSaidas);
+		Tensor[] treinoX = utils.array2DParaTensors(inTreino);
+		Tensor[] treinoY = utils.array2DParaTensors(outTreino);
+		
+		var inTeste = (double[][]) ged.separarDadosEntrada(teste, qEntradas);
+		var outTeste = (double[][]) ged.separarDadosSaida(teste, qSaidas);
+		Tensor[] testeX = utils.array2DParaTensors(inTeste);
+		Tensor[] testeY = utils.array2DParaTensors(outTeste);
 
 		//criando e configurando a rede neural
 		Sequencial modelo = new Sequencial(new Camada[]{
 			new Entrada(qEntradas),
-			new Densa(12, "sigmoid"),
-			new Dropout(0.2),
-			new Densa(12, "sigmoid"),
-			new Dropout(0.2),
+			new Densa(10, "sigmoid"),
+			new Densa(10, "sigmoid"),
 			new Densa(qSaidas, "softmax")
 		});
 
-		modelo.compilar("sgd", "entropia-cruzada");
+		modelo.compilar("nadam", "entropia-cruzada");
 		modelo.setHistorico(true);
-		// modelo.info();
+		modelo.print();
 		
 		//treinando e avaliando os resultados
-		modelo.treinar(treinoX, treinoY, 180, 16, true);
-		double acc = modelo.avaliador().acuracia(testeX, testeY);
+		modelo.treinar(treinoX, treinoY, 180, 12, true);
+		double acc = modelo.avaliador().acuracia(testeX, testeY).item();
 		System.out.println("Acurácia = " + formatarDecimal(acc*100, 4) + "%");
-		System.out.println("Perda = " + modelo.avaliar(testeX, testeY));
+		System.out.println("Perda = " + modelo.avaliar(testeX, testeY).item());
 
-		int[][] matrizConfusao = modelo.avaliador().matrizConfusao(testeX, testeY);
-		Dados d = new Dados(matrizConfusao);
-		d.editarNome("Matriz de confusão");
-		d.print();
+		Tensor matriz = modelo.avaliador().matrizConfusao(testeX, testeY);
+		matriz.nome("Matriz de confusão");
+		matriz.print();
 
 		exportarHistorico(modelo, "historico-perda");
 		// compararSaidaRede(modelo, testeX, testeY, "");
 		executarComando("python grafico.py historico-perda");
-	}
-
-	public static void compararSaidaRede(Sequencial rede, double[][] dadosEntrada, double[][] dadosSaida, String texto){
-		int nEntrada = rede.camada(0).formatoEntrada()[1];
-		int nSaida = rede.camadaSaida().tamanhoSaida();
-
-		double[] entradaRede = new double[nEntrada];
-		double[] saidaRede = new double[nSaida];
-
-		System.out.println("\n" + texto);
-
-		//mostrar saída da rede comparada aos dados
-		for(int i = 0; i < dadosEntrada.length; i++){
-			for(int j = 0; j < dadosEntrada[0].length; j++){
-				entradaRede[j] = dadosEntrada[i][j];
-			}
-
-			rede.forward(entradaRede);
-			saidaRede = rede.saidaParaArray();
-
-			//apenas formatação
-			if(i < 10) System.out.print("Dado 00" + i + " |");
-			else if(i < 100) System.out.print("Dado 0" + i + " |");
-			else System.out.print("Dado " + i + " |");
-			for(int j = 0; j < entradaRede.length; j++){
-				System.out.print(" " + entradaRede[j] + " ");
-			}
-
-			System.out.print(" - ");
-			for(int j = 0; j < dadosSaida[0].length; j++){
-				System.out.print(" " + dadosSaida[i][j]);
-			}
-			System.out.print(" | Rede ->");
-			for(int j = 0; j < nSaida; j++){
-				System.out.print("  " + formatarDecimal(saidaRede[j], 4));
-			}
-			System.out.println();
-		}
 	}
 
 	public static String formatarDecimal(double valor, int casas){

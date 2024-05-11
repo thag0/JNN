@@ -2,6 +2,7 @@ package jnn.otimizadores;
 
 import jnn.camadas.Camada;
 import jnn.core.OpArray;
+import jnn.core.tensor.Variavel;
 
 /**
  * <h2>
@@ -75,20 +76,18 @@ public class GD extends Otimizador {
 		for (Camada camada : camadas) {
 			if (!camada.treinavel()) continue;
 
-			double[] kernel = camada.kernelParaArray();
-			double[] gradK = camada.gradKernelParaArray();
-			
-			opArr.multEscalar(gradK, taxaAprendizagem, gradK);
-			opArr.sub(kernel, gradK, kernel);
-			camada.setKernel(kernel);
+			Variavel[] kernel = camada.kernelParaArray();
+			Variavel[] gradK = camada.gradKernelParaArray();		
+			for (int i = 0; i < kernel.length; i++) {
+				kernel[i].sub(gradK[i].get() * taxaAprendizagem);
+			}
 
 			if (camada.temBias()) {
-				double[] bias = camada.biasParaArray();
-				double[] gradB = camada.gradBiasParaArray();
-				
-				opArr.multEscalar(gradB, taxaAprendizagem, gradB);
-				opArr.sub(bias, gradB, bias);
-				camada.setBias(bias);
+				Variavel[] bias = camada.biasParaArray();
+				Variavel[] gradB = camada.gradBiasParaArray();
+				for (int i = 0; i < bias.length; i++) {
+					bias[i].sub(gradB[i].get() * taxaAprendizagem);
+				}
 			}
 		} 
 	}

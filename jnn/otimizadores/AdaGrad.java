@@ -1,7 +1,7 @@
 package jnn.otimizadores;
 
 import jnn.camadas.Camada;
-import jnn.core.OpArray;
+import jnn.core.tensor.Variavel;
 
 /**
  * <h2>
@@ -44,17 +44,12 @@ public class AdaGrad extends Otimizador {
 	/**
 	 * Valor padrão para a taxa de aprendizagem do otimizador.
 	 */
-	private static final double PADRAO_TA = 0.999;
+	private static final double PADRAO_TA = 0.5;
 
 	/**
 	 * Valor padrão para o valor de epsilon pro otimizador.
 	 */
 	private static final double PADRAO_EPS = 1e-7; 
-
-	/**
-	 * Operador de arrays.
-	 */
-	OpArray opArr = new OpArray();
 
 	/**
 	 * Valor de taxa de aprendizagem do otimizador.
@@ -69,12 +64,12 @@ public class AdaGrad extends Otimizador {
 	/**
 	 * Acumuladores para os kernels.
 	 */
-	private double[] ac;
+	private Variavel[] ac;
 
 	/**
 	 * Acumuladores para os bias.
 	 */
-	private double[] acb;
+	private Variavel[] acb;
 
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> AdaGrad </strong> 
@@ -130,12 +125,16 @@ public class AdaGrad extends Otimizador {
 			if (camada.temBias()) nBias += camada.bias().tamanho();
 		}
 
-		this.ac  = new double[nKernel];
-		this.acb = new double[nBias];
+		this.ac  = initVars(nKernel);
+		this.acb = initVars(nBias);
 		
 		double valorInicial = 0.1;
-		opArr.preencher(ac, valorInicial);
-		opArr.preencher(acb, valorInicial);
+		for (int i = 0; i < nKernel; i++) {
+			ac[i].set(valorInicial);
+		}
+		for (int i = 0; i < nBias; i++) {
+			acb[i].set(valorInicial);
+		}
 		
 		_construido = true;//otimizador pode ser usado
 	}
@@ -148,14 +147,14 @@ public class AdaGrad extends Otimizador {
 		for (Camada camada : camadas) {
 			if (!camada.treinavel()) continue;
 
-			double[] kernel = camada.kernelParaArray();
-			double[] gradK = camada.gradKernelParaArray();
+			Variavel[] kernel = camada.kernelParaArray();
+			Variavel[] gradK = camada.gradKernelParaArray();
 			idKernel = calcular(kernel, gradK, ac, idKernel);
 			camada.setKernel(kernel);
 			
 			if (camada.temBias()) {
-				double[] bias = camada.biasParaArray();
-				double[] gradB = camada.gradBiasParaArray();
+				Variavel[] bias = camada.biasParaArray();
+				Variavel[] gradB = camada.gradBiasParaArray();
 				idBias = calcular(bias, gradB, acb, idBias);
 				camada.setBias(bias);
 			}
@@ -170,10 +169,12 @@ public class AdaGrad extends Otimizador {
 	 * @param id índice inicial das variáveis dentro do array de momentums.
 	 * @return índice final após as atualizações.
 	 */
-	private int calcular(double[] vars, double[] grads, double[] acumulador, int id) {
+	private int calcular(Variavel[] vars, Variavel[] grads, Variavel[] acumulador, int id) {
+		double g;
 		for (int i = 0; i < vars.length; i++) {
-			acumulador[id] += grads[i] * grads[i];
-			vars[i] -= (grads[i] * taxaAprendizagem) / (Math.sqrt(ac[id] + epsilon));
+			g = grads[i].get();
+			acumulador[id].add(g*g);
+			vars[i].sub((g * taxaAprendizagem) / (Math.sqrt(ac[id].get() + epsilon)));
 			id++;
 		}
 

@@ -1,5 +1,6 @@
 package jnn.treinamento;
 
+import jnn.core.tensor.Tensor;
 import jnn.modelos.Modelo;
 
 /**
@@ -60,12 +61,12 @@ public class Treinador {
 	 * Treina o modelo ajustando seus parâmetros treináveis usando
 	 * os dados fornecidos.
 	 * @param modelo modelo que será treinada.
-	 * @param entradas dados de entrada para o treino.
-	 * @param saidas dados de saída correspondente as entradas para o treino.
+	 * @param entradas {@code Tensores} contendos os dados de entrada.
+	 * @param saidas {@code Tensores} contendos os dados de saída (rótulos).
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	public void treino(Modelo modelo, Object entradas, Object[] saidas, int epochs, boolean logs) {
+	public void treino(Modelo modelo, Tensor[] entradas, Tensor[] saidas, int epochs, boolean logs) {
 		executar(modelo, entradas, saidas, epochs, 0, logs);
 	}
 
@@ -73,26 +74,24 @@ public class Treinador {
 	 * Treina a rede neural calculando os erros dos neuronios, seus gradientes para cada peso e 
 	 * passando essas informações para o otimizador configurado ajustar os pesos.
 	 * @param modelo rede neural que será treinada.
-	 * @param entradas dados de entrada para o treino.
-	 * @param saidas dados de saída correspondente as entradas para o treino.
+	 * @param entradas {@code Tensores} contendos os dados de entrada.
+	 * @param saidas {@code Tensores} contendos os dados de saída (rótulos).
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param tamLote tamanho do lote.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	public void treino(Modelo modelo, Object entradas, Object[] saidas, int epochs, int tamLote, boolean logs) {
+	public void treino(Modelo modelo, Tensor[] entradas, Tensor[] saidas, int epochs, int tamLote, boolean logs) {
 		executar(modelo, entradas, saidas, epochs, tamLote, logs);
 	}
 
 	/**
 	 * Executa a função de treino de acordo com os valores configurados.
 	 * @param modelo rede neural que será treinada.
-	 * @param entradas dados de entrada para o treino.
-	 * @param saidas dados de saída correspondente as entradas para o treino.
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param tamLote tamanho do lote.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	private void executar(Modelo modelo, Object entradas, Object[] saidas, int epochs, int tamLote, boolean logs) {
+	private void executar(Modelo modelo, Tensor[] entradas, Tensor[] saidas, int epochs, int tamLote, boolean logs) {
 		modelo.treino(true);
 
 		if (tamLote > 1) {

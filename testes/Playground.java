@@ -1,11 +1,10 @@
 package testes;
 
+import jnn.camadas.Convolucional;
 import jnn.core.OpArray;
-import jnn.core.OpMatriz;
 import jnn.core.Utils;
-import jnn.core.tensor.OpTensor4D;
+import jnn.core.tensor.OpTensor;
 import jnn.core.tensor.Tensor;
-import jnn.core.tensor.Tensor4D;
 import lib.ged.Ged;
 import lib.geim.Geim;
 
@@ -14,24 +13,66 @@ import java.util.concurrent.TimeUnit;
 public class Playground{
 	static Ged ged = new Ged();
 	static OpArray oparr = new OpArray();
-	static OpMatriz opmat = new OpMatriz();
-	static OpTensor4D optensor = new OpTensor4D();
+	static OpTensor optensor = new OpTensor();
 	static Geim geim = new Geim();
 	static Utils utils = new Utils();
 
 	public static void main(String[] args){
 		ged.limparConsole();
 
-		double[][] arr = {
-			{1, 2},
-			{3, 4},
-		};
+		//TODO resolver broadcasting entre tensores
+		// Tensor t = new Tensor(2, 2, 2);
+		// Tensor b = new Tensor(new double[]{ 1, 2 }, 2, 1, 1);
 
-		Tensor a = new Tensor(2, 2);
-		a.copiar(arr);
-		System.out.println(a);
+		// System.out.println(t.shapeStr());
+		// System.out.println(b.shapeStr());
+
+		// t.add(b);
+
+		// System.out.println(t);
+
+		testeConv2dFull();
 	}
-    
+
+	/**
+	 * Testes
+	 */
+	static void testeConvForward() {
+		double[][] exemploEntrada = {
+			{1, 6, 2},
+			{5, 3, 1},
+			{7, 0, 4},
+		};
+		double[] exemploFiltro = {
+			 1, 2, 
+			-1, 0,
+			 0, -1, 
+			 2,  1,
+		};
+		
+		Convolucional conv = new Convolucional(new int[]{1, 3, 3}, new int[]{2, 2}, 2, "linear");
+		conv.kernel().copiarElementos(exemploFiltro);
+
+		Tensor amostra = new Tensor(exemploEntrada);
+		amostra.unsqueeze(0);
+
+		Tensor prev = conv.forward(amostra);
+		System.out.println(conv._somatorio);
+		System.out.println(prev);
+
+		Tensor resEsperado = new Tensor(
+			new double[]{
+				8, 7,
+				4, 5,
+				7, 5, 
+				11, 3
+			},
+			2, 2, 2
+		);
+
+		System.out.println("Saída esperada: " + prev.comparar(resEsperado));
+	}
+
 	/**
      * Testes
      */
@@ -46,14 +87,14 @@ public class Playground{
 			{-1, 0},
 		};
 
-		Tensor4D t1 = new Tensor4D(a);
-		Tensor4D t2 = new Tensor4D(b);
-		Tensor4D t3 = new Tensor4D(t1.dim3()+t2.dim3()-1, t1.dim4()+t2.dim4()-1);
+		Tensor t1 = new Tensor(a);
+		Tensor t2 = new Tensor(b);
+		Tensor t3 = new Tensor(4, 4);
 		long tempo = medirTempo(
-			() -> optensor.convolucao2DFull(t1, t2, t3, new int[]{0, 0}, new int[]{0, 0}, new int[]{0, 0})
+			() -> optensor.convolucao2DFull(t1, t2, t3)//implementar conv2dfull usando tres tensores
 		);
 		
-		Tensor4D esperado = new Tensor4D(new double[][]{
+		Tensor esperado = new Tensor(new double[][]{
 			{1, 8, 14, 4},
 			{4, 7, 5, 2},
 			{2, 11, 3, 8},

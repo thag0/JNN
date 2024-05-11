@@ -1,5 +1,7 @@
 package jnn.avaliacao.perda;
 
+import jnn.core.tensor.Tensor;
+
 /**
  * Função de perda Cross Entropy, que é normalmente usada em problemas 
  * de classificação multiclasse. Ela mede a discrepância entre a distribuição 
@@ -14,26 +16,25 @@ public class EntropiaCruzada extends Perda {
 	public EntropiaCruzada() {}
 
 	@Override
-	public double calcular(double[] previsto, double[] real) {
-		super.verificarDimensoes(previsto, real);
+	public Tensor calcular(Tensor prev, Tensor real) {
+		super.verificarDimensoes(prev, real);
+		int tam = prev.tamanho();
 		
 		double ec = 0.0;
-		for (int i = 0; i < real.length; i++) {
-			ec += real[i] * Math.log(previsto[i] + eps);
+		for (int i = 0; i < tam; i++) {
+			ec += real.get(i) * Math.log(prev.get(i) + eps);
 		}
 		
-		return -ec;
+		return new Tensor(new double[]{ -ec }, 1);
 	}
 	
 	@Override
-	public double[] derivada(double[] previsto, double[] real) {
-		super.verificarDimensoes(previsto, real);
-		double[] derivadas = new double[previsto.length];
+	public Tensor derivada(Tensor prev, Tensor real) {
+		super.verificarDimensoes(prev, real);
 
-		for (int i = 0; i < previsto.length; i++) {
-			derivadas[i] = previsto[i] - real[i];
-		}
-
-		return derivadas;
+		return prev.map(
+			real,
+			(p, r) -> p - r
+		);
 	}
 }

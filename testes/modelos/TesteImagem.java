@@ -2,11 +2,11 @@ package testes.modelos;
 
 import java.awt.image.BufferedImage;
 
-import jnn.avaliacao.perda.*;
 import jnn.camadas.*;
+import jnn.core.Utils;
+import jnn.core.tensor.Tensor;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
-import jnn.otimizadores.*;
 import lib.ged.Dados;
 import lib.ged.Ged;
 import lib.geim.Geim;
@@ -15,6 +15,7 @@ public class TesteImagem{
 	public static void main(String[] args){
 		Ged ged = new Ged();
 		Geim geim = new Geim();
+		Utils utils = new Utils();
 
 		ged.limparConsole();
 
@@ -26,8 +27,10 @@ public class TesteImagem{
 		int nSaida = 1;// valor de escala de cinza/brilho do pixel
 
 		//preparando dados para treinar a rede
-		double[][] dadosEntrada = (double[][]) ged.separarDadosEntrada(dados, nEntrada);
-		double[][] dadosSaida = (double[][]) ged.separarDadosSaida(dados, nSaida);
+		double[][] in = (double[][]) ged.separarDadosEntrada(dados, nEntrada);
+		double[][] out = (double[][]) ged.separarDadosSaida(dados, nSaida);
+		Tensor[] treinoX = utils.array2DParaTensors(in);
+		Tensor[] treinoY = utils.array2DParaTensors(out);
 
 		//criando rede neural para lidar com a imagem
 		//nesse exemplo queremos que ela tenha overfitting
@@ -37,14 +40,13 @@ public class TesteImagem{
 			new Densa(nSaida, "sigmoid"),
 		});
 		modelo.setHistorico(true);
-		Otimizador otm = new SGD(0.0001, 0.9995);
-		modelo.compilar(otm, new MSE());
-		modelo.treinar(dadosEntrada, dadosSaida, 2_500, true);
+		modelo.compilar("adagrad", "mse");
+		modelo.treinar(treinoX, treinoY, 1_500, true);
 
 		//avaliando resultados
-		double precisao = 1 - modelo.avaliador().erroMedioAbsoluto(dadosEntrada, dadosSaida);
+		double precisao = 1 - modelo.avaliador().erroMedioAbsoluto(treinoX, treinoY).item();
 		System.out.println("Precisão = " + (precisao * 100));
-		System.out.println("Perda = " + modelo.avaliar(dadosEntrada, dadosSaida));
+		System.out.println("Perda = " + modelo.avaliar(treinoX, treinoY).item());
 
 		exportarHistoricoPerda(modelo, ged);
 	}

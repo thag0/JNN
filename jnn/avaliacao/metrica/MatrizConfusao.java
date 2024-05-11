@@ -1,5 +1,6 @@
 package jnn.avaliacao.metrica;
 
+import jnn.core.tensor.Tensor;
 import jnn.modelos.Modelo;
 
 /**
@@ -16,7 +17,7 @@ public class MatrizConfusao extends Metrica {
 	public MatrizConfusao() {}
 
 	@Override
-	public int[][] calcularMatriz(Modelo modelo, Object entradas, double[][] saidas) {
-		return super.matrizConfusao(modelo, entradas, saidas);
+	public Tensor calcularMatriz(Modelo modelo, Tensor[] entrada, Tensor[] saidas) {
+		return super.matrizConfusao(modelo, entrada, saidas);
 	} 
 }

@@ -1,6 +1,6 @@
 package jnn.camadas;
 
-import jnn.core.tensor.Tensor4D;
+import jnn.core.tensor.Tensor;
 
 /**
  * <h2>
@@ -87,21 +87,21 @@ public class Entrada extends Camada {
 	public void inicializar() {}
 
 	@Override
-	public Tensor4D forward(Object entrada) {
+	public Tensor forward(Object entrada) {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui cálculo de saída."
 		);
 	}
 
 	@Override
-	public Tensor4D backward(Object grad) {
+	public Tensor backward(Object grad) {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui cálculo de gradientes."
 		);
 	}
 
 	@Override
-	public Tensor4D saida() {
+	public Tensor saida() {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui retorno de saída."
 		);

@@ -3,7 +3,8 @@ package jnn.inicializadores;
 import java.util.Random;
 import java.util.function.DoubleUnaryOperator;
 
-import jnn.core.tensor.Tensor4D;
+import jnn.core.Utils;
+import jnn.core.tensor.Tensor;
 
 /**
  * Classe responsável pelas funções de inicialização dos pesos
@@ -21,6 +22,11 @@ public abstract class Inicializador {
 	 * Função usada pelo inicializador.
 	 */
 	DoubleUnaryOperator func;
+
+	/**
+	 * Utilitário.
+	 */
+	Utils utils = new Utils();
 
 	/**
 	 * Inicialização com seed aleatória
@@ -44,34 +50,45 @@ public abstract class Inicializador {
 	}
 
 	/**
-	 * Inicializa os valores tensor de acordo com o índice especificado.
-	 * @param tensor tensor desejado.
-	 * @param dim1 índice da primeira dimensão.
+	 * Calcula os valores de fanIn e fanOut para ser usado pelos inicializadores.
+	 * @param tensor {@code Tensor} que será inicializado.
+	 * @return array contendo {@code [fanIn, fanOut]}.
 	 */
-	public abstract void inicializar(Tensor4D tensor, int dim1);
+	protected int[] calcularFans(Tensor tensor) {
+		int[] shape = tensor.shape();
+		int[] fans = {0, 0};
+
+		if (shape.length == 1) { //1D
+			fans[0] = shape[0];
+			fans[1] = shape[0];
+		
+		}else if (shape.length == 2) { //2D
+			fans[0] = shape[0];
+			fans[1] = shape[1];
+		
+		} else { // 3D+
+			int fanIn = 1;
+			for (int i = 0; i < shape.length - 1; i++) {
+			  fanIn *= shape[i];
+			}
+		
+			int fanOut = 1;
+			for (int i = shape.length - 1; i >= 1; i--) {
+			  fanOut *= shape[i];
+			}
+		
+			fans[0] = fanIn;
+			fans[1] = fanOut;
+		}
+
+		return fans;
+	}
 
 	/**
 	 * Inicializa todos os valores tensor.
 	 * @param tensor tensor desejado.
 	 */
-	public abstract void inicializar(Tensor4D tensor);
-
-	/**
-	 * Inicializa os valores tensor de acordo com os índices especificados.
-	 * @param tensor tensor desejado.
-	 * @param dim1 índice da primeira dimensão.
-	 * @param dim2 índice da segunda dimensão.
-	 */
-	public abstract void inicializar(Tensor4D tensor, int dim1, int dim2);
-
-	/**
-	 * Inicializa os valores tensor de acordo com os índices especificados.
-	 * @param tensor tensor desejado.
-	 * @param dim1 índice da primeira dimensão.
-	 * @param dim2 índice da segunda dimensão.
-	 * @param dim3 índice da terceira dimensão.
-	 */
-	public abstract void inicializar(Tensor4D tensor, int dim1, int dim2, int dim3);
+	public abstract void inicializar(Tensor tensor);
 
 	/**
 	 * Retorna o nome do inicializador.

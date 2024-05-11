@@ -2,7 +2,7 @@ package testes.modelos;
 
 import jnn.camadas.*;
 import jnn.core.Utils;
-import jnn.core.tensor.Tensor4D;
+import jnn.core.tensor.Tensor;
 import jnn.modelos.*;
 import jnn.otimizadores.SGD;
 import lib.ged.Dados;
@@ -28,30 +28,34 @@ public class TesteTreino{
 			{0}
 		};
 
-		Tensor4D treinoX = new Tensor4D(entrada);
+		Tensor[] treinoX = utils.array2DParaTensors(entrada);
+		Tensor[] treinoY = utils.array2DParaTensors(saida);
+
+		for (Tensor t : treinoX) {
+			t.print();
+		}
 
 		Sequencial modelo = new Sequencial(new Camada[]{
-			new Entrada(treinoX.dim4()),
+			new Entrada(treinoX[0].tamanho()),
 			new Densa(3, "sigmoid"),
 			new Densa(1, "sigmoid"),
 		});
 		
 		modelo.compilar(new SGD(0.00001, 0.9999), "mse");
-		modelo.treinar(treinoX, saida, 20_000, false);
-		verificar(entrada, saida, modelo);
+		modelo.treinar(treinoX, treinoY, 20_000, false);
+		verificar(treinoX, treinoY, modelo);
 
-		double perda = modelo.avaliar(entrada, saida);
+		double perda = modelo.avaliar(treinoX, treinoY).item();
 		System.out.println("\nPerda: " + perda + "\n");
 	}
 
-	static void verificar(Object entrada, double[][] saida, Sequencial modelo){
-		Object[] arr = utils.transformarParaArray(entrada);
-		var preds = modelo.forwards(arr);
+	static void verificar(Tensor[] entrada, Tensor[] saida, Sequencial modelo){
+		Tensor[] preds = modelo.forwards(entrada);
 		
-		for(int i = 0; i < arr.length; i++){
+		for(int i = 0; i < entrada.length; i++){
 			System.out.println(
-				"Real: " + saida[i][0] + ",   " +  
-				"Prev: " + preds[i].get(0, 0, 0, 0)
+				"Real: " + saida[i].get(0) + ",   " +  
+				"Prev: " + preds[i].get(0)
 			);
 		}
 	}

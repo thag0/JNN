@@ -3,7 +3,7 @@ package jnn.camadas;
 import java.util.Random;
 
 import jnn.core.Utils;
-import jnn.core.tensor.Tensor4D;
+import jnn.core.tensor.Tensor;
 
 /**
  * <h1>
@@ -47,7 +47,7 @@ public class Dropout extends Camada implements Cloneable {
 	 *    entrada = (1, profundidade, altura, largura)
 	 * </pre>
 	 */
-	public Tensor4D _entrada;
+	public Tensor _entrada;
 
 	/**
 	 * Tensores contendo as máscaras que serão usadas durante
@@ -59,7 +59,7 @@ public class Dropout extends Camada implements Cloneable {
 	 *    mascara = (1, profundidade, altura, largura)
 	 * </pre>
 	 */
-	public Tensor4D _mascara;
+	public Tensor _mascara;
 
 	/**
 	 * Tensor contendo os valores de saída da camada.
@@ -70,7 +70,7 @@ public class Dropout extends Camada implements Cloneable {
 	 *    saida = (1, profundidade, altura, largura)
 	 * </pre>
 	 */
-	public Tensor4D _saida;
+	public Tensor _saida;
 
 	/**
 	 * Tensor contendo os valores dos gradientes que
@@ -82,7 +82,7 @@ public class Dropout extends Camada implements Cloneable {
 	 *    gradEntrada = (1, profundidade, altura, largura)
 	 * </pre>
 	 */
-	public Tensor4D _gradEntrada;
+	public Tensor _gradEntrada;
 
 	/**
 	 * Gerador de valores aleatórios.
@@ -138,45 +138,17 @@ public class Dropout extends Camada implements Cloneable {
 				"\nOs argumentos do formato de entrada devem ser maiores que zero."
 			);
 		}
-
-		//talvez melhorar isso
-		if (formato.length == 2) {
-			this.formEntrada = new int[]{
-				1,
-				1,
-				formato[0],//altura
-				formato[1],//largura
-			};
-
-		} else if (formato.length == 3) {
-			this.formEntrada = new int[]{
-				1,
-				formato[0],//profundidade
-				formato[1],//altura
-				formato[2],//largura
-			};
-
-		} else if (formato.length == 4) {
-			this.formEntrada = new int[]{
-				1,
-				formato[1],//profundidade
-				formato[2],//altura
-				formato[3],//largura
-			};
-
-		} else {
+		if (formato.length < 1) {
 			throw new IllegalArgumentException(
-				"\nA camada de dropout aceita formatos bidimensionais (altura, largura) " + 
-				" tridimensionais (profundidade, altura, largura) " +
-				" ou quadridimensionais (primeiro valor desconsiderado) " +
-				"entrada recebida possui " + formato.length + " dimensões."
+				"\nO formato deve conter pelo menos um elemento."
 			);
 		}
-		
-		_entrada =     new Tensor4D(this.formEntrada);
-		_mascara =     new Tensor4D(_entrada.shape());
-		_saida =       new Tensor4D(_entrada.shape());
-		_gradEntrada = new Tensor4D(_entrada.shape());
+
+		this.formEntrada = formato.clone();
+		_entrada =     new Tensor(this.formEntrada);
+		_mascara =     new Tensor(_entrada.shape());
+		_saida =       new Tensor(_entrada.shape());
+		_gradEntrada = new Tensor(_entrada.shape());
 
 		setNomes();
 		
@@ -221,35 +193,30 @@ public class Dropout extends Camada implements Cloneable {
 	 *    Nota
 	 * </h3>
 	 * <p>
-	 *    Caso a entrada recebida seja um {@code Tensor4D}, os valores de entrada
+	 *    Caso a entrada recebida seja um {@code Tensor}, os valores de entrada
 	 *    que serão considerados serão apenas o da primeira dimensão do tensor.
 	 * </p>
-	 * @param entrada dados de entrada para a camada, objetos aceitos são {@code Tensor4D}
-	 * ou {@code double[][][]}.
+	 * @param entrada dados de entrada para a camada, objetos aceitos são {@code Tensor}
 	 */
 	@Override
-	public Tensor4D forward(Object entrada) {
+	public Tensor forward(Object entrada) {
 		verificarConstrucao();
 
-		if (entrada instanceof Tensor4D) {
-			Tensor4D e = (Tensor4D) entrada;
-			if (!_entrada.comparar3D(e)) {
+		if (entrada instanceof Tensor) {
+			Tensor e = (Tensor) entrada;
+			if (!_entrada.compararShape(e)) {
 				throw new IllegalArgumentException(
-					"\nDimensões de entrada " + e.shapeStr() + 
-					"incompatível com as dimensões da entrada da camada " + this._entrada.shapeStr()
+					"\nTensor de entrada deve tem formato" + e.shapeStr() + 
+					", esperado formato " + _entrada.shapeStr() + "."
 				);
 			}
 
-			_entrada.copiar(e, 0);
+			_entrada.copiar(e);
 	
-		} else if (entrada instanceof double[][][]) {
-			double[][][] e = (double[][][]) entrada;
-			_entrada.copiar(e, 0);
-
-		} else {
+		}  else {
 			throw new IllegalArgumentException(
 				"\nEntrada aceita para a camada de Dropout deve ser do tipo " +
-				this._entrada.getClass().getSimpleName() + " ou double[][][]" + 
+				_entrada.getClass().getSimpleName() + 
 				" , objeto recebido é do tipo \"" + entrada.getClass().getTypeName() + "\"."
 			);
 		}
@@ -281,7 +248,7 @@ public class Dropout extends Camada implements Cloneable {
 	 * passado para a saída, nos valores iguais a 0, a entrada será desconsiderada. 
 	 */
 	private void gerarMascaras() {
-		_mascara.aplicar(0, 
+		_mascara.aplicar(
 			x ->  (random.nextDouble() >= taxa) ? (1 / (1 - taxa)) : 0.0d
 		);
 	}
@@ -305,15 +272,15 @@ public class Dropout extends Camada implements Cloneable {
 	 * @param grad gradientes da camada seguiente.
 	 */
 	@Override
-	public Tensor4D backward(Object grad) {
+	public Tensor backward(Object grad) {
 		verificarConstrucao();
 
-		if (grad instanceof Tensor4D) {
-			Tensor4D g = (Tensor4D) grad;
-			if (!_gradEntrada.comparar3D(g)) {
+		if (grad instanceof Tensor) {
+			Tensor g = (Tensor) grad;
+			if (!_entrada.compararShape(g)) {
 				throw new IllegalArgumentException(
-					"\nDimensões incompatíveis entre o gradiente recebido " + g.shapeStr() +
-					"e o suportado pela camada " + _gradEntrada.shapeStr()
+					"\nGradiente recebido tem formato" + g.shapeStr() + 
+					", esperado formato " + _gradEntrada.shapeStr() + "."
 				);
 			}
 
@@ -333,7 +300,7 @@ public class Dropout extends Camada implements Cloneable {
 	}
 
 	@Override
-	public Tensor4D saida() {
+	public Tensor saida() {
 		verificarConstrucao();
 		return _saida;
 	}
@@ -411,7 +378,7 @@ public class Dropout extends Camada implements Cloneable {
 	}
 
 	@Override
-	public Tensor4D gradEntrada() {
+	public Tensor gradEntrada() {
 		verificarConstrucao();
 		return _gradEntrada;
 	}

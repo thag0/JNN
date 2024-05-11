@@ -5,9 +5,10 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import jnn.camadas.Densa;
-import jnn.core.tensor.Tensor4D;
+import jnn.core.tensor.Tensor;
+import jnn.core.tensor.Variavel;
 
-class SerialDensa{
+class SerialDensa {
 
 	/**
 	 * Transforma os dados contidos na camada Densa numa sequência
@@ -23,23 +24,24 @@ class SerialDensa{
 	 * </ul>
 	 * @param camada camada densa que será serializada.
 	 * @param bw escritor de buffer usado para salvar os dados da camada.
+	 * @param tipo tipo de dado que será escrito.
 	 */
-	public void serializar(Densa camada, BufferedWriter bw, String tipo){
-		try{
+	public void serializar(Densa camada, BufferedWriter bw, String tipo) {
+		try {
 			//nome da camada pra facilitar
 			bw.write(camada.nome());
 			bw.newLine();
 
 			//formato de entrada
 			int[] entrada = camada.formatoEntrada();
-			for(int i = 0; i < entrada.length; i++){
+			for (int i = 0; i < entrada.length; i++) {
 				bw.write(entrada[i] + " ");
 			}
 			bw.newLine();
 			
 			//formato de saída
 			int[] saida = camada.formatoSaida();
-			for(int i = 0; i < saida.length; i++){
+			for (int i = 0; i < saida.length; i++) {
 				bw.write(saida[i] + " ");
 			}
 			bw.newLine();
@@ -52,20 +54,22 @@ class SerialDensa{
 			bw.write(String.valueOf(camada.temBias()));
 			bw.newLine();
 			
-			double[] pesos = camada.kernelParaArray();
-			for(int i = 0; i < pesos.length; i++){
-				escreverDado(pesos[i], tipo, bw);
+			Variavel[] pesos = camada.kernelParaArray();
+			for (int i = 0; i < pesos.length; i++) {
+				escreverDado(pesos[i].get(), tipo, bw);
 				bw.newLine();
 			}
 
-			if(camada.temBias()){
-				double[] bias = camada.biasParaArray();
-				for(int i = 0; i < bias.length; i++){
-					escreverDado(bias[i], tipo, bw);
+			if (camada.temBias()) {
+				Variavel[] bias = camada.biasParaArray();
+				for (int i = 0; i < bias.length; i++) {
+					escreverDado(bias[i].get(), tipo, bw);
 					bw.newLine();
 				}
 			}
-		}catch(Exception e){
+		
+		} catch (IOException e) {
+			System.out.println("\nErro ao serializar camada Densa:");
 			e.printStackTrace();
 		}
 	}
@@ -75,18 +79,17 @@ class SerialDensa{
 	 * @param valor valor desejado.
 	 * @param tipo formatação do dado (float, double).
 	 * @param bw escritor de buffer usado.
-	 * @throws IOException
 	 */
-	 private void escreverDado(double valor, String tipo, BufferedWriter bw) throws IOException{
+	private void escreverDado(double valor, String tipo, BufferedWriter bw) throws IOException {
 		tipo = tipo.toLowerCase();
-		switch(tipo){
+		switch (tipo) {
 			case "float":
 				bw.write(String.valueOf((float) valor));
-			break;
+				break;
 
 			case "double":
 				bw.write(String.valueOf(valor));
-			break;
+				break;
 				
 			default:
 				throw new IllegalArgumentException("Tipo de dado (" + tipo + ") não suportado");
@@ -99,19 +102,19 @@ class SerialDensa{
 	 * @return instância de uma camada densa, os valores de
 	 * pesos e bias ainda não são inicializados.
 	 */
-	public Densa lerConfig(BufferedReader br){
-		try{
+	public Densa lerConfig(BufferedReader br) {
+		try {
 			//formato de entrada
 			String[] sEntrada = br.readLine().split(" ");
 			int[] entrada = new int[sEntrada.length];
-			for(int i = 0; i < sEntrada.length; i++){
+			for (int i = 0; i < sEntrada.length; i++) {
 				entrada[i] = Integer.parseInt(sEntrada[i]);
 			}
 
 			//formato de saída
 			String[] sSaida = br.readLine().split(" ");
 			int[] saida = new int[sSaida.length];
-			for(int i = 0; i < sSaida.length; i++){
+			for (int i = 0; i < sSaida.length; i++) {
 				saida[i] = Integer.parseInt(sSaida[i]);
 			}
 			
@@ -121,11 +124,13 @@ class SerialDensa{
 			//bias
 			boolean bias = Boolean.valueOf(br.readLine());
 			
-			Densa camada = new Densa(saida[1], ativacao);
+			Densa camada = new Densa(saida[0], ativacao);
 			camada.setBias(bias);
 			camada.construir(entrada);
 			return camada;
-		}catch(Exception e){
+
+		} catch (Exception e) {
+			System.out.println("\nErro ao ler configurações da camada Densa:");
 			throw new RuntimeException(e);
 		}
 	}
@@ -135,26 +140,30 @@ class SerialDensa{
 	 * @param camada camada densa que será editada.
 	 * @param br leitor de buffer.
 	 */
-	public void lerPesos(Densa camada, BufferedReader br){
-		try{
-			Tensor4D pesos = camada.kernel();
-			int linPesos = pesos.dim3();
-			int colPesos = pesos.dim4();        
-			for(int i = 0; i < linPesos; i++){
-				for(int j = 0; j < colPesos; j++){
-					double p = Double.parseDouble(br.readLine());
-					camada.kernel().set(p, 0, 0, i, j);
+	public void lerPesos(Densa camada, BufferedReader br) {
+		try {
+			Tensor pesos = camada.kernel();
+			int lin = pesos.shape()[0];
+			int col = pesos.shape()[1];   
+			double peso;     
+			for(int i = 0; i < lin; i++){
+				for(int j = 0; j < col; j++){
+					peso = Double.parseDouble(br.readLine());
+					camada.kernel().set(peso, i, j);
 				}
 			}
 			
 			if(camada.temBias()){
-				int colBias = camada.bias().dim4();        
-				for(int i = 0; i < colBias; i++){
+				Tensor bias = camada.bias();        
+				int n = bias.tamanho();
+				for(int i = 0; i < n; i++){
 					double b = Double.parseDouble(br.readLine());
-					camada.bias().set(b, 0, 0, 0, i);
+					bias.set(b, i);
 				}
 			}
-		}catch(Exception e){
+
+		} catch (Exception e) {
+			System.out.println("\nErro ao ler pesos da camada Densa:");
 			throw new RuntimeException(e);
 		}
 	}

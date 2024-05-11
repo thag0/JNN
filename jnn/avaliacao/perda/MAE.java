@@ -1,5 +1,7 @@
 package jnn.avaliacao.perda;
 
+import jnn.core.tensor.Tensor;
+
 /**
  * Função de perda Mean Absolute Error, calcula o erro médio 
  * absoluto entre as previsões e os valores reais.
@@ -12,27 +14,22 @@ public class MAE extends Perda {
 	public MAE() {}
 
 	@Override
-	public double calcular(double[] previsto, double[] real) {
-		super.verificarDimensoes(previsto, real);
-		int tam = previsto.length;
+	public Tensor calcular(Tensor prev, Tensor real) {
+		super.verificarDimensoes(prev, real);
+		int tam = prev.tamanho();
 		
 		double mae = 0;
 		for (int i = 0; i < tam; i++) {
-			mae += Math.abs(previsto[i] - real[i]);
+			mae += Math.abs(prev.get(i) - real.get(i));
 		}
 		
-		return mae / tam;
+		return new Tensor(new double[]{ (mae/tam) }, 1);
 	}
 	
 	@Override
-	public double[] derivada(double[] previsto, double[] real) {
-		super.verificarDimensoes(previsto, real);
+	public Tensor derivada(Tensor prev, Tensor real) {
+		super.verificarDimensoes(prev, real);
 
-		double[] derivadas = new double[previsto.length];
-		for (int i = 0; i < previsto.length; i++) {
-			derivadas[i] = previsto[i] - real[i];
-		}
-
-		return derivadas;
+		return prev.map(real, (p, r) -> (p-r));
 	}
 }

@@ -1,6 +1,7 @@
 package jnn.otimizadores;
 
 import jnn.camadas.Camada;
+import jnn.core.tensor.Variavel;
 
 /**
  * Classe base para implementações de otimizadores do treino da biblioteca.
@@ -44,6 +45,20 @@ public abstract class Otimizador {
 				"\nO otimizador deve ser construído para poder ser usado."
 			);
 		}
+	}
+
+	/**
+	 * Inicializa um array de variáveis.
+	 * @param tam tamanho desejado.
+	 * @return array de acordo com o tamanho, zerado.
+	 */
+	protected Variavel[] initVars(int tam) {
+		Variavel[] arr = new Variavel[tam];
+		for (int i = 0; i < tam; i++) {
+			arr[i] = new Variavel(0.0d);
+		}
+
+		return arr;
 	}
 
 	/**
