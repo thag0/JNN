@@ -261,24 +261,29 @@ public class OpTensor {
 			);
 
 		}
+
 		int[] shapeE = entrada.shape();
 		int[] shapeK = kernel.shape();
 		
 		int alt  = shapeE[0] - shapeK[0] + 1;
 		int larg = shapeE[1] - shapeK[1] + 1;
-	
+		
 		Tensor saida = new Tensor(alt, larg);
-	
-		double soma;
+		
+		final int altKernel = shapeK[0];
+		final int largKernel = shapeK[1];
+		double[] dataE = entrada.paraArrayDouble();
+		double[] dataK = kernel.paraArrayDouble();
+		Variavel[] dataS = saida.paraArray();
 		for (int i = 0; i < alt; i++) {
 			for (int j = 0; j < larg; j++) {
-				soma = 0.0d;
-				for (int k = 0; k < shapeK[0]; k++) {
-					for (int l = 0; l < shapeK[1]; l++) {
-						soma += entrada.get(k+i, l+j) * kernel.get(k, l);
+				double soma = 0.0;
+				for (int k = 0; k < altKernel; k++) {
+					for (int l = 0; l < largKernel; l++) {
+						soma += dataE[(k + i) * shapeE[1] + (l + j)] * dataK[k * shapeK[1] + l];
 					}
 				}
-				saida.set(soma, i, j);
+				dataS[i * larg + j].set(soma);
 			}
 		}
 	
@@ -309,8 +314,8 @@ public class OpTensor {
 		int largSaida = shapeS[1];
 		if (altSaida != altEsperada || largSaida != largEsperada) {
 			throw new IllegalArgumentException(
-				"\nDimensão de saída esperada (" + altSaida + ", " + largSaida + "), mas" +
-				"recebido " + saida.shapeStr()
+				"\nDimensão de saída esperada (" + altEsperada + ", " + largEsperada + "), mas" +
+				" recebido " + saida.shapeStr()
 			);
 		}
 
@@ -349,29 +354,38 @@ public class OpTensor {
 			);
 
 		}
+
 		int[] shapeE = entrada.shape();
 		int[] shapeK = kernel.shape();
 		
-		int alt  = shapeE[0] + shapeK[0] - 1;
-		int larg = shapeE[1] + shapeK[1] - 1;
+		int altSaida  = shapeE[0] + shapeK[0] - 1;
+		int largSaida = shapeE[1] + shapeK[1] - 1;
 	
-		Tensor saida = new Tensor(alt, larg);
-	
-		for (int i = 0; i < alt; i++) {
-			for (int j = 0; j < larg; j++) {
-				double soma = 0.0d;
-				for (int m = 0; m < shapeK[0]; m++) {
-					int inputRow = i - m;
-					if (inputRow >= 0 && inputRow < shapeE[0]) {
-						for (int n = 0; n < shapeK[1]; n++) {
-							int inputCol = j - n;
-							if (inputCol >= 0 && inputCol < shapeE[1]) {
-								soma += kernel.get(m, n) * entrada.get(inputRow, inputCol);
+		Tensor saida = new Tensor(altSaida, largSaida);
+
+		final int altEntrada = shapeE[0];
+		final int largEntrada = shapeE[1];
+		final int altKernel = shapeK[0];
+		final int largKernel = shapeK[1];
+		
+		double[] dataE = entrada.paraArrayDouble();
+		double[] dataK = kernel.paraArrayDouble();
+		Variavel[] dataS = saida.paraArray();
+		for (int i = 0; i < altSaida; i++) {
+			for (int j = 0; j < largSaida; j++) {
+				double soma = 0.0;
+				for (int m = 0; m < altKernel; m++) {
+					int linEntrada = i - m;
+					if (linEntrada >= 0 && linEntrada < altEntrada) {
+						for (int n = 0; n < largKernel; n++) {
+							int colEntrada = j - n;
+							if (colEntrada >= 0 && colEntrada < largEntrada) {
+								soma += dataK[m * largKernel + n] * dataE[linEntrada * largEntrada + colEntrada];
 							}
 						}
 					}
 				}
-				saida.set(soma, i, j);
+				dataS[i * largSaida + j].set(soma);
 			}
 		}
 	
@@ -402,8 +416,8 @@ public class OpTensor {
 		int largSaida = shapeS[1];
 		if (altSaida != altEsperada || largSaida != largEsperada) {
 			throw new IllegalArgumentException(
-				"\nDimensão de saída esperada (" + altSaida + ", " + largSaida + "), mas" +
-				"recebido " + saida.shapeStr()
+				"\nDimensão de saída esperada (" + altEsperada + ", " + largEsperada + "), mas" +
+				" recebido " + saida.shapeStr()
 			);
 		}
 
