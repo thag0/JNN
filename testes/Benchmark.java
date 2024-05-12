@@ -19,14 +19,14 @@ public class Benchmark{
 		Ged ged = new Ged();
 		ged.limparConsole();
 
-		int[] formEntrada = {2, 28, 28};
+		int[] formEntrada = {16, 26, 26};
 		int[] formFitlro = {3, 3};
-		int filtros = 16;
+		int filtros = 20;
 
 		convForward(formEntrada, formFitlro, filtros);
 		testarForward();
 		convBackward(formEntrada, formFitlro, filtros);
-
+		testarBackward();
 	}
 
 	/**
@@ -133,7 +133,7 @@ public class Benchmark{
 	/**
 	 * Testar com multithread
 	 */
-	static void testarForward(){
+	static void testarForward() {
 		int[] formEntrada = {12, 16, 16};
 		Inicializador iniKernel = new GlorotUniforme(12345);
 		Inicializador iniBias = new Zeros();
@@ -180,6 +180,81 @@ public class Benchmark{
 		Tensor prev = conv.forward(entrada);
 
 		System.out.println("Forward esperado: " + prev.comparar(saidaEsperada));
+	}
+
+	/**
+	 * Testar com multithread
+	 */
+	static void testarBackward() {
+		int[] formEntrada = {12, 16, 16};
+		Inicializador iniKernel = new GlorotUniforme(12345);
+		Inicializador iniBias = new Zeros();
+		Convolucional conv = new Convolucional(formEntrada, new int[]{3, 3}, 16, "linear", iniKernel, iniBias);
+		conv.inicializar();
+
+		Tensor amostra = new Tensor(conv.formatoEntrada());
+		conv.forward(amostra);
+
+		Tensor grad = new Tensor(conv.formatoSaida());
+		conv.backward(grad);
+	
+		Tensor gradK = new Tensor(conv._gradFiltros.shape());
+		Tensor gradE = new Tensor(conv._gradEntrada.shape());
+		convBackward(conv._entrada, conv._filtros, conv._gradSaida, gradK, gradE);
+
+		boolean kernelEsperado = gradK.comparar(conv._gradFiltros);
+		boolean entradaEsperada = gradE.comparar(conv._gradEntrada);
+	
+		if (kernelEsperado && entradaEsperada) {
+			System.out.println("backward esperado : " + (kernelEsperado && entradaEsperada));
+		} else {
+			System.out.println("backward inesperado : gradK" + kernelEsperado + " gradE: " + entradaEsperada);
+		}
+	}
+
+	/**
+	 * Apenas para testes
+	 * @param entrada
+	 * @param kernel
+	 * @param gradS
+	 * @param gradK
+	 * @param gradE
+	 */
+	static void convBackward(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Tensor gradE) {
+		int[] shapeE = entrada.shape();
+		int[] shapeK = kernel.shape();
+		int[] shapeS = gradS.shape();
+
+		final int filtros = shapeK[0];
+		final int entradas = shapeK[1];
+
+		final int altE = shapeE[1];
+		final int largE = shapeE[2];
+		final int altF = shapeK[2];
+		final int largF = shapeK[3];
+		final int altS = shapeS[1];
+		final int largS = shapeS[2];
+
+		for (int f = 0; f < filtros; f++) {
+			for (int e = 0; e < entradas; e++) {
+				// gradiente dos kernels
+				Tensor entrada2D = entrada.slice(new int[]{e, 0, 0}, new int[]{e+1, altE, largE});
+				entrada2D.squeeze(0);//3d -> 2d
+
+				Tensor gradSaida2D = gradS.slice(new int[]{f, 0, 0}, new int[]{f+1, altS, largS});
+				gradSaida2D.squeeze(0);//3d -> 2d
+
+				Tensor resCorr = optensor.correlacao2D(entrada2D, gradSaida2D);
+				resCorr.unsqueeze(0).unsqueeze(0);
+				gradK.slice(new int[]{f, e, 0, 0}, new int[]{f+1, e+1, altF, largF}).add(resCorr);
+			
+				// gradientes das entradas
+				Tensor kernel2D = kernel.slice(new int[]{f, e, 0, 0}, new int[]{f+1, e+1, altF, largF});
+				kernel2D.squeeze(0).squeeze(0);
+				Tensor resConv = optensor.convolucao2DFull(gradSaida2D, kernel2D);
+				gradE.slice(new int[]{e, 0, 0}, new int[]{e+1, altE, largE}).squeeze(0).add(resConv);
+			}
+		}
 	}
 
 }
