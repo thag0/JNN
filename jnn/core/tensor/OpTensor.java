@@ -115,27 +115,14 @@ public class OpTensor {
 				"A = " + a.shapeStr() + " B = " + b.shapeStr()
 			);
 		}
-
-		boolean unsqueezeA = false;
-		boolean unsqueezeB = false;
-
-		if (a.numDim() == 1) {
-			a.unsqueeze(0);
-			unsqueezeA = true;
-		}
-
-		if (b.numDim() == 1) {
-			b.unsqueeze(0);
-			unsqueezeB = true;
-		}
 	
 		int[] shapeA = a.shape();
 		int[] shapeB = b.shape();
 
-		int linA = shapeA[0];
-		int colA = shapeA[1];
-		int linB = shapeB[0];
-		int colB = shapeB[1];
+		final int linA = shapeA.length == 1 ? 1 : shapeA[0];
+		final int colA = shapeA.length == 1 ? shapeA[0] : shapeA[1];
+		final int linB = shapeB.length == 1 ? 1 : shapeB[0];
+		final int colB = shapeB.length == 1 ? shapeB[0] : shapeB[1];
 	
 		if (colA != linB) {
 			throw new IllegalArgumentException(
@@ -144,25 +131,22 @@ public class OpTensor {
 			);
 		}
 	
-		Tensor res = new Tensor(linA, colB);
+		Tensor res = linA == 1 ? new Tensor(colB) : new Tensor(linA, colB);
+		
+		//vetorização para melhor performance				
+		double[] dataA = a.paraArrayDouble();
+		double[] dataB = b.paraArrayDouble();
+		Variavel[] dataD = res.paraArray();
+		
 		int n = colA;
 		for (int i = 0; i < linA; i++) {
 			for (int j = 0; j < colB; j++) {
 				double soma = 0.0d;
 				for (int k = 0; k < n; k++) {
-					soma += a.get(i, k) * b.get(k, j);
+					soma += dataA[i * colA + k] * dataB[k * colB + j];
 				}
-				res.set(soma, i, j);
+				dataD[i * colB + j].set(soma);
 			}
-		}
-
-		if (unsqueezeA) {
-			a.squeeze(0);
-			res.squeeze(0);
-		}
-
-		if (unsqueezeB) {
-			b.squeeze(0);
 		}
 	
 		return res;
@@ -181,36 +165,17 @@ public class OpTensor {
 				"A = " + a.shapeStr() + " B = " + b.shapeStr() + " Dest = " + dest.shapeStr()
 			);
 		}
-
-		boolean unsqueezeA = false;
-		boolean unsqueezeB = false;
-		boolean unsqueezeD = false;
-
-		if (a.numDim() == 1) {
-			a.unsqueeze(0);
-			unsqueezeA = true;
-		}
-
-		if (b.numDim() == 1) {
-			b.unsqueeze(0);
-			unsqueezeB = true;
-		}
-
-		if (dest.numDim() == 1) {
-			dest.unsqueeze(0);
-			unsqueezeD = true;
-		}
 	
 		int[] shapeA = a.shape();
 		int[] shapeB = b.shape();
 		int[] shapeD = dest.shape();
 
-		final int linA = shapeA[0];
-		final int colA = shapeA[1];
-		final int linB = shapeB[0];
-		final int colB = shapeB[1];
-		final int linD = shapeD[0];
-		final int colD = shapeD[1];
+		final int linA = shapeA.length == 1 ? 1 : shapeA[0];
+		final int colA = shapeA.length == 1 ? shapeA[0] : shapeA[1];
+		final int linB = shapeB.length == 1 ? 1 : shapeB[0];
+		final int colB = shapeB.length == 1 ? shapeB[0] : shapeB[1];
+		final int linD = shapeD.length == 1 ? 1 : shapeD[0];
+		final int colD = shapeD.length == 1 ? shapeD[0] : shapeD[1];
 	
 		if (colA != linB) {
 			throw new IllegalArgumentException(
@@ -242,10 +207,6 @@ public class OpTensor {
 			}
 		}
 
-		// voltar os tensores para seus formatos originais
-		if (unsqueezeA) a.squeeze(0);
-		if (unsqueezeB) b.squeeze(0);
-		if (unsqueezeD) dest.squeeze(0);
 	}
 
 	/**
