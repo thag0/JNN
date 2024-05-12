@@ -8,6 +8,7 @@ import jnn.core.tensor.Tensor;
 import lib.ged.Ged;
 import lib.geim.Geim;
 
+import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
 
 public class Playground{
@@ -20,18 +21,24 @@ public class Playground{
 	public static void main(String[] args){
 		ged.limparConsole();
 
-		//TODO resolver broadcasting entre tensores
-		// Tensor t = new Tensor(2, 2, 2);
-		// Tensor b = new Tensor(new double[]{ 1, 2 }, 2, 1, 1);
+		int linA = 10;
+		int colB = 10;
+		int k = 100;
+		Tensor a = new Tensor(linA, k);
+		Tensor b = new Tensor(k, colB);
+		Tensor c = new Tensor(linA, colB);
 
-		// System.out.println(t.shapeStr());
-		// System.out.println(b.shapeStr());
+		a.aplicar(x -> randn());
+		b.aplicar(x -> randn());
 
-		// t.add(b);
+		long t;
+		t = medirTempo(() -> optensor.matMult(a, b, c));
 
-		// System.out.println(t);
+		System.out.println("Tempo: " + new DecimalFormat().format(t) + " ns");
+	}
 
-		testeConv2dFull();
+	static double randn() {
+		return Math.random()*2-1;
 	}
 
 	/**

@@ -169,6 +169,86 @@ public class OpTensor {
 	}
 
 	/**
+	 * Realiza a operação {@code  A * B}
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @param dest {@code Tensor} de destino.
+	 */
+	public void matMult(Tensor a, Tensor b, Tensor dest) {
+		if (a.numDim() > 2 || b.numDim() > 2 | dest.numDim() > 2) {
+			throw new IllegalArgumentException(
+				"\nOs tensores devem conter até duas dimensões, mas contêm " +
+				"A = " + a.shapeStr() + " B = " + b.shapeStr() + " Dest = " + dest.shapeStr()
+			);
+		}
+
+		boolean unsqueezeA = false;
+		boolean unsqueezeB = false;
+		boolean unsqueezeD = false;
+
+		if (a.numDim() == 1) {
+			a.unsqueeze(0);
+			unsqueezeA = true;
+		}
+
+		if (b.numDim() == 1) {
+			b.unsqueeze(0);
+			unsqueezeB = true;
+		}
+
+		if (dest.numDim() == 1) {
+			dest.unsqueeze(0);
+			unsqueezeD = true;
+		}
+	
+		int[] shapeA = a.shape();
+		int[] shapeB = b.shape();
+		int[] shapeD = dest.shape();
+
+		final int linA = shapeA[0];
+		final int colA = shapeA[1];
+		final int linB = shapeB[0];
+		final int colB = shapeB[1];
+		final int linD = shapeD[0];
+		final int colD = shapeD[1];
+	
+		if (colA != linB) {
+			throw new IllegalArgumentException(
+				"As dimensões dos tensores não são compatíveis para multiplicação de matrizes: " +
+				"A = " + a.shapeStr() + " B = " + b.shapeStr()
+			);
+		}
+
+		if (linA != linD || colB != colD) {
+			throw new IllegalArgumentException(
+				"\nDimensões de saída inesperadas, esperado (" + linA + ", " + colB +  ")" +
+				", mas recebido " + dest.shapeStr() 
+			);
+		}
+
+		//vetorização para melhor performance
+		double soma;					
+		final int n = colA;
+		Variavel[] dataA = a.paraArray();
+		Variavel[] dataB = b.paraArray();
+		Variavel[] dataD = dest.paraArray();
+		for (int i = 0; i < linA; i++) {
+			for (int j = 0; j < colB; j++) {
+				soma = 0.0d;
+				for (int k = 0; k < n; k++) {
+					soma += dataA[i * colA + k].get() * dataB[k * colB + j].get();
+				}
+				dataD[i * colD + j].set(soma);
+			}
+		}
+
+		// voltar os tensores para seus formatos originais
+		if (unsqueezeA) a.squeeze(0);
+		if (unsqueezeB) b.squeeze(0);
+		if (unsqueezeD) dest.squeeze(0);
+	}
+
+	/**
 	 * Realiza a operação de correlação cruzada entre o tensor de entrada e o kernel.
 	 * @param entrada {@code Tensor} contendo os dados de entrada.
 	 * @param kernel {@code Tensor} contendo o filtro que será aplicado à entrada.

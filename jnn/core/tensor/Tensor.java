@@ -55,7 +55,7 @@ public class Tensor implements Iterable<Variavel> {
 	/**
 	 * Conjunto de elementos do tensor.
 	 */
-	public Variavel[] dados;
+	private Variavel[] dados;
 
 	/**
 	 * Nome do tensor.
@@ -86,7 +86,7 @@ public class Tensor implements Iterable<Variavel> {
     }
 
 	/**
-	 * Inicializa um tensor a partir de um array quadridimensional primitivo.
+	 * Inicializa um tensor a partir de um array 4D primitivo.
 	 * @param tensor tensor desejado.
 	 */
 	public Tensor(double[][][][] tensor) {
@@ -109,7 +109,7 @@ public class Tensor implements Iterable<Variavel> {
 	}
 
 	/**
-	 * Inicializa um tensor a partir de um array tridimensional primitivo.
+	 * Inicializa um tensor a partir de um array 3D primitivo.
 	 * @param tensor tensor desejado.
 	 */
 	public Tensor(double[][][] tensor) {
@@ -131,7 +131,7 @@ public class Tensor implements Iterable<Variavel> {
 	}
 
 	/**
-	 * Inicializa um tensor a partir de um array bidimensional primitivo.
+	 * Inicializa um tensor a partir de um array 2D primitivo.
 	 * @param mat matriz desejada.
 	 */
 	public Tensor(double[][] mat) {
@@ -157,12 +157,12 @@ public class Tensor implements Iterable<Variavel> {
 	}
 
 	/**
-	 * Inicializa um tensor a partir de um array.
-	 * Inicializa um tensor a partir de um array.
+	 * Inicializa um tensor a partir de um array de variáveis.
 	 * @param arr array desejado.
 	 */
     public Tensor(Variavel[] arr) {
         shape = new int[]{arr.length};
+
         dados = inicializarDados(arr.length);
 		for (int i = 0; i < arr.length; i++) {
 			dados[i].set(arr[i]);
@@ -193,7 +193,6 @@ public class Tensor implements Iterable<Variavel> {
 	}
 
     /**
-     * Inicializa um novo tensor vazio a partir de um formato especificado.
      * Inicializa um novo tensor vazio a partir de um formato especificado.
      * @param shape formato desejado.
      */
@@ -301,7 +300,7 @@ public class Tensor implements Iterable<Variavel> {
 	 *    [1, 2, 3, 4]
 	 *]
 	 * </pre>
-	 * @param dim array contendo as novas dimensões (dim1, dim2, dim3, dim4).
+	 * @param dim array contendo as novas dimensões.
 	 * @return instância local alterada.
 	 */
 	public Tensor reshape(int... dims) {
@@ -312,15 +311,14 @@ public class Tensor implements Iterable<Variavel> {
 
 		if (tamInicial != tamDesejado) {
 			throw new IllegalArgumentException(
-				"\nA quatidade de elementos com as novas dimensões (" + tamDesejado +
+				"\nQuatidade de elementos com as novas dimensões (" + tamDesejado +
 				") deve ser igual a quantidade de elementos do tensor (" + tamanho() + ")."
 			);
 		}
 
-		Tensor novo = new Tensor(dimsUteis);
-		novo.copiarElementos(dados);
+		this.shape = dimsUteis;
 
-		return novo;
+		return this;
 	}
 
 	/**

@@ -46,7 +46,7 @@ public class Variavel {
      * @param v variável desejada
      */
     public Variavel(Variavel v) {
-        valor = v.get();
+        valor = v.valor;
     }
 
     /**
@@ -62,7 +62,7 @@ public class Variavel {
      * @param v variável desejada.
      */
     public void add(Variavel v) {
-        valor += v.get();
+        valor += v.valor;
     }
 
     /**
@@ -78,7 +78,7 @@ public class Variavel {
      * @param v variável desejada.
      */
     public void sub(Variavel v) {
-        valor -= v.get();
+        valor -= v.valor;
     }
 
     /**
@@ -94,7 +94,7 @@ public class Variavel {
      * @param v variável desejada.
      */
     public void mult(Variavel v) {
-        valor *= v.get();
+        valor *= v.valor;
     }
 
     /**
@@ -110,7 +110,7 @@ public class Variavel {
      * @param v variável desejada.
      */
     public void div(Variavel v) {
-        valor /= v.get();
+        valor /= v.valor;
     }
 
     /**
@@ -126,7 +126,7 @@ public class Variavel {
      * @param v variável desejada.
      */
     public void set(Variavel v) {
-        valor = v.get();
+        valor = v.valor;
     }
 
     /**

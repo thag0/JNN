@@ -221,7 +221,7 @@ public class Flatten extends Camada implements Cloneable{
 			);
 		}
 
-		_saida.copiarElementos(_entrada.dados);
+		_saida.copiarElementos(_entrada.paraArray());
 
 		return _saida;
 	}
@@ -247,7 +247,7 @@ public class Flatten extends Camada implements Cloneable{
 				);
 			}
 
-			_gradEntrada.copiarElementos(g.dados);
+			_gradEntrada.copiarElementos(g.paraArray());
 		
 		} else {
 			throw new IllegalArgumentException(
