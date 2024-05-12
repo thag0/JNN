@@ -23,7 +23,7 @@ public class Playground{
 
 		int linA = 10;
 		int colB = 10;
-		int k = 100;
+		int k = 200;
 		Tensor a = new Tensor(linA, k);
 		Tensor b = new Tensor(k, colB);
 		Tensor c = new Tensor(linA, colB);
@@ -33,8 +33,10 @@ public class Playground{
 
 		long t;
 		t = medirTempo(() -> optensor.matMult(a, b, c));
-
 		System.out.println("Tempo: " + new DecimalFormat().format(t) + " ns");
+	
+		Tensor r = optensor.matMult(a, b);
+		System.out.println("esperado: " + r.equals(c));
 	}
 
 	static double randn() {
