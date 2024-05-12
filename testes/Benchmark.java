@@ -23,10 +23,14 @@ public class Benchmark{
 		int[] formFitlro = {3, 3};
 		int filtros = 20;
 
-		convForward(formEntrada, formFitlro, filtros);
-		testarForward();
+		// convForward(formEntrada, formFitlro, filtros);
+		// testarForward();
 		convBackward(formEntrada, formFitlro, filtros);
 		testarBackward();
+	}
+
+	static double randn() {
+		return Math.random()*2-1;
 	}
 
 	/**
@@ -58,13 +62,10 @@ public class Benchmark{
 		StringBuilder sb = new StringBuilder();
 		String pad = "   ";
 
-		int[] e = conv.formatoEntrada();
-		int[] s = conv.formatoSaida();
-
 		sb.append("Config conv = [\n");
-			sb.append(pad).append("filtros: " + conv.kernel().shapeStr() + "\n");
-			sb.append(pad).append("entrada: (" + e[0] + ", " + e[1] + ", " + e[2] + ")\n");
-			sb.append(pad).append("saida: (" + s[0] + ", " + s[1] + ", " + s[2] + ")\n");
+			sb.append(pad).append("entrada: " + conv._entrada.shapeStr() + "\n");
+			sb.append(pad).append("filtros: " + conv._filtros.shapeStr() + "\n");
+			sb.append(pad).append("saida: " + conv._saida.shapeStr() + "\n");
 			sb.append(pad).append("Tempo forward: " + TimeUnit.NANOSECONDS.toMillis(tempo) + "ms\n");
 		sb.append("]\n");
 
@@ -106,13 +107,10 @@ public class Benchmark{
 		StringBuilder sb = new StringBuilder();
 		String pad = "   ";
 
-		int[] e = conv.formatoEntrada();
-		int[] s = conv.formatoSaida();
-
 		sb.append("Config conv = [\n");
-			sb.append(pad).append("filtros: " + conv.kernel().shapeStr() + "\n");
-			sb.append(pad).append("entrada: (" + e[0] + ", " + e[1] + ", " + e[2] + ")\n");
-			sb.append(pad).append("saida: (" + s[0] + ", " + s[1] + ", " + s[2] + ")\n");
+			sb.append(pad).append("entrada: " + conv._entrada.shapeStr() + "\n");
+			sb.append(pad).append("filtros: " + conv._filtros.shapeStr() + "\n");
+			sb.append(pad).append("saida: " + conv._saida.shapeStr() + "\n");
 			sb.append(pad).append("Tempo backward: " + TimeUnit.NANOSECONDS.toMillis(tempo) + "ms\n");
 		sb.append("]\n");
 
@@ -186,29 +184,37 @@ public class Benchmark{
 	 * Testar com multithread
 	 */
 	static void testarBackward() {
-		int[] formEntrada = {12, 16, 16};
+		int[] formEntrada = {16, 16, 16};
 		Inicializador iniKernel = new GlorotUniforme(12345);
 		Inicializador iniBias = new Zeros();
 		Convolucional conv = new Convolucional(formEntrada, new int[]{3, 3}, 16, "linear", iniKernel, iniBias);
 		conv.inicializar();
 
 		Tensor amostra = new Tensor(conv.formatoEntrada());
+		amostra.aplicar(x -> randn());
 		conv.forward(amostra);
 
-		Tensor grad = new Tensor(conv.formatoSaida());
-		conv.backward(grad);
-	
-		Tensor gradK = new Tensor(conv._gradFiltros.shape());
-		Tensor gradE = new Tensor(conv._gradEntrada.shape());
-		convBackward(conv._entrada, conv._filtros, conv._gradSaida, gradK, gradE);
+		Tensor convE = conv._entrada.clone();
+		Tensor convK = conv._filtros.clone();
+		Tensor convGK = conv._gradFiltros.clone();
+		Tensor convGE = conv._gradEntrada.clone();
 
-		boolean kernelEsperado = gradK.comparar(conv._gradFiltros);
-		boolean entradaEsperada = gradE.comparar(conv._gradEntrada);
-	
-		if (kernelEsperado && entradaEsperada) {
-			System.out.println("backward esperado : " + (kernelEsperado && entradaEsperada));
+		Tensor gradiente = new Tensor(conv.formatoSaida());
+		gradiente.aplicar(x -> randn());
+
+		//testar gradiente de entrada
+		for (int i = 0; i < 2; i++) {
+			convGE.preencher(0);
+			conv.backward(gradiente);
+			convBackward(convE, convK, gradiente, convGK, convGE);
+		}
+
+		boolean kEsperado = convGK.comparar(conv._gradFiltros);
+		boolean gEsperado = convGE.comparar(conv._gradEntrada);
+		if (kEsperado && gEsperado) {
+			System.out.println("backward esperado : " + (kEsperado && gEsperado));
 		} else {
-			System.out.println("backward inesperado : gradK" + kernelEsperado + " gradE: " + entradaEsperada);
+			System.out.println("backward inesperado : gradK: " + kEsperado + " gradE: " + gEsperado);
 		}
 	}
 

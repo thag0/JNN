@@ -440,20 +440,33 @@ public class OpTensor {
 			);
 		}
 
+		// NOTA
+		// essa ainda não é a melhor solução, mas é mais eficiente que fazer slicing
+		// dentro dos loops.
 		Tensor cache = new Tensor(altSaida, largSaida);
 		for (int f = 0; f < numFiltros; f++){
 			for (int e = 0; e < profEntrada; e++) {
-				Tensor entrada2d = entrada.slice(new int[]{e, 0, 0}, new int[]{e+1, altEntrada, largEntrada});
-				entrada2d.squeeze(0);// 3d -> 2d
+				Tensor entrada2d = new Tensor(altEntrada, largEntrada);
+				for (int i = 0; i < altEntrada; i++) {
+					for (int j = 0; j < largEntrada; j++) {
+						entrada2d.set(entrada.get(e, i, j), i, j);
+					}
+				}
 
-				Tensor kernel2D = kernel.slice(new int[]{f, e, 0, 0}, new int[]{f+1, e+1, altKernel, largKernel});
-				kernel2D.squeeze(0).squeeze(0);// 4d -> 2d
+				Tensor kernel2D = new Tensor(altKernel, largKernel);
+				for (int i = 0; i < altKernel; i++) {
+					for (int j = 0; j < largKernel; j++) {
+						kernel2D.set(kernel.get(f, e, i, j), i, j);
+					}
+				}
 
 				correlacao2D(entrada2d, kernel2D, cache);
-				cache.unsqueeze(0);
-				
-				saida.slice(new int[]{f, 0, 0}, new int[]{f+1, altSaida, largSaida}).add(cache);
-				cache.squeeze(0);
+
+				for (int i = 0; i < altSaida; i++) {
+					for (int j = 0; j < largSaida; j++) {
+						saida.add(cache.get(i, j), f, i, j);
+					}
+				}
 			}
 		}
 	}
@@ -476,29 +489,56 @@ public class OpTensor {
 
 		final int altE = shapeE[1];
 		final int largE = shapeE[2];
-		final int altF = shapeK[2];
-		final int largF = shapeK[3];
+		final int altK = shapeK[2];
+		final int largK = shapeK[3];
 		final int altS = shapeS[1];
 		final int largS = shapeS[2];
 
+		// NOTA
+		// essa ainda não é a melhor solução, mas é mais eficiente que 
+		// fazer slicing dentro dos loops.
+		Tensor cache1 = new Tensor(altK, largK);
+		Tensor cache2 = new Tensor(altE, largE);
 		for (int f = 0; f < filtros; f++) {
 			for (int e = 0; e < entradas; e++) {
 				// gradiente dos kernels
-				Tensor entrada2D = entrada.slice(new int[]{e, 0, 0}, new int[]{e+1, altE, largE});
-				entrada2D.squeeze(0);//3d -> 2d
+				Tensor entrada2D = new Tensor(altE, largE);
+				for (int i = 0; i < altE; i++) {
+					for (int j = 0; j < largE; j++) {
+						entrada2D.set(entrada.get(e, i, j), i, j);
+					}
+				}
 
-				Tensor gradSaida2D = gradS.slice(new int[]{f, 0, 0}, new int[]{f+1, altS, largS});
-				gradSaida2D.squeeze(0);//3d -> 2d
+				Tensor gradSaida2D = new Tensor(altS, largS);
+				for (int i = 0; i < altS; i++) {
+					for (int j = 0; j < largS; j++) {
+						gradSaida2D.set(gradS.get(f, i, j), i, j);
+					}
+				}
 
-				Tensor resCorr = correlacao2D(entrada2D, gradSaida2D);
-				resCorr.unsqueeze(0).unsqueeze(0);
-				gradK.slice(new int[]{f, e, 0, 0}, new int[]{f+1, e+1, altF, largF}).add(resCorr);
-			
+				correlacao2D(entrada2D, gradSaida2D, cache1);
+
+				for (int i = 0; i < altK; i++) {
+					for (int j = 0; j < largK; j++) {
+						gradK.add(cache1.get(i, j), f, e, i, j);
+					}
+				}
+
 				// gradientes das entradas
-				Tensor kernel2D = kernel.slice(new int[]{f, e, 0, 0}, new int[]{f+1, e+1, altF, largF});
-				kernel2D.squeeze(0).squeeze(0);
-				Tensor resConv = convolucao2DFull(gradSaida2D, kernel2D);
-				gradE.slice(new int[]{e, 0, 0}, new int[]{e+1, altE, largE}).squeeze(0).add(resConv);
+				Tensor kernel2D = new Tensor(altK, largK);
+				for (int i = 0; i < altK; i++) {
+					for (int j = 0; j < largK; j++) {
+						kernel2D.set(kernel.get(f, e, i, j), i, j);
+					}
+				}
+
+				convolucao2DFull(gradSaida2D, kernel2D, cache2);
+				
+				for (int i = 0; i < altE; i++) {
+					for (int j = 0; j < largE; j++) {
+						gradE.add(cache2.get(i, j), e, i, j);
+					}
+				}
 			}
 		}
 	}

@@ -602,19 +602,8 @@ public class Convolucional extends Camada implements Cloneable {
 	 *somatorio.add(bias)
 	 *saida = ativacao(somatorio)
 	 * </pre>
-	 * <h3>
-	 *    Nota
-	 * </h3>
-	 * <p>
-	 *    Caso a entrada seja um {@code Tensor}, é considerada apenas a primeira dimensão do
-	 *    tensor.
-	 * </p>
 	 * @param entrada dados de entrada que serão processados, tipos aceitos são,
 	 * {@code double[][][]} ou {@code Tensor}.
-	 * @throws IllegalArgumentException caso a entrada fornecida não seja suportada 
-	 * pela camada.
-	 * @throws IllegalArgumentException caso haja alguma incompatibilidade entre a entrada
-	 * fornecida e a capacidade de entrada da camada.
 	 */
 	@Override
 	public Tensor forward(Object entrada) {
@@ -685,13 +674,6 @@ public class Convolucional extends Camada implements Cloneable {
 	 * </p>
 	 * Resultados calculados ficam salvos nas prorpiedades {@code camada.gradFiltros} e
 	 * {@code camada.gradBias}.
-	 * <h3>
-	 *    Nota
-	 * </h3>
-	 * <p>
-	 *    Caso o gradiente seja um {@code Tensor}, é considerada apenas a primeira dimensão 
-	 *    do tensor.
-	 * </p>
 	 * @param grad gradiente da camada seguinte.
 	 */
 	@Override

@@ -81,7 +81,7 @@ public class Tensor implements Iterable<Variavel> {
         int n = tensor.tamanho();
         this.dados = inicializarDados(n);
 		for (int i = 0; i < n; i++) {
-			this.dados[i] = tensor.dados[i].clone();
+			this.dados[i].set(tensor.dados[i]);
 		}
     }
 
@@ -1441,6 +1441,38 @@ public class Tensor implements Iterable<Variavel> {
 	 */
 	public Variavel[] paraArray() {
 		return dados;
+	}
+
+	/**
+	 * 
+	 * @param inicio
+	 * @param fim
+	 * @return
+	 */
+	public Variavel[] paraArrayPorIndice(int inicio, int fim) {
+		if (inicio < 0) {
+			throw new IllegalArgumentException(
+				"\nÍndice de inicio (" + inicio + ") inválido."
+			);
+		}
+		if (fim > tamanho()) {
+			throw new IllegalArgumentException(
+				"\nÍndice de fim (" + fim + ") inválido."
+			);
+		}
+		if (inicio >= fim) {
+			throw new IllegalArgumentException(
+				"\nÍndice de inicio (" + inicio + ") deve ser menor que índice de fim (" + fim + ")." 
+			);
+		}
+
+		final int n = fim - inicio;
+		Variavel[] arr = new Variavel[n];
+		for (int i = 0; i < n; i++) {
+			arr[i] = dados[i+inicio];// por padrão compartilhar variáveis.
+		}
+
+		return arr;
 	}
 
 	/**

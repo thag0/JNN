@@ -8,35 +8,17 @@ import jnn.core.tensor.Tensor;
 import lib.ged.Ged;
 import lib.geim.Geim;
 
-import java.text.DecimalFormat;
-import java.util.concurrent.TimeUnit;
-
-public class Playground{
+public class Playground {
 	static Ged ged = new Ged();
 	static OpArray oparr = new OpArray();
 	static OpTensor optensor = new OpTensor();
 	static Geim geim = new Geim();
 	static Utils utils = new Utils();
 
-	public static void main(String[] args){
+	public static void main(String[] args) {
 		ged.limparConsole();
 
-		int linA = 10;
-		int colB = 10;
-		int k = 200;
-		Tensor a = new Tensor(linA, k);
-		Tensor b = new Tensor(k, colB);
-		Tensor c = new Tensor(linA, colB);
-
-		a.aplicar(x -> randn());
-		b.aplicar(x -> randn());
-
-		long t;
-		t = medirTempo(() -> optensor.matMult(a, b, c));
-		System.out.println("Tempo: " + new DecimalFormat().format(t) + " ns");
-	
-		Tensor r = optensor.matMult(a, b);
-		System.out.println("esperado: " + r.equals(c));
+		testeConv2dFull();
 	}
 
 	static double randn() {
@@ -85,7 +67,7 @@ public class Playground{
 	/**
      * Testes
      */
-	static void testeConv2dFull(){
+	static void testeConv2dFull() {
 		double[][] a = {
 			{1, 6, 2},
 			{5, 3, 1},
@@ -99,10 +81,8 @@ public class Playground{
 		Tensor t1 = new Tensor(a);
 		Tensor t2 = new Tensor(b);
 		Tensor t3 = new Tensor(4, 4);
-		long tempo = medirTempo(
-			() -> optensor.convolucao2DFull(t1, t2, t3)//implementar conv2dfull usando tres tensores
-		);
-		
+		optensor.convolucao2DFull(t1, t2, t3);
+				
 		Tensor esperado = new Tensor(new double[][]{
 			{1, 8, 14, 4},
 			{4, 7, 5, 2},
@@ -112,7 +92,6 @@ public class Playground{
 
 		t3.print();
 		System.out.println("Resultado esperado: " + t3.equals(esperado));
-		System.out.println("Tempo: " + TimeUnit.NANOSECONDS.toMillis(tempo) + "ms");
 	}
 
     /**
@@ -120,7 +99,7 @@ public class Playground{
      * @param func função.
      * @return tempo em nanosegundos.
      */
-	static long medirTempo(Runnable func){
+	static long medirTempo(Runnable func) {
 		long t = System.nanoTime();
 		func.run();
 		return System.nanoTime() - t;
