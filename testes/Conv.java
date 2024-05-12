@@ -34,23 +34,23 @@ public class Conv{
 		Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + nomeModelo + ".nn");
 		// modelo.info();
 
-		testarPrevisao(modelo, "treino/3/img_1", true);
-		testarPrevisao(modelo, "3_deslocado", true);
+		// testarPrevisao(modelo, "treino/3/img_1", true);
+		// testarPrevisao(modelo, "3_deslocado", true);
 
 		// testarAcertosMNIST(modelo);
 		// testarTodosDados(modelo);
 
-		// Dados forward = tempoForward(modelo);//media 30/40 ms
-		// Dados backward = tempoBackward(modelo);//media 20/25 ms
+		Dados forward = tempoForward(modelo);//media 30/40 ms
+		Dados backward = tempoBackward(modelo);//media 20/25 ms
 		// forward = ged.filtrar(forward, 1, "Convolucional");
 		// backward = ged.filtrar(backward, 1, "Convolucional");
-		// forward.print();
-		// backward.print();
+		forward.print();
+		backward.print();
 
 		// testarForward();
 		// testarBackward();
 
-		tempoOtimizador(modelo);
+		// tempoOtimizador(modelo);
 	}
 
 	static void testarAcertosMNIST(Sequencial modelo){

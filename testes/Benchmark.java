@@ -19,27 +19,14 @@ public class Benchmark{
 		Ged ged = new Ged();
 		ged.limparConsole();
 
-		// int[] formEntrada = {1, 28, 28};
-		// int[] formFiltro = {3, 3};
-		// int numFiltros = 18;
-		// Convolucional conv = new Convolucional(formEntrada, formFiltro, numFiltros, "leaky-relu");
-
-		// Tensor4D entrada = new Tensor4D(conv.entrada.shape());
-		// entrada.map(x -> Math.random());
-
-		// long tempo = 0;
-		// tempo = medirTempo(() -> conv.forward(entrada));
-		
-		// System.out.println("Tempo: " + TimeUnit.NANOSECONDS.toMillis(tempo) + " ms");
-
-		// --------------------------------------------------------
-		int[] formEntrada = {16, 26, 26};
+		int[] formEntrada = {2, 28, 28};
 		int[] formFitlro = {3, 3};
-		int filtros = 20;
+		int filtros = 16;
 
-		convForward(formEntrada, formFitlro, filtros);// 16ms ~ 30ms
+		convForward(formEntrada, formFitlro, filtros);
 		testarForward();
-		// convBackward(formEntrada, formFitlro, filtros);// 38ms ~ 54ms
+		convBackward(formEntrada, formFitlro, filtros);
+
 	}
 
 	/**

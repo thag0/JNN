@@ -226,17 +226,17 @@ public class OpTensor {
 			);
 		}
 
-		//vetorização para melhor performance
-		double soma;					
-		final int n = colA;
-		Variavel[] dataA = a.paraArray();
-		Variavel[] dataB = b.paraArray();
+		//vetorização para melhor performance				
+		double[] dataA = a.paraArrayDouble();
+		double[] dataB = b.paraArrayDouble();
 		Variavel[] dataD = dest.paraArray();
+		
+		final int n = colA;
 		for (int i = 0; i < linA; i++) {
 			for (int j = 0; j < colB; j++) {
-				soma = 0.0d;
+				double soma = 0.0d;
 				for (int k = 0; k < n; k++) {
-					soma += dataA[i * colA + k].get() * dataB[k * colB + j].get();
+					soma += dataA[i * colA + k] * dataB[k * colB + j];
 				}
 				dataD[i * colD + j].set(soma);
 			}
@@ -313,19 +313,27 @@ public class OpTensor {
 				"recebido " + saida.shapeStr()
 			);
 		}
-	
-		double soma;
+
+		final int altKernel = shapeK[0];
+		final int largKernel = shapeK[1];
+
+		// vetorização para melhorar o desempenho
+		double[] dataE = entrada.paraArrayDouble();
+		double[] dataK = kernel.paraArrayDouble();
+		Variavel[] dataS = saida.paraArray();
+
 		for (int i = 0; i < altEsperada; i++) {
 			for (int j = 0; j < largEsperada; j++) {
-				soma = 0.0d;
-				for (int k = 0; k < shapeK[0]; k++) {
-					for (int l = 0; l < shapeK[1]; l++) {
-						soma += entrada.get(k+i, l+j) * kernel.get(k, l);
+				double soma = 0.0;
+				for (int k = 0; k < altKernel; k++) {
+					for (int l = 0; l < largKernel; l++) {
+						soma += dataE[(k + i) * shapeE[1] + (l + j)] * dataK[k * shapeK[1] + l];
 					}
 				}
-				saida.set(soma, i, j);
+				dataS[i * largEsperada + j].set(soma);
 			}
 		}
+
 	}
 
 	/**
@@ -398,24 +406,35 @@ public class OpTensor {
 				"recebido " + saida.shapeStr()
 			);
 		}
+
+		final int altEntrada = shapeE[0];
+		final int largEntrada = shapeE[1];
+		final int altKernel = shapeK[0];
+		final int largKernel = shapeK[1];
+
+		// vetorização para melhorar o desempenho
+		double[] dataE = entrada.paraArrayDouble();
+		double[] dataK = kernel.paraArrayDouble();
+		Variavel[] dataS = saida.paraArray();
 	
 		for (int i = 0; i < altEsperada; i++) {
 			for (int j = 0; j < largEsperada; j++) {
-				double soma = 0.0d;
-				for (int m = 0; m < shapeK[0]; m++) {
-					int inputRow = i - m;
-					if (inputRow >= 0 && inputRow < shapeE[0]) {
-						for (int n = 0; n < shapeK[1]; n++) {
-							int inputCol = j - n;
-							if (inputCol >= 0 && inputCol < shapeE[1]) {
-								soma += kernel.get(m, n) * entrada.get(inputRow, inputCol);
+				double soma = 0.0;
+				for (int m = 0; m < altKernel; m++) {
+					int linEntrada = i - m;
+					if (linEntrada >= 0 && linEntrada < altEntrada) {
+						for (int n = 0; n < largKernel; n++) {
+							int colEntrada = j - n;
+							if (colEntrada >= 0 && colEntrada < largEntrada) {
+								soma += dataK[m * largKernel + n] * dataE[linEntrada * largEntrada + colEntrada];
 							}
 						}
 					}
 				}
-				saida.set(soma, i, j);
+				dataS[i * largEsperada + j].set(soma);
 			}
 		}
+
 	}
 
 	/**
