@@ -3,8 +3,6 @@ package jnn.otimizadores;
 import jnn.camadas.Camada;
 import jnn.core.tensor.Variavel;
 
-//TODO verificar insconsistências quando usado com a ativação Sigmoid
-
 /**
  * <h2>
  *    Adaptive Moment Estimation
@@ -84,7 +82,7 @@ public class Adam extends Otimizador {
 	/**
 	 * Valor padrão para epsilon.
 	 */
-	private static final double PADRAO_EPS = 1e-7;
+	private static final double PADRAO_EPS = 1e-8;
 
 	/**
 	 * Valor de taxa de aprendizagem do otimizador.
@@ -263,8 +261,8 @@ public class Adam extends Otimizador {
 			mid = m[id].get();
 			vid = v[id].get();
 
-			m[id].add((1 - beta1) * (g    - mid));
-			v[id].add((1 - beta2) + (((g*g) - vid)));  
+			m[id].add((1 - beta1) * (g      - mid));
+			v[id].add((1 - beta2) * (((g*g) - vid)));  
 			vars[i].sub((alfa * mid) / (Math.sqrt(vid) + epsilon));
 		
 			id++;

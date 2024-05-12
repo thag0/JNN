@@ -56,7 +56,7 @@ public class Classificador{
 			new Densa(qSaidas, "softmax")
 		});
 
-		modelo.compilar("nadam", "entropia-cruzada");
+		modelo.compilar("adam", "entropia-cruzada");
 		modelo.setHistorico(true);
 		modelo.print();
 		

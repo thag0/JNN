@@ -19,7 +19,7 @@ public class MainImg {
 	static Ged ged = new Ged();
 	static Geim geim = new Geim();
 	static Utils utils = new Utils();
-	static final int EPOCAS = 8*1000;
+	static final int EPOCAS = 2*1000;
 	static final double ESCALA_RENDER = 9;
 	static boolean calcularHistorico = true;
 	static final String CAMINHO_HISTORICO = "historico-perda";
@@ -90,7 +90,7 @@ public class MainImg {
 			new Densa(saidas, "sigmoid")
 		});
 
-		modelo.compilar(new SGD(0.01, 0.9), "mse");
+		modelo.compilar("adam", "mse");
 		modelo.setHistorico(calcularHistorico);
 
 		return modelo;
