@@ -1,7 +1,6 @@
 package jnn.ativacoes;
 
 import jnn.camadas.Densa;
-import jnn.core.tensor.Variavel;
 
 /**
  * Implementação da função de ativação Sigmóide para uso dentro 
@@ -29,14 +28,14 @@ public class Sigmoid extends Ativacao {
 	@Override
 	public void backward(Densa densa) {
 		//aproveitar os resultados pre calculados
-		Variavel[] s = densa._saida.paraArray();
-		Variavel[] g = densa._gradSaida.paraArray();
+		double[] s = densa._saida.paraArrayDouble();
+		double[] g = densa._gradSaida.paraArrayDouble();
 		double[] d = new double[s.length];
 
 		double ei;
 		for (int i = 0; i < d.length; i++) {
-			ei = s[i].get();
-			d[i] = (ei*(1 - ei)) * g[i].get();
+			ei = s[i];
+			d[i] = (ei*(1 - ei)) * g[i];
 		}
 
 		densa._gradSaida.copiarElementos(d);
