@@ -91,7 +91,7 @@ public class MainConv {
 			new Convolucional(new int[]{3, 3}, 20, "relu"),
 			new MaxPooling(new int[]{2, 2}),
 			new Flatten(),
-			new Densa(100, "sigmoid"),
+			new Densa(120, "sigmoid"),
 			new Densa(NUM_DIGITOS_TREINO, "softmax")
 		);
 
