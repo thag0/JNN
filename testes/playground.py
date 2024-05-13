@@ -4,9 +4,9 @@ import os
 
 os.system('cls')
 
-linA = 10
-colB = 10
-k = 200
+linA = 40
+colB = 40
+k = 40
 
 a = np.random.randn(linA, k)
 b = np.random.randn(k, colB)

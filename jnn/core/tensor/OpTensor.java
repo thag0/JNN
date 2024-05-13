@@ -133,21 +133,7 @@ public class OpTensor {
 	
 		Tensor res = linA == 1 ? new Tensor(colB) : new Tensor(linA, colB);
 		
-		//vetorização para melhor performance				
-		double[] dataA = a.paraArrayDouble();
-		double[] dataB = b.paraArrayDouble();
-		Variavel[] dataD = res.paraArray();
-		
-		int n = colA;
-		for (int i = 0; i < linA; i++) {
-			for (int j = 0; j < colB; j++) {
-				double soma = 0.0d;
-				for (int k = 0; k < n; k++) {
-					soma += dataA[i * colA + k] * dataB[k * colB + j];
-				}
-				dataD[i * colB + j].set(soma);
-			}
-		}
+		matMult(a, b, res);
 	
 		return res;
 	}
@@ -228,26 +214,10 @@ public class OpTensor {
 		
 		int alt  = shapeE[0] - shapeK[0] + 1;
 		int larg = shapeE[1] - shapeK[1] + 1;
-		
 		Tensor saida = new Tensor(alt, larg);
-		
-		final int altKernel = shapeK[0];
-		final int largKernel = shapeK[1];
-		double[] dataE = entrada.paraArrayDouble();
-		double[] dataK = kernel.paraArrayDouble();
-		Variavel[] dataS = saida.paraArray();
-		for (int i = 0; i < alt; i++) {
-			for (int j = 0; j < larg; j++) {
-				double soma = 0.0;
-				for (int k = 0; k < altKernel; k++) {
-					for (int l = 0; l < largKernel; l++) {
-						soma += dataE[(k + i) * shapeE[1] + (l + j)] * dataK[k * shapeK[1] + l];
-					}
-				}
-				dataS[i * larg + j].set(soma);
-			}
-		}
-	
+
+		correlacao2D(entrada, kernel, saida);
+
 		return saida;
 	}
 
@@ -282,6 +252,7 @@ public class OpTensor {
 
 		final int altKernel = shapeK[0];
 		final int largKernel = shapeK[1];
+		final int largEntrada = shapeE[1];
 
 		// vetorização para melhorar o desempenho
 		double[] dataE = entrada.paraArrayDouble();
@@ -290,13 +261,14 @@ public class OpTensor {
 
 		for (int i = 0; i < altEsperada; i++) {
 			for (int j = 0; j < largEsperada; j++) {
+				final int idSaida = i * largEsperada + j;
 				double soma = 0.0;
 				for (int k = 0; k < altKernel; k++) {
 					for (int l = 0; l < largKernel; l++) {
-						soma += dataE[(k + i) * shapeE[1] + (l + j)] * dataK[k * shapeK[1] + l];
+						soma += dataE[(k + i) * largEntrada + (l + j)] * dataK[k * largKernel + l];
 					}
 				}
-				dataS[i * largEsperada + j].set(soma);
+				dataS[idSaida].set(soma);
 			}
 		}
 
@@ -319,36 +291,12 @@ public class OpTensor {
 		int[] shapeE = entrada.shape();
 		int[] shapeK = kernel.shape();
 		
-		int altSaida  = shapeE[0] + shapeK[0] - 1;
-		int largSaida = shapeE[1] + shapeK[1] - 1;
+		int alt  = shapeE[0] + shapeK[0] - 1;
+		int larg = shapeE[1] + shapeK[1] - 1;
 	
-		Tensor saida = new Tensor(altSaida, largSaida);
+		Tensor saida = new Tensor(alt, larg);
 
-		final int altEntrada = shapeE[0];
-		final int largEntrada = shapeE[1];
-		final int altKernel = shapeK[0];
-		final int largKernel = shapeK[1];
-		
-		double[] dataE = entrada.paraArrayDouble();
-		double[] dataK = kernel.paraArrayDouble();
-		Variavel[] dataS = saida.paraArray();
-		for (int i = 0; i < altSaida; i++) {
-			for (int j = 0; j < largSaida; j++) {
-				double soma = 0.0;
-				for (int m = 0; m < altKernel; m++) {
-					int linEntrada = i - m;
-					if (linEntrada >= 0 && linEntrada < altEntrada) {
-						for (int n = 0; n < largKernel; n++) {
-							int colEntrada = j - n;
-							if (colEntrada >= 0 && colEntrada < largEntrada) {
-								soma += dataK[m * largKernel + n] * dataE[linEntrada * largEntrada + colEntrada];
-							}
-						}
-					}
-				}
-				dataS[i * largSaida + j].set(soma);
-			}
-		}
+		convolucao2DFull(entrada, kernel, saida);
 	
 		return saida;
 	}
