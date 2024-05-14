@@ -1,13 +1,10 @@
 package testes;
 
-import java.text.DecimalFormat;
-
 import jnn.camadas.Convolucional;
 import jnn.core.OpArray;
 import jnn.core.Utils;
 import jnn.core.tensor.OpTensor;
 import jnn.core.tensor.Tensor;
-import jnn.inicializadores.Identidade;
 import lib.ged.Ged;
 import lib.geim.Geim;
 
@@ -21,16 +18,6 @@ public class Playground {
 	public static void main(String[] args) {
 		ged.limparConsole();
 
-		Tensor a = new Tensor(20, 40);
-		Tensor b = new Tensor(40, 40);
-		Tensor c = new Tensor(20, 40);
-
-		a.aplicar(x -> Math.random());
-		new Identidade().inicializar(b);
-
-		optensor.matMult(a, b, c);
-		Tensor res = optensor.matMult(a, b);
-		System.out.println("res esperado: " + res.equals(c));
 	}
 
 	static double randn() {

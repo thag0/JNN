@@ -1,14 +1,22 @@
 package jnn.avaliacao.metrica;
 
 import jnn.core.tensor.Tensor;
-import jnn.modelos.Modelo;
 
-public class F1Score extends Metrica{
+/**
+ * TODO
+ */
+public class F1Score extends Metrica {
+
+	/**
+	 * TODO
+	 */
+	public F1Score() {}
 	
 	@Override
-	public Tensor calcular(Modelo modelo, Tensor[] entrada, Tensor[] real) {
-		Tensor mat = super.matrizConfusao(modelo, entrada, real);
+	public Tensor calcular(Tensor[] entrada, Tensor[] real) {
+		Tensor mat = super.matrizConfusao(entrada, real);
 		double f1score = f1score(mat);
+
 		return new Tensor(new double[]{ f1score }, 1);
 	}
 

@@ -280,6 +280,86 @@ public class OpTensor {
 	 * @param kernel {@code Tensor} contendo o filtro que será aplicado à entrada.
 	 * @return {@code Tensor} de destino.
 	 */
+	public Tensor convolucao2D(Tensor entrada, Tensor kernel) {
+		if (entrada.numDim() != 2 || kernel.numDim() != 2) {
+			throw new IllegalArgumentException(
+				"\nTodos os tensores devem ter duas dimensões."
+			);
+		}
+
+		int[] shapeE = entrada.shape();
+		int[] shapeK = kernel.shape();
+		
+		int alt  = shapeE[0] - shapeK[0] + 1;
+		int larg = shapeE[1] - shapeK[1] + 1;
+		Tensor res = new Tensor(alt, larg);
+
+		convolucao2D(entrada, kernel, res);
+
+		return res;
+	}
+
+	/**
+	 * Realiza a operação de convolução entre o tensor de entrada e o kernel.
+	 * @param entrada {@code Tensor} contendo os dados de entrada.
+	 * @param kernel {@code Tensor} contendo o filtro que será aplicado à entrada.
+	 * @param saida {@code Tensor} de destino.
+	 */
+	public void convolucao2D(Tensor entrada, Tensor kernel, Tensor saida) {
+		if (entrada.numDim() != 2 || kernel.numDim() != 2 || saida.numDim() != 2) {
+			throw new IllegalArgumentException(
+				"\nTodos os tensores devem ter duas dimensões."
+			);
+		}
+	
+		int[] shapeE = entrada.shape();
+		int[] shapeK = kernel.shape();
+		int[] shapeS = saida.shape();
+		
+		int altEsperada  = shapeE[0] - shapeK[0] + 1;
+		int largEsperada = shapeE[1] - shapeK[1] + 1;
+	
+		int altSaida = shapeS[0];
+		int largSaida = shapeS[1];
+		if (altSaida != altEsperada || largSaida != largEsperada) {
+			throw new IllegalArgumentException(
+				"\nDimensão de saída esperada (" + altEsperada + ", " + largEsperada + "), mas" +
+				" recebido " + saida.shapeStr()
+			);
+		}
+	
+		final int altKernel = shapeK[0];
+		final int largKernel = shapeK[1];
+		final int largEntrada = shapeE[1];
+	
+		// vetorização para melhorar o desempenho
+		double[] dataE = entrada.paraArrayDouble();
+		double[] dataK = kernel.paraArrayDouble();
+		Variavel[] dataS = saida.paraArray();
+	
+		for (int i = 0; i < altEsperada; i++) {
+			for (int j = 0; j < largEsperada; j++) {
+				final int idSaida = i * largEsperada + j;
+				double soma = 0.0;
+				for (int k = 0; k < altKernel; k++) {
+					for (int l = 0; l < largKernel; l++) {
+						soma += 
+						dataE[(k + i) * largEntrada + (l + j)] * 
+						dataK[(altKernel - 1 - k) * largKernel + (largKernel - 1 - l)];
+					}
+				}
+				dataS[idSaida].set(soma);
+			}
+		}
+		
+	}
+
+	/**
+	 * Realiza a operação de convolução entre o tensor de entrada e o kernel.
+	 * @param entrada {@code Tensor} contendo os dados de entrada.
+	 * @param kernel {@code Tensor} contendo o filtro que será aplicado à entrada.
+	 * @return {@code Tensor} de destino.
+	 */
 	public Tensor convolucao2DFull(Tensor entrada, Tensor kernel) {
 		if (entrada.numDim() != 2 || kernel.numDim() != 2) {
 			throw new IllegalArgumentException(

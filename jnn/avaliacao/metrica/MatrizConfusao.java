@@ -1,7 +1,6 @@
 package jnn.avaliacao.metrica;
 
 import jnn.core.tensor.Tensor;
-import jnn.modelos.Modelo;
 
 /**
  * Calcula a matriz de confusão para avaliação de modelos de classificação.
@@ -14,10 +13,14 @@ import jnn.modelos.Modelo;
  */
 public class MatrizConfusao extends Metrica {
 
+	/**
+	 * TODO
+	 */
 	public MatrizConfusao() {}
 
 	@Override
-	public Tensor calcularMatriz(Modelo modelo, Tensor[] entrada, Tensor[] saidas) {
-		return super.matrizConfusao(modelo, entrada, saidas);
-	} 
+	public Tensor calcular(Tensor[] prev, Tensor[] real) {
+		return super.matrizConfusao(prev, real);
+	}
+
 }

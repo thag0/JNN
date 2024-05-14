@@ -16,6 +16,7 @@ public class Avaliador {
 	Acuracia acuracia = new Acuracia();
 	MatrizConfusao matrizConfusao = new MatrizConfusao();
 	F1Score f1Score = new F1Score();
+	MatrizConfusao mc = new MatrizConfusao();
 	MSE emq = new MSE();
 	MAE ema = new MAE();
 	MSLE emql = new MSLE();   
@@ -127,7 +128,8 @@ public class Avaliador {
 	 * @return {@code Tensor} contendo o resultado.
 	 */
 	public Tensor acuracia(Tensor[] entrada, Tensor[] real) {
-		return acuracia.calcular(modelo, entrada, real);
+		Tensor[] prevs = modelo.forwards(entrada); 
+		return acuracia.calcular(prevs, real);
 	}
 
 	/**
@@ -202,7 +204,8 @@ public class Avaliador {
 	 * @return {@code Tensor} contendo o resultado.
 	 */
 	public Tensor matrizConfusao(Tensor[] entrada, Tensor[] saidas) {
-		return matrizConfusao.calcularMatriz(modelo, entrada, saidas);
+		Tensor[] prevs = modelo.forwards(entrada);
+		return mc.calcular(prevs, saidas);
 	}
 
 	/**
@@ -218,6 +221,7 @@ public class Avaliador {
 	 * @return {@code Tensor} contendo o resultado.
 	 */
 	public Tensor f1Score(Tensor[] entrada, Tensor[] real) {
-		return f1Score.calcular(this.modelo, entrada, real);
+		Tensor[] prevs = modelo.forwards(entrada);
+		return f1Score.calcular(prevs, real);
 	}
 }

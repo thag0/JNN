@@ -2,7 +2,6 @@ package jnn.avaliacao.metrica;
 
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
-import jnn.modelos.Modelo;
 
 /**
  * Classe genérica para cálculos de métricas de avaliação dos modelos.
@@ -18,30 +17,27 @@ abstract class Metrica {
 	Utils utils = new Utils();
 
 	/**
-	 * Calcula a métrica de avaliação configurada.
-	 * @param modelo modelo desejado.
-	 * @param entrada {@code Tensores} com dados de entrada para o modelo.
-	 * @param real {@code Tensores} com dados reais.
-	 * @return {@code Tensor} contendo o resultado.
+	 * Verifica se os dados previstos e reais possuem a mesma quantidade
+	 * de amostras.
+	 * @param p {@code Tensores} com dados previstos.
+	 * @param r {@code Tensores} com dados reais (rótulos).
 	 */
-	public Tensor calcular(Modelo modelo, Tensor[] entrada, Tensor[] saida) {
-		throw new UnsupportedOperationException(
-			"É necessário implementar a métrica de avaliação do modelo."
-		);
+	protected void validarDados(Tensor[] p, Tensor[] r) {
+		if (p.length != r.length) {
+			throw new IllegalArgumentException(
+				"\nQuantidade de amostras preditas (" + p.length + ") " +
+				"e rótulos (" + r.length + ") devem ser iguais."
+			);
+		}
 	}
 
 	/**
-	 * Calcula a matriz de confusão de acordo com as previsões do modelo.
-	 * @param modelo modelo desejado.
-	 * @param entrada {@code Tensores} com dados de entrada para o modelo.
+	 * Calcula a métrica de avaliação configurada.
+	 * @param prev {@code Tensores} com dados previstos.
 	 * @param real {@code Tensores} com dados reais.
 	 * @return {@code Tensor} contendo o resultado.
 	 */
-	public Tensor calcularMatriz(Modelo modelo, Tensor[] entrada, Tensor[] real) {
-		throw new UnsupportedOperationException(
-			"É necessário implementar a métrica de avaliação do modelo."
-		);
-	}
+	public abstract Tensor calcular(Tensor[] prev, Tensor[] real);
 
 	/**
 	 * <p>
@@ -97,51 +93,27 @@ abstract class Metrica {
 	 * <p>
 	 *    Auxiliar.
 	 * </p>
-	 * Encontra o índice com o maior valor contido no array fornecido
-	 * @param arr array contendo os dados
-	 * @return índice com o maior valor contido nos dados.
-	 */
-	protected int indiceMaiorValor(Double[] arr) {
-		int maiorId = 0;
-		double maiorVal = arr[0];
-  
-		for (int i = 1; i < arr.length; i++) {
-			if (arr[i] > maiorVal) {
-				maiorVal = arr[i];
-				maiorId = i;
-			}
-		}
-  
-		return maiorId;
-	}
-
-	/**
-	 * <p>
-	 *    Auxiliar.
-	 * </p>
 	 * Calcula a matriz de confusão.
 	 * @param modelo modelo para avaliar.
 	 * @param entradas conjunto de entradas.
-	 * @param saidas conjunto de saídas.
+	 * @param real conjunto de saídas.
 	 * @return matríz de confusão calculada.
 	 */
-	protected Tensor matrizConfusao(Modelo modelo, Tensor[] entrada, Tensor[] saidas) {
-		Tensor[] prevs = modelo.forwards(entrada);
-
-		if (prevs[0].numDim() != 1) {
+	protected Tensor matrizConfusao(Tensor[] prev, Tensor[] real) {
+		if (prev[0].numDim() != 1 || real[0].numDim() != 1) {
 			throw new UnsupportedOperationException(
-				"\nO modelo deve prever apenas dados de uma dimensão (arrays)."
+				"\nSuporte apenas parra tensores 1D."
 			);
 		}
 
-		int nClasses = prevs[0].tamanho();
+		int nClasses = prev[0].tamanho();
 		Tensor matriz = new Tensor(nClasses, nClasses);
 
-		for (int i = 0; i < prevs.length; i++) {
-			int previsto = indiceMaiorValor(prevs[i]);
-			int real = indiceMaiorValor(saidas[i]);
-			double val = matriz.get(real, previsto);
-			matriz.set((val += 1), real, previsto);
+		for (int i = 0; i < prev.length; i++) {
+			int previsto = indiceMaiorValor(prev[i]);
+			int rotulo = indiceMaiorValor(real[i]);
+			double val = matriz.get(rotulo, previsto);
+			matriz.set((val += 1), rotulo, previsto);
 		}
 
 		return matriz;
