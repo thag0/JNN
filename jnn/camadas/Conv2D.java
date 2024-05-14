@@ -638,7 +638,7 @@ public class Conv2D extends Camada implements Cloneable {
 		//zerar os valores calculados anteiormente
 		_somatorio.preencher(0.0d);
 
-		optensor.convForward(_entrada, _filtros, _somatorio);
+		optensor.conv2DForward(_entrada, _filtros, _somatorio);
 		
 		// TODO melhorar isso usando broadcasting de tensores
 		if (usarBias) {
@@ -705,7 +705,7 @@ public class Conv2D extends Camada implements Cloneable {
 		Tensor tempGrad = new Tensor(_gradFiltros.shape());
 		_gradEntrada.preencher(0.0d);
 		
-		optensor.convBackward(_entrada, _filtros, _gradSaida, tempGrad, _gradEntrada);
+		optensor.conv2DBackward(_entrada, _filtros, _gradSaida, tempGrad, _gradEntrada);
 		_gradFiltros.add(tempGrad);
 
 		if (usarBias) {

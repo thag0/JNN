@@ -3,8 +3,6 @@ package testes;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import java.text.DecimalFormat;
-
 import jnn.camadas.Conv2D;
 import jnn.core.tensor.OpTensor;
 import jnn.core.tensor.Tensor;
@@ -14,28 +12,21 @@ import jnn.inicializadores.Inicializador;
 import jnn.inicializadores.Zeros;
 import lib.ged.Ged;
 
-public class Benchmark{
+public class Benchmark {
 	static OpTensor optensor = new OpTensor();
 
 	public static void main(String[] args){
 		Ged ged = new Ged();
 		ged.limparConsole();
 
-		// int[] formEntrada = {16, 26, 26};
-		// int[] formFitlro = {3, 3};
-		// int filtros = 20;
+		int[] formEntrada = {16, 26, 26};
+		int[] formFitlro = {3, 3};
+		int filtros = 20;
 
 		// convForward(formEntrada, formFitlro, filtros);
 		// testarForward();
-		// convBackward(formEntrada, formFitlro, filtros);
-		// testarBackward();
-
-		Tensor a = new Tensor(28, 28);
-		Tensor b = new Tensor(3, 3);
-		Tensor c = new Tensor(26, 26);
-
-		long t = medirTempo(() -> optensor.correlacao2D(a, b, c));
-		System.out.println("tempo: " + new DecimalFormat().format(t) + " ns");//220.000~s240.000 ns
+		convBackward(formEntrada, formFitlro, filtros);
+		testarBackward();
 	}
 
 	static double randn() {

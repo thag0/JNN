@@ -446,7 +446,7 @@ public class OpTensor {
 	 * @param kernel {@code Tensor} contendos o kernel/filtros da camada.
 	 * @param saida {@code Tensor} de destino do resultado.
 	 */
-	public void convForward(Tensor entrada, Tensor kernel, Tensor saida) {
+	public void conv2DForward(Tensor entrada, Tensor kernel, Tensor saida) {
 		int[] shapeE = entrada.shape();
 		int[] shapeK = kernel.shape();
 		int[] shapeS = saida.shape();
@@ -507,7 +507,7 @@ public class OpTensor {
 	 * @param gradK {@code Tensor} contendo o gradiente em relação ao kernel/filtros da camada.
 	 * @param gradE {@code Tensor} contendo o gradiente em relação à entrada da camada.
 	 */
-	public void convBackward(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Tensor gradE) {
+	public void conv2DBackward(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Tensor gradE) {
 		int[] shapeE = entrada.shape();
 		int[] shapeK = kernel.shape();
 		int[] shapeS = gradS.shape();
