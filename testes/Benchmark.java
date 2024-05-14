@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import java.text.DecimalFormat;
 
-import jnn.camadas.Convolucional;
+import jnn.camadas.Conv2D;
 import jnn.core.tensor.OpTensor;
 import jnn.core.tensor.Tensor;
 import jnn.inicializadores.GlorotNormal;
@@ -56,7 +56,7 @@ public class Benchmark{
 		final Inicializador iniKernel = new GlorotNormal(seed);
 		final Inicializador iniBias = new GlorotNormal(seed);
 
-		Convolucional conv = new Convolucional(
+		Conv2D conv = new Conv2D(
 			formatoEntrada, formatoFiltro, filtros, ativacao, iniKernel, iniBias
 		);
 		conv.inicializar();
@@ -95,7 +95,7 @@ public class Benchmark{
 		final Inicializador iniKernel = new GlorotNormal(seed);
 		final Inicializador iniBias = new GlorotNormal(seed);
 
-		Convolucional conv = new Convolucional(
+		Conv2D conv = new Conv2D(
 			formatoEntrada, formatoFiltro, filtros, ativacao, iniKernel, iniBias
 		);
 		conv.inicializar();
@@ -144,7 +144,7 @@ public class Benchmark{
 		int[] formEntrada = {12, 16, 16};
 		Inicializador iniKernel = new GlorotUniforme(12345);
 		Inicializador iniBias = new Zeros();
-		Convolucional conv = new Convolucional(formEntrada, new int[]{3, 3}, 16, "linear", iniKernel, iniBias);
+		Conv2D conv = new Conv2D(formEntrada, new int[]{3, 3}, 16, "linear", iniKernel, iniBias);
 		conv.inicializar();
 
 		Tensor entrada = new Tensor(conv.formatoEntrada());
@@ -196,7 +196,7 @@ public class Benchmark{
 		int[] formEntrada = {16, 16, 16};
 		Inicializador iniKernel = new GlorotUniforme(12345);
 		Inicializador iniBias = new Zeros();
-		Convolucional conv = new Convolucional(formEntrada, new int[]{3, 3}, 16, "linear", iniKernel, iniBias);
+		Conv2D conv = new Conv2D(formEntrada, new int[]{3, 3}, 16, "linear", iniKernel, iniBias);
 		conv.inicializar();
 
 		Tensor amostra = new Tensor(conv.formatoEntrada());

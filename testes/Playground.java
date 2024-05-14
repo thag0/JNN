@@ -1,6 +1,6 @@
 package testes;
 
-import jnn.camadas.Convolucional;
+import jnn.camadas.Conv2D;
 import jnn.core.OpArray;
 import jnn.core.Utils;
 import jnn.core.tensor.OpTensor;
@@ -40,7 +40,7 @@ public class Playground {
 			 2,  1,
 		};
 		
-		Convolucional conv = new Convolucional(new int[]{1, 3, 3}, new int[]{2, 2}, 2, "linear");
+		Conv2D conv = new Conv2D(new int[]{1, 3, 3}, new int[]{2, 2}, 2, "linear");
 		conv.kernel().copiarElementos(exemploFiltro);
 
 		Tensor amostra = new Tensor(exemploEntrada);

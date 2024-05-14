@@ -2,7 +2,7 @@ package jnn.ativacoes;
 
 import java.util.function.DoubleUnaryOperator;
 
-import jnn.camadas.Convolucional;
+import jnn.camadas.Conv2D;
 import jnn.camadas.Densa;
 import jnn.core.tensor.Tensor;
 
@@ -116,7 +116,7 @@ public abstract class Ativacao {
 	 * </p>
 	 * @param camada camada convolucional.
 	 */
-	public void backward(Convolucional camada) {
+	public void backward(Conv2D camada) {
 		//por padrão chamar o método da própria ativação
 		backward(camada._somatorio, camada._gradSaida, camada._gradSaida);
 	}

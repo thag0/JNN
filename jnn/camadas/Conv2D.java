@@ -36,7 +36,7 @@ import jnn.inicializadores.Zeros;
  * verdadeira operação de convolução tem a peculiaridade de rotacionar o filtro 180° 
  * antes de ser executada.
  */
-public class Convolucional extends Camada implements Cloneable {
+public class Conv2D extends Camada implements Cloneable {
 
 	/**
 	 * Operador de tensores para a camada.
@@ -224,7 +224,7 @@ public class Convolucional extends Camada implements Cloneable {
 	 * @param iniKernel inicializador para os filtros.
 	 * @param iniBias inicializador para os bias.
 	 */
-	public Convolucional(int[] entrada, int[] filtro, int filtros, Object ativacao, Object iniKernel, Object iniBias) {
+	public Conv2D(int[] entrada, int[] filtro, int filtros, Object ativacao, Object iniKernel, Object iniBias) {
 		this(filtro, filtros, ativacao, iniKernel, iniBias);
 
 		utils.validarNaoNulo(entrada, "\nO formato de entrada não pode ser nulo.");
@@ -273,7 +273,7 @@ public class Convolucional extends Camada implements Cloneable {
 	 * @param ativacao função de ativação.
 	 * @param iniKernel inicializador para os filtros.
 	 */
-	public Convolucional(int[] entrada, int[] filtro, int filtros, Object ativacao, Object iniKernel) {
+	public Conv2D(int[] entrada, int[] filtro, int filtros, Object ativacao, Object iniKernel) {
 		this(entrada, filtro, filtros, ativacao, iniKernel, null);
 	}
 
@@ -300,7 +300,7 @@ public class Convolucional extends Camada implements Cloneable {
 	 * @param filtros quantidade de filtros.
 	 * @param ativacao função de ativação.
 	 */
-	public Convolucional(int[] entrada, int[] filtro, int filtros, Object ativacao) {
+	public Conv2D(int[] entrada, int[] filtro, int filtros, Object ativacao) {
 		this(entrada, filtro, filtros, ativacao, null, null);
 	}
 
@@ -329,7 +329,7 @@ public class Convolucional extends Camada implements Cloneable {
 	 * @param filtro formato dos filtros da camada.
 	 * @param filtros quantidade de filtros.
 	 */
-	public Convolucional(int[] entrada, int[] filtro, int filtros) {
+	public Conv2D(int[] entrada, int[] filtro, int filtros) {
 		this(entrada, filtro, filtros, null, null, null);
 	}
 
@@ -357,7 +357,7 @@ public class Convolucional extends Camada implements Cloneable {
 	 * @param iniKernel inicializador para os filtros.
 	 * @param iniBias inicializador para os bias.
 	 */
-	public Convolucional(int[] filtro, int filtros, Object ativacao, Object iniKernel, Object iniBias) {
+	public Conv2D(int[] filtro, int filtros, Object ativacao, Object iniKernel, Object iniBias) {
 		utils.validarNaoNulo(filtro, "\nO formato do filtro não pode ser nulo.");
 
 		//formado dos filtros
@@ -416,7 +416,7 @@ public class Convolucional extends Camada implements Cloneable {
 	 * @param ativacao função de ativação.
 	 * @param iniKernel inicializador para os filtros.
 	 */
-	public Convolucional(int[] filtro, int filtros, Object ativacao, Object iniKernel) {
+	public Conv2D(int[] filtro, int filtros, Object ativacao, Object iniKernel) {
 		this(filtro, filtros, ativacao, iniKernel, null);
 	}
 
@@ -442,7 +442,7 @@ public class Convolucional extends Camada implements Cloneable {
 	 * @param filtros quantidade de filtros.
 	 * @param ativacao função de ativação.
 	 */
-	public Convolucional(int[] filtro, int filtros, Object ativacao) {
+	public Conv2D(int[] filtro, int filtros, Object ativacao) {
 		this(filtro, filtros, ativacao, null, null);
 	}
 
@@ -467,7 +467,7 @@ public class Convolucional extends Camada implements Cloneable {
 	 * @param filtro formato dos filtros da camada.
 	 * @param filtros quantidade de filtros.
 	 */
-	public Convolucional(int[] filtro, int filtros) {
+	public Conv2D(int[] filtro, int filtros) {
 		this(filtro, filtros, null, null, null);
 	}
 	
@@ -821,10 +821,10 @@ public class Convolucional extends Camada implements Cloneable {
 	}
 
 	@Override
-	public Convolucional clone() {
+	public Conv2D clone() {
 		verificarConstrucao();
 
-		Convolucional clone = (Convolucional) super.clone();
+		Conv2D clone = (Conv2D) super.clone();
 		clone.ativacao 	 = this.ativacao;
 		clone.usarBias   = this.usarBias;
 		clone._treinavel = this._treinavel;

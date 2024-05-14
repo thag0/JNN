@@ -2,36 +2,39 @@ package jnn.camadas;
 
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
+import jnn.core.tensor.Variavel;
 
 /**
- * <h1>
- *    Camada de agrupamento médio
- * </h1>
+ * <h2>
+ *    Camada de agrupamento máximo
+ * </h2>
  * <p>
- *    A camada de agrupamento médio é um componente utilizado para reduzir a 
+ *    A camada de agrupamento máximo é um componente utilizado para reduzir a 
  *    dimensionalidade espacial dos dados, preservando as características mais 
  *    importantes para a saída.
  * </p>
  * <p>
- *    Durante a operação de agrupamento médio, a entrada é dividida em regiões 
- *    menores usando uma máscara e a média de cada região é calculada e salva. 
- *    Essencialmente, a camada realiza a operação de subamostragem, calculando a 
- *    média das informações em cada região.
+ *    Durante a operação de agrupamento máximo, a entrada é dividida em regiões 
+ *    menores usando uma márcara e o valor máximo de cada região é salvo. 
+ *    Essencialmente, a camada realiza a operação de subamostragem, mantendo apenas 
+ *    as informações mais relevantes.
  * </p>
- * Exemplo simples de operação Avg Pooling para uma região 2x2 com máscara 2x2:
+ * Exemplo simples de operação Max Pooling para uma região 2x2 com máscara 2x2:
  * <pre>
  *entrada = [
  *    [[1, 2],
  *     [3, 4]]
  *]
  * 
- *saida = [2.5]
+ *saida = [
+ *    [4]
+ *]
  * </pre>
  * <p>
- *    A camada de avg pooling não possui parâmetros treináveis nem função de ativação.
+ *    A camada de max pooling não possui parâmetros treináveis nem função de ativação.
  * </p>
  */
-public class AvgPooling extends Camada {
+public class MaxPool2D extends Camada implements Cloneable{
 
 	/**
 	 * Utilitario.
@@ -102,25 +105,27 @@ public class AvgPooling extends Camada {
 	private int[] stride;
 
 	/**
-	 * Instancia uma nova camada de average pooling, definindo o formato do
+	 * Instancia uma nova camada de max pooling, definindo o formato do
 	 * filtro que será aplicado em cada entrada da camada.
 	 * <p>
 	 *    O formato do filtro deve conter as dimensões da entrada da
 	 *    camada (altura, largura).
 	 * </p>
 	 * <p>
-	 *    Por padrão, os valores de strides serão os mesmos usados para
+	 *    Por padrão, os valores de strides serão os mesmo usados para
 	 *    as dimensões do filtro, exemplo:
 	 * </p>
 	 * <pre>
 	 *filtro = (2, 2)
 	 *stride = (2, 2) // valor padrão
 	 * </pre>
-	 * @param formFiltro formato do filtro de average pooling.
+	 * @param formFiltro formato do filtro de max pooling.
+	 * @throws IllegalArgumentException se o formato do filtro não atender as
+	 * requisições.
 	 */
-	public AvgPooling(int[] formFiltro) {
-		utils.validarNaoNulo(formFiltro, "O formato do filtro não pode ser nulo.");
-
+	public MaxPool2D(int[] formFiltro) {
+		utils.validarNaoNulo(formFiltro, "\nO formato do filtro não pode ser nulo.");
+		
 		if (formFiltro.length != 2) {
 			throw new IllegalArgumentException(
 				"\nO formato do filtro deve conter dois elementos (altura, largura)."
@@ -141,21 +146,24 @@ public class AvgPooling extends Camada {
 	}
 
 	/**
-	 * Instancia uma nova camada de average pooling, definindo o formato do filtro 
+	 * Instancia uma nova camada de max pooling, definindo o formato do filtro 
 	 * e os strides (passos) que serão aplicados em cada entrada da camada.
 	 * <p>
 	 *    O formato do filtro e dos strides devem conter as dimensões da entrada 
 	 *    da camada (altura, largura).
 	 * </p>
-	 * @param formFiltro formato do filtro de average pooling.
+	 * @param formFiltro formato do filtro de max pooling.
 	 * @param stride strides que serão aplicados ao filtro.
+	 * @throws IllegalArgumentException se o formato do filtro não atender as
+	 * requisições.
+	 * @throws IllegalArgumentException se os strides não atenderem as requisições.
 	 */
-	public AvgPooling(int[] formFiltro, int[] stride) {
-		utils.validarNaoNulo(formFiltro, "O formato do filtro não pode ser nulo.");
+	public MaxPool2D(int[] formFiltro, int[] stride) {
+		utils.validarNaoNulo(formFiltro, "\nO formato do filtro não pode ser nulo.");
 
 		if (formFiltro.length != 2) {
 			throw new IllegalArgumentException(
-				"\nO formato do filtro deve conter dois elementos (altura, largura)."
+				"\nO formato do filtro deve conter três elementos (altura, largura)."
 			);
 		}
 
@@ -165,8 +173,8 @@ public class AvgPooling extends Camada {
 			);
 		}
 
-		utils.validarNaoNulo(stride, "O formato dos strides não pode ser nulo.");
-
+		utils.validarNaoNulo(stride, "\nO formato do filtro não pode ser nulo.");
+		
 		if (stride.length != 2) {
 			throw new IllegalArgumentException(
 				"\nO formato para os strides deve conter dois elementos (altura, largura)."
@@ -184,7 +192,7 @@ public class AvgPooling extends Camada {
 	}
 
 	/**
-	 * Instancia uma nova camada de average pooling, definindo o formato do filtro, 
+	 * Instancia uma nova camada de max pooling, definindo o formato do filtro, 
 	 * formato de entrada e os strides (passos) que serão aplicados em cada entrada 
 	 * da camada.
 	 * <p>
@@ -193,16 +201,19 @@ public class AvgPooling extends Camada {
 	 * </p>
 	 * A camada será automaticamente construída usando o formato de entrada especificado.
 	 * @param formEntrada formato de entrada para a camada.
-	 * @param formFiltro formato do filtro de average pooling.
+	 * @param formFiltro formato do filtro de max pooling.
 	 * @param stride strides que serão aplicados ao filtro.
+	 * @throws IllegalArgumentException se o formato do filtro não atender as
+	 * requisições.
+	 * @throws IllegalArgumentException se os strides não atenderem as requisições.
 	 */
-	public AvgPooling(int[] formEntrada, int[] formFiltro, int[] stride) {
+	public MaxPool2D(int[] formEntrada, int[] formFiltro, int[] stride) {
 		this(formFiltro, stride);
 		construir(formEntrada);
 	}
 
 	/**
-	 * Constroi a camada AvgPooling, inicializando seus atributos.
+	 * Constroi a camada MaxPooling, inicializando seus atributos.
 	 * <p>
 	 *    O formato de entrada da camada deve seguir o padrão:
 	 * </p>
@@ -220,11 +231,11 @@ public class AvgPooling extends Camada {
 	 */
 	@Override
 	public void construir(Object entrada) {
-		utils.validarNaoNulo(entrada, "Formato de entrada fornecido para camada " + nome() + " é nulo.");
-
+		utils.validarNaoNulo(entrada, "\nFormato de entrada fornecida para camada MaxPooling é nulo.");
+		
 		if (!(entrada instanceof int[])) {
 			throw new IllegalArgumentException(
-				"\nObjeto esperado para entrada da camada " + nome() + " é do tipo int[], " +
+				"\nObjeto esperado para entrada da camada " + nome() +" é do tipo int[], " +
 				"objeto recebido é do tipo " + entrada.getClass().getTypeName()
 			);
 		}
@@ -233,10 +244,10 @@ public class AvgPooling extends Camada {
 		if (e.length == 4) {
 			this.formEntrada = new int[]{e[1], e[2], e[3]};
 		
-		} else if (e.length == 3) {
+		}else if (e.length == 3) {
 			this.formEntrada = new int[]{e[0], e[1], e[2]};
-		
-		} else {         
+
+		}else {         
 			throw new IllegalArgumentException(
 				"\nO formato de entrada deve conter três elementos (profundidade, altura, largura) ou " +
 				"quatro elementos (primeiro elementos desconsiderado)" +
@@ -275,20 +286,20 @@ public class AvgPooling extends Camada {
 		if (entrada instanceof Tensor) {
 			Tensor e = (Tensor) entrada;
 
-			if (!(_entrada.compararShape(e))) {
+			if (!_entrada.compararShape(e)) {
 				throw new IllegalArgumentException(
 					"\nDimensões da entrada recebida " + e.shapeStr() +
-					" incompatíveis com a entrada da camada " + this._entrada.shapeStr()
+					" incompatíveis com a entrada da camada " + _entrada.shapeStr()
 				);
 			}
 
 			_entrada.copiar(e);
 			
-		} else if (entrada instanceof double[][][]) {
+		}else if (entrada instanceof double[][][]) {
 			double[][][] e = (double[][][]) entrada;
 			_entrada.copiar(e);
 
-		} else {
+		}else {
 			throw new IllegalArgumentException(
 				"\nTipo de entrada \"" + entrada.getClass().getTypeName() + "\" não suportada."
 			);
@@ -303,20 +314,20 @@ public class AvgPooling extends Camada {
 	}
 
 	/**
-	 * Calcula a média dos valores encontrados na entrada de acordo com as
+	 * Agrupa os valores máximos encontrados na entrada de acordo com as 
 	 * configurações de filtro e strides.
 	 * @param entrada tensor de entrada.
 	 * @param saida tensor de destino.
 	 * @param prof índice de profundidade da operação.
 	 */
 	private void aplicar(Tensor entrada, Tensor saida, int prof) {
-		int[] shapeE = entrada.shape();
-		int[] shapeS = saida.shape();
+		int[] shapeEntrada = entrada.shape();
+		int[] shapeSaida = saida.shape();
 
-		int altEntrada  = shapeE[shapeE.length-1];
-		int largEntrada = shapeE[shapeE.length-2];
-		int altSaida  = shapeS[shapeS.length-1];
-		int largSaida = shapeS[shapeS.length-2];
+		int altEntrada  = shapeEntrada[shapeEntrada.length-1];
+		int largEntrada = shapeEntrada[shapeEntrada.length-2];
+		int altSaida  = shapeSaida[shapeSaida.length-1];
+		int largSaida = shapeSaida[shapeSaida.length-2];
 
 		int nDims = entrada.numDim();
   
@@ -326,19 +337,17 @@ public class AvgPooling extends Camada {
 			for (int j = 0; j < largSaida; j++) {
 				int colInicio = j * stride[1];
 				int colFim = Math.min(colInicio + formFiltro[1], largEntrada);
-				double soma = 0;
-				int cont = 0;
+				double maxValor = Double.MIN_VALUE;
 
 				for (int lin = linInicio; lin < linFim; lin++) {
 					for (int col = colInicio; col < colFim; col++) {
-						soma += nDims == 2 ? entrada.get(lin, col) : entrada.get(prof, lin, col);
-						cont++;
+						double valor = (nDims == 2) ? entrada.get(lin, col) : entrada.get(prof, lin, col);
+						if (valor > maxValor) maxValor = valor;
 					}
 				}
-
-				saida.set((soma/cont), 
-					(nDims == 2) ? new int[]{i, j} : new int[]{prof, i, j})
-				;
+				saida.set(maxValor, 
+					(nDims == 2) ? new int[]{i, j} : new int[]{prof, i, j}
+				);
 			}
 		}
 	}
@@ -351,57 +360,128 @@ public class AvgPooling extends Camada {
 			Tensor g = (Tensor) grad;
 			int profundidade = formEntrada[0];   
 			for (int i = 0; i < profundidade; i++) {
-				gradAvgPool(_entrada, g, _gradEntrada, i);
+				gradMaxPool(_entrada, g, _gradEntrada, i);
 			}
 		
-		} else {
+		}else {
 			throw new IllegalArgumentException(
 				"Formato de gradiente \" "+ grad.getClass().getTypeName() +" \" não " +
-				"suportado para camada de AvgPooling."
+				"suportado para camada de MaxPooling."
 			);
 		}
 
 		return _gradEntrada;
 	}
-
+	
 	/**
-	 * Calcula e atualiza os gradientes da camada de Avg Pooling em relação à entrada.
+	 * Calcula e atualiza os gradientes da camada de Max Pooling em relação à entrada.
 	 * <p>
-	 *    Retroropaga os gradientes da camada seguinte para a camada de Avg Pooling, considerando 
-	 *    a operação de agrupamento médio. Ela calcula os gradientes em relação à entrada para as 
+	 *    Retroropaga os gradientes da camada seguinte para a camada de Max Pooling, considerando 
+	 *    a operação de agrupamento máximo. Ela calcula os gradientes em relação à entrada para as 
 	 *    camadas anteriores.
 	 * </p>
 	 * @param entrada entrada da camada.
 	 * @param gradSeguinte gradiente da camada seguinte.
-	 * @param gradEntrada gradiente de entrada da camada de Avg pooling.
+	 * @param gradEntrada gradiente de entrada da camada de max pooling.
 	 * @param prof índice de profundidade da operação.
 	 */
-	private void gradAvgPool(Tensor entrada, Tensor gradSeguinte, Tensor gradEntrada, int prof) {
-		int[] shapeE = entrada.shape();
+	 private void gradMaxPool(Tensor entrada, Tensor gradSeguinte, Tensor gradEntrada, int prof) {
+		int[] shapeEntrada = entrada.shape();
 		int[] shapeGradS = gradSeguinte.shape();
 
-		int altEntrada  = shapeE[shapeE.length-1];
-		int largEntrada = shapeE[shapeE.length-2];
-		int altGradSeguinte  = shapeGradS[shapeGradS.length-1];
-		int largGradSeguinte = shapeGradS[shapeGradS.length-2];
+		int altEntrada  = shapeEntrada[shapeEntrada.length-2];
+		int largEntrada = shapeEntrada[shapeEntrada.length-1];
 
+		int altGradSeguinte  = shapeGradS[shapeGradS.length-2];
+		int largGradSeguinte = shapeGradS[shapeGradS.length-1];
+  
 		for (int i = 0; i < altGradSeguinte; i++) {
 			int linInicio = i * stride[0];
 			int linFim = Math.min(linInicio + formFiltro[0], altEntrada);
 			for (int j = 0; j < largGradSeguinte; j++) {
 				int colInicio = j * stride[1];
 				int colFim = Math.min(colInicio + formFiltro[1], largEntrada);
-
+  
+				int[] posicaoMaximo = posicaoMaxima(entrada, prof, linInicio, colInicio, linFim, colFim);
+				int linMaximo = posicaoMaximo[0];
+				int colMaximo = posicaoMaximo[1];
+  
 				double grad = gradSeguinte.get(prof, i, j);
-				double mediaGrad = grad / (formFiltro[0] * formFiltro[1]);
-
-				for (int lin = linInicio; lin < linFim; lin++) {
-					for (int col = colInicio; col < colFim; col++) {
-						gradEntrada.set(mediaGrad, prof, lin, col);
-					}
+				gradEntrada.set(grad, prof, linMaximo, colMaximo);
+			}
+		}
+	}
+  
+  
+	/**
+	 * Encontra a posição do valor máximo em uma submatriz do tensor.
+	 * <p>
+	 *    Se houver múltiplos elementos com o valor máximo, a função retorna as coordenadas 
+	 *    do primeiro encontrado.
+	 * </p>
+	 * @param tensor tensor alvo.
+	 * @param linInicio índice inicial para linha.
+	 * @param colInicio índice final para a linha.
+	 * @param linFim índice inicial para coluna (exclusivo).
+	 * @param colFim índice final para coluna (exclusivo).
+	 * @param prof índice de profundidade da operação.
+	 * @return array representando as coordenadas (linha, coluna) do valor máximo
+	 * na submatriz.
+	 */
+	private int[] posicaoMaxima(Tensor tensor, int prof, int linInicio, int colInicio, int linFim, int colFim) {
+		int[] posMaximo = {0, 0};
+		double valMaximo = Double.NEGATIVE_INFINITY;
+  
+		for (int i = linInicio; i < linFim; i++) {
+			for (int j = colInicio; j < colFim; j++) {
+				if (tensor.get(prof, i, j) > valMaximo) {
+					valMaximo = tensor.get(prof, i, j);
+					posMaximo[0] = i;
+					posMaximo[1] = j;
 				}
 			}
 		}
+  
+		return posMaximo;
+	}
+ 
+	@Override
+	public int[] formatoEntrada() {
+		verificarConstrucao();
+		return formEntrada.clone();
+	}
+
+	@Override
+	public int[] formatoSaida() {
+		verificarConstrucao();
+		return formSaida.clone();
+	}
+
+	@Override
+	public int tamanhoSaida() {
+		verificarConstrucao();
+		return _saida.tamanho();
+	}
+
+	/**
+	 * Retorna o formato do filtro usado pela camada.
+	 * @return dimensões do filtro de pooling.
+	 */
+	public int[] formatoFiltro() {
+		return formFiltro.clone();
+	}
+		
+	/**
+	 * Retorna o formato dos strides usado pela camada.
+	 * @return dimensões dos strides.
+	 */
+	public int[] formatoStride() {
+		return stride.clone();
+	}
+
+	@Override
+	public int numParametros() {
+		return 0;
 	}
 
 	@Override
@@ -411,44 +491,9 @@ public class AvgPooling extends Camada {
 	}
 
 	@Override
-	public int[] formatoSaida() {
+	public Variavel[] saidaParaArray() {
 		verificarConstrucao();
-		return formSaida;
-	}
-
-	@Override
-	public int[] formatoEntrada() {
-		verificarConstrucao();
-		return formEntrada;
-	}
-
-	/**
-	 * Retorna o formato do filtro (altura, largura) usado pela camada.
-	 * @return formato do filtro da camada.
-	 */
-	public int[] formatoFiltro() {
-		verificarConstrucao();
-		return new int[]{
-			formFiltro[0],
-			formFiltro[1]
-		};
-	}
-
-	/**
-	 * Retorna o formato dos strides (altura, largura) usado pela camada.
-	 * @return formato dos strides da camada.
-	 */
-	public int[] formatoStride() {
-		verificarConstrucao();
-		return new int[]{
-			stride[0],
-			stride[1]
-		};
-	}
-
-	@Override
-	public int numParametros() {
-		return 0;
+		return saida().paraArray();
 	}
 
 	@Override
@@ -488,5 +533,24 @@ public class AvgPooling extends Camada {
 		
 		return sb.toString();
 	}
-	
+
+	@Override
+	public MaxPool2D clone() {
+		MaxPool2D clone = (MaxPool2D) super.clone();
+
+		clone._treinavel = this._treinavel;
+		clone.treinando = this.treinando;
+		clone._construida = this._construida;
+
+		clone.formEntrada = this.formEntrada.clone();
+		clone.formFiltro = this.formFiltro.clone();
+		clone.formSaida = this.formSaida.clone();
+		clone.stride = this.stride.clone();
+		
+		clone._entrada = this._entrada.clone();
+		clone._saida = this._saida.clone();
+		clone._gradEntrada = this._gradEntrada.clone();
+
+		return clone;
+	}
 }

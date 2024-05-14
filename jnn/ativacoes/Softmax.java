@@ -1,6 +1,6 @@
 package jnn.ativacoes;
 
-import jnn.camadas.Convolucional;
+import jnn.camadas.Conv2D;
 import jnn.camadas.Densa;
 import jnn.core.tensor.OpTensor;
 import jnn.core.tensor.Tensor;
@@ -90,7 +90,7 @@ public class Softmax extends Ativacao {
 	}
 
 	@Override
-	public void backward(Convolucional camada) {
+	public void backward(Conv2D camada) {
 		throw new UnsupportedOperationException(
 			"\nSem suporte para derivada " + nome() + " em camadas convolucionais."
 		);

@@ -3,7 +3,7 @@ package jnn.serializacao;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 
-import jnn.camadas.MaxPooling;
+import jnn.camadas.MaxPool2D;
 
 class SerialMaxPool{
 
@@ -20,7 +20,7 @@ class SerialMaxPool{
 	 * @param camada camada de max pooling que será serializada.
 	 * @param bw escritor de buffer usado para salvar os dados da camada.
 	 */
-	public void serializar(MaxPooling camada, BufferedWriter bw){
+	public void serializar(MaxPool2D camada, BufferedWriter bw){
 		try{
 			//nome da camada pra facilitar
 			bw.write(camada.nome());
@@ -64,7 +64,7 @@ class SerialMaxPool{
 	 * @param br leitor de buffer.
 	 * @return instância de uma camada max pooling.
 	 */
-	public MaxPooling lerConfig(BufferedReader br){
+	public MaxPool2D lerConfig(BufferedReader br){
 		try{
 			//formato de entrada
 			String[] sEntrada = br.readLine().split(" ");
@@ -94,7 +94,7 @@ class SerialMaxPool{
 				strides[i] = Integer.parseInt(sStrides[i]);
 			}
 
-			MaxPooling camada = new MaxPooling(filtro, strides);
+			MaxPool2D camada = new MaxPool2D(filtro, strides);
 			camada.construir(entrada);
 			return camada;
 		}catch(Exception e){

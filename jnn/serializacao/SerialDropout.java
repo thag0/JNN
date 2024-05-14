@@ -5,7 +5,7 @@ import java.io.BufferedWriter;
 
 import jnn.camadas.Dropout;
 
-class SerialDropout{
+class SerialDropout {
 	
 	/**
 	 * Transforma os dados contidos na camada Dropou numa sequência
@@ -18,15 +18,15 @@ class SerialDropout{
 	 * @param camada camada de dropout que será serializada.
 	 * @param bw escritor de buffer usado para salvar os dados da camada.
 	 */
-	public void serializar(Dropout camada, BufferedWriter bw){
-		try{
+	public void serializar(Dropout camada, BufferedWriter bw) {
+		try {
 			//nome da camada pra facilitar
 			bw.write(camada.nome());
 			bw.newLine();
 
 			//formato de entrada
 			int[] entrada = camada.formatoEntrada();
-			for(int i = 0; i < entrada.length; i++){
+			for (int i = 0; i < entrada.length; i++) {
 				bw.write(entrada[i] + " ");
 			}
 			bw.newLine();
@@ -36,7 +36,7 @@ class SerialDropout{
 			bw.write(String.valueOf(taxa));
 			bw.newLine();
 
-		}catch(Exception e){
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -46,12 +46,12 @@ class SerialDropout{
 	 * @param br leitor de buffer.
 	 * @return instância de uma camada dropout.
 	 */
-	public Dropout lerConfig(BufferedReader br){
-		try{
+	public Dropout lerConfig(BufferedReader br) {
+		try {
 			//formato de entrada
 			String[] sEntrada = br.readLine().split(" ");
 			int[] entrada = new int[sEntrada.length];
-			for(int i = 0; i < sEntrada.length; i++){
+			for (int i = 0; i < sEntrada.length; i++) {
 				entrada[i] = Integer.parseInt(sEntrada[i]);
 			}
 
@@ -61,7 +61,8 @@ class SerialDropout{
 			Dropout camada = new Dropout(taxa);
 			camada.construir(entrada);
 			return camada;
-		}catch(Exception e){
+		
+		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
 	}

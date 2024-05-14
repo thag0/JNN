@@ -7,13 +7,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 
 import jnn.avaliacao.perda.Perda;
-import jnn.camadas.AvgPooling;
+import jnn.camadas.AvgPool2D;
 import jnn.camadas.Camada;
-import jnn.camadas.Convolucional;
+import jnn.camadas.Conv2D;
 import jnn.camadas.Densa;
 import jnn.camadas.Dropout;
 import jnn.camadas.Flatten;
-import jnn.camadas.MaxPooling;
+import jnn.camadas.MaxPool2D;
 import jnn.core.Dicionario;
 import jnn.modelos.RedeNeural;
 import jnn.modelos.Sequencial;
@@ -169,17 +169,17 @@ public class Serializador {
 				if (camada instanceof Densa) {
 					auxDensa.serializar((Densa) camada, bw, tipo);
 
-				} else if (camada instanceof Convolucional) {
-					auxConv.serializar((Convolucional) camada, bw, tipo);
+				} else if (camada instanceof Conv2D) {
+					auxConv.serializar((Conv2D) camada, bw, tipo);
 				
 				} else if (camada instanceof Flatten) {
 					auxFlat.serializar((Flatten) camada, bw);
 				
-				} else if (camada instanceof MaxPooling) {
-					auxMaxPool.serializar((MaxPooling) camada, bw);
+				} else if (camada instanceof MaxPool2D) {
+					auxMaxPool.serializar((MaxPool2D) camada, bw);
 
-				} else if (camada instanceof AvgPooling) {
-					auxAvgPool.serializar((AvgPooling) camada, bw);
+				} else if (camada instanceof AvgPool2D) {
+					auxAvgPool.serializar((AvgPool2D) camada, bw);
 
 				} else if (camada instanceof Dropout) {
 					auxDropout.serializar((Dropout) camada, bw);
@@ -283,8 +283,8 @@ public class Serializador {
 					auxDensa.lerPesos(densa, br);
 					modelo.add(densa);
 
-				} else if (nome.equalsIgnoreCase("convolucional")) {
-					Convolucional convolucional = auxConv.lerConfig(br);
+				} else if (nome.equalsIgnoreCase("conv2d")) {
+					Conv2D convolucional = auxConv.lerConfig(br);
 					auxConv.lerPesos(convolucional, br);
 					modelo.add(convolucional);
 				
@@ -292,12 +292,12 @@ public class Serializador {
 					Flatten flat = auxFlat.lerConfig(br);
 					modelo.add(flat);
 				
-				} else if (nome.equalsIgnoreCase("maxpooling")) {
-					MaxPooling maxPooling = auxMaxPool.lerConfig(br);
+				} else if (nome.equalsIgnoreCase("maxpool2d")) {
+					MaxPool2D maxPooling = auxMaxPool.lerConfig(br);
 					modelo.add(maxPooling);
 				
-				} else if (nome.equalsIgnoreCase("avgpooling")) {
-					AvgPooling avgPooling = auxAvgPool.lerConfig(br);
+				} else if (nome.equalsIgnoreCase("avgpool2d")) {
+					AvgPool2D avgPooling = auxAvgPool.lerConfig(br);
 					modelo.add(avgPooling);
 
 				} else if (nome.equalsIgnoreCase("dropout")) {

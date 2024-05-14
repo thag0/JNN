@@ -5,7 +5,7 @@ import java.io.Serializable;
 import jnn.ativacoes.Sigmoid;
 import jnn.avaliacao.perda.MSE;
 import jnn.camadas.Camada;
-import jnn.camadas.Convolucional;
+import jnn.camadas.Conv2D;
 import jnn.camadas.Densa;
 import jnn.inicializadores.GlorotUniforme;
 import jnn.inicializadores.Zeros;
@@ -33,7 +33,7 @@ public class SalvandoRede{
 
 	static Sequencial criar(){
 		Sequencial modelo = new Sequencial(new Camada[]{
-			new Convolucional(new int[]{2, 10, 10}, new int[]{3, 3}, 2),
+			new Conv2D(new int[]{2, 10, 10}, new int[]{3, 3}, 2),
 		});
 
 		modelo.compilar("sgd", "mse");

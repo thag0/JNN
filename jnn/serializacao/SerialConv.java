@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import jnn.camadas.Convolucional;
+import jnn.camadas.Conv2D;
 import jnn.core.tensor.Tensor;
 import jnn.core.tensor.Variavel;
 
@@ -30,7 +30,7 @@ class SerialConv {
 	 * @param camada camada convolucional que será serializada.
 	 * @param bw escritor de buffer usado para salvar os dados da camada.
 	 */
-	public void serializar(Convolucional camada, BufferedWriter bw, String tipo) {
+	public void serializar(Conv2D camada, BufferedWriter bw, String tipo) {
 		try {
 			//nome da camada pra facilitar
 			bw.write(camada.nome());
@@ -120,7 +120,7 @@ class SerialConv {
 	 * @return instância de uma camada convolucional, os valores de
 	 * filtros e bias ainda não são inicializados.
 	 */
-	public Convolucional lerConfig(BufferedReader br){
+	public Conv2D lerConfig(BufferedReader br){
 		try {
 			//formato de entrada
 			String[] sEntrada = br.readLine().split(" ");
@@ -151,7 +151,7 @@ class SerialConv {
 
 			int numFiltros = saida[0];
 
-			Convolucional camada = new Convolucional(formFiltro, numFiltros);
+			Conv2D camada = new Conv2D(formFiltro, numFiltros);
 			camada.setAtivacao(ativacao);
 			camada.setBias(bias);
 			camada.construir(entrada);
@@ -169,7 +169,7 @@ class SerialConv {
 	 * @param camada camada convolucional que será editada.
 	 * @param br leitor de buffer.
 	 */
-	public void lerPesos(Convolucional camada, BufferedReader br){
+	public void lerPesos(Conv2D camada, BufferedReader br){
 		try {
 			int tamKernel = camada.kernel().tamanho();
 			Variavel[] arrKernel = new Variavel[tamKernel];
