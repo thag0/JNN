@@ -4,8 +4,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import jnn.camadas.*;
-import jnn.core.Utils;
+import jnn.Funcional;
+import jnn.camadas.Densa;
+import jnn.camadas.Entrada;
 import jnn.core.tensor.Tensor;
 import jnn.modelos.Modelo;
 import jnn.modelos.RedeNeural;
@@ -18,7 +19,8 @@ import render.JanelaTreino;
 public class MainImg {
 	static Ged ged = new Ged();
 	static Geim geim = new Geim();
-	static Utils utils = new Utils();
+	static Funcional jnn = new Funcional();
+
 	static final int EPOCAS = 2*1000;
 	static final double ESCALA_RENDER = 9;
 	static boolean calcularHistorico = true;
@@ -42,8 +44,8 @@ public class MainImg {
 		double[][] in  = (double[][]) ged.separarDadosEntrada(dados, tamEntrada);
 		double[][] out = (double[][]) ged.separarDadosSaida(dados, tamSaida);
 
-		Tensor[] treinoX = utils.array2DParaTensors(in);
-		Tensor[] treinoY = utils.array2DParaTensors(out);
+		Tensor[] treinoX = jnn.arrayParaTensores(in);
+		Tensor[] treinoY = jnn.arrayParaTensores(out);
 
 		Modelo modelo = criarSequencial(tamEntrada, tamSaida);
 		modelo.print();
@@ -83,12 +85,12 @@ public class MainImg {
 	}
 
 	static Modelo criarSequencial(int entradas, int saidas) {
-		Sequencial modelo = new Sequencial(new Camada[]{
+		Sequencial modelo = new Sequencial(
 			new Entrada(entradas),
 			new Densa(8, "sigmoid"),
 			new Densa(8, "sigmoid"),
 			new Densa(saidas, "sigmoid")
-		});
+		);
 
 		modelo.compilar("adam", "mse");
 		modelo.setHistorico(calcularHistorico);

@@ -4,8 +4,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import jnn.Funcional;
 import jnn.camadas.*;
-import jnn.core.Utils;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
 import jnn.serializacao.Serializador;
@@ -26,9 +26,9 @@ public class MainConv {
 	static Geim geim = new Geim();
 
 	/**
-	 * Utilitário.
+	 * Iterface da biblioteca.
 	 */
-	static Utils utils = new Utils();
+	static Funcional jnn = new Funcional();
 
 	// dados de controle
 	static final int NUM_DIGITOS_TREINO = 10;
@@ -48,8 +48,8 @@ public class MainConv {
 	public static void main(String[] args) {
 		ged.limparConsole();
 		
-		final var treinoX = utils.array4DParaTensors(carregarDadosMNIST(CAMINHO_TREINO, NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO));
-		final var treinoY = utils.array2DParaTensors(criarRotulosMNIST(NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO));
+		final var treinoX = jnn.arrayParaTensores(carregarDadosMNIST(CAMINHO_TREINO, NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO));
+		final var treinoY = jnn.arrayParaTensores(criarRotulosMNIST(NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO));
 
 		Sequencial modelo = criarModelo();
 		modelo.setHistorico(true);
@@ -70,8 +70,8 @@ public class MainConv {
 		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(treinoX, treinoY).item() * 100), 4) + "%");
 
 		System.out.println("\nCarregando dados de teste.");
-		final var testeX = utils.array4DParaTensors(carregarDadosMNIST(CAMINHO_TESTE, NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE));
-		final var testeY = utils.array2DParaTensors(criarRotulosMNIST(NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE));
+		final var testeX = jnn.arrayParaTensores(carregarDadosMNIST(CAMINHO_TESTE, NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE));
+		final var testeY = jnn.arrayParaTensores(criarRotulosMNIST(NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE));
 		System.out.print("Teste -> perda: " + modelo.avaliar(testeX, testeY).item() + " - ");
 		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(testeX, testeY).item() * 100), 4) + "%");
 

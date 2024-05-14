@@ -2,8 +2,8 @@ package testes.modelos;
 
 import java.awt.image.BufferedImage;
 
+import jnn.Funcional;
 import jnn.camadas.*;
-import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
@@ -12,11 +12,11 @@ import lib.ged.Dados;
 import lib.ged.Ged;
 import lib.geim.Geim;
 
-public class AmpliarImage{
+public class AmpliarImagem{
 	public static void main(String[] args){
 		Ged ged = new Ged();
 		Geim geim = new Geim();
-		Utils utils = new Utils();
+		Funcional jnn = new Funcional();
 
 		ged.limparConsole();
 
@@ -30,8 +30,8 @@ public class AmpliarImage{
 		//preparando dados para treinar a rede
 		double[][] in = (double[][]) ged.separarDadosEntrada(dados, nEntrada);
 		double[][] out = (double[][]) ged.separarDadosSaida(dados, nSaida);
-		Tensor[] treinoX = utils.array2DParaTensors(in);
-		Tensor[] treinoY = utils.array2DParaTensors(out);
+		Tensor[] treinoX = jnn.arrayParaTensores(in);
+		Tensor[] treinoY = jnn.arrayParaTensores(out);
 
 		//criando rede neural para lidar com a imagem
 		//nesse exemplo queremos que ela tenha overfitting

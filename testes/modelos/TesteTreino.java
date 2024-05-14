@@ -1,7 +1,7 @@
 package testes.modelos;
 
+import jnn.Funcional;
 import jnn.camadas.*;
-import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 import jnn.modelos.*;
 import jnn.otimizadores.SGD;
@@ -10,7 +10,7 @@ import lib.ged.Ged;
 
 public class TesteTreino{
 	static Ged ged = new Ged();
-	static Utils utils = new Utils();
+	static Funcional jnn = new Funcional();
 
 	public static void main(String[] args){
 		ged.limparConsole();
@@ -28,8 +28,8 @@ public class TesteTreino{
 			{0}
 		};
 
-		Tensor[] treinoX = utils.array2DParaTensors(entrada);
-		Tensor[] treinoY = utils.array2DParaTensors(saida);
+		Tensor[] treinoX = jnn.arrayParaTensores(entrada);
+		Tensor[] treinoY = jnn.arrayParaTensores(saida);
 
 		Sequencial modelo = new Sequencial(
 			new Entrada(treinoX[0].tamanho()),

@@ -1,9 +1,9 @@
 package testes.modelos;
 
+import jnn.Funcional;
 import jnn.camadas.Camada;
 import jnn.camadas.Densa;
 import jnn.camadas.Entrada;
-import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 import jnn.modelos.*;
 import lib.ged.Dados;
@@ -11,7 +11,7 @@ import lib.ged.Ged;
 
 public class TesteModelos{
 	static Ged ged = new Ged();
-	static Utils utils = new Utils();
+	static Funcional jnn = new Funcional();
 
 	public static void main(String[] args){
 		ged.limparConsole();
@@ -56,8 +56,8 @@ public class TesteModelos{
 		rna.configurarAtivacao(atv1);
 		rna.configurarAtivacao(rna.camadaSaida(), atv2);
 		
-		Tensor[] treinoX = utils.array2DParaTensors(entrada);
-		Tensor[] treinoY = utils.array2DParaTensors(saida);
+		Tensor[] treinoX = jnn.arrayParaTensores(entrada);
+		Tensor[] treinoY = jnn.arrayParaTensores(saida);
 		
 		rna.treinar(treinoX, treinoY, epocas, false);
 		seq.treinar(treinoX, treinoY, epocas, false);
