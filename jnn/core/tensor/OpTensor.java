@@ -525,11 +525,42 @@ public class OpTensor {
 		// NOTA
 		// essa ainda não é a melhor solução, mas é mais eficiente que 
 		// fazer slicing dentro dos loops.
-		Tensor cache1 = new Tensor(altK, largK);
-		Tensor cache2 = new Tensor(altE, largE);
+
+		// gradientes das entradas
+		Thread t = new Thread(() -> {
+			Tensor cache = new Tensor(altE, largE);
+			for (int f = 0; f < filtros; f++) {
+				for (int e = 0; e < entradas; e++) {
+					Tensor kernel2D = new Tensor(altK, largK);
+					for (int i = 0; i < altK; i++) {
+						for (int j = 0; j < largK; j++) {
+							kernel2D.set(kernel.get(f, e, i, j), i, j);
+						}
+					}
+	
+					Tensor gradSaida2D = new Tensor(altS, largS);
+					for (int i = 0; i < altS; i++) {
+						for (int j = 0; j < largS; j++) {
+							gradSaida2D.set(gradS.get(f, i, j), i, j);
+						}
+					}
+	
+					convolucao2DFull(gradSaida2D, kernel2D, cache);
+					
+					for (int i = 0; i < altE; i++) {
+						for (int j = 0; j < largE; j++) {
+							gradE.add(cache.get(i, j), e, i, j);
+						}
+					}
+				}
+			}
+		});
+		t.start();
+
+		// gradiente dos kernels
+		Tensor cache = new Tensor(altK, largK);
 		for (int f = 0; f < filtros; f++) {
 			for (int e = 0; e < entradas; e++) {
-				// gradiente dos kernels
 				Tensor entrada2D = new Tensor(altE, largE);
 				for (int i = 0; i < altE; i++) {
 					for (int j = 0; j < largE; j++) {
@@ -544,30 +575,20 @@ public class OpTensor {
 					}
 				}
 
-				correlacao2D(entrada2D, gradSaida2D, cache1);
-
-				for (int i = 0; i < altK; i++) {
-					for (int j = 0; j < largK; j++) {
-						gradK.add(cache1.get(i, j), f, e, i, j);
-					}
-				}
-
-				// gradientes das entradas
-				Tensor kernel2D = new Tensor(altK, largK);
-				for (int i = 0; i < altK; i++) {
-					for (int j = 0; j < largK; j++) {
-						kernel2D.set(kernel.get(f, e, i, j), i, j);
-					}
-				}
-
-				convolucao2DFull(gradSaida2D, kernel2D, cache2);
+				correlacao2D(entrada2D, gradSaida2D, cache);	
 				
-				for (int i = 0; i < altE; i++) {
-					for (int j = 0; j < largE; j++) {
-						gradE.add(cache2.get(i, j), e, i, j);
+				for (int i = 0; i < altK; i++) {
+					for (int j = 0; j < largK; j++) {
+						gradK.add(cache.get(i, j), f, e, i, j);
 					}
 				}
 			}
+		}
+	
+		try {
+			t.join();
+		} catch (InterruptedException e) {
+			System.out.println(e.getMessage());
 		}
 	}
 
