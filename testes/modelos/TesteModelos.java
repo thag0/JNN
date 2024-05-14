@@ -1,8 +1,5 @@
 package testes.modelos;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import jnn.camadas.Camada;
 import jnn.camadas.Densa;
 import jnn.camadas.Entrada;
@@ -62,14 +59,8 @@ public class TesteModelos{
 		Tensor[] treinoX = utils.array2DParaTensors(entrada);
 		Tensor[] treinoY = utils.array2DParaTensors(saida);
 		
-		try (ExecutorService exec = Executors.newFixedThreadPool(2)) {
-			exec.execute(() -> {
-				seq.treinar(treinoX.clone(), treinoY.clone(), epocas, false);
-			});
-			exec.execute(() -> {
-				rna.treinar(treinoX.clone(), treinoY.clone(), epocas, false);
-			});
-		} catch (Exception e) {}
+		rna.treinar(treinoX, treinoY, epocas, false);
+		seq.treinar(treinoX, treinoY, epocas, false);
 
 		double perdaSeq = seq.avaliador().erroMedioQuadrado(treinoX, treinoY).item();
 		double perdaRna = rna.avaliador().erroMedioQuadrado(treinoX, treinoY).item();

@@ -7,11 +7,12 @@ import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
+import jnn.otimizadores.SGD;
 import lib.ged.Dados;
 import lib.ged.Ged;
 import lib.geim.Geim;
 
-public class TesteImagem{
+public class AmpliarImage{
 	public static void main(String[] args){
 		Ged ged = new Ged();
 		Geim geim = new Geim();
@@ -34,14 +35,16 @@ public class TesteImagem{
 
 		//criando rede neural para lidar com a imagem
 		//nesse exemplo queremos que ela tenha overfitting
-		Sequencial modelo = new Sequencial(new Camada[]{
-			new Densa(nEntrada, 8, "sigmoid"),
-			new Densa(8, "sigmoid"),
-			new Densa(nSaida, "sigmoid"),
-		});
+		Sequencial modelo = new Sequencial(
+			new Entrada(nEntrada),
+			new Densa(8, "tanh"),
+			new Densa(8, "tanh"),
+			new Densa(8, "tanh"),
+			new Densa(nSaida, "sigmoid")
+		);
 		modelo.setHistorico(true);
-		modelo.compilar("adagrad", "mse");
-		modelo.treinar(treinoX, treinoY, 1_500, true);
+		modelo.compilar(new SGD(0.001, 0.96), "mse");
+		modelo.treinar(treinoX, treinoY, 2_000, true);
 
 		//avaliando resultados
 		double precisao = 1 - modelo.avaliador().erroMedioAbsoluto(treinoX, treinoY).item();
@@ -49,6 +52,7 @@ public class TesteImagem{
 		System.out.println("Perda = " + modelo.avaliar(treinoX, treinoY).item());
 
 		exportarHistoricoPerda(modelo, ged);
+		geim.exportarImagemEscalaCinza(imagem, modelo, 50, "img");
 	}
 
 	/**

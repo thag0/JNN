@@ -31,15 +31,11 @@ public class TesteTreino{
 		Tensor[] treinoX = utils.array2DParaTensors(entrada);
 		Tensor[] treinoY = utils.array2DParaTensors(saida);
 
-		for (Tensor t : treinoX) {
-			t.print();
-		}
-
-		Sequencial modelo = new Sequencial(new Camada[]{
+		Sequencial modelo = new Sequencial(
 			new Entrada(treinoX[0].tamanho()),
 			new Densa(3, "sigmoid"),
-			new Densa(1, "sigmoid"),
-		});
+			new Densa(1, "sigmoid")
+		);
 		
 		modelo.compilar(new SGD(0.00001, 0.9999), "mse");
 		modelo.treinar(treinoX, treinoY, 20_000, false);
