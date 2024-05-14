@@ -6,7 +6,13 @@ import jnn.ativacoes.Softmax;
 import jnn.avaliacao.metrica.Acuracia;
 import jnn.avaliacao.metrica.F1Score;
 import jnn.avaliacao.metrica.MatrizConfusao;
+import jnn.avaliacao.perda.EntropiaCruzada;
+import jnn.avaliacao.perda.EntropiaCruzadaBinaria;
+import jnn.avaliacao.perda.MAE;
+import jnn.avaliacao.perda.MSE;
+import jnn.avaliacao.perda.MSLE;
 import jnn.avaliacao.perda.Perda;
+import jnn.avaliacao.perda.RMSE;
 import jnn.core.Dicionario;
 import jnn.core.tensor.OpTensor;
 import jnn.core.tensor.Tensor;
@@ -35,6 +41,8 @@ public final class Funcional {
      * Interface para algumas funcionalidades da biblioteca.
      */
     public Funcional() {}
+
+    // tensor
 
     /**
      * Inicializa um tensor vazio com o formato especificado.
@@ -99,6 +107,8 @@ public final class Funcional {
         return t;
     }
 
+    // operações
+
     /**
      * Realiza a operação {@code A+B}, {@code elemento a elemento}.
      * @param a {@code Tensor} A.
@@ -162,6 +172,16 @@ public final class Funcional {
     }
 
     /**
+     * Calcula o valor exponencial os elementos do tensor.
+     * @param t {@code Tensor} desejado usado como base.
+     * @param exp expoente.
+     * @return {@code Tensor} resultado.
+     */
+    public Tensor pow(Tensor t, double exp) {
+        return t.map(x -> Math.pow(x, exp));
+    }
+
+    /**
      * Realiza a operação {@code correlação cruzada} entre os tensores
      * A e B.
      * @param a {@code Tensor} usado como entrada.
@@ -182,6 +202,8 @@ public final class Funcional {
     public Tensor convolucao2D(Tensor a, Tensor b) {
         return opt.convolucao2D(a, b);
     }
+
+    // funções
 
     /**
      * Calcula a ativação relu aos elementos do tensor.
@@ -235,6 +257,88 @@ public final class Funcional {
         return arg;
     }
 
+	/**
+	 * Normaliza os valores do tensor dentro do intervalo especificado.
+	 * @param t {@code Tensor desejado}.
+	 * @param min valor mínimo do intervalo.
+	 * @param max valor máximo do intervalo.
+     * @return {@code Tensor} normalizado.
+     */
+    public Tensor normalizar(Tensor t, double min, double max) {
+        Tensor norm = new Tensor(t);
+        return norm.normalizar(min, max);
+    }
+
+    // perdas
+
+    /**
+     * Calcula o valor do {@code Erro Médio Quadrático} dos dados 
+     * previstos em relação aos dados reais.
+     * @param prev {@code Tensor} com dados previstos.
+     * @param real {@code Tensor} com dados reais.
+     * @return {@code Tensor} contendo o resultado.
+     */
+    public Tensor mse(Tensor prev, Tensor real) {
+        return new MSE().calcular(prev, real);
+    }
+
+    /**
+     * Calcula o valor do {@code Erro Absoluto Médio} dos dados 
+     * previstos em relação aos dados reais.
+     * @param prev {@code Tensor} com dados previstos.
+     * @param real {@code Tensor} com dados reais.
+     * @return {@code Tensor} contendo o resultado.
+     */
+    public Tensor mae(Tensor prev, Tensor real) {
+        return new MAE().calcular(prev, real);
+    }
+
+    /**
+     * Calcula o valor do {@code Erro Médio Quadrado Logarítmico} dos 
+     * dados previstos em relação aos dados reais.
+     * @param prev {@code Tensor} com dados previstos.
+     * @param real {@code Tensor} com dados reais.
+     * @return {@code Tensor} contendo o resultado.
+     */
+    public Tensor msle(Tensor prev, Tensor real) {
+        return new MSLE().calcular(prev, real);
+    }
+
+    /**
+     * Calcula o valor da {@code Raiz do Erro Médio Quadrático} dos 
+     * dados previstos em relação aos dados reais.
+     * @param prev {@code Tensor} com dados previstos.
+     * @param real {@code Tensor} com dados reais.
+     * @return {@code Tensor} contendo o resultado.
+     */
+    public Tensor rmse(Tensor prev, Tensor real) {
+        return new RMSE().calcular(prev, real);
+    }
+
+    /**
+     * Calcula o valor da {@code Entropia Cruzada Categórica} dos 
+     * dados previstos em relação aos dados reais.
+     * @param prev {@code Tensor} com dados previstos.
+     * @param real {@code Tensor} com dados reais.
+     * @return {@code Tensor} contendo o resultado.
+     */
+    public Tensor entropiaCruzada(Tensor prev, Tensor real) {
+        return new EntropiaCruzada().calcular(prev, real);
+    }
+
+    /**
+     * Calcula o valor da {@code Entropia Cruzada Binária} dos 
+     * dados previstos em relação aos dados reais.
+     * @param prev {@code Tensor} com dados previstos.
+     * @param real {@code Tensor} com dados reais.
+     * @return {@code Tensor} contendo o resultado.
+     */
+    public Tensor entropiaCruzadaBinaria(Tensor prev, Tensor real) {
+        return new EntropiaCruzadaBinaria().calcular(prev, real);
+    }
+
+    // métricas
+
     /**
      * Calcula o valor de acurácia dos dados previstos em relação aos
      * dados raais
@@ -257,7 +361,7 @@ public final class Funcional {
      * @return {@code Tensor} contendo o resultado.
      */
     public Tensor acuracia(Tensor[] prev, Tensor[] real) { 
-        return new Acuracia().calcular(prev, real).nome("acurácia");
+        return new Acuracia().calcular(prev, real);
     }
 
     /**
@@ -282,7 +386,7 @@ public final class Funcional {
      * @return {@code Tensor} contendo o resultado.
      */
     public Tensor f1Score(Tensor[] prev, Tensor[] real) {
-        return new F1Score().calcular(prev, real).nome("f1 score");
+        return new F1Score().calcular(prev, real);
     }
 
     /**
@@ -307,8 +411,10 @@ public final class Funcional {
      * @return {@code Tensor} contendo o resultado.
      */
     public Tensor matrizConfusao(Tensor[] prev, Tensor[] real) {
-        return new MatrizConfusao().calcular(prev, real).nome("matriz confusão");
+        return new MatrizConfusao().calcular(prev, real);
     }
+
+    // dicionario
 
     /**
      * Retorna uma ativação com base no nome informado.
