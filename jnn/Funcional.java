@@ -14,6 +14,7 @@ import jnn.avaliacao.perda.MSLE;
 import jnn.avaliacao.perda.Perda;
 import jnn.avaliacao.perda.RMSE;
 import jnn.core.Dicionario;
+import jnn.core.Utils;
 import jnn.core.tensor.OpTensor;
 import jnn.core.tensor.Tensor;
 import jnn.inicializadores.Identidade;
@@ -36,6 +37,11 @@ public final class Funcional {
      * Operador para tensores.
      */
     OpTensor opt = new OpTensor();
+
+    /**
+     * Utilitário.
+     */
+    Utils utils = new Utils();
 
     /**
      * Interface para algumas funcionalidades da biblioteca.
@@ -452,4 +458,42 @@ public final class Funcional {
         return dicionario.getInicializador(ini);
     }
 
+    // transformações de dados
+
+    /**
+     * Transforma o conteúdo do array em tensores individuais.
+     * @param arr array desejado.
+     * @return array de {@code Tensores}
+     */
+    public Tensor[] arrayParaTensores(double[] arr) {
+        return utils.array1DParaTensors(arr);
+    }
+
+    /**
+     * Transforma o conteúdo do array 2d em tensores 1d.
+     * @param arr array desejado.
+     * @return array de {@code Tensores}
+     */
+    public Tensor[] arrayParaTensores(double[][] arr) {
+        return utils.array2DParaTensors(arr);
+    }
+
+    /**
+     * Transforma o conteúdo do array 3d em tensores 2d.
+     * @param arr array desejado.
+     * @return array de {@code Tensores}
+     */
+    public Tensor[] arrayParaTensores(double[][][] arr) {
+        return utils.array3DParaTensors(arr);
+    }
+
+    /**
+     * Transforma o conteúdo do array 4d em tensores 3d.
+     * @param arr array desejado.
+     * @return array de {@code Tensores}
+     */
+    public Tensor[] arrayParaTensores(double[][][][] arr) {
+        return utils.array4DParaTensors(arr);
+    }
+    
 }

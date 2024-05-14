@@ -79,7 +79,7 @@ public class Utils {
 	 * @param array array desejado.
 	 * @return array de {@code Tensores}.
 	 */
-	public Tensor[] array1DParaTensor(double[] array) {
+	public Tensor[] array1DParaTensors(double[] array) {
 		int n = array.length;
 
 		Tensor[] arr = new Tensor[n];
