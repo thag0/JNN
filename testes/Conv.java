@@ -31,8 +31,8 @@ public class Conv{
 		ged.limparConsole();
 
 		// String nomeModelo = "mlp-mnist-89";
-		// String nomeModelo = "conv-mnist-95-8";
-		String nomeModelo = "modelo-treinado";
+		String nomeModelo = "conv-mnist-97-1";
+		// String nomeModelo = "modelo-treinado";
 		Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + nomeModelo + ".nn");
 		// modelo.info();
 
