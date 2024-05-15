@@ -2,6 +2,8 @@ package testes;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import jnn.camadas.*;
@@ -34,10 +36,10 @@ public class Conv{
 		Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + nomeModelo + ".nn");
 		// modelo.info();
 
-		testarPrevisao(modelo, "treino/3/img_1", true);
-		testarPrevisao(modelo, "3_deslocado", true);
+		// testarPrevisao(modelo, "treino/3/img_1", true);
+		// testarPrevisao(modelo, "3_deslocado", true);
 
-		// testarAcertosMNIST(modelo);
+		testarAcertosMNIST(modelo);
 		// testarTodosDados(modelo);
 
 		// Dados forward = tempoForward(modelo);//media 83/120 ms
@@ -54,17 +56,24 @@ public class Conv{
 	}
 
 	static void testarAcertosMNIST(Sequencial modelo){
-		final String caminho = "/dados/mnist/teste/";
+		final String caminho = "./dados/mnist/teste/";
 		
 		double media = 0;
 		for(int digito = 0; digito < digitos; digito++){
 
-			double acertos = 0;
+			Tensor[] imagens = new Tensor[amostras];
+
 			for(int amostra = 0; amostra < amostras; amostra++){
 				String caminhoImagem = caminho + digito + "/img_" + amostra + ".jpg";
 				Tensor img = new Tensor(imagemParaMatriz(caminhoImagem));
-				
-				double[] previsoes = modelo.forward(img).paraArrayDouble();
+				img.unsqueeze(0);// 2d -> 3d
+				imagens[amostra] = img;
+			}
+
+			double acertos = 0;
+			Tensor[] prevs = modelo.forwards(imagens);
+			for(Tensor t : prevs) {
+				double[] previsoes = t.paraArrayDouble();
 				if(maiorIndice(previsoes) == digito){
 					acertos++;
 				}
@@ -72,8 +81,9 @@ public class Conv{
 
 			double porcentagem = acertos / (double)amostras;
 			media += porcentagem;
-			System.out.println("Acertos " + digito + " -> " + porcentagem);
+			System.out.println("Acertos " + digito + " -> " + porcentagem + "%");
 		}
+
 		System.out.println("média acertos: " + String.format("%.2f", (media/digitos)*100) + "%");
 	}
 
@@ -193,22 +203,16 @@ public class Conv{
 		Otimizador otm = modelo.otimizador();
 
 		//arbritário
-		int tamGrad = modelo.saidaParaArray().length;
-		double[] grad = new double[tamGrad];
-		grad[0] = 1;
-		for(int i = 1; i < grad.length; i++){
-			grad[i] = 0.02;
-		}
+		Tensor grad = new Tensor(modelo.saidaParaArray().length);
+		grad.aplicar(x -> Math.random());
 
 		//backward simples
-		modelo.camadaSaida().backward(new Tensor(grad, tamGrad));
+		modelo.camadaSaida().backward(grad);
 		for(int i = modelo.numCamadas()-2; i >= 0; i--){
 			modelo.camada(i).backward(modelo.camada(i+1).gradEntrada());
 		}
 
-		long t = System.nanoTime();
-		otm.atualizar(modelo.camadas());
-		t = System.nanoTime() - t;
+		long t = medirTempo(() -> otm.atualizar(modelo.camadas()));
 
 		System.out.println(
 			"Tempo otimizador (" + otm.nome() + "): " + TimeUnit.NANOSECONDS.toMillis(t) + "ms"
@@ -275,21 +279,39 @@ public class Conv{
 		return imagem;
 	}
 
-	public static double[][][][] carregarDadosMNIST(String caminho, int amostras, int digitos){
-		double[][][][] entradas = new double[digitos * amostras][1][][];
+	static double[][][][] carregarDadosMNIST(String caminho, int amostras, int digitos) {
+		final double[][][][] imagens = new double[digitos * amostras][1][][];
+		final int numThreads = Runtime.getRuntime().availableProcessors() / 2;
+  
+		try (ExecutorService exec = Executors.newFixedThreadPool(numThreads)) {
+			int id = 0;
+			for (int i = 0; i < digitos; i++) {
+				for (int j = 0; j < amostras; j++) {
+					final String caminhoCompleto = caminho + i + "/img_" + j + ".jpg";
+					final int indice = id;
+					
+					exec.submit(() -> {
+						try {
+							double[][] imagem = imagemParaMatriz(caminhoCompleto);
+							imagens[indice][0] = imagem;
+						} catch (Exception e) {
+							System.out.println(e.getMessage());
+							System.exit(1);
+						}
+					});
 
-		int id = 0;
-		for(int i = 0; i < digitos; i++){
-			for(int j = 0; j < amostras; j++){
-				String caminhoCompleto = caminho + i + "/img_" + j + ".jpg";
-				double[][] imagem = imagemParaMatriz(caminhoCompleto);
-				entradas[id++][0] = imagem;
+					id++;
+				}
 			}
+  
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
 		}
-
-		System.out.println("Imagens carregadas. (" + entradas.length + ")");
-		return entradas;
-	}
+  
+		System.out.println("Imagens carregadas (" + imagens.length + ").");
+  
+		return imagens;
+  	}
 
 	public static double[][] criarRotulosMNIST(int amostras, int digitos){
 		double[][] rotulos = new double[digitos * amostras][digitos];
