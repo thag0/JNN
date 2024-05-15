@@ -30,16 +30,16 @@ public class Conv{
 	public static void main(String[] args){
 		ged.limparConsole();
 
-		// String nomeModelo = "mlp-mnist-89";
+		// String nomeModelo = "mlp-mnist-89-1";
 		String nomeModelo = "conv-mnist-97-1";
 		// String nomeModelo = "modelo-treinado";
 		Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + nomeModelo + ".nn");
-		// modelo.info();
+		modelo.print();
 
 		// testarPrevisao(modelo, "treino/3/img_1", true);
 		// testarPrevisao(modelo, "3_deslocado", true);
 
-		testarAcertosMNIST(modelo);
+		// testarAcertosMNIST(modelo);
 		// testarTodosDados(modelo);
 
 		// Dados forward = tempoForward(modelo);//media 83/120 ms
