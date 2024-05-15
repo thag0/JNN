@@ -14,14 +14,12 @@ import java.util.function.DoubleBinaryOperator;
  * o uso de estrutura de dados dentro da biblioteca.
  * <p>
  * 		O tensor possui algumas funções próprias com intuito de aproveitar a
- * 		velocidade de processamento usando um único array contendo os dados do dele.
+ * 		velocidade de processamento usando um único array contendo seus dados.
  * </p>
  * <h2>
  *		Exemplo de criação:
  * </h2>
  * <pre>
- *Tensor tensor = new Tensor(1, 1, 2, 2);
- *Tensor tensor = new Tensor(new int[]{2, 2});
  *Tensor tensor = new Tensor(2, 2);
  *tensor = [
  *  [[0.0, 0.0],
@@ -41,7 +39,6 @@ import java.util.function.DoubleBinaryOperator;
  *   [3.0, 3.0]]
  *]
  * </pre>
- * 
  * @author Thiago Barroso, acadêmico de Engenharia da Computação pela
  * Universidade Federal do Pará, Campus Tucuruí. Maio/2024.
  */
@@ -435,13 +432,21 @@ public class Tensor implements Iterable<Variavel> {
 
 	/**
 	 * Edita o valor do tensor usando o valor informado.
+	 * @param x valor desejado.
 	 * @param ids índices para atribuição.
-	 * @param ids índices para atribuição.
-	 * @param valor valor desejado.
 	 */
-    public void set(double valor, int... ids) {
-        dados[indice(ids)].set(valor);
+    public void set(double x, int... ids) {
+        dados[indice(ids)].set(x);
     }
+
+	/**
+	 * Edita o valor do tensor usando uma variável.
+	 * @param var variável com valor desejado.
+	 * @param ids índices para atribuição.
+	 */
+	public void set(Variavel var, int... ids) {
+		dados[indice(ids)].set(var);
+	}
 
 	/**
 	 * Preenche todo o conteúdo do tensor com o valor fornecido.
@@ -779,6 +784,17 @@ public class Tensor implements Iterable<Variavel> {
     }
 
 	/**
+	 * Subtrai o valor informado ao conteúdo do tensor.
+	 * @param valor valor desejado.
+	 * @param ids índices desejados para adição.
+	 * @return instância local alterada.
+	 */
+	public Tensor sub(double valor, int... ids) {
+		dados[indice(ids)].sub(valor);
+		return this;
+	}
+
+	/**
 	 * Multiplica todo o conteúdo {@code elemento a elemento} usando o tensor recebido,
 	 * seguindo a expressão:
 	 * <pre>
@@ -801,6 +817,17 @@ public class Tensor implements Iterable<Variavel> {
 
         return this;
     }
+
+	/**
+	 * Multiplica o valor informado ao conteúdo do tensor.
+	 * @param valor valor desejado.
+	 * @param ids índices desejados para adição.
+	 * @return instância local alterada.
+	 */
+	public Tensor mult(double valor, int... ids) {
+		dados[indice(ids)].mult(valor);
+		return this;
+	}
 
 	/**
 	 * Divide todo o conteúdo {@code elemento a elemento} usando o tensor recebido,
@@ -827,19 +854,30 @@ public class Tensor implements Iterable<Variavel> {
     }
 
 	/**
-	 * Remove as dimensões que tem tamanho igual a 1.
+	 * Divide o valor contido no tensor pelo valor informado.
+	 * @param valor valor desejado.
+	 * @param ids índices desejados para adição.
+	 * @return instância local alterada.
+	 */
+	public Tensor div(double valor, int... ids) {
+		dados[indice(ids)].div(valor);
+		return this;
+	}
+
+	/**
+	 * Remove a dimensão desejada caso possua tamanho = 1.
 	 * @param dim índice da dimensão desejada.
 	 * @return instância local, talvez alterada.
 	 */
 	public Tensor squeeze(int dim) {
-		if (numDim() == 1) return this; // não fazer nada com tensores escalares
-	
 		if (dim < 0 || dim >= shape.length) {
 			throw new IllegalArgumentException("\nDimensão especificada inválida");
 		}
+
+		if (numDim() == 1) return this; // não fazer nada com tensores escalares
 	
 		if (shape[dim] != 1) {
-			return this; // a dimensão especificada já possui tamanho diferente de 1
+			return this; // não alterar dimensões com tamanho != 1
 		}
 	
 		int[] novoShape = new int[shape.length - 1];
@@ -854,14 +892,14 @@ public class Tensor implements Iterable<Variavel> {
 	}
 
 	/**
-	 * Adiciona uma nova dimensão com tamanho 1.
+	 * Adiciona uma nova dimensão com tamanho = 1.
 	 * @param dim índice da dimensão que será adicionada.
 	 * @return instância local alterada.
 	 */
     public Tensor unsqueeze(int dim) {
         if (dim < 0 || dim > shape.length) {
             throw new IllegalArgumentException(
-				"\nEixo " + dim + " fora de alcance"
+				"\nDimensão " + dim + " fora de alcance"
 			);
         }
         
@@ -1129,7 +1167,9 @@ public class Tensor implements Iterable<Variavel> {
 	 *r = a.map(b, (x, y) -> x+y);
 	 *r = {2, 4, 6};
 	 *  </pre>
-	 * Onde {@code x} representa cada elemento dentro do tensor local.
+	 * Onde:
+	 *{@code x} representa cada elemento dentro do tensor local.
+	 *{@code y} representa cada elemento dentro do tensor fornecido.
 	 * @param tensor segundo {@code Tensor} para aplicar a função.
 	 * @param fun função desejada.
 	 * @return novo {@code Tensor} contendo o resultado.
@@ -1138,6 +1178,13 @@ public class Tensor implements Iterable<Variavel> {
 		if (fun == null) {
 			throw new IllegalArgumentException(
 				"\nFunção recebida é nula."
+			);
+		}
+
+		if (!compararShape(tensor)) {
+			throw new IllegalArgumentException(
+				"\nTensor " + tensor.shapeStr() + " deve conter mesmo formato do " +
+				"tensor local " + shapeStr()
 			);
 		}
 
@@ -1267,10 +1314,9 @@ public class Tensor implements Iterable<Variavel> {
 		double intOriginal = valMax - valMin;
 		double intNovo = max - min;
 
-        final int n = tamanho();
-		for (int i = 0; i < n; i++) {
-			dados[i].set(((dados[i].get() - valMin) / intOriginal) * intNovo + min);
-		}
+		aplicar(x -> {
+			return ((x - valMin) / intOriginal) * intNovo + min;
+		});
 
 		return this;
 	}
@@ -1437,6 +1483,11 @@ public class Tensor implements Iterable<Variavel> {
 
 	/**
 	 * Retorna o conteúdo do tensor no formato de array
+	 * <p>
+	 * 		Por padrão as variáveis retornadas são as mesmas usadas pelo
+	 * 		tensor, significa dizer que caso ela sofram alterações, isso
+	 * 		é refletido automaticamente no tensor.
+	 * </p>
 	 * @return conteúdo do tensor.
 	 */
 	public Variavel[] paraArray() {
@@ -1444,10 +1495,16 @@ public class Tensor implements Iterable<Variavel> {
 	}
 
 	/**
-	 * 
-	 * @param inicio
-	 * @param fim
-	 * @return
+	 * Retorna elementos específicos do conteúdo do tensor.
+	 * <p>
+	 * 		Por padrão as variáveis retornadas são as mesmas usadas pelo
+	 * 		tensor, significa dizer que caso ela sofram alterações, isso
+	 * 		é refletido automaticamente no tensor.
+	 * </p>
+	 * @param inicio índice de inicio (inclusivo).
+	 * @param fim índice de fim (exclusivo).
+	 * @return array de {@code Variaveis} do tensor de acordo com
+	 * os índices.
 	 */
 	public Variavel[] paraArrayPorIndice(int inicio, int fim) {
 		if (inicio < 0) {
@@ -1476,7 +1533,7 @@ public class Tensor implements Iterable<Variavel> {
 	}
 
 	/**
-	 * Retorna o conteúdo do tensor no formato de array
+	 * Retorna o conteúdo do tensor no formato de array {@code double[]}.
 	 * @return conteúdo do tensor.
 	 */
 	public double[] paraArrayDouble() {
@@ -1516,7 +1573,7 @@ public class Tensor implements Iterable<Variavel> {
     }
 
 	/**
-	 * Exibe, via terminal, todo o conteúdo do tensor.
+	 * Exibe, {@code via terminal}, todo o conteúdo do tensor.
 	 */
 	public void print() {
 		System.out.println(construirPrint());

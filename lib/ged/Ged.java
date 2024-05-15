@@ -110,7 +110,7 @@ public class Ged{
 	 * </pre>
 	 * @param array array com os dados.
 	 */
-	public void prinArray(Object array) {
+	public void printArray(Object array) {
 		ia.imprimirArray(array);
 	}
 

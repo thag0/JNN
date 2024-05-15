@@ -263,18 +263,6 @@ public final class Funcional {
         return arg;
     }
 
-	/**
-	 * Normaliza os valores do tensor dentro do intervalo especificado.
-	 * @param t {@code Tensor desejado}.
-	 * @param min valor mínimo do intervalo.
-	 * @param max valor máximo do intervalo.
-     * @return {@code Tensor} normalizado.
-     */
-    public Tensor normalizar(Tensor t, double min, double max) {
-        Tensor norm = new Tensor(t);
-        return norm.normalizar(min, max);
-    }
-
     // perdas
 
     /**
@@ -494,6 +482,18 @@ public final class Funcional {
      */
     public Tensor[] arrayParaTensores(double[][][][] arr) {
         return utils.array4DParaTensors(arr);
+    }
+
+	/**
+	 * Normaliza os valores do tensor dentro do intervalo especificado.
+	 * @param t {@code Tensor desejado}.
+	 * @param min valor mínimo do intervalo.
+	 * @param max valor máximo do intervalo.
+     * @return {@code Tensor} normalizado.
+     */
+    public Tensor normalizar(Tensor t, double min, double max) {
+        Tensor norm = new Tensor(t);
+        return norm.normalizar(min, max);
     }
     
 }
