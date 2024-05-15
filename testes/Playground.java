@@ -5,7 +5,6 @@ import jnn.core.OpArray;
 import jnn.core.Utils;
 import jnn.core.tensor.OpTensor;
 import jnn.core.tensor.Tensor;
-import jnn.core.tensor.Variavel;
 import lib.ged.Ged;
 import lib.geim.Geim;
 
@@ -20,16 +19,9 @@ public class Playground {
 		ged.limparConsole();
 
 		Tensor a = new Tensor(2, 2);
-		a.preencherContador(true);
-		
-		Variavel[] vars = a.paraArrayPorIndice(0, 3);
-		for (Variavel v : vars) {
-			System.out.println(v);
-		}
-
-		vars[0].set(-1);
-
-		a.print();
+		a.set(0.01, 0, 0);
+		// a.aplicar(x -> Math.random()*2-1);
+		System.out.println(a);
 	}
 
 	static double randn() {

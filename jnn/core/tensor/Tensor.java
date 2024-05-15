@@ -1585,11 +1585,20 @@ public class Tensor implements Iterable<Variavel> {
 	 */
     private String construirPrint() {
 		final String identacao = " ".repeat(4);
-        int tamMaximo = -1;
+
+		int maxCasasDecimais = 0;
+		for (Variavel valor : dados) {
+			String valorStr = ((Double)valor.get()).toString();
+			int decimais = valorStr.length() - valorStr.indexOf('.') - 1;
+			if (decimais > maxCasasDecimais) maxCasasDecimais = decimais;
+		}
+
+		int tamMaximo = -1;
         for (Variavel valor : dados) {
-            int tamValor = String.format("%f", valor.get()).length();
+            String valorStr = valorStr(valor.get(), maxCasasDecimais);
+			int tamValor = valorStr.length();
             if (tamValor > tamMaximo) tamMaximo = tamValor;
-        }
+		}
 
         StringBuilder sb = new StringBuilder();
 
@@ -1607,7 +1616,7 @@ public class Tensor implements Iterable<Variavel> {
                 }
             }
 
-            final String valorStr = String.format("%f", get(indices));
+            final String valorStr = valorStr(get(indices), maxCasasDecimais);
             sb.append(" ".repeat(tamMaximo - valorStr.length()))
 				.append(valorStr);
 
@@ -1656,6 +1665,16 @@ public class Tensor implements Iterable<Variavel> {
 		sb.append("]").append("\n");
 
         return sb.toString().trim();
+	}
+
+	/**
+	 * Retorna o valor numérico formatado em string.
+	 * @param x valor numérico. 
+	 * @param casas quantidade de casas decimais desejada.
+	 * @return valor formatado.
+	 */
+	private String valorStr(double x, int casas) {
+		return String.format("%.0" + casas + "f", x).replace(',', '.');
 	}
 
 	/**
