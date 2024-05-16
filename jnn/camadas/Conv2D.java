@@ -646,9 +646,10 @@ public class Conv2D extends Camada implements Cloneable {
 			int alt = shapeSaida[1];
 			int larg = shapeSaida[2];
 			for (int i = 0; i < f; i++) {
+				double b = _bias.get(i);
 				for (int j = 0; j < alt; j++) {
 					for (int k = 0; k < larg; k++) {
-						_somatorio.add(_bias.get(i), i, j, k);
+						_somatorio.add(b, i, j, k);
 					}
 				}
 			}

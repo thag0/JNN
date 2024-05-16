@@ -85,7 +85,7 @@ public class MainConv {
 	 */
 	static Sequencial criarModelo() {
 		Sequencial modelo = new Sequencial(
-			new Entrada(28, 28),
+			new Entrada(1, 28, 28),
 			new Conv2D(new int[]{3, 3}, 16, "relu"),
 			new MaxPool2D(new int[]{2, 2}),
 			new Conv2D(new int[]{3, 3}, 20, "relu"),

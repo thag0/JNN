@@ -34,7 +34,7 @@ public class Conv{
 		String nomeModelo = "conv-mnist-97-1";
 		// String nomeModelo = "modelo-treinado";
 		Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + nomeModelo + ".nn");
-		modelo.print();
+		// modelo.print();
 
 		// testarPrevisao(modelo, "treino/3/img_1", true);
 		// testarPrevisao(modelo, "3_deslocado", true);
@@ -42,12 +42,12 @@ public class Conv{
 		// testarAcertosMNIST(modelo);
 		// testarTodosDados(modelo);
 
-		// Dados forward = tempoForward(modelo);//media 83/120 ms
-		// Dados backward = tempoBackward(modelo);//media 118/133 ms
-		// forward = ged.filtrar(forward, 1, "Convolucional");
-		// backward = ged.filtrar(backward, 1, "Convolucional");
-		// forward.print();
-		// backward.print();
+		Dados forward = tempoForward(modelo);//media 83/120 ms
+		Dados backward = tempoBackward(modelo);//media 118/133 ms
+		// forward = ged.filtrar(forward, 1, "Conv2D");
+		// backward = ged.filtrar(backward, 1, "Conv2D");
+		forward.print();
+		backward.print();
 
 		// testarForward();
 		// testarBackward();

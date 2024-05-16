@@ -34,41 +34,29 @@ public class Dropout extends Camada implements Cloneable {
 	private double taxa;
 
 	/**
-	 * Formato de entrada da camada (profundidade, altura, largura).
+	 * Formato de entrada da camada.
 	 */
-	int[] formEntrada;
+	int[] shapeEntrada;
 
 	/**
 	 * Tensor contendo os valores de entrada para a camada.
-	 * <p>
-	 *    O formato da entrada é dado por:
-	 * </p>
-	 * <pre>
-	 *    entrada = (1, profundidade, altura, largura)
-	 * </pre>
 	 */
 	public Tensor _entrada;
 
 	/**
-	 * Tensores contendo as máscaras que serão usadas durante
+	 * Tensor contendo as máscaras que serão usadas durante
 	 * o processo de treinamento.
 	 * <p>
-	 *    O formato das máscaras é dado por:
+	 *    O formato das máscaras é dado pelo mesmo formato de entrada:
 	 * </p>
-	 * <pre>
-	 *    mascara = (1, profundidade, altura, largura)
-	 * </pre>
 	 */
 	public Tensor _mascara;
 
 	/**
 	 * Tensor contendo os valores de saída da camada.
 	 * <p>
-	 *    O formato de saída é dado por:
+	 *    O formato de saída é dado pelo mesmo formato de entrada:
 	 * </p>
-	 * <pre>
-	 *    saida = (1, profundidade, altura, largura)
-	 * </pre>
 	 */
 	public Tensor _saida;
 
@@ -76,11 +64,8 @@ public class Dropout extends Camada implements Cloneable {
 	 * Tensor contendo os valores dos gradientes que
 	 * serão retropropagados durante o processo de treinamento.
 	 * <p>
-	 *    O formato dos gradientes é dado por:
+	 *    O formato dos gradientes é dado pelo mesmo formato de entrada:
 	 * </p>
-	 * <pre>
-	 *    gradEntrada = (1, profundidade, altura, largura)
-	 * </pre>
 	 */
 	public Tensor _gradEntrada;
 
@@ -144,15 +129,16 @@ public class Dropout extends Camada implements Cloneable {
 			);
 		}
 
-		this.formEntrada = formato.clone();
-		_entrada =     new Tensor(this.formEntrada);
+		this.shapeEntrada = formato.clone();
+
+		_entrada =     new Tensor(this.shapeEntrada);
 		_mascara =     new Tensor(_entrada.shape());
 		_saida =       new Tensor(_entrada.shape());
 		_gradEntrada = new Tensor(_entrada.shape());
 
 		setNomes();
 		
-		_construida = true;//camada pode ser usada
+		_construida = true;// camada pode ser usada
 	}
 
 	@Override
@@ -239,9 +225,9 @@ public class Dropout extends Camada implements Cloneable {
 	 * </p>
 	 * <pre>
 	 *mascara = [
-	 *    1, 0, 0  
-	 *    0, 1, 1  
-	 *    0, 1, 0  
+	 *    [[1.0, 0.0, 0.0],  
+	 *     [0.0, 1.0, 1.0],  
+	 *     [0.0, 1.0, 0.0]]  
 	 *]
 	 * </pre>
 	 * Nos valores em que a máscara for igual a 1, o valor de entrada será
@@ -262,12 +248,6 @@ public class Dropout extends Camada implements Cloneable {
 	 * <p>
 	 *    Caso a camada não esteja {@code treinando}, por padrão os gradientes são 
 	 *    apenas repassados para o gradiente de entrada da camada.
-	 * </p>
-	 * <h3>
-	 *    Nota
-	 * </h3>
-	 * <p>
-	 *    Serão considerados apenas os gradientes da primeira dimensão do tensor.
 	 * </p>
 	 * @param grad gradientes da camada seguiente.
 	 */
@@ -308,7 +288,7 @@ public class Dropout extends Camada implements Cloneable {
 	@Override
 	public int[] formatoEntrada() {
 		verificarConstrucao();
-		return formEntrada.clone();
+		return shapeEntrada.clone();
 	}
 
 	@Override
@@ -334,7 +314,7 @@ public class Dropout extends Camada implements Cloneable {
 		verificarConstrucao();
 
 		Dropout clone = (Dropout) super.clone();
-		clone.formEntrada = this.formEntrada.clone();
+		clone.shapeEntrada = this.shapeEntrada.clone();
 		clone.taxa = this.taxa;
 		clone.random = new Random();
 
@@ -356,8 +336,8 @@ public class Dropout extends Camada implements Cloneable {
 		sb.append(nome() + " (id " + this.id + ") = [\n");
 
 		sb.append(pad).append("Taxa: " + taxa() + "\n");
-		sb.append(pad).append("Entrada: " + utils.shapeStr(formEntrada) + "\n");
-		sb.append(pad).append("Saída: " + utils.shapeStr(formEntrada) + "\n");
+		sb.append(pad).append("Entrada: " + utils.shapeStr(shapeEntrada) + "\n");
+		sb.append(pad).append("Saída: " + utils.shapeStr(shapeEntrada) + "\n");
 
 		sb.append("]\n");
 

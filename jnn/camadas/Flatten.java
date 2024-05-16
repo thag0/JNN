@@ -25,10 +25,10 @@ public class Flatten extends Camada implements Cloneable{
 	/**
 	 * Array contendo o formato de entrada da camada, de acordo com o formato:
 	 * <pre>
-	 *    entrada = (profundidade, altura, largura)
+	 *    entrada = (..., profundidade, altura, largura)
 	 * </pre>
 	 */
-	int[] formEntrada;
+	private int[] shapeEntrada;
 
 	/**
 	 * Array contendo o formato de saida da camada, de acordo com o formato:
@@ -36,7 +36,7 @@ public class Flatten extends Camada implements Cloneable{
 	 *    saida = (elementosTotaisEntrada)
 	 * </pre>
 	 */
-	int[] formSaida;
+	private int[] shapeSaida;
 
 	/**
 	 * Tensor contendo os valores de entrada para a camada,
@@ -45,7 +45,7 @@ public class Flatten extends Camada implements Cloneable{
 	 *    O formato da entrada é dado por:
 	 * </p>
 	 * <pre>
-	 *    entrada = (profundidade, altura, largura)
+	 *    entrada = (..., profundidade, altura, largura)
 	 * </pre>
 	 */
 	public Tensor _entrada;
@@ -57,7 +57,7 @@ public class Flatten extends Camada implements Cloneable{
 	 *    O formato dos gradientes é dado por:
 	 * </p>
 	 * <pre>
-	 *    gradEntrada = (profundidadeEntrada, alturaEntrada, larguraEntrada)
+	 *    gradEntrada = (..., profundidadeEntrada, alturaEntrada, larguraEntrada)
 	 * </pre>
 	 */
 	public Tensor _gradEntrada;
@@ -114,7 +114,7 @@ public class Flatten extends Camada implements Cloneable{
 	 */
 	@Override
 	public void construir(Object entrada) {
-		utils.validarNaoNulo(entrada, "\nFormato de entrada fornecida para camada Flatten é nulo.");
+		utils.validarNaoNulo(entrada, "Formato de entrada fornecida para camada Flatten é nulo.");
 
 		if (!(entrada instanceof int[])) {
 			throw new IllegalArgumentException(
@@ -130,49 +130,18 @@ public class Flatten extends Camada implements Cloneable{
 			);
 		}
 
-		int profundidade, altura, largura;
-		if (formatoEntrada.length == 4) {
-			profundidade = formatoEntrada[1];
-			altura = formatoEntrada[2];
-			largura = formatoEntrada[3];
-
-		} else if (formatoEntrada.length == 3) {
-			profundidade = formatoEntrada[0];
-			altura = formatoEntrada[1];
-			largura = formatoEntrada[2];
-		
-		} else if (formatoEntrada.length == 2) {
-			profundidade = 1;
-			altura = formatoEntrada[0];
-			largura = formatoEntrada[1];
-		
-		} else {
-			throw new IllegalArgumentException(
-				"O formato de entrada para a camada Flatten deve conter dois " + 
-				"elementos (altura, largura), três elementos (profundidade, altura, largura), " +
-				" ou quatro elementos (primeiro desconsiderado) " +
-				"objeto recebido possui " + formatoEntrada.length + " elementos."
-			);
-		}
-
-		//inicialização de parâmetros
-
-		this.formEntrada = new int[]{
-			profundidade,
-			altura,
-			largura
-		};
+		this.shapeEntrada = formatoEntrada.clone();
 
 		int tamanho = 1;
-		for(int i : this.formEntrada) {
+		for(int i : this.shapeEntrada) {
 			tamanho *= i;
 		}
 
-		this.formSaida = new int[]{tamanho};
+		this.shapeSaida = new int[]{tamanho};
 
-		_entrada = new Tensor(formEntrada);
+		_entrada = new Tensor(shapeEntrada);
 		_gradEntrada = new Tensor(_entrada.shape());
-		_saida = new Tensor(formSaida);
+		_saida = new Tensor(shapeSaida);
 
 		setNomes();
 
@@ -279,14 +248,14 @@ public class Flatten extends Camada implements Cloneable{
 	@Override
 	public int[] formatoEntrada() {
 		verificarConstrucao();
-		return formEntrada.clone();
+		return shapeEntrada.clone();
 	}
 
 	/**
 	 * Calcula o formato de saída da camada Flatten, que é disposto da
 	 * seguinte forma:
 	 * <pre>
-	 *    formato = (1, 1, 1, elementosEntrada)
+	 *    formato = (elementosEntrada)
 	 * </pre>
 	 * Onde {@code elementosEntrada} é a quantidade total de elementos 
 	 * contidos no formato de entrada da camada.
@@ -297,7 +266,6 @@ public class Flatten extends Camada implements Cloneable{
 		verificarConstrucao();
 		
 		return new int[]{
-			1,
 			tamanhoSaida()
 		};
 	}
@@ -322,7 +290,7 @@ public class Flatten extends Camada implements Cloneable{
 		
 		sb.append(nome() + " (id " + id + ") = [\n");
 
-		sb.append(pad).append("Entrada: " + utils.shapeStr(formEntrada) + "\n");
+		sb.append(pad).append("Entrada: " + utils.shapeStr(shapeEntrada) + "\n");
 		sb.append(pad).append("Saída: (1, " + tamanhoSaida() + ")\n");
 
 		sb.append("]\n");
@@ -351,8 +319,8 @@ public class Flatten extends Camada implements Cloneable{
 		clone.treinando = this.treinando;
 		clone._construida = this._construida;
 
-		clone.formEntrada = formEntrada.clone();
-		clone.formSaida = formSaida.clone();
+		clone.shapeEntrada = shapeEntrada.clone();
+		clone.shapeSaida = shapeSaida.clone();
 
 		clone._entrada = _entrada.clone();
 		clone._gradEntrada = _gradEntrada.clone();
