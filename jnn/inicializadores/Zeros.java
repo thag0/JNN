@@ -3,7 +3,7 @@ package jnn.inicializadores;
 import jnn.core.tensor.Tensor;
 
 /**
- * Inizialiciador para tensores com valor zero.
+ * Inicializador para tensores com valor zero.
  */
 public class Zeros extends Inicializador {
 

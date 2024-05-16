@@ -8,14 +8,14 @@ import jnn.core.tensor.Tensor;
 public class GlorotNormal extends Inicializador {
 
 	/**
-	 * Instância um inicializador Glorot normalizado para matrizes 
+	 * Instancia um inicializador Glorot normalizado para tensores 
 	 * com seed
 	 * aleatória.
 	 */
 	public GlorotNormal() {}
 
 	/**
-	 * Instância um inicializador Glorot normalizado para matrizes.
+	 * Instancia um inicializador Glorot normalizado para tensores.
 	 * @param seed seed usada pelo gerador de números aleatórios.
 	 */
 	public GlorotNormal(long seed) {

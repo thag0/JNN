@@ -3,12 +3,12 @@ package jnn.inicializadores;
 import jnn.core.tensor.Tensor;
 
 /**
- * Inicializador de matriz identidade para uso dentro da biblioteca.
+ * Inicializador de tensor identidade para uso dentro da biblioteca.
  */
 public class Identidade extends Inicializador {
 
 	/**
-	 * Instância um inicializador de matriz identidade.
+	 * Instancia um inicializador de tensores identidade.
 	 */
 	public Identidade() {}
 

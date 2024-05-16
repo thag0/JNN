@@ -8,13 +8,13 @@ import jnn.core.tensor.Tensor;
 public class LeCun extends Inicializador {
 	
 	/**
-	 * Instância um inicializador LeCun para matrizes com seed
+	 * Instancia um inicializador LeCun para tensores com seed
 	 * aleatória.
 	 */
 	public LeCun() {}
 	
 	/**
-	 * Instância um inicializador LeCun para matrizes.
+	 * Instancia um inicializador LeCun para tensores.
 	 * @param seed seed usada pelo gerador de números aleatórios.
 	 */
 	public LeCun(long seed) {

@@ -8,13 +8,13 @@ import jnn.core.tensor.Tensor;
 public class Gaussiano extends Inicializador {
 
 	/**
-	 * Instância um inicializador Gaussiano para matrizes com seed
+	 * Instancia um inicializador Gaussiano para tensores com seed
 	 * aleatória.
 	 */
 	public Gaussiano() {}
 
 	/**
-	 * Instância um inicializador Gaussiano para matrizes.
+	 * Instancia um inicializador Gaussiano para tensores.
 	 * @param seed seed usada pelo gerador de números aleatórios.
 	 */
 	public Gaussiano(long seed) {

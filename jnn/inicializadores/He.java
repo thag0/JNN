@@ -8,10 +8,19 @@ import jnn.core.tensor.Tensor;
 public class He extends Inicializador {
 
 	/**
-	 * Instância um inicializador He para matrizes com seed
+	 * Instancia um inicializador He para tensores com seed
 	 * aleatória.
 	 */
 	public He() {}
+
+	/**
+	 * Instancia um inicializador He para tensores com seed
+	 * aleatória.
+	 * @param seed seed usada pelo gerador de números aleatórios.
+	 */
+	public He(long seed) {
+		super(seed);
+	}
 
 	@Override
 	public void inicializar(Tensor tensor) {

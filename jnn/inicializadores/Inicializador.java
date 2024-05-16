@@ -1,7 +1,6 @@
 package jnn.inicializadores;
 
 import java.util.Random;
-import java.util.function.DoubleUnaryOperator;
 
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
@@ -17,11 +16,6 @@ public abstract class Inicializador {
 	 * para as classes filhas.
 	 */
 	protected Random random = new Random();
-
-	/**
-	 * Função usada pelo inicializador.
-	 */
-	DoubleUnaryOperator func;
 
 	/**
 	 * Utilitário.

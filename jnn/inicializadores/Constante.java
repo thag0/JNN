@@ -13,7 +13,7 @@ public class Constante extends Inicializador {
 	private final double val;
 
 	/**
-	 * Instância um inicializador de valor constante.
+	 * Instancia um inicializador de valor constante.
 	 * @param val valor usado de constante na inicialização.
 	 */
 	public Constante(double val) {
@@ -21,7 +21,7 @@ public class Constante extends Inicializador {
 	}
 
 	/**
-	 * Instância um inicializador de valor constante.
+	 * Instancia um inicializador de valor constante.
 	 * <p>
 	 *    Por padrão o valor é zero.
 	 * </p>

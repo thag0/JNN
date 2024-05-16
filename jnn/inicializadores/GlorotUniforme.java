@@ -8,13 +8,13 @@ import jnn.core.tensor.Tensor;
 public class GlorotUniforme extends Inicializador {
 
 	/**
-	 * Instância um inicializador Xavier para matrizes com seed
+	 * Instancia um inicializador Xavier para tensores com seed
 	 * aleatória.
 	 */
 	public GlorotUniforme() {}
 	
 	/**
-	 * Instância um inicializador Xavier para matrizes.
+	 * Instancia um inicializador Xavier para tensores.
 	 * @param seed seed usada pelo gerador de números aleatórios.
 	 */
 	public GlorotUniforme(long seed) {
