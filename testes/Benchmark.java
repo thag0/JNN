@@ -8,12 +8,10 @@ import jnn.core.tensor.OpTensor;
 import jnn.core.tensor.Tensor;
 import jnn.inicializadores.GlorotNormal;
 import jnn.inicializadores.GlorotUniforme;
-import jnn.inicializadores.Identidade;
 import jnn.inicializadores.Inicializador;
 import jnn.inicializadores.Zeros;
 import lib.ged.Ged;
 
-import java.text.DecimalFormat;
 
 public class Benchmark {
 	static OpTensor optensor = new OpTensor();
@@ -22,26 +20,20 @@ public class Benchmark {
 		Ged ged = new Ged();
 		ged.limparConsole();
 
-		// int[] formEntrada = {16, 26, 26};
-		// int[] formFitlro = {3, 3};
-		// int filtros = 20;
+		int[] shapeEntrada = {16, 26, 26};
+		int[] shapeFiltro = {3, 3};
+		int filtros = 20;
 
-		// convForward(formEntrada, formFitlro, filtros);
-		// testarForward();
-		// convBackward(formEntrada, formFitlro, filtros);
-		// testarBackward();
-
-		Tensor a = new Tensor(40, 40);
-		Tensor b = new Tensor(40, 40);
-		Tensor c = new Tensor(40, 40);
-
-		a.aplicar(x -> randn());
-		new Identidade().inicializar(b);
-
-		long t = medirTempo(() -> optensor.matMult(a, b, c));
-		System.out.println("tempo: " + new DecimalFormat().format(t) + " ns");
+		convForward(shapeEntrada, shapeFiltro, filtros);
+		testarForward();
+		convBackward(shapeEntrada, shapeFiltro, filtros);
+		testarBackward();
 	}
 
+	/**
+	 * Gera um número aleatório no intervalo [-1, 1]
+	 * @return valor aleatório.
+	 */
 	static double randn() {
 		return Math.random()*2-1;
 	}
@@ -253,6 +245,8 @@ public class Benchmark {
 		final int largF = shapeK[3];
 		final int altS = shapeS[1];
 		final int largS = shapeS[2];
+
+		// implementação antiga
 
 		for (int f = 0; f < filtros; f++) {
 			for (int e = 0; e < entradas; e++) {

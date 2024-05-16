@@ -526,8 +526,11 @@ public class OpTensor {
 		// essa ainda não é a melhor solução, mas é mais eficiente que 
 		// fazer slicing dentro dos loops.
 
+		// aproveitar paralelismo para dividir o trabalho e sobrecarregar
+		// menos um único núcleo do processador.
+
 		// gradientes das entradas
-		Thread t = new Thread(() -> {
+		Thread t1 = new Thread(() -> {
 			Tensor cache = new Tensor(altE, largE);
 			for (int f = 0; f < filtros; f++) {
 				for (int e = 0; e < entradas; e++) {
@@ -555,38 +558,42 @@ public class OpTensor {
 				}
 			}
 		});
-		t.start();
+		t1.start();
 
 		// gradiente dos kernels
-		Tensor cache = new Tensor(altK, largK);
-		for (int f = 0; f < filtros; f++) {
-			for (int e = 0; e < entradas; e++) {
-				Tensor entrada2D = new Tensor(altE, largE);
-				for (int i = 0; i < altE; i++) {
-					for (int j = 0; j < largE; j++) {
-						entrada2D.set(entrada.get(e, i, j), i, j);
+		Thread t2 = new Thread(() -> {
+			Tensor cache = new Tensor(altK, largK);
+			for (int f = 0; f < filtros; f++) {
+				for (int e = 0; e < entradas; e++) {
+					Tensor entrada2D = new Tensor(altE, largE);
+					for (int i = 0; i < altE; i++) {
+						for (int j = 0; j < largE; j++) {
+							entrada2D.set(entrada.get(e, i, j), i, j);
+						}
 					}
-				}
-
-				Tensor gradSaida2D = new Tensor(altS, largS);
-				for (int i = 0; i < altS; i++) {
-					for (int j = 0; j < largS; j++) {
-						gradSaida2D.set(gradS.get(f, i, j), i, j);
+	
+					Tensor gradSaida2D = new Tensor(altS, largS);
+					for (int i = 0; i < altS; i++) {
+						for (int j = 0; j < largS; j++) {
+							gradSaida2D.set(gradS.get(f, i, j), i, j);
+						}
 					}
-				}
-
-				correlacao2D(entrada2D, gradSaida2D, cache);	
-				
-				for (int i = 0; i < altK; i++) {
-					for (int j = 0; j < largK; j++) {
-						gradK.add(cache.get(i, j), f, e, i, j);
+	
+					correlacao2D(entrada2D, gradSaida2D, cache);	
+					
+					for (int i = 0; i < altK; i++) {
+						for (int j = 0; j < largK; j++) {
+							gradK.add(cache.get(i, j), f, e, i, j);
+						}
 					}
 				}
 			}
-		}
+		});
+		t2.start();
 	
 		try {
-			t.join();
+			t1.join();
+			t2.join();
 		} catch (InterruptedException e) {
 			System.out.println(e.getMessage());
 		}
