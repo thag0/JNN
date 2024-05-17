@@ -805,6 +805,6 @@ public class Densa extends Camada implements Cloneable {
 		verificarConstrucao();
 
 		_gradPesos.zerar();
-		_gradBias.zerar();
+		if (usarBias) _gradBias.zerar();
 	}
 }

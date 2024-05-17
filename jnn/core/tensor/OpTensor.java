@@ -185,11 +185,12 @@ public class OpTensor {
 		final int n = colA;
 		for (int i = 0; i < linA; i++) {
 			for (int j = 0; j < colB; j++) {
-				double soma = 0.0d;
+				double soma = 0.0;
+				int idSaida = (i * colD) + j;
 				for (int k = 0; k < n; k++) {
 					soma += dataA[i * colA + k] * dataB[k * colB + j];
 				}
-				dataD[i * colD + j].set(soma);
+				dataD[idSaida].set(soma);
 			}
 		}
 

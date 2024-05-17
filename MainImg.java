@@ -158,17 +158,14 @@ public class MainImg {
 		double[] perdas = modelo.historico();
 		double[][] dadosPerdas = new double[perdas.length][1];
 
-		try (ExecutorService exec = Executors.newFixedThreadPool(2)) {
-			exec.execute(() -> {
-				for(int i = 0; i < dadosPerdas.length/2; i++){
-					dadosPerdas[i][0] = perdas[i];
-				}
-			});
-			exec.execute(() -> {
-				for(int i = dadosPerdas.length/2; i < dadosPerdas.length; i++){
-					dadosPerdas[i][0] = perdas[i];
-				}
-			});
+		try (ExecutorService exec = Executors.newFixedThreadPool(4)) {
+			final int n = dadosPerdas.length;
+			for (int i = 0; i < n; i++) {
+				final int id = i;
+				exec.submit(() -> {
+					dadosPerdas[id][0] = perdas[id];
+				});
+			}
 		} catch (Exception e) {
 			throw e;
 		}

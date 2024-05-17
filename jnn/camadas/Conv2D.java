@@ -729,7 +729,7 @@ public class Conv2D extends Camada implements Cloneable {
 		verificarConstrucao();
 
 		_gradFiltros.zerar();
-		_gradBias.zerar();
+		if (usarBias) _gradBias.zerar();
 	}
 
 	/**

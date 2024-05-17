@@ -370,7 +370,8 @@ public class Sequencial extends Modelo {
   
 	@Override
 	public void zerarGradientes() {
-		for (int i = 0; i < _camadas.length; i++) {
+		final int n = _camadas.length;
+		for (int i = 0; i < n; i++) {
 			if (_camadas[i].treinavel()) _camadas[i].zerarGradientes();
 		}
 	}

@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import jnn.Funcional;
 import jnn.camadas.*;
+import jnn.core.tensor.Tensor;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
 import jnn.serializacao.Serializador;
@@ -36,7 +37,7 @@ public class MainConv {
 	static final int NUM_AMOSTRAS_TREINO = 400;
 	static final int NUM_AMOSTRAS_TESTE  = 100;
 	static final int TREINO_EPOCAS = 10; // += 12min18s - 400 amostras - 10 epocas - 10 lotes
-	static final int TREINO_LOTE = 1;
+	static final int TREINO_LOTE = 8;
 	static final boolean TREINO_LOGS = true;
 
 	// caminhos de arquivos externos
@@ -48,8 +49,8 @@ public class MainConv {
 	public static void main(String[] args) {
 		ged.limparConsole();
 		
-		final var treinoX = jnn.arrayParaTensores(carregarDadosMNIST(CAMINHO_TREINO, NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO));
-		final var treinoY = jnn.arrayParaTensores(criarRotulosMNIST(NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO));
+		final Tensor[] treinoX = jnn.arrayParaTensores(carregarDadosMNIST(CAMINHO_TREINO, NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO));
+		final Tensor[] treinoY = jnn.arrayParaTensores(criarRotulosMNIST(NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO));
 
 		Sequencial modelo = criarModelo();
 		modelo.setHistorico(true);
@@ -70,8 +71,8 @@ public class MainConv {
 		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(treinoX, treinoY).item() * 100), 4) + "%");
 
 		System.out.println("\nCarregando dados de teste.");
-		final var testeX = jnn.arrayParaTensores(carregarDadosMNIST(CAMINHO_TESTE, NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE));
-		final var testeY = jnn.arrayParaTensores(criarRotulosMNIST(NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE));
+		final Tensor[] testeX = jnn.arrayParaTensores(carregarDadosMNIST(CAMINHO_TESTE, NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE));
+		final Tensor[] testeY = jnn.arrayParaTensores(criarRotulosMNIST(NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE));
 		System.out.print("Teste -> perda: " + modelo.avaliar(testeX, testeY).item() + " - ");
 		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(testeX, testeY).item() * 100), 4) + "%");
 

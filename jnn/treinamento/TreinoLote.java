@@ -75,18 +75,18 @@ class TreinoLote {
 
 			for (int i = 0; i < numAmostras; i += tamLote) {
 				int fimIndice = Math.min(i + tamLote, numAmostras);
-				Object[] entradaLote = aux.obterSubMatriz(entradas, i, fimIndice);
-				Object[] saidaLote = aux.obterSubMatriz(saidas, i, fimIndice);
+				Tensor[] entradaLote = aux.obterSubMatriz(entradas, i, fimIndice);
+				Tensor[] saidaLote = aux.obterSubMatriz(saidas, i, fimIndice);
 				
 				modelo.zerarGradientes();//zerar gradientes para o acumular pelo lote
 				for (int j = 0; j < entradaLote.length; j++) {
 					Tensor prev = modelo.forward(entradaLote[j]);
 
 					if (calcularHistorico) {
-						perdaEpoca += perda.calcular(prev, (Tensor) saidaLote[j]).item();
+						perdaEpoca += perda.calcular(prev, saidaLote[j]).item();
 					}
 
-					aux.backpropagation(camadas, perda, prev, (Tensor)saidaLote[j]);
+					aux.backpropagation(camadas, perda, prev, saidaLote[j]);
 				}
 
 				otimizador.atualizar(camadas);          
