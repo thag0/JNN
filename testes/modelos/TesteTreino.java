@@ -15,45 +15,50 @@ public class TesteTreino{
 	public static void main(String[] args){
 		ged.limparConsole();
 
-		double[][] entrada = {
-			{0, 0},
-			{0, 1},
-			{1, 0},
-			{1, 1}
-		};
-		double[][] saida = {
-			{0},
-			{1},
-			{1},
-			{0}
-		};
+		Dados xor = ged.lerCsv("./dados/csv/xor.csv");
+		double[][] dados = ged.dadosParaDouble(xor);
+		double[][] x = (double[][]) ged.separarDadosEntrada(dados, 2);
+		double[][] y = (double[][]) ged.separarDadosSaida(dados, 1);
+		int in  = x[0].length;// colunas de entrada
+		int out = y[0].length;// colunas de saída
 
-		Tensor[] treinoX = jnn.arrayParaTensores(entrada);
-		Tensor[] treinoY = jnn.arrayParaTensores(saida);
+		Tensor[] treinoX = jnn.arrayParaTensores(x);
+		Tensor[] treinoY = jnn.arrayParaTensores(y);
 
 		Sequencial modelo = new Sequencial(
-			new Entrada(treinoX[0].tamanho()),
-			new Densa(3, "sigmoid"),
-			new Densa(1, "sigmoid")
+			new Entrada(in),
+			new Densa(2, "sigmoid"),
+			new Densa(out, "sigmoid")
 		);
 		
-		modelo.compilar(new SGD(0.00001, 0.9999), "mse");
-		modelo.treinar(treinoX, treinoY, 20_000, false);
-		verificar(treinoX, treinoY, modelo);
+		modelo.compilar(new SGD(0.00001, 0.99995), "mse");
+		modelo.treinar(treinoX, treinoY, 15_000, false);
 
-		double perda = modelo.avaliar(treinoX, treinoY).item();
-		System.out.println("\nPerda: " + perda + "\n");
+		Tensor perda = modelo.avaliar(treinoX, treinoY);
+		
+		System.out.println("Perda: " + perda.item() + "\n");
+		System.out.println(verificar(treinoX, treinoY, modelo));
 	}
 
-	static void verificar(Tensor[] entrada, Tensor[] saida, Sequencial modelo){
+	static Tensor verificar(Tensor[] entrada, Tensor[] saida, Sequencial modelo){
 		Tensor[] preds = modelo.forwards(entrada);
-		
+
+		int n = preds.length;
+		int cols = 2;
+		Tensor res = new Tensor(n, cols);
 		for(int i = 0; i < entrada.length; i++){
-			System.out.println(
-				"Real: " + saida[i].get(0) + ",   " +  
-				"Prev: " + preds[i].get(0)
+			res.set(
+				saida[i].get(0),
+				i, 0
+			);
+			res.set(
+				preds[i].get(0),
+				i, 1
 			);
 		}
+
+		res.nome("Real / Prev");
+		return res;
 	}
 
 	/**

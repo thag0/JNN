@@ -24,8 +24,8 @@ public class Benchmark {
 		int[] shapeFiltro = {3, 3};
 		int filtros = 20;
 
-		convForward(shapeEntrada, shapeFiltro, filtros);
-		testarForward();
+		// convForward(shapeEntrada, shapeFiltro, filtros);
+		// testarForward();
 		convBackward(shapeEntrada, shapeFiltro, filtros);
 		testarBackward();
 	}
