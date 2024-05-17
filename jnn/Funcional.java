@@ -136,7 +136,7 @@ public final class Funcional {
      */
     public Tensor sub(Tensor a, Tensor b) {
         Tensor r = new Tensor(a);
-        r.add(b);
+        r.sub(b);
 
         return r;
     }
@@ -149,7 +149,7 @@ public final class Funcional {
      */
     public Tensor mult(Tensor a, Tensor b) {
         Tensor r = new Tensor(a);
-        r.add(b);
+        r.mult(b);
 
         return r;
     }
