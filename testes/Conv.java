@@ -42,8 +42,8 @@ public class Conv{
 		// testarAcertosMNIST(modelo);
 		// testarTodosDados(modelo);
 
-		Dados forward = tempoForward(modelo);//media 83/120 ms
-		Dados backward = tempoBackward(modelo);//media 118/133 ms
+		Dados forward = tempoForward(modelo);//media 32/44ms
+		Dados backward = tempoBackward(modelo);//media 58/125 ms
 		// forward = ged.filtrar(forward, 1, "Conv2D");
 		// backward = ged.filtrar(backward, 1, "Conv2D");
 		forward.print();

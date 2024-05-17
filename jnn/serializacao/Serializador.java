@@ -318,7 +318,8 @@ public class Serializador {
 			otimizador.construir(modelo.camadas());
 
 		} catch(Exception e) {
-			throw new RuntimeException(e);
+			System.out.println("Erro ao ler modelo");
+			throw new RuntimeException(e.getMessage());
 		}
 
 		return modelo;
