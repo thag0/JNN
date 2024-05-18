@@ -182,10 +182,12 @@ public class OpTensor {
 		Variavel[] dataB = b.paraArray();
 		Variavel[] dataD = dest.paraArray();
 		
+		// cache
 		final int n = colA;
 		Variavel soma = new Variavel();
-		for (int i = 0; i < linA; i++) {
-			for (int j = 0; j < colB; j++) {
+
+		for (int i = 0; i < linD; i++) {
+			for (int j = 0; j < colD; j++) {
 				soma.set(0.0);
 				int idSaida = (i * colD) + j;
 				for (int k = 0; k < n; k++) {
