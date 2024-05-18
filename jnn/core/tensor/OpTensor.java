@@ -177,18 +177,22 @@ public class OpTensor {
 			);
 		}
 
-		//vetorização para melhor performance				
-		double[] dataA = a.paraArrayDouble();
-		double[] dataB = b.paraArrayDouble();
+		//vetorização para melhor performance
+		Variavel[] dataA = a.paraArray();
+		Variavel[] dataB = b.paraArray();
 		Variavel[] dataD = dest.paraArray();
 		
 		final int n = colA;
+		Variavel soma = new Variavel();
 		for (int i = 0; i < linA; i++) {
 			for (int j = 0; j < colB; j++) {
-				double soma = 0.0;
+				soma.set(0.0);
 				int idSaida = (i * colD) + j;
 				for (int k = 0; k < n; k++) {
-					soma += dataA[i * colA + k] * dataB[k * colB + j];
+					soma.addMult(
+						dataA[i * colA + k],
+						dataB[k * colB + j]
+					);
 				}
 				dataD[idSaida].set(soma);
 			}
@@ -256,17 +260,21 @@ public class OpTensor {
 		final int largEntrada = shapeE[1];
 
 		// vetorização para melhorar o desempenho
-		double[] dataE = entrada.paraArrayDouble();
-		double[] dataK = kernel.paraArrayDouble();
+		Variavel[] dataE = entrada.paraArray();
+		Variavel[] dataK = kernel.paraArray();
 		Variavel[] dataS = saida.paraArray();
 
+		Variavel soma = new Variavel();
 		for (int i = 0; i < altEsperada; i++) {
 			for (int j = 0; j < largEsperada; j++) {
 				final int idSaida = i * largEsperada + j;
-				double soma = 0.0;
+				soma.set(0.0);
 				for (int k = 0; k < altKernel; k++) {
 					for (int l = 0; l < largKernel; l++) {
-						soma += dataE[(k + i) * largEntrada + (l + j)] * dataK[k * largKernel + l];
+						soma.addMult(
+							dataE[(k + i) * largEntrada + (l + j)],
+							dataK[k * largKernel + l]
+						);
 					}
 				}
 				dataS[idSaida].set(soma);
@@ -417,20 +425,24 @@ public class OpTensor {
 		final int largKernel = shapeK[1];
 
 		// vetorização para melhorar o desempenho
-		double[] dataE = entrada.paraArrayDouble();
-		double[] dataK = kernel.paraArrayDouble();
+		Variavel[] dataE = entrada.paraArray();
+		Variavel[] dataK = kernel.paraArray();
 		Variavel[] dataS = saida.paraArray();
-	
+
+		Variavel soma = new Variavel();
 		for (int i = 0; i < altEsperada; i++) {
 			for (int j = 0; j < largEsperada; j++) {
-				double soma = 0.0;
+				soma.set(0.0);
 				for (int m = 0; m < altKernel; m++) {
 					int linEntrada = i - m;
 					if (linEntrada >= 0 && linEntrada < altEntrada) {
 						for (int n = 0; n < largKernel; n++) {
 							int colEntrada = j - n;
 							if (colEntrada >= 0 && colEntrada < largEntrada) {
-								soma += dataK[m * largKernel + n] * dataE[linEntrada * largEntrada + colEntrada];
+								soma.addMult(
+									dataK[m * largKernel + n],
+									dataE[linEntrada * largEntrada + colEntrada]
+								);
 							}
 						}
 					}

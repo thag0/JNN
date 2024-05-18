@@ -49,9 +49,6 @@ public class Conv{
 		forward.print();
 		backward.print();
 
-		// testarForward();
-		// testarBackward();
-
 		// tempoOtimizador(modelo);
 	}
 
