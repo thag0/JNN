@@ -1,7 +1,6 @@
 package jnn.serializacao;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 
 import jnn.camadas.Dropout;
 
@@ -16,29 +15,21 @@ class SerialDropout {
 	 *    <li> taxa de dropout; </li>
 	 * </ul>
 	 * @param camada camada de dropout que será serializada.
-	 * @param bw escritor de buffer usado para salvar os dados da camada.
+	 * @param sb StringBuilder usado como buffer.
 	 */
-	public void serializar(Dropout camada, BufferedWriter bw) {
-		try {
-			//nome da camada pra facilitar
-			bw.write(camada.nome());
-			bw.newLine();
+	public void serializar(Dropout camada, StringBuilder sb) {
+		//nome da camada pra facilitar
+		sb.append(camada.nome()).append("\n");
 
-			//formato de entrada
-			int[] entrada = camada.formatoEntrada();
-			for (int i = 0; i < entrada.length; i++) {
-				bw.write(entrada[i] + " ");
-			}
-			bw.newLine();
-			
-			//taxa
-			double taxa = camada.taxa();
-			bw.write(String.valueOf(taxa));
-			bw.newLine();
-
-		} catch(Exception e) {
-			e.printStackTrace();
+		//formato de entrada
+		int[] entrada = camada.formatoEntrada();
+		for (int i = 0; i < entrada.length; i++) {
+			sb.append(entrada[i]).append(" ");
 		}
+		sb.append("\n");
+		
+		//taxa
+		sb.append(camada.taxa()).append("\n");
 	}
 
 	/**

@@ -5,8 +5,6 @@ import jnn.core.OpArray;
 import jnn.core.Utils;
 import jnn.core.tensor.OpTensor;
 import jnn.core.tensor.Tensor;
-import jnn.inicializadores.He;
-import jnn.inicializadores.Inicializador;
 import lib.ged.Ged;
 import lib.geim.Geim;
 
@@ -20,10 +18,6 @@ public class Playground {
 	public static void main(String[] args) {
 		ged.limparConsole();
 
-		Tensor a = new Tensor(2, 2);
-		Inicializador ini = new He(1234);
-		ini.inicializar(a);
-		System.out.println(a);
 	}
 
 	static double randn() {

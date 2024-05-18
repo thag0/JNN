@@ -1,7 +1,6 @@
 package jnn.serializacao;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 
 import jnn.camadas.Flatten;
 
@@ -15,28 +14,27 @@ class SerialFlatten {
 	 *    <li> Formato de entrada (altura, largura, profundidade); </li>
 	 *    <li> Formato de saída (altura, largura, profundidade); </li>
 	 * </ul>
-	 * @param camada camada flatten que será serializada.
-	 * @param bw escritor de buffer usado para salvar os dados da camada.
+	 * @param sb StringBuilder usado como buffer.
+
 	 */
-	public void serializar(Flatten camada, BufferedWriter bw) {
-		try{
+	public void serializar(Flatten camada, StringBuilder sb) {
+		try {
 			//nome da camada pra facilitar
-			bw.write(camada.nome());
-			bw.newLine();
+			sb.append(camada.nome()).append("\n");
 
 			//formato de entrada
 			int[] entrada = camada.formatoEntrada();
 			for (int i = 0; i < entrada.length; i++) {
-				bw.write(entrada[i] + " ");
+				sb.append(entrada[i]).append(" ");
 			}
-			bw.newLine();
+			sb.append("\n");
 			
 			//formato de saída
 			int[] saida = camada.formatoSaida();
 			for (int i = 0; i < saida.length; i++) {
-				bw.write(saida[i] + " ");
+				sb.append(saida[i]).append(" ");
 			}
-			bw.newLine();
+			sb.append("\n");
 
 		} catch(Exception e) {
 			e.printStackTrace();

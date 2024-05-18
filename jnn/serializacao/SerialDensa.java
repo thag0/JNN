@@ -1,8 +1,6 @@
 package jnn.serializacao;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
 
 import jnn.camadas.Densa;
 import jnn.core.tensor.Tensor;
@@ -23,54 +21,45 @@ class SerialDensa {
 	 *    <li> Valores dos bias (se houver); </li>
 	 * </ul>
 	 * @param camada camada densa que será serializada.
-	 * @param bw escritor de buffer usado para salvar os dados da camada.
-	 * @param tipo tipo de dado que será escrito.
+	 * @param sb StringBuilder usado como buffer.
+	 * @param tipo tipo de dado que será escrito (double / float).
 	 */
-	public void serializar(Densa camada, BufferedWriter bw, String tipo) {
-		try {
-			//nome da camada pra facilitar
-			bw.write(camada.nome());
-			bw.newLine();
+	public void serializar(Densa camada, StringBuilder sb, String tipo) {
+		//nome da camada pra facilitar
+		sb.append(camada.nome()).append("\n");
 
-			//formato de entrada
-			int[] entrada = camada.formatoEntrada();
-			for (int i = 0; i < entrada.length; i++) {
-				bw.write(entrada[i] + " ");
-			}
-			bw.newLine();
-			
-			//formato de saída
-			int[] saida = camada.formatoSaida();
-			for (int i = 0; i < saida.length; i++) {
-				bw.write(saida[i] + " ");
-			}
-			bw.newLine();
-			
-			//função de ativação
-			bw.write(String.valueOf(camada.ativacao().getClass().getSimpleName()));
-			bw.newLine();
-
-			//bias
-			bw.write(String.valueOf(camada.temBias()));
-			bw.newLine();
-			
-			Variavel[] pesos = camada.kernelParaArray();
-			for (int i = 0; i < pesos.length; i++) {
-				escreverDado(pesos[i].get(), tipo, bw);
-				bw.newLine();
-			}
-
-			if (camada.temBias()) {
-				Variavel[] bias = camada.biasParaArray();
-				for (int i = 0; i < bias.length; i++) {
-					escreverDado(bias[i].get(), tipo, bw);
-					bw.newLine();
-				}
-			}
+		//formato de entrada
+		int[] entrada = camada.formatoEntrada();
+		for (int i = 0; i < entrada.length; i++) {
+			sb.append(entrada[i]).append(" ");
+		}
+		sb.append("\n");
 		
-		} catch (IOException e) {
-			System.out.println("\nErro ao serializar camada Densa:");
-			e.printStackTrace();
+		//formato de saída
+		int[] saida = camada.formatoSaida();
+		for (int i = 0; i < saida.length; i++) {
+			sb.append(saida[i]).append(" ");
+		}
+		sb.append("\n");
+		
+		//função de ativação
+		sb.append(camada.ativacao().nome()).append("\n");
+
+		//bias
+		sb.append(camada.temBias()).append("\n");
+		
+		Variavel[] pesos = camada.kernelParaArray();
+		for (int i = 0; i < pesos.length; i++) {
+			escreverDado(pesos[i].get(), tipo, sb);
+			sb.append("\n");
+		}
+
+		if (camada.temBias()) {
+			Variavel[] bias = camada.biasParaArray();
+			for (int i = 0; i < bias.length; i++) {
+				escreverDado(bias[i].get(), tipo, sb);
+				sb.append("\n");
+			}
 		}
 	}
 
@@ -78,17 +67,17 @@ class SerialDensa {
 	 * Salva o valor de acordo com a configuração de tipo definida.
 	 * @param valor valor desejado.
 	 * @param tipo formatação do dado (float, double).
-	 * @param bw escritor de buffer usado.
+	 * @param sb StringBuilder usado como buffer.
 	 */
-	private void escreverDado(double valor, String tipo, BufferedWriter bw) throws IOException {
+	private void escreverDado(double valor, String tipo, StringBuilder sb) {
 		tipo = tipo.toLowerCase();
 		switch (tipo) {
 			case "float":
-				bw.write(String.valueOf((float) valor));
+				sb.append((float)valor);// reduzir espaço do arquivo.
 				break;
 
 			case "double":
-				bw.write(String.valueOf(valor));
+				sb.append(valor);
 				break;
 				
 			default:

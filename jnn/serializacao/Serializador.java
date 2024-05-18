@@ -5,7 +5,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-
+import java.io.IOException;
 import jnn.avaliacao.perda.Perda;
 import jnn.camadas.AvgPool2D;
 import jnn.camadas.Camada;
@@ -95,31 +95,32 @@ public class Serializador {
 			);
 		}
 
+		final StringBuilder sb = new StringBuilder();
+		
+		//arquitetura da rede
+		int[] arq = rede.obterArquitetura();
+		for (int i = 0; i < arq.length; i++) {
+			sb.append(arq[i]).append(" ");
+		}
+		sb.append("\n");
+
+		//bias
+		sb.append(rede.temBias()).append("\n");
+
+		//funções de ativação
+		Densa[] camadas = rede.camadas();
+		for (int i = 0; i < camadas.length; i++) {
+			sb.append(camadas[i].ativacao().nome()).append("\n");
+		}
+		sb.append("\n");
+
+		//pesos dos neuronios
+		for (Densa camada : rede.camadas()) {
+			auxDensa.serializar(camada, sb, tipo);
+		}
+
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(arquivo))) {
-			//arquitetura da rede
-			int[] arq = rede.obterArquitetura();
-			for (int i = 0; i < arq.length; i++) {
-				bw.write(arq[i] + " ");
-			}
-			bw.newLine();
-
-			//bias
-			bw.write(Boolean.toString(rede.temBias()));
-			bw.newLine();
-
-			//funções de ativação
-			Densa[] camadas = rede.camadas();
-			for (int i = 0; i < camadas.length; i++) {
-				bw.write(camadas[i].ativacao().getClass().getSimpleName());
-				bw.write(" ");
-			}
-			bw.newLine();
-
-			//pesos dos neuronios
-			for (Densa camada : rede.camadas()) {
-				auxDensa.serializar(camada, bw, tipo);
-			}
-
+			bw.write(sb.toString());
 		} catch(Exception e) {
 			System.out.println("\nErro ao salvar o arquivo da Rede Neural.");
 			e.printStackTrace();
@@ -152,47 +153,50 @@ public class Serializador {
 			);
 		}
 
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(arquivo))) {
-			//quantidade de camadas
-			bw.write(String.valueOf(modelo.numCamadas()));
-			bw.newLine();
+		if (!modelo._compilado) {
+			throw new IllegalStateException(
+				"\nO modelo deve ser compilado."
+			);
+		}
 
-			//otimizador usado
-			bw.write(modelo.otimizador().nome());
-			bw.newLine();
+		final StringBuilder sb = new StringBuilder();
 
-			//função de perda
-			bw.write(modelo.perda().nome());
-			bw.newLine();
+		sb.append(modelo.numCamadas()).append("\n");
+		sb.append(modelo.otimizador().nome()).append("\n");
+		sb.append(modelo.perda().nome()).append("\n");
 
-			for (Camada camada : modelo.camadas()) {
-				if (camada instanceof Densa) {
-					auxDensa.serializar((Densa) camada, bw, tipo);
+		for (Camada camada : modelo.camadas()) {
+			if (camada instanceof Densa) {
+				auxDensa.serializar((Densa) camada, sb, tipo);
 
-				} else if (camada instanceof Conv2D) {
-					auxConv.serializar((Conv2D) camada, bw, tipo);
-				
-				} else if (camada instanceof Flatten) {
-					auxFlat.serializar((Flatten) camada, bw);
-				
-				} else if (camada instanceof MaxPool2D) {
-					auxMaxPool.serializar((MaxPool2D) camada, bw);
+			} else if (camada instanceof Conv2D) {
+				auxConv.serializar((Conv2D) camada, sb, tipo);
+			
+			} else if (camada instanceof Flatten) {
+				auxFlat.serializar((Flatten) camada, sb);
+			
+			} else if (camada instanceof MaxPool2D) {
+				auxMaxPool.serializar((MaxPool2D) camada, sb);
 
-				} else if (camada instanceof AvgPool2D) {
-					auxAvgPool.serializar((AvgPool2D) camada, bw);
+			} else if (camada instanceof AvgPool2D) {
+				auxAvgPool.serializar((AvgPool2D) camada, sb);
 
-				} else if (camada instanceof Dropout) {
-					auxDropout.serializar((Dropout) camada, bw);
+			} else if (camada instanceof Dropout) {
+				auxDropout.serializar((Dropout) camada, sb);
 
-				} else{
-					throw new IllegalArgumentException(
-						"Tipo de camada \"" + camada.getClass().getTypeName() + "\" não suportado."
-					);
-				}
+			} else{
+				throw new IllegalArgumentException(
+					"Tipo de camada \"" + camada.getClass().getTypeName() + "\" não suportado."
+				);
 			}
-		
-		} catch(Exception e) {
-			e.printStackTrace();
+		}
+
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(arquivo))) {
+			bw.write(sb.toString());
+
+	 	} catch (IOException e) {
+			System.out.println("\nErro ao salvar modelo:");
+			System.out.println(e.getMessage());
 		}
 	}
 

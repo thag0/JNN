@@ -1,8 +1,6 @@
 package jnn.serializacao;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
 
 import jnn.camadas.Conv2D;
 import jnn.core.tensor.Tensor;
@@ -13,7 +11,7 @@ import jnn.core.tensor.Variavel;
  */
 class SerialConv {
 
-	public SerialConv(){}
+	public SerialConv() {}
 
 	/**
 	 * Transforma os dados contidos na camada Convolucional numa sequência
@@ -28,85 +26,78 @@ class SerialConv {
 	 *    <li> Valores dos bias (se houver); </li>
 	 * </ul>
 	 * @param camada camada convolucional que será serializada.
-	 * @param bw escritor de buffer usado para salvar os dados da camada.
+	 * @param sb StringBuilder usado como buffer.
+	 * @param tipo tipo de dado que será escrito (double / float).
 	 */
-	public void serializar(Conv2D camada, BufferedWriter bw, String tipo) {
-		try {
-			//nome da camada pra facilitar
-			bw.write(camada.nome());
-			bw.newLine();
+	public void serializar(Conv2D camada, StringBuilder sb, String tipo) {
+		//nome da camada pra facilitar
+		sb.append(camada.nome()).append("\n");
 
-			//formato de entrada
-			int[] entrada = camada.formatoEntrada();
-			for (int i = 0; i < entrada.length; i++) {
-				bw.write(entrada[i] + " ");
-			}
-			bw.newLine();
-			
-			//formato de saída
-			int[] saida = camada.formatoSaida();
-			for (int i = 0; i < saida.length; i++) {
-				bw.write(saida[i] + " ");
-			}
-			bw.newLine();
-			
-			//formato dos filtros
-			int[] formFiltro = camada.formatoFiltro();
-			for (int i = 0; i < formFiltro.length; i++) {
-				bw.write(formFiltro[i] + " ");
-			}
-			bw.newLine();
-			
-			//função de ativação
-			bw.write(String.valueOf(camada.ativacao().getClass().getSimpleName()));
-			bw.newLine();
+		//formato de entrada
+		int[] entrada = camada.formatoEntrada();
+		for (int i = 0; i < entrada.length; i++) {
+			sb.append(entrada[i]).append(" ");
+		}
+		sb.append("\n");
+		
+		//formato de saída
+		int[] saida = camada.formatoSaida();
+		for (int i = 0; i < saida.length; i++) {
+			sb.append(saida[i]).append(" ");
+		}
+		sb.append("\n");
+		
+		//formato dos filtros
+		int[] shapeFiltro = camada.formatoFiltro();
+		for (int i = 0; i < shapeFiltro.length; i++) {
+			sb.append(shapeFiltro[i]).append(" ");
+		}
+		sb.append("\n");
+		
+		//função de ativação
+		sb.append(camada.ativacao().nome()).append("\n");
 
-			//bias
-			bw.write(String.valueOf(camada.temBias()));
-			bw.newLine();
+		//bias
+		sb.append(camada.temBias()).append("\n");
 
-			//filtros
-			Tensor filtros = camada.kernel();
-			int[] shape = filtros.shape();
-			for (int i = 0; i < shape[0]; i++) {
-				for (int j = 0; j < shape[1]; j++) {
-					for (int k = 0; k < shape[2]; k++) {
-						for (int l = 0; l < shape[3]; l++) {
-							escreverDado(filtros.get(i, j, k, l), tipo, bw);
-							bw.newLine();
-						}
+		//filtros
+		Tensor filtros = camada.kernel();
+		int[] shape = filtros.shape();
+		for (int i = 0; i < shape[0]; i++) {
+			for (int j = 0; j < shape[1]; j++) {
+				for (int k = 0; k < shape[2]; k++) {
+					for (int l = 0; l < shape[3]; l++) {
+						escreverDado(filtros.get(i, j, k, l), tipo, sb);
+						sb.append("\n");
 					}
 				}
 			}
-			
-			if(camada.temBias()){
-				Variavel[] bias = camada.bias().paraArray();
-				for(Variavel valor : bias){
-					escreverDado(valor.get(), tipo, bw);
-					bw.newLine();               
-				}
+		}
+		
+		if(camada.temBias()){
+			Variavel[] bias = camada.bias().paraArray();
+			for(Variavel valor : bias){
+				escreverDado(valor.get(), tipo, sb);
+				sb.append("\n");               
 			}
-		} catch (Exception e) {
-			System.out.println("\nErro ao serializar camada " + camada.nome());
-			e.printStackTrace();
 		}
 	}
 
 	/**
 	 * Salva o valor de acordo com a configuração de tipo definida.
 	 * @param valor valor desejado.
-	 * @param tipo formatação do dado (float, double).
-	 * @param bw escritor de buffer usado.
+	 * @param tipo formatação do dado (float / double).
+	 * @param sb StringBuilder usado como buffer..
 	 */
-	private void escreverDado(double valor, String tipo, BufferedWriter bw) throws IOException {
+	private void escreverDado(double valor, String tipo, StringBuilder sb) {
 		tipo = tipo.toLowerCase();
 		switch(tipo){
 			case "float":
-				bw.write(String.valueOf((float) valor));
+				sb.append((float) valor);
 			break;
 
 			case "double":
-				bw.write(String.valueOf(valor));
+				sb.append(valor);
 			break;
 				
 			default:

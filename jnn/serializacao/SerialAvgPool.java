@@ -1,7 +1,6 @@
 package jnn.serializacao;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 
 import jnn.camadas.AvgPool2D;
 
@@ -11,45 +10,39 @@ class SerialAvgPool {
 	 * Transforma os dados contidos na camada AvgPooling em
 	 * informações sequenciais.
 	 * @param camada camada de avg pooling que será serializada.
-	 * @param bw escritor de buffer usado para salvar os dados da camada.
+	 * @param sb StringBuilder usado como buffer.
 	 */
-	public void serializar(AvgPool2D camada, BufferedWriter bw) {
-		try {
-			//nome da camada pra facilitar
-			bw.write(camada.nome());
-			bw.newLine();
+	public void serializar(AvgPool2D camada, StringBuilder sb) {
+		//nome da camada pra facilitar
+		sb.append(camada.nome()).append("\n");
 
-			//formato de entrada
-			int[] entrada = camada.formatoEntrada();
-			for (int i = 0; i < entrada.length; i++) {
-				bw.write(entrada[i] + " ");
-			}
-			bw.newLine();
-			
-			//formato de saída
-			int[] saida = camada.formatoSaida();
-			for (int i = 0; i < saida.length; i++) {
-				bw.write(saida[i] + " ");
-			}
-			bw.newLine();
-			
-			//formato do filtro
-			int[] formFiltro = camada.formatoFiltro();
-			for (int i = 0; i < formFiltro.length; i++) {
-				bw.write(formFiltro[i] + " ");
-			}
-			bw.newLine();
-			
-			//formato dos strides
-			int[] formStride = camada.formatoStride();
-			for (int i = 0; i < formStride.length; i++) {
-				bw.write(formStride[i] + " ");
-			}
-			bw.newLine();
-
-		} catch (Exception e) {
-			e.printStackTrace();
+		//formato de entrada
+		int[] entrada = camada.formatoEntrada();
+		for (int i = 0; i < entrada.length; i++) {
+			sb.append(entrada[i]).append(" ");
 		}
+		sb.append("\n");
+		
+		//formato de saída
+		int[] saida = camada.formatoSaida();
+		for (int i = 0; i < saida.length; i++) {
+			sb.append(saida[i]).append(" ");
+		}
+		sb.append("\n");
+		
+		//formato do filtro
+		int[] formFiltro = camada.formatoFiltro();
+		for (int i = 0; i < formFiltro.length; i++) {
+			sb.append(formFiltro[i]).append(" ");
+		}
+		sb.append("\n");
+		
+		//formato dos strides
+		int[] formStride = camada.formatoStride();
+		for (int i = 0; i < formStride.length; i++) {
+			sb.append(formStride[i]).append(" ");
+		}
+		sb.append("\n");
 	}
 
 	/**
