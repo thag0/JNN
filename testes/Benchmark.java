@@ -24,10 +24,17 @@ public class Benchmark {
 		int[] shapeFiltro = {3, 3};
 		int filtros = 20;
 
-		convForward(shapeEntrada, shapeFiltro, filtros);
-		testarForward();
+		// convForward(shapeEntrada, shapeFiltro, filtros);
+		// testarForward();
 		convBackward(shapeEntrada, shapeFiltro, filtros);
 		testarBackward();
+
+		// Tensor a = new Tensor(28, 28);
+		// Tensor b = new Tensor(3, 3);
+		// Tensor c = new Tensor(26, 26);
+
+		// long t = medirTempo(() -> optensor.correlacao2D(a, b, c));
+		// System.out.println("tempo: " + new DecimalFormat().format(t) + " ns");
 	}
 
 	/**
@@ -189,7 +196,7 @@ public class Benchmark {
 	 * Testar com multithread
 	 */
 	static void testarBackward() {
-		int[] formEntrada = {16, 16, 16};
+		int[] formEntrada = {10, 16, 16};
 		Inicializador iniKernel = new GlorotUniforme(12345);
 		Inicializador iniBias = new Zeros();
 		Conv2D conv = new Conv2D(formEntrada, new int[]{3, 3}, 16, "linear", iniKernel, iniBias);

@@ -1,18 +1,15 @@
 import numpy as np
+from scipy import signal
 import time
 import os
 
 os.system('cls')
 
-linA = 40
-colB = 40
-k = 40
-
-a = np.random.randn(linA, k)
-b = np.random.randn(k, colB)
+a = np.random.randn(28, 28)
+b = np.random.randn(3, 3)
 
 start_time = time.perf_counter_ns()
-res = a @ b
+res = signal.correlate2d(a, b, "valid")
 end_time = time.perf_counter_ns()
 
 execution_time_ns = end_time - start_time
