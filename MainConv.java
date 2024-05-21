@@ -92,7 +92,7 @@ public class MainConv {
 			new Conv2D(new int[]{3, 3}, 20, "relu"),
 			new MaxPool2D(new int[]{2, 2}),
 			new Flatten(),
-			new Densa(100, "sigmoid"),
+			new Densa(110, "sigmoid"),
 			new Densa(NUM_DIGITOS_TREINO, "softmax")
 		);
 
@@ -107,8 +107,9 @@ public class MainConv {
 	 * @param caminho caminho de destino.
 	 */
 	static void salvarModelo(Sequencial modelo, String caminho) {
-		System.out.println("Exportando modelo.");
-		new Serializador().salvar(modelo, caminho, "double");
+		String tipo = "double";
+		System.out.println("Exportando modelo (" + tipo + ").");
+		new Serializador().salvar(modelo, caminho, tipo);
 	}
 
 	/**
