@@ -633,28 +633,9 @@ public class Conv2D extends Camada implements Cloneable {
 			);
 		}
 
-		//feedforward
-
-		//zerar os valores calculados anteiormente
-		_somatorio.preencher(0.0d);
-
-		optensor.conv2DForward(_entrada, _filtros, _somatorio);
-		
-		// TODO melhorar isso usando broadcasting de tensores
-		if (usarBias) {
-			int f = numFiltros();
-			int alt = shapeSaida[1];
-			int larg = shapeSaida[2];
-			for (int i = 0; i < f; i++) {
-				double b = _bias.get(i);
-				for (int j = 0; j < alt; j++) {
-					for (int k = 0; k < larg; k++) {
-						_somatorio.add(b, i, j, k);
-					}
-				}
-			}
-		}
-
+		// feedforward
+		_somatorio.preencher(0.0d);// zerar valores pre-calculados
+		optensor.conv2DForward(_entrada, _filtros, _bias, _somatorio);
 		ativacao.forward(_somatorio, _saida);
 
 		return _saida;
@@ -703,27 +684,11 @@ public class Conv2D extends Camada implements Cloneable {
 		ativacao.backward(this);
 		
 		//backward
-		Tensor tempGrad = new Tensor(_gradFiltros.shape());
 		_gradEntrada.preencher(0.0d);
+		Tensor temp = new Tensor(_gradFiltros.shape());
 		
-		optensor.conv2DBackward(_entrada, _filtros, _gradSaida, tempGrad, _gradEntrada);
-		_gradFiltros.add(tempGrad);
-
-		if (usarBias) {
-			//TODO melhorar isso usando broadcasting, se der
-			final int f = numFiltros();
-			final int alt = shapeSaida[1];
-			final int larg = shapeSaida[2];
-			for (int i = 0; i < f; i++) {
-				double soma = 0.0;
-				for (int j = 0; j < alt; j++) {
-					for (int k = 0; k < larg; k++) {
-						soma += _gradSaida.get(i, j, k);
-					}
-				}
-				_gradBias.add(soma, i);
-			}
-		}
+		optensor.conv2DBackward(_entrada, _filtros, _gradSaida, temp, _gradBias, _gradEntrada);
+		_gradFiltros.add(temp);
 
 		return _gradEntrada;
 	}

@@ -459,9 +459,10 @@ public class OpTensor {
 	 * Realiza a propagação direta através da camada convolucional.
 	 * @param entrada {@code Tensor} contendo a entrada da camada.
 	 * @param kernel {@code Tensor} contendos o kernel/filtros da camada.
+	 * @param bias {@code Tensor} contendo o bias da camada {@code (podendo ser nulo)}.
 	 * @param saida {@code Tensor} de destino do resultado.
 	 */
-	public void conv2DForward(Tensor entrada, Tensor kernel, Tensor saida) {
+	public void conv2DForward(Tensor entrada, Tensor kernel, Tensor bias, Tensor saida) {
 		int[] shapeE = entrada.shape();
 		int[] shapeK = kernel.shape();
 		int[] shapeS = saida.shape();
@@ -512,6 +513,18 @@ public class OpTensor {
 				}
 			}
 		}
+
+		// TODO melhorar isso usando broadcasting de tensores
+		if (bias != null) {
+			for (int i = 0; i < numFiltros; i++) {
+				double b = bias.get(i);
+				for (int j = 0; j < altSaida; j++) {
+					for (int k = 0; k < largSaida; k++) {
+						saida.add(b, i, j, k);
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -520,9 +533,10 @@ public class OpTensor {
 	 * @param kernel {@code Tensor} contendos o kernel/filtros da camada.
 	 * @param gradS {@code Tensor} contendo o gradiente em relação a saída da camada.
 	 * @param gradK {@code Tensor} contendo o gradiente em relação ao kernel/filtros da camada.
+	 * @param gradB {@code Tensor} contendo o gradiente em relação ao bias da camada {@code (podendo ser nulo)}.
 	 * @param gradE {@code Tensor} contendo o gradiente em relação à entrada da camada.
 	 */
-	public void conv2DBackward(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Tensor gradE) {
+	public void conv2DBackward(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Tensor gradB, Tensor gradE) {
 		int[] shapeE = entrada.shape();
 		int[] shapeK = kernel.shape();
 		int[] shapeS = gradS.shape();
@@ -536,6 +550,7 @@ public class OpTensor {
 		final int largK = shapeK[3];
 		final int altS = shapeS[1];
 		final int largS = shapeS[2];
+		final boolean temBias = gradB != null;
 
 		// NOTA
 		// essa ainda não é a melhor solução, mas é mais eficiente que 
@@ -605,10 +620,28 @@ public class OpTensor {
 			}
 		});
 		t2.start();
+
+		Thread t3 = null;
+		if (temBias) {
+			//TODO melhorar isso usando broadcasting, se der
+			t3 = new Thread(() -> {
+				for (int i = 0; i < filtros; i++) {
+					double soma = 0.0;
+					for (int j = 0; j < altS; j++) {
+						for (int k = 0; k < largS; k++) {
+							soma += gradS.get(i, j, k);
+						}
+					}
+					gradB.add(soma, i);
+				}
+			});
+			t3.start();
+		}
 	
 		try {
 			t1.join();
 			t2.join();
+			if (temBias) t3.join();
 		} catch (InterruptedException e) {
 			System.out.println(e.getMessage());
 		}
