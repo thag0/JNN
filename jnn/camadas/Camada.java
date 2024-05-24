@@ -475,7 +475,7 @@ public abstract class Camada {
 	/**
 	 * Zera os gradientes para os kernels e bias da camada.
 	 */
-	public void zerarGradientes() {
+	public void zerarGrad() {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui kernel/bias para zerar."
 		);

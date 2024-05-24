@@ -801,7 +801,7 @@ public class Densa extends Camada implements Cloneable {
 	}
 
 	@Override
-	public void zerarGradientes() {
+	public void zerarGrad() {
 		verificarConstrucao();
 
 		_gradPesos.zerar();

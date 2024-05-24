@@ -75,7 +75,7 @@ class Treino {
 					perdaEpoca += perda.calcular(prev, saida[i]).item();
 				}
 				
-				modelo.zerarGradientes();
+				modelo.zerarGrad();
 				aux.backpropagation(camadas, perda, prev, saida[i]);
 				otimizador.atualizar(camadas);
 			}

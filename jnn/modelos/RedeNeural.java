@@ -1,9 +1,5 @@
 package jnn.modelos;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
 import jnn.ativacoes.Ativacao;
 import jnn.avaliacao.Avaliador;
 import jnn.avaliacao.perda.MSE;
@@ -452,61 +448,10 @@ public class RedeNeural extends Modelo {
 		return prev.clone();//preservar a saída do modelo
 	}
 
-	/**
-	 * Alimenta os dados pela rede neural usando o método de feedforward através do conjunto
-	 * de dados fornecido. 
-	 * <p>
-	 *    Os dados são alimentados para as entradas dos neurônios e é calculado o produto junto 
-	 *    com os pesos. No final é aplicado a função de ativação da camada no neurônio e o resultado 
-	 *    fica armazenado na saída dele.
-	 * </p>
-	 */
 	@Override
-	public Tensor[] forwards(Object[] entradas) {
-		verificarCompilacao();
-
-		utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
-
-		final int numEntradas = entradas.length;
-		int numThreads = Runtime.getRuntime().availableProcessors();
-		if (numThreads > numEntradas) numThreads = numEntradas;
-
-		Tensor[] prevs = new Tensor[numEntradas];
-		RedeNeural[] clones = new RedeNeural[numThreads];
-		ExecutorService exec = Executors.newFixedThreadPool(numThreads);
-
-		for (int i = 0; i < numThreads; i++) {
-			clones[i] = clone();
-		}
-
-		int lote = numEntradas / numThreads;
-		for (int i = 0; i < numThreads; i++) {
-			final int id = i;
-			final int inicio = i * lote;
-			final int fim = (i == numThreads - 1) ? numEntradas : (i + 1) * lote;
-
-			exec.execute(() -> {
-				for (int j = inicio; j < fim; j++) {
-					prevs[j] = clones[id].forward(entradas[j]);
-				}
-			});
-		}
-		exec.shutdown();
-
-		try {
-			exec.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-
-		return prevs;
-	}
-
-	@Override
-	public void zerarGradientes() {
+	public void zerarGrad() {
 		for (int i = 0; i < _camadas.length; i++) {
-			_camadas[i].zerarGradientes();
+			_camadas[i].zerarGrad();
 		}
 	}
 

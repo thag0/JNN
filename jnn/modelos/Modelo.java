@@ -9,6 +9,10 @@ import jnn.core.tensor.Variavel;
 import jnn.otimizadores.Otimizador;
 import jnn.treinamento.Treinador;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 /**
  * <h3>
  *    Basa para crianção de modelos dentro da biblioteca.
@@ -225,7 +229,46 @@ public abstract class Modelo implements Cloneable {
 	 * @param entradas array contendo multiplas entradas para testar o modelo.
 	 * @return array de {@code Tensor} contendo as previsões correspondentes.
 	 */
-	public abstract Tensor[] forwards(Object[] entradas);
+	public Tensor[] forwards(Object[] entradas) {
+		verificarCompilacao();
+
+		utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
+
+		final int numEntradas = entradas.length;
+		int numThreads = Runtime.getRuntime().availableProcessors();
+		if (numThreads > numEntradas) numThreads = numEntradas;
+
+		Tensor[] prevs = new Tensor[numEntradas];
+		Modelo[] clones = new Modelo[numThreads];
+		ExecutorService exec = Executors.newFixedThreadPool(numThreads);
+
+		for (int i = 0; i < numThreads; i++) {
+			clones[i] = clone();
+		}
+
+		int lote = numEntradas / numThreads;
+		for (int i = 0; i < numThreads; i++) {
+			final int id = i;
+			final int inicio = i * lote;
+			final int fim = (i == numThreads - 1) ? numEntradas : (i + 1) * lote;
+
+			exec.execute(() -> {
+				for (int j = inicio; j < fim; j++) {
+					prevs[j] = clones[id].forward(entradas[j]);
+				}
+			});
+		}
+		exec.shutdown();
+
+		try {
+			exec.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+
+		return prevs;
+	}
 
 	/**
 	 * Zera os gradientes acumulados do modelo.
@@ -233,7 +276,7 @@ public abstract class Modelo implements Cloneable {
 	 *    Apenas gradientes de camadas treináveis serão zerados.
 	 * </p>
 	 */
-	public abstract void zerarGradientes();
+	public abstract void zerarGrad();
 
 	/**
 	 * Treina o modelo de acordo com as configurações predefinidas.

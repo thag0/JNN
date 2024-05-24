@@ -78,7 +78,7 @@ class TreinoLote {
 				Tensor[] entradaLote = aux.obterSubMatriz(entradas, i, fimIndice);
 				Tensor[] saidaLote = aux.obterSubMatriz(saidas, i, fimIndice);
 				
-				modelo.zerarGradientes();//zerar gradientes para o acumular pelo lote
+				modelo.zerarGrad();//zerar gradientes para o acumular pelo lote
 				for (int j = 0; j < entradaLote.length; j++) {
 					Tensor prev = modelo.forward(entradaLote[j]);
 

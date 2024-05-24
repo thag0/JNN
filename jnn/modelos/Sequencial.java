@@ -1,9 +1,5 @@
 package jnn.modelos;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
 import jnn.avaliacao.Avaliador;
 import jnn.avaliacao.perda.Perda;
 import jnn.camadas.Camada;
@@ -325,54 +321,12 @@ public class Sequencial extends Modelo {
 
 		return prev.clone();//preservar a saída do modelo
 	}
-
-	@Override
-	public Tensor[] forwards(Object[] entradas) {
-		verificarCompilacao();
-
-		utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
-
-		final int numEntradas = entradas.length;
-		int numThreads = Runtime.getRuntime().availableProcessors();
-		if (numThreads > numEntradas) numThreads = numEntradas;
-
-		Tensor[] prevs = new Tensor[numEntradas];
-		Sequencial[] clones = new Sequencial[numThreads];
-		ExecutorService exec = Executors.newFixedThreadPool(numThreads);
-
-		for (int i = 0; i < numThreads; i++) {
-			clones[i] = clone();
-		}
-
-		int lote = numEntradas / numThreads;
-		for (int i = 0; i < numThreads; i++) {
-			final int id = i;
-			final int inicio = i * lote;
-			final int fim = (i == numThreads - 1) ? numEntradas : (i + 1) * lote;
-
-			exec.execute(() -> {
-				for (int j = inicio; j < fim; j++) {
-					prevs[j] = clones[id].forward(entradas[j]);
-				}
-			});
-		}
-		exec.shutdown();
-
-		try {
-			exec.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-
-		return prevs;
-	}
   
 	@Override
-	public void zerarGradientes() {
+	public void zerarGrad() {
 		final int n = _camadas.length;
 		for (int i = 0; i < n; i++) {
-			if (_camadas[i].treinavel()) _camadas[i].zerarGradientes();
+			if (_camadas[i].treinavel()) _camadas[i].zerarGrad();
 		}
 	}
 

@@ -693,7 +693,7 @@ public class Conv2D extends Camada implements Cloneable {
 	}
 
 	@Override
-	public void zerarGradientes() {
+	public void zerarGrad() {
 		verificarConstrucao();
 
 		_gradFiltros.zerar();
