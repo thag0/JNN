@@ -279,7 +279,7 @@ public class OpTensor {
 						);
 					}
 				}
-				dataS[idSaida].set(soma);
+				dataS[idSaida].add(soma);
 			}
 		}
 
@@ -359,7 +359,7 @@ public class OpTensor {
 						dataK[(altKernel - 1 - k) * largKernel + (largKernel - 1 - l)];
 					}
 				}
-				dataS[idSaida].set(soma);
+				dataS[idSaida].add(soma);
 			}
 		}
 		
@@ -434,6 +434,7 @@ public class OpTensor {
 		Variavel soma = new Variavel();
 		for (int i = 0; i < altEsperada; i++) {
 			for (int j = 0; j < largEsperada; j++) {
+				int idSaida = i*largEsperada + j;
 				soma.set(0.0);
 				for (int m = 0; m < altKernel; m++) {
 					int linEntrada = i - m;
@@ -449,7 +450,7 @@ public class OpTensor {
 						}
 					}
 				}
-				dataS[i * largEsperada + j].set(soma);
+				dataS[idSaida].add(soma);
 			}
 		}
 
@@ -489,15 +490,17 @@ public class OpTensor {
 		// dentro dos loops.
 		Tensor cache = new Tensor(altSaida, largSaida);
 		for (int f = 0; f < numFiltros; f++){
+			Tensor entrada2d = new Tensor(altEntrada, largEntrada);
+			Tensor kernel2D = new Tensor(altKernel, largKernel);
+			cache.preencher(0.0);// zerar acumulações para o filtro atual
+			
 			for (int e = 0; e < profEntrada; e++) {
-				Tensor entrada2d = new Tensor(altEntrada, largEntrada);
 				for (int i = 0; i < altEntrada; i++) {
 					for (int j = 0; j < largEntrada; j++) {
 						entrada2d.set(entrada.get(e, i, j), i, j);
 					}
 				}
 
-				Tensor kernel2D = new Tensor(altKernel, largKernel);
 				for (int i = 0; i < altKernel; i++) {
 					for (int j = 0; j < largKernel; j++) {
 						kernel2D.set(kernel.get(f, e, i, j), i, j);
@@ -505,16 +508,15 @@ public class OpTensor {
 				}
 
 				correlacao2D(entrada2d, kernel2D, cache);
+			}
 
-				for (int i = 0; i < altSaida; i++) {
-					for (int j = 0; j < largSaida; j++) {
-						saida.add(cache.get(i, j), f, i, j);
-					}
+			for (int i = 0; i < altSaida; i++) {
+				for (int j = 0; j < largSaida; j++) {
+					saida.add(cache.get(i, j), f, i, j);
 				}
 			}
 		}
 
-		// TODO melhorar isso usando broadcasting de tensores
 		if (bias != null) {
 			for (int i = 0; i < numFiltros; i++) {
 				double b = bias.get(i);
@@ -559,19 +561,22 @@ public class OpTensor {
 		// aproveitar paralelismo para dividir o trabalho e sobrecarregar
 		// menos um único núcleo do processador.
 
-		// gradientes das entradas
+		// gradiente em relação as entradas
 		Thread t1 = new Thread(() -> {
+			Tensor kernel2D = new Tensor(altK, largK);
+			Tensor gradSaida2D = new Tensor(altS, largS);
 			Tensor cache = new Tensor(altE, largE);
-			for (int f = 0; f < filtros; f++) {
-				for (int e = 0; e < entradas; e++) {
-					Tensor kernel2D = new Tensor(altK, largK);
+
+			for (int e = 0; e < entradas; e++) {
+				cache.preencher(0.0);// zerar acumulador
+				for (int f = 0; f < filtros; f++) {
+
 					for (int i = 0; i < altK; i++) {
 						for (int j = 0; j < largK; j++) {
 							kernel2D.set(kernel.get(f, e, i, j), i, j);
 						}
 					}
 	
-					Tensor gradSaida2D = new Tensor(altS, largS);
 					for (int i = 0; i < altS; i++) {
 						for (int j = 0; j < largS; j++) {
 							gradSaida2D.set(gradS.get(f, i, j), i, j);
@@ -579,36 +584,39 @@ public class OpTensor {
 					}
 	
 					convolucao2DFull(gradSaida2D, kernel2D, cache);
-					
-					for (int i = 0; i < altE; i++) {
-						for (int j = 0; j < largE; j++) {
-							gradE.add(cache.get(i, j), e, i, j);
-						}
+				}
+
+				for (int i = 0; i < altE; i++) {
+					for (int j = 0; j < largE; j++) {
+						gradE.add(cache.get(i, j), e, i, j);
 					}
 				}
 			}
 		});
 		t1.start();
 
-		// gradiente dos kernels
+		// gradiente em relação aos kernels
 		Thread t2 = new Thread(() -> {
+			Tensor entrada2D = new Tensor(altE, largE);
+			Tensor gradSaida2D = new Tensor(altS, largS);
 			Tensor cache = new Tensor(altK, largK);
+
 			for (int f = 0; f < filtros; f++) {
 				for (int e = 0; e < entradas; e++) {
-					Tensor entrada2D = new Tensor(altE, largE);
+					
 					for (int i = 0; i < altE; i++) {
 						for (int j = 0; j < largE; j++) {
 							entrada2D.set(entrada.get(e, i, j), i, j);
 						}
 					}
 	
-					Tensor gradSaida2D = new Tensor(altS, largS);
 					for (int i = 0; i < altS; i++) {
 						for (int j = 0; j < largS; j++) {
 							gradSaida2D.set(gradS.get(f, i, j), i, j);
 						}
 					}
 	
+					cache.preencher(0.0);
 					correlacao2D(entrada2D, gradSaida2D, cache);	
 					
 					for (int i = 0; i < altK; i++) {
@@ -621,9 +629,9 @@ public class OpTensor {
 		});
 		t2.start();
 
+		// gradiente em relação aos bias
 		Thread t3 = null;
 		if (temBias) {
-			//TODO melhorar isso usando broadcasting, se der
 			t3 = new Thread(() -> {
 				for (int i = 0; i < filtros; i++) {
 					double soma = 0.0;
