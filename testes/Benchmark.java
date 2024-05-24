@@ -60,7 +60,7 @@ public class Benchmark {
 		final Inicializador iniBias = new GlorotNormal(seed);
 
 		Conv2D conv = new Conv2D(
-			formatoEntrada, formatoFiltro, filtros, ativacao, iniKernel, iniBias
+			formatoEntrada, filtros, formatoFiltro, ativacao, iniKernel, iniBias
 		);
 		conv.inicializar();
 
@@ -99,7 +99,7 @@ public class Benchmark {
 		final Inicializador iniBias = new GlorotNormal(seed);
 
 		Conv2D conv = new Conv2D(
-			formatoEntrada, formatoFiltro, filtros, ativacao, iniKernel, iniBias
+			formatoEntrada, filtros, formatoFiltro, ativacao, iniKernel, iniBias
 		);
 		conv.inicializar();
 
@@ -147,7 +147,7 @@ public class Benchmark {
 		int[] formEntrada = {12, 16, 16};
 		Inicializador iniKernel = new GlorotUniforme(12345);
 		Inicializador iniBias = new Zeros();
-		Conv2D conv = new Conv2D(formEntrada, new int[]{3, 3}, 16, "linear", iniKernel, iniBias);
+		Conv2D conv = new Conv2D(formEntrada, 16, new int[]{3, 3}, "linear", iniKernel, iniBias);
 		conv.inicializar();
 
 		Tensor entrada = new Tensor(conv.formatoEntrada());
@@ -199,7 +199,7 @@ public class Benchmark {
 		int[] formEntrada = {10, 16, 16};
 		Inicializador iniKernel = new GlorotUniforme(12345);
 		Inicializador iniBias = new Zeros();
-		Conv2D conv = new Conv2D(formEntrada, new int[]{3, 3}, 16, "linear", iniKernel, iniBias);
+		Conv2D conv = new Conv2D(formEntrada, 16, new int[]{3, 3}, "linear", iniKernel, iniBias);
 		conv.inicializar();
 
 		Tensor amostra = new Tensor(conv.formatoEntrada());

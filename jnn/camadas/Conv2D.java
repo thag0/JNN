@@ -205,7 +205,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 *    A disposição do formato de entrada deve ser da seguinte forma:
 	 * </p>
 	 * <pre>
-	 *    formEntrada = (profundidade, altura, largura)
+	 *    formEntrada = (canais, altura, largura)
 	 * </pre>
 	 * Onde largura e altura devem corresponder as dimensões dos dados de entrada
 	 * que serão processados pela camada e a profundidade diz respeito a quantidade
@@ -218,20 +218,20 @@ public class Conv2D extends Camada implements Cloneable {
 	 * </pre>
 	 * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
 	 * @param entrada formato de entrada da camada.
-	 * @param filtro formato dos filtros da camada.
 	 * @param filtros quantidade de filtros.
+	 * @param filtro formato dos filtros da camada (altura, largura).
 	 * @param ativacao função de ativação.
 	 * @param iniKernel inicializador para os filtros.
 	 * @param iniBias inicializador para os bias.
 	 */
-	public Conv2D(int[] entrada, int[] filtro, int filtros, Object ativacao, Object iniKernel, Object iniBias) {
-		this(filtro, filtros, ativacao, iniKernel, iniBias);
+	public Conv2D(int[] entrada, int filtros, int[] filtro, Object ativacao, Object iniKernel, Object iniBias) {
+		this(filtros, filtro, ativacao, iniKernel, iniBias);
 
 		utils.validarNaoNulo(entrada, "\nO formato de entrada não pode ser nulo.");
 
 		if (entrada.length != 3) {
 			throw new IllegalArgumentException(
-				"\nO formato de entrada deve conter 3 elementos (profundidade, altura, largura), " +
+				"\nO formato de entrada deve conter 3 elementos (canais, altura, largura), " +
 				"recebido: " + entrada.length
 			);
 		}
@@ -255,7 +255,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 *    A disposição do formato de entrada deve ser da seguinte forma:
 	 * </p>
 	 * <pre>
-	 *    formEntrada = (profundidade, altura, largura)
+	 *    formEntrada = (canais, altura, largura)
 	 * </pre>
 	 * Onde largura e altura devem corresponder as dimensões dos dados de entrada
 	 * que serão processados pela camada e a profundidade diz respeito a quantidade
@@ -268,13 +268,13 @@ public class Conv2D extends Camada implements Cloneable {
 	 * </pre>
 	 * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
 	 * @param entrada formato de entrada da camada.
-	 * @param filtro formato dos filtros da camada.
 	 * @param filtros quantidade de filtros.
+	 * @param filtro formato dos filtros da camada (altura, largura).
 	 * @param ativacao função de ativação.
 	 * @param iniKernel inicializador para os filtros.
 	 */
-	public Conv2D(int[] entrada, int[] filtro, int filtros, Object ativacao, Object iniKernel) {
-		this(entrada, filtro, filtros, ativacao, iniKernel, null);
+	public Conv2D(int[] entrada, int filtros, int[] filtro, Object ativacao, Object iniKernel) {
+		this(entrada, filtros, filtro, ativacao, iniKernel, null);
 	}
 
 	/**
@@ -283,7 +283,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 *    A disposição do formato de entrada deve ser da seguinte forma:
 	 * </p>
 	 * <pre>
-	 *    formEntrada = (profundidade, altura, largura)
+	 *    formEntrada = (canais, altura, largura)
 	 * </pre>
 	 * Onde largura e altura devem corresponder as dimensões dos dados de entrada
 	 * que serão processados pela camada e a profundidade diz respeito a quantidade
@@ -296,12 +296,12 @@ public class Conv2D extends Camada implements Cloneable {
 	 * </pre>
 	 * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
 	 * @param entrada formato de entrada da camada.
-	 * @param filtro formato dos filtros da camada.
 	 * @param filtros quantidade de filtros.
+	 * @param filtro formato dos filtros da camada (altura, largura).
 	 * @param ativacao função de ativação.
 	 */
-	public Conv2D(int[] entrada, int[] filtro, int filtros, Object ativacao) {
-		this(entrada, filtro, filtros, ativacao, null, null);
+	public Conv2D(int[] entrada, int filtros, int[] filtro, Object ativacao) {
+		this(entrada, filtros, filtro, ativacao, null, null);
 	}
 
 	/**
@@ -310,7 +310,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 *    A disposição do formato de entrada deve ser da seguinte forma:
 	 * </p>
 	 * <pre>
-	 *    formEntrada = (altura, largura, profundidade)
+	 *    formEntrada = (canais, altura, largura)
 	 * </pre>
 	 * Onde largura e altura devem corresponder as dimensões dos dados de entrada
 	 * que serão processados pela camada e a profundidade diz respeito a quantidade
@@ -326,11 +326,11 @@ public class Conv2D extends Camada implements Cloneable {
 	 *    O valor de uso do bias será usado como {@code true} por padrão.
 	 * <p>
 	 * @param entrada formato de entrada da camada.
-	 * @param filtro formato dos filtros da camada.
 	 * @param filtros quantidade de filtros.
+	 * @param filtro formato dos filtros da camada (altura, largura).
 	 */
-	public Conv2D(int[] entrada, int[] filtro, int filtros) {
-		this(entrada, filtro, filtros, null, null, null);
+	public Conv2D(int[] entrada, int filtros, int[] filtro) {
+		this(entrada, filtros, filtro, null, null, null);
 	}
 
 	/**
@@ -339,7 +339,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 *    A disposição do formato de entrada deve ser da seguinte forma:
 	 * </p>
 	 * <pre>
-	 *    formEntrada = (profundidade, altura, largura)
+	 *    formEntrada = (canais, altura, largura)
 	 * </pre>
 	 * Onde largura e altura devem corresponder as dimensões dos dados de entrada
 	 * que serão processados pela camada e a profundidade diz respeito a quantidade
@@ -357,8 +357,8 @@ public class Conv2D extends Camada implements Cloneable {
 	 * @param iniKernel inicializador para os filtros.
 	 * @param iniBias inicializador para os bias.
 	 */
-	public Conv2D(int[] filtro, int filtros, Object ativacao, Object iniKernel, Object iniBias) {
-		utils.validarNaoNulo(filtro, "\nO formato do filtro não pode ser nulo.");
+	public Conv2D(int filtros, int[] filtro, Object ativacao, Object iniKernel, Object iniBias) {
+		utils.validarNaoNulo(filtro, "O formato do filtro não pode ser nulo.");
 
 		//formado dos filtros
 		int[] formFiltro = (int[]) filtro;
@@ -378,10 +378,10 @@ public class Conv2D extends Camada implements Cloneable {
 		shapeFiltro[0] = formFiltro[0];
 		shapeFiltro[1] = formFiltro[1];
 
-		//número de filtros
+		// número de filtros
 		if (filtros < 1) {
 			throw new IllegalArgumentException(
-				"\nO número de filtro deve ser maior que zero, recebido: " + filtros
+				"\nO número de filtros deve ser maior que zero, recebido: " + filtros
 			);
 		}
 
@@ -399,7 +399,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 *    A disposição do formato de entrada deve ser da seguinte forma:
 	 * </p>
 	 * <pre>
-	 *    formEntrada = (profundidade, altura, largura)
+	 *    formEntrada = (canais, altura, largura)
 	 * </pre>
 	 * Onde largura e altura devem corresponder as dimensões dos dados de entrada
 	 * que serão processados pela camada e a profundidade diz respeito a quantidade
@@ -416,8 +416,8 @@ public class Conv2D extends Camada implements Cloneable {
 	 * @param ativacao função de ativação.
 	 * @param iniKernel inicializador para os filtros.
 	 */
-	public Conv2D(int[] filtro, int filtros, Object ativacao, Object iniKernel) {
-		this(filtro, filtros, ativacao, iniKernel, null);
+	public Conv2D(int filtros, int[] filtro, Object ativacao, Object iniKernel) {
+		this(filtros, filtro, ativacao, iniKernel, null);
 	}
 
 	/**
@@ -426,7 +426,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 *    A disposição do formato de entrada deve ser da seguinte forma:
 	 * </p>
 	 * <pre>
-	 *    formEntrada = (profundidade, altura, largura)
+	 *    formEntrada = (canais, altura, largura)
 	 * </pre>
 	 * Onde largura e altura devem corresponder as dimensões dos dados de entrada
 	 * que serão processados pela camada e a profundidade diz respeito a quantidade
@@ -442,8 +442,8 @@ public class Conv2D extends Camada implements Cloneable {
 	 * @param filtros quantidade de filtros.
 	 * @param ativacao função de ativação.
 	 */
-	public Conv2D(int[] filtro, int filtros, Object ativacao) {
-		this(filtro, filtros, ativacao, null, null);
+	public Conv2D(int filtros, int[] filtro, Object ativacao) {
+		this(filtros, filtro, ativacao, null, null);
 	}
 
 	/**
@@ -452,7 +452,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 *    A disposição do formato de entrada deve ser da seguinte forma:
 	 * </p>
 	 * <pre>
-	 *    formEntrada = (profundidade, altura, largura)
+	 *    formEntrada = (canais, altura, largura)
 	 * </pre>
 	 * Onde largura e altura devem corresponder as dimensões dos dados de entrada
 	 * que serão processados pela camada e a profundidade diz respeito a quantidade
@@ -467,8 +467,8 @@ public class Conv2D extends Camada implements Cloneable {
 	 * @param filtro formato dos filtros da camada.
 	 * @param filtros quantidade de filtros.
 	 */
-	public Conv2D(int[] filtro, int filtros) {
-		this(filtro, filtros, null, null, null);
+	public Conv2D(int filtros, int[] filtro) {
+		this(filtros, filtro, null, null, null);
 	}
 	
 	/**
@@ -478,7 +478,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 *    cada dimensão de entrada da camada, e deve estar no formato:
 	 * </p>
 	 * <pre>
-	 *    entrada = (profundidade, altura, largura)
+	 *    entrada = (canais, altura, largura)
 	 * </pre>
 	 * @param entrada formato de entrada para a camada.
 	 */
@@ -495,17 +495,12 @@ public class Conv2D extends Camada implements Cloneable {
 
 		int[] fEntrada = (int[]) entrada;
 
-		if (fEntrada.length != 3 && fEntrada.length != 4) {
+		if (fEntrada.length != 3) {
 			throw new IllegalArgumentException(
-				"\nO formato de entrada para a camada Convolucional deve conter três " + 
-				"elementos (profundidade, altura, largura), ou quatro elementos (primeiro desconsiderado) " + 
-				"objeto recebido possui " + fEntrada.length
+				"\nFormato de entrada para a camada " + nome() + " deve conter três " + 
+				"elementos (canais, altura, largura), mas recebido tamanho = " + fEntrada.length
 			);
 		}
-
-		shapeEntrada[0] = (fEntrada.length == 4) ? fEntrada[1] : fEntrada[0];//profundidade
-		shapeEntrada[1] = (fEntrada.length == 4) ? fEntrada[2] : fEntrada[1];//altura
-		shapeEntrada[2] = (fEntrada.length == 4) ? fEntrada[3] : fEntrada[2];//largura
 
 		if (!utils.apenasMaiorZero(fEntrada)) {
 			throw new IllegalArgumentException(
@@ -513,6 +508,10 @@ public class Conv2D extends Camada implements Cloneable {
 				"podem conter valores menores que 1."
 			);
 		}
+
+		shapeEntrada[0] = fEntrada[0];// canais
+		shapeEntrada[1] = fEntrada[1];// altura
+		shapeEntrada[2] = fEntrada[2];// largura
 
 		//dim -> ((entrada - filtro) / stride) + 1
 		shapeSaida[1] = shapeEntrada[1] - shapeFiltro[0] + 1;

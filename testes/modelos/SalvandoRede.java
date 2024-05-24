@@ -33,7 +33,7 @@ public class SalvandoRede{
 
 	static Sequencial criar(){
 		Sequencial modelo = new Sequencial(new Camada[]{
-			new Conv2D(new int[]{2, 10, 10}, new int[]{3, 3}, 2),
+			new Conv2D(new int[]{2, 10, 10}, 2, new int[]{3, 3}),
 		});
 
 		modelo.compilar("sgd", "mse");

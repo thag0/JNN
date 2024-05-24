@@ -1,12 +1,12 @@
 package testes;
 
-import java.text.DecimalFormat;
-
 import jnn.camadas.Conv2D;
+import jnn.camadas.Entrada;
 import jnn.core.OpArray;
 import jnn.core.Utils;
 import jnn.core.tensor.OpTensor;
 import jnn.core.tensor.Tensor;
+import jnn.modelos.Sequencial;
 import lib.ged.Ged;
 import lib.geim.Geim;
 
@@ -20,12 +20,11 @@ public class Playground {
 	public static void main(String[] args) {
 		ged.limparConsole();
 
-		Tensor a = new Tensor(40, 40);
-		Tensor b = new Tensor(40, 40);
-		Tensor c = new Tensor(40, 40);
-
-		long t = medirTempo(() -> optensor.matMult(a, b, c));
-		System.out.println("tempo: " + new DecimalFormat().format(t) + " ns");
+		Sequencial modelo = new Sequencial();
+		modelo.add(new Entrada(1, 28, 28));
+		modelo.add(new Conv2D(2, new int[]{3, 3}));
+		modelo.compilar("sgd", "mse");
+		modelo.print();
 	}
 
 	static double randn() {
@@ -48,7 +47,7 @@ public class Playground {
 			 2,  1,
 		};
 		
-		Conv2D conv = new Conv2D(new int[]{1, 3, 3}, new int[]{2, 2}, 2, "linear");
+		Conv2D conv = new Conv2D(new int[]{1, 3, 3}, 2, new int[]{2, 2}, "linear");
 		conv.kernel().copiarElementos(exemploFiltro);
 
 		Tensor amostra = new Tensor(exemploEntrada);

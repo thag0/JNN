@@ -142,7 +142,7 @@ class SerialConv {
 
 			int numFiltros = saida[0];
 
-			Conv2D camada = new Conv2D(formFiltro, numFiltros);
+			Conv2D camada = new Conv2D(numFiltros, formFiltro);
 			camada.setAtivacao(ativacao);
 			camada.setBias(bias);
 			camada.construir(entrada);
