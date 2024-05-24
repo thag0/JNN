@@ -30,7 +30,7 @@ Com a adição de uma nova problemática, surgiu a adição de novos métodos de
 
 Segue um exemplo:
 
-![arq conv](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/260f7848-e564-477b-b296-9c657addff7a)
+![arq-conv](https://github.com/thag0/JNN/assets/91092364/63d94991-60f4-40bc-8bef-2a77fe7d0ecf)
 
 *Modelo convolucional criado para classificar os dígitos do dataset MNIST*
 
@@ -42,7 +42,7 @@ Por enquanto a implementação mais fácil de fazer foi criar a camada de Dropou
 
 A camada de Dropout é bem simples de usar, basta empilhar entre camadas, como sugere na imagem de exemplo:
 
-![exemplo-dropout](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/c18f5981-1fe5-49ef-b126-85eebc756e70)
+![exemplo-dropout](https://github.com/thag0/JNN/assets/91092364/1bb9cba6-75cf-4b12-9db0-b18a06dce20d)
 
 *Exemplo de modelo usando camadas de abandono (dropout), valores arbitrários.*
 
