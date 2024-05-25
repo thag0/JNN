@@ -1,12 +1,10 @@
 package testes;
 
 import jnn.camadas.Conv2D;
-import jnn.camadas.Entrada;
 import jnn.core.OpArray;
 import jnn.core.Utils;
 import jnn.core.tensor.OpTensor;
 import jnn.core.tensor.Tensor;
-import jnn.modelos.Sequencial;
 import lib.ged.Ged;
 import lib.geim.Geim;
 
@@ -20,11 +18,6 @@ public class Playground {
 	public static void main(String[] args) {
 		ged.limparConsole();
 
-		Sequencial modelo = new Sequencial();
-		modelo.add(new Entrada(1, 28, 28));
-		modelo.add(new Conv2D(2, new int[]{3, 3}));
-		modelo.compilar("sgd", "mse");
-		modelo.print();
 	}
 
 	static double randn() {

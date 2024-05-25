@@ -1480,6 +1480,28 @@ public class Tensor implements Iterable<Variavel> {
 		return dados.length;
 	}
 
+    /**
+     * Calcula o tamanho em {@code bytes} do tensor, 
+     * levando em consideração a arquitetura da JVM (32 ou 64 bits).
+     * @return tamanho em bytes.
+     */
+	public long tamanhoBytes() {
+		String jvmBits = System.getProperty("sun.arch.data.model");
+        long bits = Long.valueOf(jvmBits);
+
+        long tamObj;
+		// overhead da jvm
+        if (bits == 32) tamObj = 8;
+        else if (bits == 64) tamObj = 16;
+        else throw new IllegalStateException(
+            "\nSem suporte para plataforma de " + bits + " bits."
+        );
+
+		long tamVars = dados[0].tamanhoBytes() * tamanho();
+		long tamShape = shape.length * 4; // int = 4 bytes
+		return tamObj + tamVars + tamShape;
+	}
+
 	/**
 	 * Retorna o conteúdo do tensor no formato de array
 	 * <p>

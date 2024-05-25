@@ -300,4 +300,24 @@ public class Variavel implements Cloneable {
     public String toString() {
         return "[Variavel: " + valor + "]";
     }
+
+    /**
+     * Calcula o tamanho em {@code bytes} da variavel, 
+     * levando em consideração a arquitetura da JVM (32 ou 64 bits).
+     * @return tamanho em bytes.
+     */
+    public long tamanhoBytes() {
+        String jvmBits = System.getProperty("sun.arch.data.model");
+        long bits = Long.valueOf(jvmBits);
+
+        long tamObj;
+		// overhead da jvm
+        if (bits == 32) tamObj = 8;
+        else if (bits == 64) tamObj = 16;
+        else throw new IllegalStateException(
+            "\nSem suporte para plataforma de " + bits + " bits."
+        );
+
+        return tamObj + 8; // +8 da variável double
+    }
 }
