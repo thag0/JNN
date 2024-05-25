@@ -3,13 +3,18 @@ package jnn.avaliacao.metrica;
 import jnn.core.tensor.Tensor;
 
 /**
- * TODO
+ * Acurácia para avaliação de modelos de classificação.
  */
 public class Acuracia extends Metrica {
 
-	/**
-	 * TODO
-	 */
+    /**
+     * Instancia a métrica de <strong>Acurácia</strong>.
+     * <p>
+     *		A acurácia é a proporção de previsões corretas em relação ao 
+	 *		total de exemplos avaliados. Ela é calculada como o número de 
+	 *		previsões corretas dividido pelo número total de exemplos.
+     * </p>
+     */
 	public Acuracia() {}
 
 	@Override
@@ -20,8 +25,8 @@ public class Acuracia extends Metrica {
 		int acertos = 0;
 		
 		for (int i = 0; i < n; i++) {
-			int idPrev = indiceMaiorValor(prev[i]);
-			int idReal = indiceMaiorValor(real[i]);
+			int idPrev = idMaiorValor(prev[i]);
+			int idReal = idMaiorValor(real[i]);
 
 			if (idPrev == idReal) acertos++;
 		}

@@ -43,33 +43,11 @@ abstract class Metrica {
 	 * <p>
 	 *    Auxiliar.
 	 * </p>
-	 * Encontra o índice com o maior valor contido no array fornecido
-	 * @param arr array contendo os dados
-	 * @return índice com o maior valor contido nos dados.
+	 * Encontra o índice com o maior valor contido tensor fornecido.
+	 * @param tensor tensor desejado.
+	 * @return índice com o maior valor.
 	 */
-	protected int indiceMaiorValor(double[] arr) {
-		int maiorId = 0;
-		double maiorVal = arr[0];
-  
-		for (int i = 1; i < arr.length; i++) {
-			if (arr[i] > maiorVal) {
-				maiorVal = arr[i];
-				maiorId = i;
-			}
-		}
-  
-		return maiorId;
-	}
-
-	/**
-	 * <p>
-	 *    Auxiliar.
-	 * </p>
-	 * Encontra o índice com o maior valor contido no array fornecido
-	 * @param tensor array contendo os dados
-	 * @return índice com o maior valor contido nos dados.
-	 */
-	protected int indiceMaiorValor(Tensor tensor) {
+	protected int idMaiorValor(Tensor tensor) {
 		if (tensor.numDim() != 1) {
 			throw new UnsupportedOperationException(
 				"\nSem suporte para tensores com mais de uma dimensão."
@@ -94,10 +72,9 @@ abstract class Metrica {
 	 *    Auxiliar.
 	 * </p>
 	 * Calcula a matriz de confusão.
-	 * @param modelo modelo para avaliar.
-	 * @param entradas conjunto de entradas.
-	 * @param real conjunto de saídas.
-	 * @return matríz de confusão calculada.
+	 * @param prev {@code Tensores} com dados previstos.
+	 * @param real {@code Tensores} com dados reais.
+	 * @return {@code Tensor} contendo a matriz de confusão no formato (real, previsto).
 	 */
 	protected Tensor matrizConfusao(Tensor[] prev, Tensor[] real) {
 		if (prev[0].numDim() != 1 || real[0].numDim() != 1) {
@@ -107,15 +84,15 @@ abstract class Metrica {
 		}
 
 		int nClasses = prev[0].tamanho();
-		Tensor matriz = new Tensor(nClasses, nClasses);
+		Tensor mc = new Tensor(nClasses, nClasses);
 
 		for (int i = 0; i < prev.length; i++) {
-			int previsto = indiceMaiorValor(prev[i]);
-			int rotulo = indiceMaiorValor(real[i]);
-			double val = matriz.get(rotulo, previsto);
-			matriz.set((val += 1), rotulo, previsto);
+			int p = idMaiorValor(prev[i]);
+			int r = idMaiorValor(real[i]);
+			double val = mc.get(r, p);
+			mc.set((val += 1), r, p);
 		}
 
-		return matriz;
+		return mc;
 	} 
 }

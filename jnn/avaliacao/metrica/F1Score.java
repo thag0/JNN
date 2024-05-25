@@ -3,12 +3,19 @@ package jnn.avaliacao.metrica;
 import jnn.core.tensor.Tensor;
 
 /**
- * TODO
+ *	F1 Score para avaliação de modelos de classificação.
  */
 public class F1Score extends Metrica {
 
 	/**
-	 * TODO
+	 * Instancia a métrica do <strong>F1 Score</strong>.
+	 * <p>
+	 * 		O F1 Score é a média harmônica da precisão e da revocação, 
+	 * 		considerando tanto a taxa de falsos positivos quanto a taxa 
+	 * 		de falsos negativos. É particularmente útil quando se deseja 
+	 * 		um equilíbrio entre precisão e revocação e quando há uma 
+	 * 		distribuição desbalanceada entre as classes.
+	 * </p>
 	 */
 	public F1Score() {}
 	
@@ -20,6 +27,11 @@ public class F1Score extends Metrica {
 		return new Tensor(new double[]{ f1score }, 1);
 	}
 
+	/**
+	 * Calcula o valor f1 score.
+	 * @param mat martiz de confusão
+	 * @return f1 score.
+	 */
 	private double f1score(Tensor mat) {
 		int nClasses = mat.shape()[0];
 
@@ -27,9 +39,9 @@ public class F1Score extends Metrica {
 		double[] recall = new double[nClasses];
 
 		for (int i = 0; i < nClasses; i++) {
-			int vp = (int)mat.get(i, i);//verdadeiro positivo
-			int fp = 0;//falso positivo
-			int fn = 0;//falso negativo
+			int vp = (int) mat.get(i, i);// verdadeiro positivo
+			int fp = 0;// falso positivo
+			int fn = 0;// falso negativo
 
 
 			for (int j = 0; j < nClasses; j++) {
@@ -39,7 +51,7 @@ public class F1Score extends Metrica {
 				}
 			}
 
-			//formulas da precisão e recall
+			// formulas da precisão e recall
 			if ((vp + fp) > 0) precisao[i] = vp / (double)(vp + fp);
 			else precisao[i] = 0;
 
