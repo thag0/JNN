@@ -1,7 +1,6 @@
 package testes.modelos;
 
 import jnn.Funcional;
-import jnn.camadas.Camada;
 import jnn.camadas.Densa;
 import jnn.camadas.Entrada;
 import jnn.core.tensor.Tensor;
@@ -34,19 +33,19 @@ public class TesteModelos{
 		int nSaidas = saida[0].length;
 		int nOcultas = 3;
 		long seed = 0;
-		int epocas = 10_000;
+		int epocas = 15_000;
 
 		String atv1 = "sigmoid";
 		String atv2 = "sigmoid";
-		String otm = "adam";
+		String otm = "rmsprop";
 		String perda = "mse";
 
-		Sequencial seq = new Sequencial(new Camada[]{
+		Sequencial seq = new Sequencial(
 			new Entrada(nEntradas),
 			new Densa(nOcultas, atv1),
 			new Densa(nOcultas, atv1),
 			new Densa(nSaidas, atv2)
-		});
+		);
 		seq.setSeed(seed);
 		seq.compilar(otm, perda);
 		

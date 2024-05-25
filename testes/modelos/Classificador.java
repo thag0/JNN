@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 
 import jnn.camadas.Camada;
 import jnn.camadas.Densa;
+import jnn.camadas.Dropout;
 import jnn.camadas.Entrada;
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
@@ -51,8 +52,10 @@ public class Classificador{
 		//criando e configurando a rede neural
 		Sequencial modelo = new Sequencial(new Camada[]{
 			new Entrada(qEntradas),
-			new Densa(10, "sigmoid"),
-			new Densa(10, "sigmoid"),
+			new Densa(16, "sigmoid"),
+			new Dropout(0.3),
+			new Densa(16, "sigmoid"),
+			new Dropout(0.3),
 			new Densa(qSaidas, "softmax")
 		});
 
@@ -61,7 +64,7 @@ public class Classificador{
 		modelo.print();
 		
 		//treinando e avaliando os resultados
-		modelo.treinar(treinoX, treinoY, 180, 12, true);
+		modelo.treinar(treinoX, treinoY, 180, 8, true);
 		double acc = modelo.avaliador().acuracia(testeX, testeY).item();
 		System.out.println("Acurácia = " + formatarDecimal(acc*100, 4) + "%");
 		System.out.println("Perda = " + modelo.avaliar(testeX, testeY).item());

@@ -43,7 +43,7 @@ public class AmpliarImagem{
 			new Densa(nSaida, "sigmoid")
 		);
 		modelo.setHistorico(true);
-		modelo.compilar(new SGD(0.001, 0.96), "mse");
+		modelo.compilar(new SGD(0.0001, 0.996), "mse");
 		modelo.treinar(treinoX, treinoY, 2_000, true);
 
 		//avaliando resultados
