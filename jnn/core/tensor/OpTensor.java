@@ -496,12 +496,13 @@ public class OpTensor {
 		}
 
 		// NOTA
-		// essa ainda não é a melhor solução, mas é mais eficiente que fazer slicing
-		// dentro dos loops.
+		// essa ainda não é a melhor solução, mas é mais eficiente que fazer 
+		// slicing dentro dos loops.
+		
+		Tensor entrada2d = new Tensor(altEntrada, largEntrada);
+		Tensor kernel2D = new Tensor(altKernel, largKernel);
 		Tensor cache = new Tensor(altSaida, largSaida);
 		for (int f = 0; f < numFiltros; f++){
-			Tensor entrada2d = new Tensor(altEntrada, largEntrada);
-			Tensor kernel2D = new Tensor(altKernel, largKernel);
 			cache.preencher(0.0);// zerar acumulações para o filtro atual
 			
 			for (int e = 0; e < profEntrada; e++) {
@@ -613,7 +614,7 @@ public class OpTensor {
 
 			for (int f = 0; f < filtros; f++) {
 				for (int e = 0; e < entradas; e++) {
-					
+					cache.preencher(0.0);				
 					for (int i = 0; i < altE; i++) {
 						for (int j = 0; j < largE; j++) {
 							entrada2D.set(entrada.get(e, i, j), i, j);
@@ -626,7 +627,6 @@ public class OpTensor {
 						}
 					}
 	
-					cache.preencher(0.0);
 					correlacao2D(entrada2D, gradSaida2D, cache);	
 					
 					for (int i = 0; i < altK; i++) {
