@@ -245,14 +245,14 @@ public class OpTensor {
 		int[] shapeK = kernel.shape();
 		int[] shapeS = saida.shape();
 		
-		int altEsperada  = shapeE[0] - shapeK[0] + 1;
-		int largEsperada = shapeE[1] - shapeK[1] + 1;
+		int altEsp  = shapeE[0] - shapeK[0] + 1;
+		int largEsp = shapeE[1] - shapeK[1] + 1;
 	
 		int altSaida = shapeS[0];
 		int largSaida = shapeS[1];
-		if (altSaida != altEsperada || largSaida != largEsperada) {
+		if (altSaida != altEsp || largSaida != largEsp) {
 			throw new IllegalArgumentException(
-				"\nDimensão de saída esperada (" + altEsperada + ", " + largEsperada + "), mas" +
+				"\nDimensão de saída esperada (" + altEsp + ", " + largEsp + "), mas" +
 				" recebido " + saida.shapeStr()
 			);
 		}
@@ -267,18 +267,22 @@ public class OpTensor {
 		Variavel[] dataS = saida.paraArray();
 
 		Variavel soma = new Variavel();
-		for (int i = 0; i < altEsperada; i++) {
-			for (int j = 0; j < largEsperada; j++) {
-				final int idSaida = i * largEsperada + j;
+		for (int i = 0; i < altEsp; i++) {
+			for (int j = 0; j < largEsp; j++) {
+
 				soma.set(0.0);
+				final int idSaida = i * largEsp + j;
 				for (int k = 0; k < altKernel; k++) {
+					final int idBaseEntrada = (k + i) * largEntrada;
+					final int idBaseKernel  = k * largKernel; 
 					for (int l = 0; l < largKernel; l++) {
 						soma.addMult(
-							dataE[(k + i) * largEntrada + (l + j)],
-							dataK[k * largKernel + l]
+							dataE[idBaseEntrada + (l + j)],
+							dataK[idBaseKernel + l]
 						);
 					}
 				}
+
 				dataS[idSaida].add(soma);
 			}
 		}
@@ -327,14 +331,14 @@ public class OpTensor {
 		int[] shapeK = kernel.shape();
 		int[] shapeS = saida.shape();
 		
-		int altEsperada  = shapeE[0] - shapeK[0] + 1;
-		int largEsperada = shapeE[1] - shapeK[1] + 1;
+		int altEsp  = shapeE[0] - shapeK[0] + 1;
+		int largEsp = shapeE[1] - shapeK[1] + 1;
 	
 		int altSaida = shapeS[0];
 		int largSaida = shapeS[1];
-		if (altSaida != altEsperada || largSaida != largEsperada) {
+		if (altSaida != altEsp || largSaida != largEsp) {
 			throw new IllegalArgumentException(
-				"\nDimensão de saída esperada (" + altEsperada + ", " + largEsperada + "), mas" +
+				"\nDimensão de saída esperada (" + altEsp + ", " + largEsp + "), mas" +
 				" recebido " + saida.shapeStr()
 			);
 		}
@@ -344,21 +348,25 @@ public class OpTensor {
 		final int largEntrada = shapeE[1];
 	
 		// vetorização para melhorar o desempenho
-		double[] dataE = entrada.paraArrayDouble();
-		double[] dataK = kernel.paraArrayDouble();
+		Variavel[] dataE = entrada.paraArray();
+		Variavel[] dataK = kernel.paraArray();
 		Variavel[] dataS = saida.paraArray();
 	
-		for (int i = 0; i < altEsperada; i++) {
-			for (int j = 0; j < largEsperada; j++) {
-				final int idSaida = i * largEsperada + j;
-				double soma = 0.0;
+		Variavel soma = new Variavel();
+		for (int i = 0; i < altEsp; i++) {
+			for (int j = 0; j < largEsp; j++) {
+				
+				soma.set(0.0);
+				final int idSaida = i * largEsp + j;
 				for (int k = 0; k < altKernel; k++) {
 					for (int l = 0; l < largKernel; l++) {
-						soma += 
-						dataE[(k + i) * largEntrada + (l + j)] * 
-						dataK[(altKernel - 1 - k) * largKernel + (largKernel - 1 - l)];
+						soma.addMult(
+							dataE[(k + i) * largEntrada + (l + j)], 
+							dataK[(altKernel - 1 - k) * largKernel + (largKernel - 1 - l)]
+						);
 					}
 				}
+
 				dataS[idSaida].add(soma);
 			}
 		}
@@ -409,14 +417,14 @@ public class OpTensor {
 		int[] shapeK = kernel.shape();
 		int[] shapeS = saida.shape();
 		
-		int altEsperada  = shapeE[0] + shapeK[0] - 1;
-		int largEsperada = shapeE[1] + shapeK[1] - 1;
+		int altEsp  = shapeE[0] + shapeK[0] - 1;
+		int largEsp = shapeE[1] + shapeK[1] - 1;
 	
-		int altSaida = shapeS[0];
+		int altSaida  = shapeS[0];
 		int largSaida = shapeS[1];
-		if (altSaida != altEsperada || largSaida != largEsperada) {
+		if (altSaida != altEsp || largSaida != largEsp) {
 			throw new IllegalArgumentException(
-				"\nDimensão de saída esperada (" + altEsperada + ", " + largEsperada + "), mas" +
+				"\nDimensão de saída esperada (" + altEsp + ", " + largEsp + "), mas" +
 				" recebido " + saida.shapeStr()
 			);
 		}
@@ -431,11 +439,12 @@ public class OpTensor {
 		Variavel[] dataK = kernel.paraArray();
 		Variavel[] dataS = saida.paraArray();
 
-		Variavel soma = new Variavel();
-		for (int i = 0; i < altEsperada; i++) {
-			for (int j = 0; j < largEsperada; j++) {
-				int idSaida = i*largEsperada + j;
+		Variavel soma = new Variavel();// cache
+		for (int i = 0; i < altEsp; i++) {
+			for (int j = 0; j < largEsp; j++) {
+				
 				soma.set(0.0);
+				final int idSaida = i*largEsp + j;
 				for (int m = 0; m < altKernel; m++) {
 					int linEntrada = i - m;
 					if (linEntrada >= 0 && linEntrada < altEntrada) {
@@ -450,6 +459,7 @@ public class OpTensor {
 						}
 					}
 				}
+
 				dataS[idSaida].add(soma);
 			}
 		}

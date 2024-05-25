@@ -25,8 +25,8 @@ public class Benchmark {
 		int filtros = 20;
 
 		convForward(shapeEntrada, shapeFiltro, filtros);
-		testarForward();
 		convBackward(shapeEntrada, shapeFiltro, filtros);
+		testarForward();
 		testarBackward();
 
 		// Tensor a = new Tensor(28, 28);
