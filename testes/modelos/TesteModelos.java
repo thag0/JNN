@@ -29,10 +29,13 @@ public class TesteModelos{
 			{0}
 		};
 
+		Tensor[] treinoX = jnn.arrayParaTensores(entrada);
+		Tensor[] treinoY = jnn.arrayParaTensores(saida);
+
 		int nEntradas = entrada[0].length;
 		int nSaidas = saida[0].length;
 		int nOcultas = 3;
-		long seed = 0;
+		long seed = 1234567890L;
 		int epocas = 15_000;
 
 		String atv1 = "sigmoid";
@@ -54,9 +57,6 @@ public class TesteModelos{
 		rna.compilar(otm, perda);
 		rna.configurarAtivacao(atv1);
 		rna.configurarAtivacao(rna.camadaSaida(), atv2);
-		
-		Tensor[] treinoX = jnn.arrayParaTensores(entrada);
-		Tensor[] treinoY = jnn.arrayParaTensores(saida);
 		
 		rna.treinar(treinoX, treinoY, epocas, false);
 		seq.treinar(treinoX, treinoY, epocas, false);

@@ -423,7 +423,6 @@ public class Tensor implements Iterable<Variavel> {
 	/**
 	 * Retorna o elemento do tensor de acordo com os índices fornecidos.
 	 * @param ids índices desejados para busca.
-	 * @param ids índices desejados para busca.
 	 * @return valor de acordo com os índices.
 	 */
     public double get(int... ids) {
