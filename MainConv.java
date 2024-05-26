@@ -92,11 +92,11 @@ public class MainConv {
 			new Conv2D(20, new int[]{3, 3}, "relu"),
 			new MaxPool2D(new int[]{2, 2}),
 			new Flatten(),
-			new Densa(110, "sigmoid"),
+			new Densa(100, "relu"),
 			new Densa(NUM_DIGITOS_TREINO, "softmax")
 		);
 
-		modelo.compilar("adam", "entropia-cruzada");
+		modelo.compilar("sgd", "entropia-cruzada");
 		
 		return modelo;
 	}
@@ -125,7 +125,7 @@ public class MainConv {
 
 		for (int y = 0; y < imagem.length; y++) {
 			for (int x = 0; x < imagem[y].length; x++) {
-				imagem[y][x] = (double)cinza[y][x] / 255;
+				imagem[y][x] = (double)cinza[y][x] / 255.0;
 			}
 		}
 
@@ -162,9 +162,9 @@ public class MainConv {
   
 		try (ExecutorService exec = Executors.newFixedThreadPool(numThreads)) {
 			int id = 0;
-			for (int i = 0; i < digitos; i++) {
-				for (int j = 0; j < amostras; j++) {
-					final String caminhoCompleto = caminho + i + "/img_" + j + ".jpg";
+			for (int digito = 0; digito < digitos; digito++) {
+				for (int amostra = 0; amostra < amostras; amostra++) {
+					final String caminhoCompleto = caminho + digito + "/img_" + amostra + ".jpg";
 					final int indice = id;
 					
 					exec.submit(() -> {

@@ -8,7 +8,7 @@ import jnn.core.tensor.Tensor;
  * de probabilidade prevista e a distribuição de probabilidade real dos rótulos.
  */
 public class EntropiaCruzada extends Perda {
-	double eps = 1e-7;//evitar log 0
+	double eps = 1e-8;//evitar log 0
 
 	/**
 	 * Inicializa a função de perda Categorical Cross Entropy.
@@ -25,7 +25,7 @@ public class EntropiaCruzada extends Perda {
 			ec += real.get(i) * Math.log(prev.get(i) + eps);
 		}
 		
-		return new Tensor(new double[]{ -ec }, 1);
+		return new Tensor(new double[]{ -ec/tam }, 1);
 	}
 	
 	@Override
@@ -34,7 +34,7 @@ public class EntropiaCruzada extends Perda {
 
 		return prev.map(
 			real,
-			(p, r) -> p - r
+			(p, r) -> (p - r)
 		);
 	}
 }
