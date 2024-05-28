@@ -1,6 +1,7 @@
 package testes;
 
 import java.awt.image.BufferedImage;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,8 +31,8 @@ public class Conv{
 	public static void main(String[] args){
 		ged.limparConsole();
 
-		// String nomeModelo = "mlp-mnist-89-1";
-		String nomeModelo = "conv-mnist-97-1";
+		String nomeModelo = "mlp-mnist-89-1";
+		// String nomeModelo = "conv-mnist-97-1";
 		// String nomeModelo = "modelo-treinado";
 		Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + nomeModelo + ".nn");
 		// modelo.print();
@@ -101,9 +102,8 @@ public class Conv{
 
 	static Dados tempoForward(Sequencial modelo){
 		//arbritário
-		double[][] img = imagemParaMatriz("./dados/mnist/teste/1/img_0.jpg");
-		double[][][] entrada = new double[1][][];
-		entrada[0] = img;
+		Tensor entrada = new Tensor(modelo.camada(0).formatoEntrada());
+		entrada.aplicar(x -> Math.random());
 
 		int n = modelo.numCamadas();
 		long t, total = 0;
@@ -112,11 +112,13 @@ public class Conv{
 		dados.editarNome("Tempos Forward");
 		ArrayList<String[]> conteudo = new ArrayList<>();
 
+		DecimalFormat df = new DecimalFormat();
+
 		t = medirTempo(() -> modelo.camada(0).forward(entrada));
 		conteudo.add(new String[]{
 			"0",
 			modelo.camada(0).nome(),
-			String.valueOf(TimeUnit.NANOSECONDS.toMillis(t)) + " ms"        
+			df.format(t) + " ns"        
 		});
 		total += t;
 		
@@ -131,13 +133,13 @@ public class Conv{
 			conteudo.add(new String[]{
 				String.valueOf(i),
 				modelo.camada(i).nome(),
-				String.valueOf(TimeUnit.NANOSECONDS.toMillis(t)) + " ms"        
+				df.format(t) + " ns"        
 			});
 		}
 		conteudo.add(new String[]{
 			"-",
 			"Tempo total", 
-			String.valueOf(TimeUnit.NANOSECONDS.toMillis(total)) + " ms"
+			df.format(total) + " ns"
 		});
 
 		dados.atribuir(conteudo);
@@ -147,26 +149,23 @@ public class Conv{
 
 	static Dados tempoBackward(Sequencial modelo){
 		//arbritário
-		double[] grad = new double[modelo.saidaParaArray().length];
-		grad[0] = 1;
-		for(int i = 1; i < grad.length; i++){
-			grad[i] = 0.02;
-		}
+		Tensor grad = new Tensor(modelo.camadaSaida().formatoSaida());
+		grad.aplicar(x -> Math.random());
 
 		int n = modelo.numCamadas();
 		long t, total = 0;
+
+		DecimalFormat df = new DecimalFormat();
 
 		Dados dados = new Dados();
 		dados.editarNome("Tempos Backward");
 		ArrayList<String[]> conteudo = new ArrayList<>();
 
-		Tensor g = new Tensor(grad.length);
-		g.copiarElementos(grad);
-		t = medirTempo(() -> modelo.camada(n-1).backward(g));
+		t = medirTempo(() -> modelo.camada(n-1).backward(grad));
 		conteudo.add(new String[]{
 			String.valueOf(n-1),
 			modelo.camada(n-1).nome(),
-			String.valueOf(TimeUnit.NANOSECONDS.toMillis(t)) + " ms"        
+			df.format(t) + " ns"        
 		});
 		total += t;
 		
@@ -182,13 +181,13 @@ public class Conv{
 			conteudo.add(new String[]{
 				String.valueOf(i),
 				modelo.camada(i).nome(),
-				String.valueOf(TimeUnit.NANOSECONDS.toMillis(t)) + " ms"        
+				df.format(t) + " ns"        
 			});
 		}
 		conteudo.add(new String[]{
 			"-",
 			"Tempo total",
-			String.valueOf(TimeUnit.NANOSECONDS.toMillis(total)) + " ms"        
+			df.format(total) + " ns"        
 		});
 
 		dados.atribuir(conteudo);

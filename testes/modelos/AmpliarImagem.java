@@ -37,14 +37,13 @@ public class AmpliarImagem{
 		//nesse exemplo queremos que ela tenha overfitting
 		Sequencial modelo = new Sequencial(
 			new Entrada(nEntrada),
-			new Densa(8, "tanh"),
-			new Densa(8, "tanh"),
-			new Densa(8, "tanh"),
+			new Densa(12, "tanh"),
+			new Densa(12, "sigmoid"),
 			new Densa(nSaida, "sigmoid")
 		);
 		modelo.setHistorico(true);
-		modelo.compilar(new SGD(0.0001, 0.996), "mse");
-		modelo.treinar(treinoX, treinoY, 2_000, true);
+		modelo.compilar(new SGD(0.0001, 0.999), "mse");
+		modelo.treinar(treinoX, treinoY, 3_000, true);
 
 		//avaliando resultados
 		double precisao = 1 - modelo.avaliador().erroMedioAbsoluto(treinoX, treinoY).item();
