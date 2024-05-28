@@ -2,7 +2,6 @@ package testes.modelos;
 
 import java.text.DecimalFormat;
 
-import jnn.camadas.Camada;
 import jnn.camadas.Densa;
 import jnn.camadas.Dropout;
 import jnn.camadas.Entrada;
@@ -25,39 +24,40 @@ public class Classificador{
 		//tranformando a ultima coluna em categorização binária
 		Dados iris = ged.lerCsv("./dados/csv/iris.csv");
 		ged.remLin(iris, 0);
-		int[] shape = ged.shapeDados(iris);
+		int[] shape = iris.shape();
 		int ultimoIndice = shape[1]-1;
 		ged.categorizar(iris, ultimoIndice);
 		System.out.println("Tamanho dados = " + iris.shapeInfo());
 
-		//separando dados de treino e teste
+		// separando dados de treino e teste
 		double[][] dados = ged.dadosParaDouble(iris);
 		ged.embaralharDados(dados);
 		double[][][] treinoTeste = (double[][][]) ged.separarTreinoTeste(dados, 0.25f);
 		double[][] treino = treinoTeste[0];
 		double[][] teste = treinoTeste[1];
-		int qEntradas = 4;// dados de entrada (features)
-		int qSaidas = 3;// classificações (class)
+		int numEntradas = 4;// dados de entrada (features)
+		int numSaidas = 3;// classificações (class)
 
-		var inTreino = (double[][]) ged.separarDadosEntrada(treino, qEntradas);
-		var outTreino = (double[][]) ged.separarDadosSaida(treino, qSaidas);
+		// carregando dados de treino e teste
+		double[][] inTreino  = (double[][]) ged.separarDadosEntrada(treino, numEntradas);
+		double[][] outTreino = (double[][]) ged.separarDadosSaida(treino, numSaidas);
 		Tensor[] treinoX = utils.array2DParaTensors(inTreino);
 		Tensor[] treinoY = utils.array2DParaTensors(outTreino);
 		
-		var inTeste = (double[][]) ged.separarDadosEntrada(teste, qEntradas);
-		var outTeste = (double[][]) ged.separarDadosSaida(teste, qSaidas);
+		double[][] inTeste  = (double[][]) ged.separarDadosEntrada(teste, numEntradas);
+		double[][] outTeste = (double[][]) ged.separarDadosSaida(teste, numSaidas);
 		Tensor[] testeX = utils.array2DParaTensors(inTeste);
 		Tensor[] testeY = utils.array2DParaTensors(outTeste);
 
-		//criando e configurando a rede neural
-		Sequencial modelo = new Sequencial(new Camada[]{
-			new Entrada(qEntradas),
-			new Densa(14, "sigmoid"),
+		// criando e configurando o modelo
+		Sequencial modelo = new Sequencial(
+			new Entrada(numEntradas),
+			new Densa(12, "sigmoid"),
 			new Dropout(0.3),
-			new Densa(14, "sigmoid"),
+			new Densa(12, "sigmoid"),
 			new Dropout(0.3),
-			new Densa(qSaidas, "softmax")
-		});
+			new Densa(numSaidas, "softmax")
+		);
 
 		modelo.compilar("adam", "entropia-cruzada");
 		modelo.setHistorico(true);
