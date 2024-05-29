@@ -365,12 +365,23 @@ public class Tensor implements Iterable<Variavel> {
     }
 
 	/**
-	 * 
-	 * @param n
-	 * @param ids
-	 * @return
+	 * Copia os elementos do tensores multiplas vezes.
+	 * <p>
+	 * 		Exemplo:
+	 * </p>
+	 * <pre>
+	 *tensor = [1, 2, 3];
+	 *bloco = tensor.bloco(3);
+	 *bloco = [
+	 *	[[1, 2, 3],
+	 *	 [1, 2, 3],
+	 *	 [1, 2, 3]]
+	 *]
+	 * </pre>
+	 * @param n quantidade de repetições.
+	 * @return {@code Tensor} com as modificações.
 	 */
-	public Tensor bloco(int n, int... ids) {
+	public Tensor bloco(int n) {
 		if (numDim() > 1) {
 			throw new UnsupportedOperationException(
 				"\nSem suporte para tensor com mais de uma dimensão."
@@ -380,12 +391,15 @@ public class Tensor implements Iterable<Variavel> {
 		int elementos = tamanho();
 
 		Variavel[] arr = new Variavel[elementos * n];
-		for (int i = 0; i < n; i++){
-			System.arraycopy(dados, 0, arr, i*elementos, elementos);
+		for (int i = 0; i < n; i++) {
+			int inicio = i*elementos;
+			for (int j = 0; j < elementos; j++) {
+				arr[inicio + j] = new Variavel(dados[j]);
+			}
 		}
 
-		Tensor bloco = new Tensor(n, elementos);
-		bloco.copiarElementos(arr);
+		Tensor bloco = new Tensor(arr);
+		bloco.reshape(n, elementos);
 
 		return bloco;
 	}
@@ -512,7 +526,10 @@ public class Tensor implements Iterable<Variavel> {
 			);
 		}
 
-		System.arraycopy(tensor.dados, 0, this.dados, 0, tamanho());
+		int n = tamanho();
+		for (int i = 0; i < n; i++) {
+			dados[i].set(tensor.dados[i]);
+		}
 
 		return this;
 	}

@@ -42,14 +42,14 @@ public class MaxPool2D extends Camada implements Cloneable{
 	Utils utils = new Utils();
 
 	/**
-	 * Dimensões dos dados de entrada (profundidade, altura, largura)
+	 * Dimensões dos dados de entrada (canais, altura, largura)
 	 */
-	private int[] formEntrada;
+	private int[] formEntrada = {1, 1, 1};
 
 	/**
-	 * Dimensões dos dados de saída (profundidade, altura, largura)
+	 * Dimensões dos dados de saída (canais, altura, largura)
 	 */
-	private int[] formSaida;
+	private int[] formSaida = {1, 1, 1};
 
 	/**
 	 * Tensor contendo os dados de entrada da camada.
@@ -57,7 +57,7 @@ public class MaxPool2D extends Camada implements Cloneable{
 	 *    O formato da entrada é dado por:
 	 * </p>
 	 * <pre>
-	 *    entrada = (profundidade, altura, largura)
+	 *    entrada = (canais, altura, largura)
 	 * </pre>
 	 */
 	public Tensor _entrada;
@@ -89,7 +89,7 @@ public class MaxPool2D extends Camada implements Cloneable{
 	 *    O formato do gradiente de entrada é dado por:
 	 * </p>
 	 * <pre>
-	 *    entrada = (profundidadeEntrada, alturaEntrada, larguraEntrad)
+	 *    entrada = (canaisEntrada, alturaEntrada, larguraEntrad)
 	 * </pre>
 	 */
 	public Tensor _gradEntrada;
@@ -241,19 +241,16 @@ public class MaxPool2D extends Camada implements Cloneable{
 		}
 		
 		int[] e = (int[]) entrada;
-		if (e.length == 4) {
-			this.formEntrada = new int[]{e[1], e[2], e[3]};
-		
-		}else if (e.length == 3) {
-			this.formEntrada = new int[]{e[0], e[1], e[2]};
-
-		}else {         
+		if (e.length != 3) {
 			throw new IllegalArgumentException(
-				"\nO formato de entrada deve conter três elementos (profundidade, altura, largura) ou " +
-				"quatro elementos (primeiro elementos desconsiderado)" +
-				"formato recebido possui " + e.length + " elementos."
+				"\nFormato de entrada para a camada " + nome() + " deve conter três " + 
+				"elementos (canais, altura, largura), mas recebido tamanho = " + e.length
 			);
 		}
+
+		formEntrada[0] = e[0];// canais
+		formEntrada[1] = e[1];// altura
+		formEntrada[2] = e[2];// largura
 
 		this.formSaida = new int[3];
 		formSaida[0] = formEntrada[0];//profundidade
@@ -295,18 +292,18 @@ public class MaxPool2D extends Camada implements Cloneable{
 
 			_entrada.copiar(e);
 			
-		}else if (entrada instanceof double[][][]) {
+		} else if (entrada instanceof double[][][]) {
 			double[][][] e = (double[][][]) entrada;
 			_entrada.copiar(e);
 
-		}else {
+		} else {
 			throw new IllegalArgumentException(
 				"\nTipo de entrada \"" + entrada.getClass().getTypeName() + "\" não suportada."
 			);
 		}
 
-		int profundidade = formEntrada[0];
-		for (int i = 0; i < profundidade; i++) {
+		int canais = formEntrada[0];
+		for (int i = 0; i < canais; i++) {
 			aplicar(_entrada, _saida, i);
 		}
 
@@ -324,12 +321,10 @@ public class MaxPool2D extends Camada implements Cloneable{
 		int[] shapeEntrada = entrada.shape();
 		int[] shapeSaida = saida.shape();
 
-		int altEntrada  = shapeEntrada[shapeEntrada.length-1];
-		int largEntrada = shapeEntrada[shapeEntrada.length-2];
-		int altSaida  = shapeSaida[shapeSaida.length-1];
-		int largSaida = shapeSaida[shapeSaida.length-2];
-
-		int nDims = entrada.numDim();
+		int altEntrada  = shapeEntrada[1];
+		int largEntrada = shapeEntrada[2];
+		int altSaida  = shapeSaida[1];
+		int largSaida = shapeSaida[2];
   
 		for (int i = 0; i < altSaida; i++) {
 			int linInicio = i * stride[0];
@@ -338,16 +333,16 @@ public class MaxPool2D extends Camada implements Cloneable{
 				int colInicio = j * stride[1];
 				int colFim = Math.min(colInicio + formFiltro[1], largEntrada);
 				double maxValor = Double.MIN_VALUE;
+				double valor;
 
-				for (int lin = linInicio; lin < linFim; lin++) {
-					for (int col = colInicio; col < colFim; col++) {
-						double valor = (nDims == 2) ? entrada.get(lin, col) : entrada.get(prof, lin, col);
+				for (int y = linInicio; y < linFim; y++) {
+					for (int x = colInicio; x < colFim; x++) {
+						valor = entrada.get(prof, y, x);
 						if (valor > maxValor) maxValor = valor;
 					}
 				}
-				saida.set(maxValor, 
-					(nDims == 2) ? new int[]{i, j} : new int[]{prof, i, j}
-				);
+				
+				saida.set(maxValor, prof, i, j);
 			}
 		}
 	}
@@ -363,7 +358,7 @@ public class MaxPool2D extends Camada implements Cloneable{
 				gradMaxPool(_entrada, g, _gradEntrada, i);
 			}
 		
-		}else {
+		} else {
 			throw new IllegalArgumentException(
 				"Formato de gradiente \" "+ grad.getClass().getTypeName() +" \" não " +
 				"suportado para camada de MaxPooling."
@@ -385,15 +380,15 @@ public class MaxPool2D extends Camada implements Cloneable{
 	 * @param gradEntrada gradiente de entrada da camada de max pooling.
 	 * @param prof índice de profundidade da operação.
 	 */
-	 private void gradMaxPool(Tensor entrada, Tensor gradSeguinte, Tensor gradEntrada, int prof) {
+	private void gradMaxPool(Tensor entrada, Tensor gradSeguinte, Tensor gradEntrada, int prof) {
 		int[] shapeEntrada = entrada.shape();
 		int[] shapeGradS = gradSeguinte.shape();
 
-		int altEntrada  = shapeEntrada[shapeEntrada.length-2];
-		int largEntrada = shapeEntrada[shapeEntrada.length-1];
+		int altEntrada  = shapeEntrada[1];
+		int largEntrada = shapeEntrada[2];
 
-		int altGradSeguinte  = shapeGradS[shapeGradS.length-2];
-		int largGradSeguinte = shapeGradS[shapeGradS.length-1];
+		int altGradSeguinte  = shapeGradS[1];
+		int largGradSeguinte = shapeGradS[2];
   
 		for (int i = 0; i < altGradSeguinte; i++) {
 			int linInicio = i * stride[0];
@@ -406,8 +401,10 @@ public class MaxPool2D extends Camada implements Cloneable{
 				int linMaximo = posicaoMaximo[0];
 				int colMaximo = posicaoMaximo[1];
   
-				double grad = gradSeguinte.get(prof, i, j);
-				gradEntrada.set(grad, prof, linMaximo, colMaximo);
+				gradEntrada.set(
+					gradSeguinte.get(prof, i, j), 
+					prof, linMaximo, colMaximo
+				);
 			}
 		}
 	}

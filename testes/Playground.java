@@ -16,19 +16,11 @@ public class Playground {
 	static OpTensor optensor = new OpTensor();
 	static Geim geim = new Geim();
 	static Utils utils = new Utils();
+	static DecimalFormat df = new DecimalFormat();
 
 	public static void main(String[] args) {
 		ged.limparConsole();
-
-		Tensor a = new Tensor(40, 40);
-		Tensor b = new Tensor(40, 40);
-		Tensor c = new Tensor(40, 40);
-
-		a.aplicar(x -> randn());
-		b.aplicar(x -> randn());
-	
-		long t = medirTempo(() -> optensor.matMult(a, b, c));
-		System.out.println("tempo: " + new DecimalFormat().format(t) + " ns");
+		
 	}
 
 	static double randn() {

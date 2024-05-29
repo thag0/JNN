@@ -39,14 +39,14 @@ public class AvgPool2D extends Camada {
 	Utils utils = new Utils();
 
 	/**
-	 * Dimensões dos dados de entrada (profundidade, altura, largura)
+	 * Dimensões dos dados de entrada (canais, altura, largura)
 	 */
-	private int[] formEntrada;
+	private final int[] shapeEntrada = {1, 1, 1};
 
 	/**
-	 * Dimensões dos dados de saída (profundidade, altura, largura)
+	 * Dimensões dos dados de saída (canais, altura, largura)
 	 */
-	private int[] formSaida;
+	private final int[] shapeSaida = {1, 1, 1};
 
 	/**
 	 * Tensor contendo os dados de entrada da camada.
@@ -54,7 +54,7 @@ public class AvgPool2D extends Camada {
 	 *    O formato da entrada é dado por:
 	 * </p>
 	 * <pre>
-	 *    entrada = (profundidade, altura, largura)
+	 *    entrada = (canais, altura, largura)
 	 * </pre>
 	 */
 	public Tensor _entrada;
@@ -73,7 +73,7 @@ public class AvgPool2D extends Camada {
 	 *    Com isso o formato de saída é dado por:
 	 * </p>
 	 * <pre>
-	 *    saida = (profundidade, altura, largura)
+	 *    saida = (canais, altura, largura)
 	 * </pre>
 	 * Essa relação é válida pra cada canal de entrada.
 	 */
@@ -86,7 +86,7 @@ public class AvgPool2D extends Camada {
 	 *    O formato do gradiente de entrada é dado por:
 	 * </p>
 	 * <pre>
-	 *    entrada = (profundidadeEntrada, alturaEntrada, larguraEntrad)
+	 *    entrada = (canaisEntrada, alturaEntrada, larguraEntrad)
 	 * </pre>
 	 */
 	public Tensor _gradEntrada;
@@ -207,7 +207,7 @@ public class AvgPool2D extends Camada {
 	 *    O formato de entrada da camada deve seguir o padrão:
 	 * </p>
 	 * <pre>
-	 *    formEntrada = (profundidade, altura, largura)
+	 *    formEntrada = (canais, altura, largura)
 	 * </pre>
 	 * <h3>
 	 *    Nota
@@ -230,28 +230,24 @@ public class AvgPool2D extends Camada {
 		}
 		
 		int[] e = (int[]) entrada;
-		if (e.length == 4) {
-			this.formEntrada = new int[]{e[1], e[2], e[3]};
-		
-		} else if (e.length == 3) {
-			this.formEntrada = new int[]{e[0], e[1], e[2]};
-		
-		} else {         
+		if (e.length != 3) {
 			throw new IllegalArgumentException(
-				"\nO formato de entrada deve conter três elementos (profundidade, altura, largura) ou " +
-				"quatro elementos (primeiro elementos desconsiderado)" +
-				"formato recebido possui " + e.length + " elementos."
+				"\nFormato de entrada para a camada " + nome() + " deve conter três " + 
+				"elementos (canais, altura, largura), mas recebido tamanho = " + e.length
 			);
 		}
 
-		this.formSaida = new int[3];
-		formSaida[0] = formEntrada[0];//profundidade
-		formSaida[1] = (formEntrada[1] - formFiltro[0]) / this.stride[0] + 1;//altura
-		formSaida[2] = (formEntrada[2] - formFiltro[1]) / this.stride[1] + 1;//largura
+		shapeEntrada[0] = e[0];
+		shapeEntrada[1] = e[1];
+		shapeEntrada[2] = e[2];
+
+		shapeSaida[0] = shapeEntrada[0];// canais
+		shapeSaida[1] = (shapeEntrada[1] - formFiltro[0]) / this.stride[0] + 1;//altura
+		shapeSaida[2] = (shapeEntrada[2] - formFiltro[1]) / this.stride[1] + 1;//largura
 		
-		_entrada = new Tensor(formEntrada);
+		_entrada = new Tensor(shapeEntrada);
 		_gradEntrada = new Tensor(_entrada);
-		_saida = new Tensor(formSaida);
+		_saida = new Tensor(shapeSaida);
 
 		setNomes();
 
@@ -294,8 +290,8 @@ public class AvgPool2D extends Camada {
 			);
 		}
 
-		int profundidade = formEntrada[0];
-		for (int i = 0; i < profundidade; i++) {
+		int canais = shapeEntrada[0];
+		for (int i = 0; i < canais; i++) {
 			aplicar(_entrada, _saida, i);
 		}
 
@@ -313,12 +309,10 @@ public class AvgPool2D extends Camada {
 		int[] shapeE = entrada.shape();
 		int[] shapeS = saida.shape();
 
-		int altEntrada  = shapeE[shapeE.length-1];
-		int largEntrada = shapeE[shapeE.length-2];
-		int altSaida  = shapeS[shapeS.length-1];
-		int largSaida = shapeS[shapeS.length-2];
-
-		int nDims = entrada.numDim();
+		int altEntrada  = shapeE[1];
+		int largEntrada = shapeE[2];
+		int altSaida  = shapeS[1];
+		int largSaida = shapeS[2];
   
 		for (int i = 0; i < altSaida; i++) {
 			int linInicio = i * stride[0];
@@ -331,14 +325,12 @@ public class AvgPool2D extends Camada {
 
 				for (int lin = linInicio; lin < linFim; lin++) {
 					for (int col = colInicio; col < colFim; col++) {
-						soma += nDims == 2 ? entrada.get(lin, col) : entrada.get(prof, lin, col);
+						soma += entrada.get(prof, lin, col);
 						cont++;
 					}
 				}
 
-				saida.set((soma/cont), 
-					(nDims == 2) ? new int[]{i, j} : new int[]{prof, i, j})
-				;
+				saida.set((soma/cont), prof, i, j);
 			}
 		}
 	}
@@ -349,8 +341,8 @@ public class AvgPool2D extends Camada {
 
 		if (grad instanceof Tensor) {
 			Tensor g = (Tensor) grad;
-			int profundidade = formEntrada[0];   
-			for (int i = 0; i < profundidade; i++) {
+			int canais = shapeEntrada[0];   
+			for (int i = 0; i < canais; i++) {
 				gradAvgPool(_entrada, g, _gradEntrada, i);
 			}
 		
@@ -413,13 +405,13 @@ public class AvgPool2D extends Camada {
 	@Override
 	public int[] formatoSaida() {
 		verificarConstrucao();
-		return formSaida;
+		return shapeSaida;
 	}
 
 	@Override
 	public int[] formatoEntrada() {
 		verificarConstrucao();
-		return formEntrada;
+		return shapeEntrada;
 	}
 
 	/**
@@ -466,7 +458,7 @@ public class AvgPool2D extends Camada {
 		
 		sb.append(nome() + " (id " + this.id + ") = [\n");
 
-		sb.append(pad).append("Entrada: " + utils.shapeStr(formEntrada) + "\n");
+		sb.append(pad).append("Entrada: " + utils.shapeStr(shapeEntrada) + "\n");
 		sb.append(pad).append("Filtro: " + utils.shapeStr(formFiltro) + "\n");
 		sb.append(pad).append("Strides: " + utils.shapeStr(stride) + "\n");
 		sb.append(pad).append("Saída: " + utils.shapeStr(formatoSaida()) + "\n");
