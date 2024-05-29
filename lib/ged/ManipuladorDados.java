@@ -163,7 +163,7 @@ class ManipuladorDados{
 
 		if (novoValor == null) throw new IllegalArgumentException("O novo valor para substituição é nulo");
 
-		dados.editarItem(idLinha, idColuna, novoValor);
+		dados.setItem(idLinha, idColuna, novoValor);
 	}
 
 	public void setValor(Dados dados, int idColuna, String busca, String novoValor) {
@@ -178,7 +178,7 @@ class ManipuladorDados{
 		if (busca == null) throw new IllegalArgumentException("O valor de busca é nulo");
 		if (novoValor == null) throw new IllegalArgumentException("O novo valor para substituição é nulo");
 
-		dados.editarItem(idColuna, busca, novoValor);
+		dados.setItem(idColuna, busca, novoValor);
 	}
 
 	public void trocarColunas(Dados dados, int idColuna1, int idColuna2) {
@@ -435,7 +435,7 @@ class ManipuladorDados{
 		//salvar numa estrutura separada
 		Dados dadosFiltados = new Dados();
 		dadosFiltados.atribuir(conteudoFiltrado);
-		dadosFiltados.editarNome(dados.nome());
+		dadosFiltados.setNome(dados.nome());
 
 		return dadosFiltados;
 	}
@@ -460,7 +460,7 @@ class ManipuladorDados{
 
 		Dados dadosFiltados = new Dados();
 		dadosFiltados.atribuir(conteudoFiltrado);
-		dadosFiltados.editarNome(dados.nome());
+		dadosFiltados.setNome(dados.nome());
 
 		return dadosFiltados;
 	}

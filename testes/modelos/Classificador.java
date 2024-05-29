@@ -27,7 +27,7 @@ public class Classificador{
 		int[] shape = iris.shape();
 		int ultimoIndice = shape[1]-1;
 		ged.categorizar(iris, ultimoIndice);
-		System.out.println("Tamanho dados = " + iris.shapeInfo());
+		System.out.println("Tamanho dados = " + iris.shapeStr());
 
 		// separando dados de treino e teste
 		double[][] dados = ged.dadosParaDouble(iris);

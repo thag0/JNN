@@ -21,7 +21,7 @@ class ConversorDados {
 		for (int i = 0; i < dadosConvertidos.length; i++) {
 			for (int j = 0; j < dadosConvertidos[0].length; j++) { 
 				try {
-					dadosConvertidos[i][j] = Integer.parseInt(dados.obterItem(i, j));
+					dadosConvertidos[i][j] = Integer.parseInt(dados.getItem(i, j));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -40,7 +40,7 @@ class ConversorDados {
 		for (int i = 0; i < dadosConvertidos.length; i++) {
 			for (int j = 0; j < dadosConvertidos[0].length; j++) {
 				try {
-					dadosConvertidos[i][j] = Float.parseFloat(dados.obterItem(i, j));
+					dadosConvertidos[i][j] = Float.parseFloat(dados.getItem(i, j));
 				} catch(Exception e) {
 					e.printStackTrace();
 				}
@@ -59,7 +59,7 @@ class ConversorDados {
 		for (int i = 0; i < dadosConvertidos.length; i++) {
 			for (int j = 0; j < dadosConvertidos[0].length; j++) {
 				try {
-					dadosConvertidos[i][j] = Double.parseDouble(dados.obterItem(i, j));
+					dadosConvertidos[i][j] = Double.parseDouble(dados.getItem(i, j));
 				} catch(Exception e) {
 					e.printStackTrace();
 				}
@@ -78,7 +78,7 @@ class ConversorDados {
 		for (int i = 0; i < dadosConvertidos.length; i++) {
 			for (int j = 0; j < dadosConvertidos[0].length; j++) {
 				try {
-					dadosConvertidos[i][j] = dados.obterItem(i, j);
+					dadosConvertidos[i][j] = dados.getItem(i, j);
 				} catch(Exception e) {
 					e.printStackTrace();
 				}

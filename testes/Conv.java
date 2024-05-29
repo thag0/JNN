@@ -109,7 +109,7 @@ public class Conv{
 		long t, total = 0;
 
 		Dados dados = new Dados();
-		dados.editarNome("Tempos Forward");
+		dados.setNome("Tempos Forward");
 		ArrayList<String[]> conteudo = new ArrayList<>();
 
 		DecimalFormat df = new DecimalFormat();
@@ -143,7 +143,7 @@ public class Conv{
 		});
 
 		dados.atribuir(conteudo);
-		dados.editarNome("tempos forward");
+		dados.setNome("tempos forward");
 		return dados;
 	}
 
@@ -158,7 +158,7 @@ public class Conv{
 		DecimalFormat df = new DecimalFormat();
 
 		Dados dados = new Dados();
-		dados.editarNome("Tempos Backward");
+		dados.setNome("Tempos Backward");
 		ArrayList<String[]> conteudo = new ArrayList<>();
 
 		t = medirTempo(() -> modelo.camada(n-1).backward(grad));
@@ -191,7 +191,7 @@ public class Conv{
 		});
 
 		dados.atribuir(conteudo);
-		dados.editarNome("tempos backward");
+		dados.setNome("tempos backward");
 		return dados;
 	}
 

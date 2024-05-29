@@ -80,20 +80,16 @@ public class Dados{
 	 */
 	public Dados(Object conteudo) {
 		if (conteudo instanceof int[][]) {
-			int[][] c = (int[][]) conteudo;
-			atribuir(c);
+			atribuir((int[][]) conteudo);
 		
 		}else if (conteudo instanceof float[][]) {
-			float[][] c = (float[][]) conteudo;
-			atribuir(c);
+			atribuir((float[][]) conteudo);
 		
 		}else if (conteudo instanceof double[][]) {
-			double[][] c = (double[][]) conteudo;
-			atribuir(c);
+			atribuir((double[][]) conteudo);
 		
 		}else if (conteudo instanceof String[][]) {
-			String[][] c = (String[][]) conteudo;
-			atribuir(c);
+			atribuir((String[][]) conteudo);
 		
 			//arrays
 		}else if (conteudo instanceof int[]) {
@@ -146,7 +142,7 @@ public class Dados{
 	 * @throws IllegalArgumentException se novo nome for nulo.
 	 * @throws IllegalArgumentException se novo estiver vazio ou em branco.
 	 */
-	public void editarNome(String nome) {
+	public void setNome(String nome) {
 		if (nome == null) {
 			throw new IllegalArgumentException("O novo nome não pode ser nulo.");
 		}
@@ -157,7 +153,7 @@ public class Dados{
 		}
 
 		this.nome = nome;
-		incrementarAlteracao();
+		addAlteracao();
 	}
 
 	/**
@@ -168,7 +164,7 @@ public class Dados{
 	 * @throws IllegalArgumentException se o conteúdo estiver vazio.
 	 * @throws IllegalArgumentException se os índices fornecidos estiverem fora de alcance.
 	 */
-	public String obterItem(int lin, int col) {
+	public String getItem(int lin, int col) {
 		if (conteudo.isEmpty()) {
 			throw new IllegalArgumentException("O conteúdo está vazio.");
 		}
@@ -193,7 +189,7 @@ public class Dados{
 	 * @param valor novo valor.
 	 * @throws IllegalArgumentException se os índices fornecidos forem inválidos.
 	 */
-	public void editarItem(int lin, int col, String valor) {
+	public void setItem(int lin, int col, String valor) {
 		if (lin < 0 || lin >= conteudo.size()) {
 			throw new IllegalArgumentException(
 				"Índice de linha fornecido (" + lin + ") é inválido."
@@ -208,7 +204,7 @@ public class Dados{
 		String[] linha = conteudo.get(lin);
 		linha[col] = valor;
 		conteudo.set(lin, linha);
-		incrementarAlteracao();
+		addAlteracao();
 	}
 
 	/**
@@ -219,7 +215,7 @@ public class Dados{
 	 * @throws IllegalArgumentException se o conteúdo dos dados não for simétrico.
 	 * @throws IllegalArgumentException se o índice de coluna for inválido.
 	 */
-	public void editarItem(int col, String busca, String valor) {
+	public void setItem(int col, String busca, String valor) {
 		if (!simetrico()) {
 			throw new IllegalArgumentException("O conteúdo dos dados deve ser simétrico.");
 		}
@@ -233,7 +229,7 @@ public class Dados{
 			if (linha[col].contains(busca)) linha[col] = valor;
 		}
 
-		incrementarAlteracao();
+		addAlteracao();
 	}
 
 	/**
@@ -243,7 +239,7 @@ public class Dados{
 	public void atribuir(ArrayList<String[]> conteudo) {
 		if (conteudo != null) {
 			this.conteudo = conteudo;
-			incrementarAlteracao();
+			addAlteracao();
 		}
 	}
 
@@ -261,22 +257,26 @@ public class Dados{
 	 */
 	public void atribuir(int[][] matriz) {
 		int linhas = matriz.length;
-		if (linhas == 0) {
+		if (linhas < 1) {
 			throw new IllegalArgumentException("A matriz fornecida está vazia.");
 		}
 
+		ArrayList<String[]> conteudo = new ArrayList<>(linhas);
+		
 		int colunas = matriz[0].length;
-		for (int i = 1; i < linhas; i++) {
+		for (int i = 0; i < linhas; i++) {
+			if (matriz[i] == null) {
+				throw new IllegalArgumentException(
+					"Linha " + i + " == null." 
+				);
+			}
+
 			if (matriz[i].length != colunas) {
 				throw new IllegalArgumentException(
 					"A matriz deve conter o mesmo número de colunas para todas as linhas."
 				);
 			}
-		}
 
-		ArrayList<String[]> conteudo = new ArrayList<>(linhas);
-
-		for (int i = 0; i < linhas; i++) {
 			String[] linha = new String[colunas];
 			for (int j = 0; j < colunas; j++) {
 				linha[j] = Integer.toString(matriz[i][j]);
@@ -285,7 +285,7 @@ public class Dados{
 		}
 
 		this.conteudo = conteudo;
-		incrementarAlteracao();
+		addAlteracao();
 	}
 
 	/**
@@ -302,22 +302,26 @@ public class Dados{
 	 */
 	public void atribuir(float[][] matriz) {
 		int linhas = matriz.length;
-		if (linhas == 0) {
+		if (linhas < 1) {
 			throw new IllegalArgumentException("A matriz fornecida está vazia.");
 		}
-
+		
+		ArrayList<String[]> conteudo = new ArrayList<>(linhas);
+		
 		int colunas = matriz[0].length;
-		for (int i = 1; i < linhas; i++) {
+		for (int i = 0; i < linhas; i++) {
+			if (matriz[i] == null) {
+				throw new IllegalArgumentException(
+					"Linha " + i + " == null." 
+				);
+			}
+
 			if (matriz[i].length != colunas) {
 				throw new IllegalArgumentException(
 					"A matriz deve conter o mesmo número de colunas para todas as linhas."
 				);
 			}
-		}
 
-		ArrayList<String[]> conteudo = new ArrayList<>(linhas);
-
-		for (int i = 0; i < linhas; i++) {
 			String[] linha = new String[colunas];
 			for (int j = 0; j < colunas; j++) {
 				linha[j] = Float.toString(matriz[i][j]);
@@ -326,7 +330,7 @@ public class Dados{
 		}
 
 		this.conteudo = conteudo;
-		incrementarAlteracao();
+		addAlteracao();
 	}
 
 	/**
@@ -343,22 +347,26 @@ public class Dados{
 	 */
 	public void atribuir(double[][] matriz) {
 		int linhas = matriz.length;
-		if (linhas == 0) {
+		if (linhas < 1) {
 			throw new IllegalArgumentException("A matriz fornecida está vazia.");
 		}
 
+		ArrayList<String[]> conteudo = new ArrayList<>(linhas);
+		
 		int colunas = matriz[0].length;
-		for (int i = 1; i < linhas; i++) {
+		for (int i = 0; i < linhas; i++) {
+			if (matriz[i] == null) {
+				throw new IllegalArgumentException(
+					"Linha " + i + " == null." 
+				);
+			}
+
 			if (matriz[i].length != colunas) {
 				throw new IllegalArgumentException(
 					"A matriz deve conter o mesmo número de colunas para todas as linhas."
 				);
 			}
-		}
 
-		ArrayList<String[]> conteudo = new ArrayList<>(linhas);
-
-		for (int i = 0; i < linhas; i++) {
 			String[] linha = new String[colunas];
 			for (int j = 0; j < colunas; j++) {
 				linha[j] = Double.toString(matriz[i][j]);
@@ -367,7 +375,7 @@ public class Dados{
 		}
 
 		this.conteudo = conteudo;
-		incrementarAlteracao();
+		addAlteracao();
 	}
 
 	/**
@@ -384,31 +392,35 @@ public class Dados{
 	 */
 	public void atribuir(String[][] matriz) {
 		int linhas = matriz.length;
-		if (linhas == 0) {
+		if (linhas < 1) {
 			throw new IllegalArgumentException("A matriz fornecida está vazia.");
 		}
-
+		
+		ArrayList<String[]> conteudo = new ArrayList<>(linhas);
+		
 		int colunas = matriz[0].length;
-		for (int i = 1; i < linhas; i++) {
+		for (int i = 0; i < linhas; i++) {
+			if (matriz[i] == null) {
+				throw new IllegalArgumentException(
+					"Linha " + i + " == null." 
+				);
+			}
+
 			if (matriz[i].length != colunas) {
 				throw new IllegalArgumentException(
 					"A matriz deve conter o mesmo número de colunas para todas as linhas."
 				);
 			}
-		}
 
-		ArrayList<String[]> conteudo = new ArrayList<>(linhas);
-
-		for (int i = 0; i < linhas; i++) {
 			String[] linha = new String[colunas];
 			for (int j = 0; j < colunas; j++) {
-				linha[j] = matriz[i][j];
+				linha[j] = matriz[i][j] == null ? "?" : matriz[i][j];
 			}
 			conteudo.add(i, linha);
 		}
 
 		this.conteudo = conteudo;
-		incrementarAlteracao();
+		addAlteracao();
 	}
 
 	/**
@@ -475,7 +487,7 @@ public class Dados{
 	 * Aumenta em uma unidade a quantidade de alterações
 	 * feitas dentro do conjunto de dados.
 	 */
-	public void incrementarAlteracao() {
+	private void addAlteracao() {
 		alteracoes++;
 	}
 
@@ -631,7 +643,7 @@ public class Dados{
 	 * @return desvio padrão dos valores numéricos na coluna.
 	 * @throws IllegalArgumentException Se o índice fornecido for inválido.
 	 */
-	public double desvioPadrao(int col) {
+	public double desvp(int col) {
 		if (!simetrico()) {
 			throw new IllegalArgumentException("O conteúdo dos dados deve ser simétrico.");
 		}
@@ -812,7 +824,7 @@ public class Dados{
 			double valorNormalizado = (valor - min) / (max - min);
 			linha[col] = Double.toString(valorNormalizado);
 		}
-		incrementarAlteracao();
+		addAlteracao();
 	}
 
 	/**
@@ -838,7 +850,7 @@ public class Dados{
 		for (String[] linha : this.conteudo) {
 			linha[col] = cap(linha[col]);
 		}
-		incrementarAlteracao();
+		addAlteracao();
 	}
 
 	/**
@@ -903,7 +915,7 @@ public class Dados{
 				linha[col] = linha[col].replace(busca, valor);
 			}
 		}
-		incrementarAlteracao();
+		addAlteracao();
 	}
 
 	/**
@@ -933,12 +945,12 @@ public class Dados{
 	 * ]
 	 * </pre>
 	 * @param col índice da coluna desejada.
-	 * @param crescente true caso a ordenação deva ser crescente, false caso contrário.
+	 * @param cres true caso a ordenação deva ser crescente, false caso contrário.
 	 * @throws IllegalArgumentException se o conteúdo dos dados estiver vazio.
 	 * @throws IllegalArgumentException se o conteúdo dos dados não forem simétricos.
 	 * @throws IllegalArgumentException se o índice da coluna for inválido.
 	 */
-	public void ordenar(int col, boolean crescente) {
+	public void ordenar(int col, boolean cres) {
 		if (vazio()) {
 			throw new IllegalArgumentException("O conteúdo dos dados está vazio.");
 		}
@@ -960,11 +972,11 @@ public class Dados{
 			Collator collator = Collator.getInstance(regiao);
 			collator.setStrength(Collator.TERTIARY);
 
-			return crescente ? collator.compare(valor1, valor2) : collator.compare(valor2, valor1);
+			return cres ? collator.compare(valor1, valor2) : collator.compare(valor2, valor1);
 		};
 
 		Collections.sort(this.conteudo, comp);
-		incrementarAlteracao();
+		addAlteracao();
 	}
 
 	/**
@@ -1006,30 +1018,73 @@ public class Dados{
 			throw new IllegalArgumentException("O conteúdo dos dados não é simétrico.");
 		}
 
-		return new int[]{
-			this.conteudo.size(), 
-			this.conteudo.get(0).length
+		return new int[] {
+			conteudo.size(), 
+			conteudo.get(0).length
 		};
 	}
 
 	/**
 	 * Retorna um buffer contendo as informações do conteúdo dos dados, onde:
 	 * <p>
-	 *    {@code shape = [linhas, colunas]}
+	 *    {@code shape = (linhas, colunas)}
 	 * </p>
 	 * @return buffer contendo o formato da lista, considerando que ela é simétrica.
 	 */
-	public String shapeInfo() {
+	public String shapeStr() {
+		if (vazio()) return "()";
+
+		int[] shape = shape();
+
+		return "(" + shape[0] + ", " + shape[1] + ")";
+	}
+
+	/**
+	 * Monsta as informações de exibição dos dados.
+	 * @return string formatada.
+	 */
+	public String construirPrint() {
+		String pad = "    ";
+
+		StringBuilder sb = new StringBuilder();
+
 		if (vazio()) {
-			return "[ (Vazio) ]";
+			sb.append(nome()).append(" = [").append("\n");
+			sb.append("   (Vazio)").append("\n");
+		
+		} else {
+			if (simetrico()) {
+				sb.append(nome).append(" ").append(shapeStr()).append(" = [").append("\n");
+
+			} else {
+				sb.append(nome).append(" = [").append("\n");
+			}
+
+			// comprimento máximo de cada coluna
+			int[] compMax = new int[conteudo.get(0).length];
+			for (String[] linha : conteudo) {
+				for (int i = 0; i < linha.length; i++) {
+					int comp = linha[i].length();
+
+					if (comp > compMax[i]) compMax[i] = comp;
+				}
+			}
+
+			// colunas dinâmicas
+			for (String[] linha : conteudo) {
+				for (int i = 0; i < linha.length; i++) {
+					String valor = linha[i];
+					int distancia = compMax[i] - valor.length() + 1;
+					String espacos = " ".repeat(distancia);
+					sb.append(pad).append(valor).append(espacos);
+				}
+				sb.append("\n");
+			}
 		}
 
-		int[] shape = {
-			this.conteudo.size(), 
-			this.conteudo.get(0).length
-		};
+		sb.append("]").append("\n");
 
-		return "[" + shape[0] + ", " + shape[1] + "]";
+		return sb.toString();
 	}
 
 	/**
@@ -1040,48 +1095,11 @@ public class Dados{
 	 * </p>
 	 */
 	public void print() {
-		String espacamento = "    ";
-
-		if (vazio()) {
-			System.out.println(this.nome + " = [");
-			System.out.println("   (Vazio)");
-		
-		}else{
-			if (simetrico()) {
-				int[] shape = this.shape();
-				System.out.println(this.nome + " (" + shape[0] + ", " + shape[1] + ") = [");
-
-			}else System.out.println(this.nome + " = [");
-
-			//comprimento máximo de cada coluna
-			int[] comprimentoMaximo = new int[this.conteudo.get(0).length];
-			for (String[] linha : this.conteudo) {
-				for (int i = 0; i < linha.length; i++) {
-					int comprimento = linha[i].length();
-
-					if (comprimento > comprimentoMaximo[i]) {
-						comprimentoMaximo[i] = comprimento;
-					}
-				}
-			}
-
-			//colunas dinâmicas
-			for (String[] linha : this.conteudo) {
-				for (int i = 0; i < linha.length; i++) {
-					String valor = linha[i];
-					int distancia = comprimentoMaximo[i] - valor.length() + 1;
-					String espacos = " ".repeat(distancia);
-					System.out.print(espacamento + valor + espacos);
-				}
-				System.out.println();
-			}
-		}
-
-		System.out.println("]\n");
+		System.out.println(construirPrint());
 	}
 
 	/**
-	 * Exibe algumas informações sobre o conjunto de dados no geral.
+	 * Exibe algumas informações sobre o conjunto de dados.
 	 * <p>
 	 *    As informações incluem:
 	 * </p>
@@ -1090,36 +1108,31 @@ public class Dados{
 	 *    <li>Existência de valores não numéricos;</li>
 	 *    <li>Quantidade de valores ausentes;</li>
 	 * </ul>
-	 * @return buffer formatado contendo as informações.
 	 */
-	public String info() {
-		String espacamento = "    ";
-		String formatacao = "\t\t";
+	public void info() {
+		String pad = "    ";
+		String format = "\t\t";
+		StringBuilder sb = new StringBuilder();
 
-		String buffer = "Informações do conjunto de dados = [\n";
-
-		if (this.nome == this.getClass().getSimpleName()) {
-			buffer += espacamento + "Nome padrão\n";
-		
-		}else buffer += espacamento + "Nome:" + formatacao + "\"" +this.nome + "\"\n";
+		sb.append("Info ").append("\"").append(nome).append("\"").append(" = [").append("\n");
 
 		if (vazio()) {
-			buffer += espacamento + "Conteúdo vazio.\n]"; 
-			return buffer;
+			sb.append(pad).append("Conteúdo vazio").append("\n]");
 		
-		}else{
+		} else {
 			if (simetrico()) {
 				int[] shape = this.shape();
-				buffer += espacamento + "Linhas: " + formatacao + shape[0] + "\n";
-				buffer += espacamento + "Colunas: " + formatacao + shape[1] + "\n";
+				sb.append(pad).append("Linhas").append(format).append(shape[0]).append("\n");
+				sb.append(pad).append("Colunas").append(format).append(shape[0]).append("\n");
 			
-			}else{
-				buffer += espacamento + "Tamanho inconsistente \n";
+			} else {
+				sb.append(pad).append("Tamanho inconsistente").append("\n");
 			}
 		}
-		buffer += espacamento + "Alterações:" + formatacao + this.alteracoes + "\n";
-		buffer += "\n";
 
+		sb.append(pad).append("Alterações:").append(format).append(alteracoes).append("\n");
+
+		sb.append("\n");
 
 		boolean apenasNumericos = true;
 		for (int i = 0; i < this.conteudo.get(0).length; i++) {
@@ -1128,24 +1141,28 @@ public class Dados{
 				break;
 			}
 		}
-		buffer += espacamento + "Numéricos:" + formatacao + ((apenasNumericos) ? "sim" : "não") + "\n";
+
+		sb.append(pad).append("Numéricos: ")
+		.append(format).append((apenasNumericos) ? "sim" : "não")
+		.append("\n");
 
 		boolean temValoresAusentes = false;
 		for (int i = 0; i < this.conteudo.get(0).length; i++) {
 			int valoresAusentes = ausentes(i);
 			if (valoresAusentes > 0) {
-				buffer += espacamento + "Ausentes coluna " + i + ": \t" + valoresAusentes + "\n";
+				sb.append(pad).append("Ausentes col ").append(i).append(": \t")
+				.append(valoresAusentes).append("\n");
 				temValoresAusentes = true;
 			}
 		}
   
 		if (!temValoresAusentes) {
-			buffer += espacamento + "Valores Ausentes: \tnão\n";
+			sb.append(pad).append("Valores ausentes: ").append("\tnão").append("\n");
 		}
 		
-		buffer += "]\n";
+		sb.append("]\n");
 
-		return buffer;
+		System.out.println(sb.toString());
 	}
 
 	/**
@@ -1164,30 +1181,30 @@ public class Dados{
 	 *    <li>Coluna contém valores ausentes ou em branco;</li>
 	 * </ul>
 	 * @param col índice da coluna desejada.
-	 * @return buffer formatado contendo informações da coluna.
-	 * @throws IllegalArgumentException se o índice fornecido for inválido.
 	 */
-	public String info(int col) {
+	public void info(int col) {
 		if (col < 0 || col > this.conteudo.get(0).length) {
 			throw new IllegalArgumentException(
 				"Índice fornecido (" + col + ") inválido."
 			);
 		}
 
-		String espacamento = "   ";
+		String pad = "   ";
 
-		String buffer = "Coluna " + col + ": [\n";
-		buffer += espacamento + "Média: \t\t" + media(col) + "\n";
-		buffer += espacamento + "Mediana: \t\t" + mediana(col) + "\n";
-		buffer += espacamento + "Máximo: \t\t" + maximo(col) + "\n";
-		buffer += espacamento + "Mínimo: \t\t" + minimo(col) + "\n";
-		buffer += espacamento + "Moda: \t\t" + moda(col) + "\n";
-		buffer += espacamento + "Desv Padrão: \t" + desvioPadrao(col) + "\n";
-		buffer += espacamento + "Numéricos: \t\t" + (!naoNumericos(col) ? "sim" : "não") + "\n";
-		buffer += espacamento + "Ausentes: \t\t" + ausentes(col) + "\n";
-		buffer += "]\n";
+		StringBuilder sb = new StringBuilder();
 
-		return buffer;
+		sb.append("Coluna " ).append(col).append(" = [").append("\n");
+		sb.append(pad).append("Média:").append("\t\t").append(media(col)).append("\n");
+		sb.append(pad).append("Mediana:").append("\t\t").append(mediana(col)).append("\n");
+		sb.append(pad).append("Máximo:").append("\t\t").append(maximo(col)).append("\n");
+		sb.append(pad).append("Mínimo:").append("\t\t").append(minimo(col)).append("\n");
+		sb.append(pad).append("Moda:").append("\t\t").append(moda(col)).append("\n");
+		sb.append(pad).append("Desv Padrão:").append("\t\t").append(desvp(col)).append("\n");
+		sb.append(pad).append("Numéricos:").append("\t\t").append(!naoNumericos(col) ? "sim" : "não").append("\n");
+		sb.append(pad).append("Ausentes:").append("\t\t").append(ausentes(col)).append("\n");
+		sb.append("]").append("\n");
+
+		System.out.println(sb.toString());
 	}
 
 	/**
@@ -1242,15 +1259,15 @@ public class Dados{
 			);
 		}
   
-		int contador = 0;
-		for (String[] linha : this.conteudo) {
-			String valor = linha[col];
-			if (valor.equals("?") || valor.trim().isEmpty()) {
-				contador++;
+		int cont = 0;
+		for (String[] linha : conteudo) {
+			String valor = linha[col].trim();
+			if (valor.equals("?") || valor.isEmpty()) {
+				cont++;
 			}
 		}
   
-		return contador;
+		return cont;
 	}
 
 	/**
@@ -1322,6 +1339,6 @@ public class Dados{
 
 	@Override
 	public String toString() {
-		return this.info();
+		return construirPrint();
 	}
 }
