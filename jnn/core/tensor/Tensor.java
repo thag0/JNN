@@ -703,7 +703,10 @@ public class Tensor implements Iterable<Variavel> {
 			);
 		}
 
-		System.arraycopy(elementos, 0, dados, 0, tamanho());
+		final int n = tamanho();
+		for (int i = 0; i < n; i++) {
+			dados[i].set(elementos[i]);
+		}
 
 		return this;
 	}
