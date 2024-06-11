@@ -7,7 +7,6 @@ import jnn.core.OpArray;
 import jnn.core.Utils;
 import jnn.core.tensor.OpTensor;
 import jnn.core.tensor.Tensor;
-import jnn.core.tensor.Variavel;
 import lib.ged.Ged;
 import lib.geim.Geim;
 
@@ -22,14 +21,12 @@ public class Playground {
 	public static void main(String[] args) {
 		ged.limparConsole();
 
-		Variavel[] vars = {new Variavel(1), new Variavel(2), new Variavel(3)};
-	
-		Tensor tensor = new Tensor(3);
-		tensor.copiarElementos(vars);
+		Tensor a = new Tensor(2, 3);
+		a.preencherContador(true);
 
-		vars[0].set(99);
-
-		System.out.println(tensor);
+		Tensor b = a.view(3, 2);
+		b.set(99, 0, 0);
+		System.out.println(a);
 	}
 
 	static double randn() {

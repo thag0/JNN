@@ -156,14 +156,25 @@ public class Tensor implements Iterable<Variavel> {
 	/**
 	 * Inicializa um tensor a partir de um array de variáveis.
 	 * @param arr array desejado.
+	 * @param dims dimensões desejadas.
 	 */
-    public Tensor(Variavel[] arr) {
-        shape = new int[]{arr.length};
+    private Tensor(Variavel[] arr, int... dims) {
+        shape = copiarShape(dims);
 
-        dados = inicializarDados(arr.length);
-		for (int i = 0; i < arr.length; i++) {
-			dados[i].set(arr[i]);
+		if (arr == null) {
+			throw new IllegalArgumentException(
+				"\nConjunto de elementos nulo"
+			);
 		}
+
+		if (arr.length != calcularTamanho(dims)) {
+			throw new IllegalArgumentException(
+				"\nNúmero de elementos das dimensões dadas (" + calcularTamanho(dims) + "), " +
+				"deve ser igual ao número de elementos dos dados fornecidos (" + arr.length + ")"
+			);
+		}
+
+		dados = arr;
     }
 
 	/**
@@ -316,6 +327,15 @@ public class Tensor implements Iterable<Variavel> {
 		this.shape = dimsUteis;
 
 		return this;
+	}
+
+	/**
+	 * Cria uma nova visualização do tensor com as dimensões especificadas.
+	 * @param dims dimensões desejadas.
+	 * @return {@code Tensor} com a visualização desejada.
+	 */
+	public Tensor view(int... dims) {
+		return new Tensor(dados, dims);
 	}
 
 	/**
@@ -1241,7 +1261,7 @@ public class Tensor implements Iterable<Variavel> {
 			res.set(fun.applyAsDouble(res.get(), val.get()));
 		}
 
-		return new Tensor(new Variavel[]{ res });
+		return new Tensor(new Variavel[]{ res }, 1);
 	}
 
 	/**
@@ -1256,7 +1276,7 @@ public class Tensor implements Iterable<Variavel> {
             soma += dados[i].get();
         }
 
-        return new Tensor(new Variavel[]{ new Variavel(soma) });
+        return new Tensor(new Variavel[]{ new Variavel(soma) }, 1);
     }
 
 	/**
@@ -1266,7 +1286,7 @@ public class Tensor implements Iterable<Variavel> {
 	 */
 	public Tensor media() {
         double media = soma().item() / tamanho();
-        return new Tensor(new Variavel[]{ new Variavel(media) });
+        return new Tensor(new Variavel[]{ new Variavel(media) }, 1);
     }
 
 	/**
@@ -1282,7 +1302,7 @@ public class Tensor implements Iterable<Variavel> {
 			if (dados[i].get() > max) max = dados[i].get();
 		}
 
-		return new Tensor(new Variavel[]{ new Variavel(max) });
+		return new Tensor(new Variavel[]{ new Variavel(max) }, 1);
 	}
 
 	/**
@@ -1298,7 +1318,7 @@ public class Tensor implements Iterable<Variavel> {
 			if (dados[i].get() < min) min = dados[i].get();
 		}
 
-		return new Tensor(new Variavel[]{ new Variavel(min) });
+		return new Tensor(new Variavel[]{ new Variavel(min) }, 1);
 	}
 
 	/**
@@ -1317,7 +1337,7 @@ public class Tensor implements Iterable<Variavel> {
 
 		return new Tensor(new Variavel[]{ 
 			new Variavel(Math.sqrt(soma / tamanho()))
-		});
+		}, 1);
 	}
 
 	/**
