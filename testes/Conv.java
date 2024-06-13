@@ -45,8 +45,8 @@ public class Conv{
 
 		Dados forward = tempoForward(modelo);//media 32/44ms
 		Dados backward = tempoBackward(modelo);//media 58/125 ms
-		forward = ged.filtrar(forward, 1, "MaxPool2D");
-		backward = ged.filtrar(backward, 1, "MaxPool2D");
+		// forward = ged.filtrar(forward, 1, "MaxPool2D");
+		// backward = ged.filtrar(backward, 1, "MaxPool2D");
 		forward.print();
 		backward.print();
 

@@ -418,7 +418,7 @@ public class Tensor implements Iterable<Variavel> {
 			}
 		}
 
-		Tensor bloco = new Tensor(arr);
+		Tensor bloco = new Tensor(arr, arr.length);
 		bloco.reshape(n, elementos);
 
 		return bloco;
