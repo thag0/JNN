@@ -52,7 +52,7 @@ public class Tensor implements Iterable<Variavel> {
 	/**
 	 * Conjunto de elementos do tensor.
 	 */
-	private Variavel[] dados;
+	private final Variavel[] dados;
 
 	/**
 	 * Nome do tensor.
