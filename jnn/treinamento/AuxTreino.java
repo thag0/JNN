@@ -4,7 +4,6 @@ import java.util.Random;
 
 import jnn.avaliacao.perda.Perda;
 import jnn.camadas.Camada;
-import jnn.core.OpArray;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -17,11 +16,6 @@ public class AuxTreino {
 	 * Gerador de números aleatórios.
 	 */
 	Random random = new Random();
-
-	/**
-	 * Operador para arrays.
-	 */
-	OpArray oparr = new OpArray();
 
 	/**
 	 * Configura a seed inicial do gerador de números aleatórios.

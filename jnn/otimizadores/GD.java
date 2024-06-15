@@ -1,7 +1,6 @@
 package jnn.otimizadores;
 
 import jnn.camadas.Camada;
-import jnn.core.OpArray;
 import jnn.core.tensor.Variavel;
 
 /**
@@ -27,11 +26,6 @@ import jnn.core.tensor.Variavel;
  * </p>
  */
 public class GD extends Otimizador {
-
-	/**
-	 * Operador de arrays.
-	 */
-	OpArray opArr = new OpArray();
 
 	/**
 	 * Valor de taxa de aprendizagem do otimizador.

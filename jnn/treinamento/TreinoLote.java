@@ -5,7 +5,6 @@ import java.util.Random;
 
 import jnn.avaliacao.perda.Perda;
 import jnn.camadas.Camada;
-import jnn.core.OpArray;
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 import jnn.modelos.Modelo;
@@ -15,7 +14,6 @@ import jnn.otimizadores.Otimizador;
  * Em testes ainda.
  */
 class TreinoLote {
-	OpArray oparr = new OpArray();
 	Utils utils = new Utils();
 	AuxTreino aux = new AuxTreino();
 	Random random = new Random();
