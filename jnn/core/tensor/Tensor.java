@@ -76,9 +76,9 @@ public class Tensor implements Iterable<Variavel> {
         this.shape = tensor.shape.clone();
 
         int n = tensor.tamanho();
-        this.dados = inicializarDados(n);
+        dados = initDados(n);
 		for (int i = 0; i < n; i++) {
-			this.dados[i].set(tensor.dados[i]);
+			dados[i].set(tensor.dados[i]);
 		}
     }
 
@@ -100,8 +100,7 @@ public class Tensor implements Iterable<Variavel> {
             tensor[0][0][0].length
         };
 
-		this.dados = inicializarDados(shape[0] * shape[1] * shape[2] * shape[3]);
-
+		dados = initDados(shape[0] * shape[1] * shape[2] * shape[3]);
 		copiar(tensor);
 	}
 
@@ -122,8 +121,7 @@ public class Tensor implements Iterable<Variavel> {
             tensor[0][0].length,
         };
 
-		this.dados = inicializarDados(shape[0] * shape[1] * shape[2]);
-
+		dados = initDados(shape[0] * shape[1] * shape[2]);
 		copiar(tensor);
 	}
 
@@ -148,8 +146,7 @@ public class Tensor implements Iterable<Variavel> {
 		}
 
 		this.shape = copiarShape(new int[]{mat.length, mat[0].length});
-		this.dados = inicializarDados(mat.length * mat[0].length);
-
+		dados = initDados(mat.length * mat[0].length);
 		copiar(mat);
 	}
 
@@ -194,7 +191,7 @@ public class Tensor implements Iterable<Variavel> {
 		}
 		this.shape = s;
 
-		this.dados = inicializarDados(tam);
+		this.dados = initDados(tam);
 		for (int i = 0; i < tam; i++) {
 			this.dados[i].set(dados[i]);
 		}
@@ -214,7 +211,7 @@ public class Tensor implements Iterable<Variavel> {
         int tam = calcularTamanho(shape);
 
         this.shape = copiarShape(shape);
-        dados = inicializarDados(tam);
+        dados = initDados(tam);
     }
 
 	/**
@@ -222,7 +219,7 @@ public class Tensor implements Iterable<Variavel> {
 	 * @param tamanho tamanho desejado.
 	 * @return array de dados alocado.
 	 */
-	private Variavel[] inicializarDados(int tamanho) {
+	private Variavel[] initDados(int tamanho) {
 		Variavel[] d = new Variavel[tamanho];
 		for (int i = 0; i < tamanho; i++) {
 			d[i] = new Variavel(0.0d);
@@ -314,17 +311,17 @@ public class Tensor implements Iterable<Variavel> {
 	public Tensor reshape(int... dims) {
 		int tamInicial = calcularTamanho(shape);
 
-		int[] dimsUteis = copiarShape(dims);
-		int tamDesejado = calcularTamanho(dimsUteis);
+		int[] novoShape = copiarShape(dims);
+		int novoTam = calcularTamanho(novoShape);
 
-		if (tamInicial != tamDesejado) {
+		if (tamInicial != novoTam) {
 			throw new IllegalArgumentException(
-				"\nQuatidade de elementos com as novas dimensões (" + tamDesejado +
+				"\nQuatidade de elementos com as novas dimensões (" + novoTam +
 				") deve ser igual a quantidade de elementos do tensor (" + tamanho() + ")."
 			);
 		}
 
-		this.shape = dimsUteis;
+		this.shape = novoShape;
 
 		return this;
 	}
@@ -526,7 +523,7 @@ public class Tensor implements Iterable<Variavel> {
 	public Tensor zerar() {
         final int n = tamanho();
 		for (int i = 0; i < n; i++) {
-			dados[i].set(0.0d);
+			dados[i].set(0.0);
 		}
 
 		return this;
@@ -589,7 +586,7 @@ public class Tensor implements Iterable<Variavel> {
 			for (int j = 0; j < d2; j++) {
 				for (int k = 0; k < d3; k++) {
 					for (int l = 0; l < d4; l++) {
-						this.dados[cont++].set(arr[i][j][k][l]);
+						dados[cont++].set(arr[i][j][k][l]);
 					}
 				}
 			}
@@ -629,7 +626,7 @@ public class Tensor implements Iterable<Variavel> {
 		for (int i = 0; i < d1; i++) {
 			for (int j = 0; j < d2; j++) {
 				for (int k = 0; k < d3; k++) {
-					this.dados[cont++].set(arr[i][j][k]);
+					dados[cont++].set(arr[i][j][k]);
 				}
 			}
 		}
@@ -698,6 +695,32 @@ public class Tensor implements Iterable<Variavel> {
 
 		return this;
     }
+
+	/**
+	 * Copia apenas os dados contidos no tensor, sem levar em consideração 
+	 * suas dimensões.
+	 * <p>
+	 *		Ainda é necessário que a quantidade de elementos de ambos os 
+	 *		tensores sejam iguais.
+	 * </p>
+	 * @param tensor {@code Tensor} desejado para cópia.
+	 * @return instância local alterada.
+	 */
+	public Tensor copiarElementos(Tensor tensor) {
+		if (tamanho() != tensor.tamanho()) {
+			throw new IllegalArgumentException(
+				"\nOs tensores devem conter o mesmo número de elementos. Local = " + tamanho() + 
+				"e recebido = " + tensor.tamanho()
+			);
+		}
+
+		int n = tamanho();
+		for (int i = 0; i < n; i++) {
+			dados[i].set(tensor.dados[i]);
+		}
+
+		return this;
+	}
 
 	/**
 	 * Copia apenas os dados contidos no array, sem levar em consideração
@@ -910,7 +933,7 @@ public class Tensor implements Iterable<Variavel> {
 	 */
 	public Tensor squeeze(int dim) {
 		if (dim < 0 || dim >= shape.length) {
-			throw new IllegalArgumentException("\nDimensão especificada inválida");
+			throw new IllegalArgumentException("\nDimensão " + dim + " inválida");
 		}
 
 		if (numDim() == 1) return this; // não fazer nada com tensores escalares
@@ -938,7 +961,7 @@ public class Tensor implements Iterable<Variavel> {
     public Tensor unsqueeze(int dim) {
         if (dim < 0 || dim > shape.length) {
             throw new IllegalArgumentException(
-				"\nDimensão " + dim + " fora de alcance"
+				"\nDimensão " + dim + " inválida"
 			);
         }
         
