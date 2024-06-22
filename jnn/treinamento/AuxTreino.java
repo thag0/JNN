@@ -26,7 +26,7 @@ public class AuxTreino {
 	}
 
 	/**
-	 * Realiza a retropropagação de gradientes de cada camada para a atualização de pesos.
+	 * Realiza a retropropagação de gradientes de cada camada para a atualização de seus parâmetros.
 	 * <p>
 	 *    Os gradientes iniciais são calculados usando a derivada da função de perda em relação
 	 *    aos erros do modelo.
@@ -73,22 +73,22 @@ public class AuxTreino {
 
 	/**
 	 * Dedicado para treino em lote e multithread em implementações futuras.
-	 * @param dados conjunto de dados completo.
+	 * @param arr conjunto de dados completo.
 	 * @param inicio índice de inicio do lote.
 	 * @param fim índice final do lote.
 	 * @return lote contendo os dados de acordo com os índices fornecidos.
 	 */
-	public Tensor[] obterSubMatriz(Tensor[] dados, int inicio, int fim) {
-		if (inicio < 0 || fim > dados.length || inicio >= fim) {
+	public Tensor[] subArray(Tensor[] arr, int inicio, int fim) {
+		if (inicio < 0 || fim > arr.length || inicio >= fim) {
 			throw new IllegalArgumentException("Índices de início ou fim inválidos.");
 		}
 
 		int linhas = fim - inicio;
-		Tensor[] subMatriz = new Tensor[linhas];
+		Tensor[] subArr = new Tensor[linhas];
 
-		System.arraycopy(dados, inicio, subMatriz, 0, linhas);
+		System.arraycopy(arr, inicio, subArr, 0, linhas);
 
-		return subMatriz;
+		return subArr;
 	}
 
 	/** 

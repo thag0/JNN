@@ -73,8 +73,8 @@ class TreinoLote {
 
 			for (int i = 0; i < numAmostras; i += tamLote) {
 				int fimIndice = Math.min(i + tamLote, numAmostras);
-				Tensor[] entradaLote = aux.obterSubMatriz(entradas, i, fimIndice);
-				Tensor[] saidaLote = aux.obterSubMatriz(saidas, i, fimIndice);
+				Tensor[] entradaLote = aux.subArray(entradas, i, fimIndice);
+				Tensor[] saidaLote = aux.subArray(saidas, i, fimIndice);
 				
 				modelo.zerarGrad();//zerar gradientes para o acumular pelo lote
 				for (int j = 0; j < entradaLote.length; j++) {
