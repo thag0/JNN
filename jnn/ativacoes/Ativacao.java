@@ -4,6 +4,7 @@ import java.util.function.DoubleUnaryOperator;
 
 import jnn.camadas.Conv2D;
 import jnn.camadas.Densa;
+import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -48,16 +49,17 @@ public abstract class Ativacao {
 	protected DoubleUnaryOperator dx;
 
 	/**
+	 * Utilitário.
+	 */
+	protected Utils utils = new Utils();
+
+	/**
 	 * Configura a função de ativação e sua derivada para uso.
 	 * @param fx função de ativação.
 	 * @param dx deriviada da função de ativação
 	 */
 	public void construir(DoubleUnaryOperator fx, DoubleUnaryOperator dx) {
-		if (fx == null) {
-			throw new IllegalArgumentException(
-				"É necessário que ao menos a função de ativação seja configurada, recebido null."
-			);
-		}
+		utils.validarNaoNulo(fx, "Função de ativação não pode ser nula.");
 
 		this.fx = fx;
 		this.dx = dx;
@@ -69,13 +71,6 @@ public abstract class Ativacao {
 	 * @param dest {@code Tensor} de destino.
 	 */
 	public void forward(Tensor entrada, Tensor dest) {
-		if (!entrada.compararShape(dest)) {
-			throw new IllegalArgumentException(
-				"\nAs dimensões do tensor de entrada " + entrada.shapeStr() +
-				" e saída " + dest.shapeStr() + " devem ser iguais."
-			);
-		}
-
 		dest.aplicar(entrada, fx);
 	}
 
@@ -87,13 +82,6 @@ public abstract class Ativacao {
 	 * @param dest {@code Tensor} de destino.
 	 */
 	public void backward(Tensor entrada, Tensor grad, Tensor dest) {
-		if(!entrada.compararShape(dest) && !entrada.compararShape(grad)){
-			throw new IllegalArgumentException(
-				"\nAs dimensões do tensor de entrada " + entrada.shapeStr() +
-				" e saída " + dest.shapeStr() + " devem ser iguais."
-			);
-		}
-
 		dest.aplicar(entrada, grad, (e, g) -> dx.applyAsDouble(e) * g);
 	}
 
