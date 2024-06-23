@@ -73,12 +73,12 @@ public class SGD extends Otimizador {
 	/**
 	 * Coeficientes de momentum para os kernels.
 	 */
-	public Variavel[] m;
+	private Variavel[] m;
 	
 	/**
 	 * Coeficientes de momentum para os bias.
 	 */
-	public Variavel[] mb;
+	private Variavel[] mb;
 
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient 
