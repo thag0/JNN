@@ -579,7 +579,7 @@ public class OpTensor {
 			Tensor cache = new Tensor(altE, largE);
 
 			for (int e = 0; e < entradas; e++) {
-				cache.preencher(0.0);// zerar acumulador
+				cache.zerar();// zerar acumulador
 				for (int f = 0; f < filtros; f++) {
 
 					for (int i = 0; i < altK; i++) {
@@ -604,7 +604,6 @@ public class OpTensor {
 				}
 			}
 		});
-		t1.start();
 
 		// gradiente em relação aos kernels
 		Thread t2 = new Thread(() -> {
@@ -614,7 +613,7 @@ public class OpTensor {
 
 			for (int f = 0; f < filtros; f++) {
 				for (int e = 0; e < entradas; e++) {
-					cache.preencher(0.0);				
+					cache.zerar();	
 					for (int i = 0; i < altE; i++) {
 						for (int j = 0; j < largE; j++) {
 							entrada2D.set(entrada.get(e, i, j), i, j);
@@ -637,6 +636,8 @@ public class OpTensor {
 				}
 			}
 		});
+
+		t1.start();
 		t2.start();
 
 		// gradiente em relação aos bias

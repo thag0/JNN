@@ -633,7 +633,7 @@ public class Conv2D extends Camada implements Cloneable {
 		}
 
 		// feedforward
-		_somatorio.preencher(0.0d);// zerar valores pre-calculados
+		_somatorio.zerar();// zerar valores pre-calculados
 		optensor.conv2DForward(_entrada, _filtros, _bias, _somatorio);
 		ativacao.forward(_somatorio, _saida);
 
@@ -683,7 +683,7 @@ public class Conv2D extends Camada implements Cloneable {
 		ativacao.backward(this);
 		
 		//backward
-		_gradEntrada.preencher(0.0d);
+		_gradEntrada.zerar();
 		Tensor temp = new Tensor(_gradFiltros.shape());
 		
 		optensor.conv2DBackward(_entrada, _filtros, _gradSaida, temp, _gradBias, _gradEntrada);
