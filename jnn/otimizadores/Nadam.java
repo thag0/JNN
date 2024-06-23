@@ -72,7 +72,7 @@ public class Nadam extends Otimizador {
 	/**
 	 * Valor padrão para epsilon.
 	 */
-	private static final double PADRAO_EPS = 1e-7;
+	private static final double PADRAO_EPS = 1e-8;
 
 	/**
 	 * Valor de taxa de aprendizagem do otimizador.
@@ -187,26 +187,20 @@ public class Nadam extends Otimizador {
 
 	@Override
 	public void construir(Camada[] camadas) {
-		int nKernel = 0;
-		int nBias = 0;
-		
-		for (Camada camada : camadas) {
-			if (!camada.treinavel()) continue;
+		int[] params = initParams(camadas);
+		int kernels = params[0];
+		int bias = params[1];
 
-			nKernel += camada.kernel().tamanho();
-			if (camada.temBias()) nBias += camada.bias().tamanho();
-		}
+		this.m  = initVars(kernels);
+		this.v  = initVars(kernels);
+		this.mb = initVars(bias);
+		this.vb = initVars(bias);
 
-		this.m  = initVars(nKernel);
-		this.v  = initVars(nKernel);
-		this.mb = initVars(nBias);
-		this.vb = initVars(nBias);
-
-		_construido = true;//otimizador pode ser usado
+		_construido = true;// otimizador pode ser usado
 	}
 
 	@Override
-	public void atualizar(Camada[] camadas) {
+	public void atualizar() {
 		verificarConstrucao();
 		
 		interacoes++;
@@ -214,9 +208,7 @@ public class Nadam extends Otimizador {
 		double forcaB2 = 1 - Math.pow(beta2, interacoes);
 		
 		int idKernel = 0, idBias = 0;
-		for (Camada camada : camadas) {
-			if (!camada.treinavel()) continue;
-
+		for (Camada camada : _camadas) {
 			Variavel[] kernel = camada.kernelParaArray();
 			Variavel[] gradK = camada.gradKernelParaArray();
 			idKernel = calcular(kernel, gradK, m, v, forcaB1, forcaB2, idKernel);

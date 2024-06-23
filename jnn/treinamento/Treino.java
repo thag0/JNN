@@ -77,7 +77,7 @@ class Treino {
 				
 				modelo.zerarGrad();
 				aux.backpropagation(camadas, perda, prev, saida[i]);
-				otimizador.atualizar(camadas);
+				otimizador.atualizar();
 			}
 
 			if (logs) {

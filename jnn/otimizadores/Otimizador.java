@@ -22,6 +22,11 @@ import jnn.core.tensor.Variavel;
 public abstract class Otimizador {
 
 	/**
+	 * Conjunto de elementos que serão otimizados.
+	 */
+	Camada[] _camadas = new Camada[0];
+
+	/**
 	 * Buffer de informações sobre o otimizador.
 	 */
 	StringBuilder info;
@@ -48,6 +53,32 @@ public abstract class Otimizador {
 	}
 
 	/**
+	 * Calcula o número de parâmetros das camadas fornecidas e
+	 * adiciona camadas treináveis ao otimizador.
+	 * @param camadas {@code Camadas} treináveis.
+	 * @return array contendo os valores dos parâmetros no formato
+	 * {@code [kernels, bias]}.
+	 */
+	protected int[] initParams(Camada[] camadas) {
+		int nKernel = 0;
+		int nBias = 0;
+		
+		for (Camada camada : camadas) {
+			if (!camada.treinavel()) continue;
+
+			nKernel += camada.kernel().tamanho();
+			if (camada.temBias()) nBias += camada.bias().tamanho();
+
+			addCamada(camada);
+		}
+
+		return new int[]{
+			nKernel, 
+			nBias
+		};
+	}
+
+	/**
 	 * Inicializa um array de variáveis.
 	 * @param tam tamanho desejado.
 	 * @return array de acordo com o tamanho, zerado.
@@ -68,15 +99,27 @@ public abstract class Otimizador {
 	public abstract void construir(Camada[] camadas);
 
 	/**
-	 * Atualiza os parâmetros treináveis do modelo de acordo com o 
-	 * otimizador especificado.
-	 * <p>
-	 *		A atualização de parâmetros é feita uma única vez em todas
-	 *		as camadas do modelo.
-	 * </p>
-	 * @param camadas array de camadas do modelo.
+	 * Adiciona uma camada que será treinada aos parâmetros do otmizador.
+	 * @param camada {@code Camada} treinável.
 	 */
-	public abstract void atualizar(Camada[] camadas);
+	protected void addCamada(Camada camada) {
+		if (camada == null) {
+			throw new IllegalArgumentException(
+				"\nCamada não pode ser nula."
+			);
+		}
+
+		Camada[] antigas = _camadas;
+		_camadas = new Camada[antigas.length + 1];
+
+		System.arraycopy(antigas, 0, _camadas, 0, antigas.length);
+		_camadas[_camadas.length-1] = camada;
+	}
+
+	/**
+	 * Atualiza os parâmetros inicializados do otimizador.
+	 */
+	public abstract void atualizar();
 
 	/**
  	 * Exibe as opções de configurações do otimizador.

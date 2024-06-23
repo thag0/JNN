@@ -87,7 +87,7 @@ class TreinoLote {
 					aux.backpropagation(camadas, perda, prev, saidaLote[j]);
 				}
 
-				otimizador.atualizar(camadas);          
+				otimizador.atualizar();          
 			}
 
 			if (logs) {

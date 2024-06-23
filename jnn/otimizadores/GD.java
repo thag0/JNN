@@ -59,17 +59,15 @@ public class GD extends Otimizador {
 
 	@Override
 	public void construir(Camada[] camadas) {
-		//esse otimizador não precisa de parâmetros adicionais
-		this._construido = true;//otimizador pode ser usado
+		initParams(camadas);
+		this._construido = true;// otimizador pode ser usado
 	}
 
 	@Override
-	public void atualizar(Camada[] camadas) {
+	public void atualizar() {
 		verificarConstrucao();
 		
-		for (Camada camada : camadas) {
-			if (!camada.treinavel()) continue;
-
+		for (Camada camada : _camadas) {
 			Variavel[] kernel = camada.kernelParaArray();
 			Variavel[] gradK = camada.gradKernelParaArray();		
 			for (int i = 0; i < kernel.length; i++) {

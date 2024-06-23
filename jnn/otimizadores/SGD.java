@@ -137,29 +137,22 @@ public class SGD extends Otimizador {
 
 	@Override
 	public void construir(Camada[] camadas) {
-		int nKernel = 0;
-		int nBias = 0;
+		int[] params = initParams(camadas);
+		int kernels = params[0];
+		int bias = params[1];
 		
-		for (Camada camada : camadas) {
-			if (!camada.treinavel()) continue;
-
-			nKernel += camada.kernel().tamanho();
-			if (camada.temBias()) nBias += camada.bias().tamanho();
-		}
-
-		this.m  = initVars(nKernel);
-		this.mb = initVars(nBias);
-		this._construido = true;//otimizador pode ser usado
+		this.m  = initVars(kernels);
+		this.mb = initVars(bias);
+		
+		this._construido = true;// otimizador pode ser usado
 	}
 
 	@Override
-	public void atualizar(Camada[] camadas) {
+	public void atualizar() {
 		verificarConstrucao();
 
 		int idKernel = 0, idBias = 0;
-		for(Camada camada : camadas){
-			if (!camada.treinavel()) continue;
-
+		for (Camada camada : _camadas) {
 			Variavel[] kernel = camada.kernelParaArray();
 			Variavel[] gradK = camada.gradKernelParaArray();
 			idKernel = calcular(kernel, gradK, m, idKernel);

@@ -144,30 +144,22 @@ public class RMSProp extends Otimizador {
 
 	@Override
 	public void construir(Camada[] camadas) {
-		int nKernel = 0;
-		int nBias = 0;
-		
-		for (Camada camada : camadas) {
-			if (!camada.treinavel()) continue;
+		int[] params = initParams(camadas);
+		int kernels = params[0];
+		int bias = params[1];
 
-			nKernel += camada.kernel().tamanho();
-			if (camada.temBias()) nBias += camada.bias().tamanho();
-		}
-
-		this.ac  = initVars(nKernel);
-		this.acb = initVars(nBias);
+		this.ac  = initVars(kernels);
+		this.acb = initVars(bias);
 		
-		_construido = true;//otimizador pode ser usado
+		_construido = true;// otimizador pode ser usado
 	}
 
 	@Override
-	public void atualizar(Camada[] camadas) {
+	public void atualizar() {
 		verificarConstrucao();
 		
 		int idKernel = 0, idBias = 0;
-		for (Camada camada : camadas) {
-			if (!camada.treinavel()) continue;
-
+		for (Camada camada : _camadas) {
 			Variavel[] kernel = camada.kernelParaArray();
 			Variavel[] gradK = camada.gradKernelParaArray();
 			idKernel = calcular(kernel, gradK, ac, idKernel);
