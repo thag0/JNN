@@ -2,6 +2,9 @@ package jnn.core.tensor;
 
 import java.util.Iterator;
 import java.util.function.DoubleUnaryOperator;
+
+import jnn.serializacao.SerialTensor;
+
 import java.util.function.DoubleBinaryOperator;
 
 //TODO broadcasting entre tensores
@@ -42,7 +45,7 @@ import java.util.function.DoubleBinaryOperator;
  * @author Thiago Barroso, acadêmico de Engenharia da Computação pela
  * Universidade Federal do Pará, Campus Tucuruí. Maio/2024.
  */
-public class Tensor implements Iterable<Variavel> {
+public class Tensor implements Iterable<Variavel>, Cloneable {
     
 	/**
 	 * Dimensões do tensor.
@@ -52,7 +55,7 @@ public class Tensor implements Iterable<Variavel> {
 	/**
 	 * Conjunto de elementos do tensor.
 	 */
-	private final Variavel[] dados;
+	private Variavel[] dados;
 
 	/**
 	 * Nome do tensor.
@@ -222,7 +225,7 @@ public class Tensor implements Iterable<Variavel> {
 	private Variavel[] initDados(int tamanho) {
 		Variavel[] d = new Variavel[tamanho];
 		for (int i = 0; i < tamanho; i++) {
-			d[i] = new Variavel(0.0d);
+			d[i] = new Variavel(0.0);
 		}
 
 		return d;
@@ -1767,7 +1770,21 @@ public class Tensor implements Iterable<Variavel> {
 	 */
     @Override
 	public Tensor clone() {
-		return new Tensor(this);
+		try {
+			Tensor clone = (Tensor) super.clone();
+
+			clone.shape = shape.clone();
+			
+			int n = tamanho();
+			clone.dados = new Variavel[n];
+			for (int i = 0; i < n; i++) {
+				clone.dados[i] = new Variavel(dados[i]);
+			}
+			
+			return clone;
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -1807,6 +1824,29 @@ public class Tensor implements Iterable<Variavel> {
 				"\nSem suporte."
 			);
 		}
+	}
+
+	/**
+	 * Exporta os dados do tensor em um arquivo externo.
+	 * <h3>
+	 *		Observação
+	 * </h3>
+	 * Para ler o tensor de um arquivo externo é necessário usar um
+	 * {@code SerialTensor}, interface responsável pelo io de tensores.
+	 * <p>
+	 *		Exemplo:
+	 * </p>
+	 * <pre>
+	 *import jnn.serializacao.SerialTensor;
+	 *
+	 *String caminho = ...
+	 *SerialTensor st = new SerialTensor();
+	 *Tensor t = st.ler(caminho);
+	 * </pre>
+	 * @param caminho caminho de destino.
+	 */
+	public void salvar(String caminho) {
+		new SerialTensor().serializar(this, caminho);
 	}
 
 }
