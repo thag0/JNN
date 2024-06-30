@@ -1,5 +1,7 @@
 package jnn.core;
 
+import java.lang.reflect.Array;
+
 import jnn.core.tensor.Tensor;
 
 /**
@@ -167,6 +169,26 @@ public class Utils {
 
 			throw new NullPointerException("\n" + str);
 		}
+	}
+
+	/**
+	 * Adiciona um novo elemento ao array.
+	 * @param <T> tipo dos elementos do array
+	 * @param arr {@code array}.
+	 * @param elm elemento para adição.
+	 * @return novo array com elemento adicionado.
+	 */
+	public <T> T[] addEmArray(T[] arr, T elm) {
+		validarNaoNulo(arr, "Array nulo");
+		validarNaoNulo(elm, "elemento nulo");
+		
+		@SuppressWarnings("unchecked")
+		T[] novo = (T[]) Array.newInstance(arr.getClass().getComponentType(), arr.length + 1);
+
+		System.arraycopy(arr, 0, novo, 0, arr.length);
+		novo[novo.length-1] = elm;
+		
+		return novo;
 	}
 
 }

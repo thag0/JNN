@@ -225,14 +225,7 @@ public class Sequencial extends Modelo {
 	 */
 	public void add(Camada camada) {
 		utils.validarNaoNulo(camada, "\nCamada não pode ser nula.");
-
-		Camada[] antigas = _camadas;
-		_camadas = new Camada[antigas.length + 1];
-		
-		System.arraycopy(antigas, 0, _camadas, 0, antigas.length);
-		_camadas[_camadas.length-1] = camada;
-
-		_compilado = false;
+		_camadas = utils.addEmArray(_camadas, camada);
 	}
 
 	/**
@@ -319,7 +312,7 @@ public class Sequencial extends Modelo {
 			prev = _camadas[i].forward(prev);
 		}
 
-		return prev.clone();//preservar a saída do modelo
+		return prev.clone();// preservar a saída do modelo
 	}
   
 	@Override

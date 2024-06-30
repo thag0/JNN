@@ -1,6 +1,7 @@
 package jnn.otimizadores;
 
 import jnn.camadas.Camada;
+import jnn.core.Utils;
 import jnn.core.tensor.Variavel;
 
 /**
@@ -24,7 +25,12 @@ public abstract class Otimizador {
 	/**
 	 * Conjunto de elementos que serão otimizados.
 	 */
-	Camada[] _camadas = new Camada[0];
+	Camada[] _camadas = new Camada[0];// Considerar futuramente utilizar apenas tensores.
+
+	/**
+	 * Utilitário.
+	 */
+	Utils utils = new Utils();
 
 	/**
 	 * Buffer de informações sobre o otimizador.
@@ -45,9 +51,9 @@ public abstract class Otimizador {
 	 * Verifica se o otimizador pode ser utilizado.
 	 */
 	protected void verificarConstrucao() {
-		if(!_construido){
+		if (!_construido) {
 			throw new IllegalStateException(
-				"\nO otimizador deve ser construído para poder ser usado."
+				"\nOtimizador deve ser construído."
 			);
 		}
 	}
@@ -60,21 +66,21 @@ public abstract class Otimizador {
 	 * {@code [kernels, bias]}.
 	 */
 	protected int[] initParams(Camada[] camadas) {
-		int nKernel = 0;
-		int nBias = 0;
+		int kernels = 0;
+		int bias = 0;
 		
 		for (Camada camada : camadas) {
 			if (!camada.treinavel()) continue;
 
-			nKernel += camada.kernel().tamanho();
-			if (camada.temBias()) nBias += camada.bias().tamanho();
+			kernels += camada.kernel().tamanho();
+			if (camada.temBias()) bias += camada.bias().tamanho();
 
-			addCamada(camada);
+			_camadas = utils.addEmArray(_camadas, camada);
 		}
 
-		return new int[]{
-			nKernel, 
-			nBias
+		return new int[] {
+			kernels, 
+			bias
 		};
 	}
 
@@ -86,38 +92,21 @@ public abstract class Otimizador {
 	protected Variavel[] initVars(int tam) {
 		Variavel[] arr = new Variavel[tam];
 		for (int i = 0; i < tam; i++) {
-			arr[i] = new Variavel(0.0d);
+			arr[i] = new Variavel();
 		}
 
 		return arr;
 	}
 
 	/**
-	 * Inicializa os parâmetros do otimizador para as camadas do modelo especificado.
+	 * Inicializa os parâmetros necessários do otimizador para as camadas 
+	 * do modelo especificado.
 	 * @param camadas array de camadas do modelo.
 	 */
 	public abstract void construir(Camada[] camadas);
 
 	/**
-	 * Adiciona uma camada que será treinada aos parâmetros do otmizador.
-	 * @param camada {@code Camada} treinável.
-	 */
-	protected void addCamada(Camada camada) {
-		if (camada == null) {
-			throw new IllegalArgumentException(
-				"\nCamada não pode ser nula."
-			);
-		}
-
-		Camada[] antigas = _camadas;
-		_camadas = new Camada[antigas.length + 1];
-
-		System.arraycopy(antigas, 0, _camadas, 0, antigas.length);
-		_camadas[_camadas.length-1] = camada;
-	}
-
-	/**
-	 * Atualiza os parâmetros inicializados do otimizador.
+	 * Executa um passo de atualização do otimizador.
 	 */
 	public abstract void atualizar();
 
