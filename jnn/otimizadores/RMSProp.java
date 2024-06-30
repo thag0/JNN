@@ -62,17 +62,17 @@ public class RMSProp extends Otimizador {
 	/**
 	 * Valor de taxa de aprendizagem do otimizador.
 	 */
-	private double taxaAprendizagem;
+	private final double tA;
 
 	/**
 	 * Usado para evitar divisão por zero.
 	 */
-	private double epsilon;
+	private final double epsilon;
 
 	/**
 	 * Fator de decaimento.
 	 */
-	private double rho;
+	private final double rho;
 
 	/**
 	 * Acumuladores para os kernels
@@ -108,7 +108,7 @@ public class RMSProp extends Otimizador {
 			);
 		}
 
-		this.taxaAprendizagem = tA;
+		this.tA = tA;
 		this.rho = rho;
 		this.epsilon = eps;
 	}
@@ -162,12 +162,12 @@ public class RMSProp extends Otimizador {
 		for (Camada camada : _camadas) {
 			Variavel[] kernel = camada.kernelParaArray();
 			Variavel[] gradK = camada.gradKernelParaArray();
-			idKernel = calcular(kernel, gradK, ac, idKernel);
+			idKernel = rmsprop(kernel, gradK, ac, idKernel);
 
 			if (camada.temBias()) {
 				Variavel[] bias = camada.biasParaArray();
 				Variavel[] gradB = camada.gradBiasParaArray();
-				idBias = calcular(bias, gradB, acb, idBias);
+				idBias = rmsprop(bias, gradB, acb, idBias);
 			}
 		}
 	}
@@ -180,12 +180,15 @@ public class RMSProp extends Otimizador {
 	 * @param id índice inicial das variáveis dentro do array de momentums.
 	 * @return índice final após as atualizações.
 	 */
-    private int calcular(Variavel[] vars, Variavel[] grads, Variavel[] ac, int id) {
+    private int rmsprop(Variavel[] vars, Variavel[] grads, Variavel[] ac, int id) {
         double g;
+
         for (int i = 0; i < vars.length; i++) {
             g = grads[i].get();
-            ac[id].set(rho * ac[id].get() + (1 - rho) * g * g);
-            vars[i].sub((g * taxaAprendizagem) / (Math.sqrt(ac[id].get()) + epsilon));
+            
+			ac[id].set(rho * ac[id].get() + (1 - rho) * g * g);
+            vars[i].sub((g * tA) / (Math.sqrt(ac[id].get()) + epsilon));
+
             id++;
         }
 
@@ -197,7 +200,7 @@ public class RMSProp extends Otimizador {
 		verificarConstrucao();
 		construirInfo();
 		
-		addInfo("TaxaAprendizagem: " + taxaAprendizagem);
+		addInfo("Lr: " + tA);
 		addInfo("Rho: " + rho);
 		addInfo("Epsilon: " + epsilon);
 

@@ -25,7 +25,7 @@ public abstract class Otimizador {
 	/**
 	 * Conjunto de elementos que serão otimizados.
 	 */
-	Camada[] _camadas = new Camada[0];// Considerar futuramente utilizar apenas tensores.
+	Camada[] _camadas = {};// Considerar futuramente utilizar apenas tensores.
 
 	/**
 	 * Utilitário.

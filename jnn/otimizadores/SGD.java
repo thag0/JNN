@@ -15,7 +15,7 @@ import jnn.core.tensor.Variavel;
  *    O SGD funciona usando a seguinte expressão:
  * </p>
  * <pre>
- *m = (m * M) - (g * tA)
+ *m += (m * M) - (g * tA)
  *v += m // apenas com momentum
  *v += (M * m) - (g * tA) // com nesterov
  * </pre>
@@ -35,13 +35,13 @@ import jnn.core.tensor.Variavel;
  *    {@code g} - gradientes correspondente a variável que será otimizada.
  * </p>
  * <p>
- *    {@code tA} - taxa de aprendizagem do otimizador.
+ *    {@code tA} - taxa de aprendizado do otimizador.
  * </p>
  */
 public class SGD extends Otimizador {
 
 	/**
-	 * Taxa de aprendizagem padrão do otimizador.
+	 * Taxa de aprendizado padrão do otimizador.
 	 */
 	private static final double PADRAO_TA = 0.01;
 
@@ -56,19 +56,19 @@ public class SGD extends Otimizador {
 	private static final boolean PADRAO_NESTEROV = false;
 
 	/**
-	 * Valor de taxa de aprendizagem do otimizador.
+	 * Valor de taxa de aprendizado do otimizador.
 	 */
-	private double taxaAprendizagem;
+	private final double tA;
 
 	/**
 	 * Valor de taxa de momentum do otimizador.
 	 */
-	private double momentum;
+	private final double momentum;
 
 	/**
 	 * Usar acelerador de Nesterov.
 	 */
-	private boolean nesterov;
+	private final boolean nesterov;
 
 	/**
 	 * Coeficientes de momentum para os kernels.
@@ -83,24 +83,24 @@ public class SGD extends Otimizador {
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient 
 	 * Descent (SGD) </strong> usando os valores de hiperparâmetros fornecidos.
-	 * @param tA taxa de aprendizagem do otimizador.
+	 * @param tA taxa de aprendizado do otimizador.
 	 * @param m taxa de momentum do otimizador.
 	 * @param nesterov usar acelerador de nesterov.
 	 */
 	public SGD(double tA, double m, boolean nesterov) {
 		if (tA <= 0) {
 			throw new IllegalArgumentException(
-				"\nTaxa de aprendizagem (" + tA + "), inválida."
+				"\nTaxa de aprendizado (" + tA + ") inválida."
 			);
 		}
 		
 		if (m < 0) {         
 			throw new IllegalArgumentException(
-				"\nTaxa de momentum (" + m + "), inválida."
+				"\nTaxa de momentum (" + m + ") inválida."
 			);
 		}
 
-		this.taxaAprendizagem = tA;
+		this.tA = tA;
 		this.momentum = m;
 		this.nesterov = nesterov;
 	}
@@ -108,7 +108,7 @@ public class SGD extends Otimizador {
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient 
 	 * Descent (SGD) </strong> usando os valores de hiperparâmetros fornecidos.
-	 * @param tA taxa de aprendizagem do otimizador.
+	 * @param tA taxa de aprendizado do otimizador.
 	 * @param m taxa de momentum do otimizador.
 	 */
 	public SGD(double tA, double m) {
@@ -118,7 +118,7 @@ public class SGD extends Otimizador {
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient 
 	 * Descent (SGD) </strong> usando os valores de hiperparâmetros fornecidos.
-	 * @param tA taxa de aprendizagem do otimizador.
+	 * @param tA taxa de aprendizado do otimizador.
 	 */
 	public SGD(double tA) {
 		this(tA, PADRAO_MOMENTUM, PADRAO_NESTEROV);
@@ -141,10 +141,10 @@ public class SGD extends Otimizador {
 		int kernels = params[0];
 		int bias = params[1];
 		
-		this.m  = initVars(kernels);
-		this.mb = initVars(bias);
+		m  = initVars(kernels);
+		mb = initVars(bias);
 		
-		this._construido = true;// otimizador pode ser usado
+		_construido = true;// otimizador pode ser usado
 	}
 
 	@Override
@@ -152,15 +152,16 @@ public class SGD extends Otimizador {
 		verificarConstrucao();
 
 		int idKernel = 0, idBias = 0;
+		
 		for (Camada camada : _camadas) {
 			Variavel[] kernel = camada.kernelParaArray();
 			Variavel[] gradK = camada.gradKernelParaArray();
-			idKernel = calcular(kernel, gradK, m, idKernel);
+			idKernel = sgd(kernel, gradK, m, idKernel);
 
 			if (camada.temBias()) {
 				Variavel[] bias = camada.biasParaArray();
 				Variavel[] gradB = camada.gradBiasParaArray();
-				idBias = calcular(bias, gradB, mb, idBias);
+				idBias = sgd(bias, gradB, mb, idBias);
 			}
 		}
 	}
@@ -173,14 +174,16 @@ public class SGD extends Otimizador {
 	 * @param id índice inicial das variáveis dentro do array de momentums.
 	 * @return índice final após as atualizações.
 	 */
-	private int calcular(Variavel[] vars, Variavel[] grads, Variavel[] m, int id) {
-		double mid;
-		double gi;
+	private int sgd(Variavel[] vars, Variavel[] grads, Variavel[] m, int id) {
+		double mid, g;
+
 		for (int i = 0; i < vars.length; i++) {
 			mid = m[id].get();
-			gi = grads[i].get();
-			m[id].set((mid * momentum) - (gi * taxaAprendizagem));
-			vars[i].add(nesterov ? (mid * momentum) - (gi * taxaAprendizagem) : mid);
+			g = grads[i].get();
+		
+			m[id].set((mid * momentum) - (g * tA));
+			vars[i].add(nesterov ? (mid * momentum) - (g * tA) : mid);
+		
 			id++;
 		}
 
@@ -192,7 +195,7 @@ public class SGD extends Otimizador {
 		verificarConstrucao();
 		construirInfo();
 		
-		addInfo("TaxaAprendizagem: " + taxaAprendizagem);
+		addInfo("Lr: " + tA);
 		addInfo("Momentum: " + momentum);
 		addInfo("Nesterov: " + nesterov);
 

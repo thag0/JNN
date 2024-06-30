@@ -22,29 +22,29 @@ import jnn.core.tensor.Variavel;
  *    {@code g} - gradiente correspondente a variável que será otimizada.
  * </p>
  * <p>
- *    {@code tA} - taxa de aprendizagem do otimizador.
+ *    {@code tA} - taxa de aprendizado do otimizador.
  * </p>
  */
 public class GD extends Otimizador {
 
 	/**
-	 * Valor de taxa de aprendizagem do otimizador.
+	 * Valor de taxa de aprendizado do otimizador.
 	 */
-	private double taxaAprendizagem;
+	private final double tA;
 
 	/**
 	 * Inicializa uma nova instância de otimizador da <strong> Descida do Gradiente </strong>
 	 * usando os valores de hiperparâmetros fornecidos.
-	 * @param tA taxa de aprendizagem do otimizador.
+	 * @param tA taxa de aprendizado do otimizador.
 	 */
 	public GD(double tA) {
 		if (tA <= 0) {
 			throw new IllegalArgumentException(
-				"\nTaxa de aprendizagem (" + tA + "), inválida."
+				"\nTaxa de aprendizado (" + tA + ") inválida."
 			);
 		}
 
-		this.taxaAprendizagem = tA;
+		this.tA = tA;
 	}
 
 	/**
@@ -60,7 +60,7 @@ public class GD extends Otimizador {
 	@Override
 	public void construir(Camada[] camadas) {
 		initParams(camadas);
-		this._construido = true;// otimizador pode ser usado
+		_construido = true;// otimizador pode ser usado
 	}
 
 	@Override
@@ -70,18 +70,25 @@ public class GD extends Otimizador {
 		for (Camada camada : _camadas) {
 			Variavel[] kernel = camada.kernelParaArray();
 			Variavel[] gradK = camada.gradKernelParaArray();		
-			for (int i = 0; i < kernel.length; i++) {
-				kernel[i].sub(gradK[i].get() * taxaAprendizagem);
-			}
+			gd(kernel, gradK);
 
 			if (camada.temBias()) {
 				Variavel[] bias = camada.biasParaArray();
 				Variavel[] gradB = camada.gradBiasParaArray();
-				for (int i = 0; i < bias.length; i++) {
-					bias[i].sub(gradB[i].get() * taxaAprendizagem);
-				}
+				gd(bias, gradB);
 			}
 		} 
+	}
+
+    /**
+	 * Atualiza as variáveis usando o gradiente pré calculado.
+	 * @param vars variáveis que serão atualizadas.
+	 * @param grads gradientes das variáveis.
+	 */
+	private void gd(Variavel[] vars, Variavel[] grads) {
+		for (int i = 0; i < vars.length; i++) {
+			vars[i].sub(grads[i].get() * tA);
+		}
 	}
 
 	@Override
@@ -89,7 +96,7 @@ public class GD extends Otimizador {
 		verificarConstrucao();
 		construirInfo();
 		
-		addInfo("TaxaAprendizagem: " + taxaAprendizagem);
+		addInfo("Lr: " + tA);
 
 		return super.info();
 	}

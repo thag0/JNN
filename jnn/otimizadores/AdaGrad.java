@@ -42,7 +42,7 @@ import jnn.core.tensor.Variavel;
 public class AdaGrad extends Otimizador {
 
 	/**
-	 * Valor padrão para a taxa de aprendizagem do otimizador.
+	 * Valor padrão para a taxa de aprendizado do otimizador.
 	 */
 	private static final double PADRAO_TA = 0.5;
 
@@ -52,9 +52,9 @@ public class AdaGrad extends Otimizador {
 	private static final double PADRAO_EPS = 1e-7; 
 
 	/**
-	 * Valor de taxa de aprendizagem do otimizador.
+	 * Valor de taxa de aprendizado do otimizador.
 	 */
-	private double taxaAprendizagem;
+	private double tA;
 
 	/**
 	 * Usado para evitar divisão por zero.
@@ -74,30 +74,30 @@ public class AdaGrad extends Otimizador {
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> AdaGrad </strong> 
 	 * usando os valores de hiperparâmetros fornecidos.
-	 * @param tA valor de taxa de aprendizagem.
+	 * @param tA valor de taxa de aprendizado.
 	 * @param eps usado para evitar a divisão por zero.
 	 */
 	public AdaGrad(double tA, double eps) {
 		if (tA <= 0) {
 			throw new IllegalArgumentException(
-				"\nTaxa de aprendizagem (" + tA + "), inválida."
+				"\nTaxa de aprendizado (" + tA + ") inválida."
 			);
 		}
 
 		if (eps <= 0) {
 			throw new IllegalArgumentException(
-				"\nEpsilon (" + eps + "), inválido."
+				"\nEpsilon (" + eps + ") inválido."
 			);
 		}
 		
-		this.taxaAprendizagem = tA;
+		this.tA = tA;
 		this.epsilon = eps;
 	}
 
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> AdaGrad </strong> 
 	 * usando os valores de hiperparâmetros fornecidos.
-	 * @param tA valor de taxa de aprendizagem.
+	 * @param tA valor de taxa de aprendizado.
 	 */
 	public AdaGrad(double tA) {
 		this(tA, PADRAO_EPS);
@@ -119,8 +119,8 @@ public class AdaGrad extends Otimizador {
 		int kernels = params[0];
 		int bias = params[1];
 
-		this.ac  = initVars(kernels);
-		this.acb = initVars(bias);
+		ac  = initVars(kernels);
+		acb = initVars(bias);
 		
 		double valorInicial = 0.1;
 		for (int i = 0; i < kernels; i++) {
@@ -138,17 +138,16 @@ public class AdaGrad extends Otimizador {
 		verificarConstrucao();
 		
 		int idKernel = 0, idBias = 0;
+
 		for (Camada camada : _camadas) {
 			Variavel[] kernel = camada.kernelParaArray();
 			Variavel[] gradK = camada.gradKernelParaArray();
-			idKernel = calcular(kernel, gradK, ac, idKernel);
-			camada.setKernel(kernel);
+			idKernel = adagrad(kernel, gradK, ac, idKernel);
 			
 			if (camada.temBias()) {
 				Variavel[] bias = camada.biasParaArray();
 				Variavel[] gradB = camada.gradBiasParaArray();
-				idBias = calcular(bias, gradB, acb, idBias);
-				camada.setBias(bias);
+				idBias = adagrad(bias, gradB, acb, idBias);
 			}
 		}
 	}
@@ -157,16 +156,19 @@ public class AdaGrad extends Otimizador {
 	 * Atualiza as variáveis usando o gradiente pré calculado.
 	 * @param vars variáveis que serão atualizadas.
 	 * @param grads gradientes das variáveis.
-	 * @param acumulador acumulador do otimizador.
+	 * @param ac acumulador do otimizador.
 	 * @param id índice inicial das variáveis dentro do array de momentums.
 	 * @return índice final após as atualizações.
 	 */
-	private int calcular(Variavel[] vars, Variavel[] grads, Variavel[] acumulador, int id) {
+	private int adagrad(Variavel[] vars, Variavel[] grads, Variavel[] ac, int id) {
 		double g;
+
 		for (int i = 0; i < vars.length; i++) {
 			g = grads[i].get();
-			acumulador[id].add(g*g);
-			vars[i].sub((g * taxaAprendizagem) / (Math.sqrt(ac[id].get() + epsilon)));
+
+			ac[id].add(g*g);
+			vars[i].sub((g * tA) / (Math.sqrt(ac[id].get() + epsilon)));
+			
 			id++;
 		}
 
@@ -178,7 +180,7 @@ public class AdaGrad extends Otimizador {
 		verificarConstrucao();
 		construirInfo();
 		
-		addInfo("TaxaAprendizagem: " + taxaAprendizagem);
+		addInfo("Lr: " + tA);
 		addInfo("Epsilon: " + epsilon);
 
 		return super.info();

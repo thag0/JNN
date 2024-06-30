@@ -27,7 +27,7 @@ import jnn.core.tensor.Variavel;
  *    {@code var} - variável que será otimizada.
  * </p>
  * <p>
- *    {@code alfa} - correção aplicada a taxa de aprendizagem.
+ *    {@code alfa} - correção aplicada a taxa de aprendizado.
  * </p>
  * <p>
  *    {@code m} - coeficiente de momentum correspondente a variável que
@@ -42,7 +42,7 @@ import jnn.core.tensor.Variavel;
  * </p>
  * O valor de {@code alfa} é dado por:
  * <pre>
- * alfa = taxaAprendizagem * √(1- beta1ⁱ) / (1 - beta2ⁱ)
+ * alfa = tA * √(1- beta1ⁱ) / (1 - beta2ⁱ)
  * </pre>
  * Onde:
  * <p>
@@ -65,7 +65,7 @@ import jnn.core.tensor.Variavel;
 public class Adam extends Otimizador {
 
 	/**
-	 * Valor de taxa de aprendizagem padrão do otimizador.
+	 * Valor de taxa de aprendizado padrão do otimizador.
 	 */
 	private static final double PADRAO_TA = 0.001;
 
@@ -85,24 +85,24 @@ public class Adam extends Otimizador {
 	private static final double PADRAO_EPS = 1e-8;
 
 	/**
-	 * Valor de taxa de aprendizagem do otimizador.
+	 * Valor de taxa de aprendizado do otimizador.
 	 */
-	private double taxaAprendizagem;
+	private final double tA;
 
 	/**
 	 * Decaimento do momentum.
 	 */
-	private double beta1;
+	private final double beta1;
 	 
 	/**
 	 * Decaimento do momentum de segunda ordem.
 	 */
-	private double beta2;
+	private final double beta2;
 	 
 	/**
 	 * Usado para evitar divisão por zero.
 	 */
-	private double epsilon;
+	private final double epsilon;
 
 	/**
 	 * Coeficientes de momentum para os kernels.
@@ -127,12 +127,12 @@ public class Adam extends Otimizador {
 	/**
 	 * Contador de iterações.
 	 */
-	long interacoes = 0;
+	long iteracoes = 0;
  
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> Adam </strong> 
 	 * usando os valores de hiperparâmetros fornecidos.
-	 * @param tA taxa de aprendizagem do otimizador.
+	 * @param tA taxa de aprendizado do otimizador.
 	 * @param beta1 decaimento do momento de primeira ordem.
 	 * @param beta2 decaimento do momento de segunda ordem.
 	 * @param eps usado para evitar a divisão por zero.
@@ -140,26 +140,26 @@ public class Adam extends Otimizador {
 	public Adam(double tA, double beta1, double beta2, double eps) {
 		if (tA <= 0) {
 			throw new IllegalArgumentException(
-				"\nTaxa de aprendizagem (" + tA + "), inválida."
+				"\nTaxa de aprendizado (" + tA + ") inválida."
 			);
 		}
 		if (beta1 <= 0) {
 			throw new IllegalArgumentException(
-				"\nTaxa de decaimento de primeira ordem (" + beta1 + "), inválida."
+				"\nTaxa de decaimento de primeira ordem (" + beta1 + ") inválida."
 			);
 		}
 		if (beta2 <= 0) {
 			throw new IllegalArgumentException(
-				"\nTaxa de decaimento de segunda ordem (" + beta2 + "), inválida."
+				"\nTaxa de decaimento de segunda ordem (" + beta2 + ") inválida."
 			);
 		}
 		if (eps <= 0) {
 			throw new IllegalArgumentException(
-				"\nEpsilon (" + eps + "), inválido."
+				"\nEpsilon (" + eps + ") inválido."
 			);
 		}
 		
-		this.taxaAprendizagem = tA;
+		this.tA = tA;
 		this.beta1 = beta1;
 		this.beta2 = beta2;
 		this.epsilon = eps;
@@ -168,7 +168,7 @@ public class Adam extends Otimizador {
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> Adam </strong> 
 	 * usando os valores de hiperparâmetros fornecidos.
-	 * @param tA taxa de aprendizagem do otimizador.
+	 * @param tA taxa de aprendizado do otimizador.
 	 * @param beta1 decaimento do momento de primeira ordem.
 	 * @param beta2 decaimento do momento de segunda ordem.
 	 */
@@ -179,7 +179,7 @@ public class Adam extends Otimizador {
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> Adam </strong> 
 	 * usando os valores de hiperparâmetros fornecidos.
-	 * @param tA taxa de aprendizagem do otimizador.
+	 * @param tA taxa de aprendizado do otimizador.
 	 */
 	public Adam(double tA) {
 		this(tA, PADRAO_BETA1, PADRAO_BETA2, PADRAO_EPS);
@@ -202,10 +202,10 @@ public class Adam extends Otimizador {
 		int kernels = params[0];
 		int bias = params[1];
 
-		this.m  = initVars(kernels);
-		this.v  = initVars(kernels);
-		this.mb = initVars(bias);
-		this.vb = initVars(bias);
+		m  = initVars(kernels);
+		v  = initVars(kernels);
+		mb = initVars(bias);
+		vb = initVars(bias);
 
 		_construido = true;// otimizador pode ser usado
 	}
@@ -214,23 +214,21 @@ public class Adam extends Otimizador {
 	public void atualizar() {
 		verificarConstrucao();
 		
-		interacoes++;
-		double forcaB1 = Math.pow(beta1, interacoes);
-		double forcaB2 = Math.pow(beta2, interacoes);
-		double alfa = taxaAprendizagem * Math.sqrt(1 - forcaB2) / (1 - forcaB1);
+		iteracoes++;
+		double forcaB1 = Math.pow(beta1, iteracoes);
+		double forcaB2 = Math.pow(beta2, iteracoes);
+		double alfa = tA * Math.sqrt(1 - forcaB2) / (1 - forcaB1);
 		
 		int idKernel = 0, idBias = 0;
 		for (Camada camada : _camadas) {
 			Variavel[] kernel = camada.kernelParaArray();
 			Variavel[] gradK = camada.gradKernelParaArray();
-			idKernel = calcular(kernel, gradK, m, v, alfa, idKernel);
-			camada.setKernel(kernel);
+			idKernel = adam(kernel, gradK, m, v, alfa, idKernel);
 			
 			if (camada.temBias()) {
 				Variavel[] bias = camada.biasParaArray();
 				Variavel[] gradB = camada.gradBiasParaArray();
-				idBias = calcular(bias, gradB, mb, vb, alfa, idBias);
-				camada.setBias(bias);
+				idBias = adam(bias, gradB, mb, vb, alfa, idBias);
 			}     
 		}
 	}
@@ -241,11 +239,11 @@ public class Adam extends Otimizador {
 	 * @param grads gradientes das variáveis.
 	 * @param m coeficientes de momentum de primeira ordem das variáveis.
 	 * @param v coeficientes de momentum de segunda ordem das variáveis.
-	 * @param alfa pequena correção na taxa de aprendizagem.
+	 * @param alfa pequena correção na taxa de aprendizado.
 	 * @param id índice inicial das variáveis dentro do array de momentums.
 	 * @return índice final após as atualizações.
 	 */
-	private int calcular(Variavel[] vars, Variavel[] grads, Variavel[] m, Variavel[] v, double alfa, int id) {
+	private int adam(Variavel[] vars, Variavel[] grads, Variavel[] m, Variavel[] v, double alfa, int id) {
 		double g, mid, vid;
 
 		for (int i = 0; i < vars.length; i++) {
@@ -254,7 +252,8 @@ public class Adam extends Otimizador {
 			vid = v[id].get();
 
 			m[id].add((1 - beta1) * (g      - mid));
-			v[id].add((1 - beta2) * (((g*g) - vid)));  
+			v[id].add((1 - beta2) * (((g*g) - vid)));
+
 			vars[i].sub((alfa * mid) / (Math.sqrt(vid) + epsilon));
 		
 			id++;
@@ -268,7 +267,7 @@ public class Adam extends Otimizador {
 		verificarConstrucao();
 		construirInfo();
 		
-		addInfo("TaxaAprendizagem: " + taxaAprendizagem);
+		addInfo("Lr: " + tA);
 		addInfo("Beta1: " + beta1);
 		addInfo("Beta2: " + beta2);
 		addInfo("Epsilon: " + epsilon);

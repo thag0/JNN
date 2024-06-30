@@ -59,15 +59,15 @@ public class Adadelta extends Otimizador {
 	/**
 	 * Constante de decaimento do otimizador.
 	 */
-	private double rho;
+	private final double rho;
 
 	/**
 	 * Valor usado para evitar divisão por zero.
 	 */
-	private double epsilon;
+	private final double epsilon;
 
 	/**
-	 * Acumuladores para os pesos.
+	 * Acumuladores para os kernels.
 	 */
 	private Variavel[] ac;
 
@@ -95,13 +95,13 @@ public class Adadelta extends Otimizador {
 	public Adadelta(double rho, double eps) {
 		if (rho <= 0) {
 			throw new IllegalArgumentException(
-				"\nTaxa de decaimento (" + rho + "), inválida."
+				"\nTaxa de decaimento (" + rho + ") inválida."
 			);
 		}
 
 		if (eps <= 0) {
 			throw new IllegalArgumentException(
-				"\nEpsilon (" + eps + "), inválido."
+				"\nEpsilon (" + eps + ") inválido."
 			);
 		}
 
@@ -135,10 +135,10 @@ public class Adadelta extends Otimizador {
 		int kernels = params[0];
 		int bias = params[1];
 
-		this.ac    = initVars(kernels);
-		this.acAt  = initVars(kernels);
-		this.acb   = initVars(bias);
-		this.acAtb = initVars(bias);
+		ac    = initVars(kernels);
+		acAt  = initVars(kernels);
+		acb   = initVars(bias);
+		acAtb = initVars(bias);
 
 		_construido = true;// otimizador pode ser usado
 	}
@@ -148,16 +148,16 @@ public class Adadelta extends Otimizador {
 		verificarConstrucao();
 		
 		int idKernel = 0, idBias = 0;
-		for (Camada camada : _camadas) {
 
+		for (Camada camada : _camadas) {
 			Variavel[] kernel = camada.kernelParaArray();
 			Variavel[] gradK = camada.gradKernelParaArray();
-			idKernel = calcular(kernel, gradK, ac, acAt, idKernel);
+			idKernel = adadelta(kernel, gradK, ac, acAt, idKernel);
 
 			if (camada.temBias()) {
 				Variavel[] bias = camada.biasParaArray();
 				Variavel[] gradB = camada.gradBiasParaArray();
-				idBias = calcular(bias, gradB, acb, acAtb, idBias);
+				idBias = adadelta(bias, gradB, acb, acAtb, idBias);
 			}
 		}
 	}
@@ -171,7 +171,7 @@ public class Adadelta extends Otimizador {
 	 * @param id índice inicial das variáveis dentro do array de momentums.
 	 * @return índice final após as atualizações.
 	 */
-	private int calcular(Variavel[] vars, Variavel[] grads, Variavel[] ac, Variavel[] acAt, int id) {
+	private int adadelta(Variavel[] vars, Variavel[] grads, Variavel[] ac, Variavel[] acAt, int id) {
 		double g, delta;
 
 		for (int i = 0; i < vars.length; i++) {
