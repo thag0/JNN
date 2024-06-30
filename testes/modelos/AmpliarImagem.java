@@ -37,8 +37,8 @@ public class AmpliarImagem{
 		//nesse exemplo queremos que ela tenha overfitting
 		Sequencial modelo = new Sequencial(
 			new Entrada(nEntrada),
-			new Densa(12, "tanh"),
-			new Densa(12, "sigmoid"),
+			new Densa(14, "tanh"),
+			new Densa(14, "tanh"),
 			new Densa(nSaida, "sigmoid")
 		);
 		modelo.setHistorico(true);
