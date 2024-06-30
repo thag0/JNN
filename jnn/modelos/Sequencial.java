@@ -224,7 +224,7 @@ public class Sequencial extends Modelo {
 	 * @throws IllegalArgumentException se a camada fornecida for nula,
 	 */
 	public void add(Camada camada) {
-		utils.validarNaoNulo(camada, "Camada não pode ser nula.");
+		utils.validarNaoNulo(camada, "\nCamada não pode ser nula.");
 
 		Camada[] antigas = _camadas;
 		_camadas = new Camada[antigas.length + 1];
@@ -324,9 +324,8 @@ public class Sequencial extends Modelo {
   
 	@Override
 	public void zerarGrad() {
-		final int n = _camadas.length;
-		for (int i = 0; i < n; i++) {
-			if (_camadas[i].treinavel()) _camadas[i].zerarGrad();
+		for (Camada camada : _camadas) {
+			if (camada.treinavel()) camada.zerarGrad();
 		}
 	}
 

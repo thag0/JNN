@@ -10,21 +10,19 @@ import jnn.core.tensor.Tensor;
 /**
  * Classe base para a implementação das funções de ativação.
  * <p>
- *    As funções de ativação percorres todos os elementos contendo os
- *    resultados de cada operação dos kernels das camadas, e aplica sua
- *    operação correspondente nas suas saídas.
+ *		As funções de ativação são usadas para melhorar a capacidade de modelagem
+ *		dos dados em que os modelos treinados estão sendo usados.
  * </p>
  * <p>
- *    Funções de ativação podem fazer uso dos métodos {@code aplicarFx()} e 
- *    {@code aplicarDx()}, sendo necessário informar nos seus constritures 
- *    uma interface funcional que fará o cálculo da saída de acordo com uma
- *    entrada redebida.
+ * 		Novas implementações devem obrigatoriamente informar o cálculo correspondente
+ * 		da ativação, usando o método {@code construir()}, onde nele é informado tanto
+ * 		a expressão da função de ativação, quanto sua derivada.
  * </p>
- * Exemplo com a função ReLU:
+ * Exemplo:
  * <pre>
  *public class ReLU extends Ativacao{
  *  public ReLU(){
- *    super.construir(
+ *    construir(
  *       (x) -> (x > 0) ? x : 0,
  *       (x) -> (x > 0) ? 1 : 0
  *    );
@@ -33,7 +31,8 @@ import jnn.core.tensor.Tensor;
  *}
  * </pre>
  * <p>
- *    Novas funções de ativações devem sobrescrever os métodos existentes {@code ativar()} e {@code derivada()}.
+ *		Novas funções de ativações devem sobrescrever os métodos existentes 
+ * 		{@code forward()} e {@code backward()}.
  * </p>
  */
 public abstract class Ativacao {
@@ -88,7 +87,7 @@ public abstract class Ativacao {
 	/**
 	 * Implementação especifíca para camadas densas.
 	 * <p>
-	 *    Função criada para dar suporte a ativações especiais.
+	 *    Criada para dar suporte a ativações especiais.
 	 * </p>
 	 * @param camada camada densa.
 	 */
@@ -100,7 +99,7 @@ public abstract class Ativacao {
 	/**
 	 * Implementação especifíca para camadas convolucionais.
 	 * <p>
-	 *    Função criada para dar suporte a ativações especiais.
+	 *    Criada para dar suporte a ativações especiais.
 	 * </p>
 	 * @param camada camada convolucional.
 	 */

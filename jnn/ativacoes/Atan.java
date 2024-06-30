@@ -1,10 +1,10 @@
 package jnn.ativacoes;
 
 /**
- * Implementação da função de ativação ArcTangente (atan) para uso dentro 
+ * Implementação da função de ativação Arco Tangente (atan) para uso dentro 
  * dos modelos.
  * <p>
- *    A função ArcTangente (atan) retorna o ângulo cuja tangente é o número
+ *    A função Arco Tangente retorna o ângulo cuja tangente é o número
  *    recebido como argumento. Ela retorna valores no intervalo [-pi/2, pi/2].
  * </p>
  */

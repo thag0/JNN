@@ -9,7 +9,7 @@ import jnn.core.tensor.Tensor;
 public class Argmax extends Ativacao {
 
 	/**
-	 * Intancia uma nova função de ativação Softmax.
+	 * Intancia uma nova função de ativação Argmax.
 	 * <p>
 	 *    A função argmax encontra o maior valor de saída dentre os neurônios
 	 *    da camada e converte ele para 1, as demais saídas dos neurônios serão
