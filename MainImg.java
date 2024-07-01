@@ -158,7 +158,7 @@ public class MainImg {
 		double[] perdas = modelo.historico();
 		double[][] dadosPerdas = new double[perdas.length][1];
 
-		try (ExecutorService exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())) {
+		try (ExecutorService exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()/2)) {
 			final int n = dadosPerdas.length;
 			for (int i = 0; i < n; i++) {
 				final int id = i;
