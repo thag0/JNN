@@ -188,28 +188,24 @@ public class Sequencial extends Modelo {
 	 * ou alguma camada contida seja.
 	 */
 	public Sequencial(Camada... camadas) {
-		utils.validarNaoNulo(camadas, "Conjunto de camadas não pode ser nulo.");
+		this();// evitar repetição de código
 
-		for (int i = 0; i < camadas.length; i++) {
-			utils.validarNaoNulo(
-				camadas[i], ("O conjunto de camadas fornecido possui uma camada nula, id = " + i)
-			);
-		}
+		utils.validarNaoNulo(camadas, "Conjunto de camadas nulo.");
 
 		if (camadas.length < 1) {
 			throw new IllegalArgumentException(
-				"\nCamadas fornecidas possuem tamanho = " + camadas.length + "."
+				"\nConjunto de camadas vazio."
 			);
 		}
 
-		_camadas = new Camada[0];
+		for (int i = 0; i < camadas.length; i++) {
+			utils.validarNaoNulo(camadas[i], ("Camada nula, id = " + i + "."));
+		}
 		
 		add(camadas[0]);
 		for (int i = 1; i < camadas.length; i++) {
 			if (!(camadas[i] instanceof Entrada)) add(camadas[i]);
 		}
-
-		_compilado = false;
 	}
 
 	/**
@@ -224,7 +220,7 @@ public class Sequencial extends Modelo {
 	 * @throws IllegalArgumentException se a camada fornecida for nula,
 	 */
 	public void add(Camada camada) {
-		utils.validarNaoNulo(camada, "\nCamada não pode ser nula.");
+		utils.validarNaoNulo(camada, "Camada nula.");
 		_camadas = utils.addEmArray(_camadas, camada);
 	}
 
@@ -294,11 +290,11 @@ public class Sequencial extends Modelo {
 		
 		Dicionario dicio = new Dicionario();
 		_perda = dicio.getPerda(perda);
-		_otimizador = dicio.getOtimizador(otimizador);
-
-		_otimizador.construir(_camadas);
 		
-		_compilado = true;//modelo pode ser usado.
+		_otimizador = dicio.getOtimizador(otimizador);
+		_otimizador.construir(camadas());
+		
+		_compilado = true;// modelo pode ser usado.
 	}
 
 	@Override
@@ -317,14 +313,14 @@ public class Sequencial extends Modelo {
   
 	@Override
 	public void zerarGrad() {
-		for (Camada camada : _camadas) {
+		for (Camada camada : camadas()) {
 			if (camada.treinavel()) camada.zerarGrad();
 		}
 	}
 
 	@Override
 	public void treino(boolean treinando) {
-		for (Camada camada : _camadas) {
+		for (Camada camada : camadas()) {
 			camada.setTreino(treinando);
 		}
 	}
@@ -384,7 +380,7 @@ public class Sequencial extends Modelo {
 	public int numParametros() {
 		int params = 0;
 
-		for(Camada camada : _camadas) {
+		for (Camada camada : camadas()) {
 			params += camada.numParametros();
 		}
 
@@ -417,7 +413,7 @@ public class Sequencial extends Modelo {
 			)
 		);
 
-		for (Camada camada : _camadas) {
+		for (Camada camada : camadas()) {
 			
 			//identificador da camada
 			String nomeCamada = camada.id + " - " + camada.nome();
@@ -432,7 +428,7 @@ public class Sequencial extends Modelo {
 			String ativacao;
 			try {
 				ativacao = camada.ativacao().nome();
-			} catch (Exception exception) {
+			} catch (Exception e) {
 				ativacao = "-";
 			}
 
