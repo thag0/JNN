@@ -23,14 +23,14 @@ class SerialFlatten {
 			sb.append(camada.nome()).append("\n");
 
 			//formato de entrada
-			int[] entrada = camada.formatoEntrada();
+			int[] entrada = camada.shapeEntrada();
 			for (int i = 0; i < entrada.length; i++) {
 				sb.append(entrada[i]).append(" ");
 			}
 			sb.append("\n");
 			
 			//formato de saída
-			int[] saida = camada.formatoSaida();
+			int[] saida = camada.shapeSaida();
 			for (int i = 0; i < saida.length; i++) {
 				sb.append(saida[i]).append(" ");
 			}

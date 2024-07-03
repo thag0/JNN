@@ -72,7 +72,7 @@ public class Dropout extends Camada implements Cloneable {
 	/**
 	 * Gerador de valores aleatórios.
 	 */
-	Random random = new Random();//implementar configuração de seed
+	Random random = new Random();// implementar configuração de seed
 
 	/**
 	 * Utilitário.
@@ -82,7 +82,7 @@ public class Dropout extends Camada implements Cloneable {
 	/**
 	 * Instancia uma nova camada de dropout, definindo a taxa
 	 * de abandono que será usada durante o processo de treinamento.
-	 * @param taxa taxa de dropout, um valor entre 0 e 1 representando a
+	 * @param taxa taxa de dropout, um {@code valor entre 0 e 1} representando a
 	 * taxa de abandono da camada.
 	 */
 	public Dropout(double taxa) {
@@ -109,29 +109,24 @@ public class Dropout extends Camada implements Cloneable {
 	}
 
 	@Override
-	public void construir(Object entrada) {
-		if (!(entrada instanceof int[])) {
-			throw new IllegalArgumentException(
-				"\nObjeto esperado para entrada da camada Dropout é do tipo int[], " +
-				"objeto recebido é do tipo " + entrada.getClass().getTypeName()
-			);
-		}
+	public void construir(int[] shape) {
+		utils.validarNaoNulo(shape, "Formato de entrada nulo.");
 
-		int[] formato = (int[]) entrada;
-		if (!utils.apenasMaiorZero(formato)) {
-			throw new IllegalArgumentException(
-				"\nOs argumentos do formato de entrada devem ser maiores que zero."
-			);
-		}
-		if (formato.length < 1) {
+		if (shape.length < 1) {
 			throw new IllegalArgumentException(
 				"\nO formato deve conter pelo menos um elemento."
 			);
 		}
 
-		this.shapeEntrada = formato.clone();
+		if (!utils.apenasMaiorZero(shape)) {
+			throw new IllegalArgumentException(
+				"\nValores do formato de entrada devem ser maiores que zero."
+			);
+		}
 
-		_entrada =     new Tensor(this.shapeEntrada);
+		shapeEntrada = shape.clone();
+
+		_entrada =     new Tensor(shapeEntrada);
 		_mascara =     new Tensor(_entrada.shape());
 		_saida =       new Tensor(_entrada.shape());
 		_gradEntrada = new Tensor(_entrada.shape());
@@ -174,13 +169,6 @@ public class Dropout extends Camada implements Cloneable {
 	 * <p>
 	 *    Caso a camada não esteja {@code treinando}, por padrão a entrada é apenas
 	 *    repassada para a saída da camada.
-	 * </p>
-	 * <h3>
-	 *    Nota
-	 * </h3>
-	 * <p>
-	 *    Caso a entrada recebida seja um {@code Tensor}, os valores de entrada
-	 *    que serão considerados serão apenas o da primeira dimensão do tensor.
 	 * </p>
 	 * @param entrada dados de entrada para a camada, objetos aceitos são {@code Tensor}
 	 */
@@ -235,7 +223,7 @@ public class Dropout extends Camada implements Cloneable {
 	 */
 	private void gerarMascaras() {
 		_mascara.aplicar(
-			x ->  (random.nextDouble() >= taxa) ? (1 / (1 - taxa)) : 0.0d
+			x ->  (random.nextDouble() >= taxa) ? (1 / (1 - taxa)) : 0.0
 		);
 	}
 
@@ -286,14 +274,14 @@ public class Dropout extends Camada implements Cloneable {
 	}
 
 	@Override
-	public int[] formatoEntrada() {
+	public int[] shapeEntrada() {
 		verificarConstrucao();
 		return shapeEntrada.clone();
 	}
 
 	@Override
-	public int[] formatoSaida() {
-		return formatoEntrada();
+	public int[] shapeSaida() {
+		return shapeEntrada();
 	}
 
 	@Override

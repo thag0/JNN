@@ -402,7 +402,7 @@ public class RedeNeural extends Modelo {
 		for (int i = 1; i < _camadas.length; i++) {
 			_camadas[i] = new Densa(_arq[i+1]);
 			_camadas[i].setBias(bias);
-			_camadas[i].construir(_camadas[i-1].formatoSaida());
+			_camadas[i].construir(_camadas[i-1].shapeSaida());
 		}
 
 		for (int i = 0; i < _camadas.length; i++) {

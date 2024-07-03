@@ -22,7 +22,7 @@ class SerialDropout {
 		sb.append(camada.nome()).append("\n");
 
 		//formato de entrada
-		int[] entrada = camada.formatoEntrada();
+		int[] entrada = camada.shapeEntrada();
 		for (int i = 0; i < entrada.length; i++) {
 			sb.append(entrada[i]).append(" ");
 		}

@@ -87,15 +87,13 @@ public abstract class Camada {
 	/**
 	 * Monta a estrutura da camada.
 	 * <p>
-	 *    A construção da camada envolve inicializar seus atributos como entrada,
-	 *    kernels, bias, além de elementos auxiliares que são importantes para
-	 *    o seu funcionamento correto.
+	 *		A construção da camada envolve inicializar seus atributos como 
+	 *		entrada, kernels, bias, além de elementos auxiliares que são 
+	 *		importantes para o seu funcionamento correto.
 	 * </p>
-	 * @param entrada formato de entrada da camada, dependerá do formato de saída
-	 * da camada anterior, no caso de ser a primeira camada, dependerá do formato
-	 * dos dados de entrada.
+	 * @param shape formato para os dados de entrada da camada.
 	 */
-	public abstract void construir(Object entrada);
+	public abstract void construir(int[] shape);
 
 	/**
 	 * Verificador de inicialização para evitar problemas.
@@ -237,30 +235,16 @@ public abstract class Camada {
 	}
 	
 	/**
-	 * Lógica para retornar o formato configurado de entrada da camada.
-	 * <p>
-	 *    Nele devem ser consideradas as dimensões dos dados de entrada da
-	 *    camada, que devem estar disposto como:
-	 * </p>
-	 * <pre>
-	 *    formato = (profundidade, altura, largura)
-	 * </pre>
-	 * @return array contendo os valores das dimensões de entrada da camada.
+	 * Retorna o formado dos dados de entrada suportados pela camada.
+	 * @return formato de entrada da camada.
 	 */
-	public abstract int[] formatoEntrada();
+	public abstract int[] shapeEntrada();
 
 	/**
-	 * Lógica para retornar o formato configurado de saída da camada.
-	 * <p>
-	 *    Nele devem ser consideradas as dimensões dos dados de saída da
-	 *    camada, que devem estar disposto como:
-	 * </p>
-	 * <pre>
-	 *    formato = (profundidade, altura, largura)
-	 * </pre>
-	 * @return array contendo os valores das dimensões de saída da camada.
+	 * Retorna o formado dos dos dados de saída gerados pela camada.
+	 * @return formato de saída da camada.
 	 */
-	public abstract int[] formatoSaida();
+	public abstract int[] shapeSaida();
 
 	/**
 	 * Retorna a saída da camada no formato de array.
@@ -305,13 +289,9 @@ public abstract class Camada {
 	/**
 	 * Retorna o kernel da camada.
 	 * <p>
-	 *    O kernel de uma camada inclui seus atributos mais importantes, como
-	 *    os pesos de uma camada densa, ou os filtros de uma camada convolucional.
-	 * </p>
-	 * <p>
 	 *    <strong> O kernel só existe em camadas treináveis </strong>.
 	 * </p>
-	 * @return kernel da camada.
+	 * @return {@code Tensor} de kernel da camada.
 	 */
 	public Tensor kernel() {
 		throw new UnsupportedOperationException(
@@ -320,15 +300,11 @@ public abstract class Camada {
 	}
 
 	/**
-	 * Retorna um array contendo os elementos do kernel presente na camada.
-	 * <p>
-	 *    O kernel de uma camada inclui seus atributos mais importantes, como
-	 *    os pesos de uma camada densa, ou os filtros de uma camada convolucional.
-	 * </p>
+	 * Retorna um array contendo os elementos do kernel presentes na camada.
 	 * <p>
 	 *    <strong> O kernel só existe em camadas treináveis </strong>.
 	 * </p>
-	 * @return kernel da camada.
+	 * @return kernel da camada em formato de array.
 	 */
 	public Variavel[] kernelParaArray() {
 		throw new UnsupportedOperationException(
@@ -341,7 +317,7 @@ public abstract class Camada {
 	 * <p>
 	 *    <strong> O gradiente do kernel só existe em camadas treináveis </strong>.
 	 * </p>
-	 * @return gradiente do kernel da camada.
+	 * @return {@code Tensor} de gradiente em relação ao kernel da camada.
 	 */
 	public Tensor gradKernel() {
 		throw new UnsupportedOperationException(
@@ -352,7 +328,7 @@ public abstract class Camada {
 	/**
 	 * Retorna um array contendo os elementos usados para armazenar o valor
 	 * dos gradientes para os kernels da camada.
-	 * @return gradientes para os kernels da camada.
+	 * @return gradientes em relação aos kernels da camada em formato de array.
 	 */
 	public Variavel[] gradKernelParaArray() {
 		throw new UnsupportedOperationException(
@@ -363,14 +339,9 @@ public abstract class Camada {
 	/**
 	 * Retorna o bias da camada.
 	 * <p>
-	 *    É importante verificar se a camada foi configurada para suportar
-	 *    os bias antes de usar os valores retornados por ela. Quando não
-	 *    configurados, os bias da camada são nulos.
-	 * </p>
-	 * <p>
 	 *    <strong> O bias só existe em camadas treináveis </strong>.
 	 * </p>
-	 * @return bias da camada.
+	 * @return {@code Tensor} de bias da camada.
 	 */
 	public Tensor bias() {
 		throw new UnsupportedOperationException(
@@ -381,14 +352,9 @@ public abstract class Camada {
 	/**
 	 * Retorna um array contendo os elementos dos bias presente na camada.
 	 * <p>
-	 *    É importante verificar se a camada foi configurada para suportar
-	 *    os bias antes de usar os valores retornados por ela. Quando não
-	 *    configurados, os bias da camada são nulos.
-	 * </p>
-	 * <p>
 	 *    <strong> O bias só existe em camadas treináveis </strong>.
 	 * </p>
-	 * @return bias da camada.
+	 * @return bias da camada em formato de array.
 	 */
 	public Variavel[] biasParaArray() {
 		throw new UnsupportedOperationException(
@@ -398,7 +364,7 @@ public abstract class Camada {
 
 	/**
 	 * Retorna os gradientes em relação ao bias da camada.
-	 * @return gradientes para os bias da camada.
+	 * @return {@code Tensor} de gradientes em relação ao bias da camada.
 	 */
 	public Tensor gradBias() {
 		throw new UnsupportedOperationException(
@@ -409,7 +375,7 @@ public abstract class Camada {
 	/**
 	 * Retorna um array contendo os elementos usados para armazenar o valor
 	 * dos gradientes para os bias da camada.
-	 * @return gradientes para os bias da camada.
+	 * @return gradientes em relação aos bias da camada em formato de array.
 	 */
 	public Variavel[] gradBiasParaArray() {
 		throw new UnsupportedOperationException(
@@ -418,9 +384,8 @@ public abstract class Camada {
 	}
 
 	/**
-	 * Retorna o gradiente de entrada da camada, dependendo do tipo
-	 * de camada, esse gradiente pode assumir diferentes tipos de objetos.
-	 * @return {@code Tensor} contendo o gradiente de entrada da camada.
+	 * Retorna o gradiente em relação à entrada da camada.
+	 * @return {@code Tensor} contendo os gradientes em relação à entrada da camada.
 	 */
 	public Tensor gradEntrada() {
 		throw new UnsupportedOperationException(
@@ -429,7 +394,7 @@ public abstract class Camada {
 	}
 
 	/**
-	 * Ajusta os valores do kernel usando os valores contidos no array
+	 * Atribui os valores do kernel usando os valores contidos no array
 	 * fornecido.
 	 * @param kernel novos valores do kernel.
 	 */
@@ -440,18 +405,18 @@ public abstract class Camada {
 	}
 
 	/**
-	 * Ajusta os valores dos gradientes para o kernel usando os valores 
+	 * Atribui os valores dos gradientes para o kernel usando os valores 
 	 * contidos no array fornecido.
 	 * @param grads novos valores de gradientes.
 	 */
-	public void setGradienteKernel(Variavel[] grads) {
+	public void setGradKernel(Variavel[] grads) {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui edição de gradiente para kernel."
 		);    
 	}
 
 	/**
-	 * Ajusta os valores do bias usando os valores contidos no array
+	 * Atribui os valores do bias usando os valores contidos no array
 	 * fornecido.
 	 * @param bias novos valores do bias.
 	 */
@@ -462,18 +427,18 @@ public abstract class Camada {
 	}
 
 	/**
-	 * Ajusta os valores dos gradientes para o bias usando os valores 
+	 * Atribui os valores dos gradientes para o bias usando os valores 
 	 * contidos no array fornecido.
 	 * @param grads novos valores de gradientes.
 	 */
-	public void setGradienteBias(Variavel[] grads) {
+	public void setGradBias(Variavel[] grads) {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui edição de gradiente para bias."
 		);  
 	}
 
 	/**
-	 * Zera os gradientes para os kernels e bias da camada.
+	 * Zera os gradientes de parâmetros treináveis.
 	 */
 	public void zerarGrad() {
 		throw new UnsupportedOperationException(
@@ -483,7 +448,7 @@ public abstract class Camada {
 
 	/**
 	 * Verifica se a camada é treinável.
-	 * @return {@code true} caso a camada seja treinável, {@code false},
+	 * @return {@code true} caso a camada seja treinável, {@code false}
 	 * caso contrário.
 	 */
 	public boolean treinavel() {

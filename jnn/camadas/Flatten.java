@@ -110,34 +110,25 @@ public class Flatten extends Camada implements Cloneable{
 	 * <pre>
 	 *    entrada = ( altura, largura)
 	 * </pre>
-	 * @param entrada formato de entrada para a camada.
 	 */
 	@Override
-	public void construir(Object entrada) {
-		utils.validarNaoNulo(entrada, "Formato de entrada fornecida para camada Flatten é nulo.");
+	public void construir(int[] shape) {
+		utils.validarNaoNulo(shape, "Formato de entrada nulo.");
 
-		if (!(entrada instanceof int[])) {
-			throw new IllegalArgumentException(
-				"\nObjeto esperado para entrada da camada Flatten é do tipo int[], " +
-				"objeto recebido é do tipo " + entrada.getClass().getTypeName()
-			);
-		}
-
-		int[] formatoEntrada = (int[]) entrada;
-		if (!utils.apenasMaiorZero(formatoEntrada)) {
+		if (!utils.apenasMaiorZero(shape)) {
 			throw new IllegalArgumentException(
 				"\nOs valores do formato de entrada devem ser maiores que zero."
 			);
 		}
 
-		this.shapeEntrada = formatoEntrada.clone();
+		shapeEntrada = shape.clone();
 
 		int tamanho = 1;
-		for(int i : this.shapeEntrada) {
+		for (int i : shapeEntrada) {
 			tamanho *= i;
 		}
 
-		this.shapeSaida = new int[]{tamanho};
+		shapeSaida = new int[]{tamanho};
 
 		_entrada = new Tensor(shapeEntrada);
 		_gradEntrada = new Tensor(_entrada.shape());
@@ -145,7 +136,7 @@ public class Flatten extends Camada implements Cloneable{
 
 		setNomes();
 
-		_construida = true;//camada pode ser usada.
+		_construida = true;// camada pode ser usada.
 	}
 
 	@Override
@@ -235,18 +226,16 @@ public class Flatten extends Camada implements Cloneable{
 
 	@Override
 	public Variavel[] saidaParaArray() {
-		verificarConstrucao();
 		return saida().paraArray();
 	}
 
 	@Override
 	public int tamanhoSaida() {
-		verificarConstrucao();
 		return saida().tamanho();
 	}
 
 	@Override
-	public int[] formatoEntrada() {
+	public int[] shapeEntrada() {
 		verificarConstrucao();
 		return shapeEntrada.clone();
 	}
@@ -262,7 +251,7 @@ public class Flatten extends Camada implements Cloneable{
 	 * @return formato de saída da camada
 	 */
 	 @Override
-	public int[] formatoSaida() {
+	public int[] shapeSaida() {
 		verificarConstrucao();
 		
 		return new int[]{

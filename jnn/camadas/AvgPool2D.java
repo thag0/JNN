@@ -209,41 +209,25 @@ public class AvgPool2D extends Camada {
 	 * <pre>
 	 *    formEntrada = (canais, altura, largura)
 	 * </pre>
-	 * <h3>
-	 *    Nota
-	 * </h3>
-	 * <p>
-	 *    Caso o formato de entrada contenha quatro elementos, o primeiro
-	 *    valor é descondiderado.
-	 * </p>
-	 * @param entrada formato dos dados de entrada para a camada.
 	 */
 	@Override
-	public void construir(Object entrada) {
-		utils.validarNaoNulo(entrada, "Formato de entrada fornecido para camada " + nome() + " é nulo.");
-
-		if (!(entrada instanceof int[])) {
-			throw new IllegalArgumentException(
-				"\nObjeto esperado para entrada da camada " + nome() + " é do tipo int[], " +
-				"objeto recebido é do tipo " + entrada.getClass().getTypeName()
-			);
-		}
+	public void construir(int[] shape) {
+		utils.validarNaoNulo(shape, "Formato de entrada nulo.");
 		
-		int[] e = (int[]) entrada;
-		if (e.length != 3) {
+		if (shape.length != 3) {
 			throw new IllegalArgumentException(
 				"\nFormato de entrada para a camada " + nome() + " deve conter três " + 
-				"elementos (canais, altura, largura), mas recebido tamanho = " + e.length
+				"elementos (canais, altura, largura), mas recebido tamanho = " + shape.length
 			);
 		}
 
-		shapeEntrada[0] = e[0];
-		shapeEntrada[1] = e[1];
-		shapeEntrada[2] = e[2];
+		shapeEntrada[0] = shape[0];// canais
+		shapeEntrada[1] = shape[1];// altura
+		shapeEntrada[2] = shape[2];// largura
 
-		shapeSaida[0] = shapeEntrada[0];// canais
-		shapeSaida[1] = (shapeEntrada[1] - formFiltro[0]) / this.stride[0] + 1;//altura
-		shapeSaida[2] = (shapeEntrada[2] - formFiltro[1]) / this.stride[1] + 1;//largura
+		shapeSaida[0] = shapeEntrada[0];
+		shapeSaida[1] = (shapeEntrada[1] - formFiltro[0]) / this.stride[0] + 1;
+		shapeSaida[2] = (shapeEntrada[2] - formFiltro[1]) / this.stride[1] + 1;
 		
 		_entrada = new Tensor(shapeEntrada);
 		_gradEntrada = new Tensor(_entrada);
@@ -251,7 +235,7 @@ public class AvgPool2D extends Camada {
 
 		setNomes();
 
-		_construida = true;//camada pode ser usada
+		_construida = true;// camada pode ser usada
 	}
 
 	@Override
@@ -403,13 +387,13 @@ public class AvgPool2D extends Camada {
 	}
 
 	@Override
-	public int[] formatoSaida() {
+	public int[] shapeSaida() {
 		verificarConstrucao();
 		return shapeSaida;
 	}
 
 	@Override
-	public int[] formatoEntrada() {
+	public int[] shapeEntrada() {
 		verificarConstrucao();
 		return shapeEntrada;
 	}
@@ -461,7 +445,7 @@ public class AvgPool2D extends Camada {
 		sb.append(pad).append("Entrada: " + utils.shapeStr(shapeEntrada) + "\n");
 		sb.append(pad).append("Filtro: " + utils.shapeStr(formFiltro) + "\n");
 		sb.append(pad).append("Strides: " + utils.shapeStr(stride) + "\n");
-		sb.append(pad).append("Saída: " + utils.shapeStr(formatoSaida()) + "\n");
+		sb.append(pad).append("Saída: " + utils.shapeStr(shapeSaida()) + "\n");
 
 		sb.append("]\n");
 

@@ -63,7 +63,7 @@ public class Entrada extends Camada {
 	}
 
 	@Override
-	public void construir(Object entrada) {}
+	public void construir(int[] shape) {}
 
 	@Override
 	public void inicializar() {}
@@ -90,13 +90,13 @@ public class Entrada extends Camada {
 	}
 
 	@Override
-	public int[] formatoEntrada() {
-		return this.shape;
+	public int[] shapeEntrada() {
+		return shape;
 	}
 
 	@Override
-	public int[] formatoSaida() {
-		return formatoEntrada();
+	public int[] shapeSaida() {
+		return shapeEntrada();
 	}
 
 	@Override
