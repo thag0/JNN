@@ -182,7 +182,7 @@ public class RedeNeural extends Modelo {
 	 * @throws IllegalArgumentException se o modelo não foi compilado previamente.
 	 */
 	public void configurarAtivacao(Ativacao ativacao) {
-		verificarCompilacao();
+		validarCompilacao();
 		
 		for (Camada camada : _camadas) {
 			camada.setAtivacao(ativacao);
@@ -220,7 +220,7 @@ public class RedeNeural extends Modelo {
 	 * @throws IllegalArgumentException se o modelo não foi compilado previamente.
 	 */
 	public void configurarAtivacao(String ativacao) {
-		verificarCompilacao();
+		validarCompilacao();
 		
 		for (Camada camada : _camadas) {
 			camada.setAtivacao(ativacao);
@@ -436,7 +436,7 @@ public class RedeNeural extends Modelo {
 	 */
 	@Override
 	public Tensor forward(Object entrada) {
-		verificarCompilacao();
+		validarCompilacao();
 
 		utils.validarNaoNulo(entrada, "Dados de entrada não pode ser nulo.");
 
@@ -482,7 +482,7 @@ public class RedeNeural extends Modelo {
 	 */
 	@Override
 	public Densa camada(int id) {
-		verificarCompilacao();
+		validarCompilacao();
 
 		if ((id < 0) || (id >= _camadas.length)) {
 			throw new IllegalArgumentException(
@@ -501,7 +501,7 @@ public class RedeNeural extends Modelo {
 	 */
 	@Override
 	public Densa[] camadas() {
-		verificarCompilacao();
+		validarCompilacao();
 		return _camadas;
 	}
 
@@ -512,7 +512,7 @@ public class RedeNeural extends Modelo {
 	 */
 	@Override
 	public Densa camadaSaida() {
-		verificarCompilacao();
+		validarCompilacao();
 		return _camadas[_camadas.length-1];
 	}
 
@@ -526,7 +526,7 @@ public class RedeNeural extends Modelo {
 	 */
 	@Override
 	public Variavel[] saidaParaArray() {
-		verificarCompilacao();
+		validarCompilacao();
 		return camadaSaida().saidaParaArray();
 	}
 
@@ -548,7 +548,7 @@ public class RedeNeural extends Modelo {
 	 * @throws IllegalArgumentException se o modelo não foi compilado previamente.
 	 */
 	public int[] obterArquitetura() {
-		verificarCompilacao();
+		validarCompilacao();
 		return _arq;
 	}
 
@@ -590,7 +590,7 @@ public class RedeNeural extends Modelo {
 	 */
 	@Override
 	public int numCamadas() {
-		verificarCompilacao();
+		validarCompilacao();
 		return _camadas.length;
 	}
 
@@ -601,7 +601,7 @@ public class RedeNeural extends Modelo {
 	 * @throws IllegalArgumentException se o modelo não foi compilado previamente.
 	 */
 	public int obterTamanhoEntrada() {
-		verificarCompilacao();
+		validarCompilacao();
 		return _arq[0];
 	}
 
@@ -612,7 +612,7 @@ public class RedeNeural extends Modelo {
 	 * @throws IllegalArgumentException se o modelo não foi compilado previamente.
 	 */
 	public int obterTamanhoSaida() {
-		verificarCompilacao();
+		validarCompilacao();
 		return _arq[_arq.length-1];
 	}
 
@@ -707,7 +707,7 @@ public class RedeNeural extends Modelo {
 	 */
 	@Override
 	public void print() {
-		verificarCompilacao();
+		validarCompilacao();
 		System.out.println(construirInfo());
 	}
 

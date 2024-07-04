@@ -299,7 +299,7 @@ public class Sequencial extends Modelo {
 
 	@Override
 	public Tensor forward(Object entrada) {
-		verificarCompilacao();
+		validarCompilacao();
 
 		utils.validarNaoNulo(entrada, "Dados de entrada não podem ser nulos.");
 
@@ -327,13 +327,13 @@ public class Sequencial extends Modelo {
 
 	@Override
 	public Otimizador otimizador() {
-		verificarCompilacao();
+		validarCompilacao();
 		return _otimizador;
 	}
 
 	@Override
 	public Perda perda() {
-		verificarCompilacao();
+		validarCompilacao();
 		return _perda;
 	}
 
@@ -367,7 +367,7 @@ public class Sequencial extends Modelo {
 
 	@Override
 	public Variavel[] saidaParaArray() {
-		verificarCompilacao();
+		validarCompilacao();
 		return camadaSaida().saidaParaArray();
 	}
 
@@ -451,7 +451,7 @@ public class Sequencial extends Modelo {
 
 	@Override
 	public void print() {
-		verificarCompilacao();
+		validarCompilacao();
 		System.out.println(construirInfo());
 	}
 

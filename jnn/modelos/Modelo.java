@@ -15,10 +15,10 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * <h3>
- *    Basa para crianção de modelos dentro da biblioteca.
+ *    Modelo base
  * </h3>
  * Contém a inteface para os métodos necessários que são usados
- * para implementação de modelos.
+ * na implementação de modelos.
  */
 public abstract class Modelo implements Cloneable {
 
@@ -48,20 +48,20 @@ public abstract class Modelo implements Cloneable {
 	/**
 	 * Ponto inicial para os geradores aleatórios.
 	 * <p>
-	 *    0 não é considerado uma seed e ela só é configurada quando esse valor é
-	 *    alterado.
+	 *		Uma nova seed só é configurada se seu valor for
+	 *		diferente de zero.
 	 * </p>
 	 */
 	protected long seedInicial = 0;
 
 	/**
-	 * Gerenciador de treino do modelo. contém implementações dos 
+	 * Gerenciador de treino do modelo. Contém implementações dos 
 	 * algoritmos de treino para o ajuste de parâmetros treináveis.
 	 */
 	protected Treinador _treinador;
 
 	/**
-	 * Auxiliar na verificação para o salvamento do histórico
+	 * Auxiliar na verificação de armazenagem do histórico
 	 * de perda do modelo durante o treinamento.
 	 */
 	protected boolean calcularHistorico = false;
@@ -147,7 +147,7 @@ public abstract class Modelo implements Cloneable {
 	 * @param perda nova função de perda.
 	 */
 	public void setPerda(Perda perda) {
-		utils.validarNaoNulo(perda, "A função de perda não pode ser nula.");
+		utils.validarNaoNulo(perda, "Função de perda nula.");
 
 		this._perda = perda;
 	}
@@ -175,7 +175,7 @@ public abstract class Modelo implements Cloneable {
 	 * @param otm novo otimizador.
 	 */
 	public void setOtimizador(Otimizador otm) {
-		utils.validarNaoNulo(otm, "O novo otimizador não pode ser nulo.");
+		utils.validarNaoNulo(otm, "Otimizador nulo.");
 
 		_otimizador = otm;
 	}
@@ -209,7 +209,7 @@ public abstract class Modelo implements Cloneable {
 	/**
 	 * Auxiliar na verificação da compilação do modelo.
 	 */
-	protected void verificarCompilacao() {
+	protected void validarCompilacao() {
 		if (!_compilado) {
 			throw new IllegalStateException(
 				"\nO modelo ainda não foi compilado."
@@ -219,22 +219,22 @@ public abstract class Modelo implements Cloneable {
 
 	/**
 	 * Alimenta o modelo com os dados de entrada.
-	 * @param entrada dados de entrada que serão propagados através do modelo.
+	 * @param x dados de entrada que serão propagados através do modelo.
 	 * @return {@code Tensor} contendo a saída prevista pelo modelo.
 	 */
-	public abstract Tensor forward(Object entrada);
+	public abstract Tensor forward(Object x);
 
 	/**
 	 * Alimenta o modelo com vários dados de entrada.
-	 * @param entradas array contendo multiplas entradas para testar o modelo.
+	 * @param x array contendo multiplas entradas para o modelo.
 	 * @return array de {@code Tensor} contendo as previsões correspondentes.
 	 */
-	public Tensor[] forwards(Object[] entradas) {
-		verificarCompilacao();
+	public Tensor[] forwards(Object[] x) {
+		validarCompilacao();
 
-		utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
+		utils.validarNaoNulo(x, "Dados de entrada nulos.");
 
-		final int numEntradas = entradas.length;
+		final int numEntradas = x.length;
 		int numThreads = Runtime.getRuntime().availableProcessors();
 		if (numThreads > numEntradas) numThreads = numEntradas;
 
@@ -254,7 +254,7 @@ public abstract class Modelo implements Cloneable {
 
 			exec.execute(() -> {
 				for (int j = inicio; j < fim; j++) {
-					prevs[j] = clones[id].forward(entradas[j]);
+					prevs[j] = clones[id].forward(x[j]);
 				}
 			});
 		}
@@ -273,55 +273,69 @@ public abstract class Modelo implements Cloneable {
 	/**
 	 * Zera os gradientes acumulados do modelo.
 	 * <p>
-	 *    Apenas gradientes de camadas treináveis serão zerados.
+	 *    Apenas camadas treináveis são afetadas.
 	 * </p>
 	 */
 	public abstract void zerarGrad();
 
 	/**
+	 * Realiza as verificações necessárias nos dados usados pelo modelo.
+	 * @param <T> tipo de dados, comumente usando {@code Tensor}.
+	 * @param x array contendos dados de entrada.
+	 * @param y array contendos dados de saída.
+	 */
+	private <T> void validarDados(T[] x, T[] y) {
+		utils.validarNaoNulo(x, "Dados de entrada nulos.");
+		utils.validarNaoNulo(y, "Dados de saida nulos.");
+ 
+		if (x.length != y.length) {
+			throw new IllegalArgumentException(
+				"\nDados de entrada e saída devem conter o mesmo tamanho, " +
+				"recebido x = " + x.length + " e y = " + y.length
+			);
+		}
+	}
+
+	/**
 	 * Treina o modelo de acordo com as configurações predefinidas.
-	 * @param entradas dados de entrada do treino (features).
-	 * @param saidas dados de saída correspondente a entrada (classes).
+	 * @param x dados de entrada do treino (features).
+	 * @param y dados de saída correspondente a entrada (classes).
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	public void treinar(Tensor[] entradas, Tensor[] saidas, int epochs, boolean logs) {
-		verificarCompilacao();
-
-		utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
-		utils.validarNaoNulo(saidas, "Dados de saida não podem ser nulos.");
+	public void treinar(Tensor[] x, Tensor[] y, int epochs, boolean logs) {
+		validarCompilacao();
+		validarDados(x, y);
 
 		if (epochs < 1) {
 			throw new IllegalArgumentException(
-				"\nO valor de épocas deve ser maior que zero, recebido = " + epochs
+				"\nValor de épocas deve ser maior que zero, recebido = " + epochs
 			);
 		}
 
-		_treinador.treino(this, entradas.clone(), saidas.clone(), epochs, logs);
+		_treinador.treino(this, x.clone(), y.clone(), epochs, logs);
 	}
 	
 	/**
 	 * Treina o modelo de acordo com as configurações predefinidas utilizando o
 	 * treinamento em lotes.
-	 * @param entradas {@code Tensores} contendos os dados de entrada.
-	 * @param saidas {@code Tensores} contendos os dados de saída (rótulos).
+	 * @param x {@code Tensores} contendos os dados de entrada.
+	 * @param y {@code Tensores} contendos os dados de saída (rótulos).
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param tamLote tamanho do lote de treinamento.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	public void treinar(Tensor[] entradas, Tensor[] saidas, int epochs, int tamLote, boolean logs) {
-		verificarCompilacao();
-
-		utils.validarNaoNulo(entradas, "Dados de entrada não podem ser nulos.");
-		utils.validarNaoNulo(saidas, "Dados de saida não podem ser nulos.");
+	public void treinar(Tensor[] x, Tensor[] y, int epochs, int tamLote, boolean logs) {
+		validarCompilacao();
+		validarDados(x, y);
 
 		if (epochs < 1) {
 			throw new IllegalArgumentException(
-				"\nO valor de epochs (" + epochs + ") não pode ser menor que um"
+				"\nValor de épocas deve ser maior que zero, recebido = " + epochs
 			);
 		}
 
-		_treinador.treino(this, entradas.clone(), saidas.clone(), epochs, tamLote, logs);
+		_treinador.treino(this, x.clone(), y.clone(), epochs, tamLote, logs);
 	}
 
 	/**
@@ -341,28 +355,20 @@ public abstract class Modelo implements Cloneable {
 	 * <pre>
 	 * modelo.avaliador()
 	 * </pre>
-	 * @param entrada dados de entrada para avaliação.
-	 * @param real dados de saída correspondente as entradas fornecidas.
+	 * @param x {@code Tensores} contendo dados de entrada.
+	 * @param y {@code Tensores} contendo dados de saída correspondente as entradas fornecidas.
 	 * @return valor de perda do modelo.
 	 */
-	public Tensor avaliar(Tensor[] entrada, Tensor[] real) {
-		verificarCompilacao();
+	public Tensor avaliar(Tensor[] x, Tensor[] y) {
+		validarCompilacao();
+		validarDados(x, y);
 
-		utils.validarNaoNulo(entrada, "Dados de entrada não podem ser nulos.");
-		utils.validarNaoNulo(real, "Dados de saida não podem ser nulos.");
- 
-		if (entrada.length != real.length) {
-			throw new IllegalArgumentException(
-				"\nA quantidade de dados de entrada (" + entrada.length + ") " +
-				"e saída (" + real.length + ") " + "devem ser iguais."
-			);
-		}
-
-		Tensor[] prevs = forwards(entrada);
+		Tensor[] prevs = forwards(x);
+		
 		int n = prevs.length;
 		double soma = 0;
 		for (int i = 0; i < n; i++) {
-			soma += _perda.calcular(prevs[i], real[i]).item();
+			soma += _perda.calcular(prevs[i], y[i]).item();
 		}
 
 		return new Tensor(new double[]{ (soma/n) }, 1);
@@ -377,7 +383,7 @@ public abstract class Modelo implements Cloneable {
 	 * @return avaliador do modelo.
 	 */
 	public Avaliador avaliador() {
-		return this._avaliador;
+		return _avaliador;
 	}
 
 	/**
@@ -422,9 +428,9 @@ public abstract class Modelo implements Cloneable {
 	 * @param arr array para cópia.
 	 */
 	public void copiarDaSaida(double[] arr) {
+		utils.validarNaoNulo(arr, "Array nulo.");
+		
 		Variavel[] saida = saidaParaArray();
-
-		utils.validarNaoNulo(arr, "O array de cópia não pode ser nulo.");
 		
 		if (saida.length != arr.length) {
 			throw new IllegalArgumentException(
@@ -443,7 +449,7 @@ public abstract class Modelo implements Cloneable {
 	 * @return nome do modelo.
 	 */
 	public String nome() {
-		return this.nome;
+		return nome;
 	}
 
 	/**
@@ -451,7 +457,7 @@ public abstract class Modelo implements Cloneable {
 	 * <p>
 	 *    isso inclui todos os kernels e bias (caso configurados).
 	 * </p>
-	 * @return quantiade de parâmetros total do modelo.
+	 * @return quantidade de parâmetros total do modelo.
 	 */
 	public abstract int numParametros();
 
