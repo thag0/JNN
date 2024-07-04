@@ -1,7 +1,6 @@
 package jnn.treinamento;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import jnn.avaliacao.perda.Perda;
 import jnn.camadas.Camada;
@@ -10,22 +9,45 @@ import jnn.core.tensor.Tensor;
 import jnn.modelos.Modelo;
 import jnn.otimizadores.Otimizador;
 
+/**
+  * Implementação de treino em lote dos modelos.
+ */
 class Treino {
-	AuxTreino aux = new AuxTreino();
-	Utils utils = new Utils();
-	Random random = new Random();
 
+	/**
+	 * Auxiliar.
+	 */
+	AuxTreino aux = new AuxTreino();
+	
+	/**
+	 * Utilitário.
+	 */
+	Utils utils = new Utils();
+
+	/**
+	 * Verificador para o calculo de perdas do modelo durante 
+	 * o processo de treinamento.
+	 */
 	private boolean calcularHistorico = false;
+
+	/**
+	 * Histórico do modelo pelo processo de treinameto.
+	 */
 	private ArrayList<Double> historico;
+
+	/**
+	 * Verificador para rastrear o último modo de treino usado.
+	 */
 	boolean ultimoUsado = false;
 
 	/**
-	 * Objeto de treino sequencial da rede.
-	 * @param historico lista de custos da rede durante cada época de treino.
+	 * Implementação de treino sequencial dos modelos.
+	 * @param historico se {@code true} serão computados os valores de perda
+	 * do modelo ao longo das épocas.
 	 */
 	public Treino(boolean calcularHistorico) {
 		historico = new ArrayList<>(0);
-		this.calcularHistorico = calcularHistorico;
+		setHistorico(calcularHistorico);
 	}
 
 	/**
@@ -33,50 +55,49 @@ class Treino {
 	 * @param seed nova seed.
 	 */
 	public void setSeed(long seed) {
-		random.setSeed(seed);
 		aux.setSeed(seed);
 	}
 
 	/**
-	 * Configura o cálculo de custos da rede neural durante cada
-	 * época de treinamento.
-	 * @param calcular caso verdadeiro, armazena os valores de custo da rede.
+	 * Configura o cálculo dos valores de perda/custo do modelo
+	 * durante o processo de treinamento.
+	 * @param calcular se {@code true} serão computados os valores de 
+	 * perda do modelo ao longo das épocas.
 	 */
 	public void setHistorico(boolean calcular) {
 		calcularHistorico = calcular;
 	}
 
 	/**
-	 * Treina a rede neural calculando os erros dos neuronios, seus gradientes para cada peso e 
-	 * passando essas informações para o otimizador configurado ajustar os pesos.
-	 * @param modelo instância da rede.
-	 * @param entradas {@code Tensores} contendos os dados de entrada.
-	 * @param saidas {@code Tensores} contendos os dados de saída (rótulos).
+	 * Treino modelo por um número determinado de épocas.
+	 * @param modelo modelo desejado.
+	 * @param x {@code Tensores} contendos os dados de entrada.
+	 * @param y {@code Tensores} contendos os dados de saída (rótulos).
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	public void treinar(Modelo modelo, Tensor[] entrada, Tensor[] saida, int epochs, boolean logs) {
+	public void treinar(Modelo modelo, Tensor[] x, Tensor[] y, int epochs, boolean logs) {
 		Camada[] camadas = modelo.camadas();
 		Otimizador otimizador = modelo.otimizador();
 		Perda perda = modelo.perda();
-		int numAmostras = entrada.length;
+		int numAmostras = x.length;
 
 		if (logs) aux.esconderCursor();
 		double perdaEpoca;
 		for (int e = 1; e <= epochs; e++) {
-			aux.embaralharDados(entrada, saida);
+			aux.embaralhar(x, y);
 			perdaEpoca = 0;
 			
 			for (int i = 0; i < numAmostras; i++) {
-				Tensor prev = modelo.forward(entrada[i]);
+				Tensor prev = modelo.forward(x[i]);
 				
 				//feedback de avanço da rede
 				if (calcularHistorico) {
-					perdaEpoca += perda.calcular(prev, saida[i]).item();
+					perdaEpoca += perda.calcular(prev, y[i]).item();
 				}
 				
 				modelo.zerarGrad();
-				aux.backpropagation(camadas, perda, prev, saida[i]);
+				aux.backpropagation(camadas, perda, prev, y[i]);
 				otimizador.atualizar();
 			}
 
@@ -85,7 +106,7 @@ class Treino {
 				aux.exibirLogTreino("Época " +  e + "/" + epochs + " -> perda: " + (double)(perdaEpoca/numAmostras));
 			}
 
-			//feedback de avanço da rede
+			// feedback de avanço da rede
 			if (calcularHistorico) historico.add(perdaEpoca/numAmostras);
 		}
 

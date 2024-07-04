@@ -13,11 +13,6 @@ public class Treinador {
 	 * Auxiliar na verificação do cálculo do histórico de custos.
 	 */
 	public boolean calcularHistorico = false;
-	
-	/**
-	 * Auxiliar para o treinador.
-	 */
-	AuxTreino aux;
 
 	/**
 	 * Operador do treino sequencial.
@@ -33,7 +28,6 @@ public class Treinador {
 	 * Responsável por organizar os tipos dos modelos.
 	 */
 	public Treinador() {
-		aux =        new AuxTreino();
 		treino =     new Treino(calcularHistorico);
 		treinoLote = new TreinoLote(calcularHistorico);
 	}

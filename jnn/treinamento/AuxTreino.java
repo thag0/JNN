@@ -1,5 +1,7 @@
 package jnn.treinamento;
 
+import java.lang.reflect.Array;
+
 import java.util.Random;
 
 import jnn.avaliacao.perda.Perda;
@@ -47,49 +49,52 @@ public class AuxTreino {
 	}
 
 	/**
-	 * Embaralha os dados da matriz usando o algoritmo Fisher-Yates.
-	 * @param entradas matriz com os dados de entrada.
-	 * @param saidas matriz com os dados de saída.
+	 * Embaralha os dos arrays usando o algoritmo Fisher-Yates.
+	 * @param <T> tipo de dados de entrada e saida.
+	 * @param x {@code array} com os dados de entrada.
+	 * @param y {@code array} com os dados de saída.
 	 */
-	public void embaralharDados(Tensor[] entradas, Tensor[] saidas) {
-		int linhas = entradas.length;
+	public <T> void embaralhar(T[] x, T[] y) {
+		int linhas = x.length;
 		int i, idAleatorio;
 
-		Tensor temp;
+		T temp;
 		for (i = linhas - 1; i > 0; i--) {
 			idAleatorio = random.nextInt(i+1);
+			
+			// entradas
+			temp = x[i];
+			x[i] = x[idAleatorio];
+			x[idAleatorio] = temp;
 
-			//trocar entradas
-			temp = entradas[i];
-			entradas[i] = entradas[idAleatorio];
-			entradas[idAleatorio] = temp;
-
-			//trocar saídas
-			temp = saidas[i];
-			saidas[i] = saidas[idAleatorio];
-			saidas[idAleatorio] = temp;
+			// saídas
+			temp = y[i];
+			y[i] = y[idAleatorio];
+			y[idAleatorio] = temp;
 		}
 	}
 
 	/**
-	 * Dedicado para treino em lote e multithread em implementações futuras.
-	 * @param arr conjunto de dados completo.
-	 * @param inicio índice de inicio do lote.
-	 * @param fim índice final do lote.
-	 * @return lote contendo os dados de acordo com os índices fornecidos.
+	 * Separa um sub conjunto dos dados do array de acordo com os índices fornecidos.
+	 * @param <T> tipo de dados do array.
+	 * @param arr conjunto de dados desejado.
+	 * @param inicio indice inicial (inclusivo).
+	 * @param fim índice final (exclusivo).
+	 * @return sub conjunto dos dados fornecidos.
 	 */
-	public Tensor[] subArray(Tensor[] arr, int inicio, int fim) {
-		if (inicio < 0 || fim > arr.length || inicio >= fim) {
-			throw new IllegalArgumentException("Índices de início ou fim inválidos.");
-		}
+    public <T> T[] subArray(T[] arr, int inicio, int fim) {
+        if (inicio < 0 || fim > arr.length || inicio >= fim) {
+            throw new IllegalArgumentException("Índices de início ou fim inválidos.");
+        }
 
-		int linhas = fim - inicio;
-		Tensor[] subArr = new Tensor[linhas];
+        int tamanho = fim - inicio;
 
-		System.arraycopy(arr, inicio, subArr, 0, linhas);
+        @SuppressWarnings("unchecked")
+        T[] subArr = (T[]) Array.newInstance(arr.getClass().getComponentType(), tamanho);
+        System.arraycopy(arr, inicio, subArr, 0, tamanho);
 
-		return subArr;
-	}
+        return subArr;
+    }
 
 	/** 
 	 * Esconde o cursor do terminal.
