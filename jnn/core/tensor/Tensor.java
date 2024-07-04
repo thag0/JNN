@@ -985,6 +985,15 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
     }
 
 	/**
+	 * Achata os dados do tensor.
+	 * @return instância local alterada.
+	 */
+	public Tensor flatten() {
+		this.shape = new int[] { tamanho() };
+		return this;
+	}
+
+	/**
 	 * Fatia o conteúdo do tensor de acordo com os índices especificados.
 	 * <p>
 	 *		Exemplo:
