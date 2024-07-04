@@ -227,7 +227,7 @@ public class AMSGrad extends Otimizador {
 		double forcaB1 = (1 - Math.pow(beta1, iteracoes));
 		double forcaB2 = (1 - Math.pow(beta2, iteracoes));
 		
-		for (Camada camada : _camadas) {
+		for (Camada camada : _params) {
 			Variavel[] kernel = camada.kernelParaArray();
 			Variavel[] gradK = camada.gradKernelParaArray();
 			idKernel = amsgrad(kernel, gradK, m, v, vc, forcaB1, forcaB2, idKernel);

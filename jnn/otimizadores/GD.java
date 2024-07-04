@@ -67,7 +67,7 @@ public class GD extends Otimizador {
 	public void atualizar() {
 		verificarConstrucao();
 		
-		for (Camada camada : _camadas) {
+		for (Camada camada : _params) {
 			Variavel[] kernel = camada.kernelParaArray();
 			Variavel[] gradK = camada.gradKernelParaArray();		
 			gd(kernel, gradK);

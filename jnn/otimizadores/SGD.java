@@ -153,7 +153,7 @@ public class SGD extends Otimizador {
 
 		int idKernel = 0, idBias = 0;
 		
-		for (Camada camada : _camadas) {
+		for (Camada camada : _params) {
 			Variavel[] kernel = camada.kernelParaArray();
 			Variavel[] gradK = camada.gradKernelParaArray();
 			idKernel = sgd(kernel, gradK, m, idKernel);

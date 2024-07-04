@@ -220,7 +220,7 @@ public class Adam extends Otimizador {
 		double alfa = tA * Math.sqrt(1 - forcaB2) / (1 - forcaB1);
 		
 		int idKernel = 0, idBias = 0;
-		for (Camada camada : _camadas) {
+		for (Camada camada : _params) {
 			Variavel[] kernel = camada.kernelParaArray();
 			Variavel[] gradK = camada.gradKernelParaArray();
 			idKernel = adam(kernel, gradK, m, v, alfa, idKernel);

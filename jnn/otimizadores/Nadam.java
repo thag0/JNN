@@ -208,7 +208,7 @@ public class Nadam extends Otimizador {
 		double forcaB2 = 1 - Math.pow(beta2, iteracoes);
 		
 		int idKernel = 0, idBias = 0;
-		for (Camada camada : _camadas) {
+		for (Camada camada : _params) {
 			Variavel[] kernel = camada.kernelParaArray();
 			Variavel[] gradK = camada.gradKernelParaArray();
 			idKernel = nadam(kernel, gradK, m, v, forcaB1, forcaB2, idKernel);

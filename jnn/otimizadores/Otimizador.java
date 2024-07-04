@@ -25,7 +25,7 @@ public abstract class Otimizador {
 	/**
 	 * Conjunto de elementos que serão otimizados.
 	 */
-	Camada[] _camadas = {};// Considerar futuramente utilizar apenas tensores.
+	Camada[] _params = {};// Considerar futuramente utilizar apenas tensores.
 
 	/**
 	 * Utilitário.
@@ -75,7 +75,7 @@ public abstract class Otimizador {
 			kernels += camada.kernel().tamanho();
 			if (camada.temBias()) bias += camada.bias().tamanho();
 
-			_camadas = utils.addEmArray(_camadas, camada);
+			_params = utils.addEmArray(_params, camada);
 		}
 
 		return new int[] {

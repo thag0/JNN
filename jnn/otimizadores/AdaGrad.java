@@ -139,7 +139,7 @@ public class AdaGrad extends Otimizador {
 		
 		int idKernel = 0, idBias = 0;
 
-		for (Camada camada : _camadas) {
+		for (Camada camada : _params) {
 			Variavel[] kernel = camada.kernelParaArray();
 			Variavel[] gradK = camada.gradKernelParaArray();
 			idKernel = adagrad(kernel, gradK, ac, idKernel);
