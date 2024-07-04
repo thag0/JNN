@@ -989,8 +989,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return instância local alterada.
 	 */
 	public Tensor flatten() {
-		this.shape = new int[] { tamanho() };
-		return this;
+		return view(tamanho());
 	}
 
 	/**
