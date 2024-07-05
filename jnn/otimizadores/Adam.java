@@ -1,7 +1,7 @@
 package jnn.otimizadores;
 
 import jnn.camadas.Camada;
-import jnn.core.tensor.Variavel;
+import jnn.core.tensor.Tensor;
 
 /**
  * <h2>
@@ -102,27 +102,17 @@ public class Adam extends Otimizador {
 	/**
 	 * Usado para evitar divisão por zero.
 	 */
-	private final double epsilon;
+	private final double eps;
 
 	/**
-	 * Coeficientes de momentum para os kernels.
+	 * Coeficientes de momentum.
 	 */
-	private Variavel[] m;
+	private Tensor[] m;
 
 	/**
-	 * Coeficientes de momentum para os bias.
+	 * Coeficientes de momentum de segunda ordem.
 	 */
-	private Variavel[] mb;
-
-	/**
-	 * Coeficientes de momentum de segunda ordem para os kernels.
-	 */
-	private Variavel[] v;
-
-	/**
-	 * Coeficientes de momentum de segunda ordem para os bias.
-	 */
-	private Variavel[] vb;
+	private Tensor[] v;
 	
 	/**
 	 * Contador de iterações.
@@ -162,7 +152,7 @@ public class Adam extends Otimizador {
 		this.tA = tA;
 		this.beta1 = beta1;
 		this.beta2 = beta2;
-		this.epsilon = eps;
+		this.eps = eps;
 	}
  
 	/**
@@ -198,14 +188,14 @@ public class Adam extends Otimizador {
 
 	@Override
 	public void construir(Camada[] camadas) {
-		int[] params = initParams(camadas);
-		int kernels = params[0];
-		int bias = params[1];
+		initParams(camadas);
 
-		m  = initVars(kernels);
-		v  = initVars(kernels);
-		mb = initVars(bias);
-		vb = initVars(bias);
+		m = new Tensor[0];
+		v = new Tensor[0];
+		for (Tensor t : _params) {
+			m = utils.addEmArray(m, new Tensor(t.shape()));
+			v = utils.addEmArray(v, new Tensor(t.shape()));
+		}
 
 		_construido = true;// otimizador pode ser usado
 	}
@@ -215,51 +205,23 @@ public class Adam extends Otimizador {
 		verificarConstrucao();
 		
 		iteracoes++;
-		double forcaB1 = Math.pow(beta1, iteracoes);
-		double forcaB2 = Math.pow(beta2, iteracoes);
-		double alfa = tA * Math.sqrt(1 - forcaB2) / (1 - forcaB1);
+		double fb1 = Math.pow(beta1, iteracoes);
+		double fb2 = Math.pow(beta2, iteracoes);
+		double alfa = tA * Math.sqrt(1 - fb2) / (1 - fb1);
 		
-		int idKernel = 0, idBias = 0;
-		for (Camada camada : _params) {
-			Variavel[] kernel = camada.kernelParaArray();
-			Variavel[] gradK = camada.gradKernelParaArray();
-			idKernel = adam(kernel, gradK, m, v, alfa, idKernel);
-			
-			if (camada.temBias()) {
-				Variavel[] bias = camada.biasParaArray();
-				Variavel[] gradB = camada.gradBiasParaArray();
-				idBias = adam(bias, gradB, mb, vb, alfa, idBias);
-			}     
+		for (int i = 0; i < _params.length; i++) {
+			m[i].aplicar(m[i], _grads[i], 
+				(m, g) -> m + ((1 - beta1) * (g - m))
+			);
+
+			v[i].aplicar(v[i], _grads[i], 
+				(v, g) -> v + ((1 - beta2) * ((g*g) - v))
+			);
+
+			_params[i].aplicar(_params[i], m[i], v[i], 
+				(p, m, v) -> p - (((alfa * m) / (Math.sqrt(v) + eps)))
+			);
 		}
-	}
-
-	/**
-	 * Atualiza as variáveis usando o gradiente pré calculado.
-	 * @param vars variáveis que serão atualizadas.
-	 * @param grads gradientes das variáveis.
-	 * @param m coeficientes de momentum de primeira ordem das variáveis.
-	 * @param v coeficientes de momentum de segunda ordem das variáveis.
-	 * @param alfa pequena correção na taxa de aprendizado.
-	 * @param id índice inicial das variáveis dentro do array de momentums.
-	 * @return índice final após as atualizações.
-	 */
-	private int adam(Variavel[] vars, Variavel[] grads, Variavel[] m, Variavel[] v, double alfa, int id) {
-		double g, mid, vid;
-
-		for (int i = 0; i < vars.length; i++) {
-			g = grads[i].get();
-			mid = m[id].get();
-			vid = v[id].get();
-
-			m[id].add((1 - beta1) * (g      - mid));
-			v[id].add((1 - beta2) * (((g*g) - vid)));
-
-			vars[i].sub((alfa * mid) / (Math.sqrt(vid) + epsilon));
-		
-			id++;
-		}
-
-		return id;
 	}
 
 	@Override
@@ -270,7 +232,7 @@ public class Adam extends Otimizador {
 		addInfo("Lr: " + tA);
 		addInfo("Beta1: " + beta1);
 		addInfo("Beta2: " + beta2);
-		addInfo("Epsilon: " + epsilon);
+		addInfo("Epsilon: " + eps);
 
 		return super.info();
 	}

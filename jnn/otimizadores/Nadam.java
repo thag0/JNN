@@ -1,7 +1,7 @@
 package jnn.otimizadores;
 
 import jnn.camadas.Camada;
-import jnn.core.tensor.Variavel;
+import jnn.core.tensor.Tensor;
 
 /**
  * <h2>
@@ -82,7 +82,7 @@ public class Nadam extends Otimizador {
 	/**
 	 * Usado para evitar divisão por zero.
 	 */
-	private final double epsilon;
+	private final double eps;
 
 	/**
 	 * decaimento do momentum.
@@ -97,22 +97,22 @@ public class Nadam extends Otimizador {
 	/**
 	 * Coeficientes de momentum.
 	 */
-	private Variavel[] m;
-	
-	/**
-	 * Coeficientes de momentum.
-	 */
-	private Variavel[] mb;
+	private Tensor[] m;
 
 	/**
-	 * Coeficientes de momentum de segunda orgem.
+	 * Coeficientes de momentum de segunda ordem.
 	 */
-	private Variavel[] v;
+	private Tensor[] v;
 
 	/**
-	 * Coeficientes de momentum de segunda orgem.
+	 * Coeficientes de momentum corrigidos.
 	 */
-	private Variavel[] vb;
+	private Tensor[] mc;
+
+	/**
+	 * Coeficientes de momentum de segunda ordem corrigidos.
+	 */
+	private Tensor[] vc;
 
 	/**
 	 * Contador de iterações.
@@ -152,7 +152,7 @@ public class Nadam extends Otimizador {
 		this.tA = tA;
 		this.beta1 = beta1;
 		this.beta2 = beta2;
-		this.epsilon = eps;
+		this.eps = eps;
 	}
 
 	/**
@@ -187,14 +187,18 @@ public class Nadam extends Otimizador {
 
 	@Override
 	public void construir(Camada[] camadas) {
-		int[] params = initParams(camadas);
-		int kernels = params[0];
-		int bias = params[1];
+		initParams(camadas);
 
-		m  = initVars(kernels);
-		v  = initVars(kernels);
-		mb = initVars(bias);
-		vb = initVars(bias);
+		m  = new Tensor[0];
+		v  = new Tensor[0];
+		mc = new Tensor[0];
+		vc = new Tensor[0];
+		for (Tensor t : _params) {
+			m  = utils.addEmArray(m,  new Tensor(t.shape()));
+			v  = utils.addEmArray(v,  new Tensor(t.shape()));
+			mc = utils.addEmArray(mc, new Tensor(t.shape()));
+			vc = utils.addEmArray(vc, new Tensor(t.shape()));
+		}
 
 		_construido = true;// otimizador pode ser usado
 	}
@@ -204,50 +208,26 @@ public class Nadam extends Otimizador {
 		verificarConstrucao();
 		
 		iteracoes++;
-		double forcaB1 = 1 - Math.pow(beta1, iteracoes);
-		double forcaB2 = 1 - Math.pow(beta2, iteracoes);
+		double fb1 = 1 - Math.pow(beta1, iteracoes);
+		double fb2 = 1 - Math.pow(beta2, iteracoes);
 		
-		int idKernel = 0, idBias = 0;
-		for (Camada camada : _params) {
-			Variavel[] kernel = camada.kernelParaArray();
-			Variavel[] gradK = camada.gradKernelParaArray();
-			idKernel = nadam(kernel, gradK, m, v, forcaB1, forcaB2, idKernel);
-			
-			if (camada.temBias()) {
-				Variavel[] bias = camada.biasParaArray();
-				Variavel[] gradB = camada.gradBiasParaArray();
-				idBias = nadam(bias, gradB, mb, vb, forcaB1, forcaB2, idBias);
-			}     
+		for (int i = 0; i < _params.length; i++) {
+			m[i].aplicar(m[i], _grads[i], 
+				(m, g) -> (beta1 * m) + ((1 - beta1) * g)
+			);
+			v[i].aplicar(v[i], _grads[i], 
+				(v, g) -> (beta2 * v) + ((1 - beta2) * (g*g))
+			);
+			mc[i].aplicar(m[i], _grads[i],
+				(m, g) -> (beta1 * m) + ((1 - beta1) * g) / fb1
+			);
+			vc[i].aplicar(v[i], _grads[i],
+				(v, g) -> (beta2 * v) / fb2
+			);
+			_params[i].aplicar(_params[i], mc[i], vc[i], 
+				(p, mc, vc) -> p -= (mc * tA) / (Math.sqrt(vc) + eps)
+			);
 		}
-	}
-
-	/**
-	 * Atualiza as variáveis usando o gradiente pré calculado.
-	 * @param vars variáveis que serão atualizadas.
-	 * @param grads gradientes das variáveis.
-	 * @param m coeficientes de momentum de primeira ordem das variáveis.
-	 * @param v coeficientes de momentum de segunda ordem das variáveis.
-	 * @param forcaB1 força do decaimento do momentum de primeira ordem.
-	 * @param forcaB2 força do decaimento do momentum de segunda ordem.
-	 * @param id índice inicial das variáveis dentro do array de momentums.
-	 * @return índice final após as atualizações.
-	 */
-	private int nadam(Variavel[] vars, Variavel[] grads, Variavel[] m, Variavel[] v, double forcaB1, double forcaB2, int id) {
-		double g, mChapeu, vChapeu;
-		
-		for (int i = 0; i < vars.length; i++) {
-			g = grads[i].get();
-			m[id].set((beta1 * m[id].get()) + ((1 - beta1) * g));
-			v[id].set((beta2 * v[id].get()) + ((1 - beta2) * (g*g)));
-			
-			mChapeu = (beta1 * m[id].get()) + ((1 - beta1) * g) / forcaB1;
-			vChapeu = (beta2 * v[id].get()) / forcaB2;
-			vars[i].sub((mChapeu * tA) / (Math.sqrt(vChapeu) + epsilon));
-		
-			id++;
-		}
-
-		return id;
 	}
 
 	@Override
@@ -258,7 +238,7 @@ public class Nadam extends Otimizador {
 		addInfo("Lr: " + tA);
 		addInfo("Beta1: " + beta1);
 		addInfo("Beta2: " + beta2);
-		addInfo("Epsilon: " + epsilon);
+		addInfo("Epsilon: " + eps);
 
 		return super.info();
 	}

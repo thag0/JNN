@@ -2,7 +2,7 @@ package jnn.otimizadores;
 
 import jnn.camadas.Camada;
 import jnn.core.Utils;
-import jnn.core.tensor.Variavel;
+import jnn.core.tensor.Tensor;
 
 /**
  * Classe base para implementações de otimizadores do treino da biblioteca.
@@ -25,7 +25,12 @@ public abstract class Otimizador {
 	/**
 	 * Conjunto de elementos que serão otimizados.
 	 */
-	Camada[] _params = {};// Considerar futuramente utilizar apenas tensores.
+	Tensor[] _params = {};
+
+	/**
+	 * Conjunto de gradientes dos parâmetros.
+	 */
+	Tensor[] _grads = {};
 
 	/**
 	 * Utilitário.
@@ -59,43 +64,21 @@ public abstract class Otimizador {
 	}
 
 	/**
-	 * Calcula o número de parâmetros das camadas fornecidas e
-	 * adiciona camadas treináveis ao otimizador.
+	 * Calcula os parâmetros das camadas fornecidas e adiciona ao otimizador
 	 * @param camadas {@code Camadas} treináveis.
-	 * @return array contendo os valores dos parâmetros no formato
-	 * {@code [kernels, bias]}.
 	 */
-	protected int[] initParams(Camada[] camadas) {
-		int kernels = 0;
-		int bias = 0;
-		
+	protected void initParams(Camada[] camadas) {
 		for (Camada camada : camadas) {
-			if (!camada.treinavel()) continue;
-
-			kernels += camada.kernel().tamanho();
-			if (camada.temBias()) bias += camada.bias().tamanho();
-
-			_params = utils.addEmArray(_params, camada);
+			if (camada.treinavel()) {
+				_params = utils.addEmArray(_params, camada.kernel());
+				_grads  = utils.addEmArray(_grads, camada.gradKernel());
+				
+				if (camada.temBias()) {
+					_params = utils.addEmArray(_params, camada.bias());
+					_grads  = utils.addEmArray(_grads, camada.gradBias());
+				};
+			}
 		}
-
-		return new int[] {
-			kernels, 
-			bias
-		};
-	}
-
-	/**
-	 * Inicializa um array de variáveis.
-	 * @param tam tamanho desejado.
-	 * @return array de acordo com o tamanho, zerado.
-	 */
-	protected Variavel[] initVars(int tam) {
-		Variavel[] arr = new Variavel[tam];
-		for (int i = 0; i < tam; i++) {
-			arr[i] = new Variavel();
-		}
-
-		return arr;
 	}
 
 	/**

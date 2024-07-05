@@ -1162,18 +1162,15 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 				"\nOs tesores fornecidos não podem ser nulos."
 			);
 		}
-		if (!compararShape(a)) {
+
+		if (!compararShape(a) || !compararShape(b)) {
 			throw new IllegalArgumentException(
-				"\nAs dimensões do tensor A " + a.shapeStr() +
+				"\nAs dimensões dos tensores A " + a.shapeStr() +
+				", B " + b.shapeStr() +
 				" e as da instância local " + shapeStr() + " devem ser iguais."
 			);
 		}
-		if (!compararShape(b)) {
-			throw new IllegalArgumentException(
-				"\nAs dimensões do tensor B " + b.shapeStr() +
-				" e as da instância local " + shapeStr() + " devem ser iguais."
-			);
-		}
+
 		if (fun == null) {
 			throw new IllegalArgumentException(
 				"\nFunção recebida é nula."
@@ -1184,6 +1181,65 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 			dados[i].set(fun.applyAsDouble(a.dados[i].get(), b.dados[i].get()));
 		}
 
+		return this;
+	}
+
+	/**
+	 * Aplica a função recebida em todos os elementos do tensor de acordo com a operação
+	 * entre A, B e C.
+	 * <p>
+	 *      Exemplo:
+	 * </p>
+	 * <pre>
+	 *Tensor a = new Tensor(2, 2);
+	 *Tensor b = new Tensor(2, 2);
+	 *Tensor c = new Tensor(2, 2);
+	 *Tensor d = new Tensor(2, 2);
+	 *d.aplicar(a, b, c, (x, y, z) -> x + y + z);
+	 * </pre>
+	 * Onde:
+	 * <p>{@code x} representa cada elemento dentro do tensor A.
+	 * <p>{@code y} representa cada elemento dentro do tensor B.
+	 * <p>{@code z} representa cada elemento dentro do tensor C.
+	 * <p>
+	 *		É necessário que todos os tensores possuam o mesmo formato.
+	 * </p>
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @param c {@code Tensor} C.
+	 * @param fun função para aplicar no tensor local.
+	 * @return instância local alterada.
+	 */
+	public Tensor aplicar(Tensor a, Tensor b, Tensor c, DoubleTernaryOperator fun) {
+		if (a == null || b == null || c == null) {
+			throw new IllegalArgumentException(
+				"\nOs tensores fornecidos não podem ser nulos."
+			);
+		}
+
+		if (!compararShape(a) || !compararShape(b) || !compararShape(c)) {
+			throw new IllegalArgumentException(
+				"\nAs dimensões dos tensores A " + a.shapeStr() +
+				", B " + b.shapeStr() +
+				" e C " + c.shapeStr() +
+				" e as da instância local " + shapeStr() + " devem ser iguais."
+			);
+		}
+
+		if (fun == null) {
+			throw new IllegalArgumentException(
+				"\nFunção recebida é nula."
+			);
+		}
+
+		for (int i = 0; i < dados.length; i++) {
+			dados[i].set(
+				fun.applyAsDouble(
+					a.dados[i].get(), b.dados[i].get(), c.dados[i].get()
+				)
+			);
+		}
+		
 		return this;
 	}
 

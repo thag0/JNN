@@ -1,7 +1,7 @@
 package jnn.otimizadores;
 
 import jnn.camadas.Camada;
-import jnn.core.tensor.Variavel;
+import jnn.core.tensor.Tensor;
 
 /**
  * <h2>
@@ -71,14 +71,9 @@ public class SGD extends Otimizador {
 	private final boolean nesterov;
 
 	/**
-	 * Coeficientes de momentum para os kernels.
+	 * Coeficientes de momentum.
 	 */
-	private Variavel[] m;
-	
-	/**
-	 * Coeficientes de momentum para os bias.
-	 */
-	private Variavel[] mb;
+	private Tensor[] m;
 
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient 
@@ -137,57 +132,33 @@ public class SGD extends Otimizador {
 
 	@Override
 	public void construir(Camada[] camadas) {
-		int[] params = initParams(camadas);
-		int kernels = params[0];
-		int bias = params[1];
-		
-		m  = initVars(kernels);
-		mb = initVars(bias);
+		initParams(camadas);
+
+		m = new Tensor[0];
+		for (Tensor t : _params) {
+			m = utils.addEmArray(m, new Tensor(t.shape()));
+		}
 		
 		_construido = true;// otimizador pode ser usado
 	}
-
+	
 	@Override
 	public void atualizar() {
 		verificarConstrucao();
-
-		int idKernel = 0, idBias = 0;
 		
-		for (Camada camada : _params) {
-			Variavel[] kernel = camada.kernelParaArray();
-			Variavel[] gradK = camada.gradKernelParaArray();
-			idKernel = sgd(kernel, gradK, m, idKernel);
+		for (int i = 0; i < _params.length; i++) {
+			m[i].aplicar(m[i], _grads[i], 
+				(m, g) -> (m * momentum) - (g * tA)
+			);
 
-			if (camada.temBias()) {
-				Variavel[] bias = camada.biasParaArray();
-				Variavel[] gradB = camada.gradBiasParaArray();
-				idBias = sgd(bias, gradB, mb, idBias);
+			if (nesterov) {
+				_params[i].aplicar(_params[i], m[i], _grads[i], 
+					(p, m, g) -> p + (momentum * m) - (g * tA)
+				);
+			} else {
+				_params[i].add(m[i]);
 			}
 		}
-	}
-
-	/**
-	 * Atualiza as variáveis usando o gradiente pré calculado.
-	 * @param vars variáveis que serão atualizadas.
-	 * @param grads gradientes das variáveis.
-	 * @param m coeficientes de momentum.
-	 * @param id índice inicial das variáveis dentro do array de momentums.
-	 * @return índice final após as atualizações.
-	 */
-	private int sgd(Variavel[] vars, Variavel[] grads, Variavel[] m, int id) {
-		double mid, g;
-
-		for (int i = 0; i < vars.length; i++) {
-			mid = m[id].get();
-			g = grads[i].get();
-		
-			m[id].set((mid * momentum) - (g * tA));
-			vars[i].add(nesterov ? (mid * momentum) - (g * tA) : mid);
-		
-			id++;
-		}
-
-		return id;
 	}
 
 	@Override

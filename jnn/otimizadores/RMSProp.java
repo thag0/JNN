@@ -1,7 +1,7 @@
 package jnn.otimizadores;
 
 import jnn.camadas.Camada;
-import jnn.core.tensor.Variavel;
+import jnn.core.tensor.Tensor;
 
 /**
  * <h2>
@@ -67,7 +67,7 @@ public class RMSProp extends Otimizador {
 	/**
 	 * Usado para evitar divisão por zero.
 	 */
-	private final double epsilon;
+	private final double eps;
 
 	/**
 	 * Fator de decaimento.
@@ -75,14 +75,9 @@ public class RMSProp extends Otimizador {
 	private final double rho;
 
 	/**
-	 * Acumuladores para os kernels
+	 * Acumuladores para os.
 	 */
-	private Variavel[] ac;
-
-	/**
-	 * Acumuladores para os bias.
-	 */
-	private Variavel[] acb;
+	private Tensor[] ac;
 
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> RMSProp </strong> 
@@ -110,7 +105,7 @@ public class RMSProp extends Otimizador {
 
 		this.tA = tA;
 		this.rho = rho;
-		this.epsilon = eps;
+		this.eps = eps;
 	}
 
 	/**
@@ -144,12 +139,12 @@ public class RMSProp extends Otimizador {
 
 	@Override
 	public void construir(Camada[] camadas) {
-		int[] params = initParams(camadas);
-		int kernels = params[0];
-		int bias = params[1];
+		initParams(camadas);
 
-		this.ac  = initVars(kernels);
-		this.acb = initVars(bias);
+		ac = new Tensor[0];
+		for (Tensor t : _params) {
+			ac = utils.addEmArray(ac, new Tensor(t.shape()));
+		}
 		
 		_construido = true;// otimizador pode ser usado
 	}
@@ -158,42 +153,15 @@ public class RMSProp extends Otimizador {
 	public void atualizar() {
 		verificarConstrucao();
 		
-		int idKernel = 0, idBias = 0;
-		for (Camada camada : _params) {
-			Variavel[] kernel = camada.kernelParaArray();
-			Variavel[] gradK = camada.gradKernelParaArray();
-			idKernel = rmsprop(kernel, gradK, ac, idKernel);
-
-			if (camada.temBias()) {
-				Variavel[] bias = camada.biasParaArray();
-				Variavel[] gradB = camada.gradBiasParaArray();
-				idBias = rmsprop(bias, gradB, acb, idBias);
-			}
+		for (int i = 0; i < _params.length; i++) {
+			ac[i].aplicar(ac[i], _grads[i], 
+				(ac, g) -> (rho * ac) + (1 - rho) * (g*g)
+			);
+			_params[i].aplicar(_params[i], _grads[i], ac[i], 
+				(p, g, ac) -> p -= (g * tA) / (Math.sqrt(ac) + eps)
+			);
 		}
 	}
-
-	/**
-	 * Atualiza as variáveis usando o gradiente pré calculado.
-	 * @param vars variáveis que serão atualizadas.
-	 * @param grads gradientes das variáveis.
-	 * @param ac acumulador do otimizador.
-	 * @param id índice inicial das variáveis dentro do array de momentums.
-	 * @return índice final após as atualizações.
-	 */
-    private int rmsprop(Variavel[] vars, Variavel[] grads, Variavel[] ac, int id) {
-        double g;
-
-        for (int i = 0; i < vars.length; i++) {
-            g = grads[i].get();
-            
-			ac[id].set(rho * ac[id].get() + (1 - rho) * g * g);
-            vars[i].sub((g * tA) / (Math.sqrt(ac[id].get()) + epsilon));
-
-            id++;
-        }
-
-        return id;
-    }
 
 	@Override
 	public String info() {
@@ -202,7 +170,7 @@ public class RMSProp extends Otimizador {
 		
 		addInfo("Lr: " + tA);
 		addInfo("Rho: " + rho);
-		addInfo("Epsilon: " + epsilon);
+		addInfo("Epsilon: " + eps);
 
 		return super.info();
 	}

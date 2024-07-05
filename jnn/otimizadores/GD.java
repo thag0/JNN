@@ -1,7 +1,6 @@
 package jnn.otimizadores;
 
 import jnn.camadas.Camada;
-import jnn.core.tensor.Variavel;
 
 /**
  * <h2>
@@ -54,7 +53,7 @@ public class GD extends Otimizador {
 	 * </p>
 	 */
 	public GD() {
-		this(0.1);
+		this(0.001);
 	}
 
 	@Override
@@ -67,28 +66,11 @@ public class GD extends Otimizador {
 	public void atualizar() {
 		verificarConstrucao();
 		
-		for (Camada camada : _params) {
-			Variavel[] kernel = camada.kernelParaArray();
-			Variavel[] gradK = camada.gradKernelParaArray();		
-			gd(kernel, gradK);
-
-			if (camada.temBias()) {
-				Variavel[] bias = camada.biasParaArray();
-				Variavel[] gradB = camada.gradBiasParaArray();
-				gd(bias, gradB);
-			}
+		for (int i = 0; i < _params.length; i++) {
+			_params[i].aplicar(_params[i], _grads[i], 
+				(p, g) -> p -= g
+			);
 		} 
-	}
-
-    /**
-	 * Atualiza as variáveis usando o gradiente pré calculado.
-	 * @param vars variáveis que serão atualizadas.
-	 * @param grads gradientes das variáveis.
-	 */
-	private void gd(Variavel[] vars, Variavel[] grads) {
-		for (int i = 0; i < vars.length; i++) {
-			vars[i].sub(grads[i].get() * tA);
-		}
 	}
 
 	@Override

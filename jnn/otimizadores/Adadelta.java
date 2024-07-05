@@ -1,7 +1,7 @@
 package jnn.otimizadores;
 
 import jnn.camadas.Camada;
-import jnn.core.tensor.Variavel;
+import jnn.core.tensor.Tensor;
 
 /**
  * Implementação do otimizador Adadelta.
@@ -64,27 +64,22 @@ public class Adadelta extends Otimizador {
 	/**
 	 * Valor usado para evitar divisão por zero.
 	 */
-	private final double epsilon;
+	private final double eps;
 
 	/**
-	 * Acumuladores para os kernels.
+	 * Acumuladores.
 	 */
-	private Variavel[] ac;
+	private Tensor[] ac;
 
 	/**
-	 * Acumuladores para os bias.
+	 * Deltas de atualização
 	 */
-	private Variavel[] acb;
+	private Tensor[] deltas;
 
 	/**
-	 * Acumulador atualizado para os kernels.
+	 * Acumuladores atualizados.
 	 */
-	private Variavel[] acAt;
-
-	/**
-	 * Acumulador atualizado para os bias.
-	 */
-	private Variavel[] acAtb;
+	private Tensor[] acAt;
 
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> Adadelta </strong> 
@@ -106,14 +101,14 @@ public class Adadelta extends Otimizador {
 		}
 
 		this.rho = rho;
-		this.epsilon = eps;
+		this.eps = eps;
 	}
 
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> Adadelta </strong> 
 	 * usando os valores de hiperparâmetros fornecidos.
 	 * @param rho valor de decaimento do otimizador.
-	 * @param epsilon usado para evitar a divisão por zero.
+	 * @param eps usado para evitar a divisão por zero.
 	 */
 	public Adadelta(double rho) {
 		this(rho, PADRAO_EPS);
@@ -131,14 +126,16 @@ public class Adadelta extends Otimizador {
 
 	@Override
 	public void construir(Camada[] camadas) {
-		int[] params = initParams(camadas);
-		int kernels = params[0];
-		int bias = params[1];
+		initParams(camadas);
 
-		ac    = initVars(kernels);
-		acAt  = initVars(kernels);
-		acb   = initVars(bias);
-		acAtb = initVars(bias);
+		ac     = new Tensor[0];
+		deltas = new Tensor[0];
+		acAt   = new Tensor[0];
+		for (Tensor t : _params) {
+			ac     = utils.addEmArray(ac,     new Tensor(t.shape()));
+			deltas = utils.addEmArray(deltas, new Tensor(t.shape()));
+			acAt   = utils.addEmArray(acAt,   new Tensor(t.shape()));
+		}
 
 		_construido = true;// otimizador pode ser usado
 	}
@@ -147,46 +144,21 @@ public class Adadelta extends Otimizador {
 	public void atualizar() {
 		verificarConstrucao();
 		
-		int idKernel = 0, idBias = 0;
+		for (int i = 0; i < _params.length; i++) {
+			ac[i].aplicar(ac[i], _grads[i],
+				(ac, g) -> (rho * ac) + ((1 - rho) * (g*g))
+			);
 
-		for (Camada camada : _params) {
-			Variavel[] kernel = camada.kernelParaArray();
-			Variavel[] gradK = camada.gradKernelParaArray();
-			idKernel = adadelta(kernel, gradK, ac, acAt, idKernel);
+			deltas[i].aplicar(acAt[i], ac[i], _grads[i], 
+				(acat, ac, g) -> Math.sqrt(acat + eps) / Math.sqrt(ac + eps) * g
+			);
 
-			if (camada.temBias()) {
-				Variavel[] bias = camada.biasParaArray();
-				Variavel[] gradB = camada.gradBiasParaArray();
-				idBias = adadelta(bias, gradB, acb, acAtb, idBias);
-			}
+			acAt[i].aplicar(acAt[i], deltas[i], 
+				(acat, d) -> (rho * acat) + ((1 - rho) * (d*d))
+			);
+
+			_params[i].sub(deltas[i]);
 		}
-	}
-
-	/**
-	 * Atualiza as variáveis usando o gradiente pré calculado.
-	 * @param vars variáveis que serão atualizadas.
-	 * @param grads gradientes das variáveis.
-	 * @param ac acumulador do otimizador.
-	 * @param acAt acumulador atualizado.
-	 * @param id índice inicial das variáveis dentro do array de momentums.
-	 * @return índice final após as atualizações.
-	 */
-	private int adadelta(Variavel[] vars, Variavel[] grads, Variavel[] ac, Variavel[] acAt, int id) {
-		double g, delta;
-
-		for (int i = 0; i < vars.length; i++) {
-			g = grads[i].get();
-			ac[id].set((rho * ac[id].get()) + ((1 - rho) * (g*g)));
-			
-			delta = Math.sqrt(acAt[id].get() + epsilon) / Math.sqrt(ac[id].get() + epsilon) * g;
-			acAt[id].set((rho * acAt[id].get()) + ((1 - rho) * (delta * delta)));
-			
-			vars[i].sub(delta);
-			
-			id++;
-		}
-
-		return id;
 	}
 
 	@Override
@@ -195,7 +167,7 @@ public class Adadelta extends Otimizador {
 		construirInfo();
 
 		addInfo("Rho: " + rho);
-		addInfo("Epsilon: " + epsilon);
+		addInfo("Epsilon: " + eps);
 
 		return super.info();
 	}

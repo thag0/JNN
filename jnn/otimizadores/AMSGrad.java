@@ -1,7 +1,7 @@
 package jnn.otimizadores;
 
 import jnn.camadas.Camada;
-import jnn.core.tensor.Variavel;
+import jnn.core.tensor.Tensor;
 
 /**
  * Implementação do algoritmo de otimização AMSGrad, que é uma variação do 
@@ -78,7 +78,7 @@ public class AMSGrad extends Otimizador {
 	/**
 	 * Valor padrão para epsilon.
 	 */
-	private static final double PADRAO_EPS = 1e-7;
+	private static final double PADRAO_EPS = 1e-8;
 
     /**
 	 * Valor de taxa de aprendizado do otimizador.
@@ -88,7 +88,7 @@ public class AMSGrad extends Otimizador {
 	/**
 	 * Usado para evitar divisão por zero.
 	 */
-	private final double epsilon;
+	private final double eps;
 
 	/**
 	 * Decaimento do momentum de primeira ordem.
@@ -101,34 +101,19 @@ public class AMSGrad extends Otimizador {
 	private final double beta2;
 
     /**
-	 * Coeficientes de momentum para os kernels.
+	 * Coeficientes de momentum.
 	 */
-	private Variavel[] m;
-
-    /**
-	 * Coeficientes de momentum para os bias.
-	 */
-	private Variavel[] mb;
+	private Tensor[] m;
 
 	/**
-	 * Coeficientes de momentum de segunda orgem para os kernels.
+	 * Coeficientes de momentum de segunda ordem.
 	 */
-	private Variavel[] v;
+	private Tensor[] v;
 
 	/**
-	 * Coeficientes de momentum de segunda orgem para os bias.
+	 * Coeficientes de momentum de segunda ordem corrigidos.
 	 */
-	private Variavel[] vb;
-
-	/**
-	 * Coeficientes de momentum de segunda orgem corrigidos para os kernels.
-	 */
-	private Variavel[] vc;
-
-	/**
-	 * Coeficientes de momentum de segunda orgem corrigidos para os bias.
-	 */
-	private Variavel[] vcb;
+	private Tensor[] vc;
 
 	/**
 	 * Contador de iterações.
@@ -168,7 +153,7 @@ public class AMSGrad extends Otimizador {
 		this.tA = tA;
 		this.beta1 = beta1;
 		this.beta2 = beta2;
-		this.epsilon = eps;
+		this.eps = eps;
 	}
 
 	/**
@@ -203,16 +188,16 @@ public class AMSGrad extends Otimizador {
 
 	@Override
 	public void construir(Camada[] camadas) {
-		int[] params = initParams(camadas);
-		int kernels = params[0];
-		int bias = params[1];
+		initParams(camadas);
 
-		m   = initVars(kernels);
-		v   = initVars(kernels);
-		vc  = initVars(kernels);
-		mb  = initVars(bias);
-		vb  = initVars(bias);
-		vcb = initVars(bias);
+		m  = new Tensor[0];
+		v  = new Tensor[0];
+		vc = new Tensor[0];
+		for (Tensor t : _params) {
+			m  = utils.addEmArray(m,  new Tensor(t.shape()));
+			v  = utils.addEmArray(v,  new Tensor(t.shape()));
+			vc = utils.addEmArray(vc, new Tensor(t.shape()));
+		}
 
 		_construido = true;// otimizador pode ser usado
 	}
@@ -220,61 +205,25 @@ public class AMSGrad extends Otimizador {
 	@Override
 	public void atualizar() {
 		verificarConstrucao();
-		
-		int idKernel = 0, idBias = 0;
 
 		iteracoes++;
-		double forcaB1 = (1 - Math.pow(beta1, iteracoes));
-		double forcaB2 = (1 - Math.pow(beta2, iteracoes));
+		double fb1 = (1 - Math.pow(beta1, iteracoes));
+		double fb2 = (1 - Math.pow(beta2, iteracoes));
 		
-		for (Camada camada : _params) {
-			Variavel[] kernel = camada.kernelParaArray();
-			Variavel[] gradK = camada.gradKernelParaArray();
-			idKernel = amsgrad(kernel, gradK, m, v, vc, forcaB1, forcaB2, idKernel);
-
-			if (camada.temBias()) {
-				Variavel[] bias = camada.biasParaArray();
-				Variavel[] gradB = camada.gradBiasParaArray();
-				idBias = amsgrad(bias, gradB, mb, vb, vcb, forcaB1, forcaB2, idBias);
-			} 
+		for (int i = 0; i < _params.length; i++) {
+			m[i].aplicar(m[i], _grads[i], (m, g) ->
+				(beta1 * m) + ((1 - beta1) * g)
+			);
+			v[i].aplicar(v[i], _grads[i], 
+				(v, g) -> (beta2 * v) + ((1 - beta2) * (g*g))
+			);
+			vc[i].aplicar(vc[i], v[i],
+				(vc, v) -> Math.max(vc, v)
+			);
+			_params[i].aplicar(_params[i], m[i], v[i],
+				(p, m, v) -> p -= ((m/fb1) * tA) / (Math.sqrt(v/fb2) + eps)
+			);
 		}
-	}
-
-    /**
-	 * Atualiza as variáveis usando o gradiente pré calculado.
-	 * @param vars variáveis que serão atualizadas.
-	 * @param grads gradientes das variáveis.
-	 * @param m coeficientes de momentum de primeira ordem das variáveis.
-	 * @param v coeficientes de momentum de segunda ordem das variáveis.
-	 * @param vc coeficientes de momentum de segunda ordem corrigidos.
-	 * @param forcaB1 força do decaimento do momentum de primeira ordem.
-	 * @param forcaB2 força do decaimento do momentum de segunda ordem.
-	 * @param id índice inicial das variáveis dentro do array de momentums.
-	 * @return índice final após as atualizações.
-	 */
-	private int amsgrad(Variavel[] vars, Variavel[] grads, Variavel[] m, Variavel[] v, Variavel[] vc, double forcaB1, double forcaB2, int id) {
-		double mChapeu, vChapeu, g, mid, vid, vcid;
-
-		for (int i = 0; i < vars.length; i++) {
-			g = grads[i].get();
-
-			m[id].set((beta1 * m[id].get()) + ((1 - beta1) * g));
-			v[id].set((beta2 * v[id].get()) + ((1 - beta2) * (g*g)));
-			
-			mid = m[id].get();
-			vid = v[id].get();
-			vcid = vc[id].get();
-
-			vc[id].set(Math.max(vcid, vid));
-
-			mChapeu = mid / forcaB1;
-			vChapeu = vid / forcaB2;
-			vars[i].sub((mChapeu * tA) / (Math.sqrt(vChapeu) + epsilon));
-
-			id++;
-		}
-
-		return id;
 	}
 
 	@Override
@@ -285,7 +234,7 @@ public class AMSGrad extends Otimizador {
 		addInfo("Lr: " + tA);
 		addInfo("Beta1: " + beta1);
 		addInfo("Beta2: " + beta2);
-		addInfo("Epsilon: " + epsilon);
+		addInfo("Epsilon: " + eps);
 
 		return super.info();
 	}
