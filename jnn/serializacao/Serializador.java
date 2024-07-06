@@ -276,9 +276,7 @@ public class Serializador {
 			int numCamadas = Integer.parseInt(br.readLine());
 			Otimizador otimizador = dicio.getOtimizador(br.readLine().trim());
 			Perda perda = dicio.getPerda(br.readLine().trim());
-		
-			modelo.setOtimizador(otimizador);
-			modelo.setPerda(perda);
+
 			for (int i = 0; i < numCamadas; i++) {
 				String nome = br.readLine();
 				
@@ -319,7 +317,11 @@ public class Serializador {
 			for (int i = 0; i < modelo.numCamadas(); i++) {
 				modelo.camada(i).setId(i);
 			}
-			otimizador.construir(modelo.camadas());
+
+			modelo.setOtimizador(otimizador);
+			otimizador.construir(modelo);
+			
+			modelo.setPerda(perda);
 
 		} catch(Exception e) {
 			System.out.println("Erro ao ler modelo");

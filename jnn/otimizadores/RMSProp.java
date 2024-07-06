@@ -1,7 +1,7 @@
 package jnn.otimizadores;
 
-import jnn.camadas.Camada;
 import jnn.core.tensor.Tensor;
+import jnn.modelos.Modelo;
 
 /**
  * <h2>
@@ -138,8 +138,8 @@ public class RMSProp extends Otimizador {
 	}
 
 	@Override
-	public void construir(Camada[] camadas) {
-		initParams(camadas);
+	public void construir(Modelo modelo) {
+		initParams(modelo);
 
 		ac = new Tensor[0];
 		for (Tensor t : _params) {

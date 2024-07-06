@@ -1,6 +1,6 @@
 package jnn.otimizadores;
 
-import jnn.camadas.Camada;
+import jnn.modelos.Modelo;
 
 /**
  * <h2>
@@ -57,8 +57,8 @@ public class GD extends Otimizador {
 	}
 
 	@Override
-	public void construir(Camada[] camadas) {
-		initParams(camadas);
+	public void construir(Modelo modelo) {
+		initParams(modelo);
 		_construido = true;// otimizador pode ser usado
 	}
 

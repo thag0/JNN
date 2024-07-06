@@ -3,6 +3,7 @@ package jnn.otimizadores;
 import jnn.camadas.Camada;
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
+import jnn.modelos.Modelo;
 
 /**
  * Classe base para implementações de otimizadores do treino da biblioteca.
@@ -65,10 +66,10 @@ public abstract class Otimizador {
 
 	/**
 	 * Calcula os parâmetros das camadas fornecidas e adiciona ao otimizador
-	 * @param camadas {@code Camadas} treináveis.
+	 * @param modelo modelo para otimização.
 	 */
-	protected void initParams(Camada[] camadas) {
-		for (Camada camada : camadas) {
+	protected void initParams(Modelo modelo) {
+		for (Camada camada : modelo.camadas()) {
 			if (camada.treinavel()) {
 				_params = utils.addEmArray(_params, camada.kernel());
 				_grads  = utils.addEmArray(_grads, camada.gradKernel());
@@ -84,9 +85,9 @@ public abstract class Otimizador {
 	/**
 	 * Inicializa os parâmetros necessários do otimizador para as camadas 
 	 * do modelo especificado.
-	 * @param camadas array de camadas do modelo.
+	 * @param modelo modelo para otimização.
 	 */
-	public abstract void construir(Camada[] camadas);
+	public abstract void construir(Modelo modelo);
 
 	/**
 	 * Executa um passo de atualização do otimizador.

@@ -292,7 +292,7 @@ public class Sequencial extends Modelo {
 		_perda = dicio.getPerda(perda);
 		
 		_otimizador = dicio.getOtimizador(otimizador);
-		_otimizador.construir(camadas());
+		_otimizador.construir(this);
 		
 		_compilado = true;// modelo pode ser usado.
 	}
@@ -363,6 +363,20 @@ public class Sequencial extends Modelo {
 		}
 
 		return _camadas[_camadas.length-1];
+	}
+
+	@Override
+	public Tensor[] parametros() {
+		Tensor[] params = new Tensor[0];
+
+		for (Camada camada : camadas()) {
+			params = utils.addEmArray(params, camada.kernel());
+			if (camada.temBias()) {
+				params = utils.addEmArray(params, camada.bias());
+			}
+		}
+
+		return params;
 	}
 
 	@Override

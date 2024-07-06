@@ -1,7 +1,7 @@
 package jnn.otimizadores;
 
-import jnn.camadas.Camada;
 import jnn.core.tensor.Tensor;
+import jnn.modelos.Modelo;
 
 /**
  * Implementação do algoritmo de otimização AMSGrad, que é uma variação do 
@@ -187,8 +187,8 @@ public class AMSGrad extends Otimizador {
 	}
 
 	@Override
-	public void construir(Camada[] camadas) {
-		initParams(camadas);
+	public void construir(Modelo modelo) {
+		initParams(modelo);
 
 		m  = new Tensor[0];
 		v  = new Tensor[0];

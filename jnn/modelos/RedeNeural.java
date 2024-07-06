@@ -416,7 +416,7 @@ public class RedeNeural extends Modelo {
 		_perda = dic.getPerda(perda);
 		_otimizador = dic.getOtimizador(otimizador);
 
-		_otimizador.construir(_camadas);
+		_otimizador.construir(this);
 
 		_compilado = true;
 	}
@@ -514,6 +514,20 @@ public class RedeNeural extends Modelo {
 	public Densa camadaSaida() {
 		validarCompilacao();
 		return _camadas[_camadas.length-1];
+	}
+
+	@Override
+	public Tensor[] parametros() {
+		Tensor[] params = new Tensor[0];
+
+		for (Densa camada : camadas()) {
+			params = utils.addEmArray(params, camada.kernel());
+			if (camada.temBias()) {
+				params = utils.addEmArray(params, camada.bias());
+			}
+		}
+
+		return params;
 	}
 
 	/**

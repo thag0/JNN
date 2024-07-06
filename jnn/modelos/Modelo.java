@@ -416,6 +416,23 @@ public abstract class Modelo implements Cloneable {
 	 * @return camada de saída.
 	 */
 	public abstract Camada camadaSaida();
+
+	/**
+	 * Retorna o conjunto de parâmetros do modelo.
+	 * <p>
+	 *		Os parâmetros de um modelo incluem {@code kernels} e {@code bias}
+	 *		de cada camada, todos sendo do tipo {@code Tensor}.
+	 * </p>
+	 * <p>
+	 * 		A sequência fornecida dos parâmetros é dada por:
+	 * </p>
+	 * <pre>
+	 * 	params = [k1, b1, k2, b2, k3, b3, ...]
+	 * </pre>
+	 * Onde: {@code k = kenrel} e {@code b = bias}.
+	 * @return array de {@code Tensor} contendo os parâmetros do modelo.
+	 */
+	public abstract Tensor[] parametros();
 	
 	/**
 	 * Retorna um array contendo a saída serializada do modelo.
