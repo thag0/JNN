@@ -46,12 +46,13 @@ import jnn.treinamento.Treinador;
  *);
  * </pre>
  * O modelo sequencial não é limitado apenas a camadas densas, podendo empilhar camadas
- * compatívels que herdam de {@code rna.Camada}, algumas camadas dispoíveis incluem:
+ * compatívels que herdam de {@code jnn.camadas.Camada}, algumas camadas dispoíveis incluem:
  * <ul>
+ *    <li> Entrada; </li>
  *    <li> Densa; </li>
- *    <li> Convolucional; </li>
- *    <li> MaxPooling; </li>
- *    <li> AvgPooling; </li>
+ *    <li> Conv2D; </li>
+ *    <li> MaxPool2D; </li>
+ *    <li> AvgPool2D; </li>
  *    <li> Flatten; </li>
  *    <li> Dropout; </li>
  * </ul>
@@ -61,8 +62,8 @@ import jnn.treinamento.Treinador;
  * <pre>
  *modelo = Sequencial(
  *    new Entrada(28, 28),
- *    new Convolucional(new int[]{3, 3}, 5),
- *    new MaxPooling(new int[]{2, 2}),
+ *    new Conv2D(5, new int[]{3, 3}),
+ *    new MaxPool2D(new int[]{2, 2}),
  *    new Flatten(),
  *    new Densa(50),
  *    new Dropout(0.3),
@@ -222,6 +223,7 @@ public class Sequencial extends Modelo {
 	public void add(Camada camada) {
 		utils.validarNaoNulo(camada, "Camada nula.");
 		_camadas = utils.addEmArray(_camadas, camada);
+		_compilado = false;
 	}
 
 	/**
@@ -250,6 +252,12 @@ public class Sequencial extends Modelo {
 
 	@Override
 	public void compilar(Object otimizador, Object perda) {
+		if (camadas().length < 1) {
+			throw new IllegalStateException(
+				"\nNão há camadas no modelo."
+			);
+		}
+
 		int[] formato = {};
 
 		if (_camadas[0] instanceof Entrada) {
