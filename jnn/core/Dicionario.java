@@ -104,13 +104,13 @@ public class Dicionario {
 				case "selu"       : return new SELU();
 	
 				default: throw new IllegalArgumentException(
-					"Ativação \"" + nome + "\" não encontada."
+					"\nAtivação \"" + nome + "\" não encontada."
 				);
 			}
 
 		} else {
 			throw new IllegalArgumentException(
-				"Tipo de dado \"" + ativacao.getClass().getTypeName() + "\" não suportado."
+				"\nTipo de dado \"" + ativacao.getClass().getTypeName() + "\" não suportado."
 			);
 		}
 	}
@@ -139,13 +139,13 @@ public class Dicionario {
 				case "sgd":       return new SGD();
 	
 				default: throw new IllegalArgumentException(
-					"Otimizador \"" + nome + "\" não encontado."
+					"\nOtimizador \"" + nome + "\" não encontado."
 				);
 			}
 
 		} else {
 			throw new IllegalArgumentException(
-				"Tipo de dado \"" + otimizador.getClass().getTypeName() + "\" não suportado."
+				"\nTipo de dado \"" + otimizador.getClass().getTypeName() + "\" não suportado."
 			);
 		}
 	}
@@ -173,12 +173,12 @@ public class Dicionario {
 				case "entropiacruzadabinaria" : return new EntropiaCruzadaBinaria();
 	
 				default: throw new IllegalArgumentException(
-					"Função de perda \"" + nome + "\" não encontada."
+					"\nFunção de perda \"" + nome + "\" não encontada."
 				);
 			}           
 		} else {
 			throw new IllegalArgumentException(
-				"Tipo de dado \"" + perda.getClass().getTypeName() + "\" não suportado."
+				"\nTipo de dado \"" + perda.getClass().getTypeName() + "\" não suportado."
 			);
 		}
 		
@@ -210,13 +210,13 @@ public class Dicionario {
 				case "zeros"               : return new Zeros();
 				
 				default: throw new IllegalArgumentException(
-					"Inicializador \"" + nome + "\" não encontado."
+					"\nInicializador \"" + nome + "\" não encontado."
 				);
 			}
 		
 		} else {
 			throw new IllegalArgumentException(
-				"Tipo de dado \"" + inicializador.getClass().getTypeName() + "\" não suportado."
+				"\nTipo de dado \"" + inicializador.getClass().getTypeName() + "\" não suportado."
 			);
 		}
 
