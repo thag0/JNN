@@ -53,6 +53,10 @@ import jnn.modelos.Modelo;
  *m += (1 - beta1) * (g  - m)
  *v += (1 - beta2) * (g² - v)
  *</pre>
+ * Caso a correção {@code amsgrad} esteja ativa:
+ *<pre>
+ *v = max(v, vc);
+ *</pre>
  * Onde:
  * <p>
  *    {@code beta1 e beta2} - valores de decaimento dos momentums de primeira
@@ -60,6 +64,9 @@ import jnn.modelos.Modelo;
  * </p>
  * <p>
  *    {@code g} - gradiente correspondente a variável que será otimizada.
+ * </p>
+ * <p>
+ *    {@code vc} - histórico de atualizações do amsgrad.
  * </p>
  */
 public class Adam extends Otimizador {
@@ -125,7 +132,7 @@ public class Adam extends Otimizador {
 	private Tensor[] v;
 
 	/**
-	 * 
+	 * Coeficientes de segunda ordem corrigidos.
 	 */
 	private Tensor[] vc;
 	
@@ -170,6 +177,18 @@ public class Adam extends Otimizador {
 		this.beta2 = beta2;
 		this.eps = eps;
 		this.amsgrad = amsgrad;
+	}
+ 
+	/**
+	 * Inicializa uma nova instância de otimizador <strong> Adam </strong> 
+	 * usando os valores de hiperparâmetros fornecidos.
+	 * @param tA taxa de aprendizado do otimizador.
+	 * @param beta1 decaimento do momento de primeira ordem.
+	 * @param beta2 decaimento do momento de segunda ordem.
+	 * @param eps pequeno valor usado para evitar a divisão por zero.
+	 */
+	public Adam(double tA, double beta1, double beta2, double eps) {
+		this(tA, beta1, beta2, eps, PADRAO_AMSGRAD);
 	}
  
 	/**
@@ -249,19 +268,16 @@ public class Adam extends Otimizador {
 			);
 
 			if (amsgrad) {
-				vc[i].aplicar(vc[i], v[i],
-					(vc, v) -> Math.max(vc, v)
+				vc[i].aplicar(v[i], vc[i],
+					(v, vc) -> Math.max(v, vc)
 				);
 
-				_params[i].aplicar(_params[i], m[i], vc[i], 
-					(p, m, vc) -> p - (((alfa * m) / (Math.sqrt(vc) + eps)))
-				);
-				
-			} else {
-				_params[i].aplicar(_params[i], m[i], v[i], 
-					(p, m, v) -> p - (((alfa * m) / (Math.sqrt(v) + eps)))
-				);
+				v[i].copiar(vc[i]);
 			}
+
+			_params[i].aplicar(_params[i], m[i], v[i], 
+				(p, m, v) -> p - (((m * alfa) / (Math.sqrt(v) + eps)))
+			);
 		}
 	}
 
