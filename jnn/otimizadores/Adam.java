@@ -83,6 +83,11 @@ public class Adam extends Otimizador {
 	 * Valor padrão para epsilon.
 	 */
 	private static final double PADRAO_EPS = 1e-8;
+	 
+	/**
+	 * Valor padrão de correção.
+	 */
+	private static final boolean PADRAO_AMSGRAD = false;
 
 	/**
 	 * Valor de taxa de aprendizado do otimizador.
@@ -105,6 +110,11 @@ public class Adam extends Otimizador {
 	private final double eps;
 
 	/**
+	 * Correção dos valores de velocidade.
+	 */
+	private final boolean amsgrad;
+
+	/**
 	 * Coeficientes de momentum.
 	 */
 	private Tensor[] m;
@@ -113,6 +123,11 @@ public class Adam extends Otimizador {
 	 * Coeficientes de momentum de segunda ordem.
 	 */
 	private Tensor[] v;
+
+	/**
+	 * 
+	 */
+	private Tensor[] vc;
 	
 	/**
 	 * Contador de iterações.
@@ -125,9 +140,10 @@ public class Adam extends Otimizador {
 	 * @param tA taxa de aprendizado do otimizador.
 	 * @param beta1 decaimento do momento de primeira ordem.
 	 * @param beta2 decaimento do momento de segunda ordem.
-	 * @param eps usado para evitar a divisão por zero.
+	 * @param eps pequeno valor usado para evitar a divisão por zero.
+	 * @param amsgrad aplicar correção.
 	 */
-	public Adam(double tA, double beta1, double beta2, double eps) {
+	public Adam(double tA, double beta1, double beta2, double eps, boolean amsgrad) {
 		if (tA <= 0) {
 			throw new IllegalArgumentException(
 				"\nTaxa de aprendizado (" + tA + ") inválida."
@@ -153,6 +169,7 @@ public class Adam extends Otimizador {
 		this.beta1 = beta1;
 		this.beta2 = beta2;
 		this.eps = eps;
+		this.amsgrad = amsgrad;
 	}
  
 	/**
@@ -163,7 +180,7 @@ public class Adam extends Otimizador {
 	 * @param beta2 decaimento do momento de segunda ordem.
 	 */
 	public Adam(double tA, double beta1, double beta2) {
-		this(tA, beta1, beta2, PADRAO_EPS);
+		this(tA, beta1, beta2, PADRAO_EPS, PADRAO_AMSGRAD);
 	}
  
 	/**
@@ -172,7 +189,16 @@ public class Adam extends Otimizador {
 	 * @param tA taxa de aprendizado do otimizador.
 	 */
 	public Adam(double tA) {
-		this(tA, PADRAO_BETA1, PADRAO_BETA2, PADRAO_EPS);
+		this(tA, PADRAO_BETA1, PADRAO_BETA2, PADRAO_EPS, PADRAO_AMSGRAD);
+	}
+ 
+	/**
+	 * Inicializa uma nova instância de otimizador <strong> Adam </strong> 
+	 * usando os valores de hiperparâmetros fornecidos.
+	 * @param amsgrad aplicar correção.
+	 */
+	public Adam(boolean amsgrad) {
+		this(PADRAO_TA, PADRAO_BETA1, PADRAO_BETA2, PADRAO_EPS, amsgrad);
 	}
 
 	/**
@@ -183,7 +209,7 @@ public class Adam extends Otimizador {
 	 * </p>
 	 */
 	public Adam() {
-		this(PADRAO_TA, PADRAO_BETA1, PADRAO_BETA2, PADRAO_EPS);
+		this(PADRAO_TA, PADRAO_BETA1, PADRAO_BETA2, PADRAO_EPS, PADRAO_AMSGRAD);
 	}
 
 	@Override
@@ -192,9 +218,13 @@ public class Adam extends Otimizador {
 
 		m = new Tensor[0];
 		v = new Tensor[0];
+		if (amsgrad) vc = new Tensor[0];
 		for (Tensor t : _params) {
 			m = utils.addEmArray(m, new Tensor(t.shape()));
 			v = utils.addEmArray(v, new Tensor(t.shape()));
+			if (amsgrad) {
+				vc = utils.addEmArray(vc, new Tensor(t.shape()));
+			}
 		}
 
 		_construido = true;// otimizador pode ser usado
@@ -218,9 +248,20 @@ public class Adam extends Otimizador {
 				(v, g) -> v + ((1 - beta2) * ((g*g) - v))
 			);
 
-			_params[i].aplicar(_params[i], m[i], v[i], 
-				(p, m, v) -> p - (((alfa * m) / (Math.sqrt(v) + eps)))
-			);
+			if (amsgrad) {
+				vc[i].aplicar(vc[i], v[i],
+					(vc, v) -> Math.max(vc, v)
+				);
+
+				_params[i].aplicar(_params[i], m[i], vc[i], 
+					(p, m, vc) -> p - (((alfa * m) / (Math.sqrt(vc) + eps)))
+				);
+				
+			} else {
+				_params[i].aplicar(_params[i], m[i], v[i], 
+					(p, m, v) -> p - (((alfa * m) / (Math.sqrt(v) + eps)))
+				);
+			}
 		}
 	}
 
@@ -233,6 +274,7 @@ public class Adam extends Otimizador {
 		addInfo("Beta1: " + beta1);
 		addInfo("Beta2: " + beta2);
 		addInfo("Epsilon: " + eps);
+		addInfo("Amsgrad: " + amsgrad);
 
 		return super.info();
 	}
