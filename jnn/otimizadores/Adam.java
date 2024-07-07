@@ -117,7 +117,7 @@ public class Adam extends Otimizador {
 	/**
 	 * Contador de iterações.
 	 */
-	long iteracoes = 0;
+	long iteracoes = 0L;
  
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> Adam </strong> 

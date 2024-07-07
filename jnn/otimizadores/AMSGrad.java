@@ -68,7 +68,7 @@ public class AMSGrad extends Otimizador {
 	/**
 	 * Valor padrão para o decaimento do momento de primeira ordem.
 	 */
-	private static final double PADRAO_BETA1 = 0.95;
+	private static final double PADRAO_BETA1 = 0.9;
  
 	/**
 	 * Valor padrão para o decaimento do momento de segunda ordem.
@@ -211,15 +211,18 @@ public class AMSGrad extends Otimizador {
 		double fb2 = (1 - Math.pow(beta2, iteracoes));
 		
 		for (int i = 0; i < _params.length; i++) {
-			m[i].aplicar(m[i], _grads[i], (m, g) ->
-				(beta1 * m) + ((1 - beta1) * g)
+			m[i].aplicar(m[i], _grads[i], 
+				(m, g) -> (beta1 * m) + ((1 - beta1) * g)
 			);
+
 			v[i].aplicar(v[i], _grads[i], 
 				(v, g) -> (beta2 * v) + ((1 - beta2) * (g*g))
 			);
+
 			vc[i].aplicar(vc[i], v[i],
 				(vc, v) -> Math.max(vc, v)
 			);
+			
 			_params[i].aplicar(_params[i], m[i], v[i],
 				(p, m, v) -> p -= ((m/fb1) * tA) / (Math.sqrt(v/fb2) + eps)
 			);
