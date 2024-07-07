@@ -44,10 +44,15 @@ import jnn.otimizadores.RMSProp;
 import jnn.otimizadores.SGD;
 
 /**
- * Tradutor para as funções de ativação, otimizadores e funções de pperda 
+ * Tradutor para as funções de ativação, otimizadores e funções de perda 
  * e inicializadores.
  */
 public class Dicionario {
+
+	/**
+	 * Utilitário.
+	 */
+	private Utils utils = new Utils();
 
     /**
      * Tradutor para as funções de ativação, otimizadores, funções de perda 
@@ -58,7 +63,7 @@ public class Dicionario {
     /**
      * Remove caracteres especiais.
      * @param nome nome de alguma instância que o dicionário lê.
-     * @return valor do nome tratado.
+     * @return nome tratado.
      */
 	private String tratarNome(String nome) {
 		nome = nome.trim();
@@ -66,7 +71,7 @@ public class Dicionario {
 		nome = nome.replace("-", "");
 		nome = nome.replace(".", "");
 
-		return nome;
+		return nome.toLowerCase();
 	}
 
     /**
@@ -76,18 +81,14 @@ public class Dicionario {
      * @return instância da função de ativação lida.
      */
 	public Ativacao getAtivacao(Object ativacao) {
-		if (ativacao == null) {
-			throw new IllegalArgumentException(
-				"Ativação não pode ser nula."
-			);
+		utils.validarNaoNulo(ativacao, "Ativação nula.");
 		
-		} else if (ativacao instanceof Ativacao) {
+		if (ativacao instanceof Ativacao) {
 			return (Ativacao) ativacao;
 		
 		} else if (ativacao instanceof String) {
 			String nome = (String) ativacao;
-			nome = tratarNome(nome);
-			switch (nome.toLowerCase()) {
+			switch (tratarNome(nome)) {
 				case "argmax"     : return new Argmax();
 				case "elu"        : return new ELU();
 				case "gelu"       : return new GELU();
@@ -104,7 +105,7 @@ public class Dicionario {
 				case "selu"       : return new SELU();
 	
 				default: throw new IllegalArgumentException(
-				"Ativação \"" + ativacao + "\" não encontada."
+					"Ativação \"" + nome + "\" não encontada."
 				);
 			}
 
@@ -122,18 +123,14 @@ public class Dicionario {
      * @return instância do otimizador lido.
      */
 	public Otimizador getOtimizador(Object otimizador) {
-		if (otimizador == null) {
-			throw new IllegalArgumentException(
-				"Otimizador não pode ser nulo."
-			);
+		utils.validarNaoNulo(otimizador, "Otimizador nulo.");
 
-		} else if (otimizador instanceof Otimizador) {
+		if (otimizador instanceof Otimizador) {
 			return (Otimizador) otimizador;
 
 		} else if (otimizador instanceof String) {
 			String nome = (String) otimizador;
-			nome = tratarNome(nome);
-			switch (nome.toLowerCase()){
+			switch (tratarNome(nome)){
 				case "adadelta":  return new Adadelta();
 				case "adagrad":   return new AdaGrad();
 				case "adam":      return new Adam();
@@ -144,7 +141,7 @@ public class Dicionario {
 				case "sgd":       return new SGD();
 	
 				default: throw new IllegalArgumentException(
-				"Otimizador \"" + nome + "\" não encontado."
+					"Otimizador \"" + nome + "\" não encontado."
 				);
 			}
 
@@ -162,18 +159,14 @@ public class Dicionario {
      * @return instância da função de perda lida.
      */
 	public Perda getPerda(Object perda) {
-		if (perda == null) {
-			throw new IllegalArgumentException(
-				"Função de perda não pode ser nula."
-			);
+		utils.validarNaoNulo(perda, "Função de perda nula.");
 
-		} else if (perda instanceof Perda) {
+		if (perda instanceof Perda) {
 			return (Perda) perda;
 
 		} else if (perda instanceof String) {
 			String nome = (String) perda;
-			nome = tratarNome(nome);
-			switch (nome.toLowerCase()) {
+			switch (tratarNome(nome)) {
 				case "mse"                    : return new MSE();
 				case "mae"                    : return new MAE();
 				case "msle"                   : return new MSLE();
@@ -182,7 +175,7 @@ public class Dicionario {
 				case "entropiacruzadabinaria" : return new EntropiaCruzadaBinaria();
 	
 				default: throw new IllegalArgumentException(
-				"Função de perda \"" + perda + "\" não encontada."
+					"Função de perda \"" + nome + "\" não encontada."
 				);
 			}           
 		} else {
@@ -199,18 +192,14 @@ public class Dicionario {
      * @return instância do inicializador lido.
      */
 	public Inicializador getInicializador(Object inicializador) {
-		if (inicializador == null) {
-			throw new IllegalArgumentException(
-				"Inicializador não pode ser nulo."
-			);
+		utils.validarNaoNulo(inicializador, "Inicializador nulo.");
 
-		} else if (inicializador instanceof Inicializador) {
+		if (inicializador instanceof Inicializador) {
 			return (Inicializador) inicializador;
 		
 		} else if (inicializador instanceof String) {
 			String nome = (String) inicializador;
-			nome = tratarNome(nome);
-			switch (nome.toLowerCase()) {
+			switch (tratarNome(nome)) {
 				case "aleatorio"           : return new Aleatorio();
 				case "aleatoriopositivo"   : return new AleatorioPositivo();
 				case "constante"           : return new Constante();
@@ -223,7 +212,7 @@ public class Dicionario {
 				case "zeros"               : return new Zeros();
 				
 				default: throw new IllegalArgumentException(
-				"Inicializador \"" + inicializador + "\" não encontado."
+					"Inicializador \"" + nome + "\" não encontado."
 				);
 			}
 		
