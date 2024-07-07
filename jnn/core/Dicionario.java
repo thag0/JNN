@@ -33,7 +33,6 @@ import jnn.inicializadores.Identidade;
 import jnn.inicializadores.Inicializador;
 import jnn.inicializadores.LeCun;
 import jnn.inicializadores.Zeros;
-import jnn.otimizadores.AMSGrad;
 import jnn.otimizadores.AdaGrad;
 import jnn.otimizadores.Adadelta;
 import jnn.otimizadores.Adam;
@@ -134,7 +133,6 @@ public class Dicionario {
 				case "adadelta":  return new Adadelta();
 				case "adagrad":   return new AdaGrad();
 				case "adam":      return new Adam();
-				case "amsgrad":   return new AMSGrad();
 				case "gd":        return new GD();
 				case "nadam":     return new Nadam();
 				case "rmsprop":   return new RMSProp();
