@@ -429,7 +429,7 @@ public abstract class Modelo implements Cloneable {
 	 * <pre>
 	 * 	params = [k1, b1, k2, b2, k3, b3, ...]
 	 * </pre>
-	 * Onde: {@code k = kenrel} e {@code b = bias}.
+	 * Onde: {@code k = kernel} e {@code b = bias}.
 	 * @return array de {@code Tensor} contendo os parâmetros do modelo.
 	 */
 	public abstract Tensor[] parametros();
