@@ -93,6 +93,7 @@ public class MainImg {
 		);
 		
 		modelo.compilar(new SGD(0.0001, 0.999), "mse");
+		// modelo.compilar("adam", "mse");
 		modelo.setHistorico(calcularHistorico);
 
 		return modelo;
@@ -108,8 +109,8 @@ public class MainImg {
 	 * @return tempo (em nano segundos) do treino.
 	 */
 	static long treinoEmPainel(Modelo modelo, int altura, int largura, Tensor[] entradas, Tensor[] saidas) {
-		final int fps = 600000;
-		int epocasPorFrame = 50;
+		final int fps = 6000000;
+		int epocasPorFrame = 55;
 
 		//acelerar o processo de desenho
 		//bom em situações de janelas muito grandes

@@ -3,8 +3,6 @@ package jnn.treinamento;
 import java.util.ArrayList;
 
 import jnn.avaliacao.perda.Perda;
-import jnn.camadas.Camada;
-import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 import jnn.modelos.Modelo;
 import jnn.otimizadores.Otimizador;
@@ -18,11 +16,6 @@ class Treino {
 	 * Auxiliar.
 	 */
 	AuxTreino aux = new AuxTreino();
-	
-	/**
-	 * Utilitário.
-	 */
-	Utils utils = new Utils();
 
 	/**
 	 * Verificador para o calculo de perdas do modelo durante 
@@ -77,7 +70,6 @@ class Treino {
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
 	public void treinar(Modelo modelo, Tensor[] x, Tensor[] y, int epochs, boolean logs) {
-		Camada[] camadas = modelo.camadas();
 		Otimizador otimizador = modelo.otimizador();
 		Perda perda = modelo.perda();
 		int numAmostras = x.length;
@@ -97,7 +89,7 @@ class Treino {
 				}
 				
 				modelo.zerarGrad();
-				aux.backpropagation(camadas, perda, prev, y[i]);
+				aux.backpropagation(modelo, prev, y[i]);
 				otimizador.atualizar();
 			}
 

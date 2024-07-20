@@ -7,7 +7,6 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import javax.swing.JPanel;
 
@@ -17,8 +16,8 @@ import jnn.modelos.Modelo;
 public class PainelTreino extends JPanel {
    final int largura;
    final int altura;
+
    Modelo modelo;
-   double[] entradaRede;
 
    BufferedImage imagem;
    int epocaAtual = 0;
@@ -46,15 +45,15 @@ public class PainelTreino extends JPanel {
       
       int nEntrada = 2;
       int nSaida = modelo.camadaSaida().tamanhoSaida();
-      entradaRede = new double[nEntrada];
+      double[] entrada = new double[nEntrada];
 
       if (nSaida == 1) {//escala de cinza
          for (y = 0; y < this.altura; y++) {
             for (x = 0; x < this.largura; x++) {
-               entradaRede[0] = (double)x / this.largura;
-               entradaRede[1] = (double)y / this.altura;
+               entrada[0] = (double)x / this.largura;
+               entrada[1] = (double)y / this.altura;
 
-               modelo.forward(entradaRede);
+               modelo.forward(entrada);
 
                Variavel[] saida = modelo.saidaParaArray();
                int cinza = (int)(saida[0].get() * 255);
@@ -70,9 +69,9 @@ public class PainelTreino extends JPanel {
       } else if (nSaida == 3) {//rgb
          for (y = 0; y < this.altura; y++) {
             for (x = 0; x < this.largura; x++) {
-               entradaRede[0] = (double)x / this.largura;
-               entradaRede[1] = (double)y / this.altura;
-               modelo.forward(entradaRede);
+               entrada[0] = (double)x / this.largura;
+               entrada[1] = (double)y / this.altura;
+               modelo.forward(entrada);
 
                Variavel[] saida = modelo.saidaParaArray();
                r = (int)(saida[0].get() * 255);
@@ -89,89 +88,65 @@ public class PainelTreino extends JPanel {
    }
 
    public void desenhar(Modelo modelo, int epocasPorFrame, int numThreads) {
-      ExecutorService exec = Executors.newFixedThreadPool(numThreads);
-
-      Modelo[] clones = new Modelo[numThreads];
-      for (int i = 0; i < clones.length; i++) {
-         clones[i] = modelo.clone();
-      }
+      int numSaidas = modelo.camadaSaida().tamanhoSaida();
       
-      int alturaPorThread = this.altura / numThreads;
-      int restoAltura = this.altura % numThreads;
-      int nSaida = modelo.camadaSaida().tamanhoSaida();
-
-      for (int i = 0; i < numThreads; i++) {
-         final int id = i;
-         int inicioY = i * alturaPorThread;
-         int fimY = inicioY + alturaPorThread + ((i == numThreads-1) ? restoAltura : 0);
-
-         if (nSaida == 1) {
-            exec.submit(() -> calcularParteCinza(clones[id], inicioY, fimY));
-            
-         } else if(nSaida == 3) {
-            exec.submit(() -> calcularParteRGB(clones[id], inicioY, fimY));
+      Modelo[] clones = new Modelo[numThreads];
+      try (ExecutorService exec = Executors.newFixedThreadPool(numThreads)) {
+         for (int i = 0; i < numThreads; i++) {
+            final int id = i;
+            clones[id] = modelo.clone();
+   
+            exec.submit(() -> {
+               for (int j = id; j < altura; j += numThreads) {
+                  if (numSaidas == 1) calcCinza(clones[id], j);
+                  else if (numSaidas == 3) calcRgb(clones[id], j);
+               }
+            });
          }
       }
-
-      exec.shutdown();
-
-      try {
-         exec.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-
-      } catch (Exception e) {
-         throw new RuntimeException(e);
-      }
-
+      
       epocaAtual = epocasPorFrame;
       repaint();
    }
-
-   private void calcularParteCinza(Modelo modelo, int inicioY, int fimY) {
-      double[] entrada = new double[2];
-      double[] saida = new double[1];
-
-      int r, g, b, rgb, cinza;
-      int x, y;
-
-      for (y = inicioY; y < fimY; y++) {
-         for (x = 0; x < this.largura; x++) {
-            entrada[0] = (double) x / this.largura;
-            entrada[1] = (double) y / this.altura;
-
-            modelo.forward(entrada);
-            modelo.copiarDaSaida(saida);
+   
+   private void calcCinza(Modelo modelo, int y) {
+      double[] in = new double[2];
+      in[1] = (double) y / altura;
+      
+      int[] pixels = new int[largura];
+      int cinza, r, g, b;
+      for (int x = 0; x < largura; x++) {
+         in[0] = (double) x / largura;
+         cinza = (int)(modelo.forward(in).get(0) * 255);
             
-            cinza = (int)(saida[0] * 255);
-            r = cinza;
-            g = cinza;
-            b = cinza;
-            rgb = (r << 16) | (g << 8) | b;
-            imagem.setRGB(x, y, rgb);
-         }
+         r = cinza;
+         g = cinza;
+         b = cinza;
+         pixels[x] = (r << 16) | (g << 8) | b;
       }
+
+      imagem.setRGB(0, y, largura, 1, pixels, 0, largura);
    }
 
-   private void calcularParteRGB(Modelo modelo, int inicioY, int fimY) {
-      double[] entrada = new double[2];
+   private void calcRgb(Modelo modelo, int y) {
+      double[] in = new double[2];
+      in[1] = (double) y / altura;
+
+      int[] pixels = new int[largura];
       double[] saida = new double[3];
-      int r, g, b, rgb;
-      int x, y;
+      for (int x = 0; x < largura; x++) {
+         in[0] = (double) x / largura;
+         
+         modelo.forward(in);
+         modelo.copiarDaSaida(saida);
 
-      for (y = inicioY; y < fimY; y++) {
-         for (x = 0; x < this.largura; x++) {
-            entrada[0] = (double) x / this.largura;
-            entrada[1] = (double) y / this.altura;
-            
-            modelo.forward(entrada);
-            modelo.copiarDaSaida(saida);
-
-            r = (int) (saida[0] * 255);
-            g = (int) (saida[1] * 255);
-            b = (int) (saida[2] * 255);
-            rgb = (r << 16) | (g << 8) | b;
-            imagem.setRGB(x, y, rgb);
-         }
+         int r = (int) (saida[0] * 255);
+         int g = (int) (saida[1] * 255);
+         int b = (int) (saida[2] * 255);
+         pixels[x] = (r << 16) | (g << 8) | b;
       }
+      
+      imagem.setRGB(0, y, largura, 1, pixels, 0, largura);
    }
 
    @Override

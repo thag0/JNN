@@ -55,7 +55,7 @@ public class Utils {
 	 * </p>
 	 * <pre>
 	 *int[] arr = {2, 3};
-	 *arr.shapeStr == "(2, 3)"
+	 *arr.shapeStr -> "(2, 3)"
 	 * </pre>
 	 * @param arr array desejado.
 	 * @return formato das dimensões do array
@@ -81,7 +81,7 @@ public class Utils {
 	 * @param array array desejado.
 	 * @return array de {@code Tensores}.
 	 */
-	public Tensor[] array1DParaTensors(double[] array) {
+	public Tensor[] arrayParaTensores(double[] array) {
 		int n = array.length;
 
 		Tensor[] arr = new Tensor[n];
@@ -99,7 +99,7 @@ public class Utils {
 	 * @param array array desejado.
 	 * @return array de {@code Tensores}.
 	 */
-	public Tensor[] array2DParaTensors(double[][] array) {
+	public Tensor[] arrayParaTensores(double[][] array) {
 		int lin = array.length;
 		int col = array[0].length;
 
@@ -119,7 +119,7 @@ public class Utils {
 	 * @param array array desejado.
 	 * @return array de {@code Tensores}.
 	 */
-	public Tensor[] array3DParaTensors(double[][][] array) {
+	public Tensor[] arrayParaTensores(double[][][] array) {
 		Tensor[] arr = new Tensor[array.length];
 
 		int n = array.length;
@@ -137,7 +137,7 @@ public class Utils {
 	 * @param array array desejado.
 	 * @return array de {@code Tensores}.
 	 */
-	public Tensor[] array4DParaTensors(double[][][][] array) {
+	public Tensor[] arrayParaTensores(double[][][][] array) {
 		Tensor[] arr = new Tensor[array.length];
 
 		int n = array.length;
@@ -190,5 +190,27 @@ public class Utils {
 		
 		return novo;
 	}
+
+	/**
+	 * Separa um sub conjunto dos dados do array de acordo com os índices fornecidos.
+	 * @param <T> tipo de dados do array.
+	 * @param arr conjunto de dados desejado.
+	 * @param inicio indice inicial (inclusivo).
+	 * @param fim índice final (exclusivo).
+	 * @return sub conjunto dos dados fornecidos.
+	 */
+    public <T> T[] subArray(T[] arr, int inicio, int fim) {
+        if (inicio < 0 || fim > arr.length || inicio >= fim) {
+            throw new IllegalArgumentException("\nÍndices de início ou fim inválidos.");
+        }
+
+        int tamanho = fim - inicio;
+
+        @SuppressWarnings("unchecked")
+        T[] subArr = (T[]) Array.newInstance(arr.getClass().getComponentType(), tamanho);
+        System.arraycopy(arr, inicio, subArr, 0, tamanho);
+
+        return subArr;
+    }
 
 }

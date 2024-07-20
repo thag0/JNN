@@ -4,15 +4,10 @@ import jnn.core.tensor.Tensor;
 import jnn.modelos.Modelo;
 
 /**
- * Disponibilzia uma interface para usar os métodos de treino e treino em
- * lote da Rede Neural.
+ * Interface para usar os métodos de treino sequencial e treino em
+ * lote dos modelos.
  */
 public class Treinador {
-
-	/**
-	 * Auxiliar na verificação do cálculo do histórico de custos.
-	 */
-	public boolean calcularHistorico = false;
 
 	/**
 	 * Operador do treino sequencial.
@@ -28,8 +23,8 @@ public class Treinador {
 	 * Responsável por organizar os tipos dos modelos.
 	 */
 	public Treinador() {
-		treino =     new Treino(calcularHistorico);
-		treinoLote = new TreinoLote(calcularHistorico);
+		treino 	   = new Treino(false);
+		treinoLote = new TreinoLote(false);
 	}
 
 	/**
@@ -46,7 +41,6 @@ public class Treinador {
 	 * @param calcular calcular ou não o histórico de custo.
 	 */
 	public void setHistorico(boolean calcular) {
-		this.calcularHistorico = calcular;
 		treino.setHistorico(calcular);
 		treinoLote.setHistorico(calcular);
 	}
@@ -97,9 +91,9 @@ public class Treinador {
 			treino.ultimoUsado = true;
 		}
 
-		modelo.treino(false);
-
 		treino.ultimoUsado = treinoLote.ultimoUsado ? false : true;
+		
+		modelo.treino(false);
 	}
 
 	/**
@@ -108,11 +102,11 @@ public class Treinador {
 	 * @return lista com os custo por época durante a fase de treinamento.
 	 */
 	public double[] historico() {
-		Object[] historico = treino.ultimoUsado ? treino.historico() : treinoLote.historico();
-		double[] h = new double[historico.length];
+		Object[] hist = treino.ultimoUsado ? treino.historico() : treinoLote.historico();
+		double[] h = new double[hist.length];
 
 		for (int i = 0; i < h.length; i++) {
-			h[i] = (double) historico[i];
+			h[i] = (double) hist[i];
 		}
 
 		return h;

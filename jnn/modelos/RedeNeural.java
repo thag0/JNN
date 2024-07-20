@@ -638,30 +638,6 @@ public class RedeNeural extends Modelo {
 		return bias;
 	}
 
-	/**
-	 * Disponibiliza o histórico da função de perda da Rede Neural durante cada época
-	 * de treinamento.
-	 * <p>
-	 *    O histórico será o do ultimo processo de treinamento usado, seja ele sequencial ou em
-	 *    lotes. Sendo assim, por exemplo, caso o treino seja em sua maioria feito pelo modo sequencial
-	 *    mas logo depois é usado o treino em lotes, o histórico retornado será o do treinamento em lote.
-	 * </p>
-	 * @return lista contendo o histórico de perdas durante o treinamento da rede.
-	 * @throws IllegalArgumentException se não foi habilitado previamente o cálculo do 
-	 * histórico de custos.
-	 */
-	@Override
-	public double[] historico() {
-		if (_treinador.calcularHistorico) {
-			return _treinador.historico();   
-		
-		} else {
-			throw new UnsupportedOperationException(
-				"O histórico de treino da rede deve ser configurado previamente."
-			);
-		}
-	}
-
 	@Override
 	protected String construirInfo() {
 		StringBuilder sb = new StringBuilder();

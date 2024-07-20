@@ -3,7 +3,6 @@ package jnn.treinamento;
 import java.util.ArrayList;
 
 import jnn.avaliacao.perda.Perda;
-import jnn.camadas.Camada;
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 import jnn.modelos.Modelo;
@@ -79,7 +78,6 @@ class TreinoLote {
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
 	public void treinar(Modelo modelo, Tensor[] x, Tensor[] y, int epochs, int tamLote, boolean logs) {
-		Camada[] camadas = modelo.camadas();
 		Otimizador otimizador = modelo.otimizador();
 		Perda perda = modelo.perda();
 		int numAmostras = x.length;
@@ -92,8 +90,8 @@ class TreinoLote {
 
 			for (int i = 0; i < numAmostras; i += tamLote) {
 				int fimId = Math.min(i + tamLote, numAmostras);
-				Tensor[] loteX = aux.subArray(x, i, fimId);
-				Tensor[] loteY = aux.subArray(y, i, fimId);
+				Tensor[] loteX = utils.subArray(x, i, fimId);
+				Tensor[] loteY = utils.subArray(y, i, fimId);
 				
 				modelo.zerarGrad();// zerar gradientes para o acumular pelo lote
 				for (int j = 0; j < loteX.length; j++) {
@@ -103,10 +101,10 @@ class TreinoLote {
 						perdaEpoca += perda.calcular(prev, loteY[j]).item();
 					}
 
-					aux.backpropagation(camadas, perda, prev, loteY[j]);
+					aux.backpropagation(modelo, prev, loteY[j]);
 				}
 
-				otimizador.atualizar();          
+				otimizador.atualizar();      
 			}
 
 			if (logs) {

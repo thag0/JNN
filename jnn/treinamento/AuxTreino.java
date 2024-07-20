@@ -1,12 +1,9 @@
 package jnn.treinamento;
 
-import java.lang.reflect.Array;
-
 import java.util.Random;
 
-import jnn.avaliacao.perda.Perda;
-import jnn.camadas.Camada;
 import jnn.core.tensor.Tensor;
+import jnn.modelos.Modelo;
 
 /**
  * Classe auxiliar no treinamento, faz uso de ferramentas que podem
@@ -41,10 +38,12 @@ public class AuxTreino {
 	 * @param prev {@code Tensor} contendos os dados previstos.
 	 * @param real {@code Tensor} contendos os dados reais (rotulados).
 	 */
-	public void backpropagation(Camada[] camadas, Perda perda, Tensor prev, Tensor real) {
-		Tensor grad = perda.derivada(prev, real);
-		for (int i = camadas.length-1; i >= 0; i--) {
-			grad = camadas[i].backward(grad);
+	public void backpropagation(Modelo modelo, Tensor prev, Tensor real) {
+		Tensor grad = modelo.perda().derivada(prev, real);
+		final int n = modelo.numCamadas();
+		
+		for (int i = n-1; i >= 0; i--) {
+			grad = modelo.camada(i).backward(grad);
 		}
 	}
 
@@ -73,28 +72,6 @@ public class AuxTreino {
 			y[idAleatorio] = temp;
 		}
 	}
-
-	/**
-	 * Separa um sub conjunto dos dados do array de acordo com os índices fornecidos.
-	 * @param <T> tipo de dados do array.
-	 * @param arr conjunto de dados desejado.
-	 * @param inicio indice inicial (inclusivo).
-	 * @param fim índice final (exclusivo).
-	 * @return sub conjunto dos dados fornecidos.
-	 */
-    public <T> T[] subArray(T[] arr, int inicio, int fim) {
-        if (inicio < 0 || fim > arr.length || inicio >= fim) {
-            throw new IllegalArgumentException("Índices de início ou fim inválidos.");
-        }
-
-        int tamanho = fim - inicio;
-
-        @SuppressWarnings("unchecked")
-        T[] subArr = (T[]) Array.newInstance(arr.getClass().getComponentType(), tamanho);
-        System.arraycopy(arr, inicio, subArr, 0, tamanho);
-
-        return subArr;
-    }
 
 	/** 
 	 * Esconde o cursor do terminal.

@@ -454,7 +454,7 @@ public final class Funcional {
      * @return array de {@code Tensores}
      */
     public Tensor[] arrayParaTensores(double[] arr) {
-        return utils.array1DParaTensors(arr);
+        return utils.arrayParaTensores(arr);
     }
 
     /**
@@ -463,7 +463,7 @@ public final class Funcional {
      * @return array de {@code Tensores}
      */
     public Tensor[] arrayParaTensores(double[][] arr) {
-        return utils.array2DParaTensors(arr);
+        return utils.arrayParaTensores(arr);
     }
 
     /**
@@ -472,7 +472,7 @@ public final class Funcional {
      * @return array de {@code Tensores}
      */
     public Tensor[] arrayParaTensores(double[][][] arr) {
-        return utils.array3DParaTensors(arr);
+        return utils.arrayParaTensores(arr);
     }
 
     /**
@@ -481,7 +481,7 @@ public final class Funcional {
      * @return array de {@code Tensores}
      */
     public Tensor[] arrayParaTensores(double[][][][] arr) {
-        return utils.array4DParaTensors(arr);
+        return utils.arrayParaTensores(arr);
     }
 
 	/**

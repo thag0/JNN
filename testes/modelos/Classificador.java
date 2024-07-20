@@ -41,13 +41,13 @@ public class Classificador{
 		// carregando dados de treino e teste
 		double[][] inTreino  = (double[][]) ged.separarDadosEntrada(treino, numEntradas);
 		double[][] outTreino = (double[][]) ged.separarDadosSaida(treino, numSaidas);
-		Tensor[] treinoX = utils.array2DParaTensors(inTreino);
-		Tensor[] treinoY = utils.array2DParaTensors(outTreino);
+		Tensor[] treinoX = utils.arrayParaTensores(inTreino);
+		Tensor[] treinoY = utils.arrayParaTensores(outTreino);
 		
 		double[][] inTeste  = (double[][]) ged.separarDadosEntrada(teste, numEntradas);
 		double[][] outTeste = (double[][]) ged.separarDadosSaida(teste, numSaidas);
-		Tensor[] testeX = utils.array2DParaTensors(inTeste);
-		Tensor[] testeY = utils.array2DParaTensors(outTeste);
+		Tensor[] testeX = utils.arrayParaTensores(inTeste);
+		Tensor[] testeY = utils.arrayParaTensores(outTeste);
 
 		// criando e configurando o modelo
 		Sequencial modelo = new Sequencial(
