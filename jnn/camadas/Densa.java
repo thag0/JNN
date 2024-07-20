@@ -1,5 +1,7 @@
 package jnn.camadas;
 
+import java.util.Optional;
+
 import jnn.ativacoes.Ativacao;
 import jnn.ativacoes.Linear;
 import jnn.core.Dicionario;
@@ -85,7 +87,7 @@ public class Densa extends Camada implements Cloneable {
 	 * b = (neuronios)
 	 * </pre>
 	 */
-	public Tensor _bias;
+	public Optional<Tensor> _bias;
 
 	/**
 	 * Auxiliar na verificação do uso do bias na camada.
@@ -159,7 +161,7 @@ public class Densa extends Camada implements Cloneable {
 	 *    gradBias = (neuronios)
 	 * </pre>
 	 */
-	public Tensor _gradBias;
+	public Optional<Tensor> _gradBias;
 
 	/**
 	 * Função de ativação da camada
@@ -322,24 +324,24 @@ public class Densa extends Camada implements Cloneable {
 			);
 		}
 
-		if (this.numNeuronios < 1) {
+		if (numNeuronios < 1) {
 			throw new IllegalArgumentException(
 				"\nO número de neurônios para a camada Densa não foi definido."
 			);
 		}
 
-		_entrada =    new Tensor(this.tamEntrada);
-		_saida =      new Tensor(this.numNeuronios);
-		_kernel =      new Tensor(this.tamEntrada, this.numNeuronios);
-		_gradKernel =  new Tensor(_kernel.shape());
+		_entrada  	= new Tensor(tamEntrada);
+		_saida  	= new Tensor(numNeuronios);
+		_kernel 	= new Tensor(tamEntrada, numNeuronios);
+		_gradKernel = new Tensor(_kernel.shape());
 
 		if (usarBias) {
-			_bias =     new Tensor(_saida.shape());
-			_gradBias = new Tensor(_saida.shape());
+			_bias 	  = Optional.of(new Tensor(_saida.shape()));
+			_gradBias = Optional.of(new Tensor(_saida.shape()));
 		}
 
-		_somatorio =   new Tensor(_saida.shape());
-		_gradSaida =   new Tensor(_saida.shape());
+		_somatorio 	 = new Tensor(_saida.shape());
+		_gradSaida 	 = new Tensor(_saida.shape());
 		_gradEntrada = new Tensor(_entrada.shape());
 
 		setNomes();
@@ -359,7 +361,8 @@ public class Densa extends Camada implements Cloneable {
 		verificarConstrucao();
 
 		iniKernel.inicializar(_kernel);
-		if (usarBias) iniBias.inicializar(_bias);
+
+		_bias.ifPresent(b -> iniBias.inicializar(b));
 	}
 
 	@Override
@@ -378,25 +381,27 @@ public class Densa extends Camada implements Cloneable {
 		_kernel.nome("kernel");
 		_saida.nome("saida");
 		_somatorio.nome("somatório");
-		_gradSaida.nome("gradiente saída");
-		_gradEntrada.nome("gradiente entrada");
-		_gradKernel.nome("gradiente kernel");
+		_gradSaida.nome("grad saída");
+		_gradEntrada.nome("grad entrada");
+		_gradKernel.nome("grad kernel");
 
-		if (usarBias) {
-			_bias.nome("bias");
-			_gradBias.nome("gradiente bias");
-		}
+		_bias.ifPresent(b -> b.nome("bias"));
+		_gradBias.ifPresent(gb -> gb.nome("grad bias"));
 	}
 
 	/**
 	 * <h2>
-	 *    Propagação direta através da camada Densa
+	 *		Propagação direta através da camada Densa
 	 * </h2>
 	 * <p>
-	 *    Alimenta os dados de entrada para a saída da camada por meio da 
-	 *    multiplicação matricial entre a entrada recebida da camada e os pesos 
-	 *    da camada, em seguida é adicionado o bias caso ele seja configurado 
-	 *    no momento da inicialização.
+	 *		Alimenta os dados de entrada para a saída da camada por meio da 
+	 *		multiplicação matricial entre a entrada recebida e os pesos da 
+	 *		camada, em seguida é adicionado o bias caso ele seja configurado 
+	 *		no momento da inicialização.
+	 * </p>
+	 * <p>
+	 *		Após a propagação dos dados, a função de ativação da camada é aplicada
+	 *		ao resultado, que então é salvo da saída da camada.
 	 * </p>
 	 * <p>
 	 *    A expressão que define a saída é dada por:
@@ -406,8 +411,6 @@ public class Densa extends Camada implements Cloneable {
 	 *somatorio.add(bias)
 	 *saida = ativacao(somatorio)
 	 * </pre>
-	 * Após a propagação dos dados, a função de ativação da camada é aplicada
-	 * ao resultado do somatório e o resultado é salvo da saída da camada.
 	 * @param entrada dados de entrada que serão processados, objetos aceitos incluem:
 	 * {@code Tensor}, ou {@code double[]}.
 	 */
@@ -416,26 +419,10 @@ public class Densa extends Camada implements Cloneable {
 		verificarConstrucao();
 
 		if (entrada instanceof Tensor) {
-			Tensor e = (Tensor) entrada;
-			if (!_entrada.compararShape(e)) {
-				throw new IllegalArgumentException(
-					"\nTensor esperado para camada Densa de ser " + _entrada.shapeStr() + 
-					", mas possui " + e.shapeStr() + "."
-				);
-			}
-
-			_entrada.copiar(e);
+			_entrada.copiar((Tensor) entrada);
 
 		} else if (entrada instanceof double[]) {
-			double[] e = (double[]) entrada;
-			if (e.length != _entrada.tamanho()) {
-				throw new IllegalArgumentException(
-					"Dimensões incompatíveis entre a entrada recebida (" + e.length +") e a" +
-					" entrada da camada " + _entrada.tamanho()
-				);
-			}
-
-			_entrada.copiar(e);
+			_entrada.copiar((double[]) entrada);
 
 		} else {
 			throw new IllegalArgumentException(
@@ -447,9 +434,7 @@ public class Densa extends Camada implements Cloneable {
 		//feedforward
 		optensor.matMult(_entrada, _kernel, _somatorio);
 
-		if (usarBias) {
-			_somatorio.add(_bias);
-		}
+		_bias.ifPresent(b -> _somatorio.add(b));
 
 		ativacao.forward(_somatorio, _saida);
 
@@ -458,19 +443,17 @@ public class Densa extends Camada implements Cloneable {
 
 	/**
 	 * <h2>
-	 *    Propagação reversa através da camada Densa
+	 *		Propagação reversa através da camada Densa
 	 * </h2>
 	 * <p>
-	 *    Calcula os gradientes da camada para os pesos e bias baseado nos
-	 *    gradientes fornecidos.
+	 *		Calcula os gradientes da camada para os pesos e bias baseado nos
+	 *		gradientes fornecidos.
 	 * </p>
 	 * <p>
-	 *    Após calculdos, os gradientes em relação a entrada da camada são
-	 *    calculados e salvos em {@code gradEntrada} para serem retropropagados 
-	 *    para as camadas anteriores do modelo em que a camada estiver.
+	 *		Após calculdos, os gradientes em relação a entrada da camada são
+	 *		calculados e salvos em {@code gradEntrada} para serem retropropagados 
+	 *		para as camadas anteriores do modelo em que a camada estiver.
 	 * </p>
-	 * Resultados calculados ficam salvos nas prorpiedades {@code camada.gradPesos} e
-	 * {@code camada.gradBias}.
 	 * @param grad gradiente da camada seguinte, deve ser um objeto do tipo 
 	 * {@code Tensor} ou {@code double[]}.
 	 */
@@ -479,28 +462,14 @@ public class Densa extends Camada implements Cloneable {
 		verificarConstrucao();
 
 		if (grad instanceof Tensor) {
-			Tensor g = (Tensor) grad;
-			if (g.numDim() != 1) {
-				throw new IllegalArgumentException(
-					"\nTensor de entrada deve ter 1 dimensão, mas tem " + g.numDim() + "."
-				);
-			}
-			_gradSaida.copiar(g);
+			_gradSaida.copiar((Tensor) grad);
 
-		}else if (grad instanceof double[]) {
-			double[] g = (double[]) grad;
-			if (g.length != _gradSaida.tamanho()) {
-				throw new IllegalArgumentException(
-					"\nTamanho do gradiente recebido (" + g.length + ") incompatível com o " +
-					"suportado pela camada Densa (" + _gradSaida.tamanho() + ")."
-				);
-			}
-
-			_gradSaida.copiar(g);
+		} else if (grad instanceof double[]) {
+			_gradSaida.copiar((double[]) grad);
 		
 		}  else {
 			throw new IllegalArgumentException(
-				"\nO gradiente para a camada Densa deve ser do tipo " + this._gradSaida.getClass() +
+				"\nGradiente para a camada " + nome() + " deve ser do tipo " + _gradSaida.getClass() +
 				" ou \"double[]\", objeto recebido é do tipo \"" + grad.getClass().getTypeName() + "\""
 			);
 		}
@@ -513,15 +482,21 @@ public class Densa extends Camada implements Cloneable {
 		optensor.matMult(_entrada.transpor(), _gradSaida, temp1);
 		_gradKernel.add(temp1);
 
-		if (usarBias) {
-			_gradBias.add(_gradSaida);
-		}
+		_gradBias.ifPresent(gb -> gb.add(_gradSaida));
 
 		Tensor temp2 = new Tensor(_gradEntrada.shape());
 		optensor.matMult(_gradSaida, _kernel.transpor(), temp2);
 		_gradEntrada.copiar(temp2);
 
 		return _gradEntrada;
+	}
+
+	@Override
+	public void zerarGrad() {
+		verificarConstrucao();
+
+		_gradKernel.zerar();
+		_bias.ifPresent(b -> b.zerar());
 	}
 
 	@Override
@@ -564,7 +539,7 @@ public class Densa extends Camada implements Cloneable {
 
 	@Override
 	public boolean temBias() {
-		return usarBias;
+		return _bias.isPresent();
 	}
 
 	@Override
@@ -572,7 +547,7 @@ public class Densa extends Camada implements Cloneable {
 		verificarConstrucao();
 
 		int parametros = _kernel.tamanho();
-		if (usarBias) parametros += _bias.tamanho();
+		if (temBias()) parametros += bias().tamanho();
 
 		return parametros;
 	}
@@ -602,7 +577,7 @@ public class Densa extends Camada implements Cloneable {
 
 		sb.append(pad + "Bias:   ");
 		if (temBias()) {
-			sb.append(_bias.shapeStr() + "\n");
+			sb.append(_bias.get().shapeStr() + "\n");
 		} else {
 			sb.append(" n/a\n");
 		}
@@ -636,9 +611,9 @@ public class Densa extends Camada implements Cloneable {
 		clone._treinavel = this._treinavel;
 
 		clone.usarBias = this.usarBias;
-		if (this.usarBias) {
-			clone._bias = this._bias.clone();
-			clone._gradBias = this._gradBias.clone();
+		if (temBias()) {
+			clone._bias 	= Optional.of(bias());
+			clone._gradBias = Optional.of(gradBias());
 		}
 
 		clone._entrada = this._entrada.clone();
@@ -709,11 +684,9 @@ public class Densa extends Camada implements Cloneable {
 	public Tensor bias() {
 		verificarConstrucao();
 
-		if (usarBias) return _bias;
-
-		throw new IllegalStateException(
+		return _bias.orElseThrow(() -> new IllegalStateException(
 			"\nA camada " + nome() + " (" + id + ") não possui bias configurado."
-		);
+		));
 	}
 
 	@Override
@@ -724,7 +697,10 @@ public class Densa extends Camada implements Cloneable {
 	@Override
 	public Tensor gradBias() {
 		verificarConstrucao();
-		return _gradBias;
+
+		return _gradBias.orElseThrow(() -> new IllegalStateException(
+			"\nA camada " + nome() + " (" + id + ") não possui bias configurado."
+		));
 	}
 
 	@Override
@@ -747,7 +723,15 @@ public class Densa extends Camada implements Cloneable {
 	@Override
 	public void setGradBias(Variavel[] grads) {
 		verificarConstrucao();
-		_gradBias.copiarElementos(grads);
+
+		_gradBias.ifPresentOrElse(
+			gb -> gb.copiarElementos(grads),
+			() -> {
+				throw new IllegalStateException(
+					"\nA camada " + nome() + " (" + id + ") não possui bias configurado."
+				);
+			}
+		);
 	}
 
 	@Override
@@ -759,14 +743,15 @@ public class Densa extends Camada implements Cloneable {
 	@Override
 	public void setBias(Variavel[] bias) {
 		verificarConstrucao();
-		_bias.copiarElementos(bias);
+
+		_bias.ifPresentOrElse(
+			b -> b.copiarElementos(bias),
+			() -> {
+				throw new IllegalStateException(
+					"\nA camada " + nome() + " (" + id + ") não possui bias configurado."
+				);
+			}
+		);
 	}
 
-	@Override
-	public void zerarGrad() {
-		verificarConstrucao();
-
-		_gradKernel.zerar();
-		if (usarBias) _gradBias.zerar();
-	}
 }

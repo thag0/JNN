@@ -1,5 +1,7 @@
 package jnn.core.tensor;
 
+import java.util.Optional;
+
 /**
  * Auxiliar em operação para tensores.
  */
@@ -473,7 +475,7 @@ public class OpTensor {
 	 * @param bias {@code Tensor} contendo o bias da camada {@code (podendo ser nulo)}.
 	 * @param saida {@code Tensor} de destino do resultado.
 	 */
-	public void conv2DForward(Tensor entrada, Tensor kernel, Tensor bias, Tensor saida) {
+	public void conv2DForward(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
 		int[] shapeE = entrada.shape();
 		int[] shapeK = kernel.shape();
 		int[] shapeS = saida.shape();
@@ -528,16 +530,16 @@ public class OpTensor {
 			}
 		}
 
-		if (bias != null) {
+		bias.ifPresent(b -> {
 			for (int i = 0; i < numFiltros; i++) {
-				double b = bias.get(i);
+				double val = b.get(i);
 				for (int j = 0; j < altSaida; j++) {
 					for (int k = 0; k < largSaida; k++) {
-						saida.add(b, i, j, k);
+						saida.add(val, i, j, k);
 					}
 				}
 			}
-		}
+		});
 	}
 
 	/**
@@ -549,7 +551,7 @@ public class OpTensor {
 	 * @param gradB {@code Tensor} contendo o gradiente em relação ao bias da camada {@code (podendo ser nulo)}.
 	 * @param gradE {@code Tensor} contendo o gradiente em relação à entrada da camada.
 	 */
-	public void conv2DBackward(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Tensor gradB, Tensor gradE) {
+	public void conv2DBackward(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
 		int[] shapeE = entrada.shape();
 		int[] shapeK = kernel.shape();
 		int[] shapeS = gradS.shape();
@@ -563,7 +565,8 @@ public class OpTensor {
 		final int largK = shapeK[3];
 		final int altS = shapeS[1];
 		final int largS = shapeS[2];
-		final boolean temBias = gradB != null;
+
+		boolean temBias = gradB.isPresent();
 
 		// NOTA
 		// essa ainda não é a melhor solução, mas é mais eficiente que 
@@ -651,7 +654,7 @@ public class OpTensor {
 							soma += gradS.get(i, j, k);
 						}
 					}
-					gradB.add(soma, i);
+					gradB.get().add(soma, i);
 				}
 			});
 			t3.start();
