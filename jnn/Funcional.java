@@ -493,7 +493,7 @@ public final class Funcional {
      */
     public Tensor normalizar(Tensor t, double min, double max) {
         Tensor norm = new Tensor(t);
-        return norm.normalizar(min, max);
+        return norm.norm(min, max);
     }
     
 }

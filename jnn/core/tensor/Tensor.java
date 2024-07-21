@@ -7,8 +7,6 @@ import jnn.serializacao.SerialTensor;
 
 import java.util.function.DoubleBinaryOperator;
 
-//TODO broadcasting entre tensores
-
 /**
  * <h2>
  *		Tensor multidimensional
@@ -311,10 +309,10 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @param dim array contendo as novas dimensões.
 	 * @return instância local alterada.
 	 */
-	public Tensor reshape(int... dims) {
-		int tamInicial = calcularTamanho(shape);
+	public Tensor reshape(int... shape) {
+		int tamInicial = calcularTamanho(this.shape);
 
-		int[] novoShape = copiarShape(dims);
+		int[] novoShape = copiarShape(shape);
 		int novoTam = calcularTamanho(novoShape);
 
 		if (tamInicial != novoTam) {
@@ -331,11 +329,11 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 
 	/**
 	 * Cria uma nova visualização do tensor com as dimensões especificadas.
-	 * @param dims dimensões desejadas.
+	 * @param shape dimensões desejadas.
 	 * @return {@code Tensor} com a visualização desejada.
 	 */
-	public Tensor view(int... dims) {
-		return new Tensor(dados, dims);
+	public Tensor view(int... shape) {
+		return new Tensor(dados, shape);
 	}
 
 	/**
@@ -808,9 +806,85 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
         int n = tamanho();
         for (int i = 0; i < n; i++) {
             dados[i].add(tensor.dados[i]);
-        }
+		}
 
         return this;
+    }
+
+	/**
+	 * Adiciona localmente o resultado da adição elemento a elemento entre 
+	 * os tensores A e B.
+	 * <p>
+	 * 		Podendo ser expresso por:
+	 * </p>
+	 * <pre>
+	 *		this += (a + b)
+	 * </pre>
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @return instância local alterada.
+	 */
+    public Tensor addSoma(Tensor a, Tensor b) {
+		return aplicar(this, a, b, 
+			(t, t1, t2) -> t += (t1 + t2)
+		);
+    }
+
+	/**
+	 * Adiciona localmente o resultado da diferença elemento a elemento entre 
+	 * os tensores A e B.
+	 * <p>
+	 * 		Podendo ser expresso por:
+	 * </p>
+	 * <pre>
+	 *		this += (a - b)
+	 * </pre>
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @return instância local alterada.
+	 */
+    public Tensor addSub(Tensor a, Tensor b) {
+		return aplicar(this, a, b, 
+			(t, t1, t2) -> t += (t1 - t2)
+		);
+    }
+
+	/**
+	 * Adiciona localmente o resultado da multiplicação elemento a elemento entre 
+	 * os tensores A e B.
+	 * <p>
+	 * 		Podendo ser expresso por:
+	 * </p>
+	 * <pre>
+	 *		this += (a * b)
+	 * </pre>
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @return instância local alterada.
+	 */
+    public Tensor addMult(Tensor a, Tensor b) {
+		return aplicar(this, a, b, 
+			(t, t1, t2) -> t += (t1 * t2)
+		);
+    }
+
+	/**
+	 * Adiciona localmente o resultado da divisão elemento a elemento entre 
+	 * os tensores A e B.
+	 * <p>
+	 * 		Podendo ser expresso por:
+	 * </p>
+	 * <pre>
+	 *		this += (a / b)
+	 * </pre>
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @return instância local alterada.
+	 */
+    public Tensor addDiv(Tensor a, Tensor b) {
+		return aplicar(this, a, b, 
+			(t, t1, t2) -> t += (t1 / t2)
+		);
     }
 
 	/**
@@ -849,6 +923,82 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
     }
 
 	/**
+	 * Subtrai localmente o resultado da adição elemento a elemento entre 
+	 * os tensores A e B.
+	 * <p>
+	 * 		Podendo ser expresso por:
+	 * </p>
+	 * <pre>
+	 *		this -= (a + b)
+	 * </pre>
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @return instância local alterada.
+	 */
+    public Tensor subSoma(Tensor a, Tensor b) {
+		return aplicar(this, a, b, 
+			(t, t1, t2) -> t -= (t1 + t2)
+		);
+    }
+
+	/**
+	 * Subtrai localmente o resultado da diferença elemento a elemento entre 
+	 * os tensores A e B.
+	 * <p>
+	 * 		Podendo ser expresso por:
+	 * </p>
+	 * <pre>
+	 *		this -= (a - b)
+	 * </pre>
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @return instância local alterada.
+	 */
+    public Tensor subSub(Tensor a, Tensor b) {
+		return aplicar(this, a, b, 
+			(t, t1, t2) -> t -= (t1 - t2)
+		);
+    }
+
+	/**
+	 * Subtrai localmente o resultado da multiplicação elemento a elemento entre 
+	 * os tensores A e B.
+	 * <p>
+	 * 		Podendo ser expresso por:
+	 * </p>
+	 * <pre>
+	 *		this -= (a * b)
+	 * </pre>
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @return instância local alterada.
+	 */
+    public Tensor subMult(Tensor a, Tensor b) {
+		return aplicar(this, a, b, 
+			(t, t1, t2) -> t -= (t1 * t2)
+		);
+    }
+
+	/**
+	 * Subtrai localmente o resultado da divisão elemento a elemento entre 
+	 * os tensores A e B.
+	 * <p>
+	 * 		Podendo ser expresso por:
+	 * </p>
+	 * <pre>
+	 *		this -= (a / b)
+	 * </pre>
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @return instância local alterada.
+	 */
+    public Tensor subDiv(Tensor a, Tensor b) {
+		return aplicar(this, a, b, 
+			(t, t1, t2) -> t -= (t1 / t2)
+		);
+    }
+
+	/**
 	 * Subtrai o valor informado ao conteúdo do tensor.
 	 * @param valor valor desejado.
 	 * @param ids índices desejados para adição.
@@ -884,6 +1034,82 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
     }
 
 	/**
+	 * Multiplica localmente o resultado da adição elemento a elemento entre 
+	 * os tensores A e B.
+	 * <p>
+	 * 		Podendo ser expresso por:
+	 * </p>
+	 * <pre>
+	 *		this *= (a + b)
+	 * </pre>
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @return instância local alterada.
+	 */
+    public Tensor multSoma(Tensor a, Tensor b) {
+		return aplicar(this, a, b, 
+			(t, t1, t2) -> t *= (t1 + t2)
+		);
+    }
+
+	/**
+	 * Multiplica localmente o resultado da subtração elemento a elemento entre 
+	 * os tensores A e B.
+	 * <p>
+	 * 		Podendo ser expresso por:
+	 * </p>
+	 * <pre>
+	 *		this *= (a - b)
+	 * </pre>
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @return instância local alterada.
+	 */
+    public Tensor multSub(Tensor a, Tensor b) {
+		return aplicar(this, a, b, 
+			(t, t1, t2) -> t *= (t1 - t2)
+		);
+    }
+
+	/**
+	 * Multiplica localmente o resultado da multiplicação elemento a elemento entre 
+	 * os tensores A e B.
+	 * <p>
+	 * 		Podendo ser expresso por:
+	 * </p>
+	 * <pre>
+	 *		this *= (a * b)
+	 * </pre>
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @return instância local alterada.
+	 */
+    public Tensor multMult(Tensor a, Tensor b) {
+		return aplicar(this, a, b, 
+			(t, t1, t2) -> t *= (t1 * t2)
+		);
+    }
+
+	/**
+	 * Multiplica localmente o resultado da divisão elemento a elemento entre 
+	 * os tensores A e B.
+	 * <p>
+	 * 		Podendo ser expresso por:
+	 * </p>
+	 * <pre>
+	 *		this *= (a * b)
+	 * </pre>
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @return instância local alterada.
+	 */
+    public Tensor multDiv(Tensor a, Tensor b) {
+		return aplicar(this, a, b, 
+			(t, t1, t2) -> t *= (t1 / t2)
+		);
+    }
+
+	/**
 	 * Multiplica o valor informado ao conteúdo do tensor.
 	 * @param valor valor desejado.
 	 * @param ids índices desejados para adição.
@@ -916,6 +1142,82 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
         }
 
         return this;
+    }
+
+	/**
+	 * Divide localmente o resultado da adição elemento a elemento entre 
+	 * os tensores A e B.
+	 * <p>
+	 * 		Podendo ser expresso por:
+	 * </p>
+	 * <pre>
+	 *		this /= (a + b)
+	 * </pre>
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @return instância local alterada.
+	 */
+    public Tensor divSoma(Tensor a, Tensor b) {
+		return aplicar(this, a, b, 
+			(t, t1, t2) -> t /= (t1 + t2)
+		);
+    }
+
+	/**
+	 * Divide localmente o resultado da subtração elemento a elemento entre 
+	 * os tensores A e B.
+	 * <p>
+	 * 		Podendo ser expresso por:
+	 * </p>
+	 * <pre>
+	 *		this /= (a - b)
+	 * </pre>
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @return instância local alterada.
+	 */
+    public Tensor divSub(Tensor a, Tensor b) {
+		return aplicar(this, a, b, 
+			(t, t1, t2) -> t /= (t1 - t2)
+		);
+    }
+
+	/**
+	 * Divide localmente o resultado da multiplicação elemento a elemento entre 
+	 * os tensores A e B.
+	 * <p>
+	 * 		Podendo ser expresso por:
+	 * </p>
+	 * <pre>
+	 *		this /= (a * b)
+	 * </pre>
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @return instância local alterada.
+	 */
+    public Tensor divMult(Tensor a, Tensor b) {
+		return aplicar(this, a, b, 
+			(t, t1, t2) -> t /= (t1 * t2)
+		);
+    }
+
+	/**
+	 * Divide localmente o resultado da divisão elemento a elemento entre 
+	 * os tensores A e B.
+	 * <p>
+	 * 		Podendo ser expresso por:
+	 * </p>
+	 * <pre>
+	 *		this /= (a / b)
+	 * </pre>
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @return instância local alterada.
+	 */
+    public Tensor divDiv(Tensor a, Tensor b) {
+		return aplicar(this, a, b, 
+			(t, t1, t2) -> t /= (t1 / t2)
+		);
     }
 
 	/**
@@ -1088,7 +1390,8 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 			);
 		}
 
-		for (int i = 0; i < dados.length; i++) {
+		int n = tamanho();
+		for (int i = 0; i < n; i++) {
 			dados[i].set(fun.applyAsDouble(dados[i].get()));
 		}
 
@@ -1126,7 +1429,8 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 			);
 		}
 
-		for (int i = 0; i < dados.length; i++) {
+		int n = tamanho();
+		for (int i = 0; i < n; i++) {
 			dados[i].set(fun.applyAsDouble(tensor.dados[i].get()));
 		}
 
@@ -1177,7 +1481,8 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 			);
 		}
 
-		for (int i = 0; i < dados.length; i++) {
+		int n = tamanho();
+		for (int i = 0; i < n; i++) {
 			dados[i].set(fun.applyAsDouble(a.dados[i].get(), b.dados[i].get()));
 		}
 
@@ -1232,7 +1537,8 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 			);
 		}
 
-		for (int i = 0; i < dados.length; i++) {
+		int n = tamanho();
+		for (int i = 0; i < n; i++) {
 			dados[i].set(
 				fun.applyAsDouble(
 					a.dados[i].get(), b.dados[i].get(), c.dados[i].get()
@@ -1272,13 +1578,14 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	public Tensor map(DoubleUnaryOperator fun) {
 		if (fun == null) {
 			throw new IllegalArgumentException(
-				"\nFunção recebida é nula."
+				"\nFunção nula."
 			);
 		}
 
 		Tensor t = new Tensor(shape());
 
-		for (int i = 0; i < t.tamanho(); i++) {
+		int n = tamanho();
+		for (int i = 0; i < n; i++) {
 			t.dados[i].set(fun.applyAsDouble(dados[i].get()));
 		}
 
@@ -1320,7 +1627,8 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 
 		Tensor t = new Tensor(shape());
 
-		for (int i = 0; i < t.tamanho(); i++) {
+		int n = tamanho();
+		for (int i = 0; i < n; i++) {
 			t.dados[i].set(fun.applyAsDouble(dados[i].get(), tensor.dados[i].get()));
 		}
 
@@ -1361,13 +1669,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return {@code Tensor} resultado.
 	 */
     public Tensor soma() {
-        double soma = 0.0d;
-        final int n = tamanho();
-        for (int i = 0; i < n; i++) {
-            soma += dados[i].get();
-        }
-
-        return new Tensor(new Variavel[]{ new Variavel(soma) }, 1);
+		return reduce(0.0, (x, y) -> x + y);
     }
 
 	/**
@@ -1377,7 +1679,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 */
 	public Tensor media() {
         double media = soma().item() / tamanho();
-        return new Tensor(new Variavel[]{ new Variavel(media) }, 1);
+        return new Tensor(new double[]{ media }, 1);
     }
 
 	/**
@@ -1385,7 +1687,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
      * elementos da instância local.
 	 * @return {@code Tensor} resultado.
 	 */
-	public Tensor maximo() {
+	public Tensor max() {
 		double max = dados[0].get();
 		final int tam = tamanho();
 
@@ -1393,7 +1695,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 			if (dados[i].get() > max) max = dados[i].get();
 		}
 
-		return new Tensor(new Variavel[]{ new Variavel(max) }, 1);
+		return new Tensor(new double[]{ max }, 1);
 	}
 
 	/**
@@ -1401,7 +1703,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
      * elementos da instância local.
 	 * @return {@code Tensor} resultado.
 	 */
-	public Tensor minimo() {
+	public Tensor min() {
 		double min = dados[0].get();
 		final int tam = tamanho();
 
@@ -1409,7 +1711,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 			if (dados[i].get() < min) min = dados[i].get();
 		}
 
-		return new Tensor(new Variavel[]{ new Variavel(min) }, 1);
+		return new Tensor(new double[]{ min }, 1);
 	}
 
 	/**
@@ -1426,9 +1728,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 			soma += Math.pow(dados[i].get() - media, 2);
 		}
 
-		return new Tensor(new Variavel[]{ 
-			new Variavel(Math.sqrt(soma / tamanho()))
-		}, 1);
+		return new Tensor(new double[]{ Math.sqrt(soma / tamanho()) }, 1);
 	}
 
 	/**
@@ -1437,18 +1737,14 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @param max valor máximo do intervalo.
 	 * @return instância local alterada.
 	 */
-	public Tensor normalizar(double min, double max) {
-		double valMin = minimo().item();
-		double valMax = maximo().item();
+	public Tensor norm(double min, double max) {
+		double valMin = min().item();
+		double valMax = max().item();
 
 		double intOriginal = valMax - valMin;
 		double intNovo = max - min;
 
-		aplicar(x -> {
-			return ((x - valMin) / intOriginal) * intNovo + min;
-		});
-
-		return this;
+		return aplicar(x -> ((x - valMin) / intOriginal) * intNovo + min);
 	}
 
 	/**
@@ -1548,7 +1844,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return dimensões do tensor.
 	 */
     public int[] shape() {
-        return shape;
+        return shape.clone();
     }
 
 	/**
@@ -1579,7 +1875,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		if (!compararShape(tensor)) return false;
 
 		for (int i = 0; i < dados.length; i++) {
-			if (dados[i].get() != tensor.dados[i].get()) return false;
+			if (dados[i].equals(tensor.dados[i])) return false;
 		}
 
 		return true;
@@ -1689,8 +1985,9 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return conteúdo do tensor.
 	 */
 	public double[] paraArrayDouble() {
-		double[] arr = new double[dados.length];
-		for (int i = 0; i < arr.length; i++) {
+		final int n = tamanho();
+		double[] arr = new double[n];
+		for (int i = 0; i < n; i++) {
 			arr[i] = dados[i].get();
 		}
 
