@@ -177,21 +177,12 @@ public class Dropout extends Camada implements Cloneable {
 		verificarConstrucao();
 
 		if (entrada instanceof Tensor) {
-			Tensor e = (Tensor) entrada;
-			if (!_entrada.compararShape(e)) {
-				throw new IllegalArgumentException(
-					"\nTensor de entrada deve tem formato" + e.shapeStr() + 
-					", esperado formato " + _entrada.shapeStr() + "."
-				);
-			}
-
-			_entrada.copiar(e);
-	
-		}  else {
+			_entrada.copiar((Tensor) entrada);
+			
+		} else {
 			throw new IllegalArgumentException(
-				"\nEntrada aceita para a camada de Dropout deve ser do tipo " +
-				_entrada.getClass().getSimpleName() + 
-				" , objeto recebido é do tipo \"" + entrada.getClass().getTypeName() + "\"."
+				"\nTipo de entrada \"" + entrada.getClass().getTypeName() + "\"" +
+				" não suportada."
 			);
 		}
 
@@ -244,21 +235,12 @@ public class Dropout extends Camada implements Cloneable {
 		verificarConstrucao();
 
 		if (grad instanceof Tensor) {
-			Tensor g = (Tensor) grad;
-			if (!_entrada.compararShape(g)) {
-				throw new IllegalArgumentException(
-					"\nGradiente recebido tem formato" + g.shapeStr() + 
-					", esperado formato " + _gradEntrada.shapeStr() + "."
-				);
-			}
-
-			_gradEntrada.copiar(g);
+			_gradEntrada.copiar((Tensor) grad);
 
 		} else {
 			throw new IllegalArgumentException(
-				"\nGradiente aceito para a camada de Dropout deve ser do tipo " + 
-				this._gradEntrada.getClass().getTypeName() +
-				" ,objeto recebido é do tipo \"" + grad.getClass().getTypeName() + "\"."
+				"\nTipo de gradiente \"" + grad.getClass().getTypeName() + "\"" +
+				" não suportado."
 			);
 		}
 

@@ -604,14 +604,11 @@ public class Conv2D extends Camada implements Cloneable {
 		
 		} else {
 			throw new IllegalArgumentException(
-				"\nDados de entrada para a camada " + nome() + " devem ser " +
-				"do tipo " + _entrada.getClass().getSimpleName() + 
-				" ou double[][][], objeto recebido é do tipo \"" + 
-				entrada.getClass().getTypeName() + "\"."
+				"\nTipo de entrada \"" + entrada.getClass().getTypeName() + "\"" +
+				" não suportada."
 			);
 		}
-
-		// feedforward
+		
 		_somatorio.zerar();// zerar valores pre-calculados
 		optensor.conv2DForward(_entrada, _kernel, _bias, _somatorio);
 
@@ -644,17 +641,18 @@ public class Conv2D extends Camada implements Cloneable {
 		if (grad instanceof Tensor) {
 			_gradSaida.copiar((Tensor) grad);
 
+		} else if (grad instanceof double[][][]) {
+			_gradSaida.copiar((double[][][]) grad);
+
 		} else {
 			throw new IllegalArgumentException(
-				"Os gradientes para a camada Convolucional devem ser " +
-				"do tipo \"" + _gradSaida.getClass().getTypeName() + 
-				"\", objeto recebido é do tipo \"" + grad.getClass().getTypeName() + "\""
+				"\nTipo de gradiente \"" + grad.getClass().getTypeName() + "\"" +
+				" não suportado."
 			);
 		}
 
 		ativacao.backward(this);
-		
-		//backward
+
 		_gradEntrada.zerar();
 		Tensor temp = new Tensor(_gradKernel.shape());
 		

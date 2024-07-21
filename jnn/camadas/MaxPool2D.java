@@ -264,23 +264,15 @@ public class MaxPool2D extends Camada implements Cloneable{
 		verificarConstrucao();
 
 		if (entrada instanceof Tensor) {
-			Tensor e = (Tensor) entrada;
-
-			if (!_entrada.compararShape(e)) {
-				throw new IllegalArgumentException(
-					"\nDimensões da entrada recebida " + e.shapeStr() +
-					" incompatíveis com a entrada da camada " + _entrada.shapeStr()
-				);
-			}
-
-			_entrada.copiar(e);
+			_entrada.copiar((Tensor) entrada);
 			
 		} else if (entrada instanceof double[][][]) {
 			_entrada.copiar((double[][][]) entrada);
 
 		} else {
 			throw new IllegalArgumentException(
-				"\nTipo de entrada \"" + entrada.getClass().getTypeName() + "\" não suportada."
+				"\nTipo de entrada \"" + entrada.getClass().getTypeName() + "\"" +
+				" não suportada."
 			);
 		}
 
@@ -342,8 +334,8 @@ public class MaxPool2D extends Camada implements Cloneable{
 		
 		} else {
 			throw new IllegalArgumentException(
-				"Formato de gradiente \" "+ grad.getClass().getTypeName() +" \" não " +
-				"suportado para camada de MaxPooling."
+				"\nTipo de gradiente \"" + grad.getClass().getTypeName() + "\"" +
+				" não suportado."
 			);
 		}
 

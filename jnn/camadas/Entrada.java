@@ -70,16 +70,28 @@ public class Entrada extends Camada {
 
 	@Override
 	public Tensor forward(Object entrada) {
-		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui cálculo de saída."
-		);
+		if (entrada instanceof Tensor) {
+			return (Tensor) entrada;
+		
+		} else {
+			throw new IllegalArgumentException(
+				"\nTipo de entrada \"" + entrada.getClass().getTypeName() + "\"" +
+				" não suportada."
+			);
+		}
 	}
 
 	@Override
 	public Tensor backward(Object grad) {
-		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui cálculo de gradientes."
-		);
+		if (grad instanceof Tensor) {
+			return (Tensor) grad;
+		
+		} else {
+			throw new IllegalArgumentException(
+				"\nTipo de gradiente \"" + grad.getClass().getTypeName() + "\"" +
+				" não suportada."
+			);
+		}
 	}
 
 	@Override

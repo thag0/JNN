@@ -244,7 +244,7 @@ public class AvgPool2D extends Camada {
 	@Override
 	protected void setNomes() {
 		_entrada.nome("entrada");
-		_gradEntrada.nome("gradiente entrada");
+		_gradEntrada.nome("grad entrada");
 		_saida.nome("saída");
 	}
 
@@ -253,24 +253,15 @@ public class AvgPool2D extends Camada {
 		verificarConstrucao();
 
 		if (entrada instanceof Tensor) {
-			Tensor e = (Tensor) entrada;
-
-			if (!(_entrada.compararShape(e))) {
-				throw new IllegalArgumentException(
-					"\nDimensões da entrada recebida " + e.shapeStr() +
-					" incompatíveis com a entrada da camada " + this._entrada.shapeStr()
-				);
-			}
-
-			_entrada.copiar(e);
+			_entrada.copiar((Tensor) entrada);
 			
 		} else if (entrada instanceof double[][][]) {
-			double[][][] e = (double[][][]) entrada;
-			_entrada.copiar(e);
+			_entrada.copiar((double[][][]) entrada);
 
 		} else {
 			throw new IllegalArgumentException(
-				"\nTipo de entrada \"" + entrada.getClass().getTypeName() + "\" não suportada."
+				"\nTipo de entrada \"" + entrada.getClass().getTypeName() + "\"" +
+				" não suportada."
 			);
 		}
 
@@ -332,8 +323,8 @@ public class AvgPool2D extends Camada {
 		
 		} else {
 			throw new IllegalArgumentException(
-				"Formato de gradiente \" "+ grad.getClass().getTypeName() +" \" não " +
-				"suportado para camada de AvgPooling."
+				"\nTipo de gradiente \"" + grad.getClass().getTypeName() + "\"" +
+				" não suportado."
 			);
 		}
 

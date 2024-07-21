@@ -165,19 +165,12 @@ public class Flatten extends Camada implements Cloneable{
 		verificarConstrucao();
 
 		if (entrada instanceof Tensor) {
-			Tensor e = (Tensor) entrada;
-			if (!_entrada.compararShape(e)) {
-				throw new IllegalArgumentException(
-					"\nDimensões da entrada recebida " + e.shapeStr() +
-					" incompatíveis com a entrada da camada " + _entrada.shapeStr()
-				);
-			}
-
-			_entrada.copiar(e);
+			_entrada.copiar((Tensor) entrada);
 
 		} else {
 			throw new IllegalArgumentException(
-				"A camada Flatten não suporta entradas do tipo \"" + entrada.getClass().getTypeName() + "\"."
+				"\nTipo de entrada \"" + entrada.getClass().getTypeName() + "\"" +
+				" não suportada."
 			);
 		}
 
@@ -199,19 +192,12 @@ public class Flatten extends Camada implements Cloneable{
 		verificarConstrucao();
 
 		if (grad instanceof Tensor) {
-			Tensor g = (Tensor) grad;
-			if (_gradEntrada.compararShape(g)) {
-				throw new IllegalArgumentException(
-					"\nDimensões do gradiente recebido " + g.shapeStr() +
-					"inconpatíveis com o suportado pela camada " + _gradEntrada.shapeStr()
-				);
-			}
-
-			_gradEntrada.copiarElementos(g);
+			_gradEntrada.copiarElementos((Tensor) grad);
 		
 		} else {
 			throw new IllegalArgumentException(
-				"A camada Flatten não suporta gradientes do tipo \"" + grad.getClass().getTypeName() + "\"."
+				"\nTipo de gradiente \"" + grad.getClass().getTypeName() + "\"" +
+				" não suportado."
 			);
 		}
 

@@ -426,7 +426,7 @@ public class Densa extends Camada implements Cloneable {
 
 		} else {
 			throw new IllegalArgumentException(
-				"Tipo de entrada \"" + entrada.getClass().getTypeName() + "\"" +
+				"\nTipo de entrada \"" + entrada.getClass().getTypeName() + "\"" +
 				" não suportada."
 			);
 		}
@@ -464,14 +464,13 @@ public class Densa extends Camada implements Cloneable {
 		} else if (grad instanceof double[]) {
 			_gradSaida.copiar((double[]) grad);
 		
-		}  else {
+		} else {
 			throw new IllegalArgumentException(
-				"\nGradiente para a camada " + nome() + " deve ser do tipo " + _gradSaida.getClass() +
-				" ou \"double[]\", objeto recebido é do tipo \"" + grad.getClass().getTypeName() + "\""
+				"\nTipo de gradiente \"" + grad.getClass().getTypeName() + "\"" +
+				" não suportado."
 			);
 		}
-
-		//backward
+		
 		ativacao.backward(this);
 		
 		optensor.densaBackward(_entrada, _kernel, _gradSaida, _gradKernel, _gradBias, _gradEntrada);
