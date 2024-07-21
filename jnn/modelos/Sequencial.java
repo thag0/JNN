@@ -378,9 +378,11 @@ public class Sequencial extends Modelo {
 		Tensor[] params = new Tensor[0];
 
 		for (Camada camada : camadas()) {
-			params = utils.addEmArray(params, camada.kernel());
-			if (camada.temBias()) {
-				params = utils.addEmArray(params, camada.bias());
+			if (camada.treinavel()) {
+				params = utils.addEmArray(params, camada.kernel());
+				if (camada.temBias()) {
+					params = utils.addEmArray(params, camada.bias());
+				}
 			}
 		}
 
