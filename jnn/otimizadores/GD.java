@@ -67,9 +67,7 @@ public class GD extends Otimizador {
 		verificarConstrucao();
 		
 		for (int i = 0; i < _params.length; i++) {
-			_params[i].aplicar(_params[i], _grads[i], 
-				(p, g) -> p -= g
-			);
+			_params[i].sub(_grads[i]);
 		} 
 	}
 
