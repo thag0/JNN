@@ -431,10 +431,7 @@ public class Densa extends Camada implements Cloneable {
 			);
 		}
 
-		//feedforward
-		optensor.matMult(_entrada, _kernel, _somatorio);
-
-		_bias.ifPresent(b -> _somatorio.add(b));
+		optensor.densaForward(_entrada, _kernel, _bias, _somatorio);
 
 		ativacao.forward(_somatorio, _saida);
 
@@ -476,17 +473,8 @@ public class Densa extends Camada implements Cloneable {
 
 		//backward
 		ativacao.backward(this);
-
-		//acumular gradientes
-		Tensor temp1 = new Tensor(_gradKernel.shape());
-		optensor.matMult(_entrada.transpor(), _gradSaida, temp1);
-		_gradKernel.add(temp1);
-
-		_gradBias.ifPresent(gb -> gb.add(_gradSaida));
-
-		Tensor temp2 = new Tensor(_gradEntrada.shape());
-		optensor.matMult(_gradSaida, _kernel.transpor(), temp2);
-		_gradEntrada.copiar(temp2);
+		
+		optensor.densaBackward(_entrada, _kernel, _gradSaida, _gradKernel, _gradBias, _gradEntrada);
 
 		return _gradEntrada;
 	}

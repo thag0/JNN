@@ -469,6 +469,37 @@ public class OpTensor {
 	}
 
 	/**
+	 * Realiza a peopagação direta através da camada densa.
+	 * @param entrada {@code Tensor} contendo a entrada da camada.
+	 * @param kernel {@code Tensor} contendos o kernel/pesos da camada.
+	 * @param bias {@code Tensor} contendo o bias da camada {@code (podendo ser nulo)}.
+	 * @param saida {@code Tensor} de destino do resultado.
+	 */
+	public void densaForward(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
+		matMult(entrada, kernel, saida);
+		bias.ifPresent(b -> saida.add(b));
+	}
+
+	/**
+	 * Realiza a propagação reversa através da camada densa.
+	 * @param entrada {@code Tensor} contendo a entrada da camada.
+	 * @param kernel {@code Tensor} contendos o kernel/pesos da camada.
+	 * @param gradS {@code Tensor} contendo o gradiente em relação a saída da camada.
+	 * @param gradK {@code Tensor} contendo o gradiente em relação ao kernel/pesos da camada.
+	 * @param gradB {@code Tensor} contendo o gradiente em relação ao bias da camada {@code (podendo ser nulo)}.
+	 * @param gradE {@code Tensor} contendo o gradiente em relação à entrada da camada.
+	 */
+	public void densaBackward(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
+		Tensor temp = new Tensor(gradK.shape());
+		matMult(entrada.transpor(), gradS, temp);
+		gradK.add(temp);
+
+		gradB.ifPresent(gb -> gb.add(gradS));
+
+		matMult(gradS, kernel.transpor(), gradE);
+	}
+
+	/**
 	 * Realiza a propagação direta através da camada convolucional.
 	 * @param entrada {@code Tensor} contendo a entrada da camada.
 	 * @param kernel {@code Tensor} contendos o kernel/filtros da camada.
