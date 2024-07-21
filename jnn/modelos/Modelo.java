@@ -511,6 +511,7 @@ public abstract class Modelo implements Cloneable {
 
 	@Override
 	public String toString(){
+		validarCompilacao();
 		return construirInfo();
 	}
 
