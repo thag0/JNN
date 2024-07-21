@@ -787,6 +787,29 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	}
 
 	/**
+	 * Adiciona o valor informado em todos os elementos do tensor.
+	 * @param x valor desejado.
+	 * @return instância local alterada.
+	 */
+	public Tensor add(double x) {
+		final int n = tamanho();
+		for (int i = 0; i < n; i++) {
+			dados[i].add(x);
+		}
+
+		return this;
+	}
+
+	/**
+	 * Adiciona o valor da variável informada em todos os elementos do tensor.
+	 * @param x valor desejado.
+	 * @return instância local alterada.
+	 */
+	public Tensor add(Variavel x) {
+		return add(x.get());
+	}
+
+	/**
 	 * Adiciona todo o conteúdo {@code elemento a elemento} usando o tensor recebido,
 	 * seguindo a expressão:
 	 * <pre>
@@ -896,6 +919,29 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	public Tensor add(double valor, int... ids) {
 		dados[indice(ids)].add(valor);
 		return this;
+	}
+
+	/**
+	 * Subtrai o valor informado em todos os elementos do tensor.
+	 * @param x valor desejado.
+	 * @return instância local alterada.
+	 */
+	public Tensor sub(double x) {
+		final int n = tamanho();
+		for (int i = 0; i < n; i++) {
+			dados[i].sub(x);
+		}
+
+		return this;
+	}
+
+	/**
+	 * Subtrai o valor da variável informada em todos os elementos do tensor.
+	 * @param x valor desejado.
+	 * @return instância local alterada.
+	 */
+	public Tensor sub(Variavel x) {
+		return sub(x.get());
 	}
 
 	/**
@@ -1010,6 +1056,29 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	}
 
 	/**
+	 * Multiplica o valor informado em todos os elementos do tensor.
+	 * @param x valor desejado.
+	 * @return instância local alterada.
+	 */
+	public Tensor mult(double x) {
+		final int n = tamanho();
+		for (int i = 0; i < n; i++) {
+			dados[i].mult(x);
+		}
+
+		return this;
+	}
+
+	/**
+	 * Multiplica o valor da variável informada em todos os elementos do tensor.
+	 * @param x valor desejado.
+	 * @return instância local alterada.
+	 */
+	public Tensor mult(Variavel x) {
+		return mult(x.get());
+	}
+	
+	/**
 	 * Multiplica todo o conteúdo {@code elemento a elemento} usando o tensor recebido,
 	 * seguindo a expressão:
 	 * <pre>
@@ -1118,6 +1187,29 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	public Tensor mult(double valor, int... ids) {
 		dados[indice(ids)].mult(valor);
 		return this;
+	}
+
+	/**
+	 * Divide o valor informado em todos os elementos do tensor.
+	 * @param x valor desejado.
+	 * @return instância local alterada.
+	 */
+	public Tensor div(double x) {
+		final int n = tamanho();
+		for (int i = 0; i < n; i++) {
+			dados[i].div(x);
+		}
+
+		return this;
+	}
+
+	/**
+	 * Divide o valor da variável informada em todos os elementos do tensor.
+	 * @param x valor desejado.
+	 * @return instância local alterada.
+	 */
+	public Tensor div(Variavel x) {
+		return div(x.get());
 	}
 
 	/**
