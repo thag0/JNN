@@ -11,7 +11,6 @@ import jnn.treinamento.Treinador;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 /**
  * <h3>
@@ -240,31 +239,24 @@ public abstract class Modelo implements Cloneable {
 
 		Tensor[] prevs = new Tensor[numEntradas];
 		Modelo[] clones = new Modelo[numThreads];
-		ExecutorService exec = Executors.newFixedThreadPool(numThreads);
 
 		for (int i = 0; i < numThreads; i++) {
 			clones[i] = clone();
 		}
 
 		int lote = numEntradas / numThreads;
-		for (int i = 0; i < numThreads; i++) {
-			final int id = i;
-			final int inicio = i * lote;
-			final int fim = (i == numThreads - 1) ? numEntradas : (i + 1) * lote;
-
-			exec.execute(() -> {
-				for (int j = inicio; j < fim; j++) {
-					prevs[j] = clones[id].forward(x[j]);
-				}
-			});
-		}
-		exec.shutdown();
-
-		try {
-			exec.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			System.exit(1);
+		try (ExecutorService exec = Executors.newFixedThreadPool(numThreads)) {
+			for (int i = 0; i < numThreads; i++) {
+				final int id = i;
+				final int inicio = i * lote;
+				final int fim = (i == numThreads - 1) ? numEntradas : (i + 1) * lote;
+	
+				exec.execute(() -> {
+					for (int j = inicio; j < fim; j++) {
+						prevs[j] = clones[id].forward(x[j]);
+					}
+				});
+			}
 		}
 
 		return prevs;
