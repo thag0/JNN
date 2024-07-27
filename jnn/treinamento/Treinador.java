@@ -48,46 +48,48 @@ public class Treinador {
 	/**
 	 * Treina o modelo ajustando seus parâmetros treináveis usando
 	 * os dados fornecidos.
-	 * @param modelo modelo que será treinada.
-	 * @param entradas {@code Tensores} contendos os dados de entrada.
-	 * @param saidas {@code Tensores} contendos os dados de saída (rótulos).
+	 * @param modelo instância de modelo.
+	 * @param x {@code Tensores} contendos os dados de entrada.
+	 * @param y {@code Tensores} contendos os dados de saída (rótulos).
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	public void treino(Modelo modelo, Tensor[] entradas, Tensor[] saidas, int epochs, boolean logs) {
-		executar(modelo, entradas, saidas, epochs, 0, logs);
+	public void treino(Modelo modelo, Tensor[] x, Tensor[] y, int epochs, boolean logs) {
+		executar(modelo, x, y, epochs, 0, logs);
 	}
 
 	/**
-	 * Treina a rede neural calculando os erros dos neuronios, seus gradientes para cada peso e 
-	 * passando essas informações para o otimizador configurado ajustar os pesos.
-	 * @param modelo rede neural que será treinada.
-	 * @param entradas {@code Tensores} contendos os dados de entrada.
-	 * @param saidas {@code Tensores} contendos os dados de saída (rótulos).
+	 * Treina o modelo ajustando seus parâmetros treináveis usando
+	 * os dados fornecidos.
+	 * @param modelo instância de modelo.
+	 * @param x {@code Tensores} contendos os dados de entrada.
+	 * @param y {@code Tensores} contendos os dados de saída (rótulos).
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param tamLote tamanho do lote.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	public void treino(Modelo modelo, Tensor[] entradas, Tensor[] saidas, int epochs, int tamLote, boolean logs) {
-		executar(modelo, entradas, saidas, epochs, tamLote, logs);
+	public void treino(Modelo modelo, Tensor[] x, Tensor[] y, int epochs, int tamLote, boolean logs) {
+		executar(modelo, x, y, epochs, tamLote, logs);
 	}
 
 	/**
 	 * Executa a função de treino de acordo com os valores configurados.
-	 * @param modelo rede neural que será treinada.
+	 * @param modelo instância de modelo.
+	 * @param x {@code Tensores} contendos os dados de entrada.
+	 * @param y {@code Tensores} contendos os dados de saída (rótulos).
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param tamLote tamanho do lote.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	private void executar(Modelo modelo, Tensor[] entradas, Tensor[] saidas, int epochs, int tamLote, boolean logs) {
+	private void executar(Modelo modelo, Tensor[] x, Tensor[] y, int epochs, int tamLote, boolean logs) {
 		modelo.treino(true);
 
 		if (tamLote > 1) {
-			treinoLote.treinar(modelo, entradas, saidas, epochs, tamLote, logs);
+			treinoLote.treinar(modelo, x, y, epochs, tamLote, logs);
 			treinoLote.ultimoUsado = true;
 		
 		} else {
-			treino.treinar(modelo, entradas, saidas, epochs, logs);
+			treino.treinar(modelo, x, y, epochs, logs);
 			treino.ultimoUsado = true;
 		}
 

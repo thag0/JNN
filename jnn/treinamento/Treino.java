@@ -1,6 +1,6 @@
 package jnn.treinamento;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 import jnn.avaliacao.perda.Perda;
 import jnn.core.tensor.Tensor;
@@ -26,7 +26,7 @@ class Treino {
 	/**
 	 * Histórico do modelo pelo processo de treinameto.
 	 */
-	private ArrayList<Double> historico;
+	private LinkedList<Double> historico;
 
 	/**
 	 * Verificador para rastrear o último modo de treino usado.
@@ -39,7 +39,7 @@ class Treino {
 	 * do modelo ao longo das épocas.
 	 */
 	public Treino(boolean calcularHistorico) {
-		historico = new ArrayList<>(0);
+		historico = new LinkedList<>();
 		setHistorico(calcularHistorico);
 	}
 

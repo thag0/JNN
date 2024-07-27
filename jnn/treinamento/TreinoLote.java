@@ -1,6 +1,6 @@
 package jnn.treinamento;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 import jnn.avaliacao.perda.Perda;
 import jnn.core.Utils;
@@ -32,7 +32,7 @@ class TreinoLote {
 	/**
 	 * Histórico do modelo pelo processo de treinameto.
 	 */
-	private ArrayList<Double> historico;
+	private LinkedList<Double> historico;
 
 	/**
 	 * Verificador para rastrear o último modo de treino usado.
@@ -45,7 +45,7 @@ class TreinoLote {
 	 * do modelo ao longo das épocas.
 	 */
 	public TreinoLote(boolean calcularHistorico) {
-		historico = new ArrayList<>(0);
+		historico = new LinkedList<>();
 		setHistorico(calcularHistorico);
 	}
 
@@ -73,7 +73,6 @@ class TreinoLote {
 	 * @param x {@code Tensores} contendos os dados de entrada.
 	 * @param y {@code Tensores} contendos os dados de saída (rótulos).
 	 * @param epochs quantidade de épocas de treinamento.
-	 * @param embaralhar embaralhar dados de treino para cada época.
 	 * @param tamLote tamanho do lote.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
