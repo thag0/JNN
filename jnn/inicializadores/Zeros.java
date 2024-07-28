@@ -14,7 +14,7 @@ public class Zeros extends Inicializador {
 
 	@Override
 	public void inicializar(Tensor tensor) {
-		tensor.preencher(0);
+		tensor.zerar();
 	}
 
 }

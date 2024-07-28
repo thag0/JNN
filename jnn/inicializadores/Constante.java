@@ -14,10 +14,10 @@ public class Constante extends Inicializador {
 
 	/**
 	 * Instancia um inicializador de valor constante.
-	 * @param val valor usado de constante na inicialização.
+	 * @param x valor usado de constante na inicialização.
 	 */
-	public Constante(double val) {
-		this.val = val;
+	public Constante(Number x) {
+		val = x.doubleValue();
 	}
 
 	/**
@@ -27,7 +27,7 @@ public class Constante extends Inicializador {
 	 * </p>
 	 */
 	public Constante() {
-		this(0.0d);
+		this(0.0);
 	}
 
 	@Override

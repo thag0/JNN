@@ -18,8 +18,8 @@ public class He extends Inicializador {
 	 * aleatória.
 	 * @param seed seed usada pelo gerador de números aleatórios.
 	 */
-	public He(long seed) {
-		super(seed);
+	public He(Number seed) {
+		setSeed(seed);
 	}
 
 	@Override

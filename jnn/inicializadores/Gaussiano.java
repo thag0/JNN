@@ -17,8 +17,8 @@ public class Gaussiano extends Inicializador {
 	 * Instancia um inicializador Gaussiano para tensores.
 	 * @param seed seed usada pelo gerador de números aleatórios.
 	 */
-	public Gaussiano(long seed) {
-		super(seed);
+	public Gaussiano(Number seed) {
+		setSeed(seed);
 	}
 
 	@Override

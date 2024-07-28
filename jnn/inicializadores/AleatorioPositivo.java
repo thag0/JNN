@@ -17,14 +17,16 @@ public class AleatorioPositivo extends Inicializador {
 	 * com seed aleatória.
 	 * @param max valor máximo de aleatorização.
 	 */
-	public AleatorioPositivo(double max) {
-		if (max <= 0) {
+	public AleatorioPositivo(Number max) {
+		double m = max.doubleValue();
+
+		if (m <= 0) {
 			throw new IllegalArgumentException(
-				"O valor máximo deve ser maior que zero."
+				"\nValor máximo deve ser maior que zero."
 			);
 		}
 
-		this.max = max;
+		this.max = m;
 	}
 
 	/**
@@ -32,15 +34,9 @@ public class AleatorioPositivo extends Inicializador {
 	 * @param max valor máximo de aleatorização.
 	 * @param seed seed usada pelo gerador de números aleatórios.
 	 */
-	public AleatorioPositivo(double max, long seed) {
-		if (max <= 0) {
-			throw new IllegalArgumentException(
-				"O valor máximo deve ser maior que zero."
-			);
-		}
-
-		super.setSeed(seed);
-		this.max = max;
+	public AleatorioPositivo(Number max, Number seed) {
+		this(max);
+		setSeed(seed);
 	}
 
 	/**
@@ -56,8 +52,7 @@ public class AleatorioPositivo extends Inicializador {
 	 * @param seed seed usada pelo gerador de números aleatórios.
 	 */
 	public AleatorioPositivo(long seed) {
-		super(seed);
-		this.max = 1;
+		this(1.0, seed);
 	}
 
 	@Override

@@ -9,8 +9,7 @@ public class GlorotNormal extends Inicializador {
 
 	/**
 	 * Instancia um inicializador Glorot normalizado para tensores 
-	 * com seed
-	 * aleatória.
+	 * com seed aleatória.
 	 */
 	public GlorotNormal() {}
 
@@ -18,8 +17,8 @@ public class GlorotNormal extends Inicializador {
 	 * Instancia um inicializador Glorot normalizado para tensores.
 	 * @param seed seed usada pelo gerador de números aleatórios.
 	 */
-	public GlorotNormal(long seed) {
-		super(seed);
+	public GlorotNormal(Number seed) {
+		setSeed(seed);
 	}
 
 	@Override

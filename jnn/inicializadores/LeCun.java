@@ -17,8 +17,8 @@ public class LeCun extends Inicializador {
 	 * Instancia um inicializador LeCun para tensores.
 	 * @param seed seed usada pelo gerador de números aleatórios.
 	 */
-	public LeCun(long seed) {
-		super(seed);
+	public LeCun(Number seed) {
+		setSeed(seed);
 	}
 
 	@Override

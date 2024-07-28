@@ -17,8 +17,8 @@ public class GlorotUniforme extends Inicializador {
 	 * Instancia um inicializador Xavier para tensores.
 	 * @param seed seed usada pelo gerador de números aleatórios.
 	 */
-	public GlorotUniforme(long seed) {
-		super(seed);
+	public GlorotUniforme(Number seed) {
+		setSeed(seed);
 	}
 
 	@Override

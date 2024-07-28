@@ -2,7 +2,6 @@ package jnn.inicializadores;
 
 import java.util.Random;
 
-import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -18,29 +17,16 @@ public abstract class Inicializador {
 	protected Random random = new Random();
 
 	/**
-	 * Utilitário.
-	 */
-	Utils utils = new Utils();
-
-	/**
 	 * Inicialização com seed aleatória
 	 */
 	protected Inicializador() {}
 
 	/**
-	 * Inicialização com seed configurada.
-	 * @param seed seed. 
-	 */
-	protected Inicializador(long seed) {
-		this.random.setSeed(seed);
-	}
-
-	/**
 	 * Configura o início do gerador aleatório.
 	 * @param seed nova seed de início.
 	 */
-	public void setSeed(long seed) {
-		this.random.setSeed(seed);
+	public void setSeed(Number seed) {
+		random.setSeed(seed.longValue());
 	}
 
 	/**
