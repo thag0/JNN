@@ -87,21 +87,24 @@ public class Adadelta extends Otimizador {
 	 * @param rho valor de decaimento do otimizador.
 	 * @param eps pequeno valor usado para evitar a divisão por zero.
 	 */
-	public Adadelta(double rho, double eps) {
-		if (rho <= 0) {
+	public Adadelta(Number rho, Number eps) {
+		double r = rho.doubleValue();
+		double e = eps.doubleValue();
+
+		if (r <= 0) {
 			throw new IllegalArgumentException(
-				"\nTaxa de decaimento (" + rho + ") inválida."
+				"\nTaxa de decaimento (" + r + ") inválida."
 			);
 		}
 
-		if (eps <= 0) {
+		if (e <= 0) {
 			throw new IllegalArgumentException(
-				"\nEpsilon (" + eps + ") inválido."
+				"\nEpsilon (" + e + ") inválido."
 			);
 		}
 
-		this.rho = rho;
-		this.eps = eps;
+		this.rho = r;
+		this.eps = e;
 	}
 
 	/**
@@ -110,7 +113,7 @@ public class Adadelta extends Otimizador {
 	 * @param rho valor de decaimento do otimizador.
 	 * @param eps usado para evitar a divisão por zero.
 	 */
-	public Adadelta(double rho) {
+	public Adadelta(Number rho) {
 		this(rho, PADRAO_EPS);
 	}
 
@@ -131,10 +134,10 @@ public class Adadelta extends Otimizador {
 		ac     = new Tensor[0];
 		deltas = new Tensor[0];
 		acAt   = new Tensor[0];
-		for (Tensor t : _params) {
-			ac     = utils.addEmArray(ac,     new Tensor(t.shape()));
-			deltas = utils.addEmArray(deltas, new Tensor(t.shape()));
-			acAt   = utils.addEmArray(acAt,   new Tensor(t.shape()));
+		for (Tensor param : _params) {
+			ac     = utils.addEmArray(ac,     new Tensor(param.shape()));
+			deltas = utils.addEmArray(deltas, new Tensor(param.shape()));
+			acAt   = utils.addEmArray(acAt,   new Tensor(param.shape()));
 		}
 
 		_construido = true;// otimizador pode ser usado

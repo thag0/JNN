@@ -72,21 +72,24 @@ public class AdaGrad extends Otimizador {
 	 * @param tA valor de taxa de aprendizado.
 	 * @param eps usado para evitar a divisão por zero.
 	 */
-	public AdaGrad(double tA, double eps) {
-		if (tA <= 0) {
+	public AdaGrad(Number tA, Number eps) {
+		double lr = tA.doubleValue();
+		double e = eps.doubleValue();
+
+		if (lr <= 0) {
 			throw new IllegalArgumentException(
-				"\nTaxa de aprendizado (" + tA + ") inválida."
+				"\nTaxa de aprendizado (" + lr + ") inválida."
 			);
 		}
 
-		if (eps <= 0) {
+		if (e <= 0) {
 			throw new IllegalArgumentException(
 				"\nEpsilon (" + eps + ") inválido."
 			);
 		}
 		
-		this.tA = tA;
-		this.eps = eps;
+		this.tA  = lr;
+		this.eps = e;
 	}
 
 	/**
@@ -94,7 +97,7 @@ public class AdaGrad extends Otimizador {
 	 * usando os valores de hiperparâmetros fornecidos.
 	 * @param tA valor de taxa de aprendizado.
 	 */
-	public AdaGrad(double tA) {
+	public AdaGrad(Number tA) {
 		this(tA, PADRAO_EPS);
 	}
 
@@ -114,10 +117,9 @@ public class AdaGrad extends Otimizador {
 
 		ac = new Tensor[0];
 		double valorInicial = 0.1;
-		for (Tensor t : _params) {
-			Tensor novo = new Tensor(t.shape());
-			novo.preencher(valorInicial);
-			ac = utils.addEmArray(ac, novo);
+		for (Tensor param : _params) {
+			Tensor t = new Tensor(param.shape()).preencher(valorInicial);
+			ac = utils.addEmArray(ac, t);
 		}
 		
 		_construido = true;// otimizador pode ser usado

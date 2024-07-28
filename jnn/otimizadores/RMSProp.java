@@ -86,26 +86,30 @@ public class RMSProp extends Otimizador {
 	 * @param rho fator de decaimento do RMSProp.
 	 * @param eps usado para evitar a divisão por zero.
 	 */
-	public RMSProp(double tA, double rho, double eps) {
-		if (tA <= 0) {
+	public RMSProp(Number tA, Number rho, Number eps) {
+		double lr = tA.doubleValue();
+		double rh = rho.doubleValue();
+		double ep = eps.doubleValue();
+
+		if (lr <= 0) {
 			throw new IllegalArgumentException(
-				"\nTaxa de aprendizagem (" + tA + "), inválida."
+				"\nTaxa de aprendizagem (" + lr + "), inválida."
 			);
 		}
-		if (rho <= 0) {
+		if (rh <= 0) {
 			throw new IllegalArgumentException(
-				"\nTaxa de decaimento (" + rho + "), inválida."
+				"\nTaxa de decaimento (" + rh + "), inválida."
 			);
 		}
-		if (eps <= 0) {
+		if (ep <= 0) {
 			throw new IllegalArgumentException(
-				"\nEpsilon (" + eps + "), inválido."
+				"\nEpsilon (" + ep + "), inválido."
 			);
 		}
 
-		this.tA = tA;
-		this.rho = rho;
-		this.eps = eps;
+		this.tA  = lr;
+		this.rho = rh;
+		this.eps = ep;
 	}
 
 	/**
@@ -114,7 +118,7 @@ public class RMSProp extends Otimizador {
 	 * @param tA valor de taxa de aprendizagem.
 	 * @param rho fator de decaimento do RMSProp.
 	 */
-	public RMSProp(double tA, double rho) {
+	public RMSProp(Number tA, Number rho) {
 		this(tA, rho, PADRAO_EPS);
 	}
 
@@ -123,7 +127,7 @@ public class RMSProp extends Otimizador {
 	 * usando os valores de hiperparâmetros fornecidos.
 	 * @param tA valor de taxa de aprendizagem.
 	 */
-	public RMSProp(double tA) {
+	public RMSProp(Number tA) {
 		this(tA, PADRAO_RHO, PADRAO_EPS);
 	}
 
@@ -142,8 +146,8 @@ public class RMSProp extends Otimizador {
 		initParams(modelo);
 
 		ac = new Tensor[0];
-		for (Tensor t : _params) {
-			ac = utils.addEmArray(ac, new Tensor(t.shape()));
+		for (Tensor param : _params) {
+			ac = utils.addEmArray(ac, new Tensor(param.shape()));
 		}
 		
 		_construido = true;// otimizador pode ser usado

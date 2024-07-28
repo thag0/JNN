@@ -1,6 +1,5 @@
 package jnn.otimizadores;
 
-import jnn.camadas.Camada;
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 import jnn.modelos.Modelo;
@@ -65,20 +64,27 @@ public abstract class Otimizador {
 	}
 
 	/**
-	 * Calcula os parâmetros das camadas fornecidas e adiciona ao otimizador
+	 * Captura os parâmetros e gradientes do modelo e inicializa os
+	 * atributos necessários para o otimizador.
 	 * @param modelo modelo para otimização.
 	 */
 	protected void initParams(Modelo modelo) {
-		for (Camada camada : modelo.camadas()) {
-			if (camada.treinavel()) {
-				_params = utils.addEmArray(_params, camada.kernel());
-				_grads  = utils.addEmArray(_grads, camada.gradKernel());
-				
-				if (camada.temBias()) {
-					_params = utils.addEmArray(_params, camada.bias());
-					_grads  = utils.addEmArray(_grads, camada.gradBias());
-				};
-			}
+		Tensor[] p = modelo.params();
+		Tensor[] g = modelo.grads();
+
+		if (p.length != g.length) {
+			throw new IllegalStateException(
+				"\nQuantidade de parâmetros e gradientes deve ser igual. " + 
+				"\nRecebido: p = " + p.length + ", g = " + g.length
+			);
+		}
+
+		for (Tensor param : p) {
+			_params = utils.addEmArray(_params, param);	
+		}
+
+		for (Tensor grad : g) {
+			_grads = utils.addEmArray(_grads, grad);
 		}
 	}
 

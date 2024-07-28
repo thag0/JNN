@@ -82,21 +82,23 @@ public class SGD extends Otimizador {
 	 * @param m taxa de momentum do otimizador.
 	 * @param nesterov usar acelerador de nesterov.
 	 */
-	public SGD(double tA, double m, boolean nesterov) {
-		if (tA <= 0) {
+	public SGD(Number tA, Number m, boolean nesterov) {
+		double lr = tA.doubleValue();
+		double mm = m.doubleValue();
+
+		if (lr <= 0) {
 			throw new IllegalArgumentException(
-				"\nTaxa de aprendizado (" + tA + ") inválida."
+				"\nTaxa de aprendizado (" + lr + ") inválida."
 			);
 		}
-		
-		if (m < 0) {         
+		if (mm < 0) {         
 			throw new IllegalArgumentException(
-				"\nTaxa de momentum (" + m + ") inválida."
+				"\nTaxa de momentum (" + mm + ") inválida."
 			);
 		}
 
-		this.tA = tA;
-		this.momentum = m;
+		this.tA 	  = lr;
+		this.momentum = mm;
 		this.nesterov = nesterov;
 	}
 
@@ -106,7 +108,7 @@ public class SGD extends Otimizador {
 	 * @param tA taxa de aprendizado do otimizador.
 	 * @param m taxa de momentum do otimizador.
 	 */
-	public SGD(double tA, double m) {
+	public SGD(Number tA, Number m) {
 		this(tA, m, PADRAO_NESTEROV);
 	}
 
@@ -115,7 +117,7 @@ public class SGD extends Otimizador {
 	 * Descent (SGD) </strong> usando os valores de hiperparâmetros fornecidos.
 	 * @param tA taxa de aprendizado do otimizador.
 	 */
-	public SGD(double tA) {
+	public SGD(Number tA) {
 		this(tA, PADRAO_MOMENTUM, PADRAO_NESTEROV);
 	}
 
@@ -135,8 +137,8 @@ public class SGD extends Otimizador {
 		initParams(modelo);
 
 		m = new Tensor[0];
-		for (Tensor t : _params) {
-			m = utils.addEmArray(m, new Tensor(t.shape()));
+		for (Tensor param : _params) {
+			m = utils.addEmArray(m, new Tensor(param.shape()));
 		}
 		
 		_construido = true;// otimizador pode ser usado

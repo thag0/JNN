@@ -127,32 +127,37 @@ public class Nadam extends Otimizador {
 	 * @param beta2 decaimento da segunda ordem.
 	 * @param eps usado para evitar a divisão por zero.
 	 */
-	public Nadam(double tA, double beta1, double beta2, double eps) {
-		if (tA <= 0) {
+	public Nadam(Number tA, Number beta1, Number beta2, Number eps) {
+		double lr = tA.doubleValue();
+		double b1 = beta1.doubleValue();
+		double b2 = beta2.doubleValue();
+		double ep = eps.doubleValue();
+
+		if (lr <= 0) {
 			throw new IllegalArgumentException(
-				"\nTaxa de aprendizado (" + tA + ") inválida."
+				"\nTaxa de aprendizado (" + lr + ") inválida."
 			);
 		}
-		if (beta1 <= 0) {
+		if (b1 <= 0) {
 			throw new IllegalArgumentException(
-				"\nTaxa de decaimento de primeira ordem (" + beta1 + ") inválida."
+				"\nTaxa de decaimento de primeira ordem (" + b1 + ") inválida."
 			);
 		}
-		if (beta2 <= 0) {
+		if (b2 <= 0) {
 			throw new IllegalArgumentException(
-				"\nTaxa de decaimento de segunda ordem (" + beta2 + ") inválida."
+				"\nTaxa de decaimento de segunda ordem (" + b2 + ") inválida."
 			);
 		}
-		if (eps <= 0) {
+		if (ep <= 0) {
 			throw new IllegalArgumentException(
-				"\nEpsilon (" + eps + "), inválido."
+				"\nEpsilon (" + ep + ") inválido."
 			);
 		}
 		
-		this.tA = tA;
-		this.beta1 = beta1;
-		this.beta2 = beta2;
-		this.eps = eps;
+		this.tA 	 = lr;
+		this.beta1 	 = b1;
+		this.beta2 	 = b2;
+		this.eps 	 = ep;
 	}
 
 	/**
@@ -162,7 +167,7 @@ public class Nadam extends Otimizador {
 	 * @param beta1 decaimento do momento de primeira ordem.
 	 * @param beta2 decaimento da segunda ordem.
 	 */
-	public Nadam(double tA, double beta1, double beta2) {
+	public Nadam(Number tA, Number beta1, Number beta2) {
 		this(tA, beta1, beta2, PADRAO_EPS);
 	}
 
@@ -171,7 +176,7 @@ public class Nadam extends Otimizador {
 	 * usando os valores de hiperparâmetros fornecidos.
 	 * @param tA valor de taxa de aprendizado.
 	 */
-	public Nadam(double tA) {
+	public Nadam(Number tA) {
 		this(tA, PADRAO_BETA1, PADRAO_BETA2, PADRAO_EPS);
 	}
 
@@ -193,11 +198,11 @@ public class Nadam extends Otimizador {
 		v  = new Tensor[0];
 		mc = new Tensor[0];
 		vc = new Tensor[0];
-		for (Tensor t : _params) {
-			m  = utils.addEmArray(m,  new Tensor(t.shape()));
-			v  = utils.addEmArray(v,  new Tensor(t.shape()));
-			mc = utils.addEmArray(mc, new Tensor(t.shape()));
-			vc = utils.addEmArray(vc, new Tensor(t.shape()));
+		for (Tensor param : _params) {
+			m  = utils.addEmArray(m,  new Tensor(param.shape()));
+			v  = utils.addEmArray(v,  new Tensor(param.shape()));
+			mc = utils.addEmArray(mc, new Tensor(param.shape()));
+			vc = utils.addEmArray(vc, new Tensor(param.shape()));
 		}
 
 		_construido = true;// otimizador pode ser usado

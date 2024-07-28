@@ -36,14 +36,16 @@ public class GD extends Otimizador {
 	 * usando os valores de hiperparâmetros fornecidos.
 	 * @param tA taxa de aprendizado do otimizador.
 	 */
-	public GD(double tA) {
-		if (tA <= 0) {
+	public GD(Number tA) {
+		double lr = tA.doubleValue();
+
+		if (lr <= 0) {
 			throw new IllegalArgumentException(
-				"\nTaxa de aprendizado (" + tA + ") inválida."
+				"\nTaxa de aprendizado (" + lr + ") inválida."
 			);
 		}
 
-		this.tA = tA;
+		this.tA = lr;
 	}
 
 	/**
@@ -53,7 +55,7 @@ public class GD extends Otimizador {
 	 * </p>
 	 */
 	public GD() {
-		this(0.001);
+		this(0.01);
 	}
 
 	@Override
