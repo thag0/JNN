@@ -466,7 +466,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @param x valor desejado.
 	 * @param ids índices para atribuição.
 	 */
-    public void set(double x, int... ids) {
+    public void set(Number x, int... ids) {
         dados[indice(ids)].set(x);
     }
 
@@ -481,13 +481,13 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 
 	/**
 	 * Preenche todo o conteúdo do tensor com o valor fornecido.
-	 * @param valor valor desejado.
+	 * @param x valor desejado.
 	 * @return instância local alterada.
 	 */
-	public Tensor preencher(double valor) {
+	public Tensor preencher(Number x) {
 		final int n = tamanho();
 		for (int i = 0; i < n; i++) {
-			dados[i].set(valor);
+			dados[i].set(x);
 		}
 
 		return this;
@@ -791,7 +791,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @param x valor desejado.
 	 * @return instância local alterada.
 	 */
-	public Tensor add(double x) {
+	public Tensor add(Number x) {
 		final int n = tamanho();
 		for (int i = 0; i < n; i++) {
 			dados[i].add(x);
@@ -916,7 +916,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @param ids índices desejados para adição.
 	 * @return instância local alterada.
 	 */
-	public Tensor add(double valor, int... ids) {
+	public Tensor add(Number valor, int... ids) {
 		dados[indice(ids)].add(valor);
 		return this;
 	}
@@ -926,7 +926,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @param x valor desejado.
 	 * @return instância local alterada.
 	 */
-	public Tensor sub(double x) {
+	public Tensor sub(Number x) {
 		final int n = tamanho();
 		for (int i = 0; i < n; i++) {
 			dados[i].sub(x);
@@ -1050,7 +1050,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @param ids índices desejados para adição.
 	 * @return instância local alterada.
 	 */
-	public Tensor sub(double valor, int... ids) {
+	public Tensor sub(Number valor, int... ids) {
 		dados[indice(ids)].sub(valor);
 		return this;
 	}
@@ -1060,7 +1060,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @param x valor desejado.
 	 * @return instância local alterada.
 	 */
-	public Tensor mult(double x) {
+	public Tensor mult(Number x) {
 		final int n = tamanho();
 		for (int i = 0; i < n; i++) {
 			dados[i].mult(x);
@@ -1184,7 +1184,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @param ids índices desejados para adição.
 	 * @return instância local alterada.
 	 */
-	public Tensor mult(double valor, int... ids) {
+	public Tensor mult(Number valor, int... ids) {
 		dados[indice(ids)].mult(valor);
 		return this;
 	}
@@ -1194,7 +1194,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @param x valor desejado.
 	 * @return instância local alterada.
 	 */
-	public Tensor div(double x) {
+	public Tensor div(Number x) {
 		final int n = tamanho();
 		for (int i = 0; i < n; i++) {
 			dados[i].div(x);
@@ -1318,7 +1318,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @param ids índices desejados para adição.
 	 * @return instância local alterada.
 	 */
-	public Tensor div(double valor, int... ids) {
+	public Tensor div(Number valor, int... ids) {
 		dados[indice(ids)].div(valor);
 		return this;
 	}
@@ -1740,7 +1740,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @param fun função desejada.
 	 * @return {@code Tensor} contendo o resultado.
 	 */
-	public Tensor reduce(double in, DoubleBinaryOperator fun) {
+	public Tensor reduce(Number in, DoubleBinaryOperator fun) {
 		if (fun == null) {
 			throw new IllegalArgumentException(
 				"\nFunção de redução não pode ser nula."
@@ -1829,14 +1829,14 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @param max valor máximo do intervalo.
 	 * @return instância local alterada.
 	 */
-	public Tensor norm(double min, double max) {
+	public Tensor norm(Number min, Number max) {
 		double valMin = min().item();
 		double valMax = max().item();
 
 		double intOriginal = valMax - valMin;
-		double intNovo = max - min;
+		double intNovo = max.doubleValue() - min.doubleValue();
 
-		return aplicar(x -> ((x - valMin) / intOriginal) * intNovo + min);
+		return aplicar(x -> ((x - valMin) / intOriginal) * intNovo + min.doubleValue());
 	}
 
 	/**

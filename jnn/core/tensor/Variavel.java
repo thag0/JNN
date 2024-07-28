@@ -7,8 +7,10 @@ package jnn.core.tensor;
  * <p>
  *      Essa é a unidade mais básica de variável usada pela biblioteca.
  * </p>
- * Implementei isso para poder compartilhar referências de
- * variáveis entre tensores, principalmente usando slicing.
+ *      Implementei isso para poder compartilhar referências de
+ *      variáveis entre tensores, principalmente usando operação que
+ *      alteram a visualização de tensores mas que devem referencias os
+ *      mesmos objetos.
  * <p>
  *      Uma variável é basicamente um valor numérico encapsulado. Ela
  *      pode fazer operações aritméticas simples (soma, subtração, 
@@ -36,8 +38,8 @@ public class Variavel implements Cloneable {
      * Inicializa uma variável com o valor desejado.
      * @param x valor desejado
      */
-    public Variavel(double x) {
-        valor = x;
+    public Variavel(Number x) {
+        valor = x.doubleValue();
     }
 
     /**
@@ -56,8 +58,8 @@ public class Variavel implements Cloneable {
      * Adiciona o valor informado no conteúdo da variável.
      * @param x valor desejado.
      */
-    public void add(double x) {
-        valor += x;
+    public void add(Number x) {
+        valor += x.doubleValue();
     }
 
     /**
@@ -72,8 +74,8 @@ public class Variavel implements Cloneable {
      * Subtrai o valor informado no conteúdo da variável.
      * @param x valor desejado.
      */
-    public void sub(double x) {
-        valor -= x;
+    public void sub(Number x) {
+        valor -= x.doubleValue();
     }
 
     /**
@@ -88,8 +90,8 @@ public class Variavel implements Cloneable {
      * Multiplica o valor informado no conteúdo da variável.
      * @param x valor desejado.
      */
-    public void mult(double x) {
-        valor *= x;
+    public void mult(Number x) {
+        valor *= x.doubleValue();
     }
 
     /**
@@ -104,8 +106,8 @@ public class Variavel implements Cloneable {
      * Divide o valor informado no conteúdo da variável.
      * @param x valor desejado.
      */
-    public void div(double x) {
-        valor /= x;
+    public void div(Number x) {
+        valor /= x.doubleValue();
     }
    
     /**
@@ -120,8 +122,8 @@ public class Variavel implements Cloneable {
      * Atribui o valor informado no conteúdo da variável.
      * @param x valor desejado.
      */
-    public void set(double x) {
-        valor = x;
+    public void set(Number x) {
+        valor = x.doubleValue();
     }
 
      /**
