@@ -374,7 +374,7 @@ public class Sequencial extends Modelo {
 	}
 
 	@Override
-	public Tensor[] parametros() {
+	public Tensor[] params() {
 		Tensor[] params = new Tensor[0];
 
 		for (Camada camada : camadas()) {
@@ -387,6 +387,22 @@ public class Sequencial extends Modelo {
 		}
 
 		return params;
+	}
+
+	@Override
+	public Tensor[] grads() {
+		Tensor[] grads = new Tensor[0];
+
+		for (Camada camada : camadas()) {
+			if (camada.treinavel()) {
+				grads = utils.addEmArray(grads, camada.gradKernel());
+				if (camada.temBias()) {
+					grads = utils.addEmArray(grads, camada.gradBias());
+				}
+			}
+		}
+
+		return grads;
 	}
 
 	@Override

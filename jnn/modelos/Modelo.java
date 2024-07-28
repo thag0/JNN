@@ -424,7 +424,20 @@ public abstract class Modelo implements Cloneable {
 	 * Onde: {@code k = kernel} e {@code b = bias}.
 	 * @return array de {@code Tensor} contendo os parâmetros do modelo.
 	 */
-	public abstract Tensor[] parametros();
+	public abstract Tensor[] params();
+
+	/**
+	 * Retorna o conjunto de gradientes em relação aos parâmetros do modelo.
+	 * <p>
+	 * 		A sequência fornecida dos gradientes é dada por:
+	 * </p>
+	 * <pre>
+	 * 	params = [gk1, gb1, gk2, gb2, gk3, gb3, ...]
+	 * </pre>
+	 * Onde: {@code gk = gradKernel} e {@code gb = gradBias}.
+	 * @return array de {@code Tensor} contendo os gradientes do modelo.
+	 */
+	public abstract Tensor[] grads();
 	
 	/**
 	 * Retorna um array contendo a saída serializada do modelo.

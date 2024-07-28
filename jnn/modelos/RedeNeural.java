@@ -517,7 +517,7 @@ public class RedeNeural extends Modelo {
 	}
 
 	@Override
-	public Tensor[] parametros() {
+	public Tensor[] params() {
 		Tensor[] params = new Tensor[0];
 
 		for (Densa camada : camadas()) {
@@ -530,6 +530,22 @@ public class RedeNeural extends Modelo {
 		}
 
 		return params;
+	}
+
+	@Override
+	public Tensor[] grads() {
+		Tensor[] grads = new Tensor[0];
+
+		for (Densa camada : camadas()) {
+			if (camada.treinavel()) {
+				grads = utils.addEmArray(grads, camada.gradKernel());
+				if (camada.temBias()) {
+					grads = utils.addEmArray(grads, camada.gradBias());
+				}
+			}
+		}
+
+		return grads;
 	}
 
 	/**
