@@ -19,10 +19,12 @@ public class LeakyReLU extends Ativacao {
 	 * </p>
 	 * @param alfa novo valor alfa.
 	 */
-	public LeakyReLU(double alfa) {
+	public LeakyReLU(Number alfa) {
+		double a = alfa.doubleValue();
+
 		construir(
-			x -> (x > 0) ? x : x*alfa, 
-			x -> (x > 0) ? 1 : alfa   
+			x -> (x > 0) ? x : x*a,
+			x -> (x > 0) ? 1 : a
 		);
 	}
 

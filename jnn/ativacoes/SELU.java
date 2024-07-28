@@ -17,10 +17,13 @@ public class SELU extends Ativacao {
 	 * @param alfa constante alfa.
 	 * @param escala constante de escala.
 	 */
-	public SELU(double alfa, double escala) {
+	public SELU(Number alfa, Number escala) {
+		double a = alfa.doubleValue();
+		double e = escala.doubleValue();
+
 		construir(
-			x -> (x > 0) ? escala * x : escala * alfa * (Math.exp(x) - 1),
-			x -> (x > 0) ? escala : escala * alfa * Math.exp(x)
+			x -> (x > 0) ? e * x : e * a * (Math.exp(x) - 1),
+			x -> (x > 0) ? e     : e * a * Math.exp(x)
 		);
 	}
 

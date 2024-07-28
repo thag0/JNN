@@ -15,10 +15,12 @@ public class ELU extends Ativacao {
 	 * seu valor de alfa configurável.
 	 * @param alfa novo valor alfa.
 	 */
-	public ELU(double alfa) {
+	public ELU(Number alfa) {
+		double a = alfa.doubleValue();
+
 		construir(
-			x -> (x > 0) ? x : alfa * (Math.exp(x) - 1),
-			x -> (x > 0) ? 1 : alfa * Math.exp(x)
+			x -> (x > 0) ? x : a * (Math.exp(x) - 1),
+			x -> (x > 0) ? 1 : a * Math.exp(x)
 		);
 	}
 
