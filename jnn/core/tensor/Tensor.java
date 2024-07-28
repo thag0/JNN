@@ -2303,4 +2303,70 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		new SerialTensor().serializar(this, caminho);
 	}
 
+	/**
+	 * Retorna um novo tensor contendo os dados da dimensão desejada.
+	 * <p>
+	 *		Exemplo:
+	 * </p>
+	 * <pre>
+	 *tensor = [
+	 *	[[1, 2, 3],
+	 *	 [4, 5, 6]]
+	 *]
+	 * 
+	 *subTensor0 = tensor.subTensor(0).
+	 *subtensor0 = [
+	 *	[1, 2, 3],
+	 *]
+	 * 
+	 *subTensor1 = tensor.subTensor(1).
+	 *subtensor1 = [
+	 *	[4, 5, 6],
+	 *]
+	 * </pre>
+	 * @param id índice da subdimensão desejada.
+	 * @return {@code Tensor} com o sub conteúdo.
+	 */
+	public Tensor subTensor(int id) {
+		if (tamanho() == 1) {
+			throw new UnsupportedOperationException(
+				"\nNão é possível obter um subtensor a partir de um tensor escalar."
+			);
+		}
+
+		if (id < 0 || id >= shape[0]) {
+			throw new IllegalArgumentException(
+				"\nÍndice " + id + " inválido."
+			);
+		}
+
+		if (numDim() == 1) {// retornar tensor escalar
+			return new Tensor(
+				new Variavel[] { dados[id] },
+				1
+			);
+		}
+
+		int[] novoShape = new int[shape.length-1];
+		for (int i = 0; i < novoShape.length; i++) {
+			novoShape[i] = shape[i+1];
+		}
+
+		int[] indices = new int[shape.length];
+		indices[0] = id;
+		int inicio = indice(indices);
+
+		for (int i = 1; i < indices.length; i++) {
+			indices[i] = shape[i]-1;
+		}
+		int fim = indice(indices);
+
+		Variavel[] novosDados = new Variavel[calcularTamanho(novoShape)];
+		for (int i = inicio; i <= fim; i++) {
+			novosDados[i-inicio] = dados[i];
+		}
+
+		return new Tensor(novosDados, novoShape);
+	}
+
 }
