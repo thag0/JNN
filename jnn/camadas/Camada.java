@@ -151,14 +151,16 @@ public abstract class Camada {
 	 * qual posição a camada está localizada.
 	 * @param id id da camada.
 	 */
-	public void setId(int id) {
-		if (id < 0) {
+	public void setId(Number id) {
+		int i = id.intValue();
+		
+		if (i < 0) {
 			throw new IllegalArgumentException(
-				"\nId da camada deve ser maior ou igual a zero, recebido: " + id + "."
+				"\nId da camada deve ser maior ou igual a zero, recebido: " + i + "."
 			);
 		}
 
-		this.id = id;
+		this.id = i;
 	}
 
 	/**
