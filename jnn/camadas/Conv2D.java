@@ -226,7 +226,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 * @param iniKernel inicializador para os filtros.
 	 * @param iniBias inicializador para os bias.
 	 */
-	public Conv2D(int[] entrada, int filtros, int[] filtro, Object ativacao, Object iniKernel, Object iniBias) {
+	public Conv2D(int[] entrada, Number filtros, int[] filtro, Object ativacao, Object iniKernel, Object iniBias) {
 		this(filtros, filtro, ativacao, iniKernel, iniBias);
 
 		utils.validarNaoNulo(entrada, "\nO formato de entrada não pode ser nulo.");
@@ -275,7 +275,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 * @param ativacao função de ativação.
 	 * @param iniKernel inicializador para os filtros.
 	 */
-	public Conv2D(int[] entrada, int filtros, int[] filtro, Object ativacao, Object iniKernel) {
+	public Conv2D(int[] entrada, Number filtros, int[] filtro, Object ativacao, Object iniKernel) {
 		this(entrada, filtros, filtro, ativacao, iniKernel, null);
 	}
 
@@ -302,7 +302,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 * @param filtro formato dos filtros da camada (altura, largura).
 	 * @param ativacao função de ativação.
 	 */
-	public Conv2D(int[] entrada, int filtros, int[] filtro, Object ativacao) {
+	public Conv2D(int[] entrada, Number filtros, int[] filtro, Object ativacao) {
 		this(entrada, filtros, filtro, ativacao, null, null);
 	}
 
@@ -331,7 +331,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 * @param filtros quantidade de filtros.
 	 * @param filtro formato dos filtros da camada (altura, largura).
 	 */
-	public Conv2D(int[] entrada, int filtros, int[] filtro) {
+	public Conv2D(int[] entrada, Number filtros, int[] filtro) {
 		this(entrada, filtros, filtro, null, null, null);
 	}
 
@@ -359,7 +359,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 * @param iniKernel inicializador para os filtros.
 	 * @param iniBias inicializador para os bias.
 	 */
-	public Conv2D(int filtros, int[] filtro, Object ativacao, Object iniKernel, Object iniBias) {
+	public Conv2D(Number filtros, int[] filtro, Object ativacao, Object iniKernel, Object iniBias) {
 		utils.validarNaoNulo(filtro, "O formato do filtro não pode ser nulo.");
 
 		//formado dos filtros
@@ -381,13 +381,14 @@ public class Conv2D extends Camada implements Cloneable {
 		shapeFiltro[1] = formFiltro[1];
 
 		// número de filtros
-		if (filtros < 1) {
+		int f = filtros.intValue();
+		if (f < 1) {
 			throw new IllegalArgumentException(
 				"\nO número de filtros deve ser maior que zero, recebido: " + filtros
 			);
 		}
 
-		shapeSaida[0] = filtros;
+		shapeSaida[0] = f;
 		
 		Dicionario dicio = new Dicionario();
 		if (ativacao != null) this.ativacao = dicio.getAtivacao(ativacao);
@@ -418,7 +419,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 * @param ativacao função de ativação.
 	 * @param iniKernel inicializador para os filtros.
 	 */
-	public Conv2D(int filtros, int[] filtro, Object ativacao, Object iniKernel) {
+	public Conv2D(Number filtros, int[] filtro, Object ativacao, Object iniKernel) {
 		this(filtros, filtro, ativacao, iniKernel, null);
 	}
 
@@ -444,7 +445,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 * @param filtros quantidade de filtros.
 	 * @param ativacao função de ativação.
 	 */
-	public Conv2D(int filtros, int[] filtro, Object ativacao) {
+	public Conv2D(Number filtros, int[] filtro, Object ativacao) {
 		this(filtros, filtro, ativacao, null, null);
 	}
 
@@ -469,7 +470,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 * @param filtro formato dos filtros da camada.
 	 * @param filtros quantidade de filtros.
 	 */
-	public Conv2D(int filtros, int[] filtro) {
+	public Conv2D(Number filtros, int[] filtro) {
 		this(filtros, filtro, null, null, null);
 	}
 	
