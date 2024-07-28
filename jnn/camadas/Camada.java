@@ -188,7 +188,7 @@ public abstract class Camada {
 	 * camada.
 	 * @param seed nova seed.
 	 */
-	public void setSeed(long seed) {
+	public void setSeed(Number seed) {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui configuração de seed."
 		); 

@@ -189,22 +189,23 @@ public class Densa extends Camada implements Cloneable {
 	 * @param iniKernel inicializador para os pesos da camada.
 	 * @param iniBias inicializador para os bias da camada.
 	 */
-	public Densa(int e, int n, Object ativacao, Object iniKernel, Object iniBias) {
+	public Densa(Number e, Number n, Object ativacao, Object iniKernel, Object iniBias) {
 		this(n, ativacao, iniKernel, iniBias);
 
-		if (e < 1) {
+		int en = e.intValue();
+		if (en < 1) {
 			throw new IllegalArgumentException(
 				"\nA camada deve conter ao menos uma entrada."
 			);
 		}
 
-		if (e <= 0) {
+		if (en <= 0) {
 			throw new IllegalArgumentException(
-				"\nO valor de entrada deve ser maior que zero."
+				"\nValor de entrada deve ser maior que zero."
 			);
 		}
 	
-		construir(new int[]{1, e});//construir automaticamente
+		construir(new int[]{1, en});// construir automaticamente
 	}
 
 	/**
@@ -216,7 +217,7 @@ public class Densa extends Camada implements Cloneable {
 	 * @param ativacao função de ativação que será usada pela camada.
 	 * @param iniKernel inicializador para os pesos da camada.
 	 */
-	public Densa(int e, int n, Object ativacao, Object iniKernel) {
+	public Densa(Number e, Number n, Object ativacao, Object iniKernel) {
 		this(e, n, ativacao, iniKernel, null);
 	}
 
@@ -228,7 +229,7 @@ public class Densa extends Camada implements Cloneable {
 	 * @param n quantidade de neurônios.
 	 * @param ativacao função de ativação que será usada pela camada.
 	 */
-	public Densa(int e, int n, Object ativacao) {
+	public Densa(Number e, Number n, Object ativacao) {
 		this(e, n, ativacao, null, null);
 	}
 
@@ -239,7 +240,7 @@ public class Densa extends Camada implements Cloneable {
 	 * @param e quantidade de conexões de entrada.
 	 * @param n quantidade de neurônios.
 	 */
-	public Densa(int e, int n) {
+	public Densa(Number e, Number n) {
 		this(e, n, null, null, null);
 	}
 
@@ -252,13 +253,16 @@ public class Densa extends Camada implements Cloneable {
 	 * @param iniKernel inicializador para os pesos da camada.
 	 * @param iniBias inicializador para os bias da camada.
 	 */
-	public Densa(int n, Object ativacao, Object iniKernel, Object iniBias) {
-		if (n < 1) {
+	public Densa(Number n, Object ativacao, Object iniKernel, Object iniBias) {
+		int unidades = n.intValue();
+
+		if (unidades < 1) {
 			throw new IllegalArgumentException(
-				"A camada deve conter ao menos um neurônio."
+				"\nA camada deve conter ao menos um neurônio."
 			);
 		}
-		this.numNeuronios = n;
+
+		numNeuronios = unidades;
 
 		//usar os valores padrão se necessário
 		Dicionario dic = new Dicionario();
@@ -275,7 +279,7 @@ public class Densa extends Camada implements Cloneable {
 	 * @param ativacao função de ativação que será usada pela camada.
 	 * @param iniKernel inicializador para os pesos da camada.
 	 */
-	public Densa(int n, Object ativacao, Object iniKernel) {
+	public Densa(Number n, Object ativacao, Object iniKernel) {
 		this(n, ativacao, iniKernel, null);
 	}
 
@@ -286,7 +290,7 @@ public class Densa extends Camada implements Cloneable {
 	 * @param n quantidade de neurônios.
 	 * @param ativacao função de ativação que será usada pela camada.
 	 */
-	public Densa(int n, Object ativacao) {
+	public Densa(Number n, Object ativacao) {
 		this(n, ativacao, null, null);
 	}
 
@@ -296,7 +300,7 @@ public class Densa extends Camada implements Cloneable {
 	 * inicializados com o método {@code inicializar()}.
 	 * @param n quantidade de neurônios.
 	 */
-	public Densa(int n) {
+	public Densa(Number n) {
 		this(n, null, null, null);
 	}
 
@@ -316,7 +320,13 @@ public class Densa extends Camada implements Cloneable {
 	public void construir(int[] shape) {
 		utils.validarNaoNulo(shape, "Formato de entrada nulo.");
 
-		tamEntrada = shape[utils.ultimoIndice(shape)];
+		if (shape.length != 1) {
+			throw new IllegalArgumentException(
+				"\nFormato de entrada deve conter 1 elemento, recebido " + shape.length
+			);
+		}
+
+		tamEntrada = shape[0];
 
 		if (tamEntrada < 1) {
 			throw new IllegalArgumentException(
@@ -326,7 +336,7 @@ public class Densa extends Camada implements Cloneable {
 
 		if (numNeuronios < 1) {
 			throw new IllegalArgumentException(
-				"\nO número de neurônios para a camada Densa não foi definido."
+				"\nNúmero de neurônios para a camada Densa não foi definido."
 			);
 		}
 
@@ -351,7 +361,7 @@ public class Densa extends Camada implements Cloneable {
 	}
 
 	@Override
-	public void setSeed(long seed) {
+	public void setSeed(Number seed) {
 		iniKernel.setSeed(seed);
 		iniBias.setSeed(seed);
 	}

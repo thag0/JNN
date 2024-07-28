@@ -85,15 +85,17 @@ public class Dropout extends Camada implements Cloneable {
 	 * @param taxa taxa de dropout, um {@code valor entre 0 e 1} representando a
 	 * taxa de abandono da camada.
 	 */
-	public Dropout(double taxa) {
-		if (taxa <= 0 || taxa >= 1) {
+	public Dropout(Number taxa) {
+		double t = taxa.doubleValue();
+		
+		if (t <= 0 || t >= 1) {
 			throw new IllegalArgumentException(
 				"\nTaxa de dropout deve estar entre 0 e 1, " + 
 				"recebido: " + taxa
 			);
 		}
 
-		this.taxa = taxa;
+		this.taxa = t;
 	}
 
 	/**
@@ -103,9 +105,9 @@ public class Dropout extends Camada implements Cloneable {
 	 * taxa de abandono da camada.
 	 * @param seed seed usada para o gerador de números aleatórios da camada.
 	 */
-	public Dropout(double taxa, long seed) {
+	public Dropout(Number taxa, Number seed) {
 		this(taxa);
-		random.setSeed(seed);
+		setSeed(seed);
 	}
 
 	@Override
@@ -139,13 +141,9 @@ public class Dropout extends Camada implements Cloneable {
 	@Override
 	public void inicializar() {}
 
-	/**
-	 * Configura uma seed fixa para geradores de números aleatórios da
-	 * camada.
-	 * @param seed nova seed.
-	 */
-	public void setSeed(long seed) {
-		random.setSeed(seed);
+	@Override
+	public void setSeed(Number seed) {
+		random.setSeed(seed.longValue());
 	}
 
 	@Override

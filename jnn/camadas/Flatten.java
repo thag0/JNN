@@ -143,7 +143,7 @@ public class Flatten extends Camada implements Cloneable{
 	public void inicializar() {}
 
 	@Override
-	public void setSeed(long seed) {}
+	public void setSeed(Number seed) {}
 
 	@Override
 	protected void setNomes() {
