@@ -96,7 +96,7 @@ public class MainConv {
 			new Densa(NUM_DIGITOS_TREINO, "softmax")
 		);
 
-		modelo.compilar("adam", "entropia-cruzada");
+		modelo.compilar("lion", "entropia-cruzada");
 		
 		return modelo;
 	}
