@@ -86,7 +86,6 @@ public abstract class Otimizador {
 			}
 		}
 
-
 		for (Tensor param : params) {
 			_params = utils.addEmArray(_params, param);	
 		}
