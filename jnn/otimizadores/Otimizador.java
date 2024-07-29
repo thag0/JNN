@@ -2,7 +2,6 @@ package jnn.otimizadores;
 
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
-import jnn.modelos.Modelo;
 
 /**
  * Classe base para implementações de otimizadores do treino da biblioteca.
@@ -66,24 +65,33 @@ public abstract class Otimizador {
 	/**
 	 * Captura os parâmetros e gradientes do modelo e inicializa os
 	 * atributos necessários para o otimizador.
-	 * @param modelo modelo para otimização.
+	 * @param params array de {@code Tensor} contendo os parâmetros desejados.
+	 * @param grads array de {@code Tensor} contendo os gradientes desejados.
 	 */
-	protected void initParams(Modelo modelo) {
-		Tensor[] p = modelo.params();
-		Tensor[] g = modelo.grads();
-
-		if (p.length != g.length) {
+	protected void initParams(Tensor[] params, Tensor[] grads) {
+		if (params.length != grads.length) {
 			throw new IllegalStateException(
 				"\nQuantidade de parâmetros e gradientes deve ser igual. " + 
-				"\nRecebido: p = " + p.length + ", g = " + g.length
+				"\nRecebido: p = " + params.length + ", g = " + grads.length
 			);
 		}
 
-		for (Tensor param : p) {
+		int n = params.length;
+		for (int i = 0; i < n; i++) {
+			if (!params[i].compararShape(grads[i])) {
+				throw new IllegalArgumentException(
+					"\nParâmetro " + i + params[i].shapeStr() + " deve conter" +
+					" o mesmo formato do gradiente " + i + grads[i].shapeStr()
+				);
+			}
+		}
+
+
+		for (Tensor param : params) {
 			_params = utils.addEmArray(_params, param);	
 		}
 
-		for (Tensor grad : g) {
+		for (Tensor grad : grads) {
 			_grads = utils.addEmArray(_grads, grad);
 		}
 	}
@@ -91,9 +99,10 @@ public abstract class Otimizador {
 	/**
 	 * Inicializa os parâmetros necessários do otimizador para as camadas 
 	 * do modelo especificado.
-	 * @param modelo modelo para otimização.
+	 * @param params array de {@code Tensor} contendo os parâmetros desejados.
+	 * @param grads array de {@code Tensor} contendo os gradientes desejados.
 	 */
-	public abstract void construir(Modelo modelo);
+	public abstract void construir(Tensor[] params, Tensor[] grads);
 
 	/**
 	 * Executa um passo de atualização do otimizador.

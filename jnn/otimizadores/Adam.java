@@ -1,7 +1,6 @@
 package jnn.otimizadores;
 
 import jnn.core.tensor.Tensor;
-import jnn.modelos.Modelo;
 
 /**
  * <h2>
@@ -237,8 +236,8 @@ public class Adam extends Otimizador {
 	}
 
 	@Override
-	public void construir(Modelo modelo) {
-		initParams(modelo);
+	public void construir(Tensor[] params, Tensor[] grads) {
+		initParams(params, grads);
 
 		m = new Tensor[0];
 		v = new Tensor[0];

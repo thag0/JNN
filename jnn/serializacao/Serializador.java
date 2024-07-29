@@ -319,10 +319,10 @@ public class Serializador {
 			}
 
 			modelo.setOtimizador(otimizador);
-			otimizador.construir(modelo);
+			otimizador.construir(modelo.params(), modelo.grads());
 			
 			modelo.setPerda(perda);
-
+			
 		} catch(Exception e) {
 			System.out.println("Erro ao ler modelo");
 			throw new RuntimeException(e.getMessage());

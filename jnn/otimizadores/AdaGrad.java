@@ -1,7 +1,6 @@
 package jnn.otimizadores;
 
 import jnn.core.tensor.Tensor;
-import jnn.modelos.Modelo;
 
 /**
  * <h2>
@@ -112,9 +111,9 @@ public class AdaGrad extends Otimizador {
 	}
 
 	@Override
-	public void construir(Modelo modelo) {
-		initParams(modelo);
-
+	public void construir(Tensor[] params, Tensor[] grads) {
+		initParams(params, grads);
+		
 		ac = new Tensor[0];
 		double valorInicial = 0.1;
 		for (Tensor param : _params) {

@@ -416,7 +416,7 @@ public class RedeNeural extends Modelo {
 		_perda = dic.getPerda(perda);
 		_otimizador = dic.getOtimizador(otimizador);
 
-		_otimizador.construir(this);
+		_otimizador.construir(params(), grads());
 
 		_compilado = true;
 	}

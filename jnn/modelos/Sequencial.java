@@ -300,7 +300,7 @@ public class Sequencial extends Modelo {
 		_perda = dicio.getPerda(perda);
 		
 		_otimizador = dicio.getOtimizador(otimizador);
-		_otimizador.construir(this);
+		_otimizador.construir(params(), grads());
 		
 		_compilado = true;// modelo pode ser usado.
 	}

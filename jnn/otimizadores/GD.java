@@ -1,6 +1,6 @@
 package jnn.otimizadores;
 
-import jnn.modelos.Modelo;
+import jnn.core.tensor.Tensor;
 
 /**
  * <h2>
@@ -59,8 +59,8 @@ public class GD extends Otimizador {
 	}
 
 	@Override
-	public void construir(Modelo modelo) {
-		initParams(modelo);
+	public void construir(Tensor[] params, Tensor[] grads) {
+		initParams(params, grads);
 		_construido = true;// otimizador pode ser usado
 	}
 
