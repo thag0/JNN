@@ -96,22 +96,22 @@ public class Nadam extends Otimizador {
 	/**
 	 * Coeficientes de momentum.
 	 */
-	private Tensor[] m;
+	private Tensor[] m = {};
 
 	/**
 	 * Coeficientes de momentum de segunda ordem.
 	 */
-	private Tensor[] v;
+	private Tensor[] v = {};
 
 	/**
 	 * Coeficientes de momentum corrigidos.
 	 */
-	private Tensor[] mc;
+	private Tensor[] mc = {};
 
 	/**
 	 * Coeficientes de momentum de segunda ordem corrigidos.
 	 */
-	private Tensor[] vc;
+	private Tensor[] vc = {};
 
 	/**
 	 * Contador de iterações.
@@ -192,16 +192,14 @@ public class Nadam extends Otimizador {
 	@Override
 	public void construir(Tensor[] params, Tensor[] grads) {
 		initParams(params, grads);
-
-		m  = new Tensor[0];
-		v  = new Tensor[0];
-		mc = new Tensor[0];
-		vc = new Tensor[0];
+		
 		for (Tensor param : _params) {
-			m  = utils.addEmArray(m,  new Tensor(param.shape()));
-			v  = utils.addEmArray(v,  new Tensor(param.shape()));
-			mc = utils.addEmArray(mc, new Tensor(param.shape()));
-			vc = utils.addEmArray(vc, new Tensor(param.shape()));
+			int[] shape = param.shape();
+
+			m  = utils.addEmArray(m,  new Tensor(shape));
+			v  = utils.addEmArray(v,  new Tensor(shape));
+			mc = utils.addEmArray(mc, new Tensor(shape));
+			vc = utils.addEmArray(vc, new Tensor(shape));
 		}
 
 		_construido = true;// otimizador pode ser usado

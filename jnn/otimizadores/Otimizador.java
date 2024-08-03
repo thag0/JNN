@@ -4,19 +4,13 @@ import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 
 /**
- * Classe base para implementações de otimizadores do treino da biblioteca.
+ * <h3>
+ *		Otimizador base
+ * </h3>
  * <p>
- *		O otimizador já deve levar em consideração que os gradientes para todas
- *		as camadas foram calculados previamente.
- * </p>
- * <p>
- *		Novos otimizadores devem implementar (pelo menos) os métodos {@code construir()} 
- *		e {@code atualizar()} que são chamados obrigatoriamente no momento da compilação e 
- *		treino dos modelos.
- * </p>
- * <p>
- *		O método {@code inicializar()} é útil para aqueles otimizadores que possuem atributos 
- *		especiais, como o coeficiente de momentum por exemplo.
+ *		Novos otimizadores devem implementar os métodos {@code construir()} 
+ *		e {@code atualizar()} que são chamados obrigatoriamente no momento da 
+ *		compilação e treino dos modelos.
  * </p>
  */
 public abstract class Otimizador {
@@ -24,27 +18,27 @@ public abstract class Otimizador {
 	/**
 	 * Conjunto de elementos que serão otimizados.
 	 */
-	Tensor[] _params = {};
+	protected Tensor[] _params = {};
 
 	/**
 	 * Conjunto de gradientes dos parâmetros.
 	 */
-	Tensor[] _grads = {};
+	protected Tensor[] _grads = {};
 
 	/**
 	 * Utilitário.
 	 */
-	Utils utils = new Utils();
+	protected Utils utils = new Utils();
 
 	/**
 	 * Buffer de informações sobre o otimizador.
 	 */
-	StringBuilder info;
+	protected StringBuilder info;
 
 	/**
 	 * Espaçamento para uma melhor formatação das informações do otimizador
 	 */
-	String pad = " ".repeat(4);
+	protected String pad = " ".repeat(4);
 
 	/**
 	 * Auxiliar para o controle de inicialização do otimizador.
@@ -63,7 +57,7 @@ public abstract class Otimizador {
 	}
 
 	/**
-	 * Captura os parâmetros e gradientes do modelo e inicializa os
+	 * Captura os parâmetros e gradientes e inicializa os
 	 * atributos necessários para o otimizador.
 	 * @param params array de {@code Tensor} contendo os parâmetros desejados.
 	 * @param grads array de {@code Tensor} contendo os gradientes desejados.
@@ -96,8 +90,7 @@ public abstract class Otimizador {
 	}
 
 	/**
-	 * Inicializa os parâmetros necessários do otimizador para as camadas 
-	 * do modelo especificado.
+	 * Inicializa os parâmetros necessários do otimizador.
 	 * @param params array de {@code Tensor} contendo os parâmetros desejados.
 	 * @param grads array de {@code Tensor} contendo os gradientes desejados.
 	 */

@@ -51,7 +51,7 @@ public class RMSProp extends Otimizador {
 	/**
 	 * Valor padrão para a taxa de decaimeto.
 	 */
-	private static final double PADRAO_RHO = 0.995;
+	private static final double PADRAO_RHO = 0.99;
 
 	/**
 	 * Valor padrão para epsilon.
@@ -76,7 +76,7 @@ public class RMSProp extends Otimizador {
 	/**
 	 * Acumuladores para os.
 	 */
-	private Tensor[] ac;
+	private Tensor[] ac = {};
 
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> RMSProp </strong> 
@@ -144,7 +144,6 @@ public class RMSProp extends Otimizador {
 	public void construir(Tensor[] params, Tensor[] grads) {
 		initParams(params, grads);
 
-		ac = new Tensor[0];
 		for (Tensor param : _params) {
 			ac = utils.addEmArray(ac, new Tensor(param.shape()));
 		}
@@ -158,7 +157,7 @@ public class RMSProp extends Otimizador {
 		
 		for (int i = 0; i < _params.length; i++) {
 			ac[i].aplicar(ac[i], _grads[i], 
-				(ac, g) -> (rho * ac) + (1 - rho) * (g*g)
+				(ac, g) -> (rho * ac) + ((1.0 - rho) * (g*g))
 			);
 			_params[i].aplicar(_params[i], _grads[i], ac[i], 
 				(p, g, ac) -> p -= (g * tA) / (Math.sqrt(ac) + eps)

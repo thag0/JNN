@@ -43,12 +43,12 @@ public class AdaGrad extends Otimizador {
 	/**
 	 * Valor padrão para a taxa de aprendizado do otimizador.
 	 */
-	private static final double PADRAO_TA = 0.5;
+	private static final double PADRAO_TA = 0.1;
 
 	/**
 	 * Valor padrão para o valor de epsilon pro otimizador.
 	 */
-	private static final double PADRAO_EPS = 1e-7; 
+	private static final double PADRAO_EPS = 1e-8; 
 
 	/**
 	 * Valor de taxa de aprendizado do otimizador.
@@ -63,7 +63,7 @@ public class AdaGrad extends Otimizador {
 	/**
 	 * Acumuladores.
 	 */
-	private Tensor[] ac;
+	private Tensor[] ac = {};
 
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> AdaGrad </strong> 
@@ -114,11 +114,12 @@ public class AdaGrad extends Otimizador {
 	public void construir(Tensor[] params, Tensor[] grads) {
 		initParams(params, grads);
 		
-		ac = new Tensor[0];
 		double valorInicial = 0.1;
 		for (Tensor param : _params) {
-			Tensor t = new Tensor(param.shape()).preencher(valorInicial);
-			ac = utils.addEmArray(ac, t);
+			ac = utils.addEmArray(
+				ac,
+				new Tensor(param.shape()).preencher(valorInicial)
+			);
 		}
 		
 		_construido = true;// otimizador pode ser usado

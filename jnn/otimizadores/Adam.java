@@ -123,12 +123,12 @@ public class Adam extends Otimizador {
 	/**
 	 * Coeficientes de momentum.
 	 */
-	private Tensor[] m;
+	private Tensor[] m = {};
 
 	/**
 	 * Coeficientes de momentum de segunda ordem.
 	 */
-	private Tensor[] v;
+	private Tensor[] v = {};
 
 	/**
 	 * Coeficientes de segunda ordem corrigidos.
@@ -239,17 +239,18 @@ public class Adam extends Otimizador {
 	public void construir(Tensor[] params, Tensor[] grads) {
 		initParams(params, grads);
 
-		m = new Tensor[0];
-		v = new Tensor[0];
-		if (amsgrad) vc = new Tensor[0];
 		for (Tensor param : _params) {
 			m = utils.addEmArray(m, new Tensor(param.shape()));
 			v = utils.addEmArray(v, new Tensor(param.shape()));
-			if (amsgrad) {
+		}
+
+		if (amsgrad) {
+			vc = new Tensor[0];
+			for (Tensor param : _params) {
 				vc = utils.addEmArray(vc, new Tensor(param.shape()));
 			}
 		}
-
+		
 		_construido = true;// otimizador pode ser usado
 	}
 

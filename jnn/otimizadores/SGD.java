@@ -72,7 +72,7 @@ public class SGD extends Otimizador {
 	/**
 	 * Coeficientes de momentum.
 	 */
-	private Tensor[] m;
+	private Tensor[] m = {};
 
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient 
@@ -135,7 +135,6 @@ public class SGD extends Otimizador {
 	public void construir(Tensor[] params, Tensor[] grads) {
 		initParams(params, grads);
 
-		m = new Tensor[0];
 		for (Tensor param : _params) {
 			m = utils.addEmArray(m, new Tensor(param.shape()));
 		}
@@ -151,7 +150,7 @@ public class SGD extends Otimizador {
 			m[i].aplicar(m[i], _grads[i], 
 				(m, g) -> (m * momentum) - (g * tA)
 			);
-
+			
 			if (nesterov) {
 				_params[i].aplicar(_params[i], m[i], _grads[i], 
 					(p, m, g) -> p + (momentum * m) - (g * tA)

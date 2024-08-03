@@ -48,12 +48,12 @@ public class Adadelta extends Otimizador {
 	/**
 	 * Valor padrão para a taxa de decaimento.
 	 */
-	private static final double PADRAO_RHO = 0.999;
+	private static final double PADRAO_RHO = 0.99;
 
 	/**
 	 * Valor padrão para epsilon.
 	 */
-	private static final double PADRAO_EPS = 1e-6;
+	private static final double PADRAO_EPS = 1e-8;
 
 	/**
 	 * Constante de decaimento do otimizador.
@@ -68,17 +68,17 @@ public class Adadelta extends Otimizador {
 	/**
 	 * Acumuladores.
 	 */
-	private Tensor[] ac;
+	private Tensor[] ac = {};
 
 	/**
 	 * Deltas de atualização
 	 */
-	private Tensor[] deltas;
+	private Tensor[] deltas = {};
 
 	/**
 	 * Acumuladores atualizados.
 	 */
-	private Tensor[] acAt;
+	private Tensor[] acAt = {};
 
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> Adadelta </strong> 
@@ -129,10 +129,7 @@ public class Adadelta extends Otimizador {
 	@Override
 	public void construir(Tensor[] params, Tensor[] grads) {
 		initParams(params, grads);
-		
-		ac     = new Tensor[0];
-		deltas = new Tensor[0];
-		acAt   = new Tensor[0];
+
 		for (Tensor param : _params) {
 			ac     = utils.addEmArray(ac,     new Tensor(param.shape()));
 			deltas = utils.addEmArray(deltas, new Tensor(param.shape()));

@@ -69,7 +69,7 @@ public class Lion extends Otimizador {
 	/**
 	 * Coeficientes de momentum.
 	 */
-    private Tensor[] m;
+    private Tensor[] m = {};
 
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> Lion </strong> 
@@ -126,15 +126,18 @@ public class Lion extends Otimizador {
     @Override
 	public void construir(Tensor[] params, Tensor[] grads) {
 		initParams(params, grads);
-
-        m = new Tensor[0];
+		
         for (Tensor param : _params) {
             m = utils.addEmArray(m, new Tensor(param.shape()));
         }
+
+		_construido = true;// otimizador pode ser usado
     }
 
     @Override
     public void atualizar() {
+		verificarConstrucao();
+
         for (int i = 0; i < _params.length; i++) {
             _params[i].aplicar(_params[i], _grads[i], m[i],
                 (p, g, m) -> p -= tA * Math.signum((m * beta1) + (g * (1.0 - beta1)))
