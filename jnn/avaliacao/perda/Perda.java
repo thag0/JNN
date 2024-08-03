@@ -43,10 +43,10 @@ public abstract class Perda {
 			);
 		}
 
-		if (prev.tamanho() != real.tamanho()) {
+		if (prev.tam() != real.tam()) {
 			throw new IllegalArgumentException(
-				"Dimensões de dados previstos (" + prev.tamanho() + 
-				") diferente da dimensão dos dados reais (" + real.tamanho() + 
+				"Dimensões de dados previstos (" + prev.tam() + 
+				") diferente da dimensão dos dados reais (" + real.tam() + 
 				")"
 			);
 		}

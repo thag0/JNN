@@ -262,7 +262,7 @@ public abstract class Camada {
 	 * Retorna a quantidade total de elementos presentes na saída da camada.
 	 * @return tamanho de saída da camada.
 	 */
-	public int tamanhoSaida() {
+	public int tamSaida() {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui retorno de tamanho da saída."
 		);      
@@ -276,7 +276,7 @@ public abstract class Camada {
 	 * O resultado deve ser a quantidade total desses elementos.
 	 * @return número da parâmetros da camada.
 	 */
-	public abstract int numParametros();
+	public abstract int numParams();
 
 	/**
 	 * Retorna o verificador de uso do bias dentro da camada.

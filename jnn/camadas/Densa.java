@@ -519,14 +519,14 @@ public class Densa extends Camada implements Cloneable {
 	 */
 	public int tamanhoEntrada() {
 		verificarConstrucao();
-		return _entrada.tamanho();
+		return _entrada.tam();
 	}
 
 	/**
 	 * Retorna a capacidade de saída da camada.
 	 * @return tamanho de saída da camada.
 	 */
-	public int tamanhoSaida() {
+	public int tamSaida() {
 		verificarConstrucao();
 		return numNeuronios;
 	}
@@ -537,11 +537,11 @@ public class Densa extends Camada implements Cloneable {
 	}
 
 	@Override
-	public int numParametros() {
+	public int numParams() {
 		verificarConstrucao();
 
-		int parametros = _kernel.tamanho();
-		if (temBias()) parametros += bias().tamanho();
+		int parametros = _kernel.tam();
+		if (temBias()) parametros += bias().tam();
 
 		return parametros;
 	}
@@ -564,7 +564,7 @@ public class Densa extends Camada implements Cloneable {
 		sb.append(pad).append("Ativação: " + ativacao.nome() + "\n");
 		sb.append(pad).append("Entrada: " + tamanhoEntrada() + "\n");
 		sb.append(pad).append("Neurônios: " + numNeuronios() + "\n");
-		sb.append(pad).append("Saida: " + tamanhoSaida() + "\n");
+		sb.append(pad).append("Saida: " + tamSaida() + "\n");
 		sb.append("\n");
 
 		sb.append(pad + "Pesos:  " + _kernel.shapeStr() + "\n");

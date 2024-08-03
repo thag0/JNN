@@ -188,7 +188,7 @@ public class Dropout extends Camada implements Cloneable {
 
 		if (treinando) {
 			gerarMascaras();
-			_saida.mult(_mascara);
+			_saida.mul(_mascara);
 		}
 
 		return _saida;
@@ -242,7 +242,7 @@ public class Dropout extends Camada implements Cloneable {
 			);
 		}
 
-		if (treinando) _gradEntrada.mult(_mascara);
+		if (treinando) _gradEntrada.mul(_mascara);
 
 		return _gradEntrada;
 	}
@@ -265,7 +265,7 @@ public class Dropout extends Camada implements Cloneable {
 	}
 
 	@Override
-	public int numParametros() {
+	public int numParams() {
 		return 0;
 	}
 

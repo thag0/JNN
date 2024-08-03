@@ -216,8 +216,8 @@ public class Flatten extends Camada implements Cloneable{
 	}
 
 	@Override
-	public int tamanhoSaida() {
-		return saida().tamanho();
+	public int tamSaida() {
+		return saida().tam();
 	}
 
 	@Override
@@ -241,12 +241,12 @@ public class Flatten extends Camada implements Cloneable{
 		verificarConstrucao();
 		
 		return new int[]{
-			tamanhoSaida()
+			tamSaida()
 		};
 	}
 
 	@Override
-	public int numParametros() {
+	public int numParams() {
 		return 0;
 	}
 
@@ -266,7 +266,7 @@ public class Flatten extends Camada implements Cloneable{
 		sb.append(nome() + " (id " + id + ") = [\n");
 
 		sb.append(pad).append("Entrada: " + utils.shapeStr(shapeEntrada) + "\n");
-		sb.append(pad).append("Saída: (1, " + tamanhoSaida() + ")\n");
+		sb.append(pad).append("Saída: (1, " + tamSaida() + ")\n");
 
 		sb.append("]\n");
 

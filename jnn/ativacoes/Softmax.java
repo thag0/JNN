@@ -68,7 +68,7 @@ public class Softmax extends Ativacao {
 
 	@Override
 	public void backward(Densa camada) {
-		int n = camada._somatorio.tamanho();
+		int n = camada._somatorio.tam();
 		Tensor tmp = camada.saida().bloco(n);
 		Tensor ident = new Tensor(n, n);
 		for (int i = 0; i < n; i++) {
@@ -79,7 +79,7 @@ public class Softmax extends Ativacao {
 
 		Tensor transp = tmp.transpor();
 
-		Tensor res = optensor.matMult(
+		Tensor res = optensor.matMul(
 			camada._gradSaida, 
 			optensor.matHadamard(
 				tmp, optensor.matSub(ident, transp)

@@ -48,10 +48,10 @@ public class Variavel implements Cloneable {
      * <p>
      *      Apenas o valor da variável informada será copiado.
      * </p>
-     * @param v variável desejada
+     * @param x variável desejada
      */
-    public Variavel(Variavel v) {
-        valor = v.valor;
+    public Variavel(Variavel x) {
+        valor = x.valor;
     }
 
     /**
@@ -64,10 +64,10 @@ public class Variavel implements Cloneable {
 
     /**
      * Adiciona o valor local usando o valor da variável informada.
-     * @param v variável desejada.
+     * @param x variável desejada.
      */
-    public void add(Variavel v) {
-        valor += v.valor;
+    public void add(Variavel x) {
+        valor += x.valor;
     }
 
     /**
@@ -80,26 +80,26 @@ public class Variavel implements Cloneable {
 
     /**
      * Subtrai o valor local usando o valor da variável informada.
-     * @param v variável desejada.
+     * @param x variável desejada.
      */
-    public void sub(Variavel v) {
-        valor -= v.valor;
+    public void sub(Variavel x) {
+        valor -= x.valor;
     }
 
     /**
      * Multiplica o valor informado no conteúdo da variável.
      * @param x valor desejado.
      */
-    public void mult(Number x) {
+    public void mul(Number x) {
         valor *= x.doubleValue();
     }
 
     /**
      * Multiplica o valor local usando o valor da variável informada.
-     * @param v variável desejada.
+     * @param x variável desejada.
      */
-    public void mult(Variavel v) {
-        valor *= v.valor;
+    public void mul(Variavel x) {
+        valor *= x.valor;
     }
 
     /**
@@ -112,10 +112,10 @@ public class Variavel implements Cloneable {
    
     /**
      * Divide o valor local usando o valor da variável informada.
-     * @param v variável desejada.
+     * @param x variável desejada.
      */
-    public void div(Variavel v) {
-        valor /= v.valor;
+    public void div(Variavel x) {
+        valor /= x.valor;
     }
 
     /**
@@ -128,10 +128,10 @@ public class Variavel implements Cloneable {
 
      /**
      * Atribui o valor local usando o valor da variável informada.
-     * @param v variável desejada.
+     * @param x variável desejada.
      */
-    public void set(Variavel v) {
-        valor = v.valor;
+    public void set(Variavel x) {
+        valor = x.valor;
     }
 
     /**
@@ -146,146 +146,146 @@ public class Variavel implements Cloneable {
 
     /**
      * Adiciona localmente o resultado da soma entre variáveis recebidas.
-     * @param v1 {@code Variavel} 1
-     * @param v2 {@code Variavel} 2
+     * @param x {@code Variavel} 1
+     * @param y {@code Variavel} 2
      */
-    public void addSoma(Variavel v1, Variavel v2) {
-        valor += (v1.valor + v2.valor);
+    public void addSoma(Variavel x, Variavel y) {
+        valor += (x.valor + y.valor);
     }
 
     /**
      * Adiciona localmente o resultado da diferença entre variáveis recebidas.
-     * @param v1 {@code Variavel} 1
-     * @param v2 {@code Variavel} 2
+     * @param x {@code Variavel} 1
+     * @param y {@code Variavel} 2
      */
-    public void addSub(Variavel v1, Variavel v2) {
-        valor += (v1.valor - v2.valor);
+    public void addSub(Variavel x, Variavel y) {
+        valor += (x.valor - y.valor);
     }
 
     /**
      * Adiciona localmente o resultado do produto entre variáveis recebidas.
-     * @param v1 {@code Variavel} 1
-     * @param v2 {@code Variavel} 2
+     * @param x {@code Variavel} 1
+     * @param y {@code Variavel} 2
      */
-    public void addMult(Variavel v1, Variavel v2) {
-        valor += (v1.valor * v2.valor);
+    public void addMul(Variavel x, Variavel y) {
+        valor += (x.valor * y.valor);
     }
 
     /**
      * Adiciona localmente o resultado da divisão entre variáveis recebidas.
-     * @param v1 {@code Variavel} 1
-     * @param v2 {@code Variavel} 2
+     * @param x {@code Variavel} 1
+     * @param y {@code Variavel} 2
      */
-    public void addDiv(Variavel v1, Variavel v2) {
-        valor += (v1.valor / v2.valor);
+    public void addDiv(Variavel x, Variavel y) {
+        valor += (x.valor / y.valor);
     }
 
     /**
      * Subtrai localmente o resultado da soma entre variáveis recebidas.
-     * @param v1 {@code Variavel} 1
-     * @param v2 {@code Variavel} 2
+     * @param x {@code Variavel} 1
+     * @param y {@code Variavel} 2
      */
-    public void subSoma(Variavel v1, Variavel v2) {
-        valor -= (v1.valor + v2.valor);
+    public void subSoma(Variavel x, Variavel y) {
+        valor -= (x.valor + y.valor);
     }
 
     /**
      * Subtrai localmente o resultado da diferença entre variáveis recebidas.
-     * @param v1 {@code Variavel} 1
-     * @param v2 {@code Variavel} 2
+     * @param x {@code Variavel} 1
+     * @param y {@code Variavel} 2
      */
-    public void subSub(Variavel v1, Variavel v2) {
-        valor -= (v1.valor - v2.valor);
+    public void subSub(Variavel x, Variavel y) {
+        valor -= (x.valor - y.valor);
     }
 
     /**
      * Subtrai localmente o resultado do produto entre variáveis recebidas.
-     * @param v1 {@code Variavel} 1
-     * @param v2 {@code Variavel} 2
+     * @param x {@code Variavel} 1
+     * @param y {@code Variavel} 2
      */
-    public void subMult(Variavel v1, Variavel v2) {
-        valor -= (v1.valor * v2.valor);
+    public void subMul(Variavel x, Variavel y) {
+        valor -= (x.valor * y.valor);
     }
 
     /**
      * Subtrai localmente o resultado da divisão entre variáveis recebidas.
-     * @param v1 {@code Variavel} 1
-     * @param v2 {@code Variavel} 2
+     * @param x {@code Variavel} 1
+     * @param y {@code Variavel} 2
      */
-    public void subDiv(Variavel v1, Variavel v2) {
-        valor -= (v1.valor / v2.valor);
+    public void subDiv(Variavel x, Variavel y) {
+        valor -= (x.valor / y.valor);
     }
 
     /**
      * Multiplica localmente o resultado da soma entre variáveis recebidas.
-     * @param v1 {@code Variavel} 1
-     * @param v2 {@code Variavel} 2
+     * @param x {@code Variavel} 1
+     * @param y {@code Variavel} 2
      */
-    public void multSoma(Variavel v1, Variavel v2) {
-        valor *= (v1.valor + v2.valor);
+    public void mulSoma(Variavel x, Variavel y) {
+        valor *= (x.valor + y.valor);
     }
 
     /**
      * Multiplica localmente o resultado da diferneça entre variáveis recebidas.
-     * @param v1 {@code Variavel} 1
-     * @param v2 {@code Variavel} 2
+     * @param x {@code Variavel} 1
+     * @param y {@code Variavel} 2
      */
-    public void multSub(Variavel v1, Variavel v2) {
-        valor *= (v1.valor - v2.valor);
+    public void mulSub(Variavel x, Variavel y) {
+        valor *= (x.valor - y.valor);
     }
 
     /**
      * Multiplica localmente o resultado do produto entre variáveis recebidas.
-     * @param v1 {@code Variavel} 1
-     * @param v2 {@code Variavel} 2
+     * @param x {@code Variavel} 1
+     * @param y {@code Variavel} 2
      */
-    public void multMult(Variavel v1, Variavel v2) {
-        valor *= (v1.valor * v2.valor);
+    public void mulMul(Variavel x, Variavel y) {
+        valor *= (x.valor * y.valor);
     }
 
     /**
      * Multiplica localmente o resultado da divisão entre variáveis recebidas.
-     * @param v1 {@code Variavel} 1
-     * @param v2 {@code Variavel} 2
+     * @param x {@code Variavel} 1
+     * @param y {@code Variavel} 2
      */
-    public void multDiv(Variavel v1, Variavel v2) {
-        valor *= (v1.valor / v2.valor);
+    public void mulDiv(Variavel x, Variavel y) {
+        valor *= (x.valor / y.valor);
     }
 
     /**
      * Divide localmente o resultado da soma entre variáveis recebidas.
-     * @param v1 {@code Variavel} 1
-     * @param v2 {@code Variavel} 2
+     * @param x {@code Variavel} 1
+     * @param y {@code Variavel} 2
      */
-    public void divSoma(Variavel v1, Variavel v2) {
-        valor /= (v1.valor + v2.valor);
+    public void divSoma(Variavel x, Variavel y) {
+        valor /= (x.valor + y.valor);
     }
 
     /**
      * Divide localmente o resultado da diferneça entre variáveis recebidas.
-     * @param v1 {@code Variavel} 1
-     * @param v2 {@code Variavel} 2
+     * @param x {@code Variavel} 1
+     * @param y {@code Variavel} 2
      */
-    public void divSub(Variavel v1, Variavel v2) {
-        valor /= (v1.valor - v2.valor);
+    public void divSub(Variavel x, Variavel y) {
+        valor /= (x.valor - y.valor);
     }
 
     /**
      * Divide localmente o resultado do produto entre variáveis recebidas.
-     * @param v1 {@code Variavel} 1
-     * @param v2 {@code Variavel} 2
+     * @param x {@code Variavel} 1
+     * @param y {@code Variavel} 2
      */
-    public void divMult(Variavel v1, Variavel v2) {
-        valor /= (v1.valor * v2.valor);
+    public void divMul(Variavel x, Variavel y) {
+        valor /= (x.valor * y.valor);
     }
 
     /**
      * Divide localmente o resultado da divisão entre variáveis recebidas.
-     * @param v1 {@code Variavel} 1
-     * @param v2 {@code Variavel} 2
+     * @param x {@code Variavel} 1
+     * @param y {@code Variavel} 2
      */
-    public void divtDiv(Variavel v1, Variavel v2) {
-        valor /= (v1.valor / v2.valor);
+    public void divtDiv(Variavel x, Variavel y) {
+        valor /= (x.valor / y.valor);
     }
 
     @Override

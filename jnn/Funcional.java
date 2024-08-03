@@ -149,7 +149,7 @@ public final class Funcional {
      */
     public Tensor mult(Tensor a, Tensor b) {
         Tensor r = new Tensor(a);
-        r.mult(b);
+        r.mul(b);
 
         return r;
     }
@@ -161,7 +161,7 @@ public final class Funcional {
      * @return {@code Tensor} resultado.
      */
     public Tensor matmult(Tensor a, Tensor b) {
-        return opt.matMult(a, b);
+        return opt.matMul(a, b);
     }
 
     /**

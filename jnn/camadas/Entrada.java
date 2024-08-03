@@ -112,7 +112,7 @@ public class Entrada extends Camada {
 	}
 
 	@Override
-	public int numParametros() {
+	public int numParams() {
 		return 0;
 	}
 	

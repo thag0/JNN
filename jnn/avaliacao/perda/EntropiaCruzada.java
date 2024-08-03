@@ -18,7 +18,7 @@ public class EntropiaCruzada extends Perda {
 	@Override
 	public Tensor calcular(Tensor prev, Tensor real) {
 		super.verificarDimensoes(prev, real);
-		int tam = prev.tamanho();
+		int tam = prev.tam();
 		
 		double ec = 0.0;
 		for (int i = 0; i < tam; i++) {

@@ -93,7 +93,7 @@ class GerenciadorArquivos {
 	public void exportarImagemEscalaCinza(GerenciadorDadosImagem gdi, BufferedImage imagem, Modelo modelo, double escala, String caminho) {
 		if (imagem == null) throw new IllegalArgumentException("A imagem fornecida é nula.");
 		if (escala <= 0) throw new IllegalArgumentException("O valor de escala não pode ser menor que 1.");
-		if (modelo.camadaSaida().tamanhoSaida() != 1) {
+		if (modelo.camadaSaida().tamSaida() != 1) {
 			throw new IllegalArgumentException(
 				"O modelo deve trabalhar apenas com uma unidade na camada de saída para a escala de cinza."
 			);
@@ -173,7 +173,7 @@ class GerenciadorArquivos {
 	public void exportarImagemRGB(GerenciadorDadosImagem gdi, BufferedImage imagem, Modelo modelo, double escala, String caminho) {
 		if (imagem == null) throw new IllegalArgumentException("A imagem fornecida é nula.");
 		if (escala <= 0) throw new IllegalArgumentException("O valor de escala não pode ser menor que 1.");
-		if (modelo.camadaSaida().tamanhoSaida() != 3) {
+		if (modelo.camadaSaida().tamSaida() != 3) {
 			throw new IllegalArgumentException(
 				"O modelo deve trabalhar apenas com três neurônios na saída para RGB."
 			);

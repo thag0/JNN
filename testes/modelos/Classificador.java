@@ -97,7 +97,7 @@ public class Classificador{
 	 */
 	static void exportarHistorico(Modelo modelo, String caminho){
 		System.out.println("Exportando histórico de perda");
-		double[] perdas = modelo.historico();
+		double[] perdas = modelo.hist();
 		double[][] dadosPerdas = new double[perdas.length][1];
 
 		for(int i = 0; i < dadosPerdas.length; i++){

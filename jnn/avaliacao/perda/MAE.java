@@ -16,7 +16,7 @@ public class MAE extends Perda {
 	@Override
 	public Tensor calcular(Tensor prev, Tensor real) {
 		super.verificarDimensoes(prev, real);
-		int tam = prev.tamanho();
+		int tam = prev.tam();
 		
 		double mae = 0;
 		for (int i = 0; i < tam; i++) {

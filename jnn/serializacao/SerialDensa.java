@@ -144,7 +144,7 @@ class SerialDensa {
 			
 			if(camada.temBias()){
 				Tensor bias = camada.bias();        
-				int n = bias.tamanho();
+				int n = bias.tam();
 				for(int i = 0; i < n; i++){
 					double b = Double.parseDouble(br.readLine());
 					bias.set(b, i);

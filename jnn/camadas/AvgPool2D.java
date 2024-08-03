@@ -414,7 +414,7 @@ public class AvgPool2D extends Camada {
 	}
 
 	@Override
-	public int numParametros() {
+	public int numParams() {
 		return 0;
 	}
 

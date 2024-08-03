@@ -499,7 +499,7 @@ public abstract class Modelo implements Cloneable {
 	 * @return array contendo o valor de perda durante cada época de treinamento 
 	 * do modelo.
 	 */
-	public double[] historico() {
+	public double[] hist() {
 		return _treinador.historico();
 	}
 

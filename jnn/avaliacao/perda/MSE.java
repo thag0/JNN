@@ -16,7 +16,7 @@ public class MSE extends Perda {
 	@Override
 	public Tensor calcular(Tensor prev, Tensor real) {
 		super.verificarDimensoes(prev, real);
-		int tam = prev.tamanho();
+		int tam = prev.tam();
 		
 		double mse = 0.0;
 		for (int i = 0; i < tam; i++) {
@@ -30,7 +30,7 @@ public class MSE extends Perda {
 	@Override
 	public Tensor derivada(Tensor prev, Tensor real) {
 		super.verificarDimensoes(prev, real);
-		final int tam = prev.tamanho();
+		final int tam = prev.tam();
 
 		return prev.map(
 			real,

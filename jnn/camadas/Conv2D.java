@@ -702,11 +702,11 @@ public class Conv2D extends Camada implements Cloneable {
 	}
 
 	@Override
-	public int numParametros() {
+	public int numParams() {
 		verificarConstrucao();
 
-		int parametros = _kernel.tamanho();
-		if (temBias()) parametros += bias().tamanho();
+		int parametros = _kernel.tam();
+		if (temBias()) parametros += bias().tam();
 
 		return parametros;
 	}
@@ -717,8 +717,8 @@ public class Conv2D extends Camada implements Cloneable {
 	}
 
 	@Override 
-	public int tamanhoSaida() {
-		return saida().tamanho();
+	public int tamSaida() {
+		return saida().tam();
 	}
 
 	@Override

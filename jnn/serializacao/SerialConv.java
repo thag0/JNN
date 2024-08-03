@@ -162,7 +162,7 @@ class SerialConv {
 	 */
 	public void lerPesos(Conv2D camada, BufferedReader br){
 		try {
-			int tamKernel = camada.kernel().tamanho();
+			int tamKernel = camada.kernel().tam();
 			Variavel[] arrKernel = new Variavel[tamKernel];
 
 			for (int i = 0; i < tamKernel; i++) {
@@ -172,7 +172,7 @@ class SerialConv {
 			camada.setKernel(arrKernel);
 			
 			if (camada.temBias()) {
-				int tamBias = camada.bias().tamanho();
+				int tamBias = camada.bias().tam();
 				Variavel[] arrBias = new Variavel[tamBias];
 
 				for (int i = 0; i < tamBias; i++) {

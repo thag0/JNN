@@ -18,7 +18,7 @@ import java.util.function.DoubleBinaryOperator;
  * 		velocidade de processamento usando um único array contendo seus dados.
  * </p>
  * <h2>
- *		Exemplo de criação:
+ *		Criação:
  * </h2>
  * <pre>
  *Tensor tensor = new Tensor(2, 2);
@@ -26,19 +26,23 @@ import java.util.function.DoubleBinaryOperator;
  *  [[0.0, 0.0],
  *   [0.0, 0.0]]
  *]
+ * 
+ *double[][] mat = { {...}, {...}, ... };
+ *Tensor tensor = new Tensor(mat);
  * </pre>
- * Algumas operações entre tensores são válidas desde que as dimensões
- * de ambos os tensores sejam iguais.
+ * <h2>
+ *		Operações
+ * </h2>
+ *		Quase todas as operações realizadas acontecem localmente,
+ *		alterando o conteúdo da instância que realizou o procedimento.
  * <pre>
- *Tensor a = new Tensor(2, 2);
- *a.preencer(1);
- *Tensor b = new Tensor(2, 2);
- *b.preencer(2);
- *a.add(b);//operação acontece dentro do tensor A
- *a = [
- *  [[3.0, 3.0],
- *   [3.0, 3.0]]
+ *Tensor a = [
+ *	[1, 2, 3]
  *]
+ *Tensor b = [
+ *	[1, 2, 3]
+ *]
+ *a.add(b);// resultado em A
  * </pre>
  * @author Thiago Barroso, acadêmico de Engenharia da Computação pela
  * Universidade Federal do Pará, Campus Tucuruí. Maio/2024.
@@ -70,13 +74,13 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
     public Tensor(Tensor tensor) {
 		if (tensor == null) {
 			throw new IllegalArgumentException(
-				"O tensor fornecido é nulo."
+				"\nTensor nulo."
 			);
 		}
 
         this.shape = tensor.shape.clone();
 
-        int n = tensor.tamanho();
+        int n = tensor.tam();
         dados = initDados(n);
 		for (int i = 0; i < n; i++) {
 			dados[i].set(tensor.dados[i]);
@@ -84,72 +88,135 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
     }
 
 	/**
-	 * Inicializa um tensor a partir de um array 4D primitivo.
-	 * @param tensor tensor desejado.
+	 * Inicializa um tensor a partir de um array 5D primitivo.
+	 * @param elms elementos desejados.
 	 */
-	public Tensor(double[][][][] tensor) {
-		if (tensor == null) {
+	public Tensor(double[][][][][] elms) {
+		if (elms == null) {
 			throw new IllegalArgumentException(
-				"\nO tensor fornecido é nulo."
+				"\nTensor nulo."
+			);
+		}
+
+		shape = copiarShape(
+            elms.length, 
+            elms[0].length, 
+            elms[0][0].length, 
+            elms[0][0][0].length,
+            elms[0][0][0][0].length
+        );
+
+		dados = initDados(shape[0] * shape[1] * shape[2] * shape[3] * shape[4]);
+		copiar(elms);
+	}
+
+	/**
+	 * Inicializa um tensor a partir de um array 4D primitivo.
+	 * @param elms elementos desejados.
+	 */
+	public Tensor(double[][][][] elms) {
+		if (elms == null) {
+			throw new IllegalArgumentException(
+				"\nTensor nulo."
 			);
 		}
 
 		this.shape = new int[]{
-            tensor.length, 
-            tensor[0].length, 
-            tensor[0][0].length, 
-            tensor[0][0][0].length
+            elms.length, 
+            elms[0].length, 
+            elms[0][0].length, 
+            elms[0][0][0].length
         };
 
 		dados = initDados(shape[0] * shape[1] * shape[2] * shape[3]);
-		copiar(tensor);
+		copiar(elms);
 	}
 
 	/**
 	 * Inicializa um tensor a partir de um array 3D primitivo.
-	 * @param tensor tensor desejado.
+	 * @param elms elementos desejados.
 	 */
-	public Tensor(double[][][] tensor) {
-		if (tensor == null) {
+	public Tensor(double[][][] elms) {
+		if (elms == null) {
 			throw new IllegalArgumentException(
 				"\nO tensor fornecido é nulo."
 			);
 		}
 
 		this.shape = new int[]{
-            tensor.length, 
-            tensor[0].length, 
-            tensor[0][0].length,
+            elms.length, 
+            elms[0].length, 
+            elms[0][0].length,
         };
 
 		dados = initDados(shape[0] * shape[1] * shape[2]);
-		copiar(tensor);
+		copiar(elms);
 	}
 
 	/**
 	 * Inicializa um tensor a partir de um array 2D primitivo.
-	 * @param mat matriz desejada.
+	 * @param elms elementos desejados.
 	 */
-	public Tensor(double[][] mat) {
-		if (mat == null) {
+	public Tensor(double[][] elms) {
+		if (elms == null) {
 			throw new IllegalArgumentException(
 				"\nA matriz fornecida é nula."
 			);
 		}
 
-		int col = mat[0].length;
-		for (int i = 1; i < mat.length; i++) {
-			if (mat[i].length != col) {
+		int col = elms[0].length;
+		for (int i = 1; i < elms.length; i++) {
+			if (elms[i].length != col) {
 				throw new IllegalArgumentException(
 					"\nA matriz deve conter a mesma quantidade de linhas para todas as colunas."
 				);
 			}
 		}
 
-		this.shape = copiarShape(new int[]{mat.length, mat[0].length});
-		dados = initDados(mat.length * mat[0].length);
-		copiar(mat);
+		this.shape = copiarShape(new int[]{elms.length, elms[0].length});
+		dados = initDados(elms.length * elms[0].length);
+		copiar(elms);
 	}
+
+	/**
+	 * Inicializar um tensor a partir de um conjunto de dados e formato
+	 * pré-definidos.
+	 * @param elms elementos desejados.
+	 * @param shape formato desejado.
+	 */
+	public Tensor(double[] elms, int... shape) {
+		int[] s  = copiarShape(shape);
+		int tam = calcularTamanho(s);
+		if (tam != elms.length) {
+			throw new IllegalArgumentException(
+				"\nTamanho dos dados (" + elms.length + ") não corresponde ao " +
+				"formato fornecido (" + tam + ")"
+			);
+		}
+		this.shape = s;
+
+		this.dados = initDados(tam);
+		for (int i = 0; i < tam; i++) {
+			this.dados[i].set(elms[i]);
+		}
+	}
+
+    /**
+     * Inicializa um novo tensor vazio a partir de um formato especificado.
+     * @param shape formato desejado.
+     */
+    public Tensor(int... shape) {
+        if (shape == null) {
+            throw new IllegalArgumentException(
+                "\nShape nulo."
+            );
+        }
+
+        int tam = calcularTamanho(shape);
+
+        this.shape = copiarShape(shape);
+        dados = initDados(tam);
+    }
 
 	/**
 	 * Inicializa um tensor a partir de um array de variáveis.
@@ -173,46 +240,6 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		}
 
 		dados = arr;
-    }
-
-	/**
-	 * Inicializar um tensor a partir de um conjunto de dados e formato
-	 * pré-definidos.
-	 * @param dados conjunto de dados desejado.
-	 * @param shape formato do tensor.
-	 */
-	public Tensor(double[] dados, int... shape) {
-		int[] s  = copiarShape(shape);
-		int tam = calcularTamanho(s);
-		if (tam != dados.length) {
-			throw new IllegalArgumentException(
-				"\nTamanho dos dados (" + dados.length + ") não corresponde ao " +
-				"formato fornecido (" + tam + ")"
-			);
-		}
-		this.shape = s;
-
-		this.dados = initDados(tam);
-		for (int i = 0; i < tam; i++) {
-			this.dados[i].set(dados[i]);
-		}
-	}
-
-    /**
-     * Inicializa um novo tensor vazio a partir de um formato especificado.
-     * @param shape formato desejado.
-     */
-    public Tensor(int... shape) {
-        if (shape == null) {
-            throw new IllegalArgumentException(
-                "\nShape fornecido é nulo."
-            );
-        }
-
-        int tam = calcularTamanho(shape);
-
-        this.shape = copiarShape(shape);
-        dados = initDados(tam);
     }
 
 	/**
@@ -256,7 +283,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
      * @param shape shape desejado.
      * @return shape com valores úteis.
      */
-	private int[] copiarShape(int[] shape) {
+	private int[] copiarShape(int... shape) {
 		if (shape.length == 0) {
 			throw new IllegalArgumentException(
 				"\nShape vazio."
@@ -310,15 +337,13 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return instância local alterada.
 	 */
 	public Tensor reshape(int... shape) {
-		int tamInicial = calcularTamanho(this.shape);
-
 		int[] novoShape = copiarShape(shape);
 		int novoTam = calcularTamanho(novoShape);
 
-		if (tamInicial != novoTam) {
+		if (tam() != novoTam) {
 			throw new IllegalArgumentException(
 				"\nQuatidade de elementos com as novas dimensões (" + novoTam +
-				") deve ser igual a quantidade de elementos do tensor (" + tamanho() + ")."
+				") deve ser igual a quantidade de elementos do tensor (" + tam() + ")."
 			);
 		}
 
@@ -406,7 +431,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 			);
 		}
 
-		int elementos = tamanho();
+		int elementos = tam();
 
 		Variavel[] arr = new Variavel[elementos * n];
 		for (int i = 0; i < n; i++) {
@@ -424,13 +449,13 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 
     /**
      * Calcula o índice de um elementos dentro do conjunto de dados do tensor.
-     * @param dims índices desejados.
+     * @param ids índices desejados.
      * @return índice correspondente no array de elementos do tensor.
      */
-    private int indice(int... dims) {
-        if (numDim() != dims.length) {
+    private int indice(int... ids) {
+        if (numDim() != ids.length) {
             throw new IllegalArgumentException(
-				"\nNúmero de dimensões fornecidas " + dims.length + 
+				"\nNúmero de dimensões fornecidas " + ids.length + 
 				" não corresponde às " + numDim() + " do tensor."
 			);
         }
@@ -439,13 +464,13 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
         int multiplicador = 1;
     
         for (int i = shape.length - 1; i >= 0; i--) {
-            if (dims[i] < 0 || dims[i] >= shape[i]) {
+            if (ids[i] < 0 || ids[i] >= shape[i]) {
                 throw new IllegalArgumentException(
-					"\nÍndice " + dims[i] + " fora dos limites para a dimensão " + i +
+					"\nÍndice " + ids[i] + " fora dos limites para a dimensão " + i +
 					" (tamanho = " + shape[i] + ");"
 				);
             }
-            id += dims[i] * multiplicador;
+            id += ids[i] * multiplicador;
             multiplicador *= shape[i];
         }
     
@@ -472,11 +497,11 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 
 	/**
 	 * Edita o valor do tensor usando uma variável.
-	 * @param var variável com valor desejado.
+	 * @param x variável com valor desejado.
 	 * @param ids índices para atribuição.
 	 */
-	public void set(Variavel var, int... ids) {
-		dados[indice(ids)].set(var);
+	public void set(Variavel x, int... ids) {
+		dados[indice(ids)].set(x);
 	}
 
 	/**
@@ -485,7 +510,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return instância local alterada.
 	 */
 	public Tensor preencher(Number x) {
-		final int n = tamanho();
+		final int n = tam();
 		for (int i = 0; i < n; i++) {
 			dados[i].set(x);
 		}
@@ -501,7 +526,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return instância local alterada.
 	 */
 	public Tensor preencherContador(boolean cres) {
-		int tam = tamanho();
+		int tam = tam();
 
 		if (cres) {
 			for (int i = 0; i < tam; i++) {
@@ -522,7 +547,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return instância local alterada.
 	 */
 	public Tensor zerar() {
-        final int n = tamanho();
+        final int n = tam();
 		for (int i = 0; i < n; i++) {
 			dados[i].set(0.0);
 		}
@@ -544,13 +569,64 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 			);
 		}
 
-		int n = tamanho();
+		int n = tam();
 		for (int i = 0; i < n; i++) {
 			dados[i].set(tensor.dados[i]);
 		}
 
 		return this;
 	}
+
+	/**
+	 * Copia todo o conteúdo do array na instância local.
+	 * @param arr array desejado.
+	 * @return instância local alterada.
+	 */
+    public Tensor copiar(double[][][][][] arr) {
+        if (numDim() != 5) {
+            throw new IllegalArgumentException(
+                "\nTensor tem " + numDim() + " dimensões, mas deve" +
+                " ter 5."
+            );
+        }
+
+        int d1 = shape[0];
+        int d2 = shape[1];
+        int d3 = shape[2];
+        int d4 = shape[3];
+        int d5 = shape[4];
+
+		if ((d1 != arr.length) ||
+			(d2 != arr[0].length) ||
+			(d3 != arr[0][0].length) ||
+			(d4 != arr[0][0][0].length) ||
+			(d5 != arr[0][0][0][0].length)) {
+			throw new IllegalArgumentException(
+				"\nDimensões do tensor " + shapeStr() +
+				" incompatíveis com as do array recebido ("
+				+ arr.length + ", " 
+				+ arr[0].length + ", "
+				+ arr[0][0].length + ", "
+				+ arr[0][0][0].length + ", "
+				+ arr[0][0][0][0].length + ")."
+			);
+		}
+
+		int cont = 0;
+		for (int i = 0; i < d1; i++) {
+			for (int j = 0; j < d2; j++) {
+				for (int k = 0; k < d3; k++) {
+					for (int l = 0; l < d4; l++) {
+						for (int m = 0; m < d5; m++) {
+							dados[cont++].set(arr[i][j][k][l][m]);
+						}
+					}
+				}
+			}
+		}
+
+		return this;
+    }
 
 	/**
 	 * Copia todo o conteúdo do array na instância local.
@@ -683,7 +759,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
             );
         }
 
-		if ((tamanho() != arr.length)) {
+		if ((tam() != arr.length)) {
 			throw new IllegalArgumentException(
 				"\nDimensões do tensor " + shapeStr() +
 				" incompatíveis com as do array recebido (" + arr.length + ")."
@@ -708,14 +784,14 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return instância local alterada.
 	 */
 	public Tensor copiarElementos(Tensor tensor) {
-		if (tamanho() != tensor.tamanho()) {
+		if (tam() != tensor.tam()) {
 			throw new IllegalArgumentException(
-				"\nOs tensores devem conter o mesmo número de elementos. Local = " + tamanho() + 
-				"e recebido = " + tensor.tamanho()
+				"\nOs tensores devem conter o mesmo número de elementos. Local = " + tam() + 
+				"e recebido = " + tensor.tam()
 			);
 		}
 
-		int n = tamanho();
+		int n = tam();
 		for (int i = 0; i < n; i++) {
 			dados[i].set(tensor.dados[i]);
 		}
@@ -740,14 +816,14 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 			);
 		}
 
-		if (elementos.length != tamanho()) {
+		if (elementos.length != tam()) {
 			throw new IllegalArgumentException(
 				"\nTamanho do array fornecido (" + elementos.length + ") inconpatível" +
-				"com os elementos do tensor (" + tamanho() + ")."
+				"com os elementos do tensor (" + tam() + ")."
 			);
 		}
 
-		final int n = tamanho();
+		final int n = tam();
 		for (int i = 0; i < n; i++) {
 			dados[i].set(elementos[i]);
 		}
@@ -772,10 +848,10 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 			);
 		}
 
-		if (elementos.length != tamanho()) {
+		if (elementos.length != tam()) {
 			throw new IllegalArgumentException(
 				"\nTamanho do array fornecido (" + elementos.length + ") inconpatível" +
-				"com os elementos do tensor (" + tamanho() + ")."
+				"com os elementos do tensor (" + tam() + ")."
 			);
 		}
 
@@ -792,7 +868,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return instância local alterada.
 	 */
 	public Tensor add(Number x) {
-		final int n = tamanho();
+		final int n = tam();
 		for (int i = 0; i < n; i++) {
 			dados[i].add(x);
 		}
@@ -826,7 +902,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
             );
         }
 
-        int n = tamanho();
+        int n = tam();
         for (int i = 0; i < n; i++) {
             dados[i].add(tensor.dados[i]);
 		}
@@ -848,7 +924,8 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return instância local alterada.
 	 */
     public Tensor addSoma(Tensor a, Tensor b) {
-		return aplicar(this, a, b, 
+		return aplicar(
+			this, a, b, 
 			(t, t1, t2) -> t += (t1 + t2)
 		);
     }
@@ -867,7 +944,8 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return instância local alterada.
 	 */
     public Tensor addSub(Tensor a, Tensor b) {
-		return aplicar(this, a, b, 
+		return aplicar(
+			this, a, b, 
 			(t, t1, t2) -> t += (t1 - t2)
 		);
     }
@@ -885,8 +963,9 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @param b {@code Tensor} B.
 	 * @return instância local alterada.
 	 */
-    public Tensor addMult(Tensor a, Tensor b) {
-		return aplicar(this, a, b, 
+    public Tensor addMul(Tensor a, Tensor b) {
+		return aplicar(
+			this, a, b, 
 			(t, t1, t2) -> t += (t1 * t2)
 		);
     }
@@ -905,19 +984,20 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return instância local alterada.
 	 */
     public Tensor addDiv(Tensor a, Tensor b) {
-		return aplicar(this, a, b, 
+		return aplicar(
+			this, a, b, 
 			(t, t1, t2) -> t += (t1 / t2)
 		);
     }
 
 	/**
 	 * Adiciona o valor informado ao conteúdo do tensor.
-	 * @param valor valor desejado.
+	 * @param x valor desejado.
 	 * @param ids índices desejados para adição.
 	 * @return instância local alterada.
 	 */
-	public Tensor add(Number valor, int... ids) {
-		dados[indice(ids)].add(valor);
+	public Tensor add(Number x, int... ids) {
+		dados[indice(ids)].add(x);
 		return this;
 	}
 
@@ -927,7 +1007,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return instância local alterada.
 	 */
 	public Tensor sub(Number x) {
-		final int n = tamanho();
+		final int n = tam();
 		for (int i = 0; i < n; i++) {
 			dados[i].sub(x);
 		}
@@ -960,7 +1040,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
             );
         }
 
-        int n = tamanho();
+        int n = tam();
         for (int i = 0; i < n; i++) {
             dados[i].sub(tensor.dados[i]);
         }
@@ -982,7 +1062,8 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return instância local alterada.
 	 */
     public Tensor subSoma(Tensor a, Tensor b) {
-		return aplicar(this, a, b, 
+		return aplicar(
+			this, a, b, 
 			(t, t1, t2) -> t -= (t1 + t2)
 		);
     }
@@ -1001,7 +1082,8 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return instância local alterada.
 	 */
     public Tensor subSub(Tensor a, Tensor b) {
-		return aplicar(this, a, b, 
+		return aplicar(
+			this, a, b, 
 			(t, t1, t2) -> t -= (t1 - t2)
 		);
     }
@@ -1019,8 +1101,9 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @param b {@code Tensor} B.
 	 * @return instância local alterada.
 	 */
-    public Tensor subMult(Tensor a, Tensor b) {
-		return aplicar(this, a, b, 
+    public Tensor subMul(Tensor a, Tensor b) {
+		return aplicar(
+			this, a, b, 
 			(t, t1, t2) -> t -= (t1 * t2)
 		);
     }
@@ -1039,19 +1122,20 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return instância local alterada.
 	 */
     public Tensor subDiv(Tensor a, Tensor b) {
-		return aplicar(this, a, b, 
+		return aplicar(
+			this, a, b, 
 			(t, t1, t2) -> t -= (t1 / t2)
 		);
     }
 
 	/**
 	 * Subtrai o valor informado ao conteúdo do tensor.
-	 * @param valor valor desejado.
+	 * @param x valor desejado.
 	 * @param ids índices desejados para adição.
 	 * @return instância local alterada.
 	 */
-	public Tensor sub(Number valor, int... ids) {
-		dados[indice(ids)].sub(valor);
+	public Tensor sub(Number x, int... ids) {
+		dados[indice(ids)].sub(x);
 		return this;
 	}
 
@@ -1060,10 +1144,10 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @param x valor desejado.
 	 * @return instância local alterada.
 	 */
-	public Tensor mult(Number x) {
-		final int n = tamanho();
+	public Tensor mul(Number x) {
+		final int n = tam();
 		for (int i = 0; i < n; i++) {
-			dados[i].mult(x);
+			dados[i].mul(x);
 		}
 
 		return this;
@@ -1074,8 +1158,8 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @param x valor desejado.
 	 * @return instância local alterada.
 	 */
-	public Tensor mult(Variavel x) {
-		return mult(x.get());
+	public Tensor mul(Variavel x) {
+		return mul(x.get());
 	}
 	
 	/**
@@ -1087,16 +1171,16 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @param tensor {@code Tensor} com conteúdo.
 	 * @return instância local alterada.
 	 */
-    public Tensor mult(Tensor tensor) {
+    public Tensor mul(Tensor tensor) {
         if (!compararShape(tensor)) {
             throw new IllegalArgumentException(
                 "\nTensor fornecido deve conter o mesmo shape."
             );
         }
 
-        int n = tamanho();
+        int n = tam();
         for (int i = 0; i < n; i++) {
-            dados[i].mult(tensor.dados[i]);
+            dados[i].mul(tensor.dados[i]);
         }
 
         return this;
@@ -1115,8 +1199,9 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @param b {@code Tensor} B.
 	 * @return instância local alterada.
 	 */
-    public Tensor multSoma(Tensor a, Tensor b) {
-		return aplicar(this, a, b, 
+    public Tensor mulSoma(Tensor a, Tensor b) {
+		return aplicar(
+			this, a, b, 
 			(t, t1, t2) -> t *= (t1 + t2)
 		);
     }
@@ -1134,8 +1219,9 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @param b {@code Tensor} B.
 	 * @return instância local alterada.
 	 */
-    public Tensor multSub(Tensor a, Tensor b) {
-		return aplicar(this, a, b, 
+    public Tensor mulSub(Tensor a, Tensor b) {
+		return aplicar(
+			this, a, b, 
 			(t, t1, t2) -> t *= (t1 - t2)
 		);
     }
@@ -1153,8 +1239,9 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @param b {@code Tensor} B.
 	 * @return instância local alterada.
 	 */
-    public Tensor multMult(Tensor a, Tensor b) {
-		return aplicar(this, a, b, 
+    public Tensor mulMul(Tensor a, Tensor b) {
+		return aplicar(
+			this, a, b, 
 			(t, t1, t2) -> t *= (t1 * t2)
 		);
     }
@@ -1172,20 +1259,21 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @param b {@code Tensor} B.
 	 * @return instância local alterada.
 	 */
-    public Tensor multDiv(Tensor a, Tensor b) {
-		return aplicar(this, a, b, 
+    public Tensor mulDiv(Tensor a, Tensor b) {
+		return aplicar(
+			this, a, b, 
 			(t, t1, t2) -> t *= (t1 / t2)
 		);
     }
 
 	/**
 	 * Multiplica o valor informado ao conteúdo do tensor.
-	 * @param valor valor desejado.
+	 * @param x valor desejado.
 	 * @param ids índices desejados para adição.
 	 * @return instância local alterada.
 	 */
-	public Tensor mult(Number valor, int... ids) {
-		dados[indice(ids)].mult(valor);
+	public Tensor mul(Number x, int... ids) {
+		dados[indice(ids)].mul(x);
 		return this;
 	}
 
@@ -1195,7 +1283,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return instância local alterada.
 	 */
 	public Tensor div(Number x) {
-		final int n = tamanho();
+		final int n = tam();
 		for (int i = 0; i < n; i++) {
 			dados[i].div(x);
 		}
@@ -1228,7 +1316,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
             );
         }
 
-        int n = tamanho();
+        int n = tam();
         for (int i = 0; i < n; i++) {
             dados[i].div(tensor.dados[i]);
         }
@@ -1250,7 +1338,8 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return instância local alterada.
 	 */
     public Tensor divSoma(Tensor a, Tensor b) {
-		return aplicar(this, a, b, 
+		return aplicar(
+			this, a, b, 
 			(t, t1, t2) -> t /= (t1 + t2)
 		);
     }
@@ -1269,7 +1358,8 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return instância local alterada.
 	 */
     public Tensor divSub(Tensor a, Tensor b) {
-		return aplicar(this, a, b, 
+		return aplicar(
+			this, a, b, 
 			(t, t1, t2) -> t /= (t1 - t2)
 		);
     }
@@ -1287,8 +1377,9 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @param b {@code Tensor} B.
 	 * @return instância local alterada.
 	 */
-    public Tensor divMult(Tensor a, Tensor b) {
-		return aplicar(this, a, b, 
+    public Tensor mul(Tensor a, Tensor b) {
+		return aplicar(
+			this, a, b, 
 			(t, t1, t2) -> t /= (t1 * t2)
 		);
     }
@@ -1314,12 +1405,12 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 
 	/**
 	 * Divide o valor contido no tensor pelo valor informado.
-	 * @param valor valor desejado.
+	 * @param x valor desejado.
 	 * @param ids índices desejados para adição.
 	 * @return instância local alterada.
 	 */
-	public Tensor div(Number valor, int... ids) {
-		dados[indice(ids)].div(valor);
+	public Tensor div(Number x, int... ids) {
+		dados[indice(ids)].div(x);
 		return this;
 	}
 
@@ -1333,10 +1424,10 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 			throw new IllegalArgumentException("\nDimensão " + dim + " inválida");
 		}
 
-		if (numDim() == 1) return this; // não fazer nada com tensores escalares
+		if (numDim() == 1) return this;// não fazer nada com tensores escalares
 	
 		if (shape[dim] != 1) {
-			return this; // não alterar dimensões com tamanho != 1
+			return this;// não alterar dimensões com tamanho != 1
 		}
 	
 		int[] novoShape = new int[shape.length - 1];
@@ -1383,7 +1474,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return instância local alterada.
 	 */
 	public Tensor flatten() {
-		this.shape = new int[] { tamanho() };
+		this.shape = new int[] { tam() };
 		return this;
 	}
 
@@ -1429,7 +1520,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	
 		Tensor slice = new Tensor(novoShape);
 	
-		final int tam = tamanho();
+		final int tam = tam();
 		int[] indices = new int[nDims];
 		int[] idsSlice = new int[nDims];
 		boolean dentroSlice;
@@ -1482,7 +1573,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 			);
 		}
 
-		int n = tamanho();
+		int n = tam();
 		for (int i = 0; i < n; i++) {
 			dados[i].set(fun.applyAsDouble(dados[i].get()));
 		}
@@ -1521,7 +1612,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 			);
 		}
 
-		int n = tamanho();
+		int n = tam();
 		for (int i = 0; i < n; i++) {
 			dados[i].set(fun.applyAsDouble(tensor.dados[i].get()));
 		}
@@ -1573,9 +1664,14 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 			);
 		}
 
-		int n = tamanho();
+		int n = tam();
 		for (int i = 0; i < n; i++) {
-			dados[i].set(fun.applyAsDouble(a.dados[i].get(), b.dados[i].get()));
+			dados[i].set(
+				fun.applyAsDouble(
+					a.dados[i].get(),
+					b.dados[i].get()
+				)
+			);
 		}
 
 		return this;
@@ -1629,11 +1725,13 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 			);
 		}
 
-		int n = tamanho();
+		int n = tam();
 		for (int i = 0; i < n; i++) {
 			dados[i].set(
 				fun.applyAsDouble(
-					a.dados[i].get(), b.dados[i].get(), c.dados[i].get()
+					a.dados[i].get(),
+					b.dados[i].get(),
+					c.dados[i].get()
 				)
 			);
 		}
@@ -1646,7 +1744,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return valor contido no tensor.
 	 */
 	public double item() {
-		if (tamanho() > 1) {
+		if (tam() > 1) {
 			throw new IllegalArgumentException(
 				"\nO tensor deve conter apenas um elemento."
 			);
@@ -1676,7 +1774,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 
 		Tensor t = new Tensor(shape());
 
-		int n = tamanho();
+		int n = tam();
 		for (int i = 0; i < n; i++) {
 			t.dados[i].set(fun.applyAsDouble(dados[i].get()));
 		}
@@ -1719,7 +1817,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 
 		Tensor t = new Tensor(shape());
 
-		int n = tamanho();
+		int n = tam();
 		for (int i = 0; i < n; i++) {
 			t.dados[i].set(fun.applyAsDouble(dados[i].get(), tensor.dados[i].get()));
 		}
@@ -1743,7 +1841,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	public Tensor reduce(Number in, DoubleBinaryOperator fun) {
 		if (fun == null) {
 			throw new IllegalArgumentException(
-				"\nFunção de redução não pode ser nula."
+				"\nFunção nula."
 			);
 		}
 
@@ -1752,7 +1850,10 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 			res.set(fun.applyAsDouble(res.get(), val.get()));
 		}
 
-		return new Tensor(new Variavel[]{ res }, 1);
+		return new Tensor(
+			new Variavel[]{ res },
+			1
+		);
 	}
 
 	/**
@@ -1770,8 +1871,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return {@code Tensor} resultado.
 	 */
 	public Tensor media() {
-        double media = soma().item() / tamanho();
-        return new Tensor(new double[]{ media }, 1);
+        return soma().div(tam());
     }
 
 	/**
@@ -1781,13 +1881,16 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 */
 	public Tensor max() {
 		double max = dados[0].get();
-		final int tam = tamanho();
+		final int tam = tam();
 
 		for (int i = 1; i < tam; i++) {
 			if (dados[i].get() > max) max = dados[i].get();
 		}
 
-		return new Tensor(new double[]{ max }, 1);
+		return new Tensor(
+			new double[]{ max },
+			1
+		);
 	}
 
 	/**
@@ -1797,13 +1900,16 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 */
 	public Tensor min() {
 		double min = dados[0].get();
-		final int tam = tamanho();
+		final int tam = tam();
 
 		for (int i = 1; i < tam; i++) {
 			if (dados[i].get() < min) min = dados[i].get();
 		}
 
-		return new Tensor(new double[]{ min }, 1);
+		return new Tensor(
+			new double[]{ min },
+			1
+		);
 	}
 
 	/**
@@ -1814,13 +1920,16 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	public Tensor desvp() {
 		double media = media().item();
 		double soma = 0.0d;
-        final int n = tamanho();
+        final int n = tam();
 
 		for (int i = 0; i < n; i++) {
 			soma += Math.pow(dados[i].get() - media, 2);
 		}
 
-		return new Tensor(new double[]{ Math.sqrt(soma / tamanho()) }, 1);
+		return new Tensor(
+			new double[]{ Math.sqrt(soma / tam()) },
+			1
+		);
 	}
 
 	/**
@@ -1833,10 +1942,10 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		double valMin = min().item();
 		double valMax = max().item();
 
-		double intOriginal = valMax - valMin;
+		double intOrig = valMax - valMin;
 		double intNovo = max.doubleValue() - min.doubleValue();
 
-		return aplicar(x -> ((x - valMin) / intOriginal) * intNovo + min.doubleValue());
+		return aplicar(x -> ((x - valMin) / intOrig) * intNovo + min.doubleValue());
 	}
 
 	/**
@@ -1947,11 +2056,10 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
         StringBuilder sb = new StringBuilder();
 
         sb.append("(");
-        for (int i = 0; i < shape.length; i++) {
-            sb.append(shape[i]).append(", ");
+		sb.append(shape[0]);
+        for (int i = 1; i < shape.length; i++) {
+            sb.append(", ").append(shape[i]);
         }
-        sb.deleteCharAt(sb.length()-1);
-        sb.deleteCharAt(sb.length()-1);
         sb.append(")");
 
         return sb.toString();
@@ -1967,7 +2075,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		if (!compararShape(tensor)) return false;
 
 		for (int i = 0; i < dados.length; i++) {
-			if (dados[i].equals(tensor.dados[i])) return false;
+			if (!dados[i].equals(tensor.dados[i])) return false;
 		}
 
 		return true;
@@ -1995,7 +2103,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * Retorna a quantidade total de elementos no tensor.
 	 * @return número elementos do tensor.
 	 */
-	public int tamanho() {
+	public int tam() {
 		return dados.length;
 	}
 
@@ -2004,7 +2112,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
      * levando em consideração a arquitetura da JVM (32 ou 64 bits).
      * @return tamanho em bytes.
      */
-	public long tamanhoBytes() {
+	public long tamBytes() {
 		String jvmBits = System.getProperty("sun.arch.data.model");
         long bits = Long.valueOf(jvmBits);
 
@@ -2016,7 +2124,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
             "\nSem suporte para plataforma de " + bits + " bits."
         );
 
-		long tamVars = dados[0].tamanhoBytes() * tamanho();
+		long tamVars = dados[0].tamanhoBytes() * tam();
 		long tamShape = shape.length * 4; // int = 4 bytes
 		return tamObj + tamVars + tamShape;
 	}
@@ -2052,7 +2160,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 				"\nÍndice de inicio (" + inicio + ") inválido."
 			);
 		}
-		if (fim > tamanho()) {
+		if (fim > tam()) {
 			throw new IllegalArgumentException(
 				"\nÍndice de fim (" + fim + ") inválido."
 			);
@@ -2077,7 +2185,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return conteúdo do tensor.
 	 */
 	public double[] paraArrayDouble() {
-		final int n = tamanho();
+		final int n = tam();
 		double[] arr = new double[n];
 		for (int i = 0; i < n; i++) {
 			arr[i] = dados[i].get();
@@ -2149,7 +2257,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		sb.append(nome()).append(" ").append(shapeStr()).append(" = [").append("\n");
 
         sb.append(identacao);
-        for (int n = 0; n < tamanho(); n++) {
+        for (int n = 0; n < tam(); n++) {
             for (int i = 0; i < indices.length; i++) {
                 if (!parentesisAbertos[i]) {
                     sb.append("[");
@@ -2229,7 +2337,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 
 			clone.shape = shape.clone();
 			
-			int n = tamanho();
+			int n = tam();
 			clone.dados = new Variavel[n];
 			for (int i = 0; i < n; i++) {
 				clone.dados[i] = new Variavel(dados[i]);
@@ -2264,7 +2372,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 
 		@Override
 		public boolean hasNext() {
-			return indice < tamanho();
+			return indice < tam();
 		}
 
 		@Override
@@ -2324,25 +2432,25 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 *	[4, 5, 6],
 	 *]
 	 * </pre>
-	 * @param id índice da subdimensão desejada.
+	 * @param dim índice da subdimensão desejada.
 	 * @return {@code Tensor} com o sub conteúdo.
 	 */
-	public Tensor subTensor(int id) {
-		if (tamanho() == 1) {
+	public Tensor subTensor(int dim) {
+		if (tam() == 1) {
 			throw new UnsupportedOperationException(
 				"\nNão é possível obter um subtensor a partir de um tensor escalar."
 			);
 		}
 
-		if (id < 0 || id >= shape[0]) {
+		if (dim < 0 || dim >= shape[0]) {
 			throw new IllegalArgumentException(
-				"\nÍndice " + id + " inválido."
+				"\nÍndice " + dim + " inválido."
 			);
 		}
 
 		if (numDim() == 1) {// retornar tensor escalar
 			return new Tensor(
-				new Variavel[] { dados[id] },
+				new Variavel[] { dados[dim] },
 				1
 			);
 		}
@@ -2353,7 +2461,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		}
 
 		int[] indices = new int[shape.length];
-		indices[0] = id;
+		indices[0] = dim;
 		int inicio = indice(indices);
 
 		for (int i = 1; i < indices.length; i++) {

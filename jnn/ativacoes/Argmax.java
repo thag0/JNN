@@ -46,7 +46,7 @@ public class Argmax extends Ativacao {
 			);
 		}
 
-		int cols = entrada.tamanho();
+		int cols = entrada.tam();
 		double maxId = 0;
 		double maxVal = entrada.get(0);
 

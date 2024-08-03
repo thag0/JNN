@@ -18,7 +18,7 @@ import jnn.core.tensor.Tensor;
 	@Override
 	public Tensor calcular(Tensor prev, Tensor real) {
 		super.verificarDimensoes(prev, real);
-		int tam = prev.tamanho();
+		int tam = prev.tam();
 
 		double ecb = 0;
 		double p, r;
@@ -34,7 +34,7 @@ import jnn.core.tensor.Tensor;
 	@Override
 	public Tensor derivada(Tensor prev, Tensor real) {
 		super.verificarDimensoes(prev, real);
-		final int tam = prev.tamanho();
+		final int tam = prev.tam();
 
 		return prev.map(
 			real,

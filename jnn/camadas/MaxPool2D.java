@@ -428,9 +428,9 @@ public class MaxPool2D extends Camada implements Cloneable{
 	}
 
 	@Override
-	public int tamanhoSaida() {
+	public int tamSaida() {
 		verificarConstrucao();
-		return _saida.tamanho();
+		return _saida.tam();
 	}
 
 	/**
@@ -452,7 +452,7 @@ public class MaxPool2D extends Camada implements Cloneable{
 	}
 
 	@Override
-	public int numParametros() {
+	public int numParams() {
 		return 0;
 	}
 

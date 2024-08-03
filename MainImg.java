@@ -92,8 +92,8 @@ public class MainImg {
 			new Densa(saidas, "sigmoid")
 		);
 		
-		modelo.compilar(new SGD(0.0001, 0.999), "mse");
-		// modelo.compilar("adam", "mse");
+		// modelo.compilar(new SGD(0.0001, 0.999), "mse");
+		modelo.compilar("adamax", "mse");
 		modelo.setHistorico(calcularHistorico);
 
 		return modelo;
@@ -156,7 +156,7 @@ public class MainImg {
 	 */
 	static void exportarHistorico(Modelo modelo, String caminho) {
 		System.out.println("Exportando histórico de perda");
-		double[] perdas = modelo.historico();
+		double[] perdas = modelo.hist();
 		double[][] dadosPerdas = new double[perdas.length][1];
 
 		try (ExecutorService exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()/2)) {

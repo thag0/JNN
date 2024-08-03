@@ -44,7 +44,7 @@ public class PainelTreino extends JPanel {
       this.modelo = modelo;
       
       int nEntrada = 2;
-      int nSaida = modelo.camadaSaida().tamanhoSaida();
+      int nSaida = modelo.camadaSaida().tamSaida();
       double[] entrada = new double[nEntrada];
 
       if (nSaida == 1) {//escala de cinza
@@ -88,7 +88,7 @@ public class PainelTreino extends JPanel {
    }
 
    public void desenhar(Modelo modelo, int epocasPorFrame, int numThreads) {
-      int numSaidas = modelo.camadaSaida().tamanhoSaida();
+      int numSaidas = modelo.camadaSaida().tamSaida();
       
       Modelo[] clones = new Modelo[numThreads];
       try (ExecutorService exec = Executors.newFixedThreadPool(numThreads)) {

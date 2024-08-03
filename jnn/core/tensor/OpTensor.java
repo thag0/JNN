@@ -110,7 +110,7 @@ public class OpTensor {
 	 * @param b {@code Tensor} B.
 	 * @return {@code Tensor} contendo o resultado.
 	 */
-	public Tensor matMult(Tensor a, Tensor b) {
+	public Tensor matMul(Tensor a, Tensor b) {
 		if (a.numDim() > 2 || b.numDim() > 2) {
 			throw new IllegalArgumentException(
 				"\nOs tensores devem conter até duas dimensões, mas contêm " +
@@ -135,7 +135,7 @@ public class OpTensor {
 	
 		Tensor res = linA == 1 ? new Tensor(colB) : new Tensor(linA, colB);
 		
-		matMult(a, b, res);
+		matMul(a, b, res);
 	
 		return res;
 	}
@@ -146,7 +146,7 @@ public class OpTensor {
 	 * @param b {@code Tensor} B.
 	 * @param dest {@code Tensor} de destino.
 	 */
-	public void matMult(Tensor a, Tensor b, Tensor dest) {
+	public void matMul(Tensor a, Tensor b, Tensor dest) {
 		if (a.numDim() > 2 || b.numDim() > 2 | dest.numDim() > 2) {
 			throw new IllegalArgumentException(
 				"\nOs tensores devem conter até duas dimensões, mas contêm " +
@@ -193,7 +193,7 @@ public class OpTensor {
 				soma.set(0.0);
 				int idSaida = (i * colD) + j;
 				for (int k = 0; k < n; k++) {
-					soma.addMult(
+					soma.addMul(
 						dataA[i * colA + k],
 						dataB[k * colB + j]
 					);
@@ -278,7 +278,7 @@ public class OpTensor {
 					final int idBaseEntrada = (k + i) * largEntrada;
 					final int idBaseKernel  = k * largKernel; 
 					for (int l = 0; l < largKernel; l++) {
-						soma.addMult(
+						soma.addMul(
 							dataE[idBaseEntrada + (l + j)],
 							dataK[idBaseKernel + l]
 						);
@@ -362,7 +362,7 @@ public class OpTensor {
 				final int idSaida = i * largEsp + j;
 				for (int k = 0; k < altKernel; k++) {
 					for (int l = 0; l < largKernel; l++) {
-						soma.addMult(
+						soma.addMul(
 							dataE[(k + i) * largEntrada + (l + j)], 
 							dataK[(altKernel - 1 - k) * largKernel + (largKernel - 1 - l)]
 						);
@@ -453,7 +453,7 @@ public class OpTensor {
 						for (int n = 0; n < largKernel; n++) {
 							int colEntrada = j - n;
 							if (colEntrada >= 0 && colEntrada < largEntrada) {
-								soma.addMult(
+								soma.addMul(
 									dataK[m * largKernel + n],
 									dataE[linEntrada * largEntrada + colEntrada]
 								);
@@ -476,7 +476,7 @@ public class OpTensor {
 	 * @param saida {@code Tensor} de destino do resultado.
 	 */
 	public void densaForward(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
-		matMult(entrada, kernel, saida);
+		matMul(entrada, kernel, saida);
 		bias.ifPresent(b -> saida.add(b));
 	}
 
@@ -491,12 +491,12 @@ public class OpTensor {
 	 */
 	public void densaBackward(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
 		Tensor temp = new Tensor(gradK.shape());
-		matMult(entrada.transpor(), gradS, temp);
+		matMul(entrada.transpor(), gradS, temp);
 		gradK.add(temp);
 
 		gradB.ifPresent(gb -> gb.add(gradS));
 
-		matMult(gradS, kernel.transpor(), gradE);
+		matMul(gradS, kernel.transpor(), gradE);
 	}
 
 	/**

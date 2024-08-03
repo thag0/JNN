@@ -421,7 +421,7 @@ public class Sequencial extends Modelo {
 		int params = 0;
 
 		for (Camada camada : camadas()) {
-			params += camada.numParametros();
+			params += camada.numParams();
 		}
 
 		return params;
@@ -472,7 +472,7 @@ public class Sequencial extends Modelo {
 				ativacao = "-";
 			}
 
-			String parametros = String.valueOf(camada.numParametros());
+			String parametros = String.valueOf(camada.numParams());
 
 			sb.append(
 				pad + String.format(

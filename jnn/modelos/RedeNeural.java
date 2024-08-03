@@ -605,7 +605,7 @@ public class RedeNeural extends Modelo {
 	public int numParametros() {
 		int params = 0;
 		for (Camada camada : _camadas) {
-			params += camada.numParametros();
+			params += camada.numParams();
 		}
 
 		return params;
