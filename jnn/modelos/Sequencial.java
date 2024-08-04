@@ -8,7 +8,6 @@ import jnn.core.Dicionario;
 import jnn.core.tensor.Tensor;
 import jnn.core.tensor.Variavel;
 import jnn.otimizadores.Otimizador;
-import jnn.treinamento.Treinador;
 
 /**
  * <h1>
@@ -507,7 +506,7 @@ public class Sequencial extends Modelo {
 		clone._otimizador = dicio.getOtimizador(_otimizador.nome());
 		clone._perda = dicio.getPerda(_perda.nome());
 		clone.seedInicial = this.seedInicial;
-		clone._treinador = new Treinador();
+		clone._treinador = _treinador.clone();
 		
 		int nCamadas = numCamadas();
 		clone._camadas = new Camada[nCamadas];

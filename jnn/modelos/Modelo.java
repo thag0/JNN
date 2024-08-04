@@ -8,6 +8,8 @@ import jnn.core.tensor.Tensor;
 import jnn.core.tensor.Variavel;
 import jnn.otimizadores.Otimizador;
 import jnn.treinamento.Treinador;
+import jnn.treinamento.Treino;
+import jnn.treinamento.TreinoLote;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -54,8 +56,7 @@ public abstract class Modelo implements Cloneable {
 	protected long seedInicial = 0;
 
 	/**
-	 * Gerenciador de treino do modelo. Contém implementações dos 
-	 * algoritmos de treino para o ajuste de parâmetros treináveis.
+	 * Gerenciador de treino do modelo.
 	 */
 	protected Treinador _treinador;
 
@@ -84,7 +85,7 @@ public abstract class Modelo implements Cloneable {
 	 * Inicialização implicita de um modelo.
 	 */
 	protected Modelo() {
-		_treinador = new Treinador();
+		_treinador = new Treino(this);
 		_avaliador = new Avaliador(this);
 		utils = new Utils();
 	}
@@ -296,16 +297,7 @@ public abstract class Modelo implements Cloneable {
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
 	public void treinar(Tensor[] x, Tensor[] y, int epochs, boolean logs) {
-		validarCompilacao();
-		validarDados(x, y);
-
-		if (epochs < 1) {
-			throw new IllegalArgumentException(
-				"\nValor de épocas deve ser maior que zero, recebido = " + epochs
-			);
-		}
-
-		_treinador.treino(this, x.clone(), y.clone(), epochs, logs);
+		treinar(x, y, epochs, 1, logs);
 	}
 	
 	/**
@@ -327,7 +319,18 @@ public abstract class Modelo implements Cloneable {
 			);
 		}
 
-		_treinador.treino(this, x.clone(), y.clone(), epochs, tamLote, logs);
+		if (tamLote < 1) {
+			throw new IllegalArgumentException(
+				"\nValor de lote deve ser maior que zero, recebido = " + tamLote
+			);
+		}
+
+		if (tamLote > 1) {
+			_treinador = new TreinoLote(this, tamLote);
+			_treinador.setHistorico(calcularHistorico);
+		}
+		
+		_treinador.executar(x, y, epochs, logs);
 	}
 
 	/**

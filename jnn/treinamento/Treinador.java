@@ -1,39 +1,68 @@
 package jnn.treinamento;
 
+import java.util.LinkedList;
+import java.util.Random;
+
 import jnn.core.tensor.Tensor;
 import jnn.modelos.Modelo;
 
 /**
- * Interface para usar os métodos de treino sequencial e treino em
- * lote dos modelos.
+ * Interface para treino de modelos da biblioteca.
  */
-public class Treinador {
+public abstract class Treinador implements Cloneable {
 
 	/**
-	 * Operador do treino sequencial.
+	 * Modelo de treino.
 	 */
-	Treino treino;
+	Modelo modelo;
 
 	/**
-	 * Operador do treino em lotes.
+	 * Gerador de números pseudo-aleatórios.
 	 */
-	TreinoLote treinoLote;
+	Random random;
 
 	/**
-	 * Responsável por organizar os tipos dos modelos.
+	 * Histórico de perda do modelo durante o treinamento.
 	 */
-	public Treinador() {
-		treino 	   = new Treino(false);
-		treinoLote = new TreinoLote(false);
+	protected LinkedList<Double> historico;
+	
+	/**
+	 * Variável de controle para armazenagem do histórico de treino.
+	 */
+	protected boolean calcularHistorico;
+
+	/**
+	 * Tamanho do lote de treinamento.
+	 */
+	protected int tamLote;
+
+	/**
+	 * Construtor implícito.
+	 */
+	protected Treinador(Modelo modelo, int tamLote) {
+		this.modelo = modelo;
+
+		random = new Random();
+		historico = new LinkedList<>();
+		calcularHistorico = false;
+		this.tamLote = tamLote;
 	}
 
 	/**
-	 * Configura a seed inicial do gerador de números aleatórios.
+	 * Construtor implícito.
+	 */
+	protected Treinador(Modelo modelo) {
+		this(modelo, 1);
+	}
+
+	/**
+	 * Configura a seed do gerador de números aleatórios.
 	 * @param seed nova seed.
 	 */
 	public void setSeed(Number seed) {
-		treino.setSeed(seed);
-		treinoLote.setSeed(seed);
+		if (seed != null) {
+			random.setSeed(seed.longValue());
+		}
 	}
 
 	/**
@@ -41,70 +70,81 @@ public class Treinador {
 	 * @param calcular calcular ou não o histórico de custo.
 	 */
 	public void setHistorico(boolean calcular) {
-		treino.setHistorico(calcular);
-		treinoLote.setHistorico(calcular);
+		calcularHistorico = calcular;
 	}
 
 	/**
-	 * Treina o modelo ajustando seus parâmetros treináveis usando
-	 * os dados fornecidos.
-	 * @param modelo instância de modelo.
+	 * Executa a regra de treino durante um determinado número de épocas.
 	 * @param x {@code Tensores} contendos os dados de entrada.
 	 * @param y {@code Tensores} contendos os dados de saída (rótulos).
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	public void treino(Modelo modelo, Tensor[] x, Tensor[] y, int epochs, boolean logs) {
-		executar(modelo, x, y, epochs, 0, logs);
-	}
+	public abstract void executar(Tensor[] x, Tensor[] y, int epochs, boolean logs);
 
 	/**
-	 * Treina o modelo ajustando seus parâmetros treináveis usando
-	 * os dados fornecidos.
-	 * @param modelo instância de modelo.
+	 * Executa a regra de treino durante um determinado número de épocas.
 	 * @param x {@code Tensores} contendos os dados de entrada.
 	 * @param y {@code Tensores} contendos os dados de saída (rótulos).
 	 * @param epochs quantidade de épocas de treinamento.
-	 * @param tamLote tamanho do lote.
-	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	public void treino(Modelo modelo, Tensor[] x, Tensor[] y, int epochs, int tamLote, boolean logs) {
-		executar(modelo, x, y, epochs, tamLote, logs);
+	public void executar(Tensor[] x, Tensor[] y, int epochs) {
+		executar(x, y, epochs, false);
 	}
 
 	/**
-	 * Executa a função de treino de acordo com os valores configurados.
-	 * @param modelo instância de modelo.
-	 * @param x {@code Tensores} contendos os dados de entrada.
-	 * @param y {@code Tensores} contendos os dados de saída (rótulos).
-	 * @param epochs quantidade de épocas de treinamento.
-	 * @param tamLote tamanho do lote.
-	 * @param logs logs para perda durante as épocas de treinamento.
+	 * Realiza a retropropagação de gradientes de cada camada para a atualização de seus parâmetros.
+	 * <p>
+	 *    Os gradientes iniciais são calculados usando a derivada da função de perda em relação
+	 *    aos erros do modelo.
+	 * </p>
+	 * <p>
+	 *    A partir disso, são retropropagados de volta da última camada do modelo até a primeira.
+	 * </p>
+	 * @param prev {@code Tensor} contendos os dados previstos.
+	 * @param real {@code Tensor} contendos os dados reais (rotulados).
 	 */
-	private void executar(Modelo modelo, Tensor[] x, Tensor[] y, int epochs, int tamLote, boolean logs) {
-		modelo.treino(true);
-
-		if (tamLote > 1) {
-			treinoLote.treinar(modelo, x, y, epochs, tamLote, logs);
-			treinoLote.ultimoUsado = true;
+	public void backpropagation(Tensor prev, Tensor real) {
+		Tensor grad = modelo.perda().derivada(prev, real);
 		
-		} else {
-			treino.treinar(modelo, x, y, epochs, logs);
-			treino.ultimoUsado = true;
+		final int n = modelo.numCamadas();
+		for (int i = n-1; i >= 0; i--) {
+			grad = modelo.camada(i).backward(grad);
 		}
-
-		treino.ultimoUsado = treinoLote.ultimoUsado ? false : true;
-		
-		modelo.treino(false);
 	}
 
 	/**
-	 * Retorna uma lista contendo os valores de custo da rede
-	 * a cada época de treinamento.
-	 * @return lista com os custo por época durante a fase de treinamento.
+	 * Embaralha os dos arrays usando o algoritmo Fisher-Yates.
+	 * @param <T> tipo de dados de entrada e saida.
+	 * @param x {@code array} com os dados de entrada.
+	 * @param y {@code array} com os dados de saída.
+	 */
+	public <T> void embaralhar(T[] x, T[] y) {
+		int linhas = x.length;
+		int i, idAleatorio;
+
+		T temp;
+		for (i = linhas - 1; i > 0; i--) {
+			idAleatorio = random.nextInt(i+1);
+			
+			// entradas
+			temp = x[i];
+			x[i] = x[idAleatorio];
+			x[idAleatorio] = temp;
+
+			// saídas
+			temp = y[i];
+			y[i] = y[idAleatorio];
+			y[idAleatorio] = temp;
+		}
+	}
+
+	/**
+	 * Retorna um array contendo os valores de perda por época de treinamento.
+	 * @return lista de perdas do modelo.
 	 */
 	public double[] historico() {
-		Object[] hist = treino.ultimoUsado ? treino.historico() : treinoLote.historico();
+		Object[] hist = historico.toArray();
 		double[] h = new double[hist.length];
 
 		for (int i = 0; i < h.length; i++) {
@@ -112,6 +152,53 @@ public class Treinador {
 		}
 
 		return h;
+	}
+	
+	/**
+	 * Retorna o nome do treinador.
+	 * @return nome do treinador.
+	 */
+	public String nome() {
+		return getClass().getSimpleName();
+	}
+
+	@Override
+	public Treinador clone() {
+		try {
+			return (Treinador) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/** 
+	 * Esconde o cursor do terminal.
+	 */
+	public void esconderCursor() {
+		System.out.print("\033[?25l");
+	}
+
+	/**
+	 * Exibe o cursor no terminal.
+	 */
+	public void exibirCursor() {
+		System.out.print("\033[?25h");
+	}
+
+	/**
+	 * Atualiza as informações do log de treino.
+	 * @param log informações desejadas.
+	 */
+	public void exibirLogTreino(String log) {
+		System.out.println(log);
+		System.out.print("\033[1A"); // mover pra a linha anterior
+	}
+
+	/**
+	 * Limpa a linha de log
+	 */
+	public void limparLinha() {
+		System.out.print("\033[2K");
 	}
 	
 }

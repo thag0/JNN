@@ -201,7 +201,9 @@ public class Utils {
 	 */
     public <T> T[] subArray(T[] arr, int inicio, int fim) {
         if (inicio < 0 || fim > arr.length || inicio >= fim) {
-            throw new IllegalArgumentException("\nÍndices de início ou fim inválidos.");
+            throw new IllegalArgumentException(
+				"\nÍndices de início ou fim inválidos, (i = " + inicio + ", f = " + fim + ")."
+			);
         }
 
         int tamanho = fim - inicio;

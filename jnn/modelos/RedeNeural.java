@@ -11,7 +11,6 @@ import jnn.core.tensor.Tensor;
 import jnn.core.tensor.Variavel;
 import jnn.otimizadores.Otimizador;
 import jnn.otimizadores.SGD;
-import jnn.treinamento.Treinador;
 
 /**
  * <h3>
@@ -734,7 +733,7 @@ public class RedeNeural extends Modelo {
 		clone._otimizador = dicio.getOtimizador(_otimizador.nome());
 		clone._perda = dicio.getPerda(_perda.nome());
 		clone.seedInicial = this.seedInicial;
-		clone._treinador = new Treinador();
+		clone._treinador = _treinador.clone();
 
 		clone._camadas = new Densa[_camadas.length];
 		for (int i = 0; i < _camadas.length; i++) {
