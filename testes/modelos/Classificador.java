@@ -59,7 +59,7 @@ public class Classificador{
 			new Densa(numSaidas, "softmax")
 		);
 
-		modelo.compilar("lion", "entropia-cruzada");
+		modelo.compilar("adagrad", "entropia-cruzada");
 		modelo.setHistorico(true);
 		modelo.print();
 		
