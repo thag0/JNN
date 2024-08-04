@@ -192,7 +192,7 @@ public class OpTensor {
 
 		for (int i = 0; i < linD; i++) {
 			for (int j = 0; j < colD; j++) {
-				soma.set(0.0);
+				soma.zero();
 				int idSaida = (i * colD) + j;
 				for (int k = 0; k < n; k++) {
 					soma.addMul(
@@ -274,7 +274,7 @@ public class OpTensor {
 		for (int i = 0; i < altEsp; i++) {
 			for (int j = 0; j < largEsp; j++) {
 
-				soma.set(0.0);
+				soma.zero();
 				final int idSaida = i * largEsp + j;
 				for (int k = 0; k < altKernel; k++) {
 					final int idBaseEntrada = (k + i) * largEntrada;
@@ -360,7 +360,7 @@ public class OpTensor {
 		for (int i = 0; i < altEsp; i++) {
 			for (int j = 0; j < largEsp; j++) {
 				
-				soma.set(0.0);
+				soma.zero();
 				final int idSaida = i * largEsp + j;
 				for (int k = 0; k < altKernel; k++) {
 					for (int l = 0; l < largKernel; l++) {
@@ -447,7 +447,7 @@ public class OpTensor {
 		for (int i = 0; i < altEsp; i++) {
 			for (int j = 0; j < largEsp; j++) {
 				
-				soma.set(0.0);
+				soma.zero();
 				final int idSaida = i*largEsp + j;
 				for (int m = 0; m < altKernel; m++) {
 					int linEntrada = i - m;

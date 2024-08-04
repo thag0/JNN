@@ -615,7 +615,7 @@ public class Conv2D extends Camada implements Cloneable {
 			);
 		}
 		
-		_somatorio.zerar();// zerar valores pre-calculados
+		_somatorio.zero();// zerar valores pre-calculados
 		optensor.conv2DForward(_entrada, _kernel, _bias, _somatorio);
 
 		ativacao.forward(_somatorio, _saida);
@@ -659,7 +659,7 @@ public class Conv2D extends Camada implements Cloneable {
 
 		ativacao.backward(this);
 
-		_gradEntrada.zerar();
+		_gradEntrada.zero();
 		optensor.conv2DBackward(
 			_entrada,
 			_kernel,
@@ -676,8 +676,8 @@ public class Conv2D extends Camada implements Cloneable {
 	public void zerarGrad() {
 		verificarConstrucao();
 
-		_gradKernel.zerar();
-		_bias.ifPresent(b -> b.zerar());
+		_gradKernel.zero();
+		_bias.ifPresent(b -> b.zero());
 	}
 
 	/**

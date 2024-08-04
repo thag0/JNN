@@ -142,6 +142,13 @@ public class Variavel implements Cloneable {
         return valor;
     }
 
+    /**
+     * Zera o valor da variável.
+     */
+    public void zero() {
+        valor = 0;
+    }
+
     // métodos especiais
 
     /**

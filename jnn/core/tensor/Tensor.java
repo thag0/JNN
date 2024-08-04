@@ -546,10 +546,10 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * Zera todo o conteúdo o tensor.
 	 * @return instância local alterada.
 	 */
-	public Tensor zerar() {
+	public Tensor zero() {
         final int n = tam();
 		for (int i = 0; i < n; i++) {
-			dados[i].set(0.0);
+			dados[i].zero();
 		}
 
 		return this;
