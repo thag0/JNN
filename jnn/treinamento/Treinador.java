@@ -31,7 +31,7 @@ public class Treinador {
 	 * Configura a seed inicial do gerador de números aleatórios.
 	 * @param seed nova seed.
 	 */
-	public void setSeed(long seed) {
+	public void setSeed(Number seed) {
 		treino.setSeed(seed);
 		treinoLote.setSeed(seed);
 	}

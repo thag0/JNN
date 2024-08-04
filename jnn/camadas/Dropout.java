@@ -82,6 +82,31 @@ public class Dropout extends Camada implements Cloneable {
 	/**
 	 * Instancia uma nova camada de dropout, definindo a taxa
 	 * de abandono que será usada durante o processo de treinamento.
+	 * @param entrada formato de entrada da camada.
+	 * @param taxa taxa de dropout, um valor entre 0 e 1 representando a
+	 * taxa de abandono da camada.
+	 * @param seed seed usada para o gerador de números aleatórios da camada.
+	 */
+	public Dropout(int[] entrada, Number taxa, Number seed) {
+		this(taxa, seed);
+		construir(entrada);
+	}
+
+	/**
+	 * Instancia uma nova camada de dropout, definindo a taxa
+	 * de abandono que será usada durante o processo de treinamento.
+	 * @param taxa taxa de dropout, um valor entre 0 e 1 representando a
+	 * taxa de abandono da camada.
+	 * @param seed seed usada para o gerador de números aleatórios da camada.
+	 */
+	public Dropout(Number taxa, Number seed) {
+		this(taxa);
+		setSeed(seed);
+	}
+
+	/**
+	 * Instancia uma nova camada de dropout, definindo a taxa
+	 * de abandono que será usada durante o processo de treinamento.
 	 * @param taxa taxa de dropout, um {@code valor entre 0 e 1} representando a
 	 * taxa de abandono da camada.
 	 */
@@ -96,18 +121,6 @@ public class Dropout extends Camada implements Cloneable {
 		}
 
 		this.taxa = t;
-	}
-
-	/**
-	 * Instancia uma nova camada de dropout, definindo a taxa
-	 * de abandono que será usada durante o processo de treinamento.
-	 * @param taxa taxa de dropout, um valor entre 0 e 1 representando a
-	 * taxa de abandono da camada.
-	 * @param seed seed usada para o gerador de números aleatórios da camada.
-	 */
-	public Dropout(Number taxa, Number seed) {
-		this(taxa);
-		setSeed(seed);
 	}
 
 	@Override
@@ -143,7 +156,9 @@ public class Dropout extends Camada implements Cloneable {
 
 	@Override
 	public void setSeed(Number seed) {
-		random.setSeed(seed.longValue());
+		if (seed != null) {
+			random.setSeed(seed.longValue());
+		}
 	}
 
 	@Override

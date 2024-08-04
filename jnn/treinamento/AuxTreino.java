@@ -20,8 +20,10 @@ public class AuxTreino {
 	 * Configura a seed inicial do gerador de números aleatórios.
 	 * @param seed nova seed.
 	 */
-	public void setSeed(long seed) {
-		random.setSeed(seed);
+	public void setSeed(Number seed) {
+		if (seed != null) {
+			random.setSeed(seed.longValue());
+		}
 	}
 
 	/**
