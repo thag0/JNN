@@ -579,20 +579,10 @@ public class OpTensor {
 	 * @param gradE {@code Tensor} contendo o gradiente em relação à entrada da camada.
 	 */
 	public void conv2DBackward(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
-		int[] shapeE = entrada.shape();
 		int[] shapeK = kernel.shape();
-		int[] shapeS = gradS.shape();
 
-		final int filtros = shapeK[0];
-		final int entradas = shapeK[1];
-
-		final int altE = shapeE[1];
-		final int largE = shapeE[2];
-		final int altK = shapeK[2];
-		final int largK = shapeK[3];
-		final int altS = shapeS[1];
-		final int largS = shapeS[2];
-
+		final int numFiltros = shapeK[0];
+		final int profEntrada = shapeK[1];
 		boolean temBias = gradB.isPresent();
 
 		// NOTA
@@ -602,35 +592,29 @@ public class OpTensor {
 		// aproveitar paralelismo para dividir o trabalho e sobrecarregar
 		// menos um único núcleo do processador.
 
+		Tensor[] gsSaida = new Tensor[numFiltros];
+		for (int i = 0; i < numFiltros; i++) {
+			gsSaida[i] = gradS.subTensor(i);
+		}
+
 		// gradiente em relação as entradas
 		Thread t1 = new Thread(() -> {
-			Tensor kernel2D = new Tensor(altK, largK);
-			Tensor gradSaida2D = new Tensor(altS, largS);
-			Tensor cache = new Tensor(altE, largE);
-
-			for (int e = 0; e < entradas; e++) {
-				cache.zerar();// zerar acumulador
-				for (int f = 0; f < filtros; f++) {
-
-					for (int i = 0; i < altK; i++) {
-						for (int j = 0; j < largK; j++) {
-							kernel2D.set(kernel.get(f, e, i, j), i, j);
-						}
-					}
-	
-					for (int i = 0; i < altS; i++) {
-						for (int j = 0; j < largS; j++) {
-							gradSaida2D.set(gradS.get(f, i, j), i, j);
-						}
-					}
-	
-					convolucao2DFull(gradSaida2D, kernel2D, cache);
+			Tensor[][] kernels = new Tensor[numFiltros][profEntrada];
+			for (int i = 0; i < numFiltros; i++) {
+				Tensor ki = kernel.subTensor(i);
+				for (int j = 0; j < profEntrada; j++) {
+					kernels[i][j] = ki.subTensor(j);
 				}
+			}
 
-				for (int i = 0; i < altE; i++) {
-					for (int j = 0; j < largE; j++) {
-						gradE.add(cache.get(i, j), e, i, j);
-					}
+			Tensor[] gsEntrada = new Tensor[profEntrada];
+			for (int i = 0; i < profEntrada; i++) {
+				gsEntrada[i] = gradE.subTensor(i);
+			}
+
+			for (int e = 0; e < profEntrada; e++) {
+				for (int f = 0; f < numFiltros; f++) {
+					convolucao2DFull(gsSaida[f], kernels[f][e], gsEntrada[e]);
 				}
 			}
 		});
@@ -638,32 +622,22 @@ public class OpTensor {
 
 		// gradiente em relação aos kernels
 		Thread t2 = new Thread(() -> {
-			Tensor entrada2D = new Tensor(altE, largE);
-			Tensor gradSaida2D = new Tensor(altS, largS);
-			Tensor cache = new Tensor(altK, largK);
+			Tensor[] entradas = new Tensor[profEntrada];
+			for (int i = 0; i < profEntrada; i++) {
+				entradas[i] = entrada.subTensor(i);
+			}
 
-			for (int f = 0; f < filtros; f++) {
-				for (int e = 0; e < entradas; e++) {
-					cache.zerar();	
-					for (int i = 0; i < altE; i++) {
-						for (int j = 0; j < largE; j++) {
-							entrada2D.set(entrada.get(e, i, j), i, j);
-						}
-					}
-	
-					for (int i = 0; i < altS; i++) {
-						for (int j = 0; j < largS; j++) {
-							gradSaida2D.set(gradS.get(f, i, j), i, j);
-						}
-					}
-	
-					correlacao2D(entrada2D, gradSaida2D, cache);	
-					
-					for (int i = 0; i < altK; i++) {
-						for (int j = 0; j < largK; j++) {
-							gradK.add(cache.get(i, j), f, e, i, j);
-						}
-					}
+			Tensor[][] gsKernels = new Tensor[numFiltros][profEntrada];
+			for (int i = 0; i < numFiltros; i++) {
+				Tensor ki = gradK.subTensor(i);
+				for (int j = 0; j < profEntrada; j++) {
+					gsKernels[i][j] = ki.subTensor(j);
+				}
+			}
+
+			for (int f = 0; f < numFiltros; f++) {
+				for (int e = 0; e < profEntrada; e++) {
+					correlacao2D(entradas[e], gsSaida[f], gsKernels[f][e]);	
 				}
 			}
 		});
@@ -673,13 +647,8 @@ public class OpTensor {
 		Thread t3 = null;
 		if (temBias) {
 			t3 = new Thread(() -> {
-				for (int i = 0; i < filtros; i++) {
-					double soma = 0.0;
-					for (int j = 0; j < altS; j++) {
-						for (int k = 0; k < largS; k++) {
-							soma += gradS.get(i, j, k);
-						}
-					}
+				for (int i = 0; i < numFiltros; i++) {
+					double soma = gradS.subTensor(i).soma().item();
 					gradB.get().add(soma, i);
 				}
 			});
