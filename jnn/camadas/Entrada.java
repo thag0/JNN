@@ -32,12 +32,12 @@ public class Entrada extends Camada {
 	/**
 	 * Utilitário.
 	 */
-	Utils utils = new Utils();
+	private Utils utils = new Utils();
 
 	/**
 	 * Formato usado para entrada de um modelo.
 	 */
-	int[] shape;
+	private int[] shape;
 
 	/**
 	 * Inicializa um camada de entrada de acordo com o formato especificado.

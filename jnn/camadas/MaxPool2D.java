@@ -124,25 +124,7 @@ public class MaxPool2D extends Camada implements Cloneable{
 	 * requisições.
 	 */
 	public MaxPool2D(int[] formFiltro) {
-		utils.validarNaoNulo(formFiltro, "\nO formato do filtro não pode ser nulo.");
-		
-		if (formFiltro.length != 2) {
-			throw new IllegalArgumentException(
-				"\nO formato do filtro deve conter dois elementos (altura, largura)."
-			);
-		}
-
-		if (!utils.apenasMaiorZero(formFiltro)) {
-			throw new IllegalArgumentException(
-				"\nOs valores de dimensões do filtro devem ser maiores que zero."
-			);
-		}
-
-		this.shapeFiltro = formFiltro;
-		this.stride = new int[]{
-			formFiltro[0],
-			formFiltro[1]
-		};
+		this(formFiltro, formFiltro.clone());
 	}
 
 	/**
@@ -187,8 +169,8 @@ public class MaxPool2D extends Camada implements Cloneable{
 			);
 		}
 
-		this.shapeFiltro = formFiltro;
-		this.stride = stride;
+		this.shapeFiltro = formFiltro.clone();
+		this.stride = stride.clone();
 	}
 
 	/**
@@ -237,8 +219,17 @@ public class MaxPool2D extends Camada implements Cloneable{
 		shapeEntrada[2] = shape[2];// largura
 
 		shapeSaida[0] = shapeEntrada[0];
-		shapeSaida[1] = (shapeEntrada[1] - shapeFiltro[0]) / this.stride[0] + 1;
-		shapeSaida[2] = (shapeEntrada[2] - shapeFiltro[1]) / this.stride[1] + 1;
+		shapeSaida[1] = (int) Math.floor((float)(shapeEntrada[1] - shapeFiltro[0]) / stride[0]) + 1;
+		shapeSaida[2] = (int) Math.floor((float)(shapeEntrada[2] - shapeFiltro[1]) / stride[1]) + 1;
+
+		if (shapeSaida[1] < 1 || shapeSaida[2] < 1) {
+			throw new IllegalArgumentException(
+				"\nCamada não pode ser construida:" +
+				"\nFormato de entrada " + utils.shapeStr(shape) +
+				" e formato dos filtros " + utils.shapeStr(shapeFiltro) +
+				" resultam num formato de saída inválido " + utils.shapeStr(shapeSaida)
+			);
+		}
 		
 		_entrada = new Tensor(shapeEntrada);
 		_gradEntrada = new Tensor(_entrada);

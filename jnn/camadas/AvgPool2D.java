@@ -102,6 +102,49 @@ public class AvgPool2D extends Camada {
 	private int[] stride;
 
 	/**
+	 * Instancia uma nova camada de average pooling, definindo o formato do filtro 
+	 * e os strides (passos) que serão aplicados em cada entrada da camada.
+	 * <p>
+	 *    O formato do filtro e dos strides devem conter as dimensões da entrada 
+	 *    da camada (altura, largura).
+	 * </p>
+	 * @param formFiltro formato do filtro de average pooling.
+	 * @param stride strides que serão aplicados ao filtro.
+	 */
+	public AvgPool2D(int[] formFiltro, int[] stride) {
+		utils.validarNaoNulo(formFiltro, "Formato do filtro nulo.");
+
+		if (formFiltro.length != 2) {
+			throw new IllegalArgumentException(
+				"\nO formato do filtro deve conter dois elementos (altura, largura)."
+			);
+		}
+
+		if (!utils.apenasMaiorZero(formFiltro)) {
+			throw new IllegalArgumentException(
+				"\nOs valores de dimensões do filtro devem ser maiores que zero."
+			);
+		}
+
+		utils.validarNaoNulo(stride, "Formato de stride nulo.");
+
+		if (stride.length != 2) {
+			throw new IllegalArgumentException(
+				"\nO formato para os strides deve conter dois elementos (altura, largura)."
+			);
+		}
+
+		if (!utils.apenasMaiorZero(stride)) {
+			throw new IllegalArgumentException(
+				"\nOs valores para os strides devem ser maiores que zero."
+			);
+		}
+
+		this.formFiltro = formFiltro.clone();
+		this.stride = stride.clone();
+	}
+
+	/**
 	 * Instancia uma nova camada de average pooling, definindo o formato do
 	 * filtro que será aplicado em cada entrada da camada.
 	 * <p>
@@ -119,68 +162,7 @@ public class AvgPool2D extends Camada {
 	 * @param formFiltro formato do filtro de average pooling.
 	 */
 	public AvgPool2D(int[] formFiltro) {
-		utils.validarNaoNulo(formFiltro, "O formato do filtro não pode ser nulo.");
-
-		if (formFiltro.length != 2) {
-			throw new IllegalArgumentException(
-				"\nO formato do filtro deve conter dois elementos (altura, largura)."
-			);
-		}
-
-		if (!utils.apenasMaiorZero(formFiltro)) {
-			throw new IllegalArgumentException(
-				"\nOs valores de dimensões do filtro devem ser maiores que zero."
-			);
-		}
-
-		this.formFiltro = formFiltro;
-		this.stride = new int[]{
-			formFiltro[0],
-			formFiltro[1]
-		};
-	}
-
-	/**
-	 * Instancia uma nova camada de average pooling, definindo o formato do filtro 
-	 * e os strides (passos) que serão aplicados em cada entrada da camada.
-	 * <p>
-	 *    O formato do filtro e dos strides devem conter as dimensões da entrada 
-	 *    da camada (altura, largura).
-	 * </p>
-	 * @param formFiltro formato do filtro de average pooling.
-	 * @param stride strides que serão aplicados ao filtro.
-	 */
-	public AvgPool2D(int[] formFiltro, int[] stride) {
-		utils.validarNaoNulo(formFiltro, "O formato do filtro não pode ser nulo.");
-
-		if (formFiltro.length != 2) {
-			throw new IllegalArgumentException(
-				"\nO formato do filtro deve conter dois elementos (altura, largura)."
-			);
-		}
-
-		if (!utils.apenasMaiorZero(formFiltro)) {
-			throw new IllegalArgumentException(
-				"\nOs valores de dimensões do filtro devem ser maiores que zero."
-			);
-		}
-
-		utils.validarNaoNulo(stride, "O formato dos strides não pode ser nulo.");
-
-		if (stride.length != 2) {
-			throw new IllegalArgumentException(
-				"\nO formato para os strides deve conter dois elementos (altura, largura)."
-			);
-		}
-
-		if (!utils.apenasMaiorZero(stride)) {
-			throw new IllegalArgumentException(
-				"\nOs valores para os strides devem ser maiores que zero."
-			);
-		}
-
-		this.formFiltro = formFiltro;
-		this.stride = stride;
+		this(formFiltro, formFiltro.clone());
 	}
 
 	/**
@@ -226,8 +208,17 @@ public class AvgPool2D extends Camada {
 		shapeEntrada[2] = shape[2];// largura
 
 		shapeSaida[0] = shapeEntrada[0];
-		shapeSaida[1] = (shapeEntrada[1] - formFiltro[0]) / this.stride[0] + 1;
-		shapeSaida[2] = (shapeEntrada[2] - formFiltro[1]) / this.stride[1] + 1;
+		shapeSaida[1] = (int) Math.floor((float)(shapeEntrada[1] - formFiltro[0]) / stride[0]) + 1;
+		shapeSaida[2] = (int) Math.floor((float)(shapeEntrada[2] - formFiltro[1]) / stride[1]) + 1;
+		
+		if (shapeSaida[1] < 1 || shapeSaida[2] < 1) {
+			throw new IllegalArgumentException(
+				"\nCamada não pode ser construida:" +
+				"\nFormato de entrada " + utils.shapeStr(shape) +
+				" e formato dos filtros " + utils.shapeStr(formFiltro) +
+				" resultam num formato de saída inválido " + utils.shapeStr(shapeSaida)
+			);
+		}
 		
 		_entrada = new Tensor(shapeEntrada);
 		_gradEntrada = new Tensor(_entrada);

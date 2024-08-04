@@ -20,7 +20,7 @@ public class Flatten extends Camada implements Cloneable{
 	/**
 	 * Utilitário.
 	 */
-	Utils utils = new Utils();
+	private Utils utils = new Utils();
 
 	/**
 	 * Array contendo o formato de entrada da camada, de acordo com o formato:

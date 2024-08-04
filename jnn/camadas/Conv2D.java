@@ -228,26 +228,6 @@ public class Conv2D extends Camada implements Cloneable {
 	 */
 	public Conv2D(int[] entrada, int filtros, int[] filtro, Object ativacao, Object iniKernel, Object iniBias) {
 		this(filtros, filtro, ativacao, iniKernel, iniBias);
-
-		utils.validarNaoNulo(entrada, "O formato de entrada nulo.");
-
-		if (entrada.length != 3) {
-			throw new IllegalArgumentException(
-				"\nO formato de entrada deve conter 3 elementos (canais, altura, largura), " +
-				"recebido: " + entrada.length
-			);
-		}
-
-		if (!utils.apenasMaiorZero(entrada)) {
-			throw new IllegalArgumentException(
-				"\nOs valores do formato de entrada devem ser maiores que zero."
-			);
-		}
-
-		shapeEntrada[0] = entrada[0];//profundidade
-		shapeEntrada[1] = entrada[1];//altura
-		shapeEntrada[2] = entrada[2];//largura
-
 		construir(entrada);
 	}
 
@@ -512,6 +492,7 @@ public class Conv2D extends Camada implements Cloneable {
 
 		if (shapeSaida[1] < 1 || shapeSaida[2] < 1) {
 			throw new IllegalArgumentException(
+				"\nCamada não pode ser construida:" +
 				"\nFormato de entrada " + utils.shapeStr(shape) +
 				" e formato dos filtros " + 
 				utils.shapeStr(new int[]{shapeSaida[0], shapeFiltro[0], shapeFiltro[1]}) +
@@ -615,7 +596,7 @@ public class Conv2D extends Camada implements Cloneable {
 			);
 		}
 		
-		_somatorio.zero();// zerar valores pre-calculados
+		_somatorio.zero();// zerar acumulações anteriores
 		optensor.conv2DForward(_entrada, _kernel, _bias, _somatorio);
 
 		ativacao.forward(_somatorio, _saida);
@@ -659,7 +640,7 @@ public class Conv2D extends Camada implements Cloneable {
 
 		ativacao.backward(this);
 
-		_gradEntrada.zero();
+		_gradEntrada.zero();// zerar acumulações anteriores
 		optensor.conv2DBackward(
 			_entrada,
 			_kernel,

@@ -191,19 +191,6 @@ public class Densa extends Camada implements Cloneable {
 	 */
 	public Densa(int e, int n, Object ativacao, Object iniKernel, Object iniBias) {
 		this(n, ativacao, iniKernel, iniBias);
-
-		if (e < 1) {
-			throw new IllegalArgumentException(
-				"\nA camada deve conter ao menos uma entrada."
-			);
-		}
-
-		if (e <= 0) {
-			throw new IllegalArgumentException(
-				"\nValor de entrada deve ser maior que zero."
-			);
-		}
-
 		construir(new int[]{ e });// construir automaticamente
 	}
 
@@ -368,7 +355,6 @@ public class Densa extends Camada implements Cloneable {
 		verificarConstrucao();
 
 		iniKernel.inicializar(_kernel);
-
 		_bias.ifPresent(b -> iniBias.inicializar(b));
 	}
 
@@ -524,7 +510,7 @@ public class Densa extends Camada implements Cloneable {
 	 * Retorna a capacidade de entrada da camada.
 	 * @return tamanho de entrada da camada.
 	 */
-	public int tamanhoEntrada() {
+	public int tamEntrada() {
 		verificarConstrucao();
 		return _entrada.tam();
 	}
@@ -569,7 +555,7 @@ public class Densa extends Camada implements Cloneable {
 		sb.append(nome() + " (id " + id + ") = [\n");
 
 		sb.append(pad).append("Ativação: " + ativacao.nome() + "\n");
-		sb.append(pad).append("Entrada: " + tamanhoEntrada() + "\n");
+		sb.append(pad).append("Entrada: " + tamEntrada() + "\n");
 		sb.append(pad).append("Neurônios: " + numNeuronios() + "\n");
 		sb.append(pad).append("Saida: " + tamSaida() + "\n");
 		sb.append("\n");
