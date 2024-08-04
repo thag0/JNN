@@ -480,7 +480,14 @@ public class Densa extends Camada implements Cloneable {
 		
 		ativacao.backward(this);
 		
-		optensor.densaBackward(_entrada, _kernel, _gradSaida, _gradKernel, _gradBias, _gradEntrada);
+		optensor.densaBackward(
+			_entrada,
+			_kernel,
+			_gradSaida,
+			_gradKernel,
+			_gradBias,
+			_gradEntrada
+		);
 
 		return _gradEntrada;
 	}

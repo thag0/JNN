@@ -660,8 +660,15 @@ public class Conv2D extends Camada implements Cloneable {
 		ativacao.backward(this);
 
 		_gradEntrada.zerar();
-		optensor.conv2DBackward(_entrada, _kernel, _gradSaida, _gradKernel, _gradBias, _gradEntrada);
-
+		optensor.conv2DBackward(
+			_entrada,
+			_kernel,
+			_gradSaida,
+			_gradKernel,
+			_gradBias,
+			_gradEntrada
+		);
+		
 		return _gradEntrada;
 	}
 
