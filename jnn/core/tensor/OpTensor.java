@@ -1,6 +1,8 @@
 package jnn.core.tensor;
 
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Auxiliar em operação para tensores.
@@ -529,46 +531,40 @@ public class OpTensor {
 		}
 
 		// NOTA
-		// essa ainda não é a melhor solução, mas é mais eficiente que fazer 
-		// slicing dentro dos loops.
-		Tensor entrada2D = new Tensor(altEntrada, largEntrada);
-		Tensor kernel2D = new Tensor(altKernel, largKernel);
-		Tensor cache = new Tensor(altSaida, largSaida);
-		
-		for (int f = 0; f < numFiltros; f++){
-			cache.zerar();// zerar acumulações para o filtro atual
+		// mesmo paralelizando, não tem ganho.
+		// acredito que essa nova abordagem facilite a paralelização
+		// em melhorias futuras que sejam mais otimizadas
 
-			for (int e = 0; e < profEntrada; e++) {
-				for (int i = 0; i < altEntrada; i++) {
-					for (int j = 0; j < largEntrada; j++) {
-						entrada2D.set(entrada.get(e, i, j), i, j);
-					}
-				}
+		Tensor[] entradas = new Tensor[profEntrada];
+		for (int i = 0; i < profEntrada; i++) {
+			entradas[i] = entrada.subTensor(i);
+		}
 
-				for (int i = 0; i < altKernel; i++) {
-					for (int j = 0; j < largKernel; j++) {
-						kernel2D.set(kernel.get(f, e, i, j), i, j);
-					}
-				}
-
-				correlacao2D(entrada2D, kernel2D, cache);
+		Tensor[][] kernels = new Tensor[numFiltros][profEntrada];
+		for (int i = 0; i < numFiltros; i++) {
+			Tensor ki = kernel.subTensor(i);
+			for (int j = 0; j < profEntrada; j++) {
+				kernels[i][j] = ki.subTensor(j);
 			}
+		}
 
-			for (int i = 0; i < altSaida; i++) {
-				for (int j = 0; j < largSaida; j++) {
-					saida.add(cache.get(i, j), f, i, j);
+		Tensor[] saidas = new Tensor[numFiltros];
+		for (int i = 0; i < numFiltros; i++) {
+			saidas[i] = saida.subTensor(i);
+		}
+
+		final int numThreads = 2;// diminuir sobrecarga numa única cpu
+		try (ExecutorService exec = Executors.newFixedThreadPool(numThreads)) {
+			for (int f = 0; f < numFiltros; f++){
+				for (int e = 0; e < profEntrada; e++) {
+					correlacao2D(entradas[e], kernels[f][e], saidas[f]);
 				}
 			}
 		}
 
 		bias.ifPresent(b -> {
 			for (int i = 0; i < numFiltros; i++) {
-				double val = b.get(i);
-				for (int j = 0; j < altSaida; j++) {
-					for (int k = 0; k < largSaida; k++) {
-						saida.add(val, i, j, k);
-					}
-				}
+				saida.subTensor(i).add(b.get(i));
 			}
 		});
 	}
