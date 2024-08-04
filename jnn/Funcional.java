@@ -122,10 +122,7 @@ public final class Funcional {
      * @return {@code Tensor} resultado.
      */
     public Tensor add(Tensor a, Tensor b) {
-        Tensor r = new Tensor(a);
-        r.add(b);
-
-        return r;
+        return new Tensor(a).add(b);
     }
 
     /**
@@ -135,10 +132,7 @@ public final class Funcional {
      * @return {@code Tensor} resultado.
      */
     public Tensor sub(Tensor a, Tensor b) {
-        Tensor r = new Tensor(a);
-        r.sub(b);
-
-        return r;
+        return new Tensor(a).sub(b);
     }
 
     /**
@@ -147,11 +141,8 @@ public final class Funcional {
      * @param b {@code Tensor} B.
      * @return {@code Tensor} resultado.
      */
-    public Tensor mult(Tensor a, Tensor b) {
-        Tensor r = new Tensor(a);
-        r.mul(b);
-
-        return r;
+    public Tensor mul(Tensor a, Tensor b) {
+        return new Tensor(a).mul(b);
     }
 
     /**
@@ -160,7 +151,7 @@ public final class Funcional {
      * @param b {@code Tensor} B.
      * @return {@code Tensor} resultado.
      */
-    public Tensor matmult(Tensor a, Tensor b) {
+    public Tensor matmul(Tensor a, Tensor b) {
         return opt.matMul(a, b);
     }
 
@@ -171,10 +162,7 @@ public final class Funcional {
      * @return {@code Tensor} resultado.
      */
     public Tensor div(Tensor a, Tensor b) {
-        Tensor r = new Tensor(a);
-        r.div(b);
-
-        return r;
+        return new Tensor(a).div(b);
     }
 
     /**
@@ -185,6 +173,42 @@ public final class Funcional {
      */
     public Tensor pow(Tensor t, double exp) {
         return t.map(x -> Math.pow(x, exp));
+    }
+
+    /**
+     * Retorna o valor mínimo contido no tensor.
+     * @param t {@code Tensor} desejado.
+     * @return {@code Tensor} resultado.
+     */
+    public Tensor min(Tensor t) {
+        return t.min();
+    }
+
+    /**
+     * Retorna o valor máximo contido no tensor.
+     * @param t {@code Tensor} desejado.
+     * @return {@code Tensor} resultado.
+     */
+    public Tensor max(Tensor t) {
+        return t.max();
+    }
+
+    /**
+     * Retorna o valor da média de todos os elementos do tensor.
+     * @param t {@code Tensor} desejado.
+     * @return {@code Tensor} resultado.
+     */
+    public Tensor media(Tensor t) {
+        return t.media();
+    }
+
+    /**
+     * Retorna o valor do desvio padrão de todos os elementos do tensor.
+     * @param t {@code Tensor} desejado.
+     * @return {@code Tensor} resultado.
+     */
+    public Tensor desvp(Tensor t) {
+        return t.desvp();
     }
 
     /**
