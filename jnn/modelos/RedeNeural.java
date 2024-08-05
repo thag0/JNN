@@ -428,23 +428,22 @@ public class RedeNeural extends Modelo {
 	 *    com os pesos. No final é aplicado a função de ativação da camada no neurônio e o resultado 
 	 *    fica armazenado na saída dele.
 	 * </p>
-	 * @param entrada dados usados para alimentar a camada de entrada.
+	 * @param x dados usados para alimentar a camada de entrada.
 	 * @throws IllegalArgumentException se o modelo não foi compilado previamente.
 	 * @throws IllegalArgumentException se o tamanho dos dados de entrada for diferente da capacidade
 	 * de entrada da rede.
 	 */
 	@Override
-	public Tensor forward(Object entrada) {
+	public Tensor forward(Tensor x) {
 		validarCompilacao();
 
-		utils.validarNaoNulo(entrada, "Dados de entrada não pode ser nulo.");
+		utils.validarNaoNulo(x, "Tensor de entrada nulo.");
 
-		Tensor prev = _camadas[0].forward(entrada);
-		for (int i = 1; i < _camadas.length; i++) {
-			prev = _camadas[i].forward(prev);
+		for (Densa camada : camadas()) {
+			x = camada.forward(x);
 		}
 
-		return prev.clone();//preservar a saída do modelo
+		return x.clone();//preservar a saída do modelo
 	}
 
 	@Override
@@ -500,7 +499,6 @@ public class RedeNeural extends Modelo {
 	 */
 	@Override
 	public Densa[] camadas() {
-		validarCompilacao();
 		return _camadas;
 	}
 

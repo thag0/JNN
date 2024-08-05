@@ -35,12 +35,12 @@ public class TesteModelos{
 		int nEntradas = entrada[0].length;
 		int nSaidas = saida[0].length;
 		int nOcultas = 3;
-		long seed = 1234567890L;
+		long seed = 12345678L;
 		int epocas = 15_000;
 
 		String atv1 = "sigmoid";
 		String atv2 = "sigmoid";
-		String otm = "rmsprop";
+		String otm = "sgd";
 		String perda = "mse";
 
 		Sequencial seq = new Sequencial(
@@ -57,7 +57,7 @@ public class TesteModelos{
 		rna.compilar(otm, perda);
 		rna.configurarAtivacao(atv1);
 		rna.configurarAtivacao(rna.camadaSaida(), atv2);
-		
+		    
 		rna.treinar(treinoX, treinoY, epocas, false);
 		seq.treinar(treinoX, treinoY, epocas, false);
 
@@ -71,7 +71,7 @@ public class TesteModelos{
 		System.out.println();
 		for(int i = 0; i < 2; i++){
 			for(int j = 0; j < 2; j++){
-				double[] e = {i, j};
+				Tensor e = new Tensor(new double[] {i, j}, 2);
 				double prevSeq = seq.forward(e).get(0);
 				double prevRna = rna.forward(e).get(0);
 				System.out.println(i + " " + j + " - Rna: " + prevRna + "      \t    Seq: " + prevSeq);

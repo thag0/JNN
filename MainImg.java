@@ -93,7 +93,7 @@ public class MainImg {
 		);
 		
 		// modelo.compilar(new SGD(0.0001, 0.999), "mse");
-		modelo.compilar("adagrad", "mse");
+		modelo.compilar("sgd", "mse");
 		modelo.setHistorico(calcularHistorico);
 
 		return modelo;

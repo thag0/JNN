@@ -305,17 +305,16 @@ public class Sequencial extends Modelo {
 	}
 
 	@Override
-	public Tensor forward(Object entrada) {
+	public Tensor forward(Tensor x) {
 		validarCompilacao();
+		
+		utils.validarNaoNulo(x, "Tensor de entrada nulo.");
 
-		utils.validarNaoNulo(entrada, "Dados de entrada não podem ser nulos.");
-
-		Tensor prev = _camadas[0].forward(entrada);
-		for (int i = 1; i < _camadas.length; i++) {
-			prev = _camadas[i].forward(prev);
+		for (Camada camada : camadas()) {
+			x = camada.forward(x);
 		}
 
-		return prev.clone();// preservar a saída do modelo
+		return x.clone();// preservar a saída do modelo
 	}
   
 	@Override

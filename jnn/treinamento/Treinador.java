@@ -14,12 +14,12 @@ public abstract class Treinador implements Cloneable {
 	/**
 	 * Modelo de treino.
 	 */
-	Modelo modelo;
+	protected Modelo modelo;
 
 	/**
 	 * Gerador de números pseudo-aleatórios.
 	 */
-	Random random;
+	protected Random random;
 
 	/**
 	 * Histórico de perda do modelo durante o treinamento.

@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 
 import javax.imageio.ImageIO;
 
+import jnn.core.tensor.Tensor;
 import jnn.core.tensor.Variavel;
 import jnn.modelos.Modelo;
 
@@ -128,15 +129,15 @@ class GerenciadorArquivos {
 			final int fim = inicio + alturaPorThead;
 			
 			threads[i] = new Thread(() -> {
+				Tensor in = new Tensor(2);
+
 				for (int y = inicio; y < fim; y++) {
 					for (int x = 0; x < larguraImagem; x++) {
-						double[] entrada = new double[2];
+						in.set(((double)x / (larguraImagem-1)), 0);
+						in.set(((double)y / (alturaImagem-1)), 1);
 						double[] saida = new double[1];
-
-						entrada[0] = (double)x / (larguraImagem-1);
-						entrada[1] = (double)y / (alturaImagem-1);
 					
-						clones[id].forward(entrada);
+						clones[id].forward(in);
 					
 						saida[0] = clones[id].saidaParaArray()[0].get() * 255;
 
@@ -208,15 +209,17 @@ class GerenciadorArquivos {
 			final int fim = inicio + alturaPorThead;
 			
 			threads[i] = new Thread(() -> {
+				Tensor in = new Tensor(2);
+
 				for (int y = inicio; y < fim; y++) {
 					for (int x = 0; x < larguraImagem; x++) {
-						double[] entrada = new double[2];
-						double[] saida = new double[3];
+						double[] entrada = new double[2];						in.set(((double)x / (larguraImagem-1)), 0);
+						in.set(((double)y / (alturaImagem-1)), 1);						double[] saida = new double[3];
 
 						entrada[0] = (double)x / (larguraImagem-1);
 						entrada[1] = (double)y / (alturaImagem-1);
 					
-						redes[id].forward(entrada);
+						redes[id].forward(in);
 						Variavel[] s = redes[id].saidaParaArray();
 					
 						saida[0] = s[0].get() * 255;

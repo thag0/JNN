@@ -222,14 +222,14 @@ public abstract class Modelo implements Cloneable {
 	 * @param x dados de entrada que serão propagados através do modelo.
 	 * @return {@code Tensor} contendo a saída prevista pelo modelo.
 	 */
-	public abstract Tensor forward(Object x);
+	public abstract Tensor forward(Tensor x);
 
 	/**
 	 * Alimenta o modelo com vários dados de entrada.
 	 * @param x array contendo multiplas entradas para o modelo.
 	 * @return array de {@code Tensor} contendo as previsões correspondentes.
 	 */
-	public Tensor[] forwards(Object[] x) {
+	public Tensor[] forwards(Tensor[] x) {
 		validarCompilacao();
 
 		utils.validarNaoNulo(x, "Dados de entrada nulos.");

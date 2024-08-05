@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 
 import javax.swing.JPanel;
 
+import jnn.core.tensor.Tensor;
 import jnn.core.tensor.Variavel;
 import jnn.modelos.Modelo;
 
@@ -42,18 +43,17 @@ public class PainelTreino extends JPanel {
 
    public void desenhar(Modelo modelo, int epocasPorFrame) {
       this.modelo = modelo;
-      
-      int nEntrada = 2;
       int nSaida = modelo.camadaSaida().tamSaida();
-      double[] entrada = new double[nEntrada];
+
+      Tensor in = new Tensor(2);
 
       if (nSaida == 1) {//escala de cinza
          for (y = 0; y < this.altura; y++) {
             for (x = 0; x < this.largura; x++) {
-               entrada[0] = (double)x / this.largura;
-               entrada[1] = (double)y / this.altura;
+               in.set(((double)x / this.largura), 0);
+               in.set(((double)y / this.altura), 0);
 
-               modelo.forward(entrada);
+               modelo.forward(in);
 
                Variavel[] saida = modelo.saidaParaArray();
                int cinza = (int)(saida[0].get() * 255);
@@ -69,9 +69,10 @@ public class PainelTreino extends JPanel {
       } else if (nSaida == 3) {//rgb
          for (y = 0; y < this.altura; y++) {
             for (x = 0; x < this.largura; x++) {
-               entrada[0] = (double)x / this.largura;
-               entrada[1] = (double)y / this.altura;
-               modelo.forward(entrada);
+               in.set(((double)x / this.largura), 0);
+               in.set(((double)y / this.altura), 0);
+
+               modelo.forward(in);
 
                Variavel[] saida = modelo.saidaParaArray();
                r = (int)(saida[0].get() * 255);
@@ -110,13 +111,14 @@ public class PainelTreino extends JPanel {
    }
    
    private void calcCinza(Modelo modelo, int y) {
-      double[] in = new double[2];
-      in[1] = (double) y / altura;
-      
+      Tensor in = new Tensor(2);
+      in.set(((double) y / altura), 1);
+
       int[] pixels = new int[largura];
       int cinza, r, g, b;
+
       for (int x = 0; x < largura; x++) {
-         in[0] = (double) x / largura;
+         in.set(((double) x / largura), 0);
          cinza = (int)(modelo.forward(in).get(0) * 255);
             
          r = cinza;
@@ -129,13 +131,13 @@ public class PainelTreino extends JPanel {
    }
 
    private void calcRgb(Modelo modelo, int y) {
-      double[] in = new double[2];
-      in[1] = (double) y / altura;
+      Tensor in = new Tensor(2);
+      in.set(((double) y / altura), 1);
 
       int[] pixels = new int[largura];
       double[] saida = new double[3];
       for (int x = 0; x < largura; x++) {
-         in[0] = (double) x / largura;
+         in.set(((double) x / largura), 0);
          
          modelo.forward(in);
          modelo.copiarDaSaida(saida);
