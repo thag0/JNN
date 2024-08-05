@@ -447,9 +447,9 @@ public class RedeNeural extends Modelo {
 	}
 
 	@Override
-	public void zerarGrad() {
+	public void gradZero() {
 		for (int i = 0; i < _camadas.length; i++) {
-			_camadas[i].zerarGrad();
+			_camadas[i].gradZero();
 		}
 	}
 

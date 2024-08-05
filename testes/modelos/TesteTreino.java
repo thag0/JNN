@@ -41,7 +41,7 @@ public class TesteTreino{
 	}
 
 	static Tensor verificar(Tensor[] entrada, Tensor[] saida, Sequencial modelo){
-		Tensor[] preds = modelo.forwards(entrada);
+		Tensor[] preds = modelo.forward(entrada);
 
 		int n = preds.length;
 		int cols = 2;

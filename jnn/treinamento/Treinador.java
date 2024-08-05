@@ -75,21 +75,21 @@ public abstract class Treinador implements Cloneable {
 
 	/**
 	 * Executa a regra de treino durante um determinado número de épocas.
-	 * @param x {@code Tensores} contendos os dados de entrada.
-	 * @param y {@code Tensores} contendos os dados de saída (rótulos).
+	 * @param xs {@code Tensores} contendos os dados de entrada.
+	 * @param ys {@code Tensores} contendos os dados de saída (rótulos).
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	public abstract void executar(Tensor[] x, Tensor[] y, int epochs, boolean logs);
+	public abstract void executar(Tensor[] xs, Tensor[] ys, int epochs, boolean logs);
 
 	/**
 	 * Executa a regra de treino durante um determinado número de épocas.
-	 * @param x {@code Tensores} contendos os dados de entrada.
-	 * @param y {@code Tensores} contendos os dados de saída (rótulos).
+	 * @param xs {@code Tensores} contendos os dados de entrada.
+	 * @param ys {@code Tensores} contendos os dados de saída (rótulos).
 	 * @param epochs quantidade de épocas de treinamento.
 	 */
-	public void executar(Tensor[] x, Tensor[] y, int epochs) {
-		executar(x, y, epochs, false);
+	public void executar(Tensor[] xs, Tensor[] ys, int epochs) {
+		executar(xs, ys, epochs, false);
 	}
 
 	/**
@@ -116,11 +116,11 @@ public abstract class Treinador implements Cloneable {
 	/**
 	 * Embaralha os dos arrays usando o algoritmo Fisher-Yates.
 	 * @param <T> tipo de dados de entrada e saida.
-	 * @param x {@code array} com os dados de entrada.
-	 * @param y {@code array} com os dados de saída.
+	 * @param xs {@code array} com os dados de entrada.
+	 * @param ys {@code array} com os dados de saída.
 	 */
-	public <T> void embaralhar(T[] x, T[] y) {
-		int linhas = x.length;
+	public <T> void embaralhar(T[] xs, T[] ys) {
+		int linhas = xs.length;
 		int i, idAleatorio;
 
 		T temp;
@@ -128,14 +128,14 @@ public abstract class Treinador implements Cloneable {
 			idAleatorio = random.nextInt(i+1);
 			
 			// entradas
-			temp = x[i];
-			x[i] = x[idAleatorio];
-			x[idAleatorio] = temp;
+			temp = xs[i];
+			xs[i] = xs[idAleatorio];
+			xs[idAleatorio] = temp;
 
 			// saídas
-			temp = y[i];
-			y[i] = y[idAleatorio];
-			y[idAleatorio] = temp;
+			temp = ys[i];
+			ys[i] = ys[idAleatorio];
+			ys[idAleatorio] = temp;
 		}
 	}
 

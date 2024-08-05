@@ -442,7 +442,7 @@ public abstract class Camada {
 	/**
 	 * Zera os gradientes de parâmetros treináveis.
 	 */
-	public void zerarGrad() {
+	public void gradZero() {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui kernel/bias para zerar."
 		);

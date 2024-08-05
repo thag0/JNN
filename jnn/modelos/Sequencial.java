@@ -318,9 +318,9 @@ public class Sequencial extends Modelo {
 	}
   
 	@Override
-	public void zerarGrad() {
+	public void gradZero() {
 		for (Camada camada : camadas()) {
-			if (camada.treinavel()) camada.zerarGrad();
+			if (camada.treinavel()) camada.gradZero();
 		}
 	}
 

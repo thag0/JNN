@@ -79,8 +79,13 @@ public abstract class Modelo implements Cloneable {
 	/**
 	 * Utilitário.
 	 */
-	Utils utils;
+	protected Utils utils;
 	
+	/**
+	 * Auxiliar de verificação da alteração do método de treino.
+	 */
+	protected boolean configTreino = false;
+
 	/**
 	 * Inicialização implicita de um modelo.
 	 */
@@ -148,8 +153,7 @@ public abstract class Modelo implements Cloneable {
 	 */
 	public void setPerda(Perda perda) {
 		utils.validarNaoNulo(perda, "Função de perda nula.");
-
-		this._perda = perda;
+		_perda = perda;
 	}
 
 	/**
@@ -171,13 +175,23 @@ public abstract class Modelo implements Cloneable {
 	 *    <li> Nadam </li>
 	 *    <li> AMSGrad </li>
 	 *    <li> Adadelta </li>
+	 *    <li> Lion </li>
 	 * </ol>
 	 * @param otm novo otimizador.
 	 */
 	public void setOtimizador(Otimizador otm) {
 		utils.validarNaoNulo(otm, "Otimizador nulo.");
-
 		_otimizador = otm;
+	}
+
+	/**
+	 * Configura um novo treinador para o modelo.
+	 * @param t {@code Treinador} novo.
+	 */
+	public void setTreinador(Treinador t) {
+		utils.validarNaoNulo(t, "Treinador nulo.");
+		_treinador = t;
+		configTreino = true;
 	}
 
 	/**
@@ -226,15 +240,15 @@ public abstract class Modelo implements Cloneable {
 
 	/**
 	 * Alimenta o modelo com vários dados de entrada.
-	 * @param x array contendo multiplas entradas para o modelo.
+	 * @param xs array contendo multiplas entradas para o modelo.
 	 * @return array de {@code Tensor} contendo as previsões correspondentes.
 	 */
-	public Tensor[] forwards(Tensor[] x) {
+	public Tensor[] forward(Tensor[] xs) {
 		validarCompilacao();
 
-		utils.validarNaoNulo(x, "Dados de entrada nulos.");
+		utils.validarNaoNulo(xs, "Dados de entrada nulos.");
 
-		final int numEntradas = x.length;
+		final int numEntradas = xs.length;
 		int numThreads = Runtime.getRuntime().availableProcessors();
 		if (numThreads > numEntradas) numThreads = numEntradas;
 
@@ -254,7 +268,7 @@ public abstract class Modelo implements Cloneable {
 	
 				exec.execute(() -> {
 					for (int j = inicio; j < fim; j++) {
-						prevs[j] = clones[id].forward(x[j]);
+						prevs[j] = clones[id].forward(xs[j]);
 					}
 				});
 			}
@@ -269,49 +283,49 @@ public abstract class Modelo implements Cloneable {
 	 *    Apenas camadas treináveis são afetadas.
 	 * </p>
 	 */
-	public abstract void zerarGrad();
+	public abstract void gradZero();
 
 	/**
 	 * Realiza as verificações necessárias nos dados usados pelo modelo.
 	 * @param <T> tipo de dados, comumente usando {@code Tensor}.
-	 * @param x array contendos dados de entrada.
-	 * @param y array contendos dados de saída.
+	 * @param xs array contendos dados de entrada.
+	 * @param ys array contendos dados de saída.
 	 */
-	private <T> void validarDados(T[] x, T[] y) {
-		utils.validarNaoNulo(x, "Dados de entrada nulos.");
-		utils.validarNaoNulo(y, "Dados de saida nulos.");
+	private <T> void validarDados(T[] xs, T[] ys) {
+		utils.validarNaoNulo(xs, "Dados de entrada nulos.");
+		utils.validarNaoNulo(ys, "Dados de saida nulos.");
  
-		if (x.length != y.length) {
+		if (xs.length != ys.length) {
 			throw new IllegalArgumentException(
 				"\nDados de entrada e saída devem conter o mesmo tamanho, " +
-				"recebido x = " + x.length + " e y = " + y.length
+				"recebido x = " + xs.length + " e y = " + ys.length
 			);
 		}
 	}
 
 	/**
 	 * Treina o modelo de acordo com as configurações predefinidas.
-	 * @param x dados de entrada do treino (features).
-	 * @param y dados de saída correspondente a entrada (classes).
+	 * @param xs dados de entrada do treino (features).
+	 * @param ys dados de saída correspondente a entrada (classes).
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	public void treinar(Tensor[] x, Tensor[] y, int epochs, boolean logs) {
-		treinar(x, y, epochs, 1, logs);
+	public void treinar(Tensor[] xs, Tensor[] ys, int epochs, boolean logs) {
+		treinar(xs, ys, epochs, 1, logs);
 	}
 	
 	/**
 	 * Treina o modelo de acordo com as configurações predefinidas utilizando o
 	 * treinamento em lotes.
-	 * @param x {@code Tensores} contendos os dados de entrada.
-	 * @param y {@code Tensores} contendos os dados de saída (rótulos).
+	 * @param xs {@code Tensores} contendos os dados de entrada.
+	 * @param ys {@code Tensores} contendos os dados de saída (rótulos).
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param tamLote tamanho do lote de treinamento.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	public void treinar(Tensor[] x, Tensor[] y, int epochs, int tamLote, boolean logs) {
+	public void treinar(Tensor[] xs, Tensor[] ys, int epochs, int tamLote, boolean logs) {
 		validarCompilacao();
-		validarDados(x, y);
+		validarDados(xs, ys);
 
 		if (epochs < 1) {
 			throw new IllegalArgumentException(
@@ -325,12 +339,12 @@ public abstract class Modelo implements Cloneable {
 			);
 		}
 
-		if (tamLote > 1) {
+		if (!configTreino && tamLote > 1) {
 			_treinador = new TreinoLote(this, tamLote);
 			_treinador.setHistorico(calcularHistorico);
 		}
 		
-		_treinador.executar(x, y, epochs, logs);
+		_treinador.executar(xs, ys, epochs, logs);
 	}
 
 	/**
@@ -350,20 +364,20 @@ public abstract class Modelo implements Cloneable {
 	 * <pre>
 	 * modelo.avaliador()
 	 * </pre>
-	 * @param x {@code Tensores} contendo dados de entrada.
-	 * @param y {@code Tensores} contendo dados de saída correspondente as entradas fornecidas.
+	 * @param xs {@code Tensores} contendo dados de entrada.
+	 * @param ys {@code Tensores} contendo dados de saída correspondente as entradas fornecidas.
 	 * @return valor de perda do modelo.
 	 */
-	public Tensor avaliar(Tensor[] x, Tensor[] y) {
+	public Tensor avaliar(Tensor[] xs, Tensor[] ys) {
 		validarCompilacao();
-		validarDados(x, y);
+		validarDados(xs, ys);
 
-		Tensor[] prevs = forwards(x);
+		Tensor[] prevs = forward(xs);
 		
 		int n = prevs.length;
 		double soma = 0;
 		for (int i = 0; i < n; i++) {
-			soma += _perda.calcular(prevs[i], y[i]).item();
+			soma += _perda.calcular(prevs[i], ys[i]).item();
 		}
 
 		return new Tensor(new double[]{ (soma/n) }, 1);

@@ -26,23 +26,23 @@ public class TreinoLote extends Treinador {
 	}
 
 	@Override
-	public void executar(Tensor[] x, Tensor[] y, int epochs, boolean logs) {
+	public void executar(Tensor[] xs, Tensor[] ys, int epochs, boolean logs) {
 		Otimizador otimizador = modelo.otimizador();
 		Perda perda = modelo.perda();
-		int numAmostras = x.length;
+		int numAmostras = xs.length;
 
 		if (logs) esconderCursor();
 		double perdaEpoca;
 		for (int e = 1; e <= epochs; e++) {
-			embaralhar(x, y);
+			embaralhar(xs, ys);
 			perdaEpoca = 0;
 
 			for (int i = 0; i < numAmostras; i += tamLote) {
 				int fimId = Math.min(i + tamLote, numAmostras);
-				Tensor[] loteX = utils.subArray(x, i, fimId);
-				Tensor[] loteY = utils.subArray(y, i, fimId);
+				Tensor[] loteX = utils.subArray(xs, i, fimId);
+				Tensor[] loteY = utils.subArray(ys, i, fimId);
 				
-				modelo.zerarGrad();// zerar gradientes para o acumular pelo lote
+				modelo.gradZero();// zerar gradientes para o acumular pelo lote
 				for (int j = 0; j < loteX.length; j++) {
 					Tensor prev = modelo.forward(loteX[j]);
 

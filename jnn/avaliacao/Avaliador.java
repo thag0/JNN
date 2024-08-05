@@ -52,7 +52,7 @@ public class Avaliador {
 	 * @return {@code Tensor} contendo o resultado.
 	 */
 	public Tensor erroMedioQuadrado(Tensor[] entrada, Tensor[] real) {
-		Tensor[] prev = modelo.forwards(entrada);
+		Tensor[] prev = modelo.forward(entrada);
 
 		int tam = prev.length;
 		double res = 0;
@@ -82,7 +82,7 @@ public class Avaliador {
 	 * @return {@code Tensor} contendo o resultado.
 	 */
 	public Tensor erroMedioQuadradoLogaritmico(Tensor[] entrada, Tensor[] real) {
-		Tensor[] prev = modelo.forwards(entrada);
+		Tensor[] prev = modelo.forward(entrada);
 
 		int tam = entrada.length;
 		double res = 0;
@@ -110,7 +110,7 @@ public class Avaliador {
 	 * @return {@code Tensor} contendo o resultado.
 	 */
 	public Tensor erroMedioAbsoluto(Tensor[] entrada, Tensor[] real) {
-		Tensor[] prev = modelo.forwards(entrada);
+		Tensor[] prev = modelo.forward(entrada);
 
 		int tam = entrada.length;
 		double res = 0;
@@ -128,7 +128,7 @@ public class Avaliador {
 	 * @return {@code Tensor} contendo o resultado.
 	 */
 	public Tensor acuracia(Tensor[] entrada, Tensor[] real) {
-		Tensor[] prevs = modelo.forwards(entrada); 
+		Tensor[] prevs = modelo.forward(entrada); 
 		return acuracia.calcular(prevs, real);
 	}
 
@@ -151,7 +151,7 @@ public class Avaliador {
 	 * @return {@code Tensor} contendo o resultado.
 	 */
 	public Tensor entropiaCruzada(Tensor[] entrada, Tensor[] real) {  
-		Tensor[] previsoes = modelo.forwards(entrada);
+		Tensor[] previsoes = modelo.forward(entrada);
 
 		int tam = entrada.length;
 		double res = 0;
@@ -181,7 +181,7 @@ public class Avaliador {
 	 * @return {@code Tensor} contendo o resultado.
 	 */
 	public Tensor entropiaCruzadaBinaria(Tensor[] entrada, Tensor[] real) {
-		Tensor[] prev = modelo.forwards(entrada);
+		Tensor[] prev = modelo.forward(entrada);
 
 		int tam = entrada.length;
 		double res = 0;
@@ -204,7 +204,7 @@ public class Avaliador {
 	 * @return {@code Tensor} contendo o resultado.
 	 */
 	public Tensor matrizConfusao(Tensor[] entrada, Tensor[] saidas) {
-		Tensor[] prevs = modelo.forwards(entrada);
+		Tensor[] prevs = modelo.forward(entrada);
 		return mc.calcular(prevs, saidas);
 	}
 
@@ -221,7 +221,7 @@ public class Avaliador {
 	 * @return {@code Tensor} contendo o resultado.
 	 */
 	public Tensor f1Score(Tensor[] entrada, Tensor[] real) {
-		Tensor[] prevs = modelo.forwards(entrada);
+		Tensor[] prevs = modelo.forward(entrada);
 		return f1Score.calcular(prevs, real);
 	}
 }

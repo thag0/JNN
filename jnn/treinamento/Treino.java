@@ -19,27 +19,27 @@ public class Treino extends Treinador {
 	}
 	
 	@Override
-	public void executar(Tensor[] x, Tensor[] y, int epochs, boolean logs) {
+	public void executar(Tensor[] xs, Tensor[] ys, int epochs, boolean logs) {
 		Otimizador otimizador = modelo.otimizador();
 		Perda perda = modelo.perda();
-		int numAmostras = x.length;
+		int numAmostras = xs.length;
 
 		if (logs) esconderCursor();
 		double perdaEpoca;
 		for (int e = 1; e <= epochs; e++) {
-			embaralhar(x, y);
+			embaralhar(xs, ys);
 			perdaEpoca = 0;
 			
 			for (int i = 0; i < numAmostras; i++) {
-				Tensor prev = modelo.forward(x[i]);
+				Tensor prev = modelo.forward(xs[i]);
 				
 				//feedback de avanço
 				if (calcularHistorico) {
-					perdaEpoca += perda.calcular(prev, y[i]).item();
+					perdaEpoca += perda.calcular(prev, ys[i]).item();
 				}
 				
-				modelo.zerarGrad();
-				backpropagation(prev, y[i]);
+				modelo.gradZero();
+				backpropagation(prev, ys[i]);
 				otimizador.atualizar();
 			}
 
