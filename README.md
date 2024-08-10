@@ -52,6 +52,6 @@ Excluindo a parte de pesquisa e estudo as maiores dificuldades encontradas até 
 
 - **Performance**: Melhorias em nível de código para melhorar a execução dos algoritmos;
 
-- **Multithread**: Melhorias em nível de hardware para tirar proveito de múltiplos processadores do computador. Atualmente tudo roda em single thread;
+- **Multithread**: Melhorias em nível de hardware para tirar proveito de múltiplos processadores do computador. Atualmente poucas funções tiram proveiro de mais de uma thread.
 
-- **Tensor**: Melhorias de performance principalmente em modelos convolucionais;
+- **Treinamento**: Melhorar os algoritmos de treino para aproveitar melhor os recursos da máquina;
