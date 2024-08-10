@@ -200,7 +200,7 @@ public class OpTensor {
 						dataB[k * colB + j]
 					);
 				}
-				dataD[idSaida].set(soma);
+				dataD[idSaida].add(soma);
 			}
 		}
 
@@ -492,12 +492,8 @@ public class OpTensor {
 	 * @param gradE {@code Tensor} contendo o gradiente em relação à entrada da camada.
 	 */
 	public void densaBackward(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
-		Tensor temp = new Tensor(gradK.shape());
-		matMul(entrada.transpor(), gradS, temp);
-		gradK.add(temp);
-
+		matMul(entrada.transpor(), gradS, gradK);
 		gradB.ifPresent(gb -> gb.add(gradS));
-
 		matMul(gradS, kernel.transpor(), gradE);
 	}
 

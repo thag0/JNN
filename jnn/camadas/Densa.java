@@ -424,6 +424,7 @@ public class Densa extends Camada implements Cloneable {
 			);
 		}
 
+		_somatorio.zero();
 		optensor.densaForward(_entrada, _kernel, _bias, _somatorio);
 
 		ativacao.forward(_somatorio, _saida);
@@ -466,6 +467,7 @@ public class Densa extends Camada implements Cloneable {
 		
 		ativacao.backward(this);
 		
+		_gradEntrada.zero();
 		optensor.densaBackward(
 			_entrada,
 			_kernel,
