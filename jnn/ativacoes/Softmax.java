@@ -2,7 +2,7 @@ package jnn.ativacoes;
 
 import jnn.camadas.Conv2D;
 import jnn.camadas.Densa;
-import jnn.core.tensor.OpTensor;
+import jnn.core.OpTensor;
 import jnn.core.tensor.Tensor;
 
 /**

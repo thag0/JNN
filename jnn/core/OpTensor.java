@@ -1,8 +1,11 @@
-package jnn.core.tensor;
+package jnn.core;
 
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import jnn.core.tensor.Tensor;
+import jnn.core.tensor.Variavel;
 
 /**
  * Auxiliar em operação para tensores.
