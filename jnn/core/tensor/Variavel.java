@@ -295,6 +295,46 @@ public class Variavel implements Cloneable {
         valor /= (x.valor / y.valor);
     }
 
+    /**
+     * Verifica que o valor local é {@code maior} que o valor da 
+     * variável fornecida.
+     * @param x {@code Variável} desejada.
+     * @return resultado da verificação.
+     */
+    public boolean maior(Variavel x) {
+        return valor > x.valor;
+    }
+
+    /**
+     * Verifica que o valor local é {@code maior} que o valor da 
+     * variável fornecida.
+     * @param x valor desejado.
+     * @return resultado da verificação.
+     */
+    public boolean maior(Number x) {
+        return valor > x.doubleValue();
+    }
+
+    /**
+     * Verifica que o valor local é {@code menor} que o valor da 
+     * variável fornecida.
+     * @param x {@code Variável} desejada.
+     * @return resultado da verificação.
+     */
+    public boolean menor(Variavel x) {
+        return valor < x.valor;
+    }
+
+    /**
+     * Verifica que o valor local é {@code menor} que o valor da 
+     * variável fornecida.
+     * @param x valor desejado.
+     * @return resultado da verificação.
+     */
+    public boolean menor(Number x) {
+        return valor < x.doubleValue();
+    }
+
     @Override
     public boolean equals(Object obj) {
         return (obj instanceof Variavel) && (this.valor == ((Variavel) obj).valor);
