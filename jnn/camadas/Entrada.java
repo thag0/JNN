@@ -69,13 +69,13 @@ public class Entrada extends Camada {
 	public void inicializar() {}
 
 	@Override
-	public Tensor forward(Object entrada) {
-		if (entrada instanceof Tensor) {
-			return (Tensor) entrada;
+	public Tensor forward(Object x) {
+		if (x instanceof Tensor) {
+			return (Tensor) x;
 		
 		} else {
 			throw new IllegalArgumentException(
-				"\nTipo de entrada \"" + entrada.getClass().getTypeName() + "\"" +
+				"\nTipo de entrada \"" + x.getClass().getTypeName() + "\"" +
 				" não suportada."
 			);
 		}

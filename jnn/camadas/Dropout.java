@@ -183,18 +183,18 @@ public class Dropout extends Camada implements Cloneable {
 	 *    Caso a camada não esteja {@code treinando}, por padrão a entrada é apenas
 	 *    repassada para a saída da camada.
 	 * </p>
-	 * @param entrada dados de entrada para a camada, objetos aceitos são {@code Tensor}
+	 * @param x dados de entrada para a camada, objetos aceitos são {@code Tensor}
 	 */
 	@Override
-	public Tensor forward(Object entrada) {
+	public Tensor forward(Object x) {
 		verificarConstrucao();
 
-		if (entrada instanceof Tensor) {
-			_entrada.copiar((Tensor) entrada);
+		if (x instanceof Tensor) {
+			_entrada.copiar((Tensor) x);
 			
 		} else {
 			throw new IllegalArgumentException(
-				"\nTipo de entrada \"" + entrada.getClass().getTypeName() + "\"" +
+				"\nTipo de entrada \"" + x.getClass().getTypeName() + "\"" +
 				" não suportada."
 			);
 		}

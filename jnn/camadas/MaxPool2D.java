@@ -257,18 +257,18 @@ public class MaxPool2D extends Camada implements Cloneable{
 	}
 
 	@Override
-	public Tensor forward(Object entrada) {
+	public Tensor forward(Object x) {
 		verificarConstrucao();
 
-		if (entrada instanceof Tensor) {
-			_entrada.copiar((Tensor) entrada);
+		if (x instanceof Tensor) {
+			_entrada.copiar((Tensor) x);
 			
-		} else if (entrada instanceof double[][][]) {
-			_entrada.copiar((double[][][]) entrada);
+		} else if (x instanceof double[][][]) {
+			_entrada.copiar((double[][][]) x);
 
 		} else {
 			throw new IllegalArgumentException(
-				"\nTipo de entrada \"" + entrada.getClass().getTypeName() + "\"" +
+				"\nTipo de entrada \"" + x.getClass().getTypeName() + "\"" +
 				" não suportada."
 			);
 		}

@@ -157,19 +157,19 @@ public class Flatten extends Camada implements Cloneable{
 	 *    Propagação direta através da camada Flatten
 	 * </h2>
 	 * Achata os dados de entrada num formato sequencial.
-	 * @param entrada dados de entrada que serão processados, objetos aceitos incluem:
+	 * @param x dados de entrada que serão processados, objetos aceitos incluem:
 	 * {@code Tensor}
 	 */
 	@Override
-	public Tensor forward(Object entrada) {
+	public Tensor forward(Object x) {
 		verificarConstrucao();
 
-		if (entrada instanceof Tensor) {
-			_entrada.copiar((Tensor) entrada);
+		if (x instanceof Tensor) {
+			_entrada.copiar((Tensor) x);
 
 		} else {
 			throw new IllegalArgumentException(
-				"\nTipo de entrada \"" + entrada.getClass().getTypeName() + "\"" +
+				"\nTipo de entrada \"" + x.getClass().getTypeName() + "\"" +
 				" não suportada."
 			);
 		}

@@ -404,22 +404,22 @@ public class Densa extends Camada implements Cloneable {
 	 *somatorio.add(bias)
 	 *saida = ativacao(somatorio)
 	 * </pre>
-	 * @param entrada dados de entrada que serão processados, objetos aceitos incluem:
+	 * @param x dados de entrada que serão processados, objetos aceitos incluem:
 	 * {@code Tensor}, ou {@code double[]}.
 	 */
 	@Override
-	public Tensor forward(Object entrada) {
+	public Tensor forward(Object x) {
 		verificarConstrucao();
 
-		if (entrada instanceof Tensor) {
-			_entrada.copiar((Tensor) entrada);
+		if (x instanceof Tensor) {
+			_entrada.copiar((Tensor) x);
 
-		} else if (entrada instanceof double[]) {
-			_entrada.copiar((double[]) entrada);
+		} else if (x instanceof double[]) {
+			_entrada.copiar((double[]) x);
 
 		} else {
 			throw new IllegalArgumentException(
-				"\nTipo de entrada \"" + entrada.getClass().getTypeName() + "\"" +
+				"\nTipo de entrada \"" + x.getClass().getTypeName() + "\"" +
 				" não suportada."
 			);
 		}
