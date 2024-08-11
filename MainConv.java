@@ -38,7 +38,7 @@ public class MainConv {
 	static final int NUM_AMOSTRAS_TREINO = 500;
 	static final int NUM_AMOSTRAS_TESTE  = 100;
 	static final int TREINO_EPOCAS = 8;
-	static final int TREINO_LOTE = 32;
+	static final int TREINO_LOTE = 64;
 	static final boolean TREINO_LOGS = true;
 
 	// caminhos de arquivos externos
