@@ -215,7 +215,7 @@ public class OpTensor {
 	 * @param kernel {@code Tensor} contendo o filtro que será aplicado à entrada.
 	 * @return {@code Tensor} contendo o resultado.
 	 */
-	public Tensor correlacao2D(Tensor entrada, Tensor kernel) {
+	public Tensor corr2D(Tensor entrada, Tensor kernel) {
 		if (entrada.numDim() != 2 || kernel.numDim() != 2) {
 			throw new IllegalArgumentException(
 				"\nAmbos os tensores devem ter duas dimensões."
@@ -230,7 +230,7 @@ public class OpTensor {
 		int larg = shapeE[1] - shapeK[1] + 1;
 		Tensor saida = new Tensor(alt, larg);
 
-		correlacao2D(entrada, kernel, saida);
+		corr2D(entrada, kernel, saida);
 
 		return saida;
 	}
@@ -241,7 +241,7 @@ public class OpTensor {
 	 * @param kernel {@code Tensor} contendo o filtro que será aplicado à entrada.
 	 * @param saida {@code Tensor} de destino.
 	 */
-	public void correlacao2D(Tensor entrada, Tensor kernel, Tensor saida) {
+	public void corr2D(Tensor entrada, Tensor kernel, Tensor saida) {
 		if (entrada.numDim() != 2 || kernel.numDim() != 2 || saida.numDim() != 2) {
 			throw new IllegalArgumentException(
 				"\nTodos os tensores devem ter duas dimensões."
@@ -302,7 +302,7 @@ public class OpTensor {
 	 * @param kernel {@code Tensor} contendo o filtro que será aplicado à entrada.
 	 * @return {@code Tensor} de destino.
 	 */
-	public Tensor convolucao2D(Tensor entrada, Tensor kernel) {
+	public Tensor conv2D(Tensor entrada, Tensor kernel) {
 		if (entrada.numDim() != 2 || kernel.numDim() != 2) {
 			throw new IllegalArgumentException(
 				"\nTodos os tensores devem ter duas dimensões."
@@ -316,7 +316,7 @@ public class OpTensor {
 		int larg = shapeE[1] - shapeK[1] + 1;
 		Tensor res = new Tensor(alt, larg);
 
-		convolucao2D(entrada, kernel, res);
+		conv2D(entrada, kernel, res);
 
 		return res;
 	}
@@ -327,7 +327,7 @@ public class OpTensor {
 	 * @param kernel {@code Tensor} contendo o filtro que será aplicado à entrada.
 	 * @param saida {@code Tensor} de destino.
 	 */
-	public void convolucao2D(Tensor entrada, Tensor kernel, Tensor saida) {
+	public void conv2D(Tensor entrada, Tensor kernel, Tensor saida) {
 		if (entrada.numDim() != 2 || kernel.numDim() != 2 || saida.numDim() != 2) {
 			throw new IllegalArgumentException(
 				"\nTodos os tensores devem ter duas dimensões."
@@ -386,7 +386,7 @@ public class OpTensor {
 	 * @param kernel {@code Tensor} contendo o filtro que será aplicado à entrada.
 	 * @return {@code Tensor} de destino.
 	 */
-	public Tensor convolucao2DFull(Tensor entrada, Tensor kernel) {
+	public Tensor conv2DFull(Tensor entrada, Tensor kernel) {
 		if (entrada.numDim() != 2 || kernel.numDim() != 2) {
 			throw new IllegalArgumentException(
 				"\nAmbos os tensores devem ter duas dimensões."
@@ -402,7 +402,7 @@ public class OpTensor {
 	
 		Tensor saida = new Tensor(alt, larg);
 
-		convolucao2DFull(entrada, kernel, saida);
+		conv2DFull(entrada, kernel, saida);
 	
 		return saida;
 	}
@@ -413,7 +413,7 @@ public class OpTensor {
 	 * @param kernel {@code Tensor} contendo o filtro que será aplicado à entrada.
 	 * @param saida {@code Tensor} de destino.
 	 */
-	public void convolucao2DFull(Tensor entrada, Tensor kernel, Tensor saida) {
+	public void conv2DFull(Tensor entrada, Tensor kernel, Tensor saida) {
 		if (entrada.numDim() != 2 || kernel.numDim() != 2) {
 			throw new IllegalArgumentException(
 				"\nTodos os tensores devem ter duas dimensões."
@@ -556,7 +556,7 @@ public class OpTensor {
 		try (ExecutorService exec = Executors.newFixedThreadPool(numThreads)) {
 			for (int f = 0; f < numFiltros; f++){
 				for (int e = 0; e < profEntrada; e++) {
-					correlacao2D(entradas[e], kernels[f][e], saidas[f]);
+					corr2D(entradas[e], kernels[f][e], saidas[f]);
 				}
 			}
 		}
@@ -584,10 +584,6 @@ public class OpTensor {
 		final int profEntrada = shapeK[1];
 		boolean temBias = gradB.isPresent();
 
-		// NOTA
-		// essa ainda não é a melhor solução, mas é mais eficiente que 
-		// fazer slicing dentro dos loops.
-
 		// aproveitar paralelismo para dividir o trabalho e sobrecarregar
 		// menos um único núcleo do processador.
 
@@ -613,7 +609,7 @@ public class OpTensor {
 
 			for (int e = 0; e < profEntrada; e++) {
 				for (int f = 0; f < numFiltros; f++) {
-					convolucao2DFull(gsSaida[f], kernels[f][e], gsEntrada[e]);
+					conv2DFull(gsSaida[f], kernels[f][e], gsEntrada[e]);
 				}
 			}
 		});
@@ -636,7 +632,7 @@ public class OpTensor {
 
 			for (int f = 0; f < numFiltros; f++) {
 				for (int e = 0; e < profEntrada; e++) {
-					correlacao2D(entradas[e], gsSaida[f], gsKernels[f][e]);	
+					corr2D(entradas[e], gsSaida[f], gsKernels[f][e]);	
 				}
 			}
 		});

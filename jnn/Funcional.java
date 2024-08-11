@@ -219,7 +219,7 @@ public final class Funcional {
      * @return {@code Tensor} resultado.
      */
     public Tensor correlacao2D(Tensor a, Tensor b) {
-        return opt.correlacao2D(a, b);
+        return opt.corr2D(a, b);
     }
 
     /**
@@ -230,7 +230,7 @@ public final class Funcional {
      * @return {@code Tensor} resultado.
      */
     public Tensor convolucao2D(Tensor a, Tensor b) {
-        return opt.convolucao2D(a, b);
+        return opt.conv2D(a, b);
     }
 
     // funções
