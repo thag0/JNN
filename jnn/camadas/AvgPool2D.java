@@ -1,5 +1,6 @@
 package jnn.camadas;
 
+import jnn.core.OpTensor;
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 
@@ -32,6 +33,11 @@ import jnn.core.tensor.Tensor;
  * </p>
  */
 public class AvgPool2D extends Camada {
+
+	/**
+	 * Operador para tensores.
+	 */
+	OpTensor optensor = new OpTensor();
 
 	/**
 	 * Utilitario.
@@ -94,12 +100,12 @@ public class AvgPool2D extends Camada {
 	/**
 	 * Formato do filtro de pooling (altura, largura).
 	 */
-	private int[] formFiltro;
+	private int[] _filtro;
 
 	/**
 	 * Valores de stride (altura, largura).
 	 */
-	private int[] stride;
+	private int[] _stride;
 
 	/**
 	 * Instancia uma nova camada de average pooling, definindo o formato do filtro 
@@ -140,8 +146,8 @@ public class AvgPool2D extends Camada {
 			);
 		}
 
-		this.formFiltro = formFiltro.clone();
-		this.stride = stride.clone();
+		this._filtro = formFiltro.clone();
+		this._stride = stride.clone();
 	}
 
 	/**
@@ -208,14 +214,14 @@ public class AvgPool2D extends Camada {
 		shapeEntrada[2] = shape[2];// largura
 
 		shapeSaida[0] = shapeEntrada[0];
-		shapeSaida[1] = (int) Math.floor((float)(shapeEntrada[1] - formFiltro[0]) / stride[0]) + 1;
-		shapeSaida[2] = (int) Math.floor((float)(shapeEntrada[2] - formFiltro[1]) / stride[1]) + 1;
+		shapeSaida[1] = (int) Math.floor((float)(shapeEntrada[1] - _filtro[0]) / _stride[0]) + 1;
+		shapeSaida[2] = (int) Math.floor((float)(shapeEntrada[2] - _filtro[1]) / _stride[1]) + 1;
 		
 		if (shapeSaida[1] < 1 || shapeSaida[2] < 1) {
 			throw new IllegalArgumentException(
 				"\nCamada não pode ser construida:" +
 				"\nFormato de entrada " + utils.shapeStr(shape) +
-				" e formato dos filtros " + utils.shapeStr(formFiltro) +
+				" e formato dos filtros " + utils.shapeStr(_filtro) +
 				" resultam num formato de saída inválido " + utils.shapeStr(shapeSaida)
 			);
 		}
@@ -256,51 +262,11 @@ public class AvgPool2D extends Camada {
 			);
 		}
 
-		int canais = shapeEntrada[0];
-		for (int i = 0; i < canais; i++) {
-			aplicar(_entrada, _saida, i);
-		}
+		optensor.avgPool2D(_entrada, _saida, _filtro, _stride);
 
 		return _saida;
 	}
-
-	/**
-	 * Calcula a média dos valores encontrados na entrada de acordo com as
-	 * configurações de filtro e strides.
-	 * @param entrada tensor de entrada.
-	 * @param saida tensor de destino.
-	 * @param prof índice de profundidade da operação.
-	 */
-	private void aplicar(Tensor entrada, Tensor saida, int prof) {
-		int[] shapeE = entrada.shape();
-		int[] shapeS = saida.shape();
-
-		int altEntrada  = shapeE[1];
-		int largEntrada = shapeE[2];
-		int altSaida  = shapeS[1];
-		int largSaida = shapeS[2];
-  
-		for (int i = 0; i < altSaida; i++) {
-			int linInicio = i * stride[0];
-			int linFim = Math.min(linInicio + formFiltro[0], altEntrada);
-			for (int j = 0; j < largSaida; j++) {
-				int colInicio = j * stride[1];
-				int colFim = Math.min(colInicio + formFiltro[1], largEntrada);
-				double soma = 0;
-				int cont = 0;
-
-				for (int lin = linInicio; lin < linFim; lin++) {
-					for (int col = colInicio; col < colFim; col++) {
-						soma += entrada.get(prof, lin, col);
-						cont++;
-					}
-				}
-
-				saida.set((soma/cont), prof, i, j);
-			}
-		}
-	}
-
+	
 	@Override
 	public Tensor backward(Object grad) {
 		verificarConstrucao();
@@ -344,14 +310,14 @@ public class AvgPool2D extends Camada {
 		int largGradSeguinte = shapeGradS[shapeGradS.length-2];
 
 		for (int i = 0; i < altGradSeguinte; i++) {
-			int linInicio = i * stride[0];
-			int linFim = Math.min(linInicio + formFiltro[0], altEntrada);
+			int linInicio = i * _stride[0];
+			int linFim = Math.min(linInicio + _filtro[0], altEntrada);
 			for (int j = 0; j < largGradSeguinte; j++) {
-				int colInicio = j * stride[1];
-				int colFim = Math.min(colInicio + formFiltro[1], largEntrada);
+				int colInicio = j * _stride[1];
+				int colFim = Math.min(colInicio + _filtro[1], largEntrada);
 
 				double grad = gradSeguinte.get(prof, i, j);
-				double mediaGrad = grad / (formFiltro[0] * formFiltro[1]);
+				double mediaGrad = grad / (_filtro[0] * _filtro[1]);
 
 				for (int lin = linInicio; lin < linFim; lin++) {
 					for (int col = colInicio; col < colFim; col++) {
@@ -387,8 +353,8 @@ public class AvgPool2D extends Camada {
 	public int[] formatoFiltro() {
 		verificarConstrucao();
 		return new int[]{
-			formFiltro[0],
-			formFiltro[1]
+			_filtro[0],
+			_filtro[1]
 		};
 	}
 
@@ -399,8 +365,8 @@ public class AvgPool2D extends Camada {
 	public int[] formatoStride() {
 		verificarConstrucao();
 		return new int[]{
-			stride[0],
-			stride[1]
+			_stride[0],
+			_stride[1]
 		};
 	}
 
@@ -425,8 +391,8 @@ public class AvgPool2D extends Camada {
 		sb.append(nome() + " (id " + this.id + ") = [\n");
 
 		sb.append(pad).append("Entrada: " + utils.shapeStr(shapeEntrada) + "\n");
-		sb.append(pad).append("Filtro: " + utils.shapeStr(formFiltro) + "\n");
-		sb.append(pad).append("Strides: " + utils.shapeStr(stride) + "\n");
+		sb.append(pad).append("Filtro: " + utils.shapeStr(_filtro) + "\n");
+		sb.append(pad).append("Strides: " + utils.shapeStr(_stride) + "\n");
 		sb.append(pad).append("Saída: " + utils.shapeStr(shapeSaida()) + "\n");
 
 		sb.append("]\n");

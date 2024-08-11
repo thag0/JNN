@@ -210,6 +210,26 @@ public class OpTensor {
 	}
 
 	/**
+	 * Calcula o formato de saída de operações convolucionais.
+	 * @param entrada formato de entrada {@code (altura, largura)}.
+	 * @param filtro formato do filtro aplicado {@code (altura, largura)}.
+	 * @param stride formato dos strides {@code (altura, largura)}.
+	 * @return formato de saída calculado {@code (altura, largura)}..
+	 */
+	private int[] calcShapeConv(int[] entrada, int[] filtro, int[] stride) {
+		if (entrada.length != 2 || filtro.length != 2 || stride.length != 2) {
+			throw new IllegalArgumentException(
+				"\nTodos os formatos devem conter dois elementos (altura, largura)."
+			);
+		}
+
+		return new int[] {
+			(int) Math.floor((float)(entrada[0] - filtro[0]) / stride[0]) + 1,
+			(int) Math.floor((float)(entrada[1] - filtro[1]) / stride[1]) + 1
+		};
+	}
+
+	/**
 	 * Realiza a operação de correlação cruzada entre o tensor de entrada e o kernel.
 	 * @param entrada {@code Tensor} contendo os dados de entrada.
 	 * @param kernel {@code Tensor} contendo o filtro que será aplicado à entrada.
@@ -239,10 +259,10 @@ public class OpTensor {
 	 * Realiza a operação de correlação cruzada entre o tensor de entrada e o kernel.
 	 * @param entrada {@code Tensor} contendo os dados de entrada.
 	 * @param kernel {@code Tensor} contendo o filtro que será aplicado à entrada.
-	 * @param saida {@code Tensor} de destino.
+	 * @param dest {@code Tensor} de destino.
 	 */
-	public void corr2D(Tensor entrada, Tensor kernel, Tensor saida) {
-		if (entrada.numDim() != 2 || kernel.numDim() != 2 || saida.numDim() != 2) {
+	public void corr2D(Tensor entrada, Tensor kernel, Tensor dest) {
+		if (entrada.numDim() != 2 || kernel.numDim() != 2 || dest.numDim() != 2) {
 			throw new IllegalArgumentException(
 				"\nTodos os tensores devem ter duas dimensões."
 			);
@@ -250,7 +270,7 @@ public class OpTensor {
 
 		int[] shapeE = entrada.shape();
 		int[] shapeK = kernel.shape();
-		int[] shapeS = saida.shape();
+		int[] shapeS = dest.shape();
 		
 		int altEsp  = shapeE[0] - shapeK[0] + 1;
 		int largEsp = shapeE[1] - shapeK[1] + 1;
@@ -260,7 +280,7 @@ public class OpTensor {
 		if (altSaida != altEsp || largSaida != largEsp) {
 			throw new IllegalArgumentException(
 				"\nDimensão de saída esperada (" + altEsp + ", " + largEsp + "), mas" +
-				" recebido " + saida.shapeStr()
+				" recebido " + dest.shapeStr()
 			);
 		}
 
@@ -271,7 +291,7 @@ public class OpTensor {
 		// vetorização para melhorar o desempenho
 		Variavel[] dataE = entrada.paraArray();
 		Variavel[] dataK = kernel.paraArray();
-		Variavel[] dataS = saida.paraArray();
+		Variavel[] dataS = dest.paraArray();
 
 		Variavel soma = new Variavel();
 		for (int i = 0; i < altEsp; i++) {
@@ -325,10 +345,10 @@ public class OpTensor {
 	 * Realiza a operação de convolução entre o tensor de entrada e o kernel.
 	 * @param entrada {@code Tensor} contendo os dados de entrada.
 	 * @param kernel {@code Tensor} contendo o filtro que será aplicado à entrada.
-	 * @param saida {@code Tensor} de destino.
+	 * @param dest {@code Tensor} de destino.
 	 */
-	public void conv2D(Tensor entrada, Tensor kernel, Tensor saida) {
-		if (entrada.numDim() != 2 || kernel.numDim() != 2 || saida.numDim() != 2) {
+	public void conv2D(Tensor entrada, Tensor kernel, Tensor dest) {
+		if (entrada.numDim() != 2 || kernel.numDim() != 2 || dest.numDim() != 2) {
 			throw new IllegalArgumentException(
 				"\nTodos os tensores devem ter duas dimensões."
 			);
@@ -336,7 +356,7 @@ public class OpTensor {
 	
 		int[] shapeE = entrada.shape();
 		int[] shapeK = kernel.shape();
-		int[] shapeS = saida.shape();
+		int[] shapeS = dest.shape();
 		
 		int altEsp  = shapeE[0] - shapeK[0] + 1;
 		int largEsp = shapeE[1] - shapeK[1] + 1;
@@ -346,7 +366,7 @@ public class OpTensor {
 		if (altSaida != altEsp || largSaida != largEsp) {
 			throw new IllegalArgumentException(
 				"\nDimensão de saída esperada (" + altEsp + ", " + largEsp + "), mas" +
-				" recebido " + saida.shapeStr()
+				" recebido " + dest.shapeStr()
 			);
 		}
 	
@@ -357,7 +377,7 @@ public class OpTensor {
 		// vetorização para melhorar o desempenho
 		Variavel[] dataE = entrada.paraArray();
 		Variavel[] dataK = kernel.paraArray();
-		Variavel[] dataS = saida.paraArray();
+		Variavel[] dataS = dest.paraArray();
 	
 		Variavel soma = new Variavel();
 		for (int i = 0; i < altEsp; i++) {
@@ -405,6 +425,258 @@ public class OpTensor {
 		conv2DFull(entrada, kernel, saida);
 	
 		return saida;
+	}
+
+	/**
+	 * Realiza a operação de agrupamento máximo.
+	 * @param entrada {@code Tensor} contendo os dados de entrada.
+	 * @param filtro formato do filtro (altura, largura)
+	 * @return {@code Tensor} resultado.
+	 */
+	public Tensor maxPool2D(Tensor entrada, int[] filtro) {
+		return maxPool2D(entrada, filtro, filtro.clone());
+	}
+
+	/**
+	 * Realiza a operação de agrupamento máximo.
+	 * @param entrada {@code Tensor} contendo os dados de entrada.
+	 * @param filtro formato do filtro (altura, largura)
+	 * @param stride formato dos strides (altura, largura)
+	 * @return {@code Tensor} resultado.
+	 */
+	public Tensor maxPool2D(Tensor entrada, int[] filtro, int[] stride) {
+		if (entrada.numDim() != 3) {
+			throw new IllegalArgumentException(
+				"\nEntrada deve ser 3D, mas é " + entrada.numDim() + "D."
+			);
+		}
+
+		if (filtro.length != 2) {
+			throw new IllegalArgumentException(
+				"\nFormato do filtro deve conter dois elementos, " +
+				" recebido " + filtro.length
+			);
+		}
+
+		if (stride.length != 2) {
+			throw new IllegalArgumentException(
+				"\nFormato do stride deve conter dois elementos, " +
+				" recebido " + filtro.length
+			);
+		}
+
+		int[] shapeEntrada = entrada.shape();
+
+		int[] shape = calcShapeConv(
+			new int[] {shapeEntrada[1], shapeEntrada[2]}, 
+			filtro, 
+			stride
+		);
+
+		Tensor saida = new Tensor(shapeEntrada[0], shape[0], shape[1]);
+		maxPool2D(entrada, saida, filtro, stride);
+
+		return saida;
+	}
+
+	/**
+	 * Realiza a operação de agrupamento máximo.
+	 * @param entrada {@code Tensor} contendo os dados de entrada.
+	 * @param dest {@code Tensor} de destino do resultado.
+	 * @param filtro formato do filtro (altura, largura)
+	 * @param stride formato dos strides (altura, largura)
+	 */
+	public void maxPool2D(Tensor entrada, Tensor dest, int[] filtro, int[] stride) {
+		if (entrada.numDim() != 3 || dest.numDim() != 3) {
+			throw new UnsupportedOperationException(
+				"\nAmbos os tensores devem ser 3D, recebido " +
+				" entrada = " + entrada.numDim() + "D e saida = " + dest.numDim() + "D."
+			);
+		}
+
+		if (filtro.length != 2) {
+			throw new IllegalArgumentException(
+				"\nFormato do filtro deve conter dois elementos, " +
+				" recebido " + filtro.length
+			);
+		}
+
+		if (stride.length != 2) {
+			throw new IllegalArgumentException(
+				"\nFormato do stride deve conter dois elementos, " +
+				" recebido " + filtro.length
+			);
+		}
+
+		int[] shapeEntrada = entrada.shape();
+		int[] shapeSaida = dest.shape();
+
+		int canais = shapeEntrada[0];
+		int altEntrada  = shapeEntrada[1];
+		int largEntrada = shapeEntrada[2];
+		int altSaida  = shapeSaida[1];
+		int largSaida = shapeSaida[2];
+
+		int[] shapeEsp = calcShapeConv(
+			new int[]{ altEntrada, largEntrada}, 
+			filtro,
+			stride
+		);
+		
+		if (altSaida != shapeEsp[0] || largSaida != shapeEsp[1]) {
+			throw new IllegalArgumentException(
+				"\nDimensão de saída esperada (" + shapeEsp[0] + ", " + shapeEsp[1] + "), mas" +
+				" recebido " + dest.shapeStr()
+			);
+		}
+		
+		for (int c = 0; c < canais; c++) {
+			for (int i = 0; i < altSaida; i++) {
+				int linInicio = i * stride[0];
+				int linFim = Math.min(linInicio + filtro[0], altEntrada);
+				for (int j = 0; j < largSaida; j++) {
+					int colInicio = j * stride[1];
+					int colFim = Math.min(colInicio + filtro[1], largEntrada);
+					double maxValor = Double.MIN_VALUE;
+					double valor;
+	
+					for (int y = linInicio; y < linFim; y++) {
+						for (int x = colInicio; x < colFim; x++) {
+							valor = entrada.get(c, y, x);
+							if (valor > maxValor) maxValor = valor;
+						}
+					}
+					
+					dest.set(maxValor, c, i, j);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Realiza a operação de agrupamento médio.
+	 * @param entrada {@code Tensor} contendo os dados de entrada.
+	 * @param filtro formato do filtro (altura, largura)
+	 * @return {@code Tensor} resultado.
+	 */
+	public Tensor avgPool2D(Tensor entrada, int[] stride) {
+		return avgPool2D(entrada, stride, stride.clone());
+	}
+
+	/**
+	 * Realiza a operação de agrupamento médio.
+	 * @param entrada {@code Tensor} contendo os dados de entrada.
+	 * @param filtro formato do filtro (altura, largura)
+	 * @param stride formato dos strides (altura, largura)
+	 * @return {@code Tensor} resultado.
+	 */
+	public Tensor avgPool2D(Tensor entrada, int[] filtro, int[] stride) {
+		if (entrada.numDim() != 3) {
+			throw new IllegalArgumentException(
+				"\nEntrada deve ser 3D, mas é " + entrada.numDim() + "D."
+			);
+		}
+
+		if (filtro.length != 2) {
+			throw new IllegalArgumentException(
+				"\nFormato do filtro deve conter dois elementos, " +
+				" recebido " + filtro.length
+			);
+		}
+
+		if (stride.length != 2) {
+			throw new IllegalArgumentException(
+				"\nFormato do stride deve conter dois elementos, " +
+				" recebido " + filtro.length
+			);
+		}
+
+		int[] shapeEntrada = entrada.shape();
+
+		int[] shape = calcShapeConv(
+			new int[] {shapeEntrada[1], shapeEntrada[2]}, 
+			filtro, 
+			stride
+		);
+
+		Tensor saida = new Tensor(shapeEntrada[0], shape[0], shape[1]);
+		avgPool2D(entrada, saida, filtro, stride);
+
+		return saida;		
+	}
+
+	/**
+	 * Realiza a operação de agrupamento médio.
+	 * @param entrada {@code Tensor} contendo os dados de entrada.
+	 * @param dest {@code Tensor} de destino do resultado.
+	 * @param filtro formato do filtro (altura, largura)
+	 * @param stride formato dos strides (altura, largura)
+	 */
+	public void avgPool2D(Tensor entrada, Tensor dest, int[] filtro, int[] stride) {
+		if (entrada.numDim() != 3 || dest.numDim() != 3) {
+			throw new UnsupportedOperationException(
+				"\nAmbos os tensores devem ser 3D, recebido " +
+				" entrada = " + entrada.numDim() + "D e saida = " + dest.numDim() + "D."
+			);
+		}
+
+		if (filtro.length != 2) {
+			throw new IllegalArgumentException(
+				"\nFormato do filtro deve conter dois elementos, " +
+				" recebido " + filtro.length
+			);
+		}
+
+		if (stride.length != 2) {
+			throw new IllegalArgumentException(
+				"\nFormato do stride deve conter dois elementos, " +
+				" recebido " + filtro.length
+			);
+		}
+
+		int[] shapeEntrada = entrada.shape();
+		int[] shapeSaida = dest.shape();
+
+		int canais = shapeEntrada[0];
+		int altEntrada  = shapeEntrada[1];
+		int largEntrada = shapeEntrada[2];
+		int altSaida  = shapeSaida[1];
+		int largSaida = shapeSaida[2];
+
+		int[] shapeEsp = calcShapeConv(
+			new int[]{ altEntrada, largEntrada}, 
+			filtro,
+			stride
+		);
+		
+		if (altSaida != shapeEsp[0] || largSaida != shapeEsp[1]) {
+			throw new IllegalArgumentException(
+				"\nDimensão de saída esperada (" + shapeEsp[0] + ", " + shapeEsp[1] + "), mas" +
+				" recebido " + dest.shapeStr()
+			);
+		}
+
+		for (int c = 0; c < canais; c++) {
+			for (int i = 0; i < altSaida; i++) {
+				int linInicio = i * stride[0];
+				int linFim = Math.min(linInicio + filtro[0], altEntrada);
+				for (int j = 0; j < largSaida; j++) {
+					int colInicio = j * stride[1];
+					int colFim = Math.min(colInicio + filtro[1], largEntrada);
+					double soma = 0;
+					int cont = 0;
+	
+					for (int lin = linInicio; lin < linFim; lin++) {
+						for (int col = colInicio; col < colFim; col++) {
+							soma += entrada.get(c, lin, col);
+							cont++;
+						}
+					}
+	
+					dest.set((soma/cont), c, i, j);
+				}
+			}
+		}
 	}
 
 	/**

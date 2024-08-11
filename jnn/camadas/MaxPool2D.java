@@ -1,5 +1,6 @@
 package jnn.camadas;
 
+import jnn.core.OpTensor;
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 import jnn.core.tensor.Variavel;
@@ -35,6 +36,11 @@ import jnn.core.tensor.Variavel;
  * </p>
  */
 public class MaxPool2D extends Camada implements Cloneable{
+
+	/**
+	 * Operador para tensores.
+	 */
+	OpTensor optensor = new OpTensor();
 
 	/**
 	 * Utilitario.
@@ -97,12 +103,12 @@ public class MaxPool2D extends Camada implements Cloneable{
 	/**
 	 * Formato do filtro de pooling (altura, largura).
 	 */
-	private int[] shapeFiltro;
+	private int[] _filtro;
 
 	/**
 	 * Valores de stride (altura, largura).
 	 */
-	private int[] stride;
+	private int[] _stride;
 
 	/**
 	 * Instancia uma nova camada de max pooling, definindo o formato do
@@ -169,8 +175,8 @@ public class MaxPool2D extends Camada implements Cloneable{
 			);
 		}
 
-		this.shapeFiltro = formFiltro.clone();
-		this.stride = stride.clone();
+		this._filtro = formFiltro.clone();
+		this._stride = stride.clone();
 	}
 
 	/**
@@ -219,14 +225,14 @@ public class MaxPool2D extends Camada implements Cloneable{
 		shapeEntrada[2] = shape[2];// largura
 
 		shapeSaida[0] = shapeEntrada[0];
-		shapeSaida[1] = (int) Math.floor((float)(shapeEntrada[1] - shapeFiltro[0]) / stride[0]) + 1;
-		shapeSaida[2] = (int) Math.floor((float)(shapeEntrada[2] - shapeFiltro[1]) / stride[1]) + 1;
+		shapeSaida[1] = (int) Math.floor((float)(shapeEntrada[1] - _filtro[0]) / _stride[0]) + 1;
+		shapeSaida[2] = (int) Math.floor((float)(shapeEntrada[2] - _filtro[1]) / _stride[1]) + 1;
 
 		if (shapeSaida[1] < 1 || shapeSaida[2] < 1) {
 			throw new IllegalArgumentException(
 				"\nCamada não pode ser construida:" +
 				"\nFormato de entrada " + utils.shapeStr(shape) +
-				" e formato dos filtros " + utils.shapeStr(shapeFiltro) +
+				" e formato dos filtros " + utils.shapeStr(_filtro) +
 				" resultam num formato de saída inválido " + utils.shapeStr(shapeSaida)
 			);
 		}
@@ -267,49 +273,9 @@ public class MaxPool2D extends Camada implements Cloneable{
 			);
 		}
 
-		int canais = shapeEntrada[0];
-		for (int i = 0; i < canais; i++) {
-			aplicar(_entrada, _saida, i);
-		}
+		optensor.maxPool2D(_entrada, _saida, _filtro, _stride);
 
 		return _saida;
-	}
-
-	/**
-	 * Agrupa os valores máximos encontrados na entrada de acordo com as 
-	 * configurações de filtro e strides.
-	 * @param entrada tensor de entrada.
-	 * @param saida tensor de destino.
-	 * @param prof índice de profundidade da operação.
-	 */
-	private void aplicar(Tensor entrada, Tensor saida, int prof) {
-		int[] shapeEntrada = entrada.shape();
-		int[] shapeSaida = saida.shape();
-
-		int altEntrada  = shapeEntrada[1];
-		int largEntrada = shapeEntrada[2];
-		int altSaida  = shapeSaida[1];
-		int largSaida = shapeSaida[2];
-  
-		for (int i = 0; i < altSaida; i++) {
-			int linInicio = i * stride[0];
-			int linFim = Math.min(linInicio + shapeFiltro[0], altEntrada);
-			for (int j = 0; j < largSaida; j++) {
-				int colInicio = j * stride[1];
-				int colFim = Math.min(colInicio + shapeFiltro[1], largEntrada);
-				double maxValor = Double.MIN_VALUE;
-				double valor;
-
-				for (int y = linInicio; y < linFim; y++) {
-					for (int x = colInicio; x < colFim; x++) {
-						valor = entrada.get(prof, y, x);
-						if (valor > maxValor) maxValor = valor;
-					}
-				}
-				
-				saida.set(maxValor, prof, i, j);
-			}
-		}
 	}
 
 	@Override
@@ -356,11 +322,11 @@ public class MaxPool2D extends Camada implements Cloneable{
 		int largGradSeguinte = shapeGradS[2];
   
 		for (int i = 0; i < altGradSeguinte; i++) {
-			int linInicio = i * stride[0];
-			int linFim = Math.min(linInicio + shapeFiltro[0], altEntrada);
+			int linInicio = i * _stride[0];
+			int linFim = Math.min(linInicio + _filtro[0], altEntrada);
 			for (int j = 0; j < largGradSeguinte; j++) {
-				int colInicio = j * stride[1];
-				int colFim = Math.min(colInicio + shapeFiltro[1], largEntrada);
+				int colInicio = j * _stride[1];
+				int colFim = Math.min(colInicio + _filtro[1], largEntrada);
   
 				int[] posicaoMaximo = posicaoMaxima(entrada, prof, linInicio, colInicio, linFim, colFim);
 				int linMaximo = posicaoMaximo[0];
@@ -430,7 +396,7 @@ public class MaxPool2D extends Camada implements Cloneable{
 	 */
 	public int[] formatoFiltro() {
 		verificarConstrucao();
-		return shapeFiltro.clone();
+		return _filtro.clone();
 	}
 		
 	/**
@@ -439,7 +405,7 @@ public class MaxPool2D extends Camada implements Cloneable{
 	 */
 	public int[] formatoStride() {
 		verificarConstrucao();
-		return stride.clone();
+		return _stride.clone();
 	}
 
 	@Override
@@ -474,8 +440,8 @@ public class MaxPool2D extends Camada implements Cloneable{
 		sb.append(nome() + " (id " + this.id + ") = [\n");
 
 		sb.append(pad).append("Entrada: " + utils.shapeStr(shapeEntrada) + "\n");
-		sb.append(pad).append("Filtro: " + utils.shapeStr(shapeFiltro) + "\n");
-		sb.append(pad).append("Strides: " + utils.shapeStr(stride) + "\n");
+		sb.append(pad).append("Filtro: " + utils.shapeStr(_filtro) + "\n");
+		sb.append(pad).append("Strides: " + utils.shapeStr(_stride) + "\n");
 		sb.append(pad).append("Saída: " + utils.shapeStr(shapeSaida()) + "\n");
 
 		sb.append("]\n");
@@ -505,9 +471,9 @@ public class MaxPool2D extends Camada implements Cloneable{
 		clone._construida = this._construida;
 
 		clone.shapeEntrada = this.shapeEntrada.clone();
-		clone.shapeFiltro = this.shapeFiltro.clone();
+		clone._filtro = this._filtro.clone();
 		clone.shapeSaida = this.shapeSaida.clone();
-		clone.stride = this.stride.clone();
+		clone._stride = this._stride.clone();
 		
 		clone._entrada = this._entrada.clone();
 		clone._saida = this._saida.clone();
