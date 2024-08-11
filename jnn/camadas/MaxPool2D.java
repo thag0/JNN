@@ -95,7 +95,7 @@ public class MaxPool2D extends Camada implements Cloneable{
 	 *    O formato do gradiente de entrada é dado por:
 	 * </p>
 	 * <pre>
-	 *    entrada = (canaisEntrada, alturaEntrada, larguraEntrad)
+	 *    entrada = (canaisEntrada, alturaEntrada, larguraEntrada)
 	 * </pre>
 	 */
 	public Tensor _gradEntrada;
@@ -237,9 +237,9 @@ public class MaxPool2D extends Camada implements Cloneable{
 			);
 		}
 		
-		_entrada = new Tensor(shapeEntrada);
-		_gradEntrada = new Tensor(_entrada);
-		_saida = new Tensor(shapeSaida);
+		_entrada 	 = new Tensor(shapeEntrada);
+		_gradEntrada = new Tensor(_entrada.shape());
+		_saida 		 = new Tensor(shapeSaida);
 
 		setNomes();
 
@@ -252,7 +252,7 @@ public class MaxPool2D extends Camada implements Cloneable{
 	@Override
 	protected void setNomes() {
 		_entrada.nome("entrada");
-		_gradEntrada.nome("gradiente entrada");
+		_gradEntrada.nome("grad entrada");
 		_saida.nome("saída");
 	}
 
@@ -454,6 +454,9 @@ public class MaxPool2D extends Camada implements Cloneable{
 	@Override
 	public MaxPool2D clone() {
 		MaxPool2D clone = (MaxPool2D) super.clone();
+
+		clone.optensor = new OpTensor();
+		clone.utils = new Utils();
 
 		clone._treinavel = this._treinavel;
 		clone.treinando = this.treinando;

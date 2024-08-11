@@ -47,12 +47,12 @@ public class AvgPool2D extends Camada {
 	/**
 	 * Dimensões dos dados de entrada (canais, altura, largura)
 	 */
-	private final int[] shapeEntrada = {1, 1, 1};
+	private int[] shapeEntrada = {1, 1, 1};
 
 	/**
 	 * Dimensões dos dados de saída (canais, altura, largura)
 	 */
-	private final int[] shapeSaida = {1, 1, 1};
+	private int[] shapeSaida = {1, 1, 1};
 
 	/**
 	 * Tensor contendo os dados de entrada da camada.
@@ -226,9 +226,9 @@ public class AvgPool2D extends Camada {
 			);
 		}
 		
-		_entrada = new Tensor(shapeEntrada);
-		_gradEntrada = new Tensor(_entrada);
-		_saida = new Tensor(shapeSaida);
+		_entrada 	 = new Tensor(shapeEntrada);
+		_gradEntrada = new Tensor(_entrada.shape());
+		_saida 		 = new Tensor(shapeSaida);
 
 		setNomes();
 
@@ -414,6 +414,29 @@ public class AvgPool2D extends Camada {
 		AvgPool2D c = (AvgPool2D) camada;
 		_entrada.copiar(c._entrada);
 		_saida.copiar(c._saida);
+	}
+
+	@Override
+	public AvgPool2D clone() {
+		AvgPool2D clone = (AvgPool2D) super.clone();
+
+		clone.optensor = new OpTensor();
+		clone.utils = new Utils();
+
+		clone._treinavel = this._treinavel;
+		clone.treinando = this.treinando;
+		clone._construida = this._construida;
+
+		clone.shapeEntrada = this.shapeEntrada.clone();
+		clone._filtro = this._filtro.clone();
+		clone.shapeSaida = this.shapeSaida.clone();
+		clone._stride = this._stride.clone();
+		
+		clone._entrada = this._entrada.clone();
+		clone._saida = this._saida.clone();
+		clone._gradEntrada = this._gradEntrada.clone();
+
+		return clone;
 	}
 
 }
