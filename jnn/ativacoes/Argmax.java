@@ -22,7 +22,7 @@ public class Argmax extends Ativacao {
 	 *    [1, 2, 3]
 	 *]
 	 *
-	 *argmax.calcular(tensor, tensor);
+	 *argmax.forward(tensor, tensor);
 	 *
 	 *tensor = [
 	 *    [0, 0, 1]
@@ -32,38 +32,38 @@ public class Argmax extends Ativacao {
 	public Argmax() {}
 
 	@Override
-	public void forward(Tensor entrada, Tensor saida) {
-		if (!entrada.compararShape(saida)) {
+	public void forward(Tensor x, Tensor dest) {
+		if (!x.compararShape(dest)) {
 			throw new IllegalArgumentException(
-				"\nTensor de entrada " + entrada.shapeStr() + " deve ter " +
-				"mesmo formato do tensor de saída " + saida.shapeStr()
+				"\nTensor de entrada " + x.shapeStr() + " deve ter " +
+				"mesmo formato do tensor de saída " + dest.shapeStr()
 			);
 		}
 
-		if (entrada.numDim() > 1) {
+		if (x.numDim() > 1) {
 			throw new UnsupportedOperationException(
-				"\nSem suporte para tensores com mais de uma dimensão."
+				"\nSuporte apenas para tensores 1D."
 			);
 		}
 
-		int cols = entrada.tam();
-		double maxId = 0;
-		double maxVal = entrada.get(0);
+		int cols = x.tam();
+		int maxId = 0;
+		double maxVal = x.get(0);
 
 		for (int i = 1; i < cols; i++) {
-			if (entrada.get(i) > maxVal) {
+			if (x.get(i) > maxVal) {
 				maxId = i;
-				maxVal = entrada.get(i);
+				maxVal = x.get(i);
 			}
 		}
 
 		for (int i = 0; i < cols; i++) {
-			saida.set(((i == maxId) ? 1.0d : 0.0d), i);
+			dest.set(((i == maxId) ? 1.0 : 0.0), i);
 		}
 	}
 
 	@Override
-	public void backward(Tensor a, Tensor b, Tensor c) {
+	public void backward(Tensor x, Tensor grad, Tensor dest) {
 		throw new UnsupportedOperationException(
 			"\nArgmax não possui derivada."
 		);

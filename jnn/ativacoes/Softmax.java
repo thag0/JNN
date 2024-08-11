@@ -14,7 +14,7 @@ public class Softmax extends Ativacao {
 	/**
 	 * Operador para tensores.
 	 */
-	OpTensor optensor = new OpTensor();
+	OpTensor opt = new OpTensor();
 
 	/**
 	 * Instancia a função de ativação Softmax.
@@ -40,29 +40,28 @@ public class Softmax extends Ativacao {
 	public Softmax() {}
 
 	@Override
-	public void forward(Tensor entrada, Tensor saida) {
-		if (entrada.numDim() != saida.numDim()) {
+	public void forward(Tensor x, Tensor dest) {
+		if (x.numDim() != dest.numDim()) {
 			throw new IllegalArgumentException(
-				"\nTamanho do tensor de entrada (" + entrada.numDim() + ") " +
-				"deve ser igual ao tamanho do tensor de saída (" + saida.numDim() + ")"
+				"\nTamanho do tensor de entrada (" + x.numDim() + ") " +
+				"deve ser igual ao tamanho do tensor de saída (" + dest.numDim() + ")"
 			);
 		}
 
-		int dims = entrada.numDim();
-		if (dims > 1) {
+		if (x.numDim() > 1) {
 			throw new UnsupportedOperationException(
-				"\nSem suporte para tensores com mais de uma dimensão."
+				"\nSuporte apenas para tensores 1D."
 			);
 		}
 
 		double somaExp = 0;
-		int cols = entrada.shape()[0];
+		int cols = x.shape()[0];
 		for (int i = 0; i < cols; i++) {
-			somaExp += Math.exp(entrada.get(i));
+			somaExp += Math.exp(x.get(i));
 		}
 		for (int i = 0; i < cols; i++) {
-			double s = Math.exp(entrada.get(i)) / somaExp;
-			saida.set(s, i);
+			double s = Math.exp(x.get(i)) / somaExp;
+			dest.set(s, i);
 		}
 	}
 
@@ -79,10 +78,14 @@ public class Softmax extends Ativacao {
 
 		Tensor transp = tmp.transpor();
 
-		Tensor res = optensor.matMul(
+		Tensor res = opt.matMul(
 			camada._gradSaida, 
-			optensor.matHadamard(
-				tmp, optensor.matSub(ident, transp)
+			opt.matHad(
+				tmp,
+				opt.matSub(
+					ident,
+					transp
+				)
 			)
 		);
 

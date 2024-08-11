@@ -40,12 +40,12 @@ public abstract class Ativacao {
 	/**
 	 * Função de ativação.
 	 */
-	protected DoubleUnaryOperator fx;
+	protected DoubleUnaryOperator _fx;
 
 	/**
 	 * Derivada da função de ativação.
 	 */
-	protected DoubleUnaryOperator dx;
+	protected DoubleUnaryOperator _dx;
 
 	/**
 	 * Utilitário.
@@ -58,30 +58,33 @@ public abstract class Ativacao {
 	 * @param dx deriviada da função de ativação
 	 */
 	public void construir(DoubleUnaryOperator fx, DoubleUnaryOperator dx) {
-		utils.validarNaoNulo(fx, "Função de ativação não pode ser nula.");
+		utils.validarNaoNulo(fx, "Função de ativação nula.");
 
-		this.fx = fx;
-		this.dx = dx;
+		_fx = fx;
+		_dx = dx;
 	}
 
 	/**
 	 * Calcula o resultado da ativação de acordo com a função configurada.
-	 * @param entrada {@code Tensor} de entrada.
+	 * @param x {@code Tensor} de entrada.
 	 * @param dest {@code Tensor} de destino.
 	 */
-	public void forward(Tensor entrada, Tensor dest) {
-		dest.aplicar(entrada, fx);
+	public void forward(Tensor x, Tensor dest) {
+		dest.aplicar(x, _fx);
 	}
 
 	/**
 	 * Calcula o resultado da derivada da função de ativação de acordo 
 	 * com a função configurada
-	 * @param entrada {@code Tensor} de entrada.
-	 * @param grad {@code Tensor} contendo os gradientes.
+	 * @param x {@code Tensor} de entrada.
+	 * @param grad {@code Tensor} contendo os gradientes em relação a entrada.
 	 * @param dest {@code Tensor} de destino.
 	 */
-	public void backward(Tensor entrada, Tensor grad, Tensor dest) {
-		dest.aplicar(entrada, grad, (e, g) -> dx.applyAsDouble(e) * g);
+	public void backward(Tensor x, Tensor grad, Tensor dest) {
+		// derivada da entrada * gradiente
+		dest.aplicar(x, grad, 
+			(X, g) -> _dx.applyAsDouble(X) * g
+		);
 	}
 
 	/**

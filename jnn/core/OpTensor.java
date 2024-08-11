@@ -69,7 +69,7 @@ public class OpTensor {
 	 * @param b {@code Tensor} B.
 	 * @return {@code Tensor} contendo o resultado.
 	 */
-	public Tensor matHadamard(Tensor a, Tensor b) {
+	public Tensor matHad(Tensor a, Tensor b) {
 		if (!a.compararShape(b)) {
 			throw new IllegalArgumentException(
 				"\nDimensões do tensor A " + a.shapeStr() + 
