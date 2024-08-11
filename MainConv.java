@@ -36,8 +36,8 @@ public class MainConv {
 	static final int NUM_DIGITOS_TESTE  = NUM_DIGITOS_TREINO;
 	static final int NUM_AMOSTRAS_TREINO = 400;
 	static final int NUM_AMOSTRAS_TESTE  = 100;
-	static final int TREINO_EPOCAS = 4; // += 4min53s - 400 amostras - 10 epocas - 10 lotes
-	static final int TREINO_LOTE = 10;
+	static final int TREINO_EPOCAS = 10; // += 4min53s - 400 amostras - 10 epocas - 10 lotes
+	static final int TREINO_LOTE = 32;
 	static final boolean TREINO_LOGS = true;
 
 	// caminhos de arquivos externos
