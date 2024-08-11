@@ -20,6 +20,8 @@ public class Treino extends Treinador {
 	
 	@Override
 	public void executar(Tensor[] xs, Tensor[] ys, int epochs, boolean logs) {
+		modelo.treino(true);
+
 		Otimizador otimizador = modelo.otimizador();
 		Perda perda = modelo.perda();
 		int numAmostras = xs.length;
@@ -55,7 +57,9 @@ public class Treino extends Treinador {
 		if (logs) {
 			exibirCursor();
 			System.out.println();
-		} 
+		}
+
+		modelo.treino(false);
 	}
 
 }

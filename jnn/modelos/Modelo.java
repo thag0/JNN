@@ -18,8 +18,7 @@ import java.util.concurrent.Executors;
  * <h3>
  *    Modelo base
  * </h3>
- * Contém a inteface para os métodos necessários que são usados
- * na implementação de modelos.
+ * Inteface para modelos criados dentro da biblioteca.
  */
 public abstract class Modelo implements Cloneable {
 
@@ -123,8 +122,9 @@ public abstract class Modelo implements Cloneable {
 	 * </p>
 	 * @param seed nova seed.
 	 */
-	public void setSeed(long seed) {
-		seedInicial = seed;
+	public void setSeed(Number seed) {
+		utils.validarNaoNulo(seed, "Seed nula.");
+		seedInicial = seed.longValue();
 	}
 
 	/**
@@ -195,17 +195,16 @@ public abstract class Modelo implements Cloneable {
 	}
 
 	/**
-	 * Inicializa os parâmetros necessários para cada camada do modelo,
+	 * Inicializa os parâmetros necessários para a criação do modelo,
 	 * além de gerar os valores iniciais para os kernels e bias.
 	 * <p>
-	 *    Caso nenhuma configuração inicial seja feita ou sejam fornecidos 
-	 *    apenas nomes referenciando os objetos desejados, o modelo será 
+	 *    Caso nenhuma configuração inicial seja feita, o modelo será 
 	 *    compilado com os valores padrões. 
 	 * </p>
 	 * <p>
 	 *    Otimizadores podem ser recebidos usando instâncias pré configuradas, 
 	 *    essas intâncias dão a liberdade de inicializar o otimizador com valores
-	 *    personalizáveis para seus parâmetros (como taxa de aprendizagem, por exemplo).
+	 *    personalizáveis para seus parâmetros (como taxa de aprenziado, por exemplo).
 	 * </p>
 	 * <p>
 	 *    Para treinar o modelo deve-se fazer uso da função função {@code treinar()} 
@@ -226,22 +225,25 @@ public abstract class Modelo implements Cloneable {
 	protected void validarCompilacao() {
 		if (!_compilado) {
 			throw new IllegalStateException(
-				"\nO modelo ainda não foi compilado."
+				"\nO modelo deve ser compilado."
 			);
 		}
 	}
 
 	/**
 	 * Alimenta o modelo com os dados de entrada.
-	 * @param x dados de entrada que serão propagados através do modelo.
+	 * @param x {@code Tensor} contendo dados de entrada que 
+	 * serão propagados através do modelo.
 	 * @return {@code Tensor} contendo a saída prevista pelo modelo.
 	 */
 	public abstract Tensor forward(Tensor x);
 
 	/**
 	 * Alimenta o modelo com vários dados de entrada.
-	 * @param xs array contendo multiplas entradas para o modelo.
-	 * @return array de {@code Tensor} contendo as previsões correspondentes.
+	 * @param xs array de {@code Tensor} contendo múltiplas 
+	 * entradas para o modelo.
+	 * @return array de {@code Tensor} contendo as previsões 
+	 * correspondentes.
 	 */
 	public Tensor[] forward(Tensor[] xs) {
 		validarCompilacao();
@@ -366,7 +368,7 @@ public abstract class Modelo implements Cloneable {
 	 * </pre>
 	 * @param xs {@code Tensores} contendo dados de entrada.
 	 * @param ys {@code Tensores} contendo dados de saída correspondente as entradas fornecidas.
-	 * @return valor de perda do modelo.
+	 * @return {@code Tensor} contendo valor de perda do modelo.
 	 */
 	public Tensor avaliar(Tensor[] xs, Tensor[] ys) {
 		validarCompilacao();
@@ -374,13 +376,13 @@ public abstract class Modelo implements Cloneable {
 
 		Tensor[] prevs = forward(xs);
 		
+		Tensor res = new Tensor(1);
 		int n = prevs.length;
-		double soma = 0;
 		for (int i = 0; i < n; i++) {
-			soma += _perda.calcular(prevs[i], ys[i]).item();
+			res.add(_perda.calcular(prevs[i], ys[i]));
 		}
 
-		return new Tensor(new double[]{ (soma/n) }, 1);
+		return res.div(n);
 	}
 
 	/**
@@ -532,7 +534,7 @@ public abstract class Modelo implements Cloneable {
 	public abstract void print();
 
 	@Override
-	public String toString(){
+	public String toString() {
 		validarCompilacao();
 		return construirInfo();
 	}
