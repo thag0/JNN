@@ -70,28 +70,12 @@ public class Entrada extends Camada {
 
 	@Override
 	public Tensor forward(Object x) {
-		if (x instanceof Tensor) {
-			return (Tensor) x;
-		
-		} else {
-			throw new IllegalArgumentException(
-				"\nTipo de entrada \"" + x.getClass().getTypeName() + "\"" +
-				" não suportada."
-			);
-		}
+		return utils.paraTensor(x);
 	}
 
 	@Override
 	public Tensor backward(Object grad) {
-		if (grad instanceof Tensor) {
-			return (Tensor) grad;
-		
-		} else {
-			throw new IllegalArgumentException(
-				"\nTipo de gradiente \"" + grad.getClass().getTypeName() + "\"" +
-				" não suportada."
-			);
-		}
+		return utils.paraTensor(grad);
 	}
 
 	@Override

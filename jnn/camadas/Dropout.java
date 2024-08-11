@@ -183,21 +183,12 @@ public class Dropout extends Camada implements Cloneable {
 	 *    Caso a camada não esteja {@code treinando}, por padrão a entrada é apenas
 	 *    repassada para a saída da camada.
 	 * </p>
-	 * @param x dados de entrada para a camada, objetos aceitos são {@code Tensor}
 	 */
 	@Override
 	public Tensor forward(Object x) {
 		verificarConstrucao();
 
-		if (x instanceof Tensor) {
-			_entrada.copiar((Tensor) x);
-			
-		} else {
-			throw new IllegalArgumentException(
-				"\nTipo de entrada \"" + x.getClass().getTypeName() + "\"" +
-				" não suportada."
-			);
-		}
+		_entrada.copiar(utils.paraTensor(x));
 
 		_saida.copiar(_entrada);
 
@@ -241,21 +232,12 @@ public class Dropout extends Camada implements Cloneable {
 	 *    Caso a camada não esteja {@code treinando}, por padrão os gradientes são 
 	 *    apenas repassados para o gradiente de entrada da camada.
 	 * </p>
-	 * @param grad gradientes da camada seguiente.
 	 */
 	@Override
 	public Tensor backward(Object grad) {
 		verificarConstrucao();
 
-		if (grad instanceof Tensor) {
-			_gradEntrada.copiar((Tensor) grad);
-
-		} else {
-			throw new IllegalArgumentException(
-				"\nTipo de gradiente \"" + grad.getClass().getTypeName() + "\"" +
-				" não suportado."
-			);
-		}
+		_gradEntrada.copiar(utils.paraTensor(grad));
 
 		if (treinando) _gradEntrada.mul(_mascara);
 

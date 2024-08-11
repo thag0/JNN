@@ -157,23 +157,12 @@ public class Flatten extends Camada implements Cloneable{
 	 *    Propagação direta através da camada Flatten
 	 * </h2>
 	 * Achata os dados de entrada num formato sequencial.
-	 * @param x dados de entrada que serão processados, objetos aceitos incluem:
-	 * {@code Tensor}
 	 */
 	@Override
 	public Tensor forward(Object x) {
 		verificarConstrucao();
 
-		if (x instanceof Tensor) {
-			_entrada.copiar((Tensor) x);
-
-		} else {
-			throw new IllegalArgumentException(
-				"\nTipo de entrada \"" + x.getClass().getTypeName() + "\"" +
-				" não suportada."
-			);
-		}
-
+		_entrada.copiar(utils.paraTensor(x));
 		_saida.copiarElementos(_entrada);
 
 		return _saida;
@@ -184,22 +173,12 @@ public class Flatten extends Camada implements Cloneable{
 	 *    Propagação reversa através da camada Flatten
 	 * </h2>
 	 * Desserializa os gradientes recebedos de volta para o mesmo formato de entrada.
-	 * @param grad gradientes de entrada da camada seguinte, objetos aceitos incluem:
-	 * {@code Tensor}.
 	 */
 	@Override
 	public Tensor backward(Object grad) {
 		verificarConstrucao();
 
-		if (grad instanceof Tensor) {
-			_gradEntrada.copiarElementos((Tensor) grad);
-		
-		} else {
-			throw new IllegalArgumentException(
-				"\nTipo de gradiente \"" + grad.getClass().getTypeName() + "\"" +
-				" não suportado."
-			);
-		}
+		_gradEntrada.copiarElementos(utils.paraTensor(grad));
 
 		return _gradEntrada;
 	}

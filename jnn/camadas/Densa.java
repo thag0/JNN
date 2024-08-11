@@ -404,25 +404,12 @@ public class Densa extends Camada implements Cloneable {
 	 *somatorio.add(bias)
 	 *saida = ativacao(somatorio)
 	 * </pre>
-	 * @param x dados de entrada que serão processados, objetos aceitos incluem:
-	 * {@code Tensor}, ou {@code double[]}.
 	 */
 	@Override
 	public Tensor forward(Object x) {
 		verificarConstrucao();
 
-		if (x instanceof Tensor) {
-			_entrada.copiar((Tensor) x);
-
-		} else if (x instanceof double[]) {
-			_entrada.copiar((double[]) x);
-
-		} else {
-			throw new IllegalArgumentException(
-				"\nTipo de entrada \"" + x.getClass().getTypeName() + "\"" +
-				" não suportada."
-			);
-		}
+		_entrada.copiar(utils.paraTensor(x));
 
 		_somatorio.zero();
 		optensor.densaForward(_entrada, _kernel, _bias, _somatorio);
@@ -445,25 +432,12 @@ public class Densa extends Camada implements Cloneable {
 	 *		calculados e salvos em {@code gradEntrada} para serem retropropagados 
 	 *		para as camadas anteriores do modelo em que a camada estiver.
 	 * </p>
-	 * @param grad gradiente da camada seguinte, deve ser um objeto do tipo 
-	 * {@code Tensor} ou {@code double[]}.
 	 */
 	@Override
 	public Tensor backward(Object grad) {
 		verificarConstrucao();
 
-		if (grad instanceof Tensor) {
-			_gradSaida.copiar((Tensor) grad);
-
-		} else if (grad instanceof double[]) {
-			_gradSaida.copiar((double[]) grad);
-		
-		} else {
-			throw new IllegalArgumentException(
-				"\nTipo de gradiente \"" + grad.getClass().getTypeName() + "\"" +
-				" não suportado."
-			);
-		}
+		_gradSaida.copiar(utils.paraTensor(grad));
 		
 		ativacao.backward(this);
 		

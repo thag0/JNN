@@ -572,29 +572,16 @@ public class Conv2D extends Camada implements Cloneable {
 	 *    A expressão que define a saída da camada é dada por:
 	 * </h3>
 	 * <pre>
-	 *somatorio = correlacaoCruzada(entrada, filtros)
+	 *somatorio = corr2D(entrada, filtros)
 	 *somatorio.add(bias)
 	 *saida = ativacao(somatorio)
 	 * </pre>
-	 * @param x dados de entrada que serão processados, tipos aceitos são,
-	 * {@code double[][][]} ou {@code Tensor}.
 	 */
 	@Override
 	public Tensor forward(Object x) {
 		verificarConstrucao();
 
-		if (x instanceof Tensor) {
-			_entrada.copiar((Tensor) x);
-		
-		} else if (x instanceof double[][][]) {
-			_entrada.copiar((double[][][]) x);
-		
-		} else {
-			throw new IllegalArgumentException(
-				"\nTipo de entrada \"" + x.getClass().getTypeName() + "\"" +
-				" não suportada."
-			);
-		}
+		_entrada.copiar(utils.paraTensor(x));
 		
 		_somatorio.zero();// zerar acumulações anteriores
 		optensor.conv2DForward(_entrada, _kernel, _bias, _somatorio);
@@ -619,24 +606,12 @@ public class Conv2D extends Camada implements Cloneable {
 	 * </p>
 	 * Resultados calculados ficam salvos nas prorpiedades {@code camada.gradFiltros} e
 	 * {@code camada.gradBias}.
-	 * @param grad gradiente da camada seguinte.
 	 */
 	@Override
 	public Tensor backward(Object grad) {
 		verificarConstrucao();
 
-		if (grad instanceof Tensor) {
-			_gradSaida.copiar((Tensor) grad);
-
-		} else if (grad instanceof double[][][]) {
-			_gradSaida.copiar((double[][][]) grad);
-
-		} else {
-			throw new IllegalArgumentException(
-				"\nTipo de gradiente \"" + grad.getClass().getTypeName() + "\"" +
-				" não suportado."
-			);
-		}
+		_gradSaida.copiar(utils.paraTensor(grad));
 
 		ativacao.backward(this);
 

@@ -208,7 +208,7 @@ public abstract class Camada {
 
 	/**
 	 * Propaga os dados de entrada pela camada.
-	 * @param x dados de entrada que serão processados pela camada.
+	 * @param x dados de entrada que serão processados.
 	 * @return {@code Tensor} contendo a saída calculada pela camada.
 	 */
 	public abstract Tensor forward(Object x);
