@@ -203,7 +203,7 @@ public class Flatten extends Camada implements Cloneable{
 
 		return _gradEntrada;
 	}
-	
+
 	@Override
 	public Tensor saida() {
 		verificarConstrucao();
@@ -302,6 +302,20 @@ public class Flatten extends Camada implements Cloneable{
 		clone._saida = _saida.clone();
 
 		return clone;
+	}
+
+	@Override
+	public void copiarParaTreinoLote(Camada camada) {
+		if (!(camada instanceof Flatten)) {
+			throw new UnsupportedOperationException(
+				"\nCamada deve ser do tipo " + getClass() +
+				", mas é do tipo " + camada.getClass()
+			);
+		}
+
+		Flatten c = (Flatten) camada;
+		_entrada.copiar(c._entrada);
+		_saida.copiar(c._saida);
 	}
 
 }

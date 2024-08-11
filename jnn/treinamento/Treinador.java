@@ -34,7 +34,7 @@ public abstract class Treinador implements Cloneable {
 	/**
 	 * Tamanho do lote de treinamento.
 	 */
-	protected int tamLote;
+	protected int _tamLote;
 
 	/**
 	 * Construtor implícito.
@@ -45,7 +45,7 @@ public abstract class Treinador implements Cloneable {
 		random = new Random();
 		historico = new LinkedList<>();
 		calcularHistorico = false;
-		this.tamLote = tamLote;
+		this._tamLote = tamLote;
 	}
 
 	/**

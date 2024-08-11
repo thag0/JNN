@@ -615,6 +615,22 @@ public class Densa extends Camada implements Cloneable {
 		return clone;
 	}
 
+	@Override
+	public void copiarParaTreinoLote(Camada camada) {
+		if (!(camada instanceof Densa)) {
+			throw new UnsupportedOperationException(
+				"\nCamada deve ser do tipo " + getClass() +
+				", mas é do tipo " + camada.getClass()
+			);
+		}
+
+		Densa c = (Densa) camada;
+		_entrada.copiar(c._entrada);
+		_saida.copiar(c._saida);
+		
+		_somatorio.copiar(c._somatorio);// camada treinável
+	}
+
 	/**
 	 * Calcula o formato de entrada da camada Densa, que é disposto da
 	 * seguinte forma:

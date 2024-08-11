@@ -136,6 +136,20 @@ public class ReLU extends Camada implements Cloneable {
     }
 
     @Override
+    public void copiarParaTreinoLote(Camada camada) {
+        if (!(camada instanceof ReLU)) {
+			throw new UnsupportedOperationException(
+				"\nCamada deve ser do tipo " + getClass() +
+				", mas é do tipo " + camada.getClass()
+			);
+        }
+
+		ReLU c = (ReLU) camada;
+		_entrada.copiar(c._entrada);
+		_saida.copiar(c._saida);
+    }
+
+    @Override
     public int tamSaida() {
         return saida().tam();
     }

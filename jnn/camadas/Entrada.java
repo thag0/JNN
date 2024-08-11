@@ -116,4 +116,10 @@ public class Entrada extends Camada {
 		return 0;
 	}
 	
+	@Override
+	public void copiarParaTreinoLote(Camada camada) {
+		throw new UnsupportedOperationException(
+			"\nNão suportado."
+		);
+	}
 }

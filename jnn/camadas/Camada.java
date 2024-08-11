@@ -471,6 +471,16 @@ public abstract class Camada {
 	}
 
 	/**
+	 * Copia os atributos relevantes da camada para o processamento
+	 * do treino em lotes.
+	 * <p>
+	 * 		É necessário que ambas as camadas sejam do mesmo tipo.
+	 * </p>
+	 * @param camada {@code Camada} desejada.
+	 */
+	public abstract void copiarParaTreinoLote(Camada camada);
+
+	/**
 	 * Retorna o nome da camada.
 	 * @return nome da camada.
 	 */
