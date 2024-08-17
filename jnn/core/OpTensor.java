@@ -428,6 +428,72 @@ public class OpTensor {
 	}
 
 	/**
+	 * Realiza a operação de convolução entre o tensor de entrada e o kernel.
+	 * @param entrada {@code Tensor} contendo os dados de entrada.
+	 * @param kernel {@code Tensor} contendo o filtro que será aplicado à entrada.
+	 * @param saida {@code Tensor} de destino.
+	 */
+	public void conv2DFull(Tensor entrada, Tensor kernel, Tensor saida) {
+		if (entrada.numDim() != 2 || kernel.numDim() != 2 || saida.numDim() != 2) {
+			throw new IllegalArgumentException(
+				"\nTodos os tensores devem ter duas dimensões."
+			);
+		}
+
+		int[] shapeE = entrada.shape();
+		int[] shapeK = kernel.shape();
+		int[] shapeS = saida.shape();
+		
+		int altEsp  = shapeE[0] + shapeK[0] - 1;
+		int largEsp = shapeE[1] + shapeK[1] - 1;
+	
+		int altSaida  = shapeS[0];
+		int largSaida = shapeS[1];
+		if (altSaida != altEsp || largSaida != largEsp) {
+			throw new IllegalArgumentException(
+				"\nDimensão de saída esperada (" + altEsp + ", " + largEsp + "), mas" +
+				" recebido " + saida.shapeStr()
+			);
+		}
+
+		final int altEntrada = shapeE[0];
+		final int largEntrada = shapeE[1];
+		final int altKernel = shapeK[0];
+		final int largKernel = shapeK[1];
+
+		// vetorização para melhorar o desempenho
+		Variavel[] dataE = entrada.paraArray();
+		Variavel[] dataK = kernel.paraArray();
+		Variavel[] dataS = saida.paraArray();
+
+		Variavel soma = new Variavel();// cache
+		for (int i = 0; i < altEsp; i++) {
+			for (int j = 0; j < largEsp; j++) {
+				
+				soma.zero();
+				final int idSaida = i*largEsp + j;
+				for (int m = 0; m < altKernel; m++) {
+					int linEntrada = i - m;
+					if (linEntrada >= 0 && linEntrada < altEntrada) {
+						for (int n = 0; n < largKernel; n++) {
+							int colEntrada = j - n;
+							if (colEntrada >= 0 && colEntrada < largEntrada) {
+								soma.addMul(
+									dataK[m * largKernel + n],
+									dataE[linEntrada * largEntrada + colEntrada]
+								);
+							}
+						}
+					}
+				}
+
+				dataS[idSaida].add(soma);
+			}
+		}
+
+	}
+
+	/**
 	 * Realiza a operação de agrupamento máximo.
 	 * @param entrada {@code Tensor} contendo os dados de entrada.
 	 * @param filtro formato do filtro (altura, largura)
@@ -677,72 +743,6 @@ public class OpTensor {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Realiza a operação de convolução entre o tensor de entrada e o kernel.
-	 * @param entrada {@code Tensor} contendo os dados de entrada.
-	 * @param kernel {@code Tensor} contendo o filtro que será aplicado à entrada.
-	 * @param saida {@code Tensor} de destino.
-	 */
-	public void conv2DFull(Tensor entrada, Tensor kernel, Tensor saida) {
-		if (entrada.numDim() != 2 || kernel.numDim() != 2) {
-			throw new IllegalArgumentException(
-				"\nTodos os tensores devem ter duas dimensões."
-			);
-		}
-
-		int[] shapeE = entrada.shape();
-		int[] shapeK = kernel.shape();
-		int[] shapeS = saida.shape();
-		
-		int altEsp  = shapeE[0] + shapeK[0] - 1;
-		int largEsp = shapeE[1] + shapeK[1] - 1;
-	
-		int altSaida  = shapeS[0];
-		int largSaida = shapeS[1];
-		if (altSaida != altEsp || largSaida != largEsp) {
-			throw new IllegalArgumentException(
-				"\nDimensão de saída esperada (" + altEsp + ", " + largEsp + "), mas" +
-				" recebido " + saida.shapeStr()
-			);
-		}
-
-		final int altEntrada = shapeE[0];
-		final int largEntrada = shapeE[1];
-		final int altKernel = shapeK[0];
-		final int largKernel = shapeK[1];
-
-		// vetorização para melhorar o desempenho
-		Variavel[] dataE = entrada.paraArray();
-		Variavel[] dataK = kernel.paraArray();
-		Variavel[] dataS = saida.paraArray();
-
-		Variavel soma = new Variavel();// cache
-		for (int i = 0; i < altEsp; i++) {
-			for (int j = 0; j < largEsp; j++) {
-				
-				soma.zero();
-				final int idSaida = i*largEsp + j;
-				for (int m = 0; m < altKernel; m++) {
-					int linEntrada = i - m;
-					if (linEntrada >= 0 && linEntrada < altEntrada) {
-						for (int n = 0; n < largKernel; n++) {
-							int colEntrada = j - n;
-							if (colEntrada >= 0 && colEntrada < largEntrada) {
-								soma.addMul(
-									dataK[m * largKernel + n],
-									dataE[linEntrada * largEntrada + colEntrada]
-								);
-							}
-						}
-					}
-				}
-
-				dataS[idSaida].add(soma);
-			}
-		}
-
 	}
 
 	/**
