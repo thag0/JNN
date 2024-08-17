@@ -1,8 +1,6 @@
 package jnn.core;
 
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import jnn.core.tensor.Tensor;
 import jnn.core.tensor.Variavel;
@@ -824,12 +822,9 @@ public class OpTensor {
 			saidas[i] = saida.subTensor(i);
 		}
 
-		final int numThreads = 2;// diminuir sobrecarga numa única cpu
-		try (ExecutorService exec = Executors.newFixedThreadPool(numThreads)) {
-			for (int f = 0; f < numFiltros; f++){
-				for (int e = 0; e < profEntrada; e++) {
-					corr2D(entradas[e], kernels[f][e], saidas[f]);
-				}
+		for (int f = 0; f < numFiltros; f++) {
+			for (int e = 0; e < profEntrada; e++) {
+				corr2D(entradas[e], kernels[f][e], saidas[f]);
 			}
 		}
 
