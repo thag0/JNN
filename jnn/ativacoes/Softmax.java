@@ -92,7 +92,7 @@ public class Softmax extends Ativacao {
 
 	@Override
 	public void backward(Densa camada) {
-		int n = camada._somatorio.tam();
+		int n = camada._buffer.tam();
 		Tensor tmp = camada.saida().bloco(n);
 		Tensor ident = new Tensor(n, n);
 		for (int i = 0; i < n; i++) {

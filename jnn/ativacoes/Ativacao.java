@@ -96,7 +96,7 @@ public abstract class Ativacao {
 	 */
 	public void backward(Densa camada) {
 		//por padrão chamar o método da própria ativação
-		backward(camada._somatorio, camada._gradSaida, camada._gradSaida);
+		backward(camada._buffer, camada._gradSaida, camada._gradSaida);
 	}
 
 	/**
@@ -108,7 +108,7 @@ public abstract class Ativacao {
 	 */
 	public void backward(Conv2D camada) {
 		//por padrão chamar o método da própria ativação
-		backward(camada._somatorio, camada._gradSaida, camada._gradSaida);
+		backward(camada._buffer, camada._gradSaida, camada._gradSaida);
 	}
 
 	/**

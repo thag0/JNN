@@ -28,12 +28,13 @@ import jnn.inicializadores.Zeros;
  *    com a expressão:
  * </p>
  * <pre>
- *    somatorio = matMult(pesos * entrada) + bias
+ *buffer = matMul(entrada, kernel);
+ *buffer.add(bias);
  * </pre>
  * Após a propagação dos dados, a função de ativação da camada é aplicada ao 
- * resultado do somatório, que por fim é salvo na saída da camada.
+ * resultado do buffer, que por fim é salvo na saída da camada.
  * <pre>
- *    saida = ativacao(somatorio)
+ *    saida = ativacao(buffer);
  * </pre>
  */
 public class Densa extends Camada implements Cloneable {
@@ -103,13 +104,13 @@ public class Densa extends Camada implements Cloneable {
 	public Tensor _entrada;
 
 	/**
-	 * Tensor contendo os valores de resultado da multiplicação matricial entre
-	 * os pesos e a entrada da camada adicionados com o bias, seu formato se dá por:
+	 * Tensor contendo os valores de resultados intermediários 
+	 * do processamento da camada.
 	 * <pre>
-	 *    somatorio = (neuronios)
+	 *    buffer = (neuronios)
 	 * </pre>
 	 */
-	public Tensor _somatorio;
+	public Tensor _buffer;
 
 	/**
 	 * Tensor contendo os valores de resultado da soma entre os valores 
@@ -334,7 +335,7 @@ public class Densa extends Camada implements Cloneable {
 			_gradBias = Optional.of(new Tensor(_saida.shape()));
 		}
 
-		_somatorio 	 = new Tensor(_saida.shape());
+		_buffer 	 = new Tensor(_saida.shape());
 		_gradSaida 	 = new Tensor(_saida.shape());
 		_gradEntrada = new Tensor(_entrada.shape());
 
@@ -373,7 +374,7 @@ public class Densa extends Camada implements Cloneable {
 		_entrada.nome("entrada");
 		_kernel.nome("kernel");
 		_saida.nome("saida");
-		_somatorio.nome("somatório");
+		_buffer.nome("buffer");
 		_gradSaida.nome("grad saída");
 		_gradEntrada.nome("grad entrada");
 		_gradKernel.nome("grad kernel");
@@ -400,9 +401,9 @@ public class Densa extends Camada implements Cloneable {
 	 *    A expressão que define a saída é dada por:
 	 * </p>
 	 * <pre>
-	 *somatorio = matMult(entrada, pesos)
-	 *somatorio.add(bias)
-	 *saida = ativacao(somatorio)
+	 *buffer = matMult(entrada, pesos);
+	 *buffer.add(bias);
+	 *saida = ativacao(buffer);
 	 * </pre>
 	 */
 	@Override
@@ -411,10 +412,10 @@ public class Densa extends Camada implements Cloneable {
 
 		_entrada.copiar(utils.paraTensor(x));
 
-		_somatorio.zero();
-		optensor.densaForward(_entrada, _kernel, _bias, _somatorio);
+		_buffer.zero();
+		optensor.densaForward(_entrada, _kernel, _bias, _buffer);
 
-		ativacao.forward(_somatorio, _saida);
+		ativacao.forward(_buffer, _saida);
 
 		return _saida;
 	}
@@ -581,7 +582,7 @@ public class Densa extends Camada implements Cloneable {
 
 		clone._entrada = this._entrada.clone();
 		clone._kernel = this._kernel.clone();
-		clone._somatorio = this._somatorio.clone();
+		clone._buffer = this._buffer.clone();
 		clone._saida = this._saida.clone();
 		clone._gradSaida = this._gradSaida.clone();
 		clone._gradKernel = this._gradKernel.clone();
@@ -602,7 +603,7 @@ public class Densa extends Camada implements Cloneable {
 		_entrada.copiar(c._entrada);
 		_saida.copiar(c._saida);
 		
-		_somatorio.copiar(c._somatorio);// camada treinável
+		_buffer.copiar(c._buffer);// camada treinável
 	}
 
 	/**

@@ -20,15 +20,16 @@ import jnn.inicializadores.Zeros;
  * <p>
  *    A camada convolucional realiza operações de convolução sobre a entrada
  *    utilizando filtros (kernels) para extrair características locais, dada 
- *    pela expressão:.
+ *    pela expressão:
  * </p>
  * <pre>
- *    somatorio = convolucao(entrada, filtros) + bias
+ *buffer = conv2D(entrada, filtros);
+ *buffer.add(bias);
  * </pre>
  * Após a propagação dos dados, a função de ativação da camada é aplicada ao 
  * resultado do somatório, que por fim é salvo na saída da camada.
  * <pre>
- *    saida = ativacao(somatorio)
+ *    saida = ativacao(buffer);
  * </pre>
  * <h3>
  *    Detalhe adicional:
@@ -87,13 +88,12 @@ public class Conv2D extends Camada implements Cloneable {
 	public Tensor _entrada;
 
 	/**
-	 * Tensor contendo os filtros (ou kernels)
-	 * da camada.
+	 * Tensor contendo o kernel (ou filtros) da camada.
 	 * <p>
 	 *    O formato dos filtros é dado por:
 	 * </p>
 	 * <pre>
-	 *    entrada = (numFiltros, profundidadeEntrada, alturaFiltro, larguraFiltro)
+	 *    kernel = (numFiltros, profEntrada, altFiltro, largFiltro)
 	 * </pre>
 	 */
 	public Tensor _kernel;
@@ -116,16 +116,16 @@ public class Conv2D extends Camada implements Cloneable {
 	private boolean usarBias = true;
 
 	/**
-	 * Tensor contendo valores resultantes do cálculo de correlação cruzada
-	 * entre a entrada e os filtros, com o bias adicionado (se houver).
+	 * Tensor contendo os valores de resultados intermediários 
+	 * do processamento da camada.
 	 * <p>
-	 *    O formato somatório é dado por:
+	 *    O formato buffer é dado por:
 	 * </p>
 	 * <pre>
-	 *    somatorio = (numeroFiltros, alturaSaida, larguraSaida)
+	 *    buffer = (numFiltros, altSaida, largSaida)
 	 * </pre>
 	 */
-	public Tensor _somatorio;
+	public Tensor _buffer;
 	
 	/**
 	 * Tensor contendo os valores de saídas da camada.
@@ -133,7 +133,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 *    O formato da saída é dado por:
 	 * </p>
 	 * <pre>
-	 *    saida = (numeroFiltros, alturaSaida, larguraSaida)
+	 *    saida = (numFiltros, altSaida, largSaida)
 	 * </pre>
 	 */
 	public Tensor _saida;
@@ -506,7 +506,7 @@ public class Conv2D extends Camada implements Cloneable {
 		_kernel       = new Tensor(shapeSaida[0], shapeEntrada[0], shapeFiltro[0], shapeFiltro[1]);
 		_gradKernel   = new Tensor(_kernel.shape());
 		_saida        = new Tensor(shapeSaida);
-		_somatorio    = new Tensor(_saida.shape());
+		_buffer    = new Tensor(_saida.shape());
 		_gradSaida    = new Tensor(_saida.shape());
 
 		if (usarBias) {
@@ -549,7 +549,7 @@ public class Conv2D extends Camada implements Cloneable {
 		_entrada.nome("entrada");
 		_kernel.nome("kernel");
 		_saida.nome("saida");
-		_somatorio.nome("somatório");
+		_buffer.nome("buffer");
 		_gradEntrada.nome("grad entrada");
 		_gradKernel.nome("grad kernel");
 		_gradSaida.nome("grad saída");
@@ -572,9 +572,9 @@ public class Conv2D extends Camada implements Cloneable {
 	 *    A expressão que define a saída da camada é dada por:
 	 * </h3>
 	 * <pre>
-	 *somatorio = corr2D(entrada, filtros)
-	 *somatorio.add(bias)
-	 *saida = ativacao(somatorio)
+	 *buffer = corr2D(entrada, kernel);
+	 *buffer.add(bias);
+	 *saida = ativacao(buffer);
 	 * </pre>
 	 */
 	@Override
@@ -583,10 +583,10 @@ public class Conv2D extends Camada implements Cloneable {
 
 		_entrada.copiar(utils.paraTensor(x));
 		
-		_somatorio.zero();// zerar acumulações anteriores
-		optensor.conv2DForward(_entrada, _kernel, _bias, _somatorio);
+		_buffer.zero();// zerar acumulações anteriores
+		optensor.conv2DForward(_entrada, _kernel, _bias, _buffer);
 
-		ativacao.forward(_somatorio, _saida);
+		ativacao.forward(_buffer, _saida);
 
 		return _saida;
 	}
@@ -742,7 +742,7 @@ public class Conv2D extends Camada implements Cloneable {
 			clone._gradBias = Optional.of(gradBias());
 		}
 
-		clone._somatorio   = this._somatorio.clone();
+		clone._buffer   = this._buffer.clone();
 		clone._saida       = this._saida.clone();
 		clone._gradSaida   = this._gradSaida.clone();
 
@@ -762,7 +762,7 @@ public class Conv2D extends Camada implements Cloneable {
 		_entrada.copiar(c._entrada);
 		_saida.copiar(c._saida);
 
-		_somatorio.copiar(c._somatorio);// camada treinável
+		_buffer.copiar(c._buffer);// camada treinável
 	}
 
 	/**
