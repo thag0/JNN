@@ -78,8 +78,6 @@ public class TreinoLote extends Treinador {
 	 * @param perdaEpoca valor de perda por época de treinamento.
 	 */
 	private void processoLote(Tensor[] loteX, Tensor[] loteY, Perda perda, Variavel perdaEpoca) {
-		modelo.treino(true);
-
 		int tamLote = loteX.length;
 		int numCamadas = modelo.numCamadas();
 
@@ -119,8 +117,6 @@ public class TreinoLote extends Treinador {
 		        });
 		    }
 		}
-
-		modelo.treino(false);
 	}
 
 }
