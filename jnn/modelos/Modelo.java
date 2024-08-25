@@ -401,7 +401,7 @@ public abstract class Modelo implements Cloneable {
 	 * Retorna o otimizador configurado para o treino do modelo modelo.
 	 * @return otimizador atual do modelo.
 	 */
-	public abstract Otimizador otimizador();
+	public abstract Otimizador otm();
 
 	/**
 	 * Retorna a função de perda configurada do modelo.
@@ -500,7 +500,7 @@ public abstract class Modelo implements Cloneable {
 	 * </p>
 	 * @return quantidade de parâmetros total do modelo.
 	 */
-	public abstract int numParametros();
+	public abstract int numParams();
 
 	/**
 	 * Retorna a quantidade de camadas presente no modelo.
@@ -519,7 +519,7 @@ public abstract class Modelo implements Cloneable {
 	 * do modelo.
 	 */
 	public double[] hist() {
-		return _treinador.historico();
+		return _treinador.hist();
 	}
 
 	/**

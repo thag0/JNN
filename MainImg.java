@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 import jnn.Funcional;
 import jnn.camadas.Densa;
 import jnn.camadas.Entrada;
-import jnn.camadas.atv.Sigmoid;
 import jnn.core.tensor.Tensor;
 import jnn.modelos.Modelo;
 import jnn.modelos.RedeNeural;
@@ -86,21 +85,21 @@ public class MainImg {
 	}
 
 	static Modelo criarSequencial(int entradas, int saidas) {
-		// Sequencial modelo = new Sequencial(
-		// 	new Entrada(entradas),
-		// 	new Densa(8, "sigmoid"),
-		// 	new Densa(8, "sigmoid"),
-		// 	new Densa(saidas, "sigmoid")
-		// );
 		Sequencial modelo = new Sequencial(
 			new Entrada(entradas),
-			new Densa(9),
-			new Sigmoid(),
-			new Densa(9),
-			new Sigmoid(),
-			new Densa(saidas),
-			new Sigmoid()
+			new Densa(8, "sigmoid"),
+			new Densa(8, "sigmoid"),
+			new Densa(saidas, "sigmoid")
 		);
+		// Sequencial modelo = new Sequencial(
+		// 	new Entrada(entradas),
+		// 	new Densa(9),
+		// 	new Sigmoid(),
+		// 	new Densa(9),
+		// 	new Sigmoid(),
+		// 	new Densa(saidas),
+		// 	new Sigmoid()
+		// );
 		
 		modelo.compilar(new SGD(0.0001, 0.999), "mse");
 		// modelo.compilar("sgd", "mse");

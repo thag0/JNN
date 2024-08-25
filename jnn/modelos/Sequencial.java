@@ -257,23 +257,22 @@ public class Sequencial extends Modelo {
 			);
 		}
 
-		int[] formato = {};
 
 		if (_camadas[0] instanceof Entrada) {
-			formato = _camadas[0].shapeSaida();
+			int[] shape = _camadas[0].shapeSaida();
 
 			//remover camada de entrada do modelo
 			Camada[] temp = _camadas;
 			_camadas = new Camada[_camadas.length-1];
 			System.arraycopy(temp, 1, _camadas, 0, _camadas.length);
 
-			if (_camadas.length == 0) {
+			if (_camadas.length < 1) {
 				throw new IllegalStateException(
 					"\nO modelo não possui camadas para compilar."
 				);
 			}
 
-			_camadas[0].construir(formato);
+			_camadas[0].construir(shape);
 		
 		} else {
 			if (!_camadas[0]._construida) {
@@ -332,7 +331,7 @@ public class Sequencial extends Modelo {
 	}
 
 	@Override
-	public Otimizador otimizador() {
+	public Otimizador otm() {
 		validarCompilacao();
 		return _otimizador;
 	}
@@ -406,7 +405,7 @@ public class Sequencial extends Modelo {
 	@Override
 	public Variavel[] saidaParaArray() {
 		validarCompilacao();
-		return camadaSaida().saidaParaArray();
+		return camadaSaida().saida().paraArray();
 	}
 
 	@Override
@@ -415,7 +414,7 @@ public class Sequencial extends Modelo {
 	}
 
 	@Override
-	public int numParametros() {
+	public int numParams() {
 		int params = 0;
 
 		for (Camada camada : camadas()) {
@@ -479,7 +478,7 @@ public class Sequencial extends Modelo {
 			);
 		}
 
-		String params = String.format("%,d", numParametros());
+		String params = String.format("%,d", numParams());
 		sb.append("\n");
 		sb.append(pad).append("Parâmetros treináveis: " + params);
 		sb.append("\n").append("]\n");

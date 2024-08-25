@@ -22,7 +22,7 @@ public class Treino extends Treinador {
 	public void executar(Tensor[] xs, Tensor[] ys, int epochs, boolean logs) {
 		modelo.treino(true);
 
-		Otimizador otimizador = modelo.otimizador();
+		Otimizador otimizador = modelo.otm();
 		Perda perda = modelo.perda();
 		int numAmostras = xs.length;
 

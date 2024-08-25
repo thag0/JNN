@@ -143,7 +143,7 @@ public abstract class Treinador implements Cloneable {
 	 * Retorna um array contendo os valores de perda por época de treinamento.
 	 * @return lista de perdas do modelo.
 	 */
-	public double[] historico() {
+	public double[] hist() {
 		Object[] hist = historico.toArray();
 		double[] h = new double[hist.length];
 

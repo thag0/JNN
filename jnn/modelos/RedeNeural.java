@@ -461,7 +461,7 @@ public class RedeNeural extends Modelo {
 	}
 
 	@Override
-	public Otimizador otimizador() {
+	public Otimizador otm() {
 		return _otimizador;
 	}
 
@@ -599,7 +599,7 @@ public class RedeNeural extends Modelo {
 	 * @return quantiade de parâmetros total da rede.
 	 */
 	@Override
-	public int numParametros() {
+	public int numParams() {
 		int params = 0;
 		for (Camada camada : _camadas) {
 			params += camada.numParams();
@@ -684,7 +684,7 @@ public class RedeNeural extends Modelo {
 		}
 		sb.append(")\n");
 
-		sb.append(pad).append("Parâmetros: ").append(numParametros());
+		sb.append(pad).append("Parâmetros: ").append(numParams());
 
 		sb.append("\n]\n");
 		

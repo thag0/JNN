@@ -162,7 +162,7 @@ public class Serializador {
 		final StringBuilder sb = new StringBuilder();
 
 		sb.append(modelo.numCamadas()).append("\n");
-		sb.append(modelo.otimizador().nome()).append("\n");
+		sb.append(modelo.otm().nome()).append("\n");
 		sb.append(modelo.perda().nome()).append("\n");
 
 		for (Camada camada : modelo.camadas()) {
