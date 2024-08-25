@@ -44,26 +44,26 @@ public class MainImg {
 		double[][] in  = (double[][]) ged.separarDadosEntrada(dados, tamEntrada);
 		double[][] out = (double[][]) ged.separarDadosSaida(dados, tamSaida);
 
-		Tensor[] treinoX = jnn.arrayParaTensores(in);
-		Tensor[] treinoY = jnn.arrayParaTensores(out);
+		Tensor[] x = jnn.arrayParaTensores(in);
+		Tensor[] y = jnn.arrayParaTensores(out);
 
 		Modelo modelo = criarSequencial(tamEntrada, tamSaida);
 		modelo.print();
 
-		//treinar e marcar tempo
+		// treinar e marcar tempo
 		long horas, minutos, segundos;
 
 		System.out.println("Treinando.");
-		long tempoDecorrido = treinoEmPainel(modelo, imagem.getWidth(), imagem.getHeight(), treinoX, treinoY);
+		long tempoDecorrido = treinoEmPainel(modelo, x, y, imagem.getWidth(), imagem.getHeight());
 
 		long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempoDecorrido);
-		horas = segundosTotais / 3600;
-		minutos = (segundosTotais % 3600) / 60;
+		horas 	 = segundosTotais / 3600;
+		minutos  = (segundosTotais % 3600) / 60;
 		segundos = segundosTotais % 60;
 
-		double precisao = (1 - modelo.avaliador().erroMedioQuadrado(treinoX, treinoY).item())*100;
+		double precisao = (1 - modelo.avaliador().erroMedioQuadrado(x, y).item())*100;
 		System.out.println("Precisão = " + formatarDecimal(precisao, 2) + "%");
-		System.out.println("Perda = " + modelo.avaliar(treinoX, treinoY).item());
+		System.out.println("Perda = " + modelo.avaliar(x, y).item());
 		System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
 
 		if (calcularHistorico) {
@@ -113,13 +113,13 @@ public class MainImg {
 	 * @param modelo modelo de rede neural usado no treino.
 	 * @param altura altura da janela renderizada.
 	 * @param largura largura da janela renderizada.
-	 * @param entradas dados de entrada para o treino.
-	 * @param saidas dados de saída relativos a entrada.
+	 * @param x dados de entrada para o treino.
+	 * @param y dados de saída relativos a entrada.
 	 * @return tempo (em nano segundos) do treino.
 	 */
-	static long treinoEmPainel(Modelo modelo, int altura, int largura, Tensor[] entradas, Tensor[] saidas) {
-		final int fps = 6000000;
-		int epocasPorFrame = 55;
+	static long treinoEmPainel(Modelo modelo, Tensor[] x, Tensor[] y, int altura, int largura) {
+		final int FPS = 60_000000;
+		final int EPOCAS_POR_FRAME = 55;
 
 		//acelerar o processo de desenho
 		//bom em situações de janelas muito grandes
@@ -130,16 +130,16 @@ public class MainImg {
 		jt.desenharTreino(modelo, 0);
 		
 		//trabalhar com o tempo de renderização baseado no fps
-		double intervaloDesenho = 1_000_000_000/fps;
+		double intervaloDesenho = 1_000_000_000/FPS;
 		double proximoTempoDesenho = System.nanoTime() + intervaloDesenho;
 		double tempoRestante;
 
 		int i = 0;
 		long tempoTreino = System.nanoTime();
 		while (i < EPOCAS && jt.isVisible()) {
-			modelo.treinar(entradas, saidas, epocasPorFrame, false);
+			modelo.treinar(x, y, EPOCAS_POR_FRAME, false);
 			jt.desenharTreino(modelo, i);
-			i += epocasPorFrame;
+			i += EPOCAS_POR_FRAME;
 
 			try {
 				tempoRestante = proximoTempoDesenho - System.nanoTime();
