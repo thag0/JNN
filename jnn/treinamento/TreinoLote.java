@@ -33,7 +33,7 @@ public class TreinoLote extends Treinador {
 	public void executar(Tensor[] xs, Tensor[] ys, int epochs, boolean logs) {
 		modelo.treino(true);
 		
-		Otimizador otimizador = modelo.otm();
+		Otimizador otm = modelo.otm();
 		Perda perda = modelo.perda();
 		int numAmostras = xs.length;
 
@@ -50,7 +50,7 @@ public class TreinoLote extends Treinador {
 
                 modelo.gradZero();
                 processoLote(loteX, loteY, perda, perdaEpoca);
-                otimizador.atualizar();      
+                otm.atualizar();      
 			}
 
 			if (logs) {

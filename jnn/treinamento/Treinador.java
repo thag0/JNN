@@ -93,16 +93,9 @@ public abstract class Treinador implements Cloneable {
 	}
 
 	/**
-	 * Realiza a retropropagação de gradientes de cada camada para a atualização de seus parâmetros.
-	 * <p>
-	 *    Os gradientes iniciais são calculados usando a derivada da função de perda em relação
-	 *    aos erros do modelo.
-	 * </p>
-	 * <p>
-	 *    A partir disso, são retropropagados de volta da última camada do modelo até a primeira.
-	 * </p>
-	 * @param prev {@code Tensor} contendos os dados previstos.
-	 * @param real {@code Tensor} contendos os dados reais (rotulados).
+	 * Realiza a retropropagação de gradientes através das camadas do modelo.
+	 * @param grad {@code Tensor} contendo o gradiente em relação a saída prevista
+	 * pelo modelo.
 	 */
 	public void backpropagation(Tensor grad) {
 		final int n = modelo.numCamadas();
