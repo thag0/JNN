@@ -31,7 +31,7 @@ public class Constante extends Inicializador {
 	}
 
 	@Override
-	public void inicializar(Tensor tensor) {
+	public void forward(Tensor tensor) {
 		tensor.aplicar(x -> val);
 	}
 	

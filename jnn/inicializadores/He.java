@@ -23,7 +23,7 @@ public class He extends Inicializador {
 	}
 
 	@Override
-	public void inicializar(Tensor tensor) {
+	public void forward(Tensor tensor) {
 		int fanIn = calcularFans(tensor)[0];
 		double desvP = Math.sqrt(2.0 / fanIn);
 

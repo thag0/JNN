@@ -37,7 +37,7 @@ abstract class Metrica {
 	 * @param real {@code Tensores} com dados reais.
 	 * @return {@code Tensor} contendo o resultado.
 	 */
-	public abstract Tensor calcular(Tensor[] prev, Tensor[] real);
+	public abstract Tensor forward(Tensor[] prev, Tensor[] real);
 
 	/**
 	 * <p>

@@ -13,7 +13,7 @@ public class Identidade extends Inicializador {
 	public Identidade() {}
 
 	@Override
-	public void inicializar(Tensor tensor) {
+	public void forward(Tensor tensor) {
 		if (tensor.numDim() != 2) {
 			throw new UnsupportedOperationException(
 				"\nIncialização identidade só é aplicada em tensores 2D."

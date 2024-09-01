@@ -70,7 +70,7 @@ public abstract class Inicializador {
 	 * Inicializa todos os valores tensor.
 	 * @param tensor tensor desejado.
 	 */
-	public abstract void inicializar(Tensor tensor);
+	public abstract void forward(Tensor tensor);
 
 	/**
 	 * Retorna o nome do inicializador.

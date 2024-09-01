@@ -22,7 +22,7 @@ public class LeCun extends Inicializador {
 	}
 
 	@Override
-	public void inicializar(Tensor tensor) {
+	public void forward(Tensor tensor) {
         int fanIn = calcularFans(tensor)[0];
         double var = 1.0 / fanIn;
 

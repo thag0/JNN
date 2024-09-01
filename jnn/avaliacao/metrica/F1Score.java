@@ -20,7 +20,7 @@ public class F1Score extends Metrica {
 	public F1Score() {}
 	
 	@Override
-	public Tensor calcular(Tensor[] entrada, Tensor[] real) {
+	public Tensor forward(Tensor[] entrada, Tensor[] real) {
 		Tensor mat = super.matrizConfusao(entrada, real);
 		double f1score = f1score(mat);
 

@@ -18,7 +18,7 @@ public class Acuracia extends Metrica {
 	public Acuracia() {}
 
 	@Override
-	public Tensor calcular(Tensor[] prev, Tensor[] real) {
+	public Tensor forward(Tensor[] prev, Tensor[] real) {
 		validarDados(prev, real);
 
 		int n = prev.length;

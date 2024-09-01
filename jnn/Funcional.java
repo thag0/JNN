@@ -83,7 +83,7 @@ public final class Funcional {
         }
 
         Tensor t = new Tensor(n, n);
-        new Identidade().inicializar(t);
+        new Identidade().forward(t);
 
         return t;
     }
@@ -376,7 +376,7 @@ public final class Funcional {
      * @return {@code Tensor} contendo o resultado.
      */
     public Tensor acuracia(Tensor[] prev, Tensor[] real) { 
-        return new Acuracia().calcular(prev, real);
+        return new Acuracia().forward(prev, real);
     }
 
     /**
@@ -401,7 +401,7 @@ public final class Funcional {
      * @return {@code Tensor} contendo o resultado.
      */
     public Tensor f1Score(Tensor[] prev, Tensor[] real) {
-        return new F1Score().calcular(prev, real);
+        return new F1Score().forward(prev, real);
     }
 
     /**
@@ -426,7 +426,7 @@ public final class Funcional {
      * @return {@code Tensor} contendo o resultado.
      */
     public Tensor matrizConfusao(Tensor[] prev, Tensor[] real) {
-        return new MatrizConfusao().calcular(prev, real);
+        return new MatrizConfusao().forward(prev, real);
     }
 
     // dicionario

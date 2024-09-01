@@ -56,7 +56,7 @@ public class AleatorioPositivo extends Inicializador {
 	}
 
 	@Override
-	public void inicializar(Tensor tensor) {
+	public void forward(Tensor tensor) {
 		tensor.aplicar(x -> super.random.nextDouble(0, max));
 	}
 	

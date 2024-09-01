@@ -19,7 +19,7 @@ public class MatrizConfusao extends Metrica {
 	public MatrizConfusao() {}
 
 	@Override
-	public Tensor calcular(Tensor[] prev, Tensor[] real) {
+	public Tensor forward(Tensor[] prev, Tensor[] real) {
 		return super.matrizConfusao(prev, real);
 	}
 

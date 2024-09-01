@@ -129,7 +129,7 @@ public class Avaliador {
 	 */
 	public Tensor acuracia(Tensor[] entrada, Tensor[] real) {
 		Tensor[] prevs = modelo.forward(entrada); 
-		return acuracia.calcular(prevs, real);
+		return acuracia.forward(prevs, real);
 	}
 
 	/**
@@ -205,7 +205,7 @@ public class Avaliador {
 	 */
 	public Tensor matrizConfusao(Tensor[] entrada, Tensor[] saidas) {
 		Tensor[] prevs = modelo.forward(entrada);
-		return mc.calcular(prevs, saidas);
+		return mc.forward(prevs, saidas);
 	}
 
 	/**
@@ -222,6 +222,6 @@ public class Avaliador {
 	 */
 	public Tensor f1Score(Tensor[] entrada, Tensor[] real) {
 		Tensor[] prevs = modelo.forward(entrada);
-		return f1Score.calcular(prevs, real);
+		return f1Score.forward(prevs, real);
 	}
 }

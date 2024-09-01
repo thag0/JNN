@@ -22,7 +22,7 @@ public class GlorotNormal extends Inicializador {
 	}
 
 	@Override
-	public void inicializar(Tensor tensor) {
+	public void forward(Tensor tensor) {
 		int[] fans = calcularFans(tensor);
 		double sigma = Math.sqrt(2.0 / (fans[0] + fans[1]));
 

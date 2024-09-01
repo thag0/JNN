@@ -22,7 +22,7 @@ public class GlorotUniforme extends Inicializador {
 	}
 
 	@Override
-	public void inicializar(Tensor tensor) {
+	public void forward(Tensor tensor) {
 		int[] fans = calcularFans(tensor);
 
 		int fin  = fans[0];
