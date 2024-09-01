@@ -20,7 +20,7 @@ public abstract class Perda {
 	 * @param real {@code Tensor} com dados reais.
 	 * @return {@code Tensor} contendo o valor de perda.
 	 */
-	public abstract Tensor calcular(Tensor prev, Tensor real);
+	public abstract Tensor forward(Tensor prev, Tensor real);
 
 	/**
 	 * Calcula a derivada da função de perda configurada.
@@ -28,7 +28,7 @@ public abstract class Perda {
 	 * @param real {@code Tensor} com dados reais.
 	 * @return {@code Tensor} contendo os valores de derivada.
 	 */
-	public abstract Tensor derivada(Tensor prev, Tensor real);
+	public abstract Tensor backward(Tensor prev, Tensor real);
 
 	/**
 	 * Auxiliar para verificar se os tamanhos dos tensores que serão usados

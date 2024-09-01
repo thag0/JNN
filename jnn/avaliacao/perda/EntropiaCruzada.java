@@ -16,7 +16,7 @@ public class EntropiaCruzada extends Perda {
 	public EntropiaCruzada() {}
 
 	@Override
-	public Tensor calcular(Tensor prev, Tensor real) {
+	public Tensor forward(Tensor prev, Tensor real) {
 		super.verificarDimensoes(prev, real);
 		int tam = prev.tam();
 		
@@ -29,7 +29,7 @@ public class EntropiaCruzada extends Perda {
 	}
 	
 	@Override
-	public Tensor derivada(Tensor prev, Tensor real) {
+	public Tensor backward(Tensor prev, Tensor real) {
 		super.verificarDimensoes(prev, real);
 
 		return prev.map(

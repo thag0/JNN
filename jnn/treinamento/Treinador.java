@@ -104,9 +104,7 @@ public abstract class Treinador implements Cloneable {
 	 * @param prev {@code Tensor} contendos os dados previstos.
 	 * @param real {@code Tensor} contendos os dados reais (rotulados).
 	 */
-	public void backpropagation(Tensor prev, Tensor real) {
-		Tensor grad = modelo.perda().derivada(prev, real);
-		
+	public void backpropagation(Tensor grad) {
 		final int n = modelo.numCamadas();
 		for (int i = n-1; i >= 0; i--) {
 			grad = modelo.camada(i).backward(grad);

@@ -37,11 +37,11 @@ public class Treino extends Treinador {
 				
 				//feedback de avanço
 				if (calcularHistorico) {
-					perdaEpoca += perda.calcular(prev, ys[i]).item();
+					perdaEpoca += perda.forward(prev, ys[i]).item();
 				}
 				
 				modelo.gradZero();
-				backpropagation(prev, ys[i]);
+				backpropagation(perda.backward(prev, ys[i]));
 				otimizador.atualizar();
 			}
 

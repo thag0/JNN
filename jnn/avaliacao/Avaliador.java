@@ -41,7 +41,7 @@ public class Avaliador {
 	 * @return {@code Tensor} contendo o resultado.
 	 */
 	public Tensor erroMedioQuadrado(Tensor prev, Tensor real) {
-		return ema.calcular(prev, real);
+		return ema.forward(prev, real);
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class Avaliador {
 		int tam = prev.length;
 		double res = 0;
 		for (int i = 0; i < tam; i++) {
-			res += ema.calcular(prev[i], real[i]).item();
+			res += ema.forward(prev[i], real[i]).item();
 		}
 
 		return new Tensor(new double[]{ (res/tam) }, 1);
@@ -71,7 +71,7 @@ public class Avaliador {
 	 * @return {@code Tensor} contendo o resultado.
 	 */
 	public Tensor erroMedioQuadradoLogaritmico(Tensor prev, Tensor real) {
-		return emql.calcular(prev, real);
+		return emql.forward(prev, real);
 	}
 
 	/**
@@ -87,7 +87,7 @@ public class Avaliador {
 		int tam = entrada.length;
 		double res = 0;
 		for (int i = 0; i < tam; i++) {
-			res += emql.calcular(prev[i], real[i]).item();
+			res += emql.forward(prev[i], real[i]).item();
 		}
 
 		return new Tensor(new double[]{ (res/tam) }, 1); 
@@ -100,7 +100,7 @@ public class Avaliador {
 	 * @return {@code Tensor} contendo o resultado.
 	 */
 	public Tensor erroMedioAbsoluto(Tensor prev, Tensor real) {
-		return ema.calcular(prev, real);
+		return ema.forward(prev, real);
 	}
 
 	/**
@@ -115,7 +115,7 @@ public class Avaliador {
 		int tam = entrada.length;
 		double res = 0;
 		for (int i = 0; i < tam; i++) {
-			res += ema.calcular(prev[i], real[i]).item();
+			res += ema.forward(prev[i], real[i]).item();
 		}
 
 		return new Tensor(new double[]{ (res/tam) }, 1);
@@ -140,7 +140,7 @@ public class Avaliador {
 	 * @return {@code Tensor} contendo o resultado.
 	 */
 	public Tensor entropiaCruzada(Tensor previsto, Tensor real) {  
-		return ecc.calcular(previsto, real);
+		return ecc.forward(previsto, real);
 	}
 
 	/**
@@ -156,7 +156,7 @@ public class Avaliador {
 		int tam = entrada.length;
 		double res = 0;
 		for (int i = 0; i < tam; i++) {
-			res += ecc.calcular(previsoes[i], real[i]).item();
+			res += ecc.forward(previsoes[i], real[i]).item();
 		}
 
 		return new Tensor(new double[]{ (res/tam) }, 1);
@@ -170,7 +170,7 @@ public class Avaliador {
 	 * @return {@code Tensor} contendo o resultado.
 	 */
 	public Tensor entropiaCruzadaBinaria(Tensor previsto, Tensor real) {
-		return ecb.calcular(previsto, real);
+		return ecb.forward(previsto, real);
 	}
 
 	/**
@@ -186,7 +186,7 @@ public class Avaliador {
 		int tam = entrada.length;
 		double res = 0;
 		for (int i = 0; i < tam; i++) {
-			res += ecb.calcular(prev[i], real[i]).item();
+			res += ecb.forward(prev[i], real[i]).item();
 		}
 
 		return new Tensor(new double[]{ (res/tam) }, 1);

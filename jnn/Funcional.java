@@ -241,8 +241,7 @@ public final class Funcional {
      * @return {@code Tensor} com resultado aplicado.
      */
     public Tensor relu(Tensor t) {
-        Tensor relu = new Tensor(t);
-        return relu.relu();
+        return new Tensor(t).relu();
     }
 
     /**
@@ -251,8 +250,7 @@ public final class Funcional {
      * @return {@code Tensor} com resultado aplicado.
      */
     public Tensor sigmoid(Tensor t) {
-        Tensor sig = new Tensor(t);
-        return sig.sigmoid();
+        return new Tensor(t).sigmoid();
     }
 
     /**
@@ -261,8 +259,7 @@ public final class Funcional {
      * @return {@code Tensor} com resultado aplicado.
      */
     public Tensor tanh(Tensor t) {
-        Tensor tanh = new Tensor(t);
-        return tanh.tanh();
+        return new Tensor(t).tanh();
     }
 
     /**
@@ -297,7 +294,7 @@ public final class Funcional {
      * @return {@code Tensor} contendo o resultado.
      */
     public Tensor mse(Tensor prev, Tensor real) {
-        return new MSE().calcular(prev, real);
+        return new MSE().forward(prev, real);
     }
 
     /**
@@ -308,7 +305,7 @@ public final class Funcional {
      * @return {@code Tensor} contendo o resultado.
      */
     public Tensor mae(Tensor prev, Tensor real) {
-        return new MAE().calcular(prev, real);
+        return new MAE().forward(prev, real);
     }
 
     /**
@@ -319,7 +316,7 @@ public final class Funcional {
      * @return {@code Tensor} contendo o resultado.
      */
     public Tensor msle(Tensor prev, Tensor real) {
-        return new MSLE().calcular(prev, real);
+        return new MSLE().forward(prev, real);
     }
 
     /**
@@ -330,7 +327,7 @@ public final class Funcional {
      * @return {@code Tensor} contendo o resultado.
      */
     public Tensor rmse(Tensor prev, Tensor real) {
-        return new RMSE().calcular(prev, real);
+        return new RMSE().forward(prev, real);
     }
 
     /**
@@ -341,7 +338,7 @@ public final class Funcional {
      * @return {@code Tensor} contendo o resultado.
      */
     public Tensor entropiaCruzada(Tensor prev, Tensor real) {
-        return new EntropiaCruzada().calcular(prev, real);
+        return new EntropiaCruzada().forward(prev, real);
     }
 
     /**
@@ -352,7 +349,7 @@ public final class Funcional {
      * @return {@code Tensor} contendo o resultado.
      */
     public Tensor entropiaCruzadaBinaria(Tensor prev, Tensor real) {
-        return new EntropiaCruzadaBinaria().calcular(prev, real);
+        return new EntropiaCruzadaBinaria().forward(prev, real);
     }
 
     // métricas

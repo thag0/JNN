@@ -16,7 +16,7 @@ import jnn.core.tensor.Tensor;
 	public EntropiaCruzadaBinaria() {}
 
 	@Override
-	public Tensor calcular(Tensor prev, Tensor real) {
+	public Tensor forward(Tensor prev, Tensor real) {
 		super.verificarDimensoes(prev, real);
 		int tam = prev.tam();
 
@@ -32,7 +32,7 @@ import jnn.core.tensor.Tensor;
 	}
 
 	@Override
-	public Tensor derivada(Tensor prev, Tensor real) {
+	public Tensor backward(Tensor prev, Tensor real) {
 		super.verificarDimensoes(prev, real);
 		final int tam = prev.tam();
 

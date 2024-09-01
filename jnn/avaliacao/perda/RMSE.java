@@ -14,7 +14,7 @@ public class RMSE extends Perda {
 	public RMSE() {}
 
 	@Override
-	public Tensor calcular(Tensor prev, Tensor real) {
+	public Tensor forward(Tensor prev, Tensor real) {
 		super.verificarDimensoes(prev, real);
 		int tam = prev.tam();
 		
@@ -29,10 +29,10 @@ public class RMSE extends Perda {
 	}
 	 
 	@Override
-	public Tensor derivada(Tensor prev, Tensor real) {
+	public Tensor backward(Tensor prev, Tensor real) {
 		super.verificarDimensoes(prev, real);
 		final int tam = prev.tam();
-		double rrmse = Math.sqrt(calcular(prev, real).item());
+		double rrmse = Math.sqrt(forward(prev, real).item());
 
 		return prev.map(
 			real,

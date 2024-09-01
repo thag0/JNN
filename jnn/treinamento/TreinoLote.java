@@ -102,7 +102,7 @@ public class TreinoLote extends Treinador {
 
 		                synchronized (modelo) {
 							if (calcularHistorico) {// feedback de avanço
-								perdaEpoca.add(perda.calcular(prev, loteY[j]).item());
+								perdaEpoca.add(perda.forward(prev, loteY[j]).item());
 							}
 
 							// copiar dados de cache dos clones e
@@ -111,7 +111,7 @@ public class TreinoLote extends Treinador {
 		                        modelo.camada(c).copiarParaTreinoLote(clones[id].camada(c));
 		                    }
 
-		                    backpropagation(prev, loteY[j]);
+		                    backpropagation(perda.backward(prev, loteY[j]));
 		                }
 		            }
 		        });

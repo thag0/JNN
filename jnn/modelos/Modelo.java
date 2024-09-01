@@ -379,7 +379,7 @@ public abstract class Modelo implements Cloneable {
 		Tensor res = new Tensor(1);
 		int n = prevs.length;
 		for (int i = 0; i < n; i++) {
-			res.add(_perda.calcular(prevs[i], ys[i]));
+			res.add(_perda.forward(prevs[i], ys[i]));
 		}
 
 		return res.div(n);

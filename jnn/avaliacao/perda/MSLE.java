@@ -15,7 +15,7 @@ public class MSLE extends Perda {
 	public MSLE() {}
 
 	@Override
-	public Tensor calcular(Tensor prev, Tensor real) {
+	public Tensor forward(Tensor prev, Tensor real) {
 		super.verificarDimensoes(prev, real);
 		int tam = prev.tam();
 		
@@ -29,7 +29,7 @@ public class MSLE extends Perda {
 	}
 	
 	@Override
-	public Tensor derivada(Tensor prev, Tensor real) {
+	public Tensor backward(Tensor prev, Tensor real) {
 		super.verificarDimensoes(prev, real);
 		final int tam = prev.tam();
 
