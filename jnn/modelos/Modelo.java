@@ -398,6 +398,14 @@ public abstract class Modelo implements Cloneable {
 	}
 
 	/**
+	 * Retorna o treinador do modelo.
+	 * @return treinador do modelo.
+	 */
+	public Treinador treinador() {
+		return _treinador;
+	}
+
+	/**
 	 * Retorna o otimizador configurado para o treino do modelo modelo.
 	 * @return otimizador atual do modelo.
 	 */
