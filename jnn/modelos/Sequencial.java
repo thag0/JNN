@@ -257,39 +257,39 @@ public class Sequencial extends Modelo {
 			);
 		}
 
+		if (camada(0) instanceof Entrada) {
+			int[] shape = camada(0).shapeSaida();
 
-		if (_camadas[0] instanceof Entrada) {
-			int[] shape = _camadas[0].shapeSaida();
+			// remover camada de entrada do modelo
+			Camada[] temp = camadas();
+			_camadas = new Camada[numCamadas()-1];
+			System.arraycopy(temp, 1, _camadas, 0, numCamadas());
 
-			//remover camada de entrada do modelo
-			Camada[] temp = _camadas;
-			_camadas = new Camada[_camadas.length-1];
-			System.arraycopy(temp, 1, _camadas, 0, _camadas.length);
-
-			if (_camadas.length < 1) {
+			if (numCamadas() < 1) {
 				throw new IllegalStateException(
 					"\nO modelo não possui camadas para compilar."
 				);
 			}
 
-			_camadas[0].construir(shape);
+			camada(0).construir(shape);
 		
 		} else {
-			if (!_camadas[0]._construida) {
+			if (!camada(0)._construida) {
 				throw new IllegalArgumentException(
-					"\nÉ necessário que a primeira camada (" + _camadas[0].nome() +
+					"\nÉ necessário que a primeira camada (" + camada(0).nome() +
 					") seja construída."
 				);
 			}
 		}
 
-		for (int i = 0; i < _camadas.length; i++) {
-			_camadas[i].setId(i);
-
-			if (i != 0) _camadas[i].construir(_camadas[i-1].shapeSaida());
-			if (seedInicial != 0) _camadas[i].setSeed(seedInicial);
-
-			_camadas[i].inicializar();
+		for (int i = 0; i < numCamadas(); i++) {
+			Camada camada = camada(i);
+			
+			if (i != 0) camada.construir(camada(i-1).shapeSaida());
+			if (seedInicial != 0) camada.setSeed(seedInicial);
+			
+			camada.inicializar();
+			camada.setId(i);
 		}
 
 		if (seedInicial != 0) _treinador.setSeed(seedInicial);
