@@ -506,7 +506,7 @@ public class Conv2D extends Camada implements Cloneable {
 		_kernel       = new Tensor(shapeSaida[0], shapeEntrada[0], shapeFiltro[0], shapeFiltro[1]);
 		_gradKernel   = new Tensor(_kernel.shape());
 		_saida        = new Tensor(shapeSaida);
-		_buffer    = new Tensor(_saida.shape());
+		_buffer 	  = new Tensor(_saida.shape());
 		_gradSaida    = new Tensor(_saida.shape());
 
 		if (usarBias) {
