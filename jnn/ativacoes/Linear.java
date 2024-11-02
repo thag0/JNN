@@ -18,7 +18,7 @@ public class Linear extends Ativacao {
 	public Linear() {
 		construir(
 			x -> x,
-			x -> 1
+			_ -> 1
 		);
 	}
 }

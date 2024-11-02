@@ -95,7 +95,7 @@ public final class Funcional {
      */
     public Tensor tensorRandom(int... shape) {
         Tensor t = new Tensor(shape);
-        t.aplicar(x -> Math.random()*2-1);
+        t.aplicar(_ -> Math.random()*2-1);
 
         return t;
     }
@@ -108,7 +108,7 @@ public final class Funcional {
      */
     public Tensor tensorRandom(RandomGenerator gen, int... shape) {
         Tensor t = new Tensor(shape);
-        t.aplicar(x -> gen.nextDouble(-1.0, 1.0));
+        t.aplicar(_ -> gen.nextDouble(-1.0, 1.0));
 
         return t;
     }

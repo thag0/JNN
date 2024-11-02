@@ -21,7 +21,7 @@ public class MainImg {
 	static Geim geim = new Geim();
 	static Funcional jnn = new Funcional();
 
-	static final int EPOCAS = 4*1000;
+	static final int EPOCAS = 4 * 1000;
 	static final double ESCALA_RENDER = 9;
 	static boolean calcularHistorico = true;
 	static final String CAMINHO_HISTORICO = "historico-perda";
@@ -68,7 +68,7 @@ public class MainImg {
 
 		if (calcularHistorico) {
 			exportarHistorico(modelo, CAMINHO_HISTORICO);
-			executarComando("python grafico.py " + CAMINHO_HISTORICO);
+			// executarComando("python grafico.py " + CAMINHO_HISTORICO);
 		}
 	}
 
@@ -102,7 +102,6 @@ public class MainImg {
 		// );
 		
 		modelo.compilar(new SGD(0.0001, 0.999), "mse");
-		// modelo.compilar("sgd", "mse");
 		modelo.setHistorico(calcularHistorico);
 
 		return modelo;

@@ -26,7 +26,7 @@ public class LeCun extends Inicializador {
         int fanIn = calcularFans(tensor)[0];
         double var = 1.0 / fanIn;
 
-		tensor.aplicar(x -> random.nextGaussian() * Math.sqrt(var));
+		tensor.aplicar(_ -> random.nextGaussian() * Math.sqrt(var));
 	}
 
 }

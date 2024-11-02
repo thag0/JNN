@@ -26,6 +26,6 @@ public class GlorotNormal extends Inicializador {
 		int[] fans = calcularFans(tensor);
 		double sigma = Math.sqrt(2.0 / (fans[0] + fans[1]));
 
-		tensor.aplicar(x -> random.nextGaussian() * sigma);
+		tensor.aplicar(_ -> random.nextGaussian() * sigma);
 	}
 }

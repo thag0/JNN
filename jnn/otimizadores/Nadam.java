@@ -223,8 +223,8 @@ public class Nadam extends Otimizador {
 			mc[i].aplicar(m[i], _grads[i],
 				(m, g) -> (beta1 * m) + ((1 - beta1) * g) / fb1
 			);
-			vc[i].aplicar(v[i], _grads[i],
-				(v, g) -> (beta2 * v) / fb2
+			vc[i].aplicar(v[i],
+				v -> (beta2 * v) / fb2
 			);
 			_params[i].aplicar(_params[i], mc[i], vc[i], 
 				(p, mc, vc) -> p -= (mc * tA) / (Math.sqrt(vc) + eps)

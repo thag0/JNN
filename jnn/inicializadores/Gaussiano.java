@@ -23,7 +23,7 @@ public class Gaussiano extends Inicializador {
 
 	@Override
 	public void forward(Tensor tensor) {
-		tensor.aplicar(x -> super.random.nextGaussian());
+		tensor.aplicar(_ -> super.random.nextGaussian());
 	}
 	
 }
