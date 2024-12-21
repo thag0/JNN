@@ -88,14 +88,27 @@ public abstract class Ativacao {
 	 * Calcula o resultado da derivada da função de ativação de acordo 
 	 * com a função configurada
 	 * @param x {@code Tensor} de entrada.
-	 * @param grad {@code Tensor} contendo os gradientes em relação a entrada.
+	 * @param g {@code Tensor} contendo os gradientes em relação a entrada.
 	 * @param dest {@code Tensor} de destino.
 	 */
-	public void backward(Tensor x, Tensor grad, Tensor dest) {
+	public void backward(Tensor x, Tensor g, Tensor dest) {
 		// derivada da entrada * gradiente
-		dest.aplicar(x, grad, 
-			(X, g) -> _dx.applyAsDouble(X) * g
+		dest.aplicar(x, g, 
+			(in, grad) -> _dx.applyAsDouble(in) * grad
 		);
+	}
+
+	/**
+	 * Calcula o resultado da derivada da função de ativação de acordo 
+	 * com a função configurada
+	 * @param x {@code Tensor} de entrada.
+	 * @param g {@code Tensor} contendo os gradientes em relação a entrada.
+	 * @return {@code Tensor} contendo resultado.
+	 */
+	public Tensor backward(Tensor x, Tensor g) {
+		Tensor res = new Tensor(x.shape());
+		backward(x, g, res);
+		return res;
 	}
 
 	/**
