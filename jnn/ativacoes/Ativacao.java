@@ -74,6 +74,17 @@ public abstract class Ativacao {
 	}
 
 	/**
+	 * Calcula o resultado da ativação de acordo com a função configurada.
+	 * @param x {@code Tensor} de entrada.
+	 * @return {@code Tensor} contendo resultado.
+	 */
+	public Tensor forward(Tensor x) {
+		Tensor res = new Tensor(x.shape());
+		forward(x, res);
+		return res;
+	}
+
+	/**
 	 * Calcula o resultado da derivada da função de ativação de acordo 
 	 * com a função configurada
 	 * @param x {@code Tensor} de entrada.
