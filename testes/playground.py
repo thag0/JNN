@@ -1,16 +1,7 @@
-import numpy as np
-from scipy import signal
-import time
-import os
+from keras.api.activations import relu
 
-os.system('cls')
+if __name__ == '__main__':
+    x = [1, 2, 3]
 
-a = np.random.randn(28, 28)
-b = np.random.randn(3, 3)
-
-start_time = time.perf_counter_ns()
-res = signal.correlate2d(a, b, "valid")
-end_time = time.perf_counter_ns()
-
-execution_time_ns = end_time - start_time
-print("Tempo:", format(execution_time_ns, ',d'), "ns")
+    y = relu(x)
+    print(y)
