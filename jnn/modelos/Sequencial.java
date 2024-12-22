@@ -1,13 +1,11 @@
 package jnn.modelos;
 
 import jnn.avaliacao.Avaliador;
-import jnn.avaliacao.perda.Perda;
 import jnn.camadas.Camada;
 import jnn.camadas.Entrada;
 import jnn.core.Dicionario;
 import jnn.core.tensor.Tensor;
 import jnn.core.tensor.Variavel;
-import jnn.otimizadores.Otimizador;
 
 /**
  * <h1>
@@ -328,18 +326,6 @@ public class Sequencial extends Modelo {
 		for (Camada camada : camadas()) {
 			camada.setTreino(treinando);
 		}
-	}
-
-	@Override
-	public Otimizador otm() {
-		validarCompilacao();
-		return _otimizador;
-	}
-
-	@Override
-	public Perda perda() {
-		validarCompilacao();
-		return _perda;
 	}
 
 	@Override

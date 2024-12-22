@@ -409,13 +409,19 @@ public abstract class Modelo implements Cloneable {
 	 * Retorna o otimizador configurado para o treino do modelo modelo.
 	 * @return otimizador atual do modelo.
 	 */
-	public abstract Otimizador otm();
+	public Otimizador otm() {
+		validarCompilacao();
+		return _otimizador;
+	}
 
 	/**
 	 * Retorna a função de perda configurada do modelo.
 	 * @return função de perda atual do modelo.
 	 */
-	public abstract Perda perda();
+	public Perda perda() {
+		validarCompilacao();
+		return _perda;
+	}
 
 	/**
 	 * Retorna a {@code camada} do Modelo correspondente ao índice fornecido.

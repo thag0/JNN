@@ -460,16 +460,6 @@ public class RedeNeural extends Modelo {
 		}
 	}
 
-	@Override
-	public Otimizador otm() {
-		return _otimizador;
-	}
-
-	@Override
-	public Perda perda() {
-		return _perda;
-	}
-
 	/**
 	 * Retorna a {@code camada} da Rede Neural correspondente ao índice fornecido.
 	 * @param id índice da busca.
