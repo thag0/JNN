@@ -335,6 +335,13 @@ public class Variavel implements Cloneable {
         return valor < x.doubleValue();
     }
 
+    /**
+     * Exibe, {@code via terminal}, o conteúdo da variável.
+     */
+    public void print() {
+        System.out.println(toString());
+    }
+
     @Override
     public boolean equals(Object obj) {
         return (obj instanceof Variavel) && (this.valor == ((Variavel) obj).valor);
@@ -347,7 +354,7 @@ public class Variavel implements Cloneable {
 
     @Override
     public String toString() {
-        return "[Variavel: " + valor + "]";
+        return "(Variavel: " + valor + ")";
     }
 
     /**
