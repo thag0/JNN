@@ -38,7 +38,7 @@ public class MainConv {
 	static final int NUM_AMOSTRAS_TREINO = 500;
 	static final int NUM_AMOSTRAS_TESTE  = 100;
 	static final int TREINO_EPOCAS = 8;
-	static final int TREINO_LOTE = 64;
+	static final int TREINO_LOTE = 32;
 	static final boolean TREINO_LOGS = true;
 
 	// caminhos de arquivos externos
@@ -88,13 +88,13 @@ public class MainConv {
 	static Sequencial criarModelo() {
 		Sequencial modelo = new Sequencial(
 			new Entrada(1, 28, 28),
-			new Conv2D(18, new int[]{3, 3}, "relu"),
+			new Conv2D(20, new int[]{3, 3}, "relu"),
 			new MaxPool2D(new int[]{2, 2}),
 			new Conv2D(20, new int[]{3, 3}, "relu"),
 			new MaxPool2D(new int[]{2, 2}),
 			new Flatten(),
 			new Densa(100, "relu"),
-			new Dropout(0.3),
+			new Dropout(0.5),
 			new Densa(NUM_DIGITOS_TREINO, "softmax")
 		);
 
