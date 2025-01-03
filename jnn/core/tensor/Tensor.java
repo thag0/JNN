@@ -2395,4 +2395,75 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		return new Tensor(novosDados, novoShape);
 	}
 
+	/**
+	 * Fatia o tensor de acordo com os índices fornecidos.
+	 * <p>
+	 *		Exemplo:
+	 * </p>
+	 * <pre>
+	 *tensor = [
+     *[[[ 1, 2],
+     *  [ 3, 4]],
+	 * 
+     * [[ 5, 6],
+     *  [ 7, 8]],
+	 * 
+     * [[ 9, 10],
+     *  [11, 12]]]
+	 *]
+	 * 
+	 *slice = tensor.slice(0, 2).
+	 *slice = [
+	 *	[[[1, 2],
+	 *	  [3, 4]],
+	 *
+	 *	 [[5, 6],
+	 *	  [7, 8]]]
+	 *]
+	 * </pre>
+	 * @param inicio índice inicial (inclusivo).
+	 * @param fim índice final (exclusivo).
+	 * @return {@code Tensor} fatiado.
+	 */
+	public Tensor slice(int inicio, int fim) {
+		if (tam() == 1) {
+			throw new UnsupportedOperationException(
+				"\nNão é possível obter um slice a partir de um tensor escalar."
+			);
+		}
+
+		if (inicio < 0 || fim > shape[0] || inicio >= fim) {
+			throw new IllegalArgumentException(
+				"\nIntervalo inválido: [" + inicio + ", " + fim + "]"
+			);
+		}
+
+		int[] novoShape = new int[shape.length];// manter shape original
+		novoShape[0] = fim - inicio;
+
+		for (int i = 1; i < shape.length; i++) {
+			novoShape[i] = shape[i];
+		}
+
+		int[] idsInicio = new int[shape.length];
+		int[] idsFim = new int[shape.length];
+		idsInicio[0] = inicio;
+		idsFim[0] = fim - 1;
+
+		for (int i = 1; i < idsInicio.length; i++) {
+			idsInicio[i] = 0;
+			idsFim[i] = shape[i] - 1;
+		}
+
+		int idInicio = indice(idsInicio);
+		int idFim = indice(idsFim);
+
+		Variavel[] novosDados = new Variavel[calcularTamanho(novoShape)];
+		for (int i = idInicio; i <= idFim; i++) {
+			novosDados[i - idInicio] = dados[i];
+		}
+
+		return new Tensor(novosDados, novoShape);
+	}
+
 }
