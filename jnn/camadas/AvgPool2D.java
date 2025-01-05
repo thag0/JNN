@@ -114,19 +114,19 @@ public class AvgPool2D extends Camada {
 	 *    O formato do filtro e dos strides devem conter as dimensões da entrada 
 	 *    da camada (altura, largura).
 	 * </p>
-	 * @param formFiltro formato do filtro de average pooling.
+	 * @param filtro formato do filtro de average pooling.
 	 * @param stride strides que serão aplicados ao filtro.
 	 */
-	public AvgPool2D(int[] formFiltro, int[] stride) {
-		utils.validarNaoNulo(formFiltro, "Formato do filtro nulo.");
+	public AvgPool2D(int[] filtro, int[] stride) {
+		utils.validarNaoNulo(filtro, "Formato do filtro nulo.");
 
-		if (formFiltro.length != 2) {
+		if (filtro.length != 2) {
 			throw new IllegalArgumentException(
 				"\nO formato do filtro deve conter dois elementos (altura, largura)."
 			);
 		}
 
-		if (!utils.apenasMaiorZero(formFiltro)) {
+		if (!utils.apenasMaiorZero(filtro)) {
 			throw new IllegalArgumentException(
 				"\nOs valores de dimensões do filtro devem ser maiores que zero."
 			);
@@ -146,7 +146,7 @@ public class AvgPool2D extends Camada {
 			);
 		}
 
-		this._filtro = formFiltro.clone();
+		this._filtro = filtro.clone();
 		this._stride = stride.clone();
 	}
 
@@ -165,10 +165,10 @@ public class AvgPool2D extends Camada {
 	 *filtro = (2, 2)
 	 *stride = (2, 2) // valor padrão
 	 * </pre>
-	 * @param formFiltro formato do filtro de average pooling.
+	 * @param filtro formato do filtro de average pooling.
 	 */
-	public AvgPool2D(int[] formFiltro) {
-		this(formFiltro, formFiltro.clone());
+	public AvgPool2D(int[] filtro) {
+		this(filtro, filtro.clone());
 	}
 
 	/**
@@ -180,13 +180,13 @@ public class AvgPool2D extends Camada {
 	 *    da camada (altura, largura).
 	 * </p>
 	 * A camada será automaticamente construída usando o formato de entrada especificado.
-	 * @param formEntrada formato de entrada para a camada.
-	 * @param formFiltro formato do filtro de average pooling.
+	 * @param entrada formato de entrada para a camada.
+	 * @param filtro formato do filtro de average pooling.
 	 * @param stride strides que serão aplicados ao filtro.
 	 */
-	public AvgPool2D(int[] formEntrada, int[] formFiltro, int[] stride) {
-		this(formFiltro, stride);
-		construir(formEntrada);
+	public AvgPool2D(int[] entrada, int[] filtro, int[] stride) {
+		this(filtro, stride);
+		construir(entrada);
 	}
 
 	/**

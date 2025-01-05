@@ -35,7 +35,7 @@ public class Sigmoid extends Ativacao {
 		double si;
 		for (int i = 0; i < d.length; i++) {
 			si = s[i];
-			d[i] = (si*(1 - si)) * g[i];
+			d[i] = (si*(1.0 - si)) * g[i];
 		}
 
 		densa._gradSaida.copiarElementos(d);

@@ -90,7 +90,7 @@ abstract class Metrica {
 			int p = idMaiorValor(prev[i]);
 			int r = idMaiorValor(real[i]);
 			double val = mc.get(r, p);
-			mc.set((val += 1), r, p);
+			mc.set((val += 1.0), r, p);
 		}
 
 		return mc;

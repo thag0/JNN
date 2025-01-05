@@ -35,7 +35,7 @@ public class MSLE extends Perda {
 
 		return prev.map(
 			real,
-			(p, r) -> (2.0 / tam) * (Math.log(1 + p) - Math.log(1 + r))
+			(p, r) -> (2.0 / tam) * (Math.log(1.0 + p) - Math.log(1.0 + r))
 		);
 	}
 }

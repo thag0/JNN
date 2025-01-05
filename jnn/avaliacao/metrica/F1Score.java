@@ -53,15 +53,15 @@ public class F1Score extends Metrica {
 
 			// formulas da precisão e recall
 			if ((vp + fp) > 0) precisao[i] = vp / (double)(vp + fp);
-			else precisao[i] = 0;
+			else precisao[i] = 0.0;
 
 			if ((vp + fn) > 0) recall[i] = vp / (double)(vp + fn);
-			else recall[i] = 0;
+			else recall[i] = 0.0;
 		}
 
 		double somaF1 = 0.0;
 		for (int i = 0; i < nClasses; i++) {
-			double f1Classe = 2 * (precisao[i] * recall[i]) / (precisao[i] + recall[i]);
+			double f1Classe = 2.0 * (precisao[i] * recall[i]) / (precisao[i] + recall[i]);
 			somaF1 += f1Classe;
 		}
 

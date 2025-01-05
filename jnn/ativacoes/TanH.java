@@ -17,10 +17,10 @@ public class TanH extends Ativacao {
 	 */
 	public TanH() {
 		construir(
-			x -> (2 / (1 + Math.exp(-2*x))) - 1, 
+			x -> (2.0 / (1.0 + Math.exp(-2.0 * x))) - 1.0, 
 			x -> {
-				double t = (2 / (1 + Math.exp(-2*x))) - 1;
-				return 1 - (t * t);
+				double t = (2.0 / (1.0 + Math.exp(-2.0 * x))) - 1.0;
+				return 1.0 - (t * t);
 			}
 		);
 	}
@@ -35,7 +35,7 @@ public class TanH extends Ativacao {
 		double ti;
 		for (int i = 0; i < d.length; i++) {
 			ti = t[i];
-			d[i] = (1 - (ti*ti)) * g[i];
+			d[i] = (1.0 - (ti*ti)) * g[i];
 		}
 
 		densa._gradSaida.copiarElementos(d);

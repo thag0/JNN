@@ -23,8 +23,8 @@ public class LeakyReLU extends Ativacao {
 		double a = alfa.doubleValue();
 
 		construir(
-			x -> (x > 0) ? x : x*a,
-			x -> (x > 0) ? 1 : a
+			x -> (x > 0.0) ? x   : a*x,
+			x -> (x > 0.0) ? 1.0 : a
 		);
 	}
 

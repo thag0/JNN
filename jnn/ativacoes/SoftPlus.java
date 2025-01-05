@@ -14,10 +14,10 @@ public class SoftPlus extends Ativacao {
 	 */
 	public SoftPlus() {
 		construir(
-			x -> Math.log(1 + Math.exp(x)),
+			x -> Math.log(1.0 + Math.exp(x)),
 			x -> { 
 				double exp = Math.exp(x);
-				return (exp / (1 + exp));
+				return (exp / (1.0 + exp));
 			}
 		);
 	}

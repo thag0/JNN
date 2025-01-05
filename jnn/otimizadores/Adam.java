@@ -261,15 +261,15 @@ public class Adam extends Otimizador {
 		iteracoes++;
 		double fb1 = Math.pow(beta1, iteracoes);
 		double fb2 = Math.pow(beta2, iteracoes);
-		double alfa = tA * Math.sqrt(1 - fb2) / (1 - fb1);
+		double alfa = tA * Math.sqrt(1.0 - fb2) / (1.0 - fb1);
 		
 		for (int i = 0; i < _params.length; i++) {
 			m[i].aplicar(m[i], _grads[i], 
-				(m, g) -> m + ((1 - beta1) * (g - m))
+				(m, g) -> m + ((1.0 - beta1) * (g - m))
 			);
 
 			v[i].aplicar(v[i], _grads[i], 
-				(v, g) -> v + ((1 - beta2) * ((g*g) - v))
+				(v, g) -> v + ((1.0 - beta2) * ((g*g) - v))
 			);
 
 			if (amsgrad) {

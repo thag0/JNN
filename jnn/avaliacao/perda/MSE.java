@@ -34,7 +34,7 @@ public class MSE extends Perda {
 
 		return prev.map(
 			real,
-			(p, r) -> (2.0 / tam) * (p-r)
+			(p, r) -> (2.0 / tam) * (p - r)
 		);
 	}
 }

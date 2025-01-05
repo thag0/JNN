@@ -22,8 +22,8 @@ public class SELU extends Ativacao {
 		double e = escala.doubleValue();
 
 		construir(
-			x -> (x > 0) ? e * x : e * a * (Math.exp(x) - 1),
-			x -> (x > 0) ? e     : e * a * Math.exp(x)
+			x -> (x > 0.0) ? e * x : e * a * (Math.exp(x) - 1.0),
+			x -> (x > 0.0) ? e     : e * a * Math.exp(x)
 		);
 	}
 

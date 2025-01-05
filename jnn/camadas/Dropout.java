@@ -218,7 +218,7 @@ public class Dropout extends Camada implements Cloneable {
 	 */
 	private void gerarMascaras() {
 		_mascara.aplicar(
-			_ ->  (random.nextDouble() >= taxa) ? (1 / (1 - taxa)) : 0.0
+			_ ->  (random.nextDouble() >= taxa) ? (1.0 / (1.0 - taxa)) : 0.0
 		);
 	}
 

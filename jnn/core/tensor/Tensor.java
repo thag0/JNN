@@ -1871,7 +1871,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return instância local alterada.
 	 */
 	public Tensor relu() {
-		return aplicar(x -> x > 0 ? x : 0);
+		return aplicar(x -> x > 0.0 ? x : 0.0);
 	}
 
 	/**
@@ -2374,7 +2374,8 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		}
 
 		int[] novoShape = new int[shape.length-1];
-		for (int i = 0; i < novoShape.length; i++) {
+		int i;
+		for (i = 0; i < novoShape.length; i++) {
 			novoShape[i] = shape[i+1];
 		}
 
@@ -2382,13 +2383,13 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		indices[0] = dim;
 		int inicio = indice(indices);
 
-		for (int i = 1; i < indices.length; i++) {
+		for (i = 1; i < indices.length; i++) {
 			indices[i] = shape[i]-1;
 		}
 		int fim = indice(indices);
 
 		Variavel[] novosDados = new Variavel[calcularTamanho(novoShape)];
-		for (int i = inicio; i <= fim; i++) {
+		for (i = inicio; i <= fim; i++) {
 			novosDados[i-inicio] = dados[i];
 		}
 

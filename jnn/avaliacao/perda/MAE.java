@@ -30,6 +30,9 @@ public class MAE extends Perda {
 	public Tensor backward(Tensor prev, Tensor real) {
 		super.verificarDimensoes(prev, real);
 
-		return prev.map(real, (p, r) -> (p-r));
+		return prev.map(
+			real,
+			(p, r) -> (p - r)
+		);
 	}
 }

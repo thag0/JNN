@@ -19,8 +19,8 @@ public class ELU extends Ativacao {
 		double a = alfa.doubleValue();
 
 		construir(
-			x -> (x > 0) ? x : a * (Math.exp(x) - 1),
-			x -> (x > 0) ? 1 : a * Math.exp(x)
+			x -> (x > 0.0) ? x   : a * (Math.exp(x) - 1.0),
+			x -> (x > 0.0) ? 1.0 : a * Math.exp(x)
 		);
 	}
 
@@ -32,6 +32,6 @@ public class ELU extends Ativacao {
 	 * </p>
 	 */
 	public ELU() {
-		this(0.01d);
+		this(0.01);
 	}
 }

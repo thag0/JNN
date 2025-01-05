@@ -18,12 +18,12 @@ public class Swish extends Ativacao {
 			x -> x * sigmoid(x), 
 			x -> {
 				double sig = sigmoid(x);
-				return sig + (x * sig * (1 - sig));
+				return sig + (x * sig * (1.0 - sig));
 			}
 		);
 	}
 
 	private double sigmoid(double x) {
-		return 1 / (1 + Math.exp(-x));
+		return 1.0 / (1.0 + Math.exp(-x));
 	}
 }

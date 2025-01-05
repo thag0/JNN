@@ -145,7 +145,7 @@ public class Adadelta extends Otimizador {
 		
 		for (int i = 0; i < _params.length; i++) {
 			ac[i].aplicar(ac[i], _grads[i],
-				(ac, g) -> (rho * ac) + ((1 - rho) * (g*g))
+				(ac, g) -> (rho * ac) + ((1.0 - rho) * (g*g))
 			);
 
 			deltas[i].aplicar(acAt[i], ac[i], _grads[i], 
@@ -153,7 +153,7 @@ public class Adadelta extends Otimizador {
 			);
 
 			acAt[i].aplicar(acAt[i], deltas[i], 
-				(acat, d) -> (rho * acat) + ((1 - rho) * (d*d))
+				(acat, d) -> (rho * acat) + ((1.0 - rho) * (d*d))
 			);
 
 			_params[i].sub(deltas[i]);

@@ -25,7 +25,7 @@ import jnn.core.tensor.Tensor;
 		for (int i = 0; i < tam; i++) {
 			p = prev.get(i);
 			r = real.get(i);
-			ecb += (r * Math.log(p + eps)) + (1 - r) * (Math.log(1 - p + eps));
+			ecb += (r * Math.log(p + eps)) + (1.0 - r) * (Math.log(1.0 - p + eps));
 		}
 
 		return new Tensor(new double[]{ (-ecb/tam) });

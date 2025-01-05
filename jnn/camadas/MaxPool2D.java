@@ -125,12 +125,12 @@ public class MaxPool2D extends Camada implements Cloneable{
 	 *filtro = (2, 2)
 	 *stride = (2, 2) // valor padrão
 	 * </pre>
-	 * @param formFiltro formato do filtro de max pooling.
+	 * @param filtro formato do filtro de max pooling.
 	 * @throws IllegalArgumentException se o formato do filtro não atender as
 	 * requisições.
 	 */
-	public MaxPool2D(int[] formFiltro) {
-		this(formFiltro, formFiltro.clone());
+	public MaxPool2D(int[] filtro) {
+		this(filtro, filtro.clone());
 	}
 
 	/**
@@ -140,22 +140,22 @@ public class MaxPool2D extends Camada implements Cloneable{
 	 *    O formato do filtro e dos strides devem conter as dimensões da entrada 
 	 *    da camada (altura, largura).
 	 * </p>
-	 * @param formFiltro formato do filtro de max pooling.
+	 * @param filtro formato do filtro de max pooling.
 	 * @param stride strides que serão aplicados ao filtro.
 	 * @throws IllegalArgumentException se o formato do filtro não atender as
 	 * requisições.
 	 * @throws IllegalArgumentException se os strides não atenderem as requisições.
 	 */
-	public MaxPool2D(int[] formFiltro, int[] stride) {
-		utils.validarNaoNulo(formFiltro, "\nO formato do filtro não pode ser nulo.");
+	public MaxPool2D(int[] filtro, int[] stride) {
+		utils.validarNaoNulo(filtro, "\nO formato do filtro não pode ser nulo.");
 
-		if (formFiltro.length != 2) {
+		if (filtro.length != 2) {
 			throw new IllegalArgumentException(
 				"\nO formato do filtro deve conter três elementos (altura, largura)."
 			);
 		}
 
-		if (!utils.apenasMaiorZero(formFiltro)) {
+		if (!utils.apenasMaiorZero(filtro)) {
 			throw new IllegalArgumentException(
 				"\nOs valores de dimensões do filtro devem ser maiores que zero."
 			);
@@ -175,7 +175,7 @@ public class MaxPool2D extends Camada implements Cloneable{
 			);
 		}
 
-		this._filtro = formFiltro.clone();
+		this._filtro = filtro.clone();
 		this._stride = stride.clone();
 	}
 
@@ -188,16 +188,16 @@ public class MaxPool2D extends Camada implements Cloneable{
 	 *    da camada (altura, largura).
 	 * </p>
 	 * A camada será automaticamente construída usando o formato de entrada especificado.
-	 * @param formEntrada formato de entrada para a camada.
-	 * @param formFiltro formato do filtro de max pooling.
+	 * @param entrada formato de entrada para a camada.
+	 * @param filtro formato do filtro de max pooling.
 	 * @param stride strides que serão aplicados ao filtro.
 	 * @throws IllegalArgumentException se o formato do filtro não atender as
 	 * requisições.
 	 * @throws IllegalArgumentException se os strides não atenderem as requisições.
 	 */
-	public MaxPool2D(int[] formEntrada, int[] formFiltro, int[] stride) {
-		this(formFiltro, stride);
-		construir(formEntrada);
+	public MaxPool2D(int[] entrada, int[] filtro, int[] stride) {
+		this(filtro, stride);
+		construir(entrada);
 	}
 
 	/**
