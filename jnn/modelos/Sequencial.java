@@ -466,7 +466,7 @@ public class Sequencial extends Modelo {
 
 		String params = String.format("%,d", numParams());
 		sb.append("\n");
-		sb.append(pad).append("Parâmetros treináveis: " + params);
+		sb.append(pad).append("Parâmetros: " + params);
 		sb.append("\n").append("]\n");
 
 		return sb.toString();
