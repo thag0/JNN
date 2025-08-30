@@ -1,5 +1,7 @@
 package jnn.modelos;
 
+import java.text.DecimalFormat;
+
 import jnn.avaliacao.Avaliador;
 import jnn.camadas.Camada;
 import jnn.camadas.Entrada;
@@ -454,8 +456,8 @@ public class Sequencial extends Modelo {
 			} catch (Exception e) {
 				ativacao = "-";
 			}
-
-			String parametros = String.valueOf(camada.numParams());
+			
+			String parametros = new DecimalFormat("#,###").format(camada.numParams());
 
 			sb.append(
 				pad + String.format(
