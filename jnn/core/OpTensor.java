@@ -593,32 +593,8 @@ public class OpTensor {
 				" recebido " + dest.shapeStr()
 			);
 		}
-		
-		// for (int c = 0; c < canais; c++) {
-		// 	for (int i = 0; i < altSaida; i++) {
-		// 		int linInicio = i * stride[0];
-		// 		int linFim = Math.min(linInicio + filtro[0], altEntrada);
-		// 		for (int j = 0; j < largSaida; j++) {
-		// 			int colInicio = j * stride[1];
-		// 			int colFim = Math.min(colInicio + filtro[1], largEntrada);
-		// 			double maxValor = Double.MIN_VALUE;
-		// 			double valor;
-	
-		// 			for (int y = linInicio; y < linFim; y++) {
-		// 				for (int x = colInicio; x < colFim; x++) {
-		// 					valor = entrada.get(c, y, x);
-		// 					if (valor > maxValor) maxValor = valor;
-		// 				}
-		// 			}
-					
-		// 			dest.set(maxValor, c, i, j);
-		// 		}
-		// 	}
-		// }
 
-		// ------------------------
-
-		// Vetorização: acesso direto ao array
+		// vetorização
 		Variavel[] dataE = entrada.paraArray();
 		Variavel[] dataS = dest.paraArray();
 
