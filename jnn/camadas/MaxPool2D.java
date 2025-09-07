@@ -273,10 +273,7 @@ public class MaxPool2D extends Camada implements Cloneable{
 
 		if (grad instanceof Tensor) {
 			Tensor g = (Tensor) grad;
-			int profundidade = shapeEntrada[0];   
-			for (int i = 0; i < profundidade; i++) {
-				gradMaxPool(_entrada, g, _gradEntrada, i);
-			}
+			gradMaxPool(_entrada, g, _gradEntrada);
 		
 		} else {
 			throw new IllegalArgumentException(
@@ -298,67 +295,61 @@ public class MaxPool2D extends Camada implements Cloneable{
 	 * @param entrada entrada da camada.
 	 * @param gradSeguinte gradiente da camada seguinte.
 	 * @param gradEntrada gradiente de entrada da camada de max pooling.
-	 * @param prof índice de profundidade da operação.
 	 */
-	private void gradMaxPool(Tensor entrada, Tensor gradSeguinte, Tensor gradEntrada, int prof) {
+	private void gradMaxPool(Tensor entrada, Tensor gradSeguinte, Tensor gradEntrada) {
 		int[] shapeEntrada = entrada.shape();
-		int[] shapeGradS = gradSeguinte.shape();
+		int[] shapeGradS   = gradSeguinte.shape();
 
+		int canais      = shapeEntrada[0];
 		int altEntrada  = shapeEntrada[1];
 		int largEntrada = shapeEntrada[2];
 
-		int altGradSeguinte  = shapeGradS[1];
-		int largGradSeguinte = shapeGradS[2];
-  
-		for (int i = 0; i < altGradSeguinte; i++) {
-			int linInicio = i * _stride[0];
-			int linFim = Math.min(linInicio + _filtro[0], altEntrada);
-			for (int j = 0; j < largGradSeguinte; j++) {
-				int colInicio = j * _stride[1];
-				int colFim = Math.min(colInicio + _filtro[1], largEntrada);
-  
-				int[] posicaoMaximo = posicaoMaxima(entrada, prof, linInicio, colInicio, linFim, colFim);
-				int linMaximo = posicaoMaximo[0];
-				int colMaximo = posicaoMaximo[1];
-  
-				gradEntrada.set(
-					gradSeguinte.get(prof, i, j), 
-					prof, linMaximo, colMaximo
-				);
-			}
-		}
-	}
+		int altGradS    = shapeGradS[1];
+		int largGradS   = shapeGradS[2];
 
-	/**
-	 * Encontra a posição do valor máximo em uma submatriz do tensor.
-	 * <p>
-	 *    Se houver múltiplos elementos com o valor máximo, a função retorna as coordenadas 
-	 *    do primeiro encontrado.
-	 * </p>
-	 * @param tensor tensor alvo.
-	 * @param linInicio índice inicial para linha.
-	 * @param colInicio índice final para a linha.
-	 * @param linFim índice inicial para coluna (exclusivo).
-	 * @param colFim índice final para coluna (exclusivo).
-	 * @param prof índice de profundidade da operação.
-	 * @return array representando as coordenadas (linha, coluna) do valor máximo
-	 * na submatriz.
-	 */
-	private int[] posicaoMaxima(Tensor tensor, int prof, int linInicio, int colInicio, int linFim, int colFim) {
-		int[] posMaximo = {0, 0};
-		double valMaximo = Double.NEGATIVE_INFINITY;
-  
-		for (int i = linInicio; i < linFim; i++) {
-			for (int j = colInicio; j < colFim; j++) {
-				if (tensor.get(prof, i, j) > valMaximo) {
-					valMaximo = tensor.get(prof, i, j);
-					posMaximo[0] = i;
-					posMaximo[1] = j;
+		// vetorização
+		Variavel[] dataE  = entrada.paraArray();
+		Variavel[] dataGS = gradSeguinte.paraArray();
+		Variavel[] dataGE = gradEntrada.paraArray();
+
+		int canalSizeEntrada = altEntrada * largEntrada;
+		int canalSizeGradS   = altGradS * largGradS;
+		double val, valMax;
+
+		for (int c = 0; c < canais; c++) {
+			int baseEntrada = c * canalSizeEntrada;
+			int baseGradS   = c * canalSizeGradS;
+
+			for (int i = 0; i < altGradS; i++) {
+				int linInicio = i * _stride[0];
+				int linFim    = Math.min(linInicio + _filtro[0], altEntrada);
+
+				for (int j = 0; j < largGradS; j++) {
+					int colInicio = j * _stride[1];
+					int colFim    = Math.min(colInicio + _filtro[1], largEntrada);
+
+					valMax = Double.NEGATIVE_INFINITY;
+					int linMax = linInicio;
+					int colMax = colInicio;
+
+					// Encontrar posição do máximo
+					for (int y = linInicio; y < linFim; y++) {
+						int idLinha = baseEntrada + y * largEntrada;
+						for (int x = colInicio; x < colFim; x++) {
+							val = dataE[idLinha + x].get();
+							if (val > valMax) {
+								valMax = val;
+								linMax = y;
+								colMax = x;
+							}
+						}
+					}
+
+					dataGE[baseEntrada + linMax * largEntrada + colMax].add(dataGS[baseGradS + i * largGradS + j]);
 				}
 			}
 		}
-  
-		return posMaximo;
+
 	}
  
 	@Override

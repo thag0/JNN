@@ -459,7 +459,7 @@ public class OpTensor {
 		final int altKernel = shapeK[0];
 		final int largKernel = shapeK[1];
 
-		// vetorização para melhorar o desempenho
+		// vetorização
 		Variavel[] dataE = entrada.paraArray();
 		Variavel[] dataK = kernel.paraArray();
 		Variavel[] dataS = saida.paraArray();
@@ -594,24 +594,61 @@ public class OpTensor {
 			);
 		}
 		
+		// for (int c = 0; c < canais; c++) {
+		// 	for (int i = 0; i < altSaida; i++) {
+		// 		int linInicio = i * stride[0];
+		// 		int linFim = Math.min(linInicio + filtro[0], altEntrada);
+		// 		for (int j = 0; j < largSaida; j++) {
+		// 			int colInicio = j * stride[1];
+		// 			int colFim = Math.min(colInicio + filtro[1], largEntrada);
+		// 			double maxValor = Double.MIN_VALUE;
+		// 			double valor;
+	
+		// 			for (int y = linInicio; y < linFim; y++) {
+		// 				for (int x = colInicio; x < colFim; x++) {
+		// 					valor = entrada.get(c, y, x);
+		// 					if (valor > maxValor) maxValor = valor;
+		// 				}
+		// 			}
+					
+		// 			dest.set(maxValor, c, i, j);
+		// 		}
+		// 	}
+		// }
+
+		// ------------------------
+
+		// Vetorização: acesso direto ao array
+		Variavel[] dataE = entrada.paraArray();
+		Variavel[] dataS = dest.paraArray();
+
+		int canalSizeEntrada = altEntrada * largEntrada;
+		int canalSizeSaida   = altSaida   * largSaida;
+		double maxVal, val;
+
 		for (int c = 0; c < canais; c++) {
+			int baseEntrada = c * canalSizeEntrada;
+			int baseSaida   = c * canalSizeSaida;
+
 			for (int i = 0; i < altSaida; i++) {
 				int linInicio = i * stride[0];
 				int linFim = Math.min(linInicio + filtro[0], altEntrada);
+
 				for (int j = 0; j < largSaida; j++) {
 					int colInicio = j * stride[1];
 					int colFim = Math.min(colInicio + filtro[1], largEntrada);
-					double maxValor = Double.MIN_VALUE;
-					double valor;
-	
+
+					maxVal = Double.NEGATIVE_INFINITY;
+
 					for (int y = linInicio; y < linFim; y++) {
+						int idLinha = baseEntrada + y * largEntrada;
 						for (int x = colInicio; x < colFim; x++) {
-							valor = entrada.get(c, y, x);
-							if (valor > maxValor) maxValor = valor;
+							val = dataE[idLinha + x].get();
+							if (val > maxVal) maxVal = val;
 						}
 					}
-					
-					dest.set(maxValor, c, i, j);
+
+					dataS[baseSaida + i * largSaida + j].set(maxVal);
 				}
 			}
 		}
