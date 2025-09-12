@@ -31,13 +31,13 @@ public class MainConv {
 	 */
 	static Funcional jnn = new Funcional();
 
-	// dados de controle
 	// += 4min15s - 500 amostras - 8 epocas - 32 lote
+	// dados de controle
 	static final int NUM_DIGITOS_TREINO = 10;
 	static final int NUM_DIGITOS_TESTE  = NUM_DIGITOS_TREINO;
 	static final int NUM_AMOSTRAS_TREINO = 500;
 	static final int NUM_AMOSTRAS_TESTE  = 100;
-	static final int TREINO_EPOCAS = 10;
+	static final int TREINO_EPOCAS = 12;
 	static final int TREINO_LOTE = 64;
 	static final boolean TREINO_LOGS = true;
 
@@ -93,7 +93,7 @@ public class MainConv {
 			new Conv2D(22, new int[]{3, 3}, "relu"),
 			new MaxPool2D(new int[]{2, 2}),
 			new Flatten(),
-			new Densa(100, "relu"),
+			new Densa(100, "tanh"),
 			new Dropout(0.5),
 			new Densa(NUM_DIGITOS_TREINO, "softmax")
 		);
