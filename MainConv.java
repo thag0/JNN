@@ -88,13 +88,12 @@ public class MainConv {
 	static Sequencial criarModelo() {
 		Sequencial modelo = new Sequencial(
 			new Entrada(1, 28, 28),
-			new Conv2D(26, new int[]{3, 3}, "relu"),
+			new Conv2D(18, new int[]{3, 3}, "relu"),
 			new MaxPool2D(new int[]{2, 2}),
-			new Conv2D(22, new int[]{3, 3}, "relu"),
+			new Conv2D(10, new int[]{3, 3}, "relu"),
 			new MaxPool2D(new int[]{2, 2}),
 			new Flatten(),
-			new Densa(100, "tanh"),
-			new Dropout(0.5),
+			new Densa(50, "tanh"),
 			new Densa(NUM_DIGITOS_TREINO, "softmax")
 		);
 
