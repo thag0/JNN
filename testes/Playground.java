@@ -31,6 +31,10 @@ public class Playground {
 		ged.limparConsole();
 
 		Sequencial model = serial.lerSequencial("dados\\modelos\\modelo-treinado.nn");
+		modelBenchmark(model);
+	}
+
+	public static void modelBenchmark(Sequencial model) {
 		Camada[] camadas = model.camadas();
 
 		Tensor x = new Tensor(model.camada(0).shapeEntrada());
@@ -38,7 +42,7 @@ public class Playground {
 		Tensor g = new Tensor(model.camadaSaida().shapeSaida());
 		g.aplicar(_ -> randn());
 
-		long t;
+		long t, total = 0;
 		List<Map.Entry<String, Long>> res1 = new ArrayList<>();
 		List<Map.Entry<String, Long>> res2 = new ArrayList<>();
 
@@ -50,7 +54,10 @@ public class Playground {
 			t = System.nanoTime() - t;
 
 			res1.add(new AbstractMap.SimpleEntry<>(c.id + " - " + c.nome(), t));
+			total += t;
 		}
+		res1.add(new AbstractMap.SimpleEntry<>("Total", total));
+		total = 0;
 
 		for (int i = camadas.length-1; i >= 0; i--) {
 			Camada c = camadas[i];
@@ -58,22 +65,24 @@ public class Playground {
 			t = System.nanoTime();
 			g = c.backward(g);
 			t = System.nanoTime() - t;
+			total += t;
 
 			res2.add(new AbstractMap.SimpleEntry<>(c.id + " - " + c.nome(), t));
 		}
+		res2.add(new AbstractMap.SimpleEntry<>("Total", total));
 
 		res1.sort((a, b) -> Long.compare(b.getValue(), a.getValue()));
 		res2.sort((a, b) -> Long.compare(b.getValue(), a.getValue()));
 
 		System.out.println("Tempos forward em ordem decrescente:");
 		for (Map.Entry<String, Long> r : res1) {
-			System.out.println(r.getKey() + ":\t" + formatarDecimal(r.getValue()));
+			System.out.println(r.getKey() + ":\t" + formatarDecimal(r.getValue()) + " ns");
 		}
 		
 		System.out.println();
 		System.out.println("Tempos backward em ordem decrescente:");
 		for (Map.Entry<String, Long> r : res2) {
-			System.out.println(r.getKey() + ":\t" + formatarDecimal(r.getValue()));
+			System.out.println(r.getKey() + ":\t" + formatarDecimal(r.getValue()) + " ns");
 		}
 	}
 
