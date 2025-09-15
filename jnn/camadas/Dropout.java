@@ -292,21 +292,6 @@ public class Dropout extends Camada implements Cloneable {
 	}
 
 	@Override
-	public void copiarParaTreinoLote(Camada camada) {
-		if (!(camada instanceof Dropout)) {
-			throw new UnsupportedOperationException(
-				"\nCamada deve ser do tipo " + getClass() +
-				", mas é do tipo " + camada.getClass()
-			);
-		}
-
-		Dropout c = (Dropout) camada;
-		_entrada.copiar(c._entrada);
-		_mascara.copiar(c._mascara);// necessário
-		_saida.copiar(c._saida);
-	}
-
-	@Override
 	public String info() {
 		verificarConstrucao();
 

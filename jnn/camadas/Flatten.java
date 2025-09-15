@@ -283,18 +283,4 @@ public class Flatten extends Camada implements Cloneable{
 		return clone;
 	}
 
-	@Override
-	public void copiarParaTreinoLote(Camada camada) {
-		if (!(camada instanceof Flatten)) {
-			throw new UnsupportedOperationException(
-				"\nCamada deve ser do tipo " + getClass() +
-				", mas é do tipo " + camada.getClass()
-			);
-		}
-
-		Flatten c = (Flatten) camada;
-		_entrada.copiar(c._entrada);
-		_saida.copiar(c._saida);
-	}
-
 }

@@ -146,16 +146,6 @@ public class LeakyReLU extends Camada implements Cloneable {
     }
 
     @Override
-    public void copiarParaTreinoLote(Camada camada) {
-        if (!(camada instanceof LeakyReLU)) {
-			throw new UnsupportedOperationException(
-				"\nCamada deve ser do tipo " + getClass() +
-				", mas é do tipo " + camada.getClass()
-			);
-        }
-    }
-
-    @Override
     public int tamSaida() {
         return saida().tam();
     }

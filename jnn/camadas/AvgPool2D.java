@@ -401,20 +401,6 @@ public class AvgPool2D extends Camada {
 		
 		return sb.toString();
 	}
-	
-	@Override
-	public void copiarParaTreinoLote(Camada camada) {
-		if (!(camada instanceof AvgPool2D)) {
-			throw new UnsupportedOperationException(
-				"\nCamada deve ser do tipo " + getClass() +
-				", mas é do tipo " + camada.getClass()
-			);
-		}
-
-		AvgPool2D c = (AvgPool2D) camada;
-		_entrada.copiar(c._entrada);
-		_saida.copiar(c._saida);
-	}
 
 	@Override
 	public AvgPool2D clone() {

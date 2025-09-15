@@ -749,20 +749,6 @@ public class Conv2D extends Camada implements Cloneable {
 		return clone;
 	}
 
-	@Override
-	public void copiarParaTreinoLote(Camada camada) {
-		if (!(camada instanceof Conv2D)) {
-			throw new UnsupportedOperationException(
-				"\nCamada deve ser do tipo " + getClass() +
-				", mas é do tipo " + camada.getClass()
-			);
-		}
-
-		Conv2D c = (Conv2D) camada;
-		_entrada.copiar(c._entrada);// necessário para backprop
-		_saida.copiar(c._saida);// necessário para backprop
-	}
-
 	/**
 	 * Calcula o formato de entrada da camada Convolucional, que é disposto da
 	 * seguinte forma:
