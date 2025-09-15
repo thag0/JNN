@@ -23,7 +23,7 @@ public class Conv{
 	static Geim geim = new Geim();
 	static OpTensor optensor = new OpTensor();
 	static Serializador serializador = new Serializador();
-	static final int amostras = 100;
+	static final int amostras = 500;
 	static final int digitos = 10;
 
 	static final String CAMINHO_MODELOS = "./dados/modelos/";
@@ -36,20 +36,20 @@ public class Conv{
 		String nomeModelo = "conv-mnist-97-3";
 		// String nomeModelo = "modelo-treinado";
 		Sequencial modelo = serializador.lerSequencial(CAMINHO_MODELOS + nomeModelo + ".nn");
-		// modelo.print();
+		modelo.print();
 
 		// testarPrevisao(modelo, "treino/3/img_1", true);
 		// testarPrevisao(modelo, "3_deslocado", true);
 
-		// testarAcertosMNIST(modelo);
+		testarAcertosMNIST(modelo);
 		// testarTodosDados(modelo);
 
-		Dados forward = tempoForward(modelo);//media 32/44ms
-		Dados backward = tempoBackward(modelo);//media 58/125 ms
+		// Dados forward = tempoForward(modelo);//media 32/44ms
+		// Dados backward = tempoBackward(modelo);//media 58/125 ms
 		// forward = ged.filtrar(forward, 1, "MaxPool2D");
 		// backward = ged.filtrar(backward, 1, "MaxPool2D");
-		forward.print();
-		backward.print();
+		// forward.print();
+		// backward.print();
 
 		// tempoOtimizador(modelo);
 	}
@@ -80,7 +80,7 @@ public class Conv{
 
 			double porcentagem = acertos / (double)amostras;
 			media += porcentagem;
-			System.out.println("Acertos " + digito + " -> " + porcentagem + "%");
+			System.out.println("Acertos " + digito + " -> " + (porcentagem * 100) + "%");
 		}
 
 		System.out.println("média acertos: " + String.format("%.2f", (media/digitos)*100) + "%");
