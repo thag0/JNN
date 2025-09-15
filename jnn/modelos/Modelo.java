@@ -280,6 +280,13 @@ public abstract class Modelo implements Cloneable {
 	}
 
 	/**
+	 * Realiza a propagação reversa do gradiente através do modelo.
+	 * @param g {@code Tensor}  contendo o gradiente da perda em relação a saída do modelo.
+	 * @return {@code Tensor} contendo o gradiente da perda em relação a entrada do modelo.
+	 */
+	public abstract Tensor backward(Tensor g);
+
+	/**
 	 * Zera os gradientes acumulados do modelo.
 	 * <p>
 	 *    Apenas camadas treináveis são afetadas.

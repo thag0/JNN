@@ -437,13 +437,22 @@ public class RedeNeural extends Modelo {
 	public Tensor forward(Tensor x) {
 		validarCompilacao();
 
-		utils.validarNaoNulo(x, "Tensor de entrada nulo.");
-
 		for (Densa camada : camadas()) {
 			x = camada.forward(x);
 		}
 
 		return x.clone();//preservar a saída do modelo
+	}
+
+	@Override
+	public Tensor backward(Tensor g) {
+		validarCompilacao();
+
+		for (int i = camadas().length-1; i >= 0; i--) {
+			g = camada(i).backward(g);
+		}
+
+		return g.clone();// preservar o gradiente do modelo
 	}
 
 	@Override
