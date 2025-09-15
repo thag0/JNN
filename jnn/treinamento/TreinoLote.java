@@ -80,38 +80,42 @@ public class TreinoLote extends Treinador {
 	private void processoLote(Tensor[] loteX, Tensor[] loteY, Perda perda, Variavel perdaEpoca) {
 		int tamLote = loteX.length;
 		int numCamadas = modelo.numCamadas();
+		
+		int threads = numThreads;
+		if (numThreads == 1) {
+			threads = (int)(Runtime.getRuntime().availableProcessors() * 0.25);
+		}
+		if (threads > tamLote) threads = tamLote;
 
-		int numThreads = Runtime.getRuntime().availableProcessors()/2;
-		if (numThreads > tamLote) numThreads = tamLote;
-
-		Modelo[] clones = new Modelo[numThreads];
+		Modelo[] clones = new Modelo[threads];
 		for (int j = 0; j < clones.length; j++) {
 		    clones[j] = modelo.clone();
 		}
 
-		int blocoThread = tamLote / numThreads;
-		try (ExecutorService exec = Executors.newFixedThreadPool(numThreads)) {
-		    for (int t = 0; t < numThreads; t++) {
+		int blocoThread = tamLote / threads;
+		try (ExecutorService exec = Executors.newFixedThreadPool(threads)) {
+		    for (int t = 0; t < threads; t++) {
 		        final int id = t;
 		        final int inicio = t * blocoThread;
-		        final int fim = (t == numThreads - 1) ? tamLote : (t + 1) * blocoThread;
+		        final int fim = (t == threads - 1) ? tamLote : (t + 1) * blocoThread;
 
 		        exec.execute(() -> {
 		            for (int j = inicio; j < fim; j++) {
-		                Tensor prev = clones[id].forward(loteX[j]);
-
+		                Tensor prev = clones[id].forward(loteX[j]);// forward no clone
+						clones[id].backward(perda.backward(prev, loteY[j]));// backprop no clone
+						
 						if (calcularHistorico) {// feedback de avanço
 							perdaEpoca.add(perda.forward(prev, loteY[j]).item());
 						}
 						
-		                synchronized (modelo) {
-							// copiar dados de cache dos clones e
-							// parâmetros como somatório e máscara de dropout
-		                    for (int c = 0; c < numCamadas; c++) {
-		                        modelo.camada(c).copiarParaTreinoLote(clones[id].camada(c));
-		                    }
-
-		                    backpropagation(perda.backward(prev, loteY[j]));
+						// acumular gradientes no modelo original
+						synchronized (modelo) {
+							for (int c = 0; c < numCamadas; c++) {
+								if (modelo.camada(c).treinavel()) {
+									modelo.camada(c).gradKernel().add(clones[id].camada(c).gradKernel());
+									modelo.camada(c).gradBias().add(clones[id].camada(c).gradBias());
+								}
+							}
 		                }
 		            }
 		        });

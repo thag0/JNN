@@ -37,6 +37,11 @@ public abstract class Treinador implements Cloneable {
 	protected int _tamLote;
 
 	/**
+	 * Número de threads para execução paralela no treino em lote.
+	 */
+	protected int numThreads = 1;
+
+	/**
 	 * Construtor implícito.
 	 */
 	protected Treinador(Modelo modelo, int tamLote) {
@@ -71,6 +76,18 @@ public abstract class Treinador implements Cloneable {
 	 */
 	public void setHistorico(boolean calcular) {
 		calcularHistorico = calcular;
+	}
+
+	/**
+	 * Configura o número de threads para execução paralela no treino em lote.
+	 * <p>
+	 * 	Essa função só tem efeito em {@link TreinoLote}.
+	 * </p>
+	 * @param threads número de threads.
+	 */
+	public void setThreads(int threads) {
+		if (threads < 1) threads = 1;
+		numThreads = threads;
 	}
 
 	/**
