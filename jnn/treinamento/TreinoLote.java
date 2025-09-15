@@ -81,7 +81,7 @@ public class TreinoLote extends Treinador {
 		int tamLote = loteX.length;
 		int numCamadas = modelo.numCamadas();
 
-		int numThreads = Runtime.getRuntime().availableProcessors()/4;
+		int numThreads = Runtime.getRuntime().availableProcessors()/2;
 		if (numThreads > tamLote) numThreads = tamLote;
 
 		Modelo[] clones = new Modelo[numThreads];
