@@ -81,7 +81,7 @@ public class TreinoLote extends Treinador {
 		int tamLote = loteX.length;
 		int numCamadas = modelo.numCamadas();
 
-		int numThreads = Runtime.getRuntime().availableProcessors()/2;
+		int numThreads = Runtime.getRuntime().availableProcessors()/4;
 		if (numThreads > tamLote) numThreads = tamLote;
 
 		Modelo[] clones = new Modelo[numThreads];
@@ -100,11 +100,11 @@ public class TreinoLote extends Treinador {
 		            for (int j = inicio; j < fim; j++) {
 		                Tensor prev = clones[id].forward(loteX[j]);
 
+						if (calcularHistorico) {// feedback de avanço
+							perdaEpoca.add(perda.forward(prev, loteY[j]).item());
+						}
+						
 		                synchronized (modelo) {
-							if (calcularHistorico) {// feedback de avanço
-								perdaEpoca.add(perda.forward(prev, loteY[j]).item());
-							}
-
 							// copiar dados de cache dos clones e
 							// parâmetros como somatório e máscara de dropout
 		                    for (int c = 0; c < numCamadas; c++) {

@@ -759,10 +759,8 @@ public class Conv2D extends Camada implements Cloneable {
 		}
 
 		Conv2D c = (Conv2D) camada;
-		_entrada.copiar(c._entrada);
-		_saida.copiar(c._saida);
-
-		_buffer.copiar(c._buffer);// camada treinável
+		_entrada.copiar(c._entrada);// necessário para backprop
+		_saida.copiar(c._saida);// necessário para backprop
 	}
 
 	/**

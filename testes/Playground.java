@@ -33,23 +33,23 @@ public class Playground {
 		// Sequencial model = serial.lerSequencial("dados\\modelos\\modelo-treinado.nn");
 		// modelBenchmark(model);
 
-		int[] input = {20, 26, 26};
-		int[] filtro = {3, 3};
-		int filtros = 16;
-		Conv2D conv = new Conv2D(filtros, filtro, "relu");
-		conv.construir(input);
+		// int[] input = {20, 26, 26};
+		// int[] filtro = {3, 3};
+		// int filtros = 16;
+		// Conv2D conv = new Conv2D(filtros, filtro, "relu");
+		// conv.construir(input);
 
-		Tensor x = new Tensor(input);
-		x.aplicar(_ -> randn());
+		// Tensor x = new Tensor(input);
+		// x.aplicar(_ -> randn());
 
-		Tensor g = new Tensor(conv.shapeSaida());
-		g.aplicar(_ -> randn());
+		// Tensor g = new Tensor(conv.shapeSaida());
+		// g.aplicar(_ -> randn());
 
-		conv.forward(x);
+		// conv.forward(x);
 
-		long t = medirTempo(() -> conv.backward(g));
+		// long t = medirTempo(() -> conv.backward(g));
 
-		System.out.println("\nTempo total backward: " + formatarDecimal(t) + " ns");
+		// System.out.println("\nTempo total backward: " + formatarDecimal(t) + " ns");
 	}
 
 	public static void modelBenchmark(Sequencial model) {
