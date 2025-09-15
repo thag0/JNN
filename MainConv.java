@@ -86,14 +86,22 @@ public class MainConv {
 	 * Criação de modelos para testes.
 	 */
 	static Sequencial criarModelo() {
+		// Sequencial modelo = new Sequencial(
+		// 	new Entrada(1, 28, 28),
+		// 	new Conv2D(18, new int[]{3, 3}, "relu"),
+		// 	new MaxPool2D(new int[]{2, 2}),
+		// 	new Conv2D(10, new int[]{3, 3}, "relu"),
+		// 	new MaxPool2D(new int[]{2, 2}),
+		// 	new Flatten(),
+		// 	new Densa(50, "tanh"),
+		// 	new Densa(NUM_DIGITOS_TREINO, "softmax")
+		// );
+
 		Sequencial modelo = new Sequencial(
 			new Entrada(1, 28, 28),
-			new Conv2D(18, new int[]{3, 3}, "relu"),
-			new MaxPool2D(new int[]{2, 2}),
-			new Conv2D(10, new int[]{3, 3}, "relu"),
-			new MaxPool2D(new int[]{2, 2}),
 			new Flatten(),
-			new Densa(50, "tanh"),
+			new Densa(20, "tanh"),
+			new Densa(20, "tanh"),
 			new Densa(NUM_DIGITOS_TREINO, "softmax")
 		);
 

@@ -150,7 +150,7 @@ public class OpTensor {
 	 * @param dest {@code Tensor} de destino.
 	 */
 	public void matMul(Tensor a, Tensor b, Tensor dest) {
-		if (a.numDim() > 2 || b.numDim() > 2 | dest.numDim() > 2) {
+		if (a.numDim() > 2 || b.numDim() > 2 || dest.numDim() > 2) {
 			throw new IllegalArgumentException(
 				"\nOs tensores devem conter até duas dimensões, mas contêm " +
 				"A = " + a.shapeStr() + " B = " + b.shapeStr() + " Dest = " + dest.shapeStr()
@@ -244,13 +244,12 @@ public class OpTensor {
 		int[] shapeE = entrada.shape();
 		int[] shapeK = kernel.shape();
 		
-		int alt  = shapeE[0] - shapeK[0] + 1;
-		int larg = shapeE[1] - shapeK[1] + 1;
-		Tensor saida = new Tensor(alt, larg);
+		int[] shapeS = calcShapeConv(shapeE, shapeK, new int[] {1, 1});
+		Tensor corr = new Tensor(shapeS);
 
-		corr2D(entrada, kernel, saida);
+		corr2D(entrada, kernel, corr);
 
-		return saida;
+		return corr;
 	}
 
 	/**
@@ -330,13 +329,12 @@ public class OpTensor {
 		int[] shapeE = entrada.shape();
 		int[] shapeK = kernel.shape();
 		
-		int alt  = shapeE[0] - shapeK[0] + 1;
-		int larg = shapeE[1] - shapeK[1] + 1;
-		Tensor res = new Tensor(alt, larg);
+		int[] shapeS = calcShapeConv(shapeE, shapeK, new int[] {1, 1});
+		Tensor conv = new Tensor(shapeS);
 
-		conv2D(entrada, kernel, res);
+		conv2D(entrada, kernel, conv);
 
-		return res;
+		return conv;
 	}
 
 	/**
@@ -498,7 +496,7 @@ public class OpTensor {
 	 * @return {@code Tensor} resultado.
 	 */
 	public Tensor maxPool2D(Tensor entrada, int[] filtro) {
-		return maxPool2D(entrada, filtro, filtro.clone());
+		return maxPool2D(entrada, filtro, filtro);// stride = filtro
 	}
 
 	/**
@@ -531,16 +529,16 @@ public class OpTensor {
 
 		int[] shapeEntrada = entrada.shape();
 
-		int[] shape = calcShapeConv(
+		int[] poolShape = calcShapeConv(
 			new int[] {shapeEntrada[1], shapeEntrada[2]}, 
 			filtro, 
 			stride
 		);
 
-		Tensor saida = new Tensor(shapeEntrada[0], shape[0], shape[1]);
-		maxPool2D(entrada, saida, filtro, stride);
+		Tensor pool = new Tensor(shapeEntrada[0], poolShape[0], poolShape[1]);
+		maxPool2D(entrada, pool, filtro, stride);
 
-		return saida;
+		return pool;
 	}
 
 	/**
@@ -637,7 +635,7 @@ public class OpTensor {
 	 * @return {@code Tensor} resultado.
 	 */
 	public Tensor avgPool2D(Tensor entrada, int[] stride) {
-		return avgPool2D(entrada, stride, stride.clone());
+		return avgPool2D(entrada, stride, stride);// stride = filtro
 	}
 
 	/**
@@ -670,16 +668,16 @@ public class OpTensor {
 
 		int[] shapeEntrada = entrada.shape();
 
-		int[] shape = calcShapeConv(
+		int[] poolShape = calcShapeConv(
 			new int[] {shapeEntrada[1], shapeEntrada[2]}, 
 			filtro, 
 			stride
 		);
 
-		Tensor saida = new Tensor(shapeEntrada[0], shape[0], shape[1]);
-		avgPool2D(entrada, saida, filtro, stride);
+		Tensor pool = new Tensor(shapeEntrada[0], poolShape[0], poolShape[1]);
+		avgPool2D(entrada, pool, filtro, stride);
 
-		return saida;		
+		return pool;		
 	}
 
 	/**
@@ -835,17 +833,15 @@ public class OpTensor {
 			saidas[i] = saida.subTensor(i);
 		}
 
-		for (int f = 0; f < numFiltros; f++) {
+		for (int i = 0; i < numFiltros; i++) {
 			for (int e = 0; e < profEntrada; e++) {
-				corr2D(entradas[e], kernels[f][e], saidas[f]);
+				corr2D(entradas[e], kernels[i][e], saidas[i]);
 			}
+			
+			final int f = i;
+			bias.ifPresent(b -> saidas[f].add(b.get(f)));
 		}
 
-		bias.ifPresent(b -> {
-			for (int i = 0; i < numFiltros; i++) {
-				saida.subTensor(i).add(b.get(i));
-			}
-		});
 	}
 
 	/**
