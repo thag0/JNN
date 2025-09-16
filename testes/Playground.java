@@ -20,7 +20,7 @@ import lib.geim.Geim;
 
 public class Playground {
 	static Ged ged = new Ged();
-	static OpTensor optensor = new OpTensor();
+	static OpTensor opt = new OpTensor();
 	static Geim geim = new Geim();
 	static Utils utils = new Utils();
 	static DecimalFormat df = new DecimalFormat();
@@ -30,26 +30,21 @@ public class Playground {
 	public static void main(String[] args) {
 		ged.limparConsole();
 
-		// Sequencial model = serial.lerSequencial("dados\\modelos\\modelo-treinado.nn");
-		// modelBenchmark(model);
+		// TODO: implementar treino em lotes usando blocos 
+		// de entrada ao invés de clonar modelos 
+		// - camada densa já naturalmente suporta isso
 
-		// int[] input = {20, 26, 26};
-		// int[] filtro = {3, 3};
-		// int filtros = 16;
-		// Conv2D conv = new Conv2D(filtros, filtro, "relu");
-		// conv.construir(input);
+		Tensor x1 = new Tensor(4);
+		x1.preencherContador(true);
 
-		// Tensor x = new Tensor(input);
-		// x.aplicar(_ -> randn());
+		Tensor x2 = new Tensor(x1);
+		x2 = x2.bloco(2);
 
-		// Tensor g = new Tensor(conv.shapeSaida());
-		// g.aplicar(_ -> randn());
+		Tensor kernel = new Tensor(4, 3);
+		kernel.preencherContador(true);
 
-		// conv.forward(x);
-
-		// long t = medirTempo(() -> conv.backward(g));
-
-		// System.out.println("\nTempo total backward: " + formatarDecimal(t) + " ns");
+		System.out.println(opt.matMul(x1, kernel));
+		System.out.println(opt.matMul(x2, kernel));
 	}
 
 	public static void modelBenchmark(Sequencial model) {
@@ -203,7 +198,7 @@ public class Playground {
 		Tensor t1 = new Tensor(a);
 		Tensor t2 = new Tensor(b);
 		Tensor t3 = new Tensor(4, 4);
-		optensor.conv2DFull(t1, t2, t3);
+		opt.conv2DFull(t1, t2, t3);
 				
 		Tensor esperado = new Tensor(new double[][]{
 			{1, 8, 14, 4},
