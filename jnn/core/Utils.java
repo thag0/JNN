@@ -216,6 +216,29 @@ public class Utils {
     }
 
 	/**
+	 * Unifica o array em um único {@code Tensor}.
+	 * @param ts array de {@code Tensor}.
+	 * @return {@code Tensor} concatenado.
+	 */
+	public Tensor concatenar(Tensor[] ts) {
+		int batch = ts.length;
+
+		int[] shape = ts[0].shape();
+		int[] novoShape = new int[shape.length+1];
+		novoShape[0] = batch;
+		for (int i = 0; i < shape.length; i++) {
+			novoShape[i+1] = shape[i];
+		}
+
+		Tensor c = new Tensor(novoShape);
+		for (int i = 0; i < batch; i++) {
+			c.subTensor(i).copiar(ts[i]);
+		}
+
+		return c;
+	}
+
+	/**
 	 * Converte o objeto recebido em um tensor.
 	 * @param obj objeto desejado.
 	 * @return {@code Tensor} com base nos dados do objeto.
