@@ -34,10 +34,15 @@ public class Playground {
 		// de entrada ao invés de clonar modelos 
 		// - camada densa já naturalmente suporta isso
 
-		Tensor a = new Tensor(784, 20);
-		Tensor b = new Tensor(20, 10);
+		Tensor a = new Tensor(20, 20);
+		Tensor b = new Tensor(4, 4);
 
-		long t = medirTempo(() -> opt.matMul(a, b));
+		long t = 0;
+		int n = 20;
+		for (int i = 0; i < n; i++) {
+			t += medirTempo(() -> opt.conv2D(a, b));
+		}
+		t /= n;
 		System.out.println("Tempo: " + formatarDecimal(t) + " ns");
 	}
 
