@@ -189,17 +189,14 @@ public class OpTensor {
 		
 		// cache
 		final int n = colA;
-		Variavel soma = new Variavel();
+		double soma;
 
 		for (int i = 0; i < linD; i++) {
 			for (int j = 0; j < colD; j++) {
-				soma.zero();
+				soma = 0;
 				int idSaida = (i * colD) + j;
 				for (int k = 0; k < n; k++) {
-					soma.addMul(
-						dataA[i * colA + k],
-						dataB[k * colB + j]
-					);
+					soma += dataA[i * colA + k].get() * dataB[k * colB + j].get();
 				}
 				dataD[idSaida].add(soma);
 			}
