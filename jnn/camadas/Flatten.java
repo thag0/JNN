@@ -124,17 +124,13 @@ public class Flatten extends Camada implements Cloneable{
 		shapeEntrada = shape.clone();
 
 		int tamanho = 1;
-		for (int i : shapeEntrada) {
-			tamanho *= i;
-		}
+		for (int dim : shapeEntrada) tamanho *= dim;
 
 		shapeSaida = new int[]{tamanho};
 
-		_entrada = new Tensor(shapeEntrada);
-		_gradEntrada = new Tensor(_entrada.shape());
-		_saida = new Tensor(shapeSaida);
-
-		setNomes();
+		_entrada 	 = addParam("Entrada", shapeEntrada);
+		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
+		_saida 		 = addParam("Saida", shapeSaida);
 
 		_construida = true;// camada pode ser usada.
 	}
@@ -144,13 +140,6 @@ public class Flatten extends Camada implements Cloneable{
 
 	@Override
 	public void setSeed(Number seed) {}
-
-	@Override
-	protected void setNomes() {
-		_entrada.nome("entrada");
-		_saida.nome("saída");
-		_gradEntrada.nome("gradiente entrada");     
-	}
 
 	/**
 	 * <h2>

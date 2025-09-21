@@ -226,24 +226,15 @@ public class AvgPool2D extends Camada {
 			);
 		}
 		
-		_entrada 	 = new Tensor(shapeEntrada);
-		_gradEntrada = new Tensor(_entrada.shape());
-		_saida 		 = new Tensor(shapeSaida);
-
-		setNomes();
+		_entrada 	 = addParam("Entrada", shapeEntrada);
+		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
+		_saida 		 = addParam("Saida", shapeSaida);
 
 		_construida = true;// camada pode ser usada
 	}
 
 	@Override
 	public void inicializar() {}
-
-	@Override
-	protected void setNomes() {
-		_entrada.nome("entrada");
-		_gradEntrada.nome("grad entrada");
-		_saida.nome("saída");
-	}
 
 	@Override
 	public Tensor forward(Object x) {

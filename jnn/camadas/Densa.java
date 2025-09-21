@@ -325,21 +325,19 @@ public class Densa extends Camada implements Cloneable {
 			);
 		}
 
-		_entrada  	= new Tensor(tamEntrada);
-		_saida  	= new Tensor(numNeuronios);
-		_kernel 	= new Tensor(tamEntrada, numNeuronios);
-		_gradKernel = new Tensor(_kernel.shape());
+		_entrada  	= addParam("Entrada", tamEntrada);
+		_saida  	= addParam("Saida", numNeuronios);
+		_kernel 	= addParam("Kernel", tamEntrada, numNeuronios);
+		_gradKernel = addParam("Grad Kernel", _kernel.shape());
 
 		if (usarBias) {
-			_bias 	  = Optional.of(new Tensor(_saida.shape()));
-			_gradBias = Optional.of(new Tensor(_saida.shape()));
+			_bias 	  = Optional.of(addParam("Bias", _saida.shape()));
+			_gradBias = Optional.of(addParam("Grad Bias", _saida.shape()));
 		}
 
-		_buffer 	 = new Tensor(_saida.shape());
-		_gradSaida 	 = new Tensor(_saida.shape());
-		_gradEntrada = new Tensor(_entrada.shape());
-
-		setNomes();
+		_buffer 	 = addParam("Buffer", _saida.shape());
+		_gradSaida 	 = addParam("Grad Saida", _saida.shape());
+		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
 		
 		_treinavel = true;// camada pode ser treinada.
 		_construida = true;// camada pode ser usada.
@@ -367,20 +365,6 @@ public class Densa extends Camada implements Cloneable {
 	@Override
 	public void setBias(boolean usarBias) {
 		this.usarBias = usarBias;
-	}
-
-	@Override
-	protected void setNomes() {
-		_entrada.nome("entrada");
-		_kernel.nome("kernel");
-		_saida.nome("saida");
-		_buffer.nome("buffer");
-		_gradSaida.nome("grad saída");
-		_gradEntrada.nome("grad entrada");
-		_gradKernel.nome("grad kernel");
-
-		_bias.ifPresent(b -> b.nome("bias"));
-		_gradBias.ifPresent(gb -> gb.nome("grad bias"));
 	}
 
 	/**

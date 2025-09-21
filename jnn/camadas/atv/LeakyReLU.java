@@ -46,23 +46,13 @@ public class LeakyReLU extends Camada implements Cloneable {
 
         shapeEntrada = shape.clone();
 
-        _entrada     = new Tensor(shapeEntrada);
-        _saida       = new Tensor(shapeEntrada);
-        _gradEntrada = new Tensor(shapeEntrada);
-        _gradSaida   = new Tensor(shapeEntrada);
-
-        setNomes();
+        _entrada     = addParam("Entrada", shapeEntrada);
+        _saida       = addParam("Saida", shapeEntrada);
+        _gradEntrada = addParam("Grad Entrada", shapeEntrada);
+        _gradSaida   = addParam("Grad Saida", shapeEntrada);
 
         _construida = true;
     }
-
-	@Override
-	protected void setNomes() {
-		_entrada.nome("entrada");
-		_saida.nome("saida");
-		_gradEntrada.nome("grad entrada");    
-		_gradSaida.nome("grad saida");
-	}
 
     @Override
     public void inicializar() {}

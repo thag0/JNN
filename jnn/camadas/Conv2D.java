@@ -501,20 +501,18 @@ public class Conv2D extends Camada implements Cloneable {
 		}
 
 		//inicialização dos parâmetros necessários
-		_entrada      = new Tensor(shapeEntrada);
-		_gradEntrada  = new Tensor(_entrada.shape());
-		_kernel       = new Tensor(shapeSaida[0], shapeEntrada[0], shapeFiltro[0], shapeFiltro[1]);
-		_gradKernel   = new Tensor(_kernel.shape());
-		_saida        = new Tensor(shapeSaida);
-		_buffer 	  = new Tensor(_saida.shape());
-		_gradSaida    = new Tensor(_saida.shape());
+		_entrada      = addParam("Entrada", shapeEntrada);
+		_gradEntrada  = addParam("Grad Entrada", _entrada.shape());
+		_kernel       = addParam("Kernel", shapeSaida[0], shapeEntrada[0], shapeFiltro[0], shapeFiltro[1]);
+		_gradKernel   = addParam("Grad Kernel", _kernel.shape());
+		_saida        = addParam("Saida", shapeSaida);
+		_buffer 	  = addParam("Buffer", _saida.shape());
+		_gradSaida    = addParam("Grad Saida", _saida.shape());
 
 		if (usarBias) {
-			_bias      = Optional.of(new Tensor(shapeSaida[0]));
-			_gradBias  = Optional.of(new Tensor(shapeSaida[0]));
+			_bias      = Optional.of(addParam("Bias", shapeSaida[0]));
+			_gradBias  = Optional.of(addParam("GradBias", shapeSaida[0]));
 		}
-
-		setNomes();
 		
 		_treinavel = true;// camada pode ser treinada.
 		_construida = true;// camada pode ser usada.
@@ -542,20 +540,6 @@ public class Conv2D extends Camada implements Cloneable {
 	@Override
 	public void setBias(boolean usarBias) {
 		this.usarBias = usarBias;
-	}
-
-	@Override
-	protected void setNomes() {
-		_entrada.nome("entrada");
-		_kernel.nome("kernel");
-		_saida.nome("saida");
-		_buffer.nome("buffer");
-		_gradEntrada.nome("grad entrada");
-		_gradKernel.nome("grad kernel");
-		_gradSaida.nome("grad saída");
-
-		_bias.ifPresent(b -> b.nome("bias"));
-		_gradBias.ifPresent(gb -> gb.nome("grad bias"));
 	}
 
 	/**

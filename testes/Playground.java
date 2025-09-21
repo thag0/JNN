@@ -34,17 +34,11 @@ public class Playground {
 		// de entrada ao invés de clonar modelos 
 		// - camada densa já naturalmente suporta isso
 
-		Tensor x1 = new Tensor(4);
-		x1.preencherContador(true);
+		Tensor a = new Tensor(784, 20);
+		Tensor b = new Tensor(20, 10);
 
-		Tensor x2 = new Tensor(x1);
-		x2 = x2.bloco(2);
-
-		Tensor kernel = new Tensor(4, 3);
-		kernel.preencherContador(true);
-
-		System.out.println(opt.matMul(x1, kernel));
-		System.out.println(opt.matMul(x2, kernel));
+		long t = medirTempo(() -> opt.matMul(a, b));
+		System.out.println("Tempo: " + formatarDecimal(t) + " ns");
 	}
 
 	public static void modelBenchmark(Sequencial model) {

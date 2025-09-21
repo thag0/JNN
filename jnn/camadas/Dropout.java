@@ -141,12 +141,10 @@ public class Dropout extends Camada implements Cloneable {
 
 		shapeEntrada = shape.clone();
 
-		_entrada =     new Tensor(shapeEntrada);
-		_mascara =     new Tensor(_entrada.shape());
-		_saida =       new Tensor(_entrada.shape());
-		_gradEntrada = new Tensor(_entrada.shape());
-
-		setNomes();
+		_entrada 	 = addParam("Entrada", shapeEntrada);
+		_mascara 	 = addParam("Mascara", _entrada.shape());
+		_saida 		 = addParam("Saida", _entrada.shape());
+		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
 		
 		_construida = true;// camada pode ser usada
 	}
@@ -159,14 +157,6 @@ public class Dropout extends Camada implements Cloneable {
 		if (seed != null) {
 			random.setSeed(seed.longValue());
 		}
-	}
-
-	@Override
-	protected void setNomes() {
-		_entrada.nome("entrada");
-		_mascara.nome("máscara");
-		_saida.nome("saida");
-		_gradEntrada.nome("gradiente entrada");    
 	}
 
 	/**

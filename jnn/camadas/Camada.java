@@ -197,13 +197,13 @@ public abstract class Camada {
 	}
 
 	/**
-	 * Configura os nomes dos tensores usados pela camada, com intuito estético
-	 * e de debug
+	 * Inicializa um {@code Tensor} vazio com nome especificado.
+	 * @param shape {@code array} contendo os valores das dimensões do tensor.
+	 * @param nome {@code String} contendo nome desejado.
+	 * @return {@code Tensor} criado.
 	 */
-	protected void setNomes() {
-		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui configuração para nomes de atributos."
-		);  
+	protected Tensor addParam(String nome, int... shape) {
+		return new Tensor(shape).nome(nome);
 	}
 
 	/**
