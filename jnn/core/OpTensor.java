@@ -150,16 +150,16 @@ public class OpTensor {
 	 * @param dest {@code Tensor} de destino.
 	 */
 	public void matMul(Tensor a, Tensor b, Tensor dest) {
-		if (a.numDim() > 2 || b.numDim() > 2 || dest.numDim() > 2) {
+		int[] shapeA = a.shape();
+		int[] shapeB = b.shape();
+		int[] shapeD = dest.shape();
+
+		if (shapeA.length > 2 || shapeB.length > 2 || shapeD.length > 2) {
 			throw new IllegalArgumentException(
 				"\nOs tensores devem conter até duas dimensões, mas contêm " +
 				"A = " + a.shapeStr() + " B = " + b.shapeStr() + " Dest = " + dest.shapeStr()
 			);
 		}
-	
-		int[] shapeA = a.shape();
-		int[] shapeB = b.shape();
-		int[] shapeD = dest.shape();
 
 		final int linA = shapeA.length == 1 ? 1 : shapeA[0];
 		final int colA = shapeA.length == 1 ? shapeA[0] : shapeA[1];
@@ -182,12 +182,10 @@ public class OpTensor {
 			);
 		}
 
-		//vetorização para melhor performance
 		Variavel[] dataA = a.paraArray();
 		Variavel[] dataB = b.paraArray();
 		Variavel[] dataD = dest.paraArray();
 		
-		// cache
 		final int n = colA;
 		double soma;
 
@@ -241,8 +239,7 @@ public class OpTensor {
 		int[] shapeE = entrada.shape();
 		int[] shapeK = kernel.shape();
 		
-		int[] shapeS = calcShapeConv(shapeE, shapeK, new int[] {1, 1});
-		Tensor corr = new Tensor(shapeS);
+		Tensor corr = new Tensor(calcShapeConv(shapeE, shapeK, new int[] {1, 1}));
 
 		corr2D(entrada, kernel, corr);
 
@@ -256,16 +253,17 @@ public class OpTensor {
 	 * @param dest {@code Tensor} de destino.
 	 */
 	public void corr2D(Tensor entrada, Tensor kernel, Tensor dest) {
-		if (entrada.numDim() != 2 || kernel.numDim() != 2 || dest.numDim() != 2) {
-			throw new IllegalArgumentException(
-				"\nTodos os tensores devem ter duas dimensões."
-			);
-		}
-
 		int[] shapeE = entrada.shape();
 		int[] shapeK = kernel.shape();
 		int[] shapeS = dest.shape();
-		
+
+		if (shapeE.length > 2 || shapeK.length > 2 || shapeS.length > 2) {
+			throw new IllegalArgumentException(
+				"\nTodos os tensores devem ter duas dimensões, mas Entrada " + shapeE.length + "D, " +
+				" Kernel " + shapeK.length + "D e Saida " + shapeS.length + "D." 
+			);
+		}
+
 		int altEsp  = shapeE[0] - shapeK[0] + 1;
 		int largEsp = shapeE[1] - shapeK[1] + 1;
 	
@@ -278,11 +276,10 @@ public class OpTensor {
 			);
 		}
 
-		final int altKernel = shapeK[0];
-		final int largKernel = shapeK[1];
-		final int largEntrada = shapeE[1];
+		int altKernel = shapeK[0];
+		int largKernel = shapeK[1];
+		int largEntrada = shapeE[1];
 
-		// vetorização para melhorar o desempenho
 		Variavel[] dataE = entrada.paraArray();
 		Variavel[] dataK = kernel.paraArray();
 		Variavel[] dataS = dest.paraArray();
@@ -294,8 +291,8 @@ public class OpTensor {
 				soma.zero();
 				final int idSaida = i * largEsp + j;
 				for (int k = 0; k < altKernel; k++) {
-					final int idBaseEntrada = (k + i) * largEntrada;
-					final int idBaseKernel  = k * largKernel; 
+					int idBaseEntrada = (k + i) * largEntrada;
+					int idBaseKernel  = k * largKernel; 
 					for (int l = 0; l < largKernel; l++) {
 						soma.addMul(
 							dataE[idBaseEntrada + (l + j)],
@@ -341,15 +338,16 @@ public class OpTensor {
 	 * @param dest {@code Tensor} de destino.
 	 */
 	public void conv2D(Tensor entrada, Tensor kernel, Tensor dest) {
-		if (entrada.numDim() != 2 || kernel.numDim() != 2 || dest.numDim() != 2) {
-			throw new IllegalArgumentException(
-				"\nTodos os tensores devem ter duas dimensões."
-			);
-		}
-	
 		int[] shapeE = entrada.shape();
 		int[] shapeK = kernel.shape();
 		int[] shapeS = dest.shape();
+
+		if (shapeE.length > 2 || shapeK.length > 2 || shapeS.length > 2) {
+			throw new IllegalArgumentException(
+				"\nTodos os tensores devem ter duas dimensões, mas Entrada " + shapeE.length + "D, " +
+				" Kernel " + shapeK.length + "D e Saida " + shapeS.length + "D." 
+			);
+		}
 		
 		int altEsp  = shapeE[0] - shapeK[0] + 1;
 		int largEsp = shapeE[1] - shapeK[1] + 1;
@@ -363,11 +361,10 @@ public class OpTensor {
 			);
 		}
 	
-		final int altKernel = shapeK[0];
-		final int largKernel = shapeK[1];
-		final int largEntrada = shapeE[1];
-	
-		// vetorização para melhorar o desempenho
+		int altKernel = shapeK[0];
+		int largKernel = shapeK[1];
+		int largEntrada = shapeE[1];
+
 		Variavel[] dataE = entrada.paraArray();
 		Variavel[] dataK = kernel.paraArray();
 		Variavel[] dataS = dest.paraArray();
@@ -427,15 +424,16 @@ public class OpTensor {
 	 * @param saida {@code Tensor} de destino.
 	 */
 	public void conv2DFull(Tensor entrada, Tensor kernel, Tensor saida) {
-		if (entrada.numDim() != 2 || kernel.numDim() != 2 || saida.numDim() != 2) {
-			throw new IllegalArgumentException(
-				"\nTodos os tensores devem ter duas dimensões."
-			);
-		}
-
 		int[] shapeE = entrada.shape();
 		int[] shapeK = kernel.shape();
 		int[] shapeS = saida.shape();
+
+		if (shapeE.length > 2 || shapeK.length > 2 || shapeS.length > 2) {
+			throw new IllegalArgumentException(
+				"\nTodos os tensores devem ter duas dimensões, mas Entrada " + shapeE.length + "D, " +
+				" Kernel " + shapeK.length + "D e Saida " + shapeS.length + "D." 
+			);
+		}
 		
 		int altEsp  = shapeE[0] + shapeK[0] - 1;
 		int largEsp = shapeE[1] + shapeK[1] - 1;
@@ -449,17 +447,16 @@ public class OpTensor {
 			);
 		}
 
-		final int altEntrada = shapeE[0];
-		final int largEntrada = shapeE[1];
-		final int altKernel = shapeK[0];
-		final int largKernel = shapeK[1];
+		int altEntrada = shapeE[0];
+		int largEntrada = shapeE[1];
+		int altKernel = shapeK[0];
+		int largKernel = shapeK[1];
 
-		// vetorização
 		Variavel[] dataE = entrada.paraArray();
 		Variavel[] dataK = kernel.paraArray();
 		Variavel[] dataS = saida.paraArray();
 
-		Variavel soma = new Variavel();// cache
+		Variavel soma = new Variavel();
 		for (int i = 0; i < altEsp; i++) {
 			for (int j = 0; j < largEsp; j++) {
 				
@@ -589,7 +586,6 @@ public class OpTensor {
 			);
 		}
 
-		// vetorização
 		Variavel[] dataE = entrada.paraArray();
 		Variavel[] dataS = dest.paraArray();
 
@@ -707,13 +703,13 @@ public class OpTensor {
 		}
 
 		int[] shapeEntrada = entrada.shape();
-		int[] shapeSaida = dest.shape();
+		int[] shapeSaida   = dest.shape();
 
-		int canais = shapeEntrada[0];
+		int canais      = shapeEntrada[0];
 		int altEntrada  = shapeEntrada[1];
 		int largEntrada = shapeEntrada[2];
-		int altSaida  = shapeSaida[1];
-		int largSaida = shapeSaida[2];
+		int altSaida    = shapeSaida[1];
+		int largSaida   = shapeSaida[2];
 
 		int[] shapeEsp = calcShapeConv(
 			new int[]{ altEntrada, largEntrada}, 
@@ -728,24 +724,36 @@ public class OpTensor {
 			);
 		}
 
+		Variavel[] dataE = entrada.paraArray();
+		Variavel[] dataS = dest.paraArray();
+
+		int canalSizeEntrada = altEntrada * largEntrada;
+		int canalSizeSaida   = altSaida   * largSaida;
+
 		for (int c = 0; c < canais; c++) {
+			int baseEntrada = c * canalSizeEntrada;
+			int baseSaida   = c * canalSizeSaida;
+
 			for (int i = 0; i < altSaida; i++) {
 				int linInicio = i * stride[0];
-				int linFim = Math.min(linInicio + filtro[0], altEntrada);
+				int linFim    = Math.min(linInicio + filtro[0], altEntrada);
+
 				for (int j = 0; j < largSaida; j++) {
 					int colInicio = j * stride[1];
-					int colFim = Math.min(colInicio + filtro[1], largEntrada);
+					int colFim    = Math.min(colInicio + filtro[1], largEntrada);
+
 					double soma = 0;
 					int cont = 0;
-	
-					for (int lin = linInicio; lin < linFim; lin++) {
-						for (int col = colInicio; col < colFim; col++) {
-							soma += entrada.get(c, lin, col);
+
+					for (int y = linInicio; y < linFim; y++) {
+						int idLinha = baseEntrada + y * largEntrada;
+						for (int x = colInicio; x < colFim; x++) {
+							soma += dataE[idLinha + x].get();
 							cont++;
 						}
 					}
-	
-					dest.set((soma/cont), c, i, j);
+
+					dataS[baseSaida + i * largSaida + j].set(soma / cont);
 				}
 			}
 		}
@@ -758,7 +766,7 @@ public class OpTensor {
 	 * @param bias {@code Tensor} contendo o bias da camada {@code (podendo ser nulo)}.
 	 * @param saida {@code Tensor} de destino do resultado.
 	 */
-	public void densaForward(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
+	public void forwardDensa(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
 		matMul(entrada, kernel, saida);
 		bias.ifPresent(b -> saida.add(b));
 	}
@@ -772,7 +780,7 @@ public class OpTensor {
 	 * @param gradB {@code Tensor} contendo o gradiente em relação ao bias da camada {@code (podendo ser nulo)}.
 	 * @param gradE {@code Tensor} contendo o gradiente em relação à entrada da camada.
 	 */
-	public void densaBackward(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
+	public void backwardDensa(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
 		matMul(entrada.transpor(), gradS, gradK);
 		gradB.ifPresent(gb -> gb.add(gradS));
 		matMul(gradS, kernel.transpor(), gradE);
@@ -785,7 +793,7 @@ public class OpTensor {
 	 * @param bias {@code Tensor} contendo o bias da camada {@code (podendo ser nulo)}.
 	 * @param saida {@code Tensor} de destino do resultado.
 	 */
-	public void conv2DForward(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
+	public void forwardConv2D(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
 		int[] shapeE = entrada.shape();
 		int[] shapeK = kernel.shape();
 		int[] shapeS = saida.shape();
@@ -850,7 +858,7 @@ public class OpTensor {
 	 * @param gradB {@code Tensor} contendo o gradiente em relação ao bias da camada {@code (podendo ser nulo)}.
 	 * @param gradE {@code Tensor} contendo o gradiente em relação à entrada da camada.
 	 */
-	public void conv2DBackward(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
+	public void backwardConv2D(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
 		int[] shapeK = kernel.shape();
 
 		final int numFiltros = shapeK[0];

@@ -34,16 +34,13 @@ public class Playground {
 		// de entrada ao invés de clonar modelos 
 		// - camada densa já naturalmente suporta isso
 
-		Tensor a = new Tensor(20, 20);
-		Tensor b = new Tensor(4, 4);
+		Tensor a = new Tensor(2, 10, 10);
+		a.preencherContador(true);
 
-		long t = 0;
-		int n = 20;
-		for (int i = 0; i < n; i++) {
-			t += medirTempo(() -> opt.conv2D(a, b));
-		}
-		t /= n;
+		long t = medirTempo(() -> opt.avgPool2D(a, new int[]{2, 2}));
 		System.out.println("Tempo: " + formatarDecimal(t) + " ns");
+
+		testeAvgPool();
 	}
 
 	public static void modelBenchmark(Sequencial model) {
@@ -139,6 +136,32 @@ public class Playground {
 		});
 	
 		System.out.println(esperado.equals(mp.gradEntrada()));
+	}
+
+	static void testeAvgPool() {
+		Tensor  a = new Tensor(2, 10, 10);
+		a.preencherContador(true);
+
+		int[] mask = {2, 2};
+
+		Tensor pool = opt.avgPool2D(a, mask);
+	
+		Tensor esperado = new Tensor(new double[][][]{
+    {{  6.5,   8.5,  10.5,  12.5,  14.5},
+      { 26.5,  28.5,  30.5,  32.5,  34.5},
+      { 46.5,  48.5,  50.5,  52.5,  54.5},
+      { 66.5,  68.5,  70.5,  72.5,  74.5},
+      { 86.5,  88.5,  90.5,  92.5,  94.5}},
+
+     {{106.5, 108.5, 110.5, 112.5, 114.5},
+      {126.5, 128.5, 130.5, 132.5, 134.5},
+      {146.5, 148.5, 150.5, 152.5, 154.5},
+      {166.5, 168.5, 170.5, 172.5, 174.5},
+      {186.5, 188.5, 190.5, 192.5, 194.5}}
+	});
+	
+		System.out.println(pool.comparar(esperado) == true ? "AvgPool Ok" : "AvgPool Incorreto");
+
 	}
 
 	/**

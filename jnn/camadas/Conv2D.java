@@ -568,7 +568,7 @@ public class Conv2D extends Camada implements Cloneable {
 		_entrada.copiar(utils.paraTensor(x));
 		
 		_buffer.zero();// zerar acumulações anteriores
-		optensor.conv2DForward(_entrada, _kernel, _bias, _buffer);
+		optensor.forwardConv2D(_entrada, _kernel, _bias, _buffer);
 
 		ativacao.forward(_buffer, _saida);
 
@@ -600,7 +600,7 @@ public class Conv2D extends Camada implements Cloneable {
 		ativacao.backward(this);
 
 		_gradEntrada.zero();// zerar acumulações anteriores
-		optensor.conv2DBackward(
+		optensor.backwardConv2D(
 			_entrada,
 			_kernel,
 			_gradSaida,
