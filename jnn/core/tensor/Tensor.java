@@ -1,5 +1,6 @@
 package jnn.core.tensor;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.function.DoubleUnaryOperator;
 
@@ -2465,6 +2466,112 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		}
 
 		return new Tensor(novosDados, novoShape);
+	}
+
+	/**
+	 * Realiza uma operação a partir de dois {@code Tensor} que podem conter 
+	 * shapes diferentes.
+	 * <p>
+	 *		Exemplo:
+	 * </p>
+	 * <pre>
+	 *a = [
+	 *	[[1, 2],
+	 *	 [3, 4]]
+	 *]
+	 * 
+	 * b = [2]
+	 * 
+	 * a.broadcast(b, (x, y) -> x + y);
+	 * 
+	 *res = [
+	 *	[[3, 4],
+	 *	 [5, 6]]
+	 *]
+	 * </pre>
+	 * @param t {@code Tensor} para operação.
+	 * @param op tipo de operação entre os tensores.
+	 * @return {@code Tensor} contendo o resultado.
+	 */
+	public Tensor broadcast(Tensor t, DoubleBinaryOperator op) {
+		int[] outShape = broadcastShape(this.shape, t.shape);
+		Tensor broadcast = new Tensor(outShape);
+
+		int[] idBroad = new int[outShape.length];
+		int total = broadcast.tam();
+
+		for (int i = 0; i < total; i++) {
+			unravelIndex(i, outShape, idBroad);
+
+			int[] idsA = ajustarIndices(idBroad, this.shape);
+			int[] idsB = ajustarIndices(idBroad, t.shape);
+
+			double v = op.applyAsDouble(this.get(idsA), t.get(idsB));
+			broadcast.set(v, idBroad);
+		}
+
+		return broadcast;
+	}
+
+	/**
+	 * Determina o shape resultante do broadcasting
+	 * @param shapeA {@code array} contendo o formato do {@code Tensor} A.
+	 * @param shapeB {@code array} contendo o formato do {@code Tensor} B.
+	 * @return {@code array} contendo o formato do {@code Tensor} resultante do broadcast.
+	*/
+	private int[] broadcastShape(int[] shapeA, int[] shapeB) {
+		int n = Math.max(shapeA.length, shapeB.length);
+		int[] broadShape = new int[n];
+
+		for (int i = 0; i < n; i++) {
+			int dimA = (shapeA.length - i - 1 >= 0) ? shapeA[shapeA.length - i - 1] : 1;
+			int dimB = (shapeB.length - i - 1 >= 0) ? shapeB[shapeB.length - i - 1] : 1;
+
+			if (dimA == dimB || dimA == 1 || dimB == 1) {
+				broadShape[n - i - 1] = Math.max(dimA, dimB);
+			} else {
+				throw new IllegalArgumentException(
+					"\nShapes incompatíveis para broadcasting: "
+					+ Arrays.toString(shapeA) + " e " + Arrays.toString(shapeB)
+				);
+			}
+		}
+
+		return broadShape;
+	}
+
+	/**
+	 * Converte índice linear em índices multidimensionais.
+	 * @param idLinear índice linear dentro do {@code array} de dados do {@code Tensor}.
+	 * @param shape formato do {@code Tensor}.
+	 * @param out {@code array} de destino.
+	*/
+	private void unravelIndex(int idLinear, int[] shape, int[] out) {
+		for (int i = shape.length - 1; i >= 0; i--) {
+			out[i] = idLinear % shape[i];
+			idLinear /= shape[i];
+		}
+	}
+
+	/**
+	 * Ajusta índices para lidar com broadcasting
+	 * @param ids {@code array} de índices.
+	 * @param shape {@code array} do formato do {@code Tensor}.
+	 * @return índices corrigidos.
+	*/
+	private int[] ajustarIndices(int[] ids, int[] shape) {
+		int[] out = new int[shape.length];
+		int offset = ids.length - shape.length;
+
+		for (int i = 0; i < shape.length; i++) {
+			if (shape[i] == 1) {
+				out[i] = 0;
+			} else {
+				out[i] = ids[i + offset];
+			}
+		}
+
+		return out;
 	}
 
 }
