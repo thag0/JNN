@@ -56,6 +56,12 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	private int[] shape;
 
 	/**
+	 * Strides do tensor. Cada posição indica o salto no array de dados
+	 * necessário para avançar uma unidade na respectiva dimensão.
+	 */
+	private int[] strides;
+
+	/**
 	 * Conjunto de elementos do tensor.
 	 */
 	private Variavel[] dados;
@@ -78,6 +84,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
         int n = tensor.tam();
         dados = initDados(n);
 		copiarElementos(tensor.dados);
+		calcularStrides();
     }
 
 	/**
@@ -101,6 +108,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 
 		dados = initDados(shape[0] * shape[1] * shape[2] * shape[3] * shape[4]);
 		copiar(elms);
+		calcularStrides();
 	}
 
 	/**
@@ -123,6 +131,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 
 		dados = initDados(shape[0] * shape[1] * shape[2] * shape[3]);
 		copiar(elms);
+		calcularStrides();
 	}
 
 	/**
@@ -144,6 +153,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 
 		dados = initDados(shape[0] * shape[1] * shape[2]);
 		copiar(elms);
+		calcularStrides();
 	}
 
 	/**
@@ -169,6 +179,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		this.shape = copiarShape(new int[]{elms.length, elms[0].length});
 		dados = initDados(elms.length * elms[0].length);
 		copiar(elms);
+		calcularStrides();
 	}
 
 	/**
@@ -192,6 +203,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		for (int i = 0; i < tam; i++) {
 			this.dados[i].set(elms[i]);
 		}
+		calcularStrides();
 	}
 
     /**
@@ -209,6 +221,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 
         this.shape = copiarShape(shape);
         dados = initDados(tam);
+		calcularStrides();
     }
 
 	/**
@@ -218,6 +231,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 */
     private Tensor(Variavel[] arr, int... dims) {
         shape = copiarShape(dims);
+		calcularStrides();
 
 		if (arr == null) {
 			throw new IllegalArgumentException(
@@ -247,6 +261,19 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		}
 
 		return d;
+	}
+
+	/**
+	 * Calcula os strides do tensor a partir do shape. O último stride é 1
+	 * (avanço unitário no array), e os anteriores são obtidos pelo produto
+	 * acumulado dos tamanhos das dimensões seguintes.
+	 */
+	private void calcularStrides() {
+		strides = new int[shape.length];
+		strides[shape.length - 1] = 1;
+		for (int i = shape.length - 2; i >= 0; i--) {
+			strides[i] = strides[i + 1] * shape[i + 1];
+		}
 	}
 
 	/**
@@ -446,28 +473,47 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
      * @return índice correspondente no array de elementos do tensor.
      */
     private int indice(int... ids) {
-        if (numDim() != ids.length) {
-            throw new IllegalArgumentException(
-				"\nNúmero de dimensões fornecidas " + ids.length + 
+        // if (numDim() != ids.length) {
+        //     throw new IllegalArgumentException(
+		// 		"\nNúmero de dimensões fornecidas " + ids.length + 
+		// 		" não corresponde às " + numDim() + " do tensor."
+		// 	);
+        // }
+    
+        // int id = 0;
+        // int multiplicador = 1;
+    
+        // for (int i = shape.length - 1; i >= 0; i--) {
+        //     if (ids[i] < 0 || ids[i] >= shape[i]) {
+        //         throw new IllegalArgumentException(
+		// 			"\nÍndice " + ids[i] + " fora dos limites para a dimensão " + i +
+		// 			" (tamanho = " + shape[i] + ");"
+		// 		);
+        //     }
+        //     id += ids[i] * multiplicador;
+        //     multiplicador *= shape[i];
+        // }
+    
+        // return id;
+
+		if (numDim() != ids.length) {
+			throw new IllegalArgumentException(
+				"Número de dimensões fornecidas " + ids.length +
 				" não corresponde às " + numDim() + " do tensor."
 			);
-        }
-    
-        int id = 0;
-        int multiplicador = 1;
-    
-        for (int i = shape.length - 1; i >= 0; i--) {
-            if (ids[i] < 0 || ids[i] >= shape[i]) {
-                throw new IllegalArgumentException(
-					"\nÍndice " + ids[i] + " fora dos limites para a dimensão " + i +
+		}
+
+		int id = 0;
+		for (int i = 0; i < ids.length; i++) {
+			if (ids[i] < 0 || ids[i] >= shape[i]) {
+				throw new IllegalArgumentException(
+					"Índice " + ids[i] + " fora dos limites para a dimensão " + i +
 					" (tamanho = " + shape[i] + ");"
 				);
-            }
-            id += ids[i] * multiplicador;
-            multiplicador *= shape[i];
-        }
-    
-        return id;
+			}
+			id += ids[i] * strides[i];
+		}
+		return id;
     }
 
 	/**

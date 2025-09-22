@@ -55,18 +55,28 @@ public class Playground {
 		// dl.ajustarParaLote(batch);
 		// dl.forward(xs);
 
-		Tensor a = new Tensor(new double[][] {
-			{1, 2},
-			{3, 4}
-		});
+		int[] input = {1, 28, 28};
+		int filters = 24;
+		int[] filterShape = {3, 3};
+		Conv2D conv = new Conv2D(filters, filterShape);
+		conv.construir(input);
+		conv.inicializar();
 
-		// Tensor b = new Tensor(new double[] {10, 20, 30}, 3); // shape [3]
-		Tensor b = new Tensor(1);
-		b.set(2, 0);
+		Tensor x = new Tensor(input);
+		x.aplicar(_ -> randn());
+		
+		Tensor g = new Tensor(conv.shapeSaida());
+		g.aplicar(_ -> randn());
 
-		Tensor c = a.broadcast(b, (x,y) -> x+y); 
-
-		c.print();
+		long t;
+		t = medirTempo(() -> conv.forward(x));
+		System.out.println("forward: " + formatarDecimal(t) + " ns"); 
+		
+		t = medirTempo(() -> conv.backward(g));
+		System.out.println("backward: " + formatarDecimal(t) + " ns");
+	
+		//forward: 7.733.700 ns
+		// backward: 24.866.300 ns
 	}
 
 	public static void modelBenchmark(Sequencial model) {
