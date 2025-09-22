@@ -473,29 +473,6 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
      * @return índice correspondente no array de elementos do tensor.
      */
     private int indice(int... ids) {
-        // if (numDim() != ids.length) {
-        //     throw new IllegalArgumentException(
-		// 		"\nNúmero de dimensões fornecidas " + ids.length + 
-		// 		" não corresponde às " + numDim() + " do tensor."
-		// 	);
-        // }
-    
-        // int id = 0;
-        // int multiplicador = 1;
-    
-        // for (int i = shape.length - 1; i >= 0; i--) {
-        //     if (ids[i] < 0 || ids[i] >= shape[i]) {
-        //         throw new IllegalArgumentException(
-		// 			"\nÍndice " + ids[i] + " fora dos limites para a dimensão " + i +
-		// 			" (tamanho = " + shape[i] + ");"
-		// 		);
-        //     }
-        //     id += ids[i] * multiplicador;
-        //     multiplicador *= shape[i];
-        // }
-    
-        // return id;
-
 		if (numDim() != ids.length) {
 			throw new IllegalArgumentException(
 				"Número de dimensões fornecidas " + ids.length +
@@ -2413,32 +2390,18 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 			);
 		}
 
-		if (numDim() == 1) {// retornar tensor escalar
-			return new Tensor(
-				new Variavel[] { dados[dim] },
-				1
-			);
+		// escalar
+		if (numDim() == 1) {
+			return new Tensor(new Variavel[] { dados[dim] }, 1);
 		}
 
-		int[] novoShape = new int[shape.length-1];
-		int i;
-		for (i = 0; i < novoShape.length; i++) {
-			novoShape[i] = shape[i+1];
-		}
+		int[] novoShape = Arrays.copyOfRange(shape, 1, shape.length);
+		int stride = calcularTamanho(novoShape);
 
-		int[] indices = new int[shape.length];
-		indices[0] = dim;
-		int inicio = indice(indices);
+		int inicio = dim * stride;
+		int fim = inicio + stride;
 
-		for (i = 1; i < indices.length; i++) {
-			indices[i] = shape[i]-1;
-		}
-		int fim = indice(indices);
-
-		Variavel[] novosDados = new Variavel[calcularTamanho(novoShape)];
-		for (i = inicio; i <= fim; i++) {
-			novosDados[i-inicio] = dados[i];
-		}
+		Variavel[] novosDados = Arrays.copyOfRange(dados, inicio, fim);
 
 		return new Tensor(novosDados, novoShape);
 	}
