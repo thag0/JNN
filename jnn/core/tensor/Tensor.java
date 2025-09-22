@@ -2113,12 +2113,9 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 			);
 		}
 
-		final int n = fim - inicio;
+		int n = fim - inicio;
 		Variavel[] arr = new Variavel[n];
-		for (int i = 0; i < n; i++) {
-			arr[i] = dados[i+inicio];// por padrão compartilhar variáveis.
-		}
-
+		System.arraycopy(dados, inicio, arr, 0, n);
 		return arr;
 	}
 
@@ -2398,12 +2395,10 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		int[] novoShape = Arrays.copyOfRange(shape, 1, shape.length);
 		int stride = calcularTamanho(novoShape);
 
-		int inicio = dim * stride;
-		int fim = inicio + stride;
-
-		Variavel[] novosDados = Arrays.copyOfRange(dados, inicio, fim);
-
-		return new Tensor(novosDados, novoShape);
+		return new Tensor(
+			paraArrayPorIndice(dim * stride, (dim + 1) * stride), 
+			novoShape
+		);
 	}
 
 	/**
