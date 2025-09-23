@@ -71,30 +71,14 @@ public class Playground {
 		// System.out.println("Backward: " + formatarDecimal(t) + " ns");
 
 		// ----------------------------------
-		int in = 30;
-		int out = 10;
-		Densa d = new Densa(in, out);
-		d.inicializar();
+		int[] s1 = {24, 1};
+		int[] s2 = {1, 24};
 
-		Tensor x = new Tensor(in);
-		x.aplicar(_ -> randn());
+		Tensor a = new Tensor(s1).aplicar(_ -> randn());
+		Tensor b = new Tensor(s2).aplicar(_ -> randn());
 
-		Tensor g = new Tensor(out);
-		g.aplicar(_ -> randn());
-
-		long t;
-		t = medirTempo(() -> d.forward(x));
-		System.out.println("Forward: " + formatarDecimal(t) + " ns");	
-		
-		t = medirTempo(() -> d.backward(g));
-		System.out.println("Backward: " + formatarDecimal(t) + " ns");
-
-		Tensor te = new Tensor(new double[][]{
-			{1, 2, 3},
-			{1, 2, 3},
-		});
-
-		te.transpor().print();
+		long t = medirTempo(() -> a.broadcast(b, (v1, v2) -> v1 + v2));
+		System.out.println("Tempo broadcast: " + formatarDecimal(t) + " ns");
 	}
 
 	public static void modelBenchmark(Sequencial model) {

@@ -84,7 +84,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
         int n = tensor.tam();
         dados = initDados(n);
 		copiarElementos(tensor.dados);
-		calcularStrides();
+		this.strides = calcularStrides(shape);
     }
 
 	/**
@@ -108,7 +108,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 
 		dados = initDados(shape[0] * shape[1] * shape[2] * shape[3] * shape[4]);
 		copiar(elms);
-		calcularStrides();
+		this.strides = calcularStrides(shape);
 	}
 
 	/**
@@ -131,7 +131,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 
 		dados = initDados(shape[0] * shape[1] * shape[2] * shape[3]);
 		copiar(elms);
-		calcularStrides();
+		this.strides = calcularStrides(shape);
 	}
 
 	/**
@@ -153,7 +153,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 
 		dados = initDados(shape[0] * shape[1] * shape[2]);
 		copiar(elms);
-		calcularStrides();
+		this.strides = calcularStrides(shape);
 	}
 
 	/**
@@ -179,7 +179,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		this.shape = copiarShape(new int[]{elms.length, elms[0].length});
 		dados = initDados(elms.length * elms[0].length);
 		copiar(elms);
-		calcularStrides();
+		this.strides = calcularStrides(shape);
 	}
 
 	/**
@@ -203,7 +203,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		for (int i = 0; i < tam; i++) {
 			this.dados[i].set(elms[i]);
 		}
-		calcularStrides();
+		this.strides = calcularStrides(shape);
 	}
 
     /**
@@ -221,7 +221,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 
         this.shape = copiarShape(shape);
         dados = initDados(tam);
-		calcularStrides();
+		this.strides = calcularStrides(shape);
     }
 
 	/**
@@ -230,8 +230,8 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @param dims dimensões desejadas.
 	 */
     private Tensor(Variavel[] arr, int... dims) {
-        shape = copiarShape(dims);
-		calcularStrides();
+        this.shape = copiarShape(dims);
+		this.strides = calcularStrides(shape);
 
 		if (arr == null) {
 			throw new IllegalArgumentException(
@@ -289,13 +289,17 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * Calcula os strides do tensor a partir do shape. O último stride é 1
 	 * (avanço unitário no array), e os anteriores são obtidos pelo produto
 	 * acumulado dos tamanhos das dimensões seguintes.
+	 * @param shape formato do {@code Tensor} desejado.
+	 * @return strides calculados.
 	 */
-	private void calcularStrides() {
+	private int[] calcularStrides(int[] shape) {
 		strides = new int[shape.length];
 		strides[shape.length - 1] = 1;
 		for (int i = shape.length - 2; i >= 0; i--) {
 			strides[i] = strides[i + 1] * shape[i + 1];
 		}
+
+		return strides;
 	}
 
 	/**
@@ -390,7 +394,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		}
 
 		this.shape = novoShape;
-		calcularStrides();
+		this.strides = calcularStrides(shape);
 
 		return this;
 	}
@@ -2510,22 +2514,45 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 */
 	public Tensor broadcast(Tensor t, DoubleBinaryOperator op) {
 		int[] outShape = broadcastShape(this.shape, t.shape);
-		Tensor broadcast = new Tensor(outShape);
+		Tensor out = new Tensor(outShape);
 
-		int[] idBroad = new int[outShape.length];
-		int total = broadcast.tam();
+		int n = out.tam();
 
-		for (int i = 0; i < total; i++) {
-			unravelIndex(i, outShape, idBroad);
+		int[] stridesA = calcularStrides(this.shape);
+		int[] stridesB = calcularStrides(t.shape);
 
-			int[] idsA = ajustarIndices(idBroad, this.shape);
-			int[] idsB = ajustarIndices(idBroad, t.shape);
+		int desvioA = this.shape.length < outShape.length ? outShape.length - this.shape.length : 0;
+		int desvioB = t.shape.length < outShape.length ? outShape.length - t.shape.length : 0;
 
-			double v = op.applyAsDouble(this.get(idsA), t.get(idsB));
-			broadcast.set(v, idBroad);
-		}
+		for (int ids = 0; ids < n; ids++) {
+			int temp = ids;
 
-		return broadcast;
+			int idA = 0, idB = 0;
+			for (int d = outShape.length - 1; d >= 0; d--) {
+				int cord = temp % outShape[d];
+				temp /= outShape[d];
+
+				if (d - desvioA >= 0) {// ajuste id de A
+					int dimA = this.shape[d - desvioA];
+					if (dimA != 1) {
+						idA += cord * stridesA[d - desvioA];
+					}
+				}
+
+				if (d - desvioB >= 0) {// ajuste id de B
+					int dimB = t.shape[d - desvioB];
+					if (dimB != 1) {
+						idB += cord * stridesB[d - desvioB];
+					}
+				}
+			}
+
+        out.dados[ids].set(
+            op.applyAsDouble(this.dados[idA].get(), t.dados[idB].get())
+        );
+    }
+
+    return out;
 	}
 
 	/**
@@ -2553,40 +2580,6 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		}
 
 		return broadShape;
-	}
-
-	/**
-	 * Converte índice linear em índices multidimensionais.
-	 * @param idLinear índice linear dentro do {@code array} de dados do {@code Tensor}.
-	 * @param shape formato do {@code Tensor}.
-	 * @param out {@code array} de destino.
-	*/
-	private void unravelIndex(int idLinear, int[] shape, int[] out) {
-		for (int i = shape.length - 1; i >= 0; i--) {
-			out[i] = idLinear % shape[i];
-			idLinear /= shape[i];
-		}
-	}
-
-	/**
-	 * Ajusta índices para lidar com broadcasting
-	 * @param ids {@code array} de índices.
-	 * @param shape {@code array} do formato do {@code Tensor}.
-	 * @return índices corrigidos.
-	*/
-	private int[] ajustarIndices(int[] ids, int[] shape) {
-		int[] out = new int[shape.length];
-		int offset = ids.length - shape.length;
-
-		for (int i = 0; i < shape.length; i++) {
-			if (shape[i] == 1) {
-				out[i] = 0;
-			} else {
-				out[i] = ids[i + offset];
-			}
-		}
-
-		return out;
 	}
 
 }
