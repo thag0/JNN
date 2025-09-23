@@ -838,13 +838,21 @@ public class OpTensor {
 			saidas[i] = saida.subTensor(i);
 		}
 
-		for (int i = 0; i < numFiltros; i++) {
-			for (int e = 0; e < profEntrada; e++) {
-				corr2D(entradas[e], kernels[i][e], saidas[i]);
+		if (bias.isPresent()) {
+			Tensor b = bias.get();
+			for (int i = 0; i < numFiltros; i++) {
+				for (int e = 0; e < profEntrada; e++) {
+					corr2D(entradas[e], kernels[i][e], saidas[i]);
+				}
+				saidas[i].add(b.get(i));
 			}
-			
-			final int f = i;
-			bias.ifPresent(b -> saidas[f].add(b.get(f)));
+
+		} else {
+			for (int i = 0; i < numFiltros; i++) {
+				for (int e = 0; e < profEntrada; e++) {
+					corr2D(entradas[e], kernels[i][e], saidas[i]);
+				}
+			}
 		}
 
 	}
