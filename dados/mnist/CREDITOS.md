@@ -1,0 +1,1 @@
+Dados pegos em "https://www.kaggle.com/datasets/jidhumohan/mnist-png"
