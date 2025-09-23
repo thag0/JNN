@@ -250,6 +250,28 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
     }
 
 	/**
+	 * Inicializa um tensor a partir de um array de variáveis.
+	 * @param arr array desejado.
+	 * @param shape dimensões desejadas..
+	 * @param strides strides do novo {@code Tensor}.
+	 */
+	private Tensor(Variavel[] arr, int[] shape, int[] strides) {
+		if (arr == null) {
+			throw new IllegalArgumentException("\nConjunto de elementos nulo");
+		}
+		if (shape == null || strides == null) {
+			throw new IllegalArgumentException("\nShape e strides não podem ser nulos");
+		}
+		if (shape.length != strides.length) {
+			throw new IllegalArgumentException("\nShape e strides devem ter o mesmo comprimento");
+		}
+
+		this.dados = arr;
+		this.shape = Arrays.copyOf(shape, shape.length);
+		this.strides = Arrays.copyOf(strides, strides.length);
+	}
+
+	/**
 	 * Auxiliar na inicialização do conjunto de dados do tensor.
 	 * @param tamanho tamanho desejado.
 	 * @return array de dados alocado.
@@ -368,6 +390,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		}
 
 		this.shape = novoShape;
+		calcularStrides();
 
 		return this;
 	}
@@ -386,46 +409,23 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return {@code Tensor} transposto.
 	 */
     public Tensor transpor() {
-        if (shape.length == 1) {
-			//transpor tensor coluna
-			Tensor t = new Tensor(shape[0], 1);
-			t.copiarElementos(dados);
-			return t;
-        }
-		
-		if (shape.length == 2 && shape[1] == 1) {
-			Tensor t = new Tensor(shape[0]);
-			t.copiarElementos(dados);
-			return t;
+		if (shape.length < 2) {
+			if (shape.length == 1) {
+				return new Tensor(dados, new int[]{shape[0], 1}, new int[]{1, shape[0]});
+			}
+			return this;
 		}
 
-        int[] novoShape = new int[shape.length];
-        for (int i = 0; i < shape.length; i++) {
-            novoShape[i] = shape[shape.length - i - 1];
-        }
+		int[] novoShape = new int[shape.length];
+		int[] novoStrides = new int[strides.length];
 		
-        Tensor t = new Tensor(novoShape);
+		for (int i = 0; i < shape.length; i++) {
+			novoShape[i] = shape[shape.length - 1 - i];
+			novoStrides[i] = strides[shape.length - 1 - i];
+		}
 
-        int[] idsOriginais = new int[shape.length];
-        int[] idsTranspostos = new int[shape.length];
-        for (int i = 0; i < dados.length; i++) {
-            int temp = i;
-            for (int j = shape.length - 1; j >= 0; j--) {
-                idsOriginais[j] = temp % shape[j];
-                temp /= shape[j];
-            }
-
-            for (int j = 0; j < shape.length; j++) {
-                idsTranspostos[j] = idsOriginais[shape.length - j - 1];
-            }
-
-			int indiceTransposto = t.indice(idsTranspostos);
-
-            t.dados[indiceTransposto] = dados[i];
-        }
-
-        return t;
-    }
+		return new Tensor(dados, novoShape, novoStrides);
+	}
 
 	/**
 	 * Copia os elementos do tensores multiplas vezes.

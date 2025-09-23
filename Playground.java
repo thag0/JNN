@@ -9,6 +9,7 @@ import java.util.Map;
 import jnn.Funcional;
 import jnn.camadas.Camada;
 import jnn.camadas.Conv2D;
+import jnn.camadas.Densa;
 import jnn.camadas.MaxPool2D;
 import jnn.camadas.experimental.DensaLote;
 import jnn.core.OpTensor;
@@ -50,24 +51,50 @@ public class Playground {
 
 		// // ---------------------------------------
 
-		int[] inShape = {1, 28, 28};
-		int filters = 24;
-		int[] filterShape = {3, 3};
-		Conv2D conv = new Conv2D(filters, filterShape);
-		conv.construir(inShape);
-		conv.inicializar();
+		// int[] inShape = {1, 28, 28};
+		// int filters = 24;
+		// int[] filterShape = {3, 3};
+		// Conv2D conv = new Conv2D(filters, filterShape);
+		// conv.construir(inShape);
+		// conv.inicializar();
 
-		Tensor x = new Tensor(inShape);
-		x.aplicar(_ -> randn());
+		// Tensor x = new Tensor(inShape);
+		// x.aplicar(_ -> randn());
 		
-		long t;
-		t = medirTempo(() -> conv.forward(x));
-		System.out.println("Forward: " + formatarDecimal(t) + " ns");
+		// long t;
+		// t = medirTempo(() -> conv.forward(x));
+		// System.out.println("Forward: " + formatarDecimal(t) + " ns");
 
-		Tensor g = new Tensor(conv.shapeSaida());
+		// Tensor g = new Tensor(conv.shapeSaida());
+		// g.aplicar(_ -> randn());
+		// t = medirTempo(() -> conv.backward(g));
+		// System.out.println("Backward: " + formatarDecimal(t) + " ns");
+
+		// ----------------------------------
+		int in = 30;
+		int out = 10;
+		Densa d = new Densa(in, out);
+		d.inicializar();
+
+		Tensor x = new Tensor(in);
+		x.aplicar(_ -> randn());
+
+		Tensor g = new Tensor(out);
 		g.aplicar(_ -> randn());
-		t = medirTempo(() -> conv.backward(g));
+
+		long t;
+		t = medirTempo(() -> d.forward(x));
+		System.out.println("Forward: " + formatarDecimal(t) + " ns");	
+		
+		t = medirTempo(() -> d.backward(g));
 		System.out.println("Backward: " + formatarDecimal(t) + " ns");
+
+		Tensor te = new Tensor(new double[][]{
+			{1, 2, 3},
+			{1, 2, 3},
+		});
+
+		te.transpor().print();
 	}
 
 	public static void modelBenchmark(Sequencial model) {
