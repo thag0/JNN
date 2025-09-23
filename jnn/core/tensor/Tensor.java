@@ -418,7 +418,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 
 		int[] novoShape = new int[shape.length];
 		int[] novoStrides = new int[strides.length];
-		
+
 		for (int i = 0; i < shape.length; i++) {
 			novoShape[i] = shape[shape.length - 1 - i];
 			novoStrides[i] = strides[shape.length - 1 - i];
@@ -1427,20 +1427,25 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 			throw new IllegalArgumentException("\nDimensão " + dim + " inválida");
 		}
 
-		if (numDim() == 1) return this;// não fazer nada com tensores escalares
-	
-		if (shape[dim] != 1) {
-			return this;// não alterar dimensões com tamanho != 1
-		}
-	
+		// considerar lançar exception nesses casos
+		if (numDim() == 1) return this; // não faz nada para escalar
+		if (shape[dim] != 1) return this; // só remove dimensão de tamanho 1
+
 		int[] novoShape = new int[shape.length - 1];
+		int[] novoStrides = new int[strides.length - 1];
+
 		int id = 0;
 		for (int i = 0; i < shape.length; i++) {
-			if (i != dim) novoShape[id++] = shape[i];
+			if (i != dim) {
+				novoShape[id] = shape[i];
+				novoStrides[id] = strides[i];
+				id++;
+			}
 		}
-	
-		shape = novoShape;
-	
+
+		this.shape = novoShape;
+		this.strides = novoStrides;
+
 		return this;
 	}
 
@@ -1450,24 +1455,29 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return instância local alterada.
 	 */
     public Tensor unsqueeze(int dim) {
-        if (dim < 0 || dim > shape.length) {
-            throw new IllegalArgumentException(
-				"\nDimensão " + dim + " inválida"
-			);
-        }
-        
-		final int n = numDim();
-        
-        int[] novoShape = new int[n + 1];
-		for (int i = 0; i < dim; i++) {
-            novoShape[i] = shape[i];
-        }
-        novoShape[dim] = 1;
-        for (int i = dim; i < n; i++) {
-            novoShape[i + 1] = shape[i];
-        }
+		if (dim < 0 || dim > shape.length) {
+			throw new IllegalArgumentException("\nDimensão " + dim + " inválida");
+		}
 
-        this.shape = novoShape;
+		int n = numDim();
+		int[] novoShape = new int[n + 1];
+		int[] novoStrides = new int[strides.length + 1];
+
+		for (int i = 0; i < dim; i++) {
+			novoShape[i] = shape[i];
+			novoStrides[i] = strides[i];
+		}
+
+		novoShape[dim] = 1;
+		novoStrides[dim] = (dim < strides.length) ? strides[dim] : 1;
+
+		for (int i = dim; i < n; i++) {
+			novoShape[i + 1] = shape[i];
+			novoStrides[i + 1] = strides[i];
+		}
+
+		this.shape = novoShape;
+		this.strides = novoStrides;
 
 		return this;
     }
@@ -1477,7 +1487,8 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return instância local alterada.
 	 */
 	public Tensor flatten() {
-		shape = new int[] { tam() };
+		this.shape = new int[]{ tam() };
+		this.strides = new int[]{ 1 };
 		return this;
 	}
 
