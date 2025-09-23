@@ -59,12 +59,12 @@ public class Classificador{
 			new Densa(numSaidas, "softmax")
 		);
 
-		modelo.compilar("adagrad", "entropia-cruzada");
+		modelo.compilar("adam", "entropia-cruzada");
 		modelo.setHistorico(true);
 		modelo.print();
 		
 		//treinando e avaliando os resultados
-		modelo.treinar(treinoX, treinoY, 200, 12, true);
+		modelo.treinar(treinoX, treinoY, 500, 14, true);
 		double acc = modelo.avaliador().acuracia(testeX, testeY).item();
 		System.out.println("Acurácia = " + formatarDecimal(acc*100, 4) + "%");
 		System.out.println("Perda = " + modelo.avaliar(testeX, testeY).item());
