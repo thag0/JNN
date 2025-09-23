@@ -50,35 +50,24 @@ public class Playground {
 		// dl.forward(x).print();
 
 		// // ---------------------------------------
+		int[] inShape = {1, 28, 28};
+		int filters = 24;
+		int[] filterShape = {3, 3};
+		Conv2D conv = new Conv2D(filters, filterShape);
+		conv.construir(inShape);
+		conv.inicializar();
 
-		// int[] inShape = {1, 28, 28};
-		// int filters = 24;
-		// int[] filterShape = {3, 3};
-		// Conv2D conv = new Conv2D(filters, filterShape);
-		// conv.construir(inShape);
-		// conv.inicializar();
-
-		// Tensor x = new Tensor(inShape);
-		// x.aplicar(_ -> randn());
+		Tensor x = new Tensor(inShape);
+		x.aplicar(_ -> randn());
 		
-		// long t;
-		// t = medirTempo(() -> conv.forward(x));
-		// System.out.println("Forward: " + formatarDecimal(t) + " ns");
+		long t;
+		t = medirTempo(() -> conv.forward(x));
+		System.out.println("Forward: " + formatarDecimal(t) + " ns");
 
-		// Tensor g = new Tensor(conv.shapeSaida());
-		// g.aplicar(_ -> randn());
-		// t = medirTempo(() -> conv.backward(g));
-		// System.out.println("Backward: " + formatarDecimal(t) + " ns");
-
-		// ----------------------------------
-		int[] s1 = {24, 1};
-		int[] s2 = {1, 24};
-
-		Tensor a = new Tensor(s1).aplicar(_ -> randn());
-		Tensor b = new Tensor(s2).aplicar(_ -> randn());
-
-		long t = medirTempo(() -> a.broadcast(b, (v1, v2) -> v1 + v2));
-		System.out.println("Tempo broadcast: " + formatarDecimal(t) + " ns");
+		Tensor g = new Tensor(conv.shapeSaida());
+		g.aplicar(_ -> randn());
+		t = medirTempo(() -> conv.backward(g));
+		System.out.println("Backward: " + formatarDecimal(t) + " ns");
 	}
 
 	public static void modelBenchmark(Sequencial model) {

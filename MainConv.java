@@ -31,7 +31,7 @@ public class MainConv {
 	 */
 	static Funcional jnn = new Funcional();
 
-	// += 3min 09s - 500 amostras - 8 epocas - 32 lote
+	// += 2min 23s - 500 amostras - 8 epocas - 32 lote
 	// dados de controle
 	static final int NUM_DIGITOS_TREINO = 10;
 	static final int NUM_DIGITOS_TESTE  = NUM_DIGITOS_TREINO;

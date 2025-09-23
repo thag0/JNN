@@ -871,10 +871,6 @@ public class OpTensor {
 
 		final int numFiltros = shapeK[0];
 		final int profEntrada = shapeK[1];
-		boolean temBias = gradB.isPresent();
-
-		// aproveitar paralelismo para dividir o trabalho e sobrecarregar
-		// menos um único núcleo do processador.
 
 		Tensor[] gsSaida = new Tensor[numFiltros];
 		for (int i = 0; i < numFiltros; i++) {
@@ -882,69 +878,51 @@ public class OpTensor {
 		}
 
 		// gradiente em relação as entradas
-		Thread t1 = new Thread(() -> {
-			Tensor[][] kernels = new Tensor[numFiltros][profEntrada];
-			for (int i = 0; i < numFiltros; i++) {
-				Tensor ki = kernel.subTensor(i);
-				for (int j = 0; j < profEntrada; j++) {
-					kernels[i][j] = ki.subTensor(j);
-				}
+		Tensor[][] kernels = new Tensor[numFiltros][profEntrada];
+		for (int i = 0; i < numFiltros; i++) {
+			Tensor ki = kernel.subTensor(i);
+			for (int j = 0; j < profEntrada; j++) {
+				kernels[i][j] = ki.subTensor(j);
 			}
+		}
 
-			Tensor[] gsEntrada = new Tensor[profEntrada];
-			for (int i = 0; i < profEntrada; i++) {
-				gsEntrada[i] = gradE.subTensor(i);
-			}
+		Tensor[] gsEntrada = new Tensor[profEntrada];
+		for (int i = 0; i < profEntrada; i++) {
+			gsEntrada[i] = gradE.subTensor(i);
+		}
 
-			for (int e = 0; e < profEntrada; e++) {
-				for (int f = 0; f < numFiltros; f++) {
-					conv2DFull(gsSaida[f], kernels[f][e], gsEntrada[e]);
-				}
+		for (int e = 0; e < profEntrada; e++) {
+			for (int f = 0; f < numFiltros; f++) {
+				conv2DFull(gsSaida[f], kernels[f][e], gsEntrada[e]);
 			}
-		});
-		t1.start();
+		}
 
 		// gradiente em relação aos kernels
-		Thread t2 = new Thread(() -> {
-			Tensor[] entradas = new Tensor[profEntrada];
-			for (int i = 0; i < profEntrada; i++) {
-				entradas[i] = entrada.subTensor(i);
-			}
+		Tensor[] entradas = new Tensor[profEntrada];
+		for (int i = 0; i < profEntrada; i++) {
+			entradas[i] = entrada.subTensor(i);
+		}
 
-			Tensor[][] gsKernels = new Tensor[numFiltros][profEntrada];
-			for (int i = 0; i < numFiltros; i++) {
-				Tensor ki = gradK.subTensor(i);
-				for (int j = 0; j < profEntrada; j++) {
-					gsKernels[i][j] = ki.subTensor(j);
-				}
+		Tensor[][] gsKernels = new Tensor[numFiltros][profEntrada];
+		for (int i = 0; i < numFiltros; i++) {
+			Tensor ki = gradK.subTensor(i);
+			for (int j = 0; j < profEntrada; j++) {
+				gsKernels[i][j] = ki.subTensor(j);
 			}
+		}
 
-			for (int f = 0; f < numFiltros; f++) {
-				for (int e = 0; e < profEntrada; e++) {
-					corr2D(entradas[e], gsSaida[f], gsKernels[f][e]);	
-				}
+		for (int f = 0; f < numFiltros; f++) {
+			for (int e = 0; e < profEntrada; e++) {
+				corr2D(entradas[e], gsSaida[f], gsKernels[f][e]);	
 			}
-		});
-		t2.start();
+		}
 
 		// gradiente em relação aos bias
-		Thread t3 = null;
-		if (temBias) {
-			t3 = new Thread(() -> {
-				for (int i = 0; i < numFiltros; i++) {
-					double soma = gradS.subTensor(i).soma().item();
-					gradB.get().add(soma, i);
-				}
-			});
-			t3.start();
-		}
-	
-		try {
-			t1.join();
-			t2.join();
-			if (temBias) t3.join();
-		} catch (InterruptedException e) {
-			System.out.println(e.getMessage());
+		if (gradB.isPresent()) {
+			for (int i = 0; i < numFiltros; i++) {
+				double soma = gradS.subTensor(i).soma().item();
+				gradB.get().add(soma, i);
+			}
 		}
 	}
 
