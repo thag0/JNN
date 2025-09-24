@@ -318,11 +318,9 @@ public class Sequencial extends Modelo {
 	public Tensor backward(Tensor g) {
 		validarCompilacao();
 
-		for (int i = camadas().length-1; i >= 0; i--) {
-			g = camada(i).backward(g);
-		}
+		treinador().backpropagation(g);
 
-		return g.clone();// preservar o gradiente do modelo
+		return camada(0).gradEntrada().clone();// preservar o gradiente do modelo
 	}
   
 	@Override
