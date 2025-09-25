@@ -2005,6 +2005,14 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
     }
 
 	/**
+	 * Retorna um array contendo os strides do tensor.
+	 * @return strides do tensor.
+	 */
+	public int[] strides() {
+		return strides.clone();
+	}
+
+	/**
 	 * Retorna uma String contendo as dimensões do tensor.
 	 * @return dimensões do tensor em formato de String.
 	 */
@@ -2580,6 +2588,31 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		}
 
 		return broadShape;
+	}
+
+	public Tensor contiguous() {
+		Tensor novo = new Tensor(this.shape);
+		Variavel[] dadosNovo = novo.dados;
+
+		int total = tam();
+		int[] idx = new int[shape.length];
+
+		for (int linear = 0; linear < total; linear++) {
+			int tmp = linear;
+			for (int d = shape.length - 1; d >= 0; d--) {
+				idx[d] = tmp % shape[d];
+				tmp /= shape[d];
+			}
+
+			int offset = 0;
+			for (int d = 0; d < shape.length; d++) {
+				offset += idx[d] * strides[d];
+			}
+
+			dadosNovo[linear] = dados[offset];
+		}
+
+		return novo;
 	}
 
 }
