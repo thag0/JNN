@@ -393,7 +393,12 @@ public class DensaLote extends Camada implements Cloneable {
 	public Tensor forward(Object x) {
 		verificarConstrucao();
 
-		_entrada.copiar(utils.paraTensor(x));
+		Tensor e = utils.paraTensor(x);
+		if (e.numDim() == 2) {
+			ajustarParaLote(e.shape()[0]);
+		}
+
+		_entrada.copiar(e);
 
 		_buffer.zero();
 		optensor.forwardDensa(_entrada, _kernel, _bias, _buffer);
