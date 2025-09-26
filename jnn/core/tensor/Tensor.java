@@ -446,9 +446,9 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 
 	/**
 	 * Retorna um {@code Tensor} com os eixos permutados.
-	 * <p> 
-	 *		Exemplo 
-	 * <\p>
+	 * <p>
+	 * 		Exemplo:
+	 * </p>
 	 * Tensor t = new Tensor(2, 3, 1)// shape (2, 3, 1)
 	 * Tensor p = t.permutar(2, 0, 1)// shape (1, 2, 3)
 	 * @param eixos nova ordem de eixos.
