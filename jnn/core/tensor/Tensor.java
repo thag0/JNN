@@ -417,9 +417,15 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return uma {@code view} do {@code Tensor} transposto.
 	 */
     public Tensor transpor() {
-		int ndim = shape.length;
+		int ndim = numDim();
+		
+		if (ndim < 2) {
+			if (numDim() == 1) {// (N) -> (N, 1) pra facilitar no matmul
+				return new Tensor(dados, new int[]{shape[0], 1}, new int[]{1, shape[0]});
+			}
 
-		if (ndim < 2) return this;
+			return this;// escalar não faz nada
+		}
 
 		int[] novoShape = shape.clone();
 		int[] novoStrides = strides.clone();
