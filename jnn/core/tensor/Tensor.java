@@ -2608,12 +2608,12 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 				}
 			}
 
-        out.dados[ids].set(
-            op.applyAsDouble(this.dados[idA].get(), t.dados[idB].get())
-        );
-    }
+			out.dados[ids].set(
+				op.applyAsDouble(this.dados[idA].get(), t.dados[idB].get())
+			);
+		}
 
-    return out;
+		return out;
 	}
 
 	/**
