@@ -959,6 +959,12 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
     public Tensor add(Tensor tensor) {
+		if (tensor.tam() == 1) {
+			double x = tensor.item();
+			for (Variavel v : dados) v.add(x);
+			return this;
+		}
+
         if (!compararShape(tensor)) {
             throw new IllegalArgumentException(
                 "\nTensor fornecido possui shape " + tensor.shapeStr() +
@@ -1098,6 +1104,12 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
     public Tensor sub(Tensor tensor) {
+		if (tensor.tam() == 1) {
+			double x = tensor.item();
+			for (Variavel v : dados) v.sub(x);
+			return this;
+		}
+
         if (!compararShape(tensor)) {
             throw new IllegalArgumentException(
                 "\nTensor fornecido deve conter o mesmo shape."
@@ -1236,6 +1248,12 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
     public Tensor mul(Tensor tensor) {
+		if (tensor.tam() == 1) {
+			double x = tensor.item();
+			for (Variavel v : dados) v.mul(x);
+			return this;
+		}
+
         if (!compararShape(tensor)) {
             throw new IllegalArgumentException(
                 "\nTensor fornecido deve conter o mesmo shape."
@@ -1374,6 +1392,12 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
     public Tensor div(Tensor tensor) {
+		if (tensor.tam() == 1) {
+			double x = tensor.item();
+			for (Variavel v : dados) v.div(x);
+			return this;
+		}
+
         if (!compararShape(tensor)) {
             throw new IllegalArgumentException(
                 "\nTensor fornecido deve conter o mesmo shape."
