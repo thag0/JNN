@@ -181,22 +181,33 @@ public class OpTensor {
 				", mas recebido " + dest.shapeStr() 
 			);
 		}
+	
+		int[] stridesA = a.strides();
+		int[] stridesB = b.strides();
+		int[] stridesD = dest.strides();
+
+		// Se for vetor, ajusta strides para 1D
+		int s0A = shapeA.length == 1 ? 1 : stridesA[0];
+		int s1A = shapeA.length == 1 ? 1 : stridesA[1];
+		int s0B = shapeB.length == 1 ? 1 : stridesB[0];
+		int s1B = shapeB.length == 1 ? 1 : stridesB[1];
+		int s0D = shapeD.length == 1 ? 1 : stridesD[0];
+		int s1D = shapeD.length == 1 ? 1 : stridesD[1];
 
 		Variavel[] dataA = a.paraArray();
 		Variavel[] dataB = b.paraArray();
 		Variavel[] dataD = dest.paraArray();
-		
-		final int n = colA;
 		double soma;
 
 		for (int i = 0; i < linD; i++) {
 			for (int j = 0; j < colD; j++) {
 				soma = 0;
-				int idSaida = (i * colD) + j;
-				for (int k = 0; k < n; k++) {
-					soma += dataA[i * colA + k].get() * dataB[k * colB + j].get();
+				for (int k = 0; k < colA; k++) {
+					int idA = i * s0A + k * s1A;
+					int idB = k * s0B + j * s1B;
+					soma += dataA[idA].get() * dataB[idB].get();
 				}
-				dataD[idSaida].add(soma);
+				dataD[(i * s0D) + (j * s1D)].add(soma);
 			}
 		}
 
