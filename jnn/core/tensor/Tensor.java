@@ -1477,16 +1477,25 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	/**
 	 * Remove a dimensão desejada caso possua tamanho = 1.
 	 * @param dim índice da dimensão desejada.
-	 * @return {@code Tensor} local alterado.
+	 * @return {@code view} do {@code Tensor}.
 	 */
 	public Tensor squeeze(int dim) {
 		if (dim < 0 || dim >= shape.length) {
 			throw new IllegalArgumentException("\nDimensão " + dim + " inválida");
 		}
 
-		// considerar lançar exception nesses casos
-		if (numDim() == 1) return this; // não faz nada para escalar
-		if (shape[dim] != 1) return this; // só remove dimensão de tamanho 1
+		if (numDim() == 1) {
+			throw new UnsupportedOperationException(
+				"\nNão é possível remover a única dimensão do tensor."
+			);
+		}
+
+		if (shape[dim] != 1) {
+			throw new IllegalArgumentException(
+				"\nDimensão dada (" + dim + ") deve ter tamanho = 1," +
+				"mas tem tamanho = " + shape[dim] 
+			);
+		}
 
 		int[] novoShape = new int[shape.length - 1];
 		int[] novoStrides = new int[strides.length - 1];
@@ -1500,10 +1509,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 			}
 		}
 
-		this.shape = novoShape;
-		this.strides = novoStrides;
-
-		return this;
+		return new Tensor(dados, novoShape, novoStrides);// view
 	}
 
 	/**
@@ -1533,10 +1539,8 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 			novoStrides[i + 1] = strides[i];
 		}
 
-		this.shape = novoShape;
-		this.strides = novoStrides;
 
-		return this;
+		return new Tensor(dados, novoShape, novoStrides);// view
     }
 
 	/**
