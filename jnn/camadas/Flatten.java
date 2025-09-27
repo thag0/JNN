@@ -148,10 +148,10 @@ public class Flatten extends Camada implements Cloneable{
 	 * Achata os dados de entrada num formato sequencial.
 	 */
 	@Override
-	public Tensor forward(Object x) {
+	public Tensor forward(Tensor x) {
 		verificarConstrucao();
 
-		_entrada.copiar(utils.paraTensor(x));
+		_entrada.copiar(x);
 		_saida.copiarElementos(_entrada);
 
 		return _saida;
@@ -164,10 +164,10 @@ public class Flatten extends Camada implements Cloneable{
 	 * Desserializa os gradientes recebedos de volta para o mesmo formato de entrada.
 	 */
 	@Override
-	public Tensor backward(Object grad) {
+	public Tensor backward(Tensor g) {
 		verificarConstrucao();
 
-		_gradEntrada.copiarElementos(utils.paraTensor(grad));
+		_gradEntrada.copiarElementos(g);
 
 		return _gradEntrada;
 	}

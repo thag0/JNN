@@ -69,13 +69,13 @@ public class Entrada extends Camada {
 	public void inicializar() {}
 
 	@Override
-	public Tensor forward(Object x) {
-		return utils.paraTensor(x);
+	public Tensor forward(Tensor x) {
+		return x;
 	}
 
 	@Override
-	public Tensor backward(Object grad) {
-		return utils.paraTensor(grad);
+	public Tensor backward(Tensor g) {
+		return g;
 	}
 
 	@Override

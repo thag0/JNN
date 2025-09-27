@@ -175,10 +175,10 @@ public class Dropout extends Camada implements Cloneable {
 	 * </p>
 	 */
 	@Override
-	public Tensor forward(Object x) {
+	public Tensor forward(Tensor x) {
 		verificarConstrucao();
 
-		_entrada.copiar(utils.paraTensor(x));
+		_entrada.copiar(x);
 
 		_saida.copiar(_entrada);
 
@@ -224,10 +224,10 @@ public class Dropout extends Camada implements Cloneable {
 	 * </p>
 	 */
 	@Override
-	public Tensor backward(Object grad) {
+	public Tensor backward(Tensor g) {
 		verificarConstrucao();
 
-		_gradEntrada.copiar(utils.paraTensor(grad));
+		_gradEntrada.copiar(g);
 
 		if (treinando) _gradEntrada.mul(_mascara);
 

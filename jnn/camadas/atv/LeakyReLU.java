@@ -58,45 +58,29 @@ public class LeakyReLU extends Camada implements Cloneable {
     public void inicializar() {}
 
     @Override
-    public Tensor forward(Object entrada) {
+    public Tensor forward(Tensor x) {
         verificarConstrucao();
 
 		verificarConstrucao();
 
-		if (entrada instanceof Tensor) {
-			_entrada.copiar((Tensor) entrada);
-			
-		} else {
-			throw new IllegalArgumentException(
-				"\nTipo de entrada \"" + entrada.getClass().getTypeName() + "\"" +
-				" não suportada."
-			);
-		}
+		_entrada.copiar(x);
 
         _saida.aplicar(_entrada,
-            x -> (x > 0.0) ? x : x*alfa
+            v -> (v > 0.0) ? v : v*alfa
         );
 
         return _saida;
     }
 
     @Override
-    public Tensor backward(Object grad) {
+    public Tensor backward(Tensor g) {
 		verificarConstrucao();
 
-		if (grad instanceof Tensor) {
-			_gradSaida.copiar((Tensor) grad);
-			
-		} else {
-			throw new IllegalArgumentException(
-				"\nTipo de gradiente \"" + grad.getClass().getTypeName() + "\"" +
-				" não suportado."
-			);
-		}
+		_gradSaida.copiar(g);
 
         _gradEntrada.aplicar(
             _gradSaida, _entrada,
-            (g, e) -> g * ((e > 0.0) ? 1.0 : alfa)
+            (grad, e) -> grad * ((e > 0.0) ? 1.0 : alfa)
         );
 
         return _gradEntrada;

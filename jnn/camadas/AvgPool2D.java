@@ -237,10 +237,10 @@ public class AvgPool2D extends Camada {
 	public void inicializar() {}
 
 	@Override
-	public Tensor forward(Object x) {
+	public Tensor forward(Tensor x) {
 		verificarConstrucao();
 
-		_entrada.copiar(utils.paraTensor(x));
+		_entrada.copiar(x);
 
 		optensor.avgPool2D(_entrada, _saida, _filtro, _stride);
 
@@ -248,21 +248,12 @@ public class AvgPool2D extends Camada {
 	}
 	
 	@Override
-	public Tensor backward(Object grad) {
+	public Tensor backward(Tensor g) {
 		verificarConstrucao();
 
-		if (grad instanceof Tensor) {
-			Tensor g = (Tensor) grad;
-			int canais = shapeEntrada[0];   
-			for (int i = 0; i < canais; i++) {
-				gradAvgPool(_entrada, g, _gradEntrada, i);
-			}
-		
-		} else {
-			throw new IllegalArgumentException(
-				"\nTipo de gradiente \"" + grad.getClass().getTypeName() + "\"" +
-				" não suportado."
-			);
+		int canais = shapeEntrada[0];   
+		for (int i = 0; i < canais; i++) {
+			gradAvgPool(_entrada, g, _gradEntrada, i);
 		}
 
 		return _gradEntrada;

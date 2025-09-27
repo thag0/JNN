@@ -391,10 +391,10 @@ public class Densa extends Camada implements Cloneable {
 	 * </pre>
 	 */
 	@Override
-	public Tensor forward(Object x) {
+	public Tensor forward(Tensor x) {
 		verificarConstrucao();
 
-		_entrada.copiar(utils.paraTensor(x));
+		_entrada.copiar(x);
 
 		_buffer.zero();
 		optensor.forwardDensa(_entrada, _kernel, _bias, _buffer);
@@ -419,10 +419,10 @@ public class Densa extends Camada implements Cloneable {
 	 * </p>
 	 */
 	@Override
-	public Tensor backward(Object grad) {
+	public Tensor backward(Tensor g) {
 		verificarConstrucao();
 
-		_gradSaida.copiar(utils.paraTensor(grad));
+		_gradSaida.copiar(g);
 		
 		ativacao.backward(this);
 		

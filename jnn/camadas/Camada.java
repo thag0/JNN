@@ -211,14 +211,14 @@ public abstract class Camada {
 	 * @param x dados de entrada que serão processados.
 	 * @return {@code Tensor} contendo a saída calculada pela camada.
 	 */
-	public abstract Tensor forward(Object x);
+	public abstract Tensor forward(Tensor x);
 
 	/**
 	 * Retropropaga os gradientes recebidos para as camadas anteriores.
 	 * @param grad gradiente em relação a saída da camada.
 	 * @return {@code Tensor} contendo os gradientes em relação a entrada da camada.
 	 */
-	public abstract Tensor backward(Object grad);
+	public abstract Tensor backward(Tensor g);
 
 	/**
 	 * Retorna a saída da camada.

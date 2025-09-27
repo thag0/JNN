@@ -248,10 +248,10 @@ public class MaxPool2D extends Camada implements Cloneable{
 	public void inicializar() {}
 
 	@Override
-	public Tensor forward(Object x) {
+	public Tensor forward(Tensor x) {
 		verificarConstrucao();
 
-		_entrada.copiar(utils.paraTensor(x));
+		_entrada.copiar(x);
 
 		optensor.maxPool2D(_entrada, _saida, _filtro, _stride);
 
@@ -259,19 +259,10 @@ public class MaxPool2D extends Camada implements Cloneable{
 	}
 
 	@Override
-	public Tensor backward(Object grad) {
+	public Tensor backward(Tensor g) {
 		verificarConstrucao();
 
-		if (grad instanceof Tensor) {
-			Tensor g = (Tensor) grad;
-			gradMaxPool(_entrada, g, _gradEntrada);
-		
-		} else {
-			throw new IllegalArgumentException(
-				"\nTipo de gradiente \"" + grad.getClass().getTypeName() + "\"" +
-				" não suportado."
-			);
-		}
+		gradMaxPool(_entrada, g, _gradEntrada);
 
 		return _gradEntrada;
 	}
