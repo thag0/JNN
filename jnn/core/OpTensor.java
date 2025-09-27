@@ -203,9 +203,9 @@ public class OpTensor {
 			for (int j = 0; j < colD; j++) {
 				soma = 0;
 				for (int k = 0; k < colA; k++) {
-					int idA = i * s0A + k * s1A;
-					int idB = k * s0B + j * s1B;
-					soma += dataA[idA].get() * dataB[idB].get();
+					soma += 
+						dataA[(i * s0A) + (k * s1A)].get() * 
+						dataB[(k * s0B) + (j * s1B)].get();
 				}
 				dataD[(i * s0D) + (j * s1D)].add(soma);
 			}
