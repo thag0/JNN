@@ -568,10 +568,12 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * Edita o valor do tensor usando o valor informado.
 	 * @param x valor desejado.
 	 * @param ids índices para atribuição.
+	 * @return {@code Tensor} local alterado.
 	 */
-    public void set(Number x, int... ids) {
+    public Tensor set(Number x, int... ids) {
         dados[indice(ids)].set(x);
-    }
+		return this;
+	}
 
 	/**
 	 * Edita o valor do tensor usando uma variável.
@@ -625,10 +627,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
 	public Tensor zero() {
-		for (Variavel x : dados) {
-			x.zero();
-		}
-
+		for (Variavel x : dados) x.zero();
 		return this;
 	}
 
