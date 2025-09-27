@@ -380,7 +380,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 *]
 	 * </pre>
 	 * @param dim array contendo as novas dimensões.
-	 * @return {@code Tensor} local alterado.
+	 * @return {@code view} do {@code Tensor}.
 	 */
 	public Tensor reshape(int... shape) {
 		int[] novoShape = copiarShape(shape);
@@ -393,10 +393,11 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 			);
 		}
 
-		this.shape = novoShape;
-		this.strides = calcularStrides(shape);
-
-		return this;
+		return new Tensor(
+			dados,
+			novoShape,
+			calcularStrides(novoShape)
+		);
 	}
 
 	/**
@@ -405,7 +406,11 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return {@code Tensor} com a visualização desejada.
 	 */
 	public Tensor view(int... shape) {
-		return new Tensor(dados, shape);
+		return new Tensor(
+			dados,
+			copiarShape(shape),
+			calcularStrides(shape)
+		);
 	}
 
 	/**
@@ -1515,7 +1520,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	/**
 	 * Adiciona uma nova dimensão com tamanho = 1.
 	 * @param dim índice da dimensão que será adicionada.
-	 * @return {@code Tensor} local alterado.
+	 * @return {@code view} do {@code Tensor}.
 	 */
     public Tensor unsqueeze(int dim) {
 		if (dim < 0 || dim > shape.length) {
@@ -1545,12 +1550,19 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 
 	/**
 	 * Achata os dados do tensor.
-	 * @return {@code Tensor} local alterado.
+	 * @return se o {@code Tensor} for {@code contíguo}, retorna uma {@code view},
+	 * caso contrário retorna uma {@code cópia} achatada do tensor.
 	 */
 	public Tensor flatten() {
-		this.shape = new int[]{ tam() };
-		this.strides = new int[]{ 1 };
-		return this;
+		if (isContiguous()) {
+			return new Tensor(
+				dados,
+				new int[]{ tam() },
+				new int[]{ 1 }
+			);
+		}
+
+		return new Tensor(tam()).copiar(this);
 	}
 
 	/**
