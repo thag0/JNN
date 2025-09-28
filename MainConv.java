@@ -35,10 +35,10 @@ public class MainConv {
 	// dados de controle
 	static final int NUM_DIGITOS_TREINO = 10;
 	static final int NUM_DIGITOS_TESTE  = NUM_DIGITOS_TREINO;
-	static final int NUM_AMOSTRAS_TREINO = 500;
+	static final int NUM_AMOSTRAS_TREINO = 1_000;
 	static final int NUM_AMOSTRAS_TESTE  = 500;
-	static final int TREINO_EPOCAS = 8;
-	static final int TREINO_LOTE = 32;
+	static final int TREINO_EPOCAS = 20;
+	static final int TREINO_LOTE = 64;
 	static final boolean TREINO_LOGS = true;
 
 	// caminhos de arquivos externos
@@ -94,6 +94,7 @@ public class MainConv {
 			new MaxPool2D(new int[]{2, 2}),
 			new Flatten(),
 			new Densa(100, "tanh"),
+			new Dropout(0.25),
 			new Densa(NUM_DIGITOS_TREINO, "softmax")
 		);
 
