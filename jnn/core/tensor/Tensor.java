@@ -12,8 +12,8 @@ import java.util.function.DoubleBinaryOperator;
  * <h2>
  *		Tensor multidimensional
  * </h2>
- * Implementação de um array multidimensional com finalidade de simplificar 
- * o uso de estrutura de dados dentro da biblioteca.
+ *		Um {@code Tensor} representa um vetor que pode conter diversas dimensões,
+ *		cada uma contendo um tamanho fixo de elementos.
  * <p>
  * 		O tensor possui algumas funções próprias com intuito de aproveitar a
  * 		velocidade de processamento usando um único array contendo seus dados.
@@ -45,6 +45,12 @@ import java.util.function.DoubleBinaryOperator;
  *]
  *a.add(b);// resultado em A
  * </pre>
+ * <h2>
+ *		Nota
+ * </h2>
+ * Algumas operação retornam visualizações do tensor, como: {@code view()},
+ * {@code reshape()}, {@code transpor()}, {@code permutar()}, {@code squeeze()},
+ * {@code unsqueeze()}, {@code flatten()}, {@code slice()}, {@code subTensor()}
  * @author Thiago Barroso, acadêmico de Engenharia da Computação pela
  * Universidade Federal do Pará, Campus Tucuruí. Maio/2024.
  */
