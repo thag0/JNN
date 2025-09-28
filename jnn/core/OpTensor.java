@@ -929,12 +929,12 @@ public class OpTensor {
 		}
 
 		// gradiente em relação aos bias
-		if (gradB.isPresent()) {
+		gradB.ifPresent(gb -> {
 			for (int i = 0; i < numFiltros; i++) {
 				double soma = gradS.subTensor(i).soma().item();
-				gradB.get().add(soma, i);
+				gb.add(soma, i);
 			}
-		}
+		});
 	}
 
 }
