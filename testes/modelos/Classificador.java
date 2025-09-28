@@ -53,9 +53,9 @@ public class Classificador{
 		Sequencial modelo = new Sequencial(
 			new Entrada(numEntradas),
 			new Densa(12, "sigmoid"),
-			new Dropout(0.3),
+			new Dropout(0.25),
 			new Densa(12, "sigmoid"),
-			new Dropout(0.3),
+			new Dropout(0.25),
 			new Densa(numSaidas, "softmax")
 		);
 
@@ -64,7 +64,7 @@ public class Classificador{
 		modelo.print();
 		
 		//treinando e avaliando os resultados
-		modelo.treinar(treinoX, treinoY, 500, 14, true);
+		modelo.treinar(treinoX, treinoY, 500, 12, true);
 		double acc = modelo.avaliador().acuracia(testeX, testeY).item();
 		System.out.println("Acurácia = " + formatarDecimal(acc*100, 4) + "%");
 		System.out.println("Perda = " + modelo.avaliar(testeX, testeY).item());

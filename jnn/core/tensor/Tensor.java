@@ -507,24 +507,22 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @return {@code Tensor} com as modificações.
 	 */
 	public Tensor bloco(int n) {
-		if (numDim() > 1) {
+		if (numDim() != 1) {
 			throw new UnsupportedOperationException(
 				"\nSem suporte para tensor com mais de uma dimensão."
 			);
 		}
 
 		int elementos = tam();
+		int[] novoShape = {n, elementos};
+		Tensor bloco = new Tensor(novoShape);
 
-		Variavel[] arr = new Variavel[elementos * n];
 		for (int i = 0; i < n; i++) {
 			int inicio = i*elementos;
 			for (int j = 0; j < elementos; j++) {
-				arr[inicio + j] = new Variavel(dados[j]);
+				bloco.dados[inicio + j].set(dados[j]);
 			}
 		}
-
-		Tensor bloco = new Tensor(arr, arr.length);
-		bloco.reshape(n, elementos);
 
 		return bloco;
 	}
@@ -535,10 +533,10 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
      * @return índice correspondente no array de elementos do tensor.
      */
     private int indice(int... ids) {
-		if (numDim() != ids.length) {
+		if (strides.length != ids.length) {
 			throw new IllegalArgumentException(
 				"Número de dimensões fornecidas " + ids.length +
-				" não corresponde às " + numDim() + " do tensor."
+				" não corresponde às " + strides.length + " do tensor."
 			);
 		}
 
@@ -2104,21 +2102,29 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		return strides.clone();
 	}
 
+	private String arrayStr(int[] arr) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("(");
+		sb.append(arr[0]);
+        for (int i = 1; i < arr.length; i++) {
+            sb.append(", ").append(arr[i]);
+        }
+        sb.append(")");
+
+        return sb.toString();
+	}
+
 	/**
 	 * Retorna uma String contendo as dimensões do tensor.
 	 * @return dimensões do tensor em formato de String.
 	 */
     public String shapeStr() {
-        StringBuilder sb = new StringBuilder();
+		return arrayStr(shape);
+    }
 
-        sb.append("(");
-		sb.append(shape[0]);
-        for (int i = 1; i < shape.length; i++) {
-            sb.append(", ").append(shape[i]);
-        }
-        sb.append(")");
-
-        return sb.toString();
+    public String strideStr() {
+		return arrayStr(strides);
     }
 
 	/**

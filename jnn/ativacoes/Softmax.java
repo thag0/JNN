@@ -49,17 +49,23 @@ public class Softmax extends Ativacao {
 
 	@Override
 	public void forward(Tensor x, Tensor dest) {
-		if (x.numDim() != dest.numDim()) {
+		if (x.tam() != dest.tam()) {
 			throw new IllegalArgumentException(
 				"\nTamanho do tensor de entrada (" + x.numDim() + ") " +
 				"deve ser igual ao tamanho do tensor de saída (" + dest.numDim() + ")"
 			);
 		}
+		if (x.compararShape(dest) == false) {
+			throw new IllegalArgumentException(
+				"\nFormato do tensor de entrada (" + x.shapeStr() + ") " +
+				"deve ser igual ao formato do tensor de saída (" + dest.shapeStr() + ")"
+			);				
+		}
 
 		int[] shape = x.shape();
 		if (shape.length == 1) {
-			double somaExp = 0;
 			int cols = shape[0];
+			double somaExp = 0;
 			for (int i = 0; i < cols; i++) {
 				somaExp += Math.exp(x.get(i));
 			}
@@ -93,28 +99,21 @@ public class Softmax extends Ativacao {
 	@Override
 	public void backward(Densa camada) {
 		int n = camada._buffer.tam();
-		Tensor tmp = camada.saida().bloco(n);
 		Tensor ident = new Tensor(n, n);
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
 				ident.set((i == j ? 1.0 : 0.0), i, j);
 			}
 		}
-
+		
+		Tensor tmp = camada.saida().bloco(n);
 		Tensor transp = tmp.transpor();
 
-		Tensor res = opt.matMul(
+		opt.matMul(
 			camada._gradSaida, 
-			opt.matHad(
-				tmp,
-				opt.matSub(
-					ident,
-					transp
-				)
-			)
+			opt.matHad(tmp, opt.matSub(ident, transp)),
+			camada._gradSaida
 		);
-
-		camada._gradSaida.copiar(res);
 	}
 
 	@Override
