@@ -68,7 +68,7 @@ public class MainImg {
 
 		if (calcularHistorico) {
 			exportarHistorico(modelo, CAMINHO_HISTORICO);
-			// executarComando("python grafico.py " + CAMINHO_HISTORICO);
+			executarComando("python grafico.py " + CAMINHO_HISTORICO);
 		}
 	}
 
@@ -89,7 +89,6 @@ public class MainImg {
 			new Entrada(entradas),
 			new Densa(10, "sigmoid"),
 			new Densa(10, "sigmoid"),
-			new Densa(10, "sigmoid"),
 			new Densa(saidas, "sigmoid")
 		);
 		// Sequencial modelo = new Sequencial(
@@ -101,8 +100,11 @@ public class MainImg {
 		// 	new Densa(saidas),
 		// 	new Sigmoid()
 		// );
-		
-		modelo.compilar(new SGD(0.0001, 0.999), "mse");
+
+		// Object optm = new SGD(0.0001, 0.999);
+		Object optm = "sgd";
+		Object loss = "mse"; 
+		modelo.compilar(optm, loss);
 		modelo.setHistorico(calcularHistorico);
 
 		return modelo;
