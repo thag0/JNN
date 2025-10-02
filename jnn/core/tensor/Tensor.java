@@ -2,6 +2,7 @@ package jnn.core.tensor;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.function.DoubleUnaryOperator;
 
 import jnn.serializacao.SerialTensor;
@@ -2404,30 +2405,38 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 
 	/**
 	 * Iterador para usar com o tensor, usando para percorrer
-	 * os elementos do tensor sequencialmente.
+	 * seuss elementos sequencialmente.
 	 */
 	class TensorIterator implements Iterator<Variavel> {
-
-		/**
-		 * Contador do índice atual.
-		 */
-		private int indice = 0;
+		private int linear = 0;
+		private int total = tam();
+		private int numDim = numDim();
+		private int[] coords = new int[shape.length];
 
 		@Override
 		public boolean hasNext() {
-			return indice < tam();
+			return linear < total;
 		}
 
 		@Override
 		public Variavel next() {
-			return dados[indice++];
-		}
-
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException(
-				"\nSem suporte."
+			if (!hasNext()) throw new NoSuchElementException(
+				"\nSem elementos para iterar."
 			);
+
+			int ajuste = 0;
+			for (int i = 0; i < numDim; i++) {
+				ajuste += coords[i] * strides[i];
+			}
+
+			for (int i = numDim - 1; i >= 0; i--) {
+				coords[i]++;
+				if (coords[i] < shape[i]) break;
+				coords[i] = 0;
+			}
+
+			linear++;
+			return dados[ajuste];
 		}
 	}
 
