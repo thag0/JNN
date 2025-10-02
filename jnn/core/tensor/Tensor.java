@@ -343,27 +343,6 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		}
 
 		return shape.clone();
-		
-		//TODO reconsiderar isso aqui futuramente
-		// int inicio = 0;
-		// boolean difUmEncontrado = false;
-		
-		// for (int i = 0; i < shape.length; i++) {
-		// 	if (shape[i] != 1) {
-		// 		inicio = i;
-		// 		difUmEncontrado = true;
-		// 		break;
-		// 	}
-		// }
-	
-		// if (!difUmEncontrado) {
-		// 	return new int[]{1};
-		// }
-	
-		// int[] s = new int[shape.length - inicio];
-		// System.arraycopy(shape, inicio, s, 0, s.length);
-	
-		// return s;
 	}
 
 	/**
@@ -401,8 +380,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 
 		return new Tensor(
 			dados,
-			novoShape,
-			calcularStrides(novoShape)
+			novoShape
 		);
 	}
 
@@ -414,8 +392,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	public Tensor view(int... shape) {
 		return new Tensor(
 			dados,
-			copiarShape(shape),
-			calcularStrides(shape)
+			copiarShape(shape)
 		);
 	}
 

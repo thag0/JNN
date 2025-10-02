@@ -354,7 +354,7 @@ public class Variavel implements Cloneable {
 
     @Override
     public String toString() {
-        return "(Variavel: " + valor + ")";
+        return "[Var: " + valor + "]";
     }
 
     /**
