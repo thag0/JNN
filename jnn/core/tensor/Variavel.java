@@ -48,90 +48,120 @@ public class Variavel implements Cloneable {
      * <p>
      *      Apenas o valor da variável informada será copiado.
      * </p>
-     * @param x variável desejada
+     * @param v {@code Variavel} base.
      */
-    public Variavel(Variavel x) {
-        valor = x.valor;
+    public Variavel(Variavel v) {
+        valor = v.valor;
     }
 
     /**
-     * Adiciona o valor informado no conteúdo da variável.
-     * @param x valor desejado.
+     * Realiza a operação
+     * <pre>V = V + X</pre>
+     * @param x valor base.
+	 * @return {@code Variavel} local alterada.
      */
-    public void add(Number x) {
+    public Variavel add(Number x) {
         valor += x.doubleValue();
+        return this;
     }
 
     /**
-     * Adiciona o valor local usando o valor da variável informada.
-     * @param x variável desejada.
+     * Realiza a operação
+     * <pre>V = V + X</pre>
+     * @param x {@code Variavel} base.
+	 * @return {@code Variavel} local alterada.
      */
-    public void add(Variavel x) {
+    public Variavel add(Variavel x) {
         valor += x.valor;
+        return this;
     }
 
     /**
-     * Subtrai o valor informado no conteúdo da variável.
-     * @param x valor desejado.
+     * Realiza a operação
+     * <pre>V = V - X</pre>
+     * @param x valor base.
+	 * @return {@code Variavel} local alterada.
      */
-    public void sub(Number x) {
+    public Variavel sub(Number x) {
         valor -= x.doubleValue();
+        return this;
     }
 
     /**
-     * Subtrai o valor local usando o valor da variável informada.
-     * @param x variável desejada.
+     * Realiza a operação
+     * <pre>V = V - X</pre>
+     * @param x {@code Variavel} base.
+	 * @return {@code Variavel} local alterada.
      */
-    public void sub(Variavel x) {
+    public Variavel sub(Variavel x) {
         valor -= x.valor;
+        return this;
     }
 
     /**
-     * Multiplica o valor informado no conteúdo da variável.
-     * @param x valor desejado.
+     * Realiza a operação
+     * <pre>V = V * X</pre>
+     * @param x valor base.
+	 * @return {@code Variavel} local alterada.
      */
-    public void mul(Number x) {
+    public Variavel mul(Number x) {
         valor *= x.doubleValue();
+        return this;
     }
 
     /**
-     * Multiplica o valor local usando o valor da variável informada.
-     * @param x variável desejada.
+     * Realiza a operação
+     * <pre>V = V * X</pre>
+     * @param x {@code Variavel} base.
+	 * @return {@code Variavel} local alterada.
      */
-    public void mul(Variavel x) {
+    public Variavel mul(Variavel x) {
         valor *= x.valor;
+        return this;
     }
 
     /**
-     * Divide o valor informado no conteúdo da variável.
-     * @param x valor desejado.
+     * Realiza a operação
+     * <pre>V = V / X</pre>
+     * @param x valor base.
+	 * @return {@code Variavel} local alterada.
      */
-    public void div(Number x) {
+    public Variavel div(Number x) {
         valor /= x.doubleValue();
+        return this;
     }
    
     /**
-     * Divide o valor local usando o valor da variável informada.
-     * @param x variável desejada.
+     * Realiza a operação
+     * <pre>V = V / X</pre>
+     * @param x {@code Variavel} base.
+	 * @return {@code Variavel} local alterada.
      */
-    public void div(Variavel x) {
+    public Variavel div(Variavel x) {
         valor /= x.valor;
+        return this;
     }
 
     /**
-     * Atribui o valor informado no conteúdo da variável.
-     * @param x valor desejado.
+     * Realiza a operação
+     * <pre>V = X</pre>
+     * @param x valor base.
+	 * @return {@code Variavel} local alterada.
      */
-    public void set(Number x) {
+    public Variavel set(Number x) {
         valor = x.doubleValue();
+        return this;
     }
 
-     /**
-     * Atribui o valor local usando o valor da variável informada.
-     * @param x variável desejada.
+    /**
+     * Realiza a operação
+     * <pre>V = X</pre>
+     * @param x {@code Variavel} base.
+	 * @return {@code Variavel} local alterada.
      */
-    public void set(Variavel x) {
+    public Variavel set(Variavel x) {
         valor = x.valor;
+        return this;
     }
 
     /**
@@ -143,162 +173,213 @@ public class Variavel implements Cloneable {
     }
 
     /**
-     * Zera o valor da variável.
+     * Realiza a operação
+     * <pre>V = 0</pre>
+	 * @return {@code Variavel} local alterada.
      */
-    public void zero() {
+    public Variavel zero() {
         valor = 0.0;
+        return this;
     }
 
     // métodos especiais
 
     /**
-     * Adiciona localmente o resultado da soma entre variáveis recebidas.
+     * Realiza a operação
+     * <pre>V = V + (X + Y)</pre>
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
+	 * @return {@code Variavel} local alterada.
      */
-    public void addSoma(Variavel x, Variavel y) {
+    public Variavel addadd(Variavel x, Variavel y) {
         valor += (x.valor + y.valor);
+        return this;
     }
 
     /**
-     * Adiciona localmente o resultado da diferença entre variáveis recebidas.
+     * Realiza a operação
+     * <pre>V = V + (X - Y)</pre>
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
+	 * @return {@code Variavel} local alterada.
      */
-    public void addSub(Variavel x, Variavel y) {
+    public Variavel addsub(Variavel x, Variavel y) {
         valor += (x.valor - y.valor);
+        return this;
     }
 
     /**
-     * Adiciona localmente o resultado do produto entre variáveis recebidas.
+     * Realiza a operação
+     * <pre>V = V + (X * Y)</pre>
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
+	 * @return {@code Variavel} local alterada.
      */
-    public void addMul(Variavel x, Variavel y) {
+    public Variavel addmul(Variavel x, Variavel y) {
         valor += (x.valor * y.valor);
+        return this;
     }
 
     /**
-     * Adiciona localmente o resultado da divisão entre variáveis recebidas.
+     * Realiza a operação
+     * <pre>V = V + (X / Y)</pre>
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
+	 * @return {@code Variavel} local alterada.
      */
-    public void addDiv(Variavel x, Variavel y) {
+    public Variavel adddiv(Variavel x, Variavel y) {
         valor += (x.valor / y.valor);
+        return this;
     }
 
     /**
-     * Subtrai localmente o resultado da soma entre variáveis recebidas.
+     * Realiza a operação
+     * <pre>V = V - (X + Y)</pre>
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
+	 * @return {@code Variavel} local alterada.
      */
-    public void subSoma(Variavel x, Variavel y) {
+    public Variavel subadd(Variavel x, Variavel y) {
         valor -= (x.valor + y.valor);
+        return this;
     }
 
     /**
-     * Subtrai localmente o resultado da diferença entre variáveis recebidas.
+     * Realiza a operação
+     * <pre>V = V - (X - Y)</pre>
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
+	 * @return {@code Variavel} local alterada.
      */
-    public void subSub(Variavel x, Variavel y) {
+    public Variavel subsub(Variavel x, Variavel y) {
         valor -= (x.valor - y.valor);
+        return this;
     }
 
     /**
-     * Subtrai localmente o resultado do produto entre variáveis recebidas.
+     * Realiza a operação
+     * <pre>V = V - (X * Y)</pre>
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
+	 * @return {@code Variavel} local alterada.
      */
-    public void subMul(Variavel x, Variavel y) {
+    public Variavel submul(Variavel x, Variavel y) {
         valor -= (x.valor * y.valor);
+        return this;
     }
 
     /**
-     * Subtrai localmente o resultado da divisão entre variáveis recebidas.
+     * Realiza a operação
+     * <pre>V = V - (X / Y)</pre>
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
+	 * @return {@code Variavel} local alterada.
      */
-    public void subDiv(Variavel x, Variavel y) {
+    public Variavel subdiv(Variavel x, Variavel y) {
         valor -= (x.valor / y.valor);
+        return this;
     }
 
     /**
-     * Multiplica localmente o resultado da soma entre variáveis recebidas.
+     * Realiza a operação
+     * <pre>V = V * (X + Y)</pre>
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
+	 * @return {@code Variavel} local alterada.
      */
-    public void mulSoma(Variavel x, Variavel y) {
+    public Variavel muladd(Variavel x, Variavel y) {
         valor *= (x.valor + y.valor);
+        return this;
     }
 
     /**
-     * Multiplica localmente o resultado da diferneça entre variáveis recebidas.
+     * Realiza a operação
+     * <pre>V = V * (X - Y)</pre>
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
+	 * @return {@code Variavel} local alterada.
      */
-    public void mulSub(Variavel x, Variavel y) {
+    public Variavel mulsub(Variavel x, Variavel y) {
         valor *= (x.valor - y.valor);
+        return this;
     }
 
     /**
-     * Multiplica localmente o resultado do produto entre variáveis recebidas.
+     * Realiza a operação
+     * <pre>V = V * (X * Y)</pre>
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
+	 * @return {@code Variavel} local alterada.
      */
-    public void mulMul(Variavel x, Variavel y) {
+    public Variavel mulmul(Variavel x, Variavel y) {
         valor *= (x.valor * y.valor);
+        return this;
     }
 
     /**
-     * Multiplica localmente o resultado da divisão entre variáveis recebidas.
+     * Realiza a operação
+     * <pre>V = V * (X / Y)</pre>
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
+	 * @return {@code Variavel} local alterada.
      */
-    public void mulDiv(Variavel x, Variavel y) {
+    public Variavel muldiv(Variavel x, Variavel y) {
         valor *= (x.valor / y.valor);
+        return this;
     }
 
     /**
-     * Divide localmente o resultado da soma entre variáveis recebidas.
+     * Realiza a operação
+     * <pre>V = V / (X + Y)</pre>
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
+	 * @return {@code Variavel} local alterada.
      */
-    public void divSoma(Variavel x, Variavel y) {
+    public Variavel divadd(Variavel x, Variavel y) {
         valor /= (x.valor + y.valor);
+        return this;
     }
 
     /**
-     * Divide localmente o resultado da diferneça entre variáveis recebidas.
+     * Realiza a operação
+     * <pre>V = V / (X - Y)</pre>
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
+	 * @return {@code Variavel} local alterada.
      */
-    public void divSub(Variavel x, Variavel y) {
+    public Variavel divsub(Variavel x, Variavel y) {
         valor /= (x.valor - y.valor);
+        return this;
     }
 
     /**
-     * Divide localmente o resultado do produto entre variáveis recebidas.
+     * Realiza a operação
+     * <pre>V = V / (X * Y)</pre>
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
+	 * @return {@code Variavel} local alterada.
      */
-    public void divMul(Variavel x, Variavel y) {
+    public Variavel divmul(Variavel x, Variavel y) {
         valor /= (x.valor * y.valor);
+        return this;
     }
 
     /**
-     * Divide localmente o resultado da divisão entre variáveis recebidas.
+     * Realiza a operação
+     * <pre>V = V / (X / Y)</pre>
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
+	 * @return {@code Variavel} local alterada.
      */
-    public void divtDiv(Variavel x, Variavel y) {
+    public Variavel divdiv(Variavel x, Variavel y) {
         valor /= (x.valor / y.valor);
+        return this;
     }
 
     /**
-     * Verifica que o valor local é {@code maior} que o valor da 
-     * variável fornecida.
-     * @param x {@code Variável} desejada.
+     * Realiza a operação
+     * <pre>V > X</pre>
+     * @param x {@code Variavel} desejada.
      * @return resultado da verificação.
      */
     public boolean maior(Variavel x) {
@@ -306,9 +387,9 @@ public class Variavel implements Cloneable {
     }
 
     /**
-     * Verifica que o valor local é {@code maior} que o valor da 
-     * variável fornecida.
-     * @param x valor desejado.
+     * Realiza a operação
+     * <pre>V > X</pre>
+     * @param x {@code Variavel} desejada.
      * @return resultado da verificação.
      */
     public boolean maior(Number x) {
@@ -316,9 +397,9 @@ public class Variavel implements Cloneable {
     }
 
     /**
-     * Verifica que o valor local é {@code menor} que o valor da 
-     * variável fornecida.
-     * @param x {@code Variável} desejada.
+     * Realiza a operação
+     * <pre>V < X</pre>
+     * @param x {@code Variavel} desejada.
      * @return resultado da verificação.
      */
     public boolean menor(Variavel x) {
@@ -326,9 +407,9 @@ public class Variavel implements Cloneable {
     }
 
     /**
-     * Verifica que o valor local é {@code menor} que o valor da 
-     * variável fornecida.
-     * @param x valor desejado.
+     * Realiza a operação
+     * <pre>V < X</pre>
+     * @param x {@code Variavel} desejada.
      * @return resultado da verificação.
      */
     public boolean menor(Number x) {

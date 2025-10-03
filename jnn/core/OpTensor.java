@@ -305,7 +305,7 @@ public class OpTensor {
 					int idBaseEntrada = (k + i) * largEntrada;
 					int idBaseKernel  = k * largKernel; 
 					for (int l = 0; l < largKernel; l++) {
-						soma.addMul(
+						soma.addmul(
 							dataE[idBaseEntrada + (l + j)],
 							dataK[idBaseKernel + l]
 						);
@@ -388,7 +388,7 @@ public class OpTensor {
 				final int idSaida = i * largEsp + j;
 				for (int k = 0; k < altKernel; k++) {
 					for (int l = 0; l < largKernel; l++) {
-						soma.addMul(
+						soma.addmul(
 							dataE[(k + i) * largEntrada + (l + j)], 
 							dataK[(altKernel - 1 - k) * largKernel + (largKernel - 1 - l)]
 						);
@@ -479,7 +479,7 @@ public class OpTensor {
 						for (int n = 0; n < largKernel; n++) {
 							int colEntrada = j - n;
 							if (colEntrada >= 0 && colEntrada < largEntrada) {
-								soma.addMul(
+								soma.addmul(
 									dataK[m * largKernel + n],
 									dataE[linEntrada * largEntrada + colEntrada]
 								);
