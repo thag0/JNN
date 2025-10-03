@@ -55,7 +55,7 @@ public class Softmax extends Ativacao {
 				"deve ser igual ao tamanho do tensor de saída (" + dest.numDim() + ")"
 			);
 		}
-		if (x.compararShape(dest) == false) {
+		if (x.compShape(dest) == false) {
 			throw new IllegalArgumentException(
 				"\nFormato do tensor de entrada (" + x.shapeStr() + ") " +
 				"deve ser igual ao formato do tensor de saída (" + dest.shapeStr() + ")"

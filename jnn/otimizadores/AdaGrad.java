@@ -130,7 +130,7 @@ public class AdaGrad extends Otimizador {
 		verificarConstrucao();
 		
 		for (int i = 0; i < _params.length; i++) {
-			ac[i].addMul(_grads[i], _grads[i]);
+			ac[i].addmul(_grads[i], _grads[i]);
 
 			_params[i].aplicar(_params[i], _grads[i], ac[i], 
 				(p, g, ac) -> p -= ((g * tA) / (Math.sqrt(ac) + eps))

@@ -33,7 +33,7 @@ public class Argmax extends Ativacao {
 
 	@Override
 	public void forward(Tensor x, Tensor dest) {
-		if (!x.compararShape(dest)) {
+		if (!x.compShape(dest)) {
 			throw new IllegalArgumentException(
 				"\nTensor de entrada " + x.shapeStr() + " deve ter " +
 				"mesmo formato do tensor de saída " + dest.shapeStr()

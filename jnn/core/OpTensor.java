@@ -22,7 +22,7 @@ public class OpTensor {
 	 * @return {@code Tensor} contendo o resultado.
 	 */
 	public Tensor matAdd(Tensor a, Tensor b) {
-		if (!a.compararShape(b)) {
+		if (!a.compShape(b)) {
 			throw new IllegalArgumentException(
 				"\nDimensões do tensor A " + a.shapeStr() + 
 				" e B " + b.shapeStr() + " devem ser iguais."
@@ -45,7 +45,7 @@ public class OpTensor {
 	 * @return {@code Tensor} contendo o resultado.
 	 */
 	public Tensor matSub(Tensor a, Tensor b) {
-		if (!a.compararShape(b)) {
+		if (!a.compShape(b)) {
 			throw new IllegalArgumentException(
 				"\nDimensões do tensor A " + a.shapeStr() + 
 				" e B " + b.shapeStr() + " devem ser iguais."
@@ -68,7 +68,7 @@ public class OpTensor {
 	 * @return {@code Tensor} contendo o resultado.
 	 */
 	public Tensor matHad(Tensor a, Tensor b) {
-		if (!a.compararShape(b)) {
+		if (!a.compShape(b)) {
 			throw new IllegalArgumentException(
 				"\nDimensões do tensor A " + a.shapeStr() + 
 				" e B " + b.shapeStr() + " devem ser iguais."
@@ -91,7 +91,7 @@ public class OpTensor {
 	 * @return {@code Tensor} contendo o resultado.
 	 */
 	public Tensor matDiv(Tensor a, Tensor b) {
-		if (!a.compararShape(b)) {
+		if (!a.compShape(b)) {
 			throw new IllegalArgumentException(
 				"\nDimensões do tensor A " + a.shapeStr() + 
 				" e B " + b.shapeStr() + " devem ser iguais."
@@ -792,7 +792,7 @@ public class OpTensor {
 	 * @param gradE {@code Tensor} contendo o gradiente em relação à entrada da camada.
 	 */
 	public void backwardDensa(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
-		matMul(entrada.transpor(), gradS, gradK);
+		matMul(entrada.unsqueeze(0).transpor(), gradS, gradK);
 		gradB.ifPresent(gb -> gb.add(gradS));
 		matMul(gradS, kernel.transpor(), gradE);
 	}

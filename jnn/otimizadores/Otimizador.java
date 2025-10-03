@@ -72,7 +72,7 @@ public abstract class Otimizador {
 
 		int n = params.length;
 		for (int i = 0; i < n; i++) {
-			if (!params[i].compararShape(grads[i])) {
+			if (!params[i].compShape(grads[i])) {
 				throw new IllegalArgumentException(
 					"\nParâmetro " + i + params[i].shapeStr() + " deve conter" +
 					" o mesmo formato do gradiente " + i + grads[i].shapeStr()

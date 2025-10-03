@@ -435,7 +435,7 @@ public class DensaLote extends Camada implements Cloneable {
 	public Tensor backward(Tensor g) {
 		verificarConstrucao();
 
-		if (!_gradSaida.compararShape(g)) {
+		if (!_gradSaida.compShape(g)) {
 			throw new IllegalArgumentException(
 				"\nFormato de gradiente " + g.shapeStr() +
 				" incompatível com o da camda " + _gradSaida.shapeStr()
