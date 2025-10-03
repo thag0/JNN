@@ -442,7 +442,7 @@ public class RedeNeural extends Modelo {
 			x = camada.forward(x);
 		}
 
-		return x.clone();//preservar a saída do modelo
+		return x;//preservar a saída do modelo
 	}
 
 	@Override
@@ -451,7 +451,7 @@ public class RedeNeural extends Modelo {
 
 		treinador().backpropagation(g);
 
-		return camada(0).gradEntrada().clone();// preservar o gradiente do modelo
+		return camada(0).gradEntrada();// preservar o gradiente do modelo
 	}
 
 	@Override
