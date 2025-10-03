@@ -198,10 +198,6 @@ public class Sequencial extends Modelo {
 				"\nConjunto de camadas vazio."
 			);
 		}
-
-		for (int i = 0; i < camadas.length; i++) {
-			utils.validarNaoNulo(camadas[i], ("Camada nula, id = " + i + "."));
-		}
 		
 		add(camadas[0]);
 		for (int i = 1; i < camadas.length; i++) {
@@ -221,7 +217,6 @@ public class Sequencial extends Modelo {
 	 * @throws IllegalArgumentException se a camada fornecida for nula,
 	 */
 	public void add(Camada camada) {
-		utils.validarNaoNulo(camada, "Camada nula.");
 		_camadas = utils.addEmArray(_camadas, camada);
 		_compilado = false;
 	}
