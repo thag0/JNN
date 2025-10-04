@@ -2,6 +2,8 @@ package jnn.treinamento;
 
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import jnn.core.tensor.Tensor;
 import jnn.modelos.Modelo;
@@ -155,8 +157,13 @@ public abstract class Treinador implements Cloneable {
 		Object[] hist = historico.toArray();
 		double[] h = new double[hist.length];
 
-		for (int i = 0; i < h.length; i++) {
-			h[i] = (double) hist[i];
+		try (ExecutorService exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()/2)) {
+			for (int i = 0, n = h.length; i < n; i++) {
+				final int id = i;
+				exec.execute(() -> h[id] = (double)hist[id]);
+			}
+		} catch (Exception e) {
+			throw e;
 		}
 
 		return h;
