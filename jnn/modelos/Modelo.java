@@ -270,7 +270,8 @@ public abstract class Modelo implements Cloneable {
 	
 				exec.execute(() -> {
 					for (int j = inicio; j < fim; j++) {
-						prevs[j] = clones[id].forward(xs[j]);
+						//clone porque a saída é sobrescrita na proxima iteração
+						prevs[j] = clones[id].forward(xs[j]).clone();
 					}
 				});
 			}
