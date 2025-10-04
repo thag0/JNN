@@ -222,6 +222,65 @@ public class OpTensor {
 	}
 
 	/**
+	 * Experimental
+	 * @param x {@code Tensor} de entrada.
+	 * @param altK altura do kernel (filtro).
+	 * @param largK largura do kernel (filtro).
+	 * @param altStd altura do stride.
+	 * @param largStd largura do stride.
+	 * @param altPad altura do padding.
+	 * @param largPad largura do padding.
+	 * @return {@code Tensor} convertido para o formato {@code im2col}.
+	 */
+	public Tensor im2col(Tensor x, int altK, int largK, int altStd, int largStd, int altPad, int largPad) {
+		int[] xShape = x.shape();
+		int C = xShape[0];
+		int H = xShape[1];
+		int W = xShape[2];
+
+		int outH = (H + 2 * altPad - altK) / altStd + 1;
+		int outW = (W + 2 * largPad - largK) / largStd + 1;
+
+		// col = (C * kH * kW, outH * outW)
+		Tensor col = new Tensor(C * altK * largK, outH * outW);
+
+		Variavel[] dataX = x.paraArray();
+		Variavel[] dataC = col.paraArray();
+		int[] stdX = x.strides();
+		int[] stdC = col.strides();
+
+		for (int c = 0; c < C; c++) {
+			int cAjuste = c * stdX[0];
+
+			for (int ak = 0; ak < altK; ak++) {//Altura Kernel
+				for (int lk = 0; lk < largK; lk++) {//Largura Kernel
+					int lin = c * altK * largK + ak * largK + lk;
+
+					for (int as = 0; as < outH; as++) {//Altura Saída
+						int ih = as * altStd - altPad + ak;
+
+						for (int ls = 0; ls < outW; ls++) {//Largura Saída
+							int iw = ls * largStd - largPad + lk;
+							int colId = as * outW + ls;
+
+							int colAjuste = lin * stdC[0] + colId * stdC[1];
+
+							if (ih >= 0 && ih < H && iw >= 0 && iw < W) {
+								int xAjuste = cAjuste + ih * stdX[1] + iw * stdX[2];
+								dataC[colAjuste].set(dataX[xAjuste].get());
+							} else {
+								dataC[colAjuste].set(0.0);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return col.nome("im2col");
+	}
+
+	/**
 	 * Calcula o formato de saída de operações convolucionais.
 	 * @param entrada formato de entrada {@code (altura, largura)}.
 	 * @param filtro formato do filtro aplicado {@code (altura, largura)}.
