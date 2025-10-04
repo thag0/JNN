@@ -2158,6 +2158,21 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		return dados.length;
 	}
 
+	/**
+	 * Retorna o tamanho da dimensão especifidada.
+	 * @param dim dimensão desejada.
+	 * @return tamanho da dimensão.
+	 */
+	public int tamDim(int dim) {
+		if (dim < 0 || dim > shape.length) {
+			throw new IllegalArgumentException(
+				"\nDimensão " + dim + " inválida para tensor " + numDim() + "D."
+			);
+		}
+
+		return shape[dim];
+	}
+
     /**
      * Calcula o tamanho em {@code bytes} do tensor, 
      * levando em consideração a arquitetura da JVM (32 ou 64 bits).
