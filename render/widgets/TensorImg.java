@@ -66,25 +66,20 @@ public class TensorImg extends Widget {
 					double valB = img.get(2, i, j);
 					
 					int corR = (int)(valR * 255);
-					if(corR > 255) corR = 255;
-					if(corR < 0) corR = 0;
-					
 					int corG = (int)(valG * 255);
-					if(corG > 255) corG = 255;
-					if(corG < 0) corG = 0;
-					
 					int corB = (int)(valB * 255);
-					if(corB > 255) corB = 255;
-					if(corB < 0) corR = 0;
+					
+					corR = Math.clamp(corR, 0, 255);
+					corG = Math.clamp(corG, 0, 255);
+					corB = Math.clamp(corB, 0, 255);
 					
 					g2.setColor(new Color(corR, corG, corB));
 				
 				} else {
-					double valCinza = img.get(i, j);
-					int cinza = (int)(valCinza * 255);
-					if (cinza > 255) cinza = 255;
-					if (cinza < 0) cinza = 0;
-					g2.setColor(new Color(cinza, cinza, cinza));
+					double cinza = img.get(i, j);
+					int c = (int)(cinza * 255);
+					c = Math.clamp(c, 0, 255);
+					g2.setColor(new Color(c, c, c));
 				}
 
 				int x = j * largPixel;
