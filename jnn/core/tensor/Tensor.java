@@ -2089,15 +2089,44 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	/**
 	 * Compara todo o conteúdo da instância local, isso inclui as {@code dimensões}
 	 * de cada tensor e seus {@code elementos individuais}.
-	 * @param t {@code Tensor} desejado.
+	 * <p>
+	 *		Este método de comparação não é recomendado se os valores dos tensores
+	 *		forem muito sensíveis (com muitas cadas decimais), pois compara diretamente
+	 *		um valor com outro, o que pode não ser útil em aplicações específicas.
+	 * </p>
+	 * <p>
+	 * 		Para comparações com tolerância, use:
+	 * </p>
+	 * <pre>
+	 *double eps = ... //tolerância
+	 *t.comp(t2, eps)
+	 * </pre>
+	 * @param t {@code Tensor} base.
 	 * @return {@code true} caso sejam iguais, {@code false} caso contrário.
 	 */
 	public boolean comp(Tensor t) {
+		return comp(t, 0);
+	}
+
+	/**
+	 * Compara todo o conteúdo da instância local, isso inclui as {@code dimensões}
+	 * de cada tensor e seus {@code elementos individuais}.
+	 * <p>
+	 * 		A comparação entre os valores se utiliza de um valor de tolerância, para
+	 * 		situações mais sensíveis.
+	 * </p>
+	 * @param t {@code Tensor} base.
+	 * @param eps valor de tolerância.
+	 * @return {@code true} caso sejam iguais, {@code false} caso contrário.
+	 */
+	public boolean comp(Tensor t, double eps) {
 		if (!compShape(t)) return false;
 
 		final int n = tam();
 		for (int i = 0; i < n; i++) {
-			if (!dados[i].equals(t.dados[i])) return false;
+			double a =   dados[i].get();
+			double b = t.dados[i].get();
+			if (Math.abs(a - b) > eps) return false;
 		}
 
 		return true;
