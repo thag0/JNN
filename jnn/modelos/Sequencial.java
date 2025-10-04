@@ -427,13 +427,6 @@ public class Sequencial extends Modelo {
 		
 		sb.append(nome()).append(" = [\n");
 
-		//otimizador
-		sb.append(_otimizador.info()).append("\n");
-
-		//função de perda
-		sb.append(pad).append("Perda: ").append(_perda.nome());
-		sb.append("\n").append("\n");
-
 		//camadas
 		sb.append(
 			pad + String.format(
@@ -469,10 +462,15 @@ public class Sequencial extends Modelo {
 			);
 		}
 
+		sb.append("\n");
+
+		//função de perda
+		sb.append(pad).append("Perda: ").append(_perda.nome());
+
 		String params = String.format("%,d", numParams());
 		sb.append("\n");
 		sb.append(pad).append("Parâmetros: " + params);
-		sb.append("\n").append("]\n");
+		sb.append("\n").append("]");
 
 		return sb.toString();
 	}

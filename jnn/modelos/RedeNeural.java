@@ -655,36 +655,31 @@ public class RedeNeural extends Modelo {
 	protected String construirInfo() {
 		StringBuilder sb = new StringBuilder();
 		String pad = "    ";
-		System.out.println(nome() + " = [");
-
-		//otimizador
-		sb.append(_otimizador.info()).append("\n");
-
-		//perda
-		sb.append(pad + "Perda: " + _perda.nome() + "\n\n");
-
-		//bias
-		sb.append(pad + "Bias = " + bias);
-		sb.append("\n\n");
+		sb.append(nome()).append(" = [\n");
 
 		//ativações
 		for (int i = 0; i < _camadas.length; i++) {
-			sb.append(
-				pad + "Ativação camada " + i + ": " + 
-				_camadas[i].ativacao().nome() + "\n"
-			);
+			sb.append(pad).append("Ativação camada ").append(i).append(": ")
+			.append(_camadas[i].ativacao().nome()).append("\n");
 		}
 
 		//arquitetura
-		sb.append("\n" + pad + "arquitetura = (" + _arq[0]);
+		sb.append("\n").append(pad).append("arquitetura = (").append(_arq[0]);
 		for (int i = 1; i < _arq.length; i++) {
-			sb.append(", " + _arq[i]);
+			sb.append(", ").append(_arq[i]);
 		}
 		sb.append(")\n");
 
+		//bias
+		sb.append(pad).append("Bias = ").append(bias);
+		sb.append("\n\n");
+
+		//perda
+		sb.append(pad).append("Perda: ").append(_perda.nome()).append("\n");
+
 		sb.append(pad).append("Parâmetros: ").append(numParams());
 
-		sb.append("\n]\n");
+		sb.append("\n]");
 		
 		return sb.toString();
 	}

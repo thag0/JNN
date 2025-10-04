@@ -116,8 +116,10 @@ public abstract class Otimizador {
 	protected void construirInfo() {
 		info = new StringBuilder();
 		
-		info.append(pad)
-		.append("Otimizador: ")
+		info
+		.append("Otimizador")
+		.append(" = [\n")
+		.append(pad)
 		.append(nome())
 		.append("\n");
 	}
@@ -130,6 +132,13 @@ public abstract class Otimizador {
 		this.info.append(pad)
 		.append(info)
 		.append("\n");
+	}
+
+	/**
+	 * Exibe, {@code via terminal}, as informações do otimizador.
+	 */
+	public void print() {
+		System.out.println(info() + "]");
 	}
 
 	/**
