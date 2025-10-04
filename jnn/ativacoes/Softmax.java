@@ -109,9 +109,9 @@ public class Softmax extends Ativacao {
 		Tensor tmp = camada.saida().bloco(n);
 		Tensor transp = tmp.transpor();
 
-		opt.matMul(
+		opt.matmul(
 			camada._gradSaida, 
-			opt.matHad(tmp, opt.matSub(ident, transp)),
+			opt.mathad(tmp, opt.matsub(ident, transp)),
 			camada._gradSaida
 		);
 	}

@@ -152,7 +152,7 @@ public final class Funcional {
      * @return {@code Tensor} resultado.
      */
     public Tensor matmul(Tensor a, Tensor b) {
-        return opt.matMul(a, b);
+        return opt.matmul(a, b);
     }
 
     /**
