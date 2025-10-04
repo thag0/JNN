@@ -21,16 +21,15 @@ public class JanelaTreino extends JFrame {
 
 		} catch (Exception e) {}
 
+		pt = new PainelTreino(largura, altura, escala);
 		
 		setTitle("Treino");
 		setVisible(true);
+		add(pt);
 		pack();
 		setResizable(false);
 		setLocationRelativeTo(null);
 		
-		pt = new PainelTreino(largura, altura, escala);
-		add(pt);
-
 		if (numThreads < 1) {
 			throw new IllegalArgumentException(
 				"O número de threads deve ser maior que zero."
