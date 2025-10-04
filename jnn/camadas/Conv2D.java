@@ -222,12 +222,12 @@ public class Conv2D extends Camada implements Cloneable {
 	 * @param entrada formato de entrada da camada.
 	 * @param filtros quantidade de filtros.
 	 * @param filtro formato dos filtros da camada (altura, largura).
-	 * @param ativacao função de ativação.
+	 * @param act função de ativação.
 	 * @param iniKernel inicializador para os filtros.
 	 * @param iniBias inicializador para os bias.
 	 */
-	public Conv2D(int[] entrada, int filtros, int[] filtro, Object ativacao, Object iniKernel, Object iniBias) {
-		this(filtros, filtro, ativacao, iniKernel, iniBias);
+	public Conv2D(int[] entrada, int filtros, int[] filtro, Object act, Object iniKernel, Object iniBias) {
+		this(filtros, filtro, act, iniKernel, iniBias);
 		construir(entrada);
 	}
 
@@ -252,11 +252,11 @@ public class Conv2D extends Camada implements Cloneable {
 	 * @param entrada formato de entrada da camada.
 	 * @param filtros quantidade de filtros.
 	 * @param filtro formato dos filtros da camada (altura, largura).
-	 * @param ativacao função de ativação.
+	 * @param act função de ativação.
 	 * @param iniKernel inicializador para os filtros.
 	 */
-	public Conv2D(int[] entrada, int filtros, int[] filtro, Object ativacao, Object iniKernel) {
-		this(entrada, filtros, filtro, ativacao, iniKernel, null);
+	public Conv2D(int[] entrada, int filtros, int[] filtro, Object act, Object iniKernel) {
+		this(entrada, filtros, filtro, act, iniKernel, null);
 	}
 
 	/**
@@ -280,10 +280,10 @@ public class Conv2D extends Camada implements Cloneable {
 	 * @param entrada formato de entrada da camada.
 	 * @param filtros quantidade de filtros.
 	 * @param filtro formato dos filtros da camada (altura, largura).
-	 * @param ativacao função de ativação.
+	 * @param act função de ativação.
 	 */
-	public Conv2D(int[] entrada, int filtros, int[] filtro, Object ativacao) {
-		this(entrada, filtros, filtro, ativacao, null, null);
+	public Conv2D(int[] entrada, int filtros, int[] filtro, Object act) {
+		this(entrada, filtros, filtro, act, null, null);
 	}
 
 	/**
@@ -335,11 +335,11 @@ public class Conv2D extends Camada implements Cloneable {
 	 * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
 	 * @param filtro formato dos filtros da camada.
 	 * @param filtros quantidade de filtros.
-	 * @param ativacao função de ativação.
+	 * @param act função de ativação.
 	 * @param iniKernel inicializador para os filtros.
 	 * @param iniBias inicializador para os bias.
 	 */
-	public Conv2D(int filtros, int[] filtro, Object ativacao, Object iniKernel, Object iniBias) {
+	public Conv2D(int filtros, int[] filtro, Object act, Object iniKernel, Object iniBias) {
 		utils.validarNaoNulo(filtro, "O formato do filtro não pode ser nulo.");
 
 		//formado dos filtros
@@ -370,7 +370,7 @@ public class Conv2D extends Camada implements Cloneable {
 		shapeSaida[0] = filtros;
 		
 		Dicionario dicio = new Dicionario();
-		if (ativacao != null) this.ativacao = dicio.getAtivacao(ativacao);
+		if (act != null) this.ativacao = dicio.getAtivacao(act);
 		if (iniKernel != null) this.iniKernel = dicio.getInicializador(iniKernel);
 		if (iniBias != null) this.iniBias = dicio.getInicializador(iniBias);
 	}
@@ -395,11 +395,11 @@ public class Conv2D extends Camada implements Cloneable {
 	 * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
 	 * @param filtro formato dos filtros da camada.
 	 * @param filtros quantidade de filtros.
-	 * @param ativacao função de ativação.
+	 * @param act função de ativação.
 	 * @param iniKernel inicializador para os filtros.
 	 */
-	public Conv2D(int filtros, int[] filtro, Object ativacao, Object iniKernel) {
-		this(filtros, filtro, ativacao, iniKernel, null);
+	public Conv2D(int filtros, int[] filtro, Object act, Object iniKernel) {
+		this(filtros, filtro, act, iniKernel, null);
 	}
 
 	/**
@@ -422,10 +422,10 @@ public class Conv2D extends Camada implements Cloneable {
 	 * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
 	 * @param filtro formato dos filtros da camada.
 	 * @param filtros quantidade de filtros.
-	 * @param ativacao função de ativação.
+	 * @param act função de ativação.
 	 */
-	public Conv2D(int filtros, int[] filtro, Object ativacao) {
-		this(filtros, filtro, ativacao, null, null);
+	public Conv2D(int filtros, int[] filtro, Object act) {
+		this(filtros, filtro, act, null, null);
 	}
 
 	/**
@@ -533,8 +533,8 @@ public class Conv2D extends Camada implements Cloneable {
 	}
 
 	@Override
-	public void setAtivacao(Object ativacao) {
-		this.ativacao = new Dicionario().getAtivacao(ativacao);
+	public void setAtivacao(Object act) {
+		this.ativacao = new Dicionario().getAtivacao(act);
 	}
 
 	@Override

@@ -28,7 +28,7 @@ import jnn.inicializadores.Zeros;
  *    com a expressão:
  * </p>
  * <pre>
- *buffer = matMul(entrada, kernel);
+ *buffer = matmul(entrada, kernel);
  *buffer.add(bias);
  * </pre>
  * Após a propagação dos dados, a função de ativação da camada é aplicada ao 
@@ -184,14 +184,14 @@ public class Densa extends Camada implements Cloneable {
 	 * Após a inicialização os pesos e bias da Camada estarão zerados e devem ser 
 	 * inicializados com o método {@code inicializar()}.
 	 * @param e quantidade de conexões de entrada.
-	 * @param n quantidade de neurônios.
-	 * @param ativacao função de ativação que será usada pela camada.
+	 * @param n quantidade de neurônios (unidades).
+	 * @param act função de ativação que será usada pela camada.
 	 * @param usarBias uso de viés na camada.
 	 * @param iniKernel inicializador para os pesos da camada.
 	 * @param iniBias inicializador para os bias da camada.
 	 */
-	public Densa(int e, int n, Object ativacao, Object iniKernel, Object iniBias) {
-		this(n, ativacao, iniKernel, iniBias);
+	public Densa(int e, int n, Object act, Object iniKernel, Object iniBias) {
+		this(n, act, iniKernel, iniBias);
 		construir(new int[]{ e });// construir automaticamente
 	}
 
@@ -200,12 +200,12 @@ public class Densa extends Camada implements Cloneable {
 	 * Após a inicialização os pesos e bias da Camada estarão zerados e devem ser 
 	 * inicializados com o método {@code inicializar()}.
 	 * @param e quantidade de conexões de entrada.
-	 * @param n quantidade de neurônios.
-	 * @param ativacao função de ativação que será usada pela camada.
+	 * @param n quantidade de neurônios (unidades).
+	 * @param act função de ativação que será usada pela camada.
 	 * @param iniKernel inicializador para os pesos da camada.
 	 */
-	public Densa(int e, int n, Object ativacao, Object iniKernel) {
-		this(e, n, ativacao, iniKernel, null);
+	public Densa(int e, int n, Object act, Object iniKernel) {
+		this(e, n, act, iniKernel, null);
 	}
 
 	/**
@@ -213,11 +213,11 @@ public class Densa extends Camada implements Cloneable {
 	 * Após a inicialização os pesos e bias da Camada estarão zerados e devem ser 
 	 * inicializados com o método {@code inicializar()}.
 	 * @param e quantidade de conexões de entrada.
-	 * @param n quantidade de neurônios.
-	 * @param ativacao função de ativação que será usada pela camada.
+	 * @param n quantidade de neurônios (unidades).
+	 * @param act função de ativação que será usada pela camada.
 	 */
-	public Densa(int e, int n, Object ativacao) {
-		this(e, n, ativacao, null, null);
+	public Densa(int e, int n, Object act) {
+		this(e, n, act, null, null);
 	}
 
 	/**
@@ -225,7 +225,7 @@ public class Densa extends Camada implements Cloneable {
 	 * Após a inicialização os pesos e bias da Camada estarão zerados e devem ser 
 	 * inicializados com o método {@code inicializar()}.
 	 * @param e quantidade de conexões de entrada.
-	 * @param n quantidade de neurônios.
+	 * @param n quantidade de neurônios (unidades).
 	 */
 	public Densa(int e, int n) {
 		this(e, n, null, null, null);
@@ -235,12 +235,12 @@ public class Densa extends Camada implements Cloneable {
 	 * Instancia uma nova camada densa de neurônios de acordo com os dados fornecidos.
 	 * Após a inicialização os pesos e bias da Camada estarão zerados e devem ser 
 	 * inicializados com o método {@code inicializar()}.
-	 * @param n quantidade de neurônios.
-	 * @param ativacao função de ativação que será usada pela camada.
+	 * @param n quantidade de neurônios (unidades).
+	 * @param act função de ativação que será usada pela camada.
 	 * @param iniKernel inicializador para os pesos da camada.
 	 * @param iniBias inicializador para os bias da camada.
 	 */
-	public Densa(int n, Object ativacao, Object iniKernel, Object iniBias) {
+	public Densa(int n, Object act, Object iniKernel, Object iniBias) {
 		if (n < 1) {
 			throw new IllegalArgumentException(
 				"\nA camada deve conter ao menos um neurônio."
@@ -251,7 +251,7 @@ public class Densa extends Camada implements Cloneable {
 
 		//usar os valores padrão se necessário
 		Dicionario dic = new Dicionario();
-		if (ativacao != null) this.ativacao = dic.getAtivacao(ativacao);
+		if (act != null) this.ativacao = dic.getAtivacao(act);
 		if (iniKernel != null) this.iniKernel = dic.getInicializador(iniKernel);
 		if (iniBias != null)  this.iniBias = dic.getInicializador(iniBias);
 	}
@@ -260,30 +260,30 @@ public class Densa extends Camada implements Cloneable {
 	 * Instancia uma nova camada densa de neurônios de acordo com os dados fornecidos.
 	 * Após a inicialização os pesos e bias da Camada estarão zerados e devem ser 
 	 * inicializados com o método {@code inicializar()}.
-	 * @param n quantidade de neurônios.
-	 * @param ativacao função de ativação que será usada pela camada.
+	 * @param n quantidade de neurônios (unidades).
+	 * @param act função de ativação que será usada pela camada.
 	 * @param iniKernel inicializador para os pesos da camada.
 	 */
-	public Densa(int n, Object ativacao, Object iniKernel) {
-		this(n, ativacao, iniKernel, null);
+	public Densa(int n, Object act, Object iniKernel) {
+		this(n, act, iniKernel, null);
 	}
 
 	/**
 	 * Instancia uma nova camada densa de neurônios de acordo com os dados fornecidos.
 	 * Após a inicialização os pesos e bias da Camada estarão zerados e devem ser 
 	 * inicializados com o método {@code inicializar()}.
-	 * @param n quantidade de neurônios.
-	 * @param ativacao função de ativação que será usada pela camada.
+	 * @param n quantidade de neurônios (unidades).
+	 * @param act função de ativação que será usada pela camada.
 	 */
-	public Densa(int n, Object ativacao) {
-		this(n, ativacao, null, null);
+	public Densa(int n, Object act) {
+		this(n, act, null, null);
 	}
 
 	/**
 	 * Instancia uma nova camada densa de neurônios de acordo com os dados fornecidos.
 	 * Após a inicialização os pesos e bias da Camada estarão zerados e devem ser 
 	 * inicializados com o método {@code inicializar()}.
-	 * @param n quantidade de neurônios.
+	 * @param n quantidade de neurônios (unidades).
 	 */
 	public Densa(int n) {
 		this(n, null, null, null);
@@ -358,8 +358,8 @@ public class Densa extends Camada implements Cloneable {
 	}
 
 	@Override
-	public void setAtivacao(Object ativacao) {
-		this.ativacao = new Dicionario().getAtivacao(ativacao);
+	public void setAtivacao(Object act) {
+		this.ativacao = new Dicionario().getAtivacao(act);
 	}
 
 	@Override

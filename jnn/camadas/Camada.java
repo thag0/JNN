@@ -138,9 +138,9 @@ public abstract class Camada {
 	 *    de ativação aumenta a liberdade de personalização dos hiperparâmetros
 	 *    que algumas funções podem ter.
 	 * </p>
-	 * @param atv nova função de ativação.
+	 * @param act nova função de ativação.
 	 */
-	public void setAtivacao(Object atv) {
+	public void setAtivacao(Object act) {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui configuração de função de ativação."
 		);    
