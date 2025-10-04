@@ -7,27 +7,29 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 import jnn.modelos.Modelo;
+import render.widgets.PainelTreino;
 
 public class JanelaTreino extends JFrame {
 
-	public PainelTreino painelTreino;
+	private PainelTreino pt;
 	private int numThreads = 1;
 
-	public JanelaTreino(int larguraImagem, int alturaImagem, double escala, int numThreads) {
+	public JanelaTreino(int largura, int altura, double escala, int numThreads) {
 		try {
 			BufferedImage icone = ImageIO.read(new File("./render/rede-neural.png"));
 			setIconImage(icone);
 
 		} catch (Exception e) {}
 
-		this.painelTreino = new PainelTreino(larguraImagem, alturaImagem, escala);
 		
-		setTitle("Treinamento rede");
-		add(painelTreino);
+		setTitle("Treino");
 		setVisible(true);
 		pack();
 		setResizable(false);
 		setLocationRelativeTo(null);
+		
+		pt = new PainelTreino(largura, altura, escala);
+		add(pt);
 
 		if (numThreads < 1) {
 			throw new IllegalArgumentException(
@@ -37,13 +39,12 @@ public class JanelaTreino extends JFrame {
 		this.numThreads = numThreads;
 	}
 
-
 	public void desenharTreino(Modelo modelo, int epocasPorFrame) {
 		if (numThreads == 1) {
-			painelTreino.desenhar(modelo, epocasPorFrame);
+			pt.desenhar(modelo, epocasPorFrame);
 		
 		} else {
-			painelTreino.desenhar(modelo, epocasPorFrame, this.numThreads);
+			pt.desenhar(modelo, epocasPorFrame, this.numThreads);
 		}
 	}
 }

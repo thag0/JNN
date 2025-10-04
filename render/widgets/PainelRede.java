@@ -1,4 +1,4 @@
-package render;
+package render.widgets;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -7,18 +7,15 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 
-import javax.swing.JPanel;
-
 import jnn.camadas.Densa;
 import jnn.modelos.RedeNeural;
+import render.Coordenada;
 
-public class PainelRede extends JPanel {
-	final int largura;
-	final int altura;
+public class PainelRede extends Widget {
 
 	Graphics2D g2;
 	
-	public RedeNeural rede;
+	RedeNeural rede;
 
 	//coordenadas de origem dos neuronios
 	ArrayList<ArrayList<Coordenada>> coordenadas = new ArrayList<>();
@@ -51,14 +48,12 @@ public class PainelRede extends JPanel {
 	BasicStroke linhaDesenho = new BasicStroke(1.9f);
 
 	public PainelRede(int largura, int altura) {
-		this.largura = largura;
-		this.altura = altura;
+		super(altura, largura);
 		configInicial(this.largura, this.altura);
 	}
 
 	public PainelRede() {
-		this.largura = 800;
-		this.altura = 600;
+		this(800, 800);
 		configInicial(this.largura, this.altura);
 	}
 	
