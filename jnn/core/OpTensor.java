@@ -922,6 +922,46 @@ public class OpTensor {
 	}
 
 	/**
+	 * Experimental
+	 * @param entrada
+	 * @param kernel
+	 * @param bias
+	 * @param saida
+	 */
+	public void forwardConv2DIm2col(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
+		int[] kShape = kernel.shape();// (filtros, canais, kH, kW)
+		int numFiltros = kShape[0];
+		int canais = kShape[1];
+		int kH = kShape[2];
+		int kW = kShape[3];
+		int padH = 0; 
+		int padW = 0;
+		int strideH = 1;
+		int strideW = 1;
+
+		int H = entrada.shape()[1];
+		int W = entrada.shape()[2];
+		int outH = (H + 2 * padH - kH) / strideH + 1;
+		int outW = (W + 2 * padW - kW) / strideW + 1;
+
+		Tensor im2Col = im2col(entrada, kH, kW, strideH, strideW, padH, padW);
+		Tensor flatK = kernel.reshape(numFiltros, canais * kH * kW); 
+
+		Tensor res = new Tensor(numFiltros, outH * outW);
+		matmul(flatK, im2Col, res);
+
+		res = res.reshape(numFiltros, outH, outW);
+		saida.copiar(res);
+		
+		bias.ifPresent(b -> {
+			for (int f = 0; f < numFiltros; f++) {
+				double x = b.get(f);
+				saida.subTensor(f).add(x);
+			}
+		});
+	}
+
+	/**
 	 * Realiza a propagação reversa através da camada convolucional.
 	 * @param entrada {@code Tensor} contendo a entrada da camada.
 	 * @param kernel {@code Tensor} contendos o kernel/filtros da camada.
