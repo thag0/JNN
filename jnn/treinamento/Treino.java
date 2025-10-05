@@ -12,46 +12,42 @@ public class Treino extends Treinador {
 
 	/**
 	 * Treinador sequencial, atualiza os parâmetros a cada amostra de dados.
-	 * @param historico modelo para treino.
+	 * @param modelo modelo para treino.
 	 */
 	public Treino(Modelo modelo) {
 		super(modelo);
 	}
-	
-	@Override
-	public void executar(Tensor[] xs, Tensor[] ys, int epochs, boolean logs) {
-		modelo.treino(true);
 
-		Otimizador otm = modelo.otm();
-		Perda perda = modelo.perda();
-		int numAmostras = xs.length;
+	@Override
+	protected void loop(Tensor[] x, Tensor[] y, Otimizador otm, Perda loss, int amostras, int epochs, boolean logs) {
+		modelo.treino(true);
 
 		if (logs) esconderCursor();
 		double perdaEpoca;
 		for (int e = 1; e <= epochs; e++) {
-			embaralhar(xs, ys);
+			embaralhar(x, y);
 			perdaEpoca = 0;
 			
-			for (int i = 0; i < numAmostras; i++) {
-				Tensor prev = modelo.forward(xs[i]);
+			for (int i = 0; i < amostras; i++) {
+				Tensor prev = modelo.forward(x[i]);
 				
 				//feedback de avanço
 				if (calcularHistorico) {
-					perdaEpoca += perda.forward(prev, ys[i]).item();
+					perdaEpoca += loss.forward(prev, y[i]).item();
 				}
 				
 				modelo.gradZero();
-				backpropagation(perda.backward(prev, ys[i]));
+				backpropagation(loss.backward(prev, y[i]));
 				otm.atualizar();
 			}
 
 			if (logs) {
 				limparLinha();
-				exibirLogTreino("Época " +  e + "/" + epochs + " -> perda: " + (double)(perdaEpoca/numAmostras));
+				exibirLogTreino("Época " +  e + "/" + epochs + " -> perda: " + (double)(perdaEpoca/amostras));
 			}
 
 			// feedback de avanço
-			if (calcularHistorico) historico.add(perdaEpoca/numAmostras);
+			if (calcularHistorico) historico.add(perdaEpoca/amostras);
 		}
 
 		if (logs) {

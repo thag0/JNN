@@ -8,6 +8,7 @@ import jnn.Funcional;
 import jnn.camadas.Densa;
 import jnn.camadas.Entrada;
 import jnn.core.tensor.Tensor;
+import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;
 import jnn.modelos.RedeNeural;
 import jnn.modelos.Sequencial;
@@ -46,6 +47,7 @@ public class MainImg {
 
 		Tensor[] x = jnn.arrayParaTensores(in);
 		Tensor[] y = jnn.arrayParaTensores(out);
+		DataLoader dl = new DataLoader(x, y);
 
 		Modelo modelo = criarSequencial(tamEntrada, tamSaida);
 		modelo.print();
@@ -54,7 +56,7 @@ public class MainImg {
 		long horas, minutos, segundos;
 
 		System.out.println("Treinando.");
-		long tempoDecorrido = treinoEmPainel(modelo, x, y, imagem.getWidth(), imagem.getHeight());
+		long tempoDecorrido = treinoEmPainel(modelo, dl, imagem.getWidth(), imagem.getHeight());
 
 		long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempoDecorrido);
 		horas 	 = segundosTotais / 3600;
@@ -119,7 +121,7 @@ public class MainImg {
 	 * @param y dados de saída relativos a entrada.
 	 * @return tempo (em nano segundos) do treino.
 	 */
-	static long treinoEmPainel(Modelo modelo, Tensor[] x, Tensor[] y, int altura, int largura) {
+	static long treinoEmPainel(Modelo modelo, DataLoader dl, int altura, int largura) {
 		final int FPS = 60_000000;
 		final int EPOCAS_POR_FRAME = 55;
 
@@ -139,7 +141,7 @@ public class MainImg {
 		int i = 0;
 		long tempoTreino = System.nanoTime();
 		while (i < EPOCAS && jt.isVisible()) {
-			modelo.treinar(x, y, EPOCAS_POR_FRAME, false);
+			modelo.treinar(dl, EPOCAS_POR_FRAME, false);
 			jt.desenharTreino(modelo, i);
 			i += EPOCAS_POR_FRAME;
 

@@ -30,36 +30,32 @@ public class TreinoLote extends Treinador {
 	}
 
 	@Override
-	public void executar(Tensor[] xs, Tensor[] ys, int epochs, boolean logs) {
+	protected void loop(Tensor[] x, Tensor[] y, Otimizador otm, Perda loss, int amostras, int epochs, boolean logs) {
 		modelo.treino(true);
-		
-		Otimizador otm = modelo.otm();
-		Perda perda = modelo.perda();
-		int numAmostras = xs.length;
 
 		if (logs) esconderCursor();
 		Variavel perdaEpoca = new Variavel();
 		for (int e = 1; e <= epochs; e++) {
-			embaralhar(xs, ys);
+			embaralhar(x, y);
 			perdaEpoca.zero();
 
-			for (int i = 0; i < numAmostras; i += _tamLote) {
-				int fimId = Math.min(i + _tamLote, numAmostras);
-				Tensor[] loteX = utils.subArray(xs, i, fimId);
-				Tensor[] loteY = utils.subArray(ys, i, fimId);
+			for (int i = 0; i < amostras; i += _tamLote) {
+				int fimId = Math.min(i + _tamLote, amostras);
+				Tensor[] loteX = utils.subArray(x, i, fimId);
+				Tensor[] loteY = utils.subArray(y, i, fimId);
 
                 modelo.gradZero();
-                processoLote(loteX, loteY, perda, perdaEpoca);
+                processoLote(loteX, loteY, loss, perdaEpoca);
                 otm.atualizar();      
 			}
 
 			if (logs) {
 				limparLinha();
-				exibirLogTreino("Época " +  e + "/" + epochs + " -> perda: " + (double)(perdaEpoca.get()/numAmostras));
+				exibirLogTreino("Época " +  e + "/" + epochs + " -> perda: " + (double)(perdaEpoca.get()/amostras));
 			}
 
 			// feedback de avanço
-			if (calcularHistorico) historico.add((perdaEpoca.get()/numAmostras));
+			if (calcularHistorico) historico.add((perdaEpoca.get()/amostras));
 		}
 
 		if (logs) {
@@ -67,7 +63,7 @@ public class TreinoLote extends Treinador {
 			System.out.println();
 		}
 
-		modelo.treino(false);
+		modelo.treino(false);		
 	}
 
 	/**

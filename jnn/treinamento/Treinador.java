@@ -5,9 +5,12 @@ import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import jnn.avaliacao.perda.Perda;
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
+import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;
+import jnn.otimizadores.Otimizador;
 
 /**
  * Interface para treino de modelos da biblioteca.
@@ -27,7 +30,7 @@ public abstract class Treinador implements Cloneable {
 	/**
 	 * Utilitário.
 	 */
-	protected Utils utils;
+	protected Utils utils = new Utils();
 
 	/**
 	 * Histórico de perda do modelo durante o treinamento.
@@ -105,7 +108,36 @@ public abstract class Treinador implements Cloneable {
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	public abstract void executar(Tensor[] xs, Tensor[] ys, int epochs, boolean logs);
+	public void executar(Tensor[] xs, Tensor[] ys, int epochs, boolean logs) {
+		loop(
+			xs,
+			ys,
+			modelo.otm(),
+			modelo.perda(),
+			xs.length,
+			epochs,
+			logs
+		);
+	}
+
+	/**
+	 * Executa a regra de treino durante um determinado número de épocas.
+	 * @param dl {@code DataLoader} com conjunto de amostras.
+	 * @param epochs quantidade de épocas de treinamento.
+	 * @param logs logs para perda durante as épocas de treinamento.
+	 * @see {@link jnn.dataloader.DataLoader}
+	 */
+	public void executar(DataLoader dl, int epochs, boolean logs) {
+		loop(
+			dl.getX(),
+			dl.getY(),
+			modelo.otm(),
+			modelo.perda(),
+			dl.numel(),
+			epochs,
+			logs
+		);
+	}
 
 	/**
 	 * Executa a regra de treino durante um determinado número de épocas.
@@ -116,6 +148,28 @@ public abstract class Treinador implements Cloneable {
 	public void executar(Tensor[] xs, Tensor[] ys, int epochs) {
 		executar(xs, ys, epochs, false);
 	}
+
+	/**
+	 * Executa a regra de treino durante um determinado número de épocas.
+	 * @param xs {@code Tensores} contendos os dados de entrada.
+	 * @param ys {@code Tensores} contendos os dados de saída (rótulos).
+	 * @param epochs quantidade de épocas de treinamento.
+	 */
+	public void executar(DataLoader dl, int epochs) {
+		executar(dl, epochs, false);
+	}
+
+	/**
+	 * Loop principal de treino.
+	 * @param x {@code array} de {@code Tensor} com dados de entrada.
+	 * @param y {@code array} de {@code Tensor} com dados de saída.
+	 * @param otm otimizador.
+	 * @param loss função de perda.
+	 * @param amostras quantidade de amostras.
+	 * @param epochs quantidade de épocas de treinamento.
+	 * @param logs exibir logs de avanço;
+	 */
+	protected abstract void loop(Tensor[] x, Tensor[] y, Otimizador otm, Perda loss, int amostras, int epochs, boolean logs);
 
 	/**
 	 * Realiza a retropropagação de gradientes através das camadas do modelo.
@@ -147,7 +201,8 @@ public abstract class Treinador implements Cloneable {
 		Object[] hist = historico.toArray();
 		double[] h = new double[hist.length];
 
-		try (ExecutorService exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()/2)) {
+		int t = Runtime.getRuntime().availableProcessors()/2;
+		try (ExecutorService exec = Executors.newFixedThreadPool(t)) {
 			for (int i = 0, n = h.length; i < n; i++) {
 				final int id = i;
 				exec.execute(() -> h[id] = (double)hist[id]);

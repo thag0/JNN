@@ -7,6 +7,7 @@ import jnn.camadas.Dropout;
 import jnn.camadas.Entrada;
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
+import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
 import lib.ged.Dados;
@@ -41,8 +42,11 @@ public class Classificador{
 		// carregando dados de treino e teste
 		double[][] inTreino  = (double[][]) ged.separarDadosEntrada(treino, numEntradas);
 		double[][] outTreino = (double[][]) ged.separarDadosSaida(treino, numSaidas);
-		Tensor[] treinoX = utils.arrayParaTensores(inTreino);
-		Tensor[] treinoY = utils.arrayParaTensores(outTreino);
+		
+		DataLoader dl = new DataLoader(
+			utils.arrayParaTensores(inTreino), 
+			utils.arrayParaTensores(outTreino)
+		);
 		
 		double[][] inTeste  = (double[][]) ged.separarDadosEntrada(teste, numEntradas);
 		double[][] outTeste = (double[][]) ged.separarDadosSaida(teste, numSaidas);
@@ -64,7 +68,7 @@ public class Classificador{
 		modelo.print();
 		
 		//treinando e avaliando os resultados
-		modelo.treinar(treinoX, treinoY, 500, 12, true);
+		modelo.treinar(dl, 500, 12, true);
 		double acc = modelo.avaliador().acuracia(testeX, testeY).item();
 		System.out.println("Acurácia = " + formatarDecimal(acc*100, 4) + "%");
 		System.out.println("Perda = " + modelo.avaliar(testeX, testeY).item());

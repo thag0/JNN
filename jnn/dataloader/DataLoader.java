@@ -54,6 +54,26 @@ public class DataLoader implements Iterable<Amostra> {
     }
 
     /**
+     * Inicializa um DataLoader a partir de um conjunto de {@code Tensor}
+     * para {@code X} e {@code Y}.
+     * @param x {@code array} de {@code Tensor} para dados de entrada.
+     * @param y {@code array} de {@code Tensor} para dados de saída.
+     */
+    public DataLoader(Tensor[] x, Tensor[] y) {
+        if (x.length != y.length) {
+            throw new IllegalArgumentException(
+                "\nX e Y devem ter o mesmo tamanho, mas X = " + x.length +
+                " e Y = " + y.length + "."
+            );
+        }
+
+        int n = x.length;
+        for (int i = 0; i < n; i++) {
+            add(new Amostra(x[i], y[i]));
+        }
+    }
+
+    /**
      * Adiciona um conjunto de amostras.
      * @param as conjunto de {@code Amostra} desejada.
      * @see {@link jnn.dataloader.Amostra}
@@ -230,6 +250,36 @@ public class DataLoader implements Iterable<Amostra> {
         Amostra[] lote = utils.subArray(dados, in, fim);
 
         return lote;
+    }
+
+    /**
+     * Retorna todos os elementos de {@code X}.
+     * @return {@code array} de {@code Tensor} contendo X.
+     */
+    public Tensor[] getX() {
+        int n = numel();
+        Tensor[] xs = new Tensor[n];
+
+        for (int i = 0; i < n; i++) {
+            xs[i] = dados[i].x();
+        }
+
+        return xs;
+    }
+
+    /**
+     * Retorna todos os elementos de {@code Y}.
+     * @return {@code array} de {@code Tensor} contendo Y.
+     */
+    public Tensor[] getY() {
+        int n = numel();
+        Tensor[] ys = new Tensor[n];
+
+        for (int i = 0; i < n; i++) {
+            ys[i] = dados[i].y();
+        }
+
+        return ys;
     }
 
     /**

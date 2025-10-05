@@ -6,6 +6,7 @@ import jnn.camadas.Camada;
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 import jnn.core.tensor.Variavel;
+import jnn.dataloader.DataLoader;
 import jnn.otimizadores.Otimizador;
 import jnn.treinamento.Treinador;
 import jnn.treinamento.Treino;
@@ -355,6 +356,47 @@ public abstract class Modelo implements Cloneable {
 		}
 		
 		_treinador.executar(xs, ys, epochs, logs);
+	}
+	
+	/**
+	 * Treina o modelo de acordo com as configurações predefinidas.
+	 * @param dl {@code DataLoader} com dados de treino.
+	 * @param epochs quantidade de épocas de treinamento.
+	 * @param logs logs para perda durante as épocas de treinamento.
+	 */
+	public void treinar(DataLoader dl, int epochs, boolean logs) {
+		treinar(dl, epochs, 1, logs);
+	}
+
+	/**
+	 * Treina o modelo de acordo com as configurações predefinidas
+	 * utilizando o treinamento em lotes.
+	 * @param dl {@code DataLoader} com dados de treino.
+	 * @param epochs quantidade de épocas de treinamento.
+	 * @param tamLote tamanho do lote de treinamento.
+	 * @param logs logs para perda durante as épocas de treinamento.
+	 */
+	public void treinar(DataLoader dl, int epochs, int tamLote, boolean logs) {
+		validarCompilacao();
+
+		if (epochs < 1) {
+			throw new IllegalArgumentException(
+				"\nValor de épocas deve ser maior que zero, recebido = " + epochs
+			);
+		}
+
+		if (tamLote < 1) {
+			throw new IllegalArgumentException(
+				"\nValor de lote deve ser maior que zero, recebido = " + tamLote
+			);
+		}
+
+		if (!configTreino && tamLote > 1) {
+			_treinador = new TreinoLote(this, tamLote);
+			_treinador.setHistorico(calcularHistorico);
+		}
+		
+		_treinador.executar(dl, epochs, logs);
 	}
 
 	/**
