@@ -112,4 +112,27 @@ public class Amostra {
     public void print() {
         System.out.println(info());
     }
+
+    /**
+     * Retorna o tamanho da amostra em bytes na memória.
+     * @return quantidade de bytes estimada.
+     */
+    public long tamBytes() {
+        String jvmBits = System.getProperty("sun.arch.data.model");
+        long bits = Long.valueOf(jvmBits);
+
+        long tamObj;
+        if (bits == 32) tamObj = 8;
+        else if (bits == 64) tamObj = 16;
+        else throw new IllegalStateException(
+            "\nSem suporte para plataforma de " + bits + " bits."
+        );
+
+        long tamX = x.tamBytes();
+        long tamY = y.tamBytes();
+        long tamNome = 8 + nome.length() * 2;
+
+        return tamObj + tamX + tamY + tamNome;
+    }
+
 }

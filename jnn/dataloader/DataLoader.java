@@ -1,5 +1,6 @@
 package jnn.dataloader;
 
+import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.Random;
 
@@ -313,4 +314,73 @@ public class DataLoader implements Iterable<Amostra> {
         DataLoader clone = new DataLoader(dados);
         return clone;
     }
+
+    /**
+     * Retorna o tamanho estimado do DataLoader em bytes na memória.
+     * @return quantidade de bytes estimada.
+     */
+    public long tamBytes() {
+        String jvmBits = System.getProperty("sun.arch.data.model");
+        long bits = Long.valueOf(jvmBits);
+
+        long tamObj;
+        if (bits == 32) tamObj = 8;
+        else if (bits == 64) tamObj = 16;
+        else throw new IllegalStateException(
+            "\nSem suporte para plataforma de " + bits + " bits."
+        );
+
+        long refSize = (bits == 32) ? 4 : 8;
+        long tamArrayRefs = refSize * dados.length;
+
+        long somaAmostras = 0;
+        for (Amostra a : dados) {
+            somaAmostras += a.tamBytes();    
+        }
+
+        return tamObj + tamArrayRefs + somaAmostras;
+    }
+
+    /**
+     * Monta uma {@code String} que descreve o DataLoader.
+     * @return resumo do DataLoader. 
+     */
+    private String info() {
+        StringBuilder sb = new StringBuilder();
+        String pad = " ".repeat(4);
+
+        String n = new DecimalFormat("#,###").format(numel()).replaceAll(",", ".");
+
+        sb.append("DataLoader = [\n");
+        
+        sb.append(pad).append("Amostras: ").append(n).append("\n");
+        sb.append(pad).append("Tamanho: ").append(formatarTamanho(tamBytes())).append("\n");
+
+        sb.append("]\n");
+
+        return sb.toString();
+    }
+
+    private static String formatarTamanho(long bytes) {
+        if (bytes < 1024) return bytes + " B";
+        int exp = (int) (Math.log(bytes) / Math.log(1024));
+        char prefixo = "KMGTPE".charAt(exp - 1); // K, M, G, T, P, E
+        
+        return String
+        .format("%.2f %sB", bytes / Math.pow(1024, exp), prefixo)
+        .replaceAll(",", ".");
+    }
+
+    @Override
+    public String toString() {
+        return info();
+    }
+
+    /**
+     * Exibe, via terminal, as informações do DataLoader.
+     */
+    public void print() {
+        System.out.println(info());
+    }
+
 }

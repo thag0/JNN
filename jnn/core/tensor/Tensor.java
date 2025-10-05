@@ -2192,7 +2192,8 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 
 		long tamVars = dados[0].tamanhoBytes() * tam();
 		long tamShape = shape.length * 4; // int = 4 bytes
-		return tamObj + tamVars + tamShape;
+		long tamStride = strides.length * 4; // int = 4 bytes
+		return tamObj + tamVars + tamShape + tamStride;
 	}
 
 	/**

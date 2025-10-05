@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import jnn.Funcional;
 import jnn.camadas.*;
 import jnn.core.tensor.Tensor;
+import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
 import jnn.serializacao.Serializador;
@@ -49,9 +50,13 @@ public class MainConv {
 
 	public static void main(String[] args) {
 		ged.limparConsole();
-		
-		final Tensor[] treinoX = jnn.arrayParaTensores(carregarDadosMNIST(CAMINHO_TREINO, NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO));
-		final Tensor[] treinoY = jnn.arrayParaTensores(criarRotulosMNIST(NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO));
+
+		DataLoader dl = new DataLoader(
+			jnn.arrayParaTensores(carregarDadosMNIST(CAMINHO_TREINO, NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO)),
+			jnn.arrayParaTensores(criarRotulosMNIST(NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO))
+		);
+
+		dl.print();
 
 		Sequencial modelo = criarModelo();
 		modelo.setHistorico(true);
@@ -59,7 +64,7 @@ public class MainConv {
 
 		System.out.println("Treinando.");
 		long tempo = System.nanoTime();
-			modelo.treinar(treinoX, treinoY, TREINO_EPOCAS, TREINO_LOTE, TREINO_LOGS);
+			modelo.treinar(dl, TREINO_EPOCAS, TREINO_LOTE, TREINO_LOGS);
 		tempo = System.nanoTime() - tempo;
 
 		long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempo);
@@ -68,8 +73,8 @@ public class MainConv {
 		long segundos = segundosTotais % 60;
 
 		System.out.println("\nTempo de treino: " + horas + "h " + minutos + "min " + segundos + "s");
-		System.out.print("Treino -> perda: " + modelo.avaliar(treinoX, treinoY).item() + " - ");
-		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(treinoX, treinoY).item() * 100), 4) + "%");
+		System.out.print("Treino -> perda: " + modelo.avaliar(dl.getX(), dl.getY()).item() + " - ");
+		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(dl.getX(), dl.getY()).item() * 100), 4) + "%");
 
 		System.out.println("\nCarregando dados de teste.");
 		final Tensor[] testeX = jnn.arrayParaTensores(carregarDadosMNIST(CAMINHO_TESTE, NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE));
