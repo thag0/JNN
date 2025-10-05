@@ -5,6 +5,7 @@ import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 import jnn.modelos.Modelo;
 
@@ -22,6 +23,11 @@ public abstract class Treinador implements Cloneable {
 	 * Gerador de números pseudo-aleatórios.
 	 */
 	protected Random random;
+
+	/**
+	 * Utilitário.
+	 */
+	protected Utils utils;
 
 	/**
 	 * Histórico de perda do modelo durante o treinamento.
@@ -124,29 +130,13 @@ public abstract class Treinador implements Cloneable {
 	}
 
 	/**
-	 * Embaralha os dos arrays usando o algoritmo Fisher-Yates.
+	 * Embaralha ambos os arrays de entrada e saída.
 	 * @param <T> tipo de dados de entrada e saida.
-	 * @param xs {@code array} com os dados de entrada.
-	 * @param ys {@code array} com os dados de saída.
+	 * @param xs {@code array} com dados de entrada.
+	 * @param ys {@code array} com dados de saída.
 	 */
 	public <T> void embaralhar(T[] xs, T[] ys) {
-		int linhas = xs.length;
-		int i, idAleatorio;
-
-		T temp;
-		for (i = linhas - 1; i > 0; i--) {
-			idAleatorio = random.nextInt(i+1);
-			
-			// entradas
-			temp = xs[i];
-			xs[i] = xs[idAleatorio];
-			xs[idAleatorio] = temp;
-
-			// saídas
-			temp = ys[i];
-			ys[i] = ys[idAleatorio];
-			ys[idAleatorio] = temp;
-		}
+		utils.embaralhar(xs, ys, random);
 	}
 
 	/**

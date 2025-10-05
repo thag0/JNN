@@ -1,6 +1,7 @@
 package jnn.core;
 
 import java.lang.reflect.Array;
+import java.util.Random;
 
 import jnn.core.tensor.Tensor;
 
@@ -236,6 +237,52 @@ public class Utils {
 		}
 
 		return c;
+	}
+
+	/**
+	 * Embaralha o array usando o algoritmo Fisher-Yates.
+	 * @param <T> tipo de dados de entrada e saida.
+	 * @param arr {@code array} base.
+	 * @param rng gerador de números aleatórios base.
+	 */
+	public <T> void embaralhar(T[] arr, Random rng) {
+		int n = arr.length;
+		Random r = rng == null ? new Random() : rng;
+		
+		T temp;
+		int i, idRng;
+		for (i = n - 1; i > 0; i--) {
+			idRng = r.nextInt(i+1);
+			temp = arr[i];
+			arr[i] = arr[idRng];
+			arr[idRng] = temp;
+		}
+	}
+
+	/**
+	 * Embaralha o array usando o algoritmo Fisher-Yates.
+	 * @param <T> tipo de dados de entrada e saida.
+	 * @param arr1 {@code array} 1.
+	 * @param arr2 {@code array} 2.
+	 * @param rng gerador de números aleatórios base.
+	 */
+	public <T> void embaralhar(T[] arr1, T[] arr2, Random rng) {
+		int n = arr1.length;
+		Random r = rng == null ? new Random() : rng;
+		
+		T temp;
+		int i, idRng;
+		for (i = n - 1; i > 0; i--) {
+			idRng = r.nextInt(i+1);
+			
+			temp = arr1[i];
+			arr1[i] = arr1[idRng];
+			arr1[idRng] = temp;
+
+			temp = arr2[i];
+			arr2[i] = arr2[idRng];
+			arr2[idRng] = temp;
+		}
 	}
 
 	/**
