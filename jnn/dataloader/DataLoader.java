@@ -356,11 +356,21 @@ public class DataLoader implements Iterable<Amostra> {
         sb.append(pad).append("Amostras: ").append(n).append("\n");
         sb.append(pad).append("Tamanho: ").append(formatarTamanho(tamBytes())).append("\n");
 
+        if (numel() > 1) {
+            sb.append(pad).append("Shape X: ").append(dados[0].x().shapeStr()).append("\n");
+            sb.append(pad).append("Shape Y: ").append(dados[0].y().shapeStr()).append("\n");
+        }
+
         sb.append("]\n");
 
         return sb.toString();
     }
 
+    /**
+     * Formata o tamanho do DataLoader.
+     * @param bytes quantidade total em bytes.
+     * @return valor formatado.
+     */
     private static String formatarTamanho(long bytes) {
         if (bytes < 1024) return bytes + " B";
         int exp = (int) (Math.log(bytes) / Math.log(1024));
