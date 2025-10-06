@@ -18,7 +18,7 @@ O modelo Sequencial foi criado pensando em uma limitação contida no modelo ant
 
 Nele criamos um modelo muito mais modular e personalizável, podendo empilhar quantas camadas forem necessárias. Com isso aumento o grau de liberdade na criação de modelos e expando a disponibilidade de camadas que agora não estão mais restritas apenas à Densa.
 
-![treino sequencial](https://github.com/thag0/Biblioteca-de-Redes-Neurais/assets/91092364/368c7994-ccc9-4baa-8417-5d67c7e5320c)
+<img src="https://github.com/user-attachments/assets/347ab287-eb99-4b6c-9fa1-55dd18756a0f"/>
 
 *Exemplo de treino com o modelo sequencial, usando o otimizador sgd (Stochastic Gradient Descent) e função de perda mse (Mean Squared Error)*
 
