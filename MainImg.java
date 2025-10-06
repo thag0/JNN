@@ -22,7 +22,7 @@ public class MainImg {
 	static Geim geim = new Geim();
 	static Funcional jnn = new Funcional();
 
-	static final int EPOCAS = 4 * 1000;
+	static final int EPOCAS = 5 * 1000;
 	static final double ESCALA_RENDER = 9;
 	static boolean calcularHistorico = true;
 	static final String CAMINHO_HISTORICO = "historico-perda";
@@ -48,7 +48,7 @@ public class MainImg {
 		Tensor[] x = jnn.arrayParaTensores(in);
 		Tensor[] y = jnn.arrayParaTensores(out);
 		DataLoader dl = new DataLoader(x, y);
-		System.out.println(dl);
+		dl.print();
 
 		Modelo modelo = criarSequencial(tamEntrada, tamSaida);
 		modelo.print();
@@ -57,9 +57,9 @@ public class MainImg {
 		long horas, minutos, segundos;
 
 		System.out.println("Treinando.");
-		long tempoDecorrido = treinoEmPainel(modelo, dl, imagem.getWidth(), imagem.getHeight());
+		long tempo = treinoEmPainel(modelo, dl, imagem.getWidth(), imagem.getHeight());
 
-		long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempoDecorrido);
+		long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempo);
 		horas 	 = segundosTotais / 3600;
 		minutos  = (segundosTotais % 3600) / 60;
 		segundos = segundosTotais % 60;
@@ -90,23 +90,14 @@ public class MainImg {
 	static Modelo criarSequencial(int entradas, int saidas) {
 		Sequencial modelo = new Sequencial(
 			new Entrada(entradas),
-			new Densa(10, "sigmoid"),
+			new Densa(12, "sigmoid"),
 			new Densa(10, "sigmoid"),
 			new Densa(saidas, "sigmoid")
 		);
-		// Sequencial modelo = new Sequencial(
-		// 	new Entrada(entradas),
-		// 	new Densa(9),
-		// 	new Sigmoid(),
-		// 	new Densa(9),
-		// 	new Sigmoid(),
-		// 	new Densa(saidas),
-		// 	new Sigmoid()
-		// );
 
-		// Object optm = new SGD(0.0001, 0.999);
 		Object optm = "sgd";
 		Object loss = "mse"; 
+
 		modelo.compilar(optm, loss);
 		modelo.setHistorico(calcularHistorico);
 
