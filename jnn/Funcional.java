@@ -17,6 +17,8 @@ import jnn.core.Dicionario;
 import jnn.core.OpTensor;
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
+import jnn.dataloader.Amostra;
+import jnn.dataloader.DataLoader;
 import jnn.inicializadores.Identidade;
 import jnn.inicializadores.Inicializador;
 import jnn.otimizadores.Otimizador;
@@ -65,8 +67,44 @@ public final class Funcional {
      * @param shape formato desejado do tensor.
      * @return {@code Tensor} vazio.
      */
-    public Tensor tensorConst(double x, int... shape) {
+    public Tensor tensor(double x, int... shape) {
         return new Tensor(shape).preencher(x);
+    }
+
+    /**
+     * Inicializa um tensor a partir de um array 2D.
+     * @param arr {@code array} base.
+     * @return {@code Tensor} que representa o array.
+     */
+    public Tensor tensor(double[][] arr) {
+        return new Tensor(arr);
+    }
+
+    /**
+     * Inicializa um tensor a partir de um array 3D.
+     * @param arr {@code array} base.
+     * @return {@code Tensor} que representa o array.
+     */
+    public Tensor tensor(double[][][] arr) {
+        return new Tensor(arr);
+    }
+
+    /**
+     * Inicializa um tensor a partir de um array 4D.
+     * @param arr {@code array} base.
+     * @return {@code Tensor} que representa o array.
+     */
+    public Tensor tensor(double[][][][] arr) {
+        return new Tensor(arr);
+    }
+
+    /**
+     * Inicializa um tensor a partir de um array 5D.
+     * @param arr {@code array} base.
+     * @return {@code Tensor} que representa o array.
+     */
+    public Tensor tensor(double[][][][][] arr) {
+        return new Tensor(arr);
     }
 
     /**
@@ -75,7 +113,7 @@ public final class Funcional {
      * @param n tamanho do tensor (linhas e colunas).
      * @return {@code Tensor} identidade.
      */
-    public Tensor tensorId(int n) {
+    public Tensor identidade(int n) {
         if (n < 1) {
             throw new IllegalArgumentException(
                 "\nTamanho do tensor deve ser maior que 1, recebido " + n
@@ -93,7 +131,7 @@ public final class Funcional {
      * @param shape formato desejado do tensor.
      * @return {@code Tensor} aleatório.
      */
-    public Tensor tensorRandom(int... shape) {
+    public Tensor random(int... shape) {
         Tensor t = new Tensor(shape);
         t.aplicar(_ -> Math.random()*2-1);
 
@@ -106,7 +144,7 @@ public final class Funcional {
      * @param shape formato desejado do tensor.
      * @return {@code Tensor} aleatório.
      */
-    public Tensor tensorRandom(RandomGenerator gen, int... shape) {
+    public Tensor random(RandomGenerator gen, int... shape) {
         Tensor t = new Tensor(shape);
         t.aplicar(_ -> gen.nextDouble(-1.0, 1.0));
 
@@ -172,7 +210,7 @@ public final class Funcional {
      * @return {@code Tensor} resultado.
      */
     public Tensor pow(Tensor t, double exp) {
-        return t.map(x -> Math.pow(x, exp));
+        return new Tensor(t).aplicar(x -> Math.pow(x, exp));
     }
 
     /**
@@ -181,7 +219,7 @@ public final class Funcional {
      * @return {@code Tensor} resultado.
      */
     public Tensor min(Tensor t) {
-        return t.min();
+        return new Tensor(t).min();
     }
 
     /**
@@ -190,7 +228,7 @@ public final class Funcional {
      * @return {@code Tensor} resultado.
      */
     public Tensor max(Tensor t) {
-        return t.max();
+        return new Tensor(t).max();
     }
 
     /**
@@ -199,7 +237,7 @@ public final class Funcional {
      * @return {@code Tensor} resultado.
      */
     public Tensor media(Tensor t) {
-        return t.media();
+        return new Tensor(t).media();
     }
 
     /**
@@ -208,7 +246,7 @@ public final class Funcional {
      * @return {@code Tensor} resultado.
      */
     public Tensor desvp(Tensor t) {
-        return t.desvp();
+        return new Tensor(t).desvp();
     }
 
     /**
@@ -218,7 +256,7 @@ public final class Funcional {
      * @param b {@code Tensor} usado como kernel.
      * @return {@code Tensor} resultado.
      */
-    public Tensor correlacao2D(Tensor a, Tensor b) {
+    public Tensor corr2D(Tensor a, Tensor b) {
         return opt.corr2D(a, b);
     }
 
@@ -229,7 +267,7 @@ public final class Funcional {
      * @param b {@code Tensor} usado como kernel.
      * @return {@code Tensor} resultado.
      */
-    public Tensor convolucao2D(Tensor a, Tensor b) {
+    public Tensor conv2D(Tensor a, Tensor b) {
         return opt.conv2D(a, b);
     }
 
@@ -433,11 +471,11 @@ public final class Funcional {
 
     /**
      * Retorna uma ativação com base no nome informado.
-     * @param atv nome da ativação desejada.
+     * @param act nome da ativação desejada.
      * @return {@code Ativacao} buscada.
      */
-    public Ativacao getAtivacao(String atv) {
-        return dicionario.getAtivacao(atv);
+    public Ativacao getAtivacao(String act) {
+        return dicionario.getAtivacao(act);
     }
 
     /**
@@ -468,6 +506,15 @@ public final class Funcional {
     }
 
     // transformações de dados
+
+    /**
+     * Converte o objeto em um {@code Tensor}.
+     * @param obj objeto base.
+     * @return representação do objeto em um {@code Tensor}.
+     */
+    public Tensor paraTensor(Object obj) {
+        return utils.paraTensor(obj);
+    }
 
     /**
      * Transforma o conteúdo do array em tensores individuais.
@@ -516,5 +563,92 @@ public final class Funcional {
         Tensor norm = new Tensor(t);
         return norm.norm(min, max);
     }
+  
+    // dataloader
+
+    /**
+     * Inicializa um {@code DataLoader} vazio.
+     * @return {@code DataLoader}.
+     * @see {@link DataLoader}
+     */
+    public DataLoader datalaoder() {
+        return new DataLoader();
+    }
+
+    /**
+     * Inicializa um {@code DataLoader} a partir de um conjunto de amostras
+     * de entrada (X) e de saída (Y).
+     * @param X {@code array} de {@code Tensor} com dados de entrada.
+     * @param Y {@code array} de {@code Tensor} com dados de saída.
+     * @return {@code DataLoader}.
+     * @see {@link DataLoader}
+     */
+    public DataLoader datalaoder(Tensor[] x, Tensor[] y) {
+        return new DataLoader(x, y);
+    }
+
+    /**
+     * Inicializa um {@code DataLoader} a partir de um conjunto de amostras.
+     * @param as {@code array} de {@code Amostra}.
+     * @return {@code DataLoader}.
+     * @see {@link DataLoader}
+     */
+    public DataLoader dataloader(Amostra[] as) {
+        return new DataLoader(as);
+    }
+
+    /**
+     * Inicializa um {@code DataLoader} a partir de uma amostra inicial.
+     * @param a {@code Amostra} base.
+     * @return {@code DataLoader}.
+     * @see {@link DataLoader}
+     */
+    public DataLoader dataloader(Amostra a) {
+        return new DataLoader(a);
+    }
     
+    /**
+     * Inicializa um {@code DataLoader} a partir de um array de dados.
+     * <h3>
+     *      Nota
+     * </h3>
+     * <p>
+     *      Esse tipo de abordagem leva em consideração que as amostras serão
+     *      todas no formato de {@code arrays}, tanto em X como em Y. Para
+     *      criação de DataLoaders mais completa, use a própia inicialização
+     *      da classe DataLoader.
+     * </p>
+     * @param arr {@code array} base.
+     * @param in quantidade de dados de entrada (X).
+     * @param out quantidade de dados de saída (Y).
+     * @return {@code DataLoader}.
+     * @see {@link DataLoader}
+     */
+    public DataLoader dataloader(double[][] arr, int in, int out) {
+        if (in + out > arr[0].length) {
+            throw new IllegalArgumentException(
+                "\nA soma de in + out deve ser igual a " + arr[0].length +
+                ", mas resultou em " + (in + out)
+            );
+        }
+
+        DataLoader dl = new DataLoader();
+
+        int n = arr.length;
+        for (int i = 0; i < n; i++) {
+            double[] x = new double[in];
+            double[] y = new double[out];
+
+            System.arraycopy(arr[i], 0, x, 0, x.length);
+            System.arraycopy(arr[i], x.length, y, 0, y.length);
+
+            dl.add(
+                new Tensor(x, x.length),
+                new Tensor(y, y.length)
+            );
+        }
+
+        return dl;
+    }
+
 }
