@@ -55,6 +55,7 @@ public class MainConv {
 			jnn.arrayParaTensores(carregarDadosMNIST(CAMINHO_TREINO, NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO)),
 			jnn.arrayParaTensores(criarRotulosMNIST(NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO))
 		);
+		dl.transformX(a -> a.div(255));//normalizar entrada entre 0 e 1
 
 		dl.print();
 
@@ -133,7 +134,7 @@ public class MainConv {
 	 * @param caminho caminho da imagem.
 	 * @return matriz contendo os valores de brilho da imagem.
 	 */
-	static double[][] imagemParaMatriz(String caminho) {
+	static double[][] carregarImagem(String caminho) {
 		BufferedImage img = geim.lerImagem(caminho);
 		double[][] imagem = new double[img.getHeight()][img.getWidth()];
 
@@ -141,7 +142,7 @@ public class MainConv {
 
 		for (int y = 0; y < imagem.length; y++) {
 			for (int x = 0; x < imagem[y].length; x++) {
-				imagem[y][x] = (double)cinza[y][x] / 255.0;
+				imagem[y][x] = cinza[y][x];
 			}
 		}
 
@@ -185,7 +186,7 @@ public class MainConv {
 					
 					exec.submit(() -> {
 						try {
-							double[][] imagem = imagemParaMatriz(caminhoCompleto);
+							double[][] imagem = carregarImagem(caminhoCompleto);
 							imagens[indice][0] = imagem;
 						} catch (Exception e) {
 							System.out.println(e.getMessage());
