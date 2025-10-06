@@ -1,4 +1,4 @@
-package testes.modelos;
+package exemplos.modelos;
 
 import java.text.DecimalFormat;
 
@@ -23,7 +23,7 @@ import lib.ged.Ged;
  * fazendo uso do dataset {@code Iris}
  * @see {@code Iris:} {@link https://gist.github.com/netj/8836201}
  */
-public class Classificador {
+public class Iris {
 	static Ged ged = new Ged();
 	static Utils utils = new Utils();
 	static Funcional jnn = new Funcional();
