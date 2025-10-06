@@ -15,9 +15,11 @@ if __name__ == '__main__':
    eixo_x = list(range(qtd_amostras))
    min_y = min(eixo_y)
 
+   fig, axes = plt.subplots(num="Train Loss")
    plt.plot(eixo_x, eixo_y, color='orange')
-   plt.title(f'Perda por época (min = {min_y:.8f})')
+   plt.title(f'Perda por época (min = {min_y:.6f})')
    plt.xlabel('Épocas')
    plt.ylabel('Perda')
    plt.ylim(bottom=0)
+   plt.grid()
    plt.show()
