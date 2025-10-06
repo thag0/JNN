@@ -571,7 +571,7 @@ public final class Funcional {
      * @return {@code DataLoader}.
      * @see {@link DataLoader}
      */
-    public DataLoader datalaoder() {
+    public DataLoader dataloader() {
         return new DataLoader();
     }
 
@@ -583,7 +583,7 @@ public final class Funcional {
      * @return {@code DataLoader}.
      * @see {@link DataLoader}
      */
-    public DataLoader datalaoder(Tensor[] x, Tensor[] y) {
+    public DataLoader dataloader(Tensor[] x, Tensor[] y) {
         return new DataLoader(x, y);
     }
 
