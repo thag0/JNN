@@ -372,14 +372,14 @@ public class DataLoader implements Iterable<Amostra> {
         String n = new DecimalFormat("#,###").format(numel()).replaceAll(",", ".");
 
         sb.append("DataLoader = [\n");
-        
         sb.append(pad).append("Amostras: ").append(n).append("\n");
-        sb.append(pad).append("Tamanho: ").append(formatarTamanho(tamBytes())).append("\n");
-
-        if (numel() > 1) {
+        
+        if (numel() > 0) {
             sb.append(pad).append("Shape X: ").append(dados[0].x().shapeStr()).append("\n");
             sb.append(pad).append("Shape Y: ").append(dados[0].y().shapeStr()).append("\n");
         }
+
+        sb.append(pad).append("Tamanho: ").append(formatarTamanho(tamBytes())).append("\n");
 
         sb.append("]\n");
 
@@ -410,7 +410,7 @@ public class DataLoader implements Iterable<Amostra> {
      * Exibe, via terminal, as informações do DataLoader.
      */
     public void print() {
-        System.out.println(info());
+        System.out.print(info());
     }
 
 }
