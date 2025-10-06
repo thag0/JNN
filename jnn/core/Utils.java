@@ -50,6 +50,23 @@ public class Utils {
 	}
 
 	/**
+	 * Compara se os dois arrays são igual em tamanho e numericamente.
+	 * @param a1 {@code array} 1.
+	 * @param a2 {@code array} 2.
+	 * @return {@code true} se os arrays são igual, {@code false} caso contrário.
+	 */
+	public boolean comparar(int[] a1, int[] a2) {
+		if (a1.length != a2.length) return false;
+
+		int n = a1.length;
+		for (int i = 0; i < n; i++) {
+			if (a1[i] != a2[i]) return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Formata as dimensões do array,
 	 * <p>
 	 *    Exemplo:
