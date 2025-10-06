@@ -8,7 +8,7 @@ import lib.ged.Ged;
 /**
  * Exemplo básico de serialização de um modelo em um arquivo externo.
  */
-public class ExporModelo {
+public class ExportarModelo {
 	static Ged ged = new Ged();
 
 	public static void main(String[] args){
