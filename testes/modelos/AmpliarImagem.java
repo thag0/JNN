@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 
 import jnn.Funcional;
 import jnn.camadas.*;
-import jnn.core.tensor.Tensor;
+import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
 import jnn.otimizadores.SGD;
@@ -30,8 +30,13 @@ public class AmpliarImagem{
 		//preparando dados para treinar a rede
 		double[][] in = (double[][]) ged.separarDadosEntrada(dados, nEntrada);
 		double[][] out = (double[][]) ged.separarDadosSaida(dados, nSaida);
-		Tensor[] treinoX = jnn.arrayParaTensores(in);
-		Tensor[] treinoY = jnn.arrayParaTensores(out);
+		
+		DataLoader dataloader = new DataLoader(
+			jnn.arrayParaTensores(in),
+			jnn.arrayParaTensores(out)
+		);
+
+		dataloader.transformY(a -> a.div(255));// normalizar entre 0 e 1
 
 		//criando rede neural para lidar com a imagem
 		//nesse exemplo queremos que ela tenha overfitting
@@ -43,12 +48,12 @@ public class AmpliarImagem{
 		);
 		modelo.setHistorico(true);
 		modelo.compilar(new SGD(0.0001, 0.999), "mse");
-		modelo.treinar(treinoX, treinoY, 3_000, true);
+		modelo.treinar(dataloader, 3_000, true);
 
 		//avaliando resultados
-		double precisao = 1 - modelo.avaliador().erroMedioAbsoluto(treinoX, treinoY).item();
+		double precisao = 1 - modelo.avaliador().erroMedioAbsoluto(dataloader.getX(), dataloader.getY()).item();
 		System.out.println("Precisão = " + (precisao * 100));
-		System.out.println("Perda = " + modelo.avaliar(treinoX, treinoY).item());
+		System.out.println("Perda = " + modelo.avaliar(dataloader.getX(), dataloader.getY()).item());
 
 		exportarHistoricoPerda(modelo, ged);
 		geim.exportarImagemEscalaCinza(imagem, modelo, 50, "img");
