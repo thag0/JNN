@@ -847,7 +847,17 @@ public class OpTensor {
 	 */
 	public void forwardDensa(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
 		matmul(entrada, kernel, saida);
-		bias.ifPresent(b -> saida.add(b));
+
+		bias.ifPresent(b -> {
+			if (entrada.numDim() == 1) {//amostra única
+				saida.add(b);
+
+			} else if (entrada.numDim() == 2) {//lote de amostras
+				saida.copiar(
+					saida.broadcast(b, Double::sum)
+				);
+			}
+		});
 	}
 
 	/**
@@ -860,10 +870,24 @@ public class OpTensor {
 	 * @param gradE {@code Tensor} contendo o gradiente em relação à entrada da camada.
 	 * @see {@link jnn.camadas.Densa}
 	 */
-	public void backwardDensa(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
-		matmul(entrada.unsqueeze(0).transpor(), gradS, gradK);
-		gradB.ifPresent(gb -> gb.add(gradS));
-		matmul(gradS, kernel.transpor(), gradE);
+	public void backwardDensa(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {	
+		if (gradS.numDim() == 1) {//amostra única
+			matmul(entrada.unsqueeze(0).transpor(), gradS, gradK);
+			matmul(gradS, kernel.transpor(), gradE);
+			gradB.ifPresent(gb -> gb.add(gradS));
+		
+		} else if (gradS.numDim() == 2) {//lote de amostras
+			matmul(entrada.transpor(), gradS, gradK);
+			matmul(gradS, kernel.transpor(), gradE);
+			
+			int lotes = gradS.tamDim(0);
+			gradB.ifPresent(gb -> {
+				for (int i = 0; i < lotes; i++) {					
+					gb.add(gradS.subTensor(i));
+				}
+			});
+		}
+
 	}
 
 	/**
