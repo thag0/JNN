@@ -48,6 +48,7 @@ public class MainImg {
 		Tensor[] x = jnn.arrayParaTensores(in);
 		Tensor[] y = jnn.arrayParaTensores(out);
 		DataLoader dl = new DataLoader(x, y);
+		dl.transformY(t -> t.div(255));// normalizar saída de 0-255 para 0-1
 		dl.print();
 
 		Modelo modelo = criarSequencial(tamEntrada, tamSaida);

@@ -261,7 +261,7 @@ class GerenciadorDadosImagem {
 				
 				dadosImagem[contador][0] = xNormalizado;// x
 				dadosImagem[contador][1] = yNormalizado;// y
-				dadosImagem[contador][2] = escalaCinza / 255;// escala de cinza
+				dadosImagem[contador][2] = escalaCinza;// escala de cinza
 
 				contador++;
 			}
