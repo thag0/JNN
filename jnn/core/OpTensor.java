@@ -195,12 +195,12 @@ public class OpTensor {
 		int[] stridesD = dst.strides();
 
 		// Se for vetor, ajusta strides para 1D
-		int s0A = shapeA.length == 1 ? 1 : stridesA[0];
-		int s1A = shapeA.length == 1 ? 1 : stridesA[1];
-		int s0B = shapeB.length == 1 ? 1 : stridesB[0];
-		int s1B = shapeB.length == 1 ? 1 : stridesB[1];
-		int s0D = shapeD.length == 1 ? 1 : stridesD[0];
-		int s1D = shapeD.length == 1 ? 1 : stridesD[1];
+		int s0A = stridesA.length == 1 ? 1 : stridesA[0];
+		int s1A = stridesA.length == 1 ? 1 : stridesA[1];
+		int s0B = stridesB.length == 1 ? 1 : stridesB[0];
+		int s1B = stridesB.length == 1 ? 1 : stridesB[1];
+		int s0D = stridesD.length == 1 ? 1 : stridesD[0];
+		int s1D = stridesD.length == 1 ? 1 : stridesD[1];
 
 		Variavel[] dataA = a.paraArray();
 		Variavel[] dataB = b.paraArray();
@@ -886,6 +886,10 @@ public class OpTensor {
 					gb.add(gradS.subTensor(i));
 				}
 			});
+
+			// gradE.mul(-1);
+			gradK.mul(-1);
+			gradB.get().mul(-1);
 		}
 
 	}

@@ -44,6 +44,8 @@ public class DensaLote extends Camada implements Cloneable {
 	 */
 	private int numNeuronios;
 
+	private int tamLote = 0;
+
 	/**
 	 * Tensor contendo os valores dos pesos de cada conexão da
 	 * entrada com a saída da camada.
@@ -352,18 +354,12 @@ public class DensaLote extends Camada implements Cloneable {
 	}
 
 	public void ajustarParaLote(int tamLote) {
-		if (tamLote < 2) {
-			throw new IllegalArgumentException(
-				"\nTamanho do lote deve ser maior que 1, recebido " + tamLote
-			);
-		}
-
 		_entrada  	= addParam("Entrada", tamLote,  tamEntrada);
 		_saida  	= addParam("Saida", tamLote,  numNeuronios);
-
 		_buffer 	 = addParam("Buffer", _saida.shape());
 		_gradSaida 	 = addParam("Grad Saida", _saida.shape());
 		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
+		this.tamLote = tamLote;
 	}
 
 	/**
@@ -393,18 +389,15 @@ public class DensaLote extends Camada implements Cloneable {
 	public Tensor forward(Tensor x) {
 		verificarConstrucao();
 
-		int dimX = x.numDim();
-		int dimE = _entrada.numDim();
-
-		if (dimX != dimE) {
-			if (dimX == 2) {
-				int lotes = x.shape()[0];
+		if (x.numDim() == 2) {
+			int lotes = x.tamDim(0);
+			if (tamLote != lotes) {
 				ajustarParaLote(lotes);
-			} else {
-				throw new UnsupportedOperationException(
-					"\n Dimensões de X " + dimX + " não suportadas."
-				);
 			}
+		} else if (x.numDim() != _entrada.numDim()) {
+			throw new UnsupportedOperationException(
+				"\n Dimensões de X " + x.numDim() + " não suportadas."
+			);
 		}
 
 		_entrada.copiar(x);
