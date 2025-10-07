@@ -91,7 +91,7 @@ public class DataLoader implements Iterable<Amostra> {
      * @see {@link jnn.dataloader.Amostra}
      */
     public void add(Amostra a) {
-        if (numel() > 1) {
+        if (tam() > 1) {
             int[] shapeX = a.x().shape();
             int[] shapeY = a.y().shape();
 
@@ -214,7 +214,7 @@ public class DataLoader implements Iterable<Amostra> {
             );
         }
 
-        int tam = numel();
+        int tam = tam();
         int n1 = (int) (tam * p1);
     
         DataLoader dl1 = new DataLoader(utils.subArray(dados, 0, n1));
@@ -226,10 +226,10 @@ public class DataLoader implements Iterable<Amostra> {
     }
 
     /**
-     * Retorna o número de amostras contidas no Dataloader.
+     * Retorna o tamanho do Dataloader, equivalente a quantidade de amostras.
      * @return número total de amostras.
      */
-    public int numel() {
+    public int tam() {
         return dados.length;
     }
 
@@ -239,15 +239,15 @@ public class DataLoader implements Iterable<Amostra> {
      * @return {@code Amostra} baseada no índice.
      */
     public Amostra get(int id) {
-        if (numel() < 1) {
+        if (tam() < 1) {
             throw new IllegalArgumentException(
                 "\nDataLoader vaizo."
             );
         }
 
-        if (id < 0 || id >= numel()) {
+        if (id < 0 || id >= tam()) {
             throw new IllegalArgumentException(
-                "\nÍndice " + id + " inválido para total de elementos = " + numel() + "."
+                "\nÍndice " + id + " inválido para total de elementos = " + tam() + "."
             );
         }
 
@@ -267,7 +267,7 @@ public class DataLoader implements Iterable<Amostra> {
             );
         }
 
-        int fim = Math.min(in + tam, numel());
+        int fim = Math.min(in + tam, tam());
         Amostra[] lote = utils.subArray(dados, in, fim);
 
         return lote;
@@ -278,7 +278,7 @@ public class DataLoader implements Iterable<Amostra> {
      * @return {@code array} de {@code Tensor} contendo X.
      */
     public Tensor[] getX() {
-        int n = numel();
+        int n = tam();
         Tensor[] xs = new Tensor[n];
 
         for (int i = 0; i < n; i++) {
@@ -293,7 +293,7 @@ public class DataLoader implements Iterable<Amostra> {
      * @return {@code array} de {@code Tensor} contendo Y.
      */
     public Tensor[] getY() {
-        int n = numel();
+        int n = tam();
         Tensor[] ys = new Tensor[n];
 
         for (int i = 0; i < n; i++) {
@@ -319,7 +319,7 @@ public class DataLoader implements Iterable<Amostra> {
 
         @Override
         public boolean hasNext() {
-            return id < numel();
+            return id < tam();
         }
 
         @Override
@@ -369,12 +369,12 @@ public class DataLoader implements Iterable<Amostra> {
         StringBuilder sb = new StringBuilder();
         String pad = " ".repeat(4);
 
-        String n = new DecimalFormat("#,###").format(numel()).replaceAll(",", ".");
+        String n = new DecimalFormat("#,###").format(tam()).replaceAll(",", ".");
 
         sb.append("DataLoader = [\n");
         sb.append(pad).append("Amostras: ").append(n).append("\n");
         
-        if (numel() > 0) {
+        if (tam() > 0) {
             sb.append(pad).append("Shape X: ").append(dados[0].x().shapeStr()).append("\n");
             sb.append(pad).append("Shape Y: ").append(dados[0].y().shapeStr()).append("\n");
         }

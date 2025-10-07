@@ -133,7 +133,7 @@ public abstract class Treinador implements Cloneable {
 			dl.getY(),
 			modelo.otm(),
 			modelo.perda(),
-			dl.numel(),
+			dl.tam(),
 			epochs,
 			logs
 		);
