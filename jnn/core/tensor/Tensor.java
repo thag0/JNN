@@ -2755,4 +2755,65 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 		return cont;
 	}
 
+	/**
+	 * Retorna a soma dos elementos ao longo de um eixo específico.
+	 * @param eixo eixo ao longo do qual será feita a soma.
+	 * @return {@code Tensor} resultante com o eixo reduzido.
+	 */
+	public Tensor soma(int eixo) {
+		if (eixo < 0 || eixo >= shape.length) {
+			throw new IllegalArgumentException(
+				"\nEixo (" + eixo + ") inválido."
+			);
+		}
+
+		int[] resShape = new int[shape.length - 1];
+		for (int i = 0, j = 0; i < shape.length; i++) {
+			if (i != eixo) resShape[j++] = shape[i];
+		}
+
+		Tensor res = new Tensor(resShape);
+
+		int[] idIn  = new int[shape.length];
+		int[] idRes = new int[resShape.length];
+
+		for (int i = 0; i < res.tam(); i++) {
+			indiceLinear(i, resShape, idRes);
+
+			for (int j = 0, k = 0; j < shape.length; j++) {
+				if (j == eixo) continue;
+				idIn[j] = idRes[k++];
+			}
+
+			double soma = 0.0;
+			for (int a = 0; a < shape[eixo]; a++) {
+				idIn[eixo] = a;
+				soma += get(idIn);
+			}
+
+			res.dados[i].set(soma);
+		}
+
+		return res;
+	}
+
+	/**
+	 * Converte um índice linear em um array de coordenadas multidimensionais.
+	 * <p>
+	 *		Essencialmente essa função atua como {@code unravelIndex}, em implementações
+	 *		de bibliotecas como NumPy e PyTorch.
+	 * </p>
+	 * @param id índice base.
+	 * @param shape {@code array} com formato do tensor.
+	 * @param coords {@code array} de destino.
+	 * @see {@link {@code NumPy} https://numpy.org/devdocs/reference/generated/numpy.unravel_index.html}
+	 * @see {@link {@code PyTorch} https://docs.pytorch.org/docs/stable/generated/torch.unravel_index.html}
+	 */
+	public void indiceLinear(int id, int[] shape, int[] coords) {
+		for (int i = shape.length - 1; i >= 0; i--) {
+			coords[i] = id % shape[i];
+			id /= shape[i];
+		}
+	}
+
 }
