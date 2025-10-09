@@ -2809,7 +2809,7 @@ public class Tensor implements Iterable<Variavel>, Cloneable {
 	 * @see {@link {@code NumPy} https://numpy.org/devdocs/reference/generated/numpy.unravel_index.html}
 	 * @see {@link {@code PyTorch} https://docs.pytorch.org/docs/stable/generated/torch.unravel_index.html}
 	 */
-	public void indiceLinear(int id, int[] shape, int[] coords) {
+	private void indiceLinear(int id, int[] shape, int[] coords) {
 		for (int i = shape.length - 1; i >= 0; i--) {
 			coords[i] = id % shape[i];
 			id /= shape[i];
