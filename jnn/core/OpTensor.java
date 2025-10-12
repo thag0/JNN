@@ -236,51 +236,54 @@ public class OpTensor {
 	 * @return {@code Tensor} convertido para o formato {@code im2col}.
 	 */
 	public Tensor im2col(Tensor x, int altK, int largK, int altStd, int largStd, int altPad, int largPad) {
-		int[] xShape = x.shape();
-		int C = xShape[0];
-		int H = xShape[1];
-		int W = xShape[2];
+		int[] shape = x.shape();
+		if (shape.length != 3) {
+			throw new IllegalArgumentException("O tensor de entrada deve ter formato [C, H, W].");
+		}
 
-		int outH = (H + 2 * altPad - altK) / altStd + 1;
-		int outW = (W + 2 * largPad - largK) / largStd + 1;
+		int canais = shape[0];
+		int altIn = shape[1];
+		int largIn = shape[2];
 
-		// col = (C * kH * kW, outH * outW)
-		Tensor col = new Tensor(C * altK * largK, outH * outW);
+		int altOut = (altIn + 2 * altPad - altK) / altStd + 1;
+		int largOut = (largIn + 2 * largPad - largK) / largStd + 1;
 
-		double[] dataX = x.paraArray();
-		double[] dataC = col.paraArray();
-		int[] stdX = x.strides();
-		int[] stdC = col.strides();
+		Tensor col = new Tensor(new int[]{canais * altK * largK, altOut * largOut});
+		double[] dadosX = x.paraArray();
+		double[] dadosC = col.paraArray();
 
-		for (int c = 0; c < C; c++) {
-			int cAjuste = c * stdX[0];
+		int canalArea = altK * largK;
+		int colunaCol = altOut * largOut;
 
-			for (int ak = 0; ak < altK; ak++) {//Altura Kernel
-				for (int lk = 0; lk < largK; lk++) {//Largura Kernel
-					int lin = c * altK * largK + ak * largK + lk;
+		// Iteração principal
+		for (int c = 0; c < canais; c++) {
+			for (int kh = 0; kh < altK; kh++) {
+				for (int kw = 0; kw < largK; kw++) {
+					int linhaBase = c * canalArea + kh * largK + kw;
+					int outIndex = 0;
+					int inY0 = kh - altPad;
 
-					for (int as = 0; as < outH; as++) {//Altura Saída
-						int ih = as * altStd - altPad + ak;
+					for (int y = 0; y < altOut; y++) {
+						int inY = inY0 + y * altStd;
+						int inX0 = kw - largPad;
 
-						for (int ls = 0; ls < outW; ls++) {//Largura Saída
-							int iw = ls * largStd - largPad + lk;
-							int colId = as * outW + ls;
+						for (int x2 = 0; x2 < largOut; x2++) {
+							int inX = inX0 + x2 * largStd;
 
-							int colAjuste = lin * stdC[0] + colId * stdC[1];
-
-							if (ih >= 0 && ih < H && iw >= 0 && iw < W) {
-								int xAjuste = cAjuste + ih * stdX[1] + iw * stdX[2];
-								dataC[colAjuste] = dataX[xAjuste];
+							if (inY >= 0 && inY < altIn && inX >= 0 && inX < largIn) {
+								dadosC[linhaBase * colunaCol + outIndex] = dadosX[c * altIn * largIn + inY * largIn + inX];
 							} else {
-								dataC[colAjuste] = 0.0;
+								dadosC[linhaBase * colunaCol + outIndex] = 0.0;
 							}
+
+							outIndex++;
 						}
 					}
 				}
 			}
 		}
 
-		return col.nome("im2col");
+		return col;
 	}
 
 	/**
@@ -981,8 +984,8 @@ public class OpTensor {
 		int strideH = 1;
 		int strideW = 1;
 
-		int H = entrada.shape()[1];
-		int W = entrada.shape()[2];
+		int H = entrada.tamDim(1);
+		int W = entrada.tamDim(2);
 		int outH = (H + 2 * padH - kH) / strideH + 1;
 		int outW = (W + 2 * padW - kW) / strideW + 1;
 
