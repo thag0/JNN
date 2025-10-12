@@ -380,4 +380,44 @@ public class TensorData {
     public TensorData clone() {
         return new TensorData(dados.length);
     }
+
+    /**
+     * Gera uma String personalizada representando o TensorData.
+     * @return {@code String} formatada
+     */
+    private String construirInfo() {
+        StringBuilder sb = new StringBuilder();
+
+        // usando get() para adaptar quando for uma view
+        
+        String tab = "    ";
+        sb.append("TensorData = [\n");
+        sb.append(tab).append("[").append(get(0));
+        
+        if (tam < 10) {
+            for (int i = 1; i < tam; i++) sb.append(", ").append(get(i));
+        } else {
+            // primeiros 5 elementos
+            for (int i = 1; i < 5; i++) sb.append(", ").append(get(i));
+            // ultimos 5 elementos
+            sb.append(" ... "). append(get(tam-4));
+            for (int i = tam-4; i < tam; i++) sb.append(", ").append(get(i));
+        }
+
+        sb.append("]\n");
+        sb.append(tab).append("View: ").append(offset > 0).append("\n");
+        sb.append(tab).append("Tam: ").append(tam).append("\n");
+        sb.append("]");
+
+        return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return construirInfo();
+    }
+
+    public void print() {
+        System.out.println(construirInfo());
+    }
 }
