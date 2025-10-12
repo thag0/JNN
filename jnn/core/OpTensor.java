@@ -124,17 +124,17 @@ public class OpTensor {
 		if (a.numDim() > 2 || b.numDim() > 2) {
 			throw new IllegalArgumentException(
 				"\nOs tensores devem conter até duas dimensões, mas contêm " +
-				"A = " + a.shapeStr() + " B = " + b.shapeStr()
+				"A = " + a.numDim() + " B = " + b.numDim()
 			);
 		}
 	
 		int[] shapeA = a.shape();
 		int[] shapeB = b.shape();
 
-		final int linA = shapeA.length == 1 ? 1 : shapeA[0];
-		final int colA = shapeA.length == 1 ? shapeA[0] : shapeA[1];
-		final int linB = shapeB.length == 1 ? 1 : shapeB[0];
-		final int colB = shapeB.length == 1 ? shapeB[0] : shapeB[1];
+		int linA = shapeA.length == 1 ? 1 : shapeA[0];
+		int colA = shapeA.length == 1 ? shapeA[0] : shapeA[1];
+		int linB = shapeB.length == 1 ? 1 : shapeB[0];
+		int colB = shapeB.length == 1 ? shapeB[0] : shapeB[1];
 	
 		if (colA != linB) {
 			throw new IllegalArgumentException(
@@ -157,16 +157,16 @@ public class OpTensor {
 	 * @param dst {@code Tensor} de destino.
 	 */
 	public void matmul(Tensor a, Tensor b, Tensor dst) {
-		int[] shapeA = a.shape();
-		int[] shapeB = b.shape();
-		int[] shapeD = dst.shape();
-
-		if (shapeA.length > 2 || shapeB.length > 2 || shapeD.length > 2) {
+		if (a.numDim() > 2 || b.numDim() > 2 || dst.numDim() > 2) {
 			throw new IllegalArgumentException(
 				"\nOs tensores devem conter até duas dimensões, mas contêm " +
-				"A = " + a.shapeStr() + " B = " + b.shapeStr() + " Dest = " + dst.shapeStr()
+				"A = " + a.numDim() + " B = " + b.numDim() + " Dest = " + dst.numDim()
 			);
 		}
+
+		final int[] shapeA = a.shape();
+		final int[] shapeB = b.shape();
+		final int[] shapeD = dst.shape();
 
 		final int linA = shapeA.length == 1 ? 1 : shapeA[0];
 		final int colA = shapeA.length == 1 ? shapeA[0] : shapeA[1];
@@ -189,32 +189,36 @@ public class OpTensor {
 			);
 		}
 	
-		int[] stridesA = a.strides();
-		int[] stridesB = b.strides();
-		int[] stridesD = dst.strides();
+		final int[] stridesA = a.strides();
+		final int[] stridesB = b.strides();
+		final int[] stridesD = dst.strides();
 
-		// Se for vetor, ajusta strides para 1D
-		int s0A = stridesA.length == 1 ? 1 : stridesA[0];
-		int s1A = stridesA.length == 1 ? 1 : stridesA[1];
-		int s0B = stridesB.length == 1 ? 1 : stridesB[0];
-		int s1B = stridesB.length == 1 ? 1 : stridesB[1];
-		int s0D = stridesD.length == 1 ? 1 : stridesD[0];
-		int s1D = stridesD.length == 1 ? 1 : stridesD[1];
+		final int s0A = stridesA.length == 1 ? 1 : stridesA[0];
+		final int s1A = stridesA.length == 1 ? 1 : stridesA[1];
+		final int s0B = stridesB.length == 1 ? 1 : stridesB[0];
+		final int s1B = stridesB.length == 1 ? 1 : stridesB[1];
+		final int s0D = stridesD.length == 1 ? 1 : stridesD[0];
+		final int s1D = stridesD.length == 1 ? 1 : stridesD[1];
 
-		double[] dataA = a.paraArray();
-		double[] dataB = b.paraArray();
-		double[] dataD = dst.paraArray();
-		double soma;
+		final int offsetA = a.offset();
+		final int offsetB = b.offset();
+		final int offsetD = dst.offset();
+
+		final double[] dataA = a.paraArray();
+		final double[] dataB = b.paraArray();
+		final double[] dataD = dst.paraArray();
 
 		for (int i = 0; i < linD; i++) {
+			final int baseD = offsetD + i * s0D;
+			final int baseA = offsetA + i * s0A;
+
 			for (int j = 0; j < colD; j++) {
-				soma = 0;
+				double soma = 0.0;
 				for (int k = 0; k < colA; k++) {
-					soma += 
-						dataA[(i * s0A) + (k * s1A)] * 
-						dataB[(k * s0B) + (j * s1B)];
+					soma += dataA[baseA + k * s1A] * dataB[offsetB + k * s0B + j * s1B];
 				}
-				dataD[(i * s0D) + (j * s1D)] += soma;
+
+				dataD[baseD + j * s1D] = soma;
 			}
 		}
 
