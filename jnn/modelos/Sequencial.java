@@ -7,7 +7,6 @@ import jnn.camadas.Camada;
 import jnn.camadas.Entrada;
 import jnn.core.Dicionario;
 import jnn.core.tensor.Tensor;
-import jnn.core.tensor.Variavel;
 import jnn.treinamento.Treino;
 
 /**
@@ -394,7 +393,7 @@ public class Sequencial extends Modelo {
 	}
 
 	@Override
-	public Variavel[] saidaParaArray() {
+	public double[] saidaParaArray() {
 		validarCompilacao();
 		return camadaSaida().saida().paraArray();
 	}

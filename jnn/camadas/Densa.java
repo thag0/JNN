@@ -8,7 +8,6 @@ import jnn.core.Dicionario;
 import jnn.core.OpTensor;
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
-import jnn.core.tensor.Variavel;
 import jnn.inicializadores.GlorotUniforme;
 import jnn.inicializadores.Inicializador;
 import jnn.inicializadores.Zeros;
@@ -501,12 +500,6 @@ public class Densa extends Camada implements Cloneable {
 	}
 
 	@Override
-	public Variavel[] saidaParaArray() {
-		verificarConstrucao();
-		return _saida.paraArray();
-	}
-
-	@Override
 	public String info() {
 		verificarConstrucao();
 
@@ -613,19 +606,9 @@ public class Densa extends Camada implements Cloneable {
 	}
 
 	@Override
-	public Variavel[] kernelParaArray() {
-		return kernel().paraArray();
-	}
-
-	@Override
 	public Tensor gradKernel() {
 		verificarConstrucao();
 		return _gradKernel;
-	}
-
-	@Override
-	public Variavel[] gradKernelParaArray() {
-		return gradKernel().paraArray();
 	}
 
 	@Override
@@ -638,11 +621,6 @@ public class Densa extends Camada implements Cloneable {
 	}
 
 	@Override
-	public Variavel[] biasParaArray() {
-		return bias().paraArray();
-	}
-
-	@Override
 	public Tensor gradBias() {
 		verificarConstrucao();
 
@@ -652,54 +630,9 @@ public class Densa extends Camada implements Cloneable {
 	}
 
 	@Override
-	public Variavel[] gradBiasParaArray() {
-		return gradBias().paraArray();
-	}
-
-	@Override
 	public Tensor gradEntrada() {
 		verificarConstrucao();
 		return _gradEntrada;
-	}
-
-	@Override
-	public void setGradKernel(Variavel[] grads) {
-		verificarConstrucao();
-		_gradKernel.copiarElementos(grads);
-	}
-
-	@Override
-	public void setGradBias(Variavel[] grads) {
-		verificarConstrucao();
-
-		_gradBias.ifPresentOrElse(
-			gb -> gb.copiarElementos(grads),
-			() -> {
-				throw new IllegalStateException(
-					"\nA camada " + nome() + " (" + id + ") não possui bias configurado."
-				);
-			}
-		);
-	}
-
-	@Override
-	public void setKernel(Variavel[] kernel) {
-		verificarConstrucao();
-		_kernel.copiarElementos(kernel);
-	}
-
-	@Override
-	public void setBias(Variavel[] bias) {
-		verificarConstrucao();
-
-		_bias.ifPresentOrElse(
-			b -> b.copiarElementos(bias),
-			() -> {
-				throw new IllegalStateException(
-					"\nA camada " + nome() + " (" + id + ") não possui bias configurado."
-				);
-			}
-		);
 	}
 
 }

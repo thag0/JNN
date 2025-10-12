@@ -2,7 +2,6 @@ package jnn.camadas;
 
 import jnn.ativacoes.Ativacao;
 import jnn.core.tensor.Tensor;
-import jnn.core.tensor.Variavel;
 
 /**
  * <h2>
@@ -252,7 +251,7 @@ public abstract class Camada {
 	 * Retorna a saída da camada no formato de array.
 	 * @return saída da camada.
 	 */
-	public Variavel[] saidaParaArray() {
+	public double[] saidaParaArray() {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui retorno de saída para array."
 		);    
@@ -302,19 +301,6 @@ public abstract class Camada {
 	}
 
 	/**
-	 * Retorna um array contendo os elementos do kernel presentes na camada.
-	 * <p>
-	 *    <strong> O kernel só existe em camadas treináveis </strong>.
-	 * </p>
-	 * @return kernel da camada em formato de array.
-	 */
-	public Variavel[] kernelParaArray() {
-		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui kernel."
-		);  
-	}
-
-	/**
 	 * Retorna o gradiente do kernel da camada.
 	 * <p>
 	 *    <strong> O gradiente do kernel só existe em camadas treináveis </strong>.
@@ -325,17 +311,6 @@ public abstract class Camada {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui gradiente de kernel."
 		);
-	}
-
-	/**
-	 * Retorna um array contendo os elementos usados para armazenar o valor
-	 * dos gradientes para os kernels da camada.
-	 * @return gradientes em relação aos kernels da camada em formato de array.
-	 */
-	public Variavel[] gradKernelParaArray() {
-		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui gradiente para kernel."
-		);   
 	}
 
 	/**
@@ -352,34 +327,10 @@ public abstract class Camada {
 	}
 
 	/**
-	 * Retorna um array contendo os elementos dos bias presente na camada.
-	 * <p>
-	 *    <strong> O bias só existe em camadas treináveis </strong>.
-	 * </p>
-	 * @return bias da camada em formato de array.
-	 */
-	public Variavel[] biasParaArray() {
-		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui bias."
-		);    
-	}
-
-	/**
 	 * Retorna os gradientes em relação ao bias da camada.
 	 * @return {@code Tensor} de gradientes em relação ao bias da camada.
 	 */
 	public Tensor gradBias() {
-		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui gradiente para bias."
-		);      
-	}
-
-	/**
-	 * Retorna um array contendo os elementos usados para armazenar o valor
-	 * dos gradientes para os bias da camada.
-	 * @return gradientes em relação aos bias da camada em formato de array.
-	 */
-	public Variavel[] gradBiasParaArray() {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui gradiente para bias."
 		);      
@@ -393,50 +344,6 @@ public abstract class Camada {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui gradiente de entrada."
 		);    
-	}
-
-	/**
-	 * Atribui os valores do kernel usando os valores contidos no array
-	 * fornecido.
-	 * @param kernel novos valores do kernel.
-	 */
-	public void setKernel(Variavel[] kernel) {
-		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui edição de kernel."
-		); 
-	}
-
-	/**
-	 * Atribui os valores dos gradientes para o kernel usando os valores 
-	 * contidos no array fornecido.
-	 * @param grads novos valores de gradientes.
-	 */
-	public void setGradKernel(Variavel[] grads) {
-		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui edição de gradiente para kernel."
-		);    
-	}
-
-	/**
-	 * Atribui os valores do bias usando os valores contidos no array
-	 * fornecido.
-	 * @param bias novos valores do bias.
-	 */
-	public void setBias(Variavel[] bias) {
-		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui edição de bias."
-		); 
-	}
-
-	/**
-	 * Atribui os valores dos gradientes para o bias usando os valores 
-	 * contidos no array fornecido.
-	 * @param grads novos valores de gradientes.
-	 */
-	public void setGradBias(Variavel[] grads) {
-		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui edição de gradiente para bias."
-		);  
 	}
 
 	/**

@@ -3,7 +3,6 @@ package jnn.camadas;
 import jnn.core.OpTensor;
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
-import jnn.core.tensor.Variavel;
 
 /**
  * <h2>
@@ -290,9 +289,9 @@ public class MaxPool2D extends Camada implements Cloneable{
 		int largGradS   = shapeGradS[2];
 
 		// vetorização
-		Variavel[] dataE  = entrada.paraArray();
-		Variavel[] dataGS = gradSeguinte.paraArray();
-		Variavel[] dataGE = gradEntrada.paraArray();
+		double[] dataE  = entrada.paraArray();
+		double[] dataGS = gradSeguinte.paraArray();
+		double[] dataGE = gradEntrada.paraArray();
 
 		int canalSizeEntrada = altEntrada * largEntrada;
 		int canalSizeGradS   = altGradS * largGradS;
@@ -318,7 +317,7 @@ public class MaxPool2D extends Camada implements Cloneable{
 					for (int y = linInicio; y < linFim; y++) {
 						int idLinha = baseEntrada + y * largEntrada;
 						for (int x = colInicio; x < colFim; x++) {
-							val = dataE[idLinha + x].get();
+							val = dataE[idLinha + x];
 							if (val > valMax) {
 								valMax = val;
 								linMax = y;
@@ -327,7 +326,7 @@ public class MaxPool2D extends Camada implements Cloneable{
 						}
 					}
 
-					dataGE[baseEntrada + linMax * largEntrada + colMax].add(dataGS[baseGradS + i * largGradS + j]);
+					dataGE[baseEntrada + linMax * largEntrada + colMax] += dataGS[baseGradS + i * largGradS + j];
 				}
 			}
 		}
@@ -382,7 +381,7 @@ public class MaxPool2D extends Camada implements Cloneable{
 	}
 
 	@Override
-	public Variavel[] saidaParaArray() {
+	public double[] saidaParaArray() {
 		return saida().paraArray();
 	}
 

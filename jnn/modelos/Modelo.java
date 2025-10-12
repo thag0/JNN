@@ -5,7 +5,6 @@ import jnn.avaliacao.perda.Perda;
 import jnn.camadas.Camada;
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
-import jnn.core.tensor.Variavel;
 import jnn.dataloader.DataLoader;
 import jnn.otimizadores.Otimizador;
 import jnn.treinamento.Treinador;
@@ -526,7 +525,7 @@ public abstract class Modelo implements Cloneable {
 	 * Retorna um array contendo a saída serializada do modelo.
 	 * @return saída do modelo.
 	 */
-	public abstract Variavel[] saidaParaArray();
+	public abstract double[] saidaParaArray();
 
 	/**
 	 * Copia os dados de saída da última camada do modelo para o array.
@@ -535,7 +534,7 @@ public abstract class Modelo implements Cloneable {
 	public void copiarDaSaida(double[] arr) {
 		utils.validarNaoNulo(arr, "Array nulo.");
 		
-		Variavel[] saida = saidaParaArray();
+		double[] saida = saidaParaArray();
 		
 		if (saida.length != arr.length) {
 			throw new IllegalArgumentException(
@@ -544,9 +543,7 @@ public abstract class Modelo implements Cloneable {
 			);
 		}
 
-		for (int i = 0; i < saida.length; i++) {
-			arr[i] = saida[i].get();
-		}
+		System.arraycopy(saida, 0, arr, 0, arr.length);
 	}
 
 	/**

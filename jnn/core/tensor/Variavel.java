@@ -1,6 +1,13 @@
 package jnn.core.tensor;
 
 /**
+ * <h1> Atenção </h1>
+ * <p>
+ *      {@code Variavel} está sendo substituído por {@code TensorData}
+ *      para aproveitar a maior eficiência de contiguidade em memória e será
+ *      removido em versões futuras.
+ * </p>
+ * Veja: {@link jnn.core.tensor.TensorData}
  * <h2>
  *      Variável primitiva de tensores
  * </h2>
@@ -20,6 +27,7 @@ package jnn.core.tensor;
  *      As operações não possuem retorno e a alteração do conteúdo é feita localmente.
  * </p>
  */
+@Deprecated
 public class Variavel implements Cloneable {
     
     /**

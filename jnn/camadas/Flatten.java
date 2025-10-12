@@ -2,7 +2,6 @@ package jnn.camadas;
 
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
-import jnn.core.tensor.Variavel;
 
 /**
  * <h2>
@@ -179,7 +178,7 @@ public class Flatten extends Camada implements Cloneable{
 	}
 
 	@Override
-	public Variavel[] saidaParaArray() {
+	public double[] saidaParaArray() {
 		return saida().paraArray();
 	}
 

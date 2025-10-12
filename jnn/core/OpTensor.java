@@ -3,7 +3,6 @@ package jnn.core;
 import java.util.Optional;
 
 import jnn.core.tensor.Tensor;
-import jnn.core.tensor.Variavel;
 
 /**
  * <h2>
@@ -202,9 +201,9 @@ public class OpTensor {
 		int s0D = stridesD.length == 1 ? 1 : stridesD[0];
 		int s1D = stridesD.length == 1 ? 1 : stridesD[1];
 
-		Variavel[] dataA = a.paraArray();
-		Variavel[] dataB = b.paraArray();
-		Variavel[] dataD = dst.paraArray();
+		double[] dataA = a.paraArray();
+		double[] dataB = b.paraArray();
+		double[] dataD = dst.paraArray();
 		double soma;
 
 		for (int i = 0; i < linD; i++) {
@@ -212,10 +211,10 @@ public class OpTensor {
 				soma = 0;
 				for (int k = 0; k < colA; k++) {
 					soma += 
-						dataA[(i * s0A) + (k * s1A)].get() * 
-						dataB[(k * s0B) + (j * s1B)].get();
+						dataA[(i * s0A) + (k * s1A)] * 
+						dataB[(k * s0B) + (j * s1B)];
 				}
-				dataD[(i * s0D) + (j * s1D)].add(soma);
+				dataD[(i * s0D) + (j * s1D)] += soma;
 			}
 		}
 
@@ -244,8 +243,8 @@ public class OpTensor {
 		// col = (C * kH * kW, outH * outW)
 		Tensor col = new Tensor(C * altK * largK, outH * outW);
 
-		Variavel[] dataX = x.paraArray();
-		Variavel[] dataC = col.paraArray();
+		double[] dataX = x.paraArray();
+		double[] dataC = col.paraArray();
 		int[] stdX = x.strides();
 		int[] stdC = col.strides();
 
@@ -267,9 +266,9 @@ public class OpTensor {
 
 							if (ih >= 0 && ih < H && iw >= 0 && iw < W) {
 								int xAjuste = cAjuste + ih * stdX[1] + iw * stdX[2];
-								dataC[colAjuste].set(dataX[xAjuste].get());
+								dataC[colAjuste] = dataX[xAjuste];
 							} else {
-								dataC[colAjuste].set(0.0);
+								dataC[colAjuste] = 0.0;
 							}
 						}
 					}
@@ -358,28 +357,32 @@ public class OpTensor {
 		int largKernel = shapeK[1];
 		int largEntrada = shapeE[1];
 
-		Variavel[] dataE = x.paraArray();
-		Variavel[] dataK = k.paraArray();
-		Variavel[] dataS = dst.paraArray();
+		double[] dataE = x.paraArray();
+		double[] dataK = k.paraArray();
+		double[] dataS = dst.paraArray();
 
-		Variavel soma = new Variavel();// mais rápido que usar double
+		// lidar com views de tensores
+		int offE = x.offset();
+		int offK = k.offset();
+		int offS = dst.offset();
+
+		double soma;
 		for (int i = 0; i < altEsp; i++) {
 			for (int j = 0; j < largEsp; j++) {
 
-				soma.zero();
-				final int idSaida = i * largEsp + j;
+				soma = 0.0;
+				final int idSaida = offS + (i * largEsp + j);
 				for (int l = 0; l < altKernel; l++) {
-					int idBaseEntrada = (l + i) * largEntrada;
-					int idBaseKernel  = l * largKernel; 
+					int idBaseEntrada = offE + ((l + i) * largEntrada);
+					int idBaseKernel  = offK + (l * largKernel); 
 					for (int m = 0; m < largKernel; m++) {
-						soma.addmul(
-							dataE[idBaseEntrada + (m + j)],
-							dataK[idBaseKernel + m]
-						);
+						soma += 
+							dataE[idBaseEntrada + (m + j)] *
+							dataK[idBaseKernel + m];
 					}
 				}
 
-				dataS[idSaida].add(soma);
+				dataS[idSaida] += soma;
 			}
 		}
 
@@ -443,26 +446,29 @@ public class OpTensor {
 		int largKernel = shapeK[1];
 		int largEntrada = shapeE[1];
 
-		Variavel[] dataE = x.paraArray();
-		Variavel[] dataK = k.paraArray();
-		Variavel[] dataS = dst.paraArray();
+		double[] dataE = x.paraArray();
+		double[] dataK = k.paraArray();
+		double[] dataS = dst.paraArray();
+
+		int offE = x.offset();
+		int offK = k.offset();
+		int offS = dst.offset();
 	
-		Variavel soma = new Variavel();
+		double soma;
 		for (int i = 0; i < altEsp; i++) {
 			for (int j = 0; j < largEsp; j++) {
 				
-				soma.zero();
-				final int idSaida = i * largEsp + j;
+				soma = 0.0;
+				final int idSaida = offS + (i * largEsp + j);
 				for (int l = 0; l < altKernel; l++) {
 					for (int m = 0; m < largKernel; m++) {
-						soma.addmul(
-							dataE[(l + i) * largEntrada + (m + j)], 
-							dataK[(altKernel - 1 - l) * largKernel + (largKernel - 1 - m)]
-						);
+						soma +=
+							dataE[offE + ((l + i) * largEntrada + (m + j))] * 
+							dataK[offK + ((altKernel - 1 - l) * largKernel + (largKernel - 1 - m))];
 					}
 				}
 
-				dataS[idSaida].add(soma);
+				dataS[idSaida] += soma;
 			}
 		}
 		
@@ -530,32 +536,36 @@ public class OpTensor {
 		int altKernel = shapeK[0];
 		int largKernel = shapeK[1];
 
-		Variavel[] dataE = entrada.paraArray();
-		Variavel[] dataK = kernel.paraArray();
-		Variavel[] dataS = saida.paraArray();
+		double[] dataE = entrada.paraArray();
+		double[] dataK = kernel.paraArray();
+		double[] dataS = saida.paraArray();
 
-		Variavel soma = new Variavel();
+		// lidar com views de tensores
+		int offE = entrada.offset();
+		int offK = kernel.offset();
+		int offS = saida.offset();
+
+		double soma;
 		for (int i = 0; i < altEsp; i++) {
 			for (int j = 0; j < largEsp; j++) {
 				
-				soma.zero();
-				final int idSaida = i*largEsp + j;
+				soma = 0.0;
+				final int idSaida = offS + (i * largEsp + j);
 				for (int m = 0; m < altKernel; m++) {
 					int linEntrada = i - m;
 					if (linEntrada >= 0 && linEntrada < altEntrada) {
 						for (int n = 0; n < largKernel; n++) {
 							int colEntrada = j - n;
 							if (colEntrada >= 0 && colEntrada < largEntrada) {
-								soma.addmul(
-									dataK[m * largKernel + n],
-									dataE[linEntrada * largEntrada + colEntrada]
-								);
+								soma +=
+									dataK[offK + (m * largKernel + n)] *
+									dataE[offE + (linEntrada * largEntrada + colEntrada)];
 							}
 						}
 					}
 				}
 
-				dataS[idSaida].add(soma);
+				dataS[idSaida] += soma;
 			}
 		}
 
@@ -664,8 +674,8 @@ public class OpTensor {
 			);
 		}
 
-		Variavel[] dataE = x.paraArray();
-		Variavel[] dataS = dst.paraArray();
+		double[] dataE = x.paraArray();
+		double[] dataS = dst.paraArray();
 
 		int canalSizeEntrada = altEntrada * largEntrada;
 		int canalSizeSaida   = altSaida   * largSaida;
@@ -688,12 +698,12 @@ public class OpTensor {
 					for (int l = linInicio; l < linFim; l++) {
 						int idLinha = baseEntrada + l * largEntrada;
 						for (int m = colInicio; m < colFim; m++) {
-							val = dataE[idLinha + m].get();
+							val = dataE[idLinha + m];
 							if (val > maxVal) maxVal = val;
 						}
 					}
 
-					dataS[baseSaida + i * largSaida + j].set(maxVal);
+					dataS[baseSaida + i * largSaida + j] = maxVal;
 				}
 			}
 		}
@@ -802,8 +812,8 @@ public class OpTensor {
 			);
 		}
 
-		Variavel[] dataE = x.paraArray();
-		Variavel[] dataS = dst.paraArray();
+		double[] dataE = x.paraArray();
+		double[] dataS = dst.paraArray();
 
 		int canalSizeEntrada = altEntrada * largEntrada;
 		int canalSizeSaida   = altSaida   * largSaida;
@@ -826,12 +836,12 @@ public class OpTensor {
 					for (int l = linInicio; l < linFim; l++) {
 						int idLinha = baseEntrada + l * largEntrada;
 						for (int m = colInicio; m < colFim; m++) {
-							soma += dataE[idLinha + m].get();
+							soma += dataE[idLinha + m];
 							cont++;
 						}
 					}
 
-					dataS[baseSaida + i * largSaida + j].set(soma / cont);
+					dataS[baseSaida + i * largSaida + j] = (soma / cont);
 				}
 			}
 		}

@@ -28,8 +28,8 @@ public class Sigmoid extends Ativacao {
 	@Override
 	public void backward(Densa densa) {
 		//aproveitar os resultados pre calculados
-		double[] s = densa._saida.paraArrayDouble();
-		double[] g = densa._gradSaida.paraArrayDouble();
+		double[] s = densa._saida.paraArray();
+		double[] g = densa._gradSaida.paraArray();
 		double[] d = new double[s.length];
 
 		double si;

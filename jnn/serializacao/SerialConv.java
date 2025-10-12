@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 
 import jnn.camadas.Conv2D;
 import jnn.core.tensor.Tensor;
-import jnn.core.tensor.Variavel;
 
 /**
  * Utilitário usado para serialização e desserialização de camadas Convolucionais.
@@ -75,9 +74,9 @@ class SerialConv {
 		}
 		
 		if(camada.temBias()){
-			Variavel[] bias = camada.bias().paraArray();
-			for(Variavel valor : bias){
-				escreverDado(valor.get(), tipo, sb);
+			double[] bias = camada.bias().paraArray();
+			for(double valor : bias){
+				escreverDado(valor, tipo, sb);
 				sb.append("\n");               
 			}
 		}
@@ -163,23 +162,23 @@ class SerialConv {
 	public void lerPesos(Conv2D camada, BufferedReader br){
 		try {
 			int tamKernel = camada.kernel().tam();
-			Variavel[] arrKernel = new Variavel[tamKernel];
+			double[] arrKernel = new double[tamKernel];
 
 			for (int i = 0; i < tamKernel; i++) {
-				arrKernel[i] = new Variavel(Double.parseDouble(br.readLine()));
+				arrKernel[i] = Double.parseDouble(br.readLine());
 			}
 
-			camada.setKernel(arrKernel);
+			camada.kernel().copiarElementos(arrKernel);
 			
 			if (camada.temBias()) {
 				int tamBias = camada.bias().tam();
-				Variavel[] arrBias = new Variavel[tamBias];
+				double[] arrBias = new double[tamBias];
 
 				for (int i = 0; i < tamBias; i++) {
-					arrBias[i] = new Variavel(Double.parseDouble(br.readLine()));
+					arrBias[i] = (Double.parseDouble(br.readLine()));
 				}
 				
-				camada.setBias(arrBias);
+				camada.bias().copiarElementos(arrBias);
 			}
 
 		} catch (Exception e) {

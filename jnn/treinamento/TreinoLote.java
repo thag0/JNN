@@ -13,6 +13,7 @@ import jnn.otimizadores.Otimizador;
 /**
   * Implementação de treino em lote dos modelos.
  */
+@SuppressWarnings("deprecation")// TODO: remover e adaptar para não usar Variavel
 public class TreinoLote extends Treinador {
 	
 	/**

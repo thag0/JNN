@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 
 import jnn.camadas.Densa;
 import jnn.core.tensor.Tensor;
-import jnn.core.tensor.Variavel;
 
 class SerialDensa {
 
@@ -48,16 +47,16 @@ class SerialDensa {
 		//bias
 		sb.append(camada.temBias()).append("\n");
 		
-		Variavel[] pesos = camada.kernelParaArray();
+		double[] pesos = camada.kernel().paraArray();
 		for (int i = 0; i < pesos.length; i++) {
-			escreverDado(pesos[i].get(), tipo, sb);
+			escreverDado(pesos[i], tipo, sb);
 			sb.append("\n");
 		}
 
 		if (camada.temBias()) {
-			Variavel[] bias = camada.biasParaArray();
+			double[] bias = camada.bias().paraArray();
 			for (int i = 0; i < bias.length; i++) {
-				escreverDado(bias[i].get(), tipo, sb);
+				escreverDado(bias[i], tipo, sb);
 				sb.append("\n");
 			}
 		}

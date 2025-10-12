@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import jnn.core.tensor.Tensor;
-import jnn.core.tensor.Variavel;
 
 /**
  * Interface para io de tensores.
@@ -42,9 +41,9 @@ public class SerialTensor {
             sb.append(dim).append(" ");
         }
 
-        Iterator<Variavel> it = t.iterator();
+        Iterator<Double> it = t.iterator();
         while (it.hasNext()) {
-            sb.append("\n").append(it.next().get());
+            sb.append("\n").append(it.next().doubleValue());
         }
 
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(caminho))) {

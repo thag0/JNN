@@ -32,13 +32,14 @@ public class MainConv {
 	 */
 	static Funcional jnn = new Funcional();
 
-	// += 2min 23s - 500 amostras - 8 epocas - 32 lote
+	// += 1min 59s - 500 amostras - 8 epocas - 32 lote
+	// += 5min 15s - 1000 amostras - 10 epocas - 64 lote
 	// dados de controle
 	static final int NUM_DIGITOS_TREINO = 10;
 	static final int NUM_DIGITOS_TESTE  = NUM_DIGITOS_TREINO;
 	static final int NUM_AMOSTRAS_TREINO = 1_000;
 	static final int NUM_AMOSTRAS_TESTE  = 500;
-	static final int TREINO_EPOCAS = 20;
+	static final int TREINO_EPOCAS = 10;
 	static final int TREINO_LOTE = 64;
 	static final boolean TREINO_LOGS = true;
 

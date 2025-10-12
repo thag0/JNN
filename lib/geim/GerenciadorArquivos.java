@@ -8,7 +8,6 @@ import java.io.FileInputStream;
 import javax.imageio.ImageIO;
 
 import jnn.core.tensor.Tensor;
-import jnn.core.tensor.Variavel;
 import jnn.modelos.Modelo;
 
 /**
@@ -139,7 +138,7 @@ class GerenciadorArquivos {
 					
 						clones[id].forward(in);
 					
-						saida[0] = clones[id].saidaParaArray()[0].get() * 255;
+						saida[0] = clones[id].saidaParaArray()[0] * 255;
 
 						synchronized(imagemAmpliada) {
 							gdi.setCor(imagemAmpliada, x, y, (int)saida[0], (int)saida[0], (int)saida[0]);
@@ -220,11 +219,11 @@ class GerenciadorArquivos {
 						entrada[1] = (double)y / (alturaImagem-1);
 					
 						redes[id].forward(in);
-						Variavel[] s = redes[id].saidaParaArray();
+						double[] s = redes[id].saidaParaArray();
 					
-						saida[0] = s[0].get() * 255;
-						saida[1] = s[1].get() * 255;
-						saida[2] = s[2].get() * 255;
+						saida[0] = s[0] * 255;
+						saida[1] = s[1] * 255;
+						saida[2] = s[2] * 255;
 
 						synchronized (imagemAmpliada) {
 							gdi.setCor(imagemAmpliada, x, y, (int)saida[0], (int)saida[1], (int)saida[2]);

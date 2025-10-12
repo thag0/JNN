@@ -8,7 +8,6 @@ import jnn.camadas.Camada;
 import jnn.camadas.Densa;
 import jnn.core.Dicionario;
 import jnn.core.tensor.Tensor;
-import jnn.core.tensor.Variavel;
 import jnn.otimizadores.Otimizador;
 import jnn.otimizadores.SGD;
 import jnn.treinamento.Treino;
@@ -552,7 +551,7 @@ public class RedeNeural extends Modelo {
 	 * @throws IllegalArgumentException se o modelo não foi compilado previamente.
 	 */
 	@Override
-	public Variavel[] saidaParaArray() {
+	public double[] saidaParaArray() {
 		validarCompilacao();
 		return camadaSaida().saidaParaArray();
 	}

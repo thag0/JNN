@@ -8,7 +8,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import jnn.core.tensor.Tensor;
-import jnn.core.tensor.Variavel;
 import jnn.modelos.Modelo;
 
 public class PainelTreino extends Widget {
@@ -43,8 +42,8 @@ public class PainelTreino extends Widget {
       
       
       if (nSaida == 1) {//escala de cinza
-         Variavel[] saida = modelo.saidaParaArray();//saida 1D
-         Variavel s = saida[0];
+         double[] saida = modelo.saidaParaArray();//saida 1D
+         double s = saida[0];
 
          for (y = 0; y < this.altura; y++) {
             for (x = 0; x < this.largura; x++) {
@@ -53,7 +52,7 @@ public class PainelTreino extends Widget {
 
                modelo.forward(in);
 
-               int cinza = (int)(s.get() * 255);
+               int cinza = (int)(s * 255);
 
                r = cinza;
                g = cinza;
@@ -64,10 +63,10 @@ public class PainelTreino extends Widget {
          } 
 
       } else if (nSaida == 3) {//rgb
-         Variavel[] saida = modelo.saidaParaArray();//saida 3D
-         Variavel saidaR = saida[0];
-         Variavel saidaG = saida[1];
-         Variavel saidaB = saida[2];
+         double[] saida = modelo.saidaParaArray();//saida 3D
+         double saidaR = saida[0];
+         double saidaG = saida[1];
+         double saidaB = saida[2];
          
          for (y = 0; y < this.altura; y++) {
             for (x = 0; x < this.largura; x++) {
@@ -76,9 +75,9 @@ public class PainelTreino extends Widget {
 
                modelo.forward(in);
 
-               r = (int)(saidaR.get() * 255);
-               g = (int)(saidaG.get() * 255);
-               b = (int)(saidaB.get() * 255);
+               r = (int)(saidaR * 255);
+               g = (int)(saidaG * 255);
+               b = (int)(saidaB * 255);
                rgb = (r << 16) | (g << 8) | b;
                imagem.setRGB(x, y, rgb);
             }
