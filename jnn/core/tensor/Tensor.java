@@ -2386,7 +2386,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 			} else {
 				throw new IllegalArgumentException(
 					"\nShapes incompatíveis para broadcasting: "
-					+ Arrays.toString(shapeA) + " e " + Arrays.toString(shapeB)
+					+ "A = " +arrayStr(shapeA) + " e B = " + arrayStr(shapeB)
 				);
 			}
 		}

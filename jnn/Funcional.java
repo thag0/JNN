@@ -72,12 +72,21 @@ public final class Funcional {
     }
 
     /**
+     * Inicializa um tensor a partir de um array.
+     * @param arr {@code array} base.
+     * @return {@code Tensor} que representa o array. 
+     */
+    public Tensor tensor(double[] arr) {
+        return utils.paraTensor(arr);
+    }
+
+    /**
      * Inicializa um tensor a partir de um array 2D.
      * @param arr {@code array} base.
      * @return {@code Tensor} que representa o array.
      */
     public Tensor tensor(double[][] arr) {
-        return new Tensor(arr);
+        return utils.paraTensor(arr);
     }
 
     /**
@@ -86,7 +95,7 @@ public final class Funcional {
      * @return {@code Tensor} que representa o array.
      */
     public Tensor tensor(double[][][] arr) {
-        return new Tensor(arr);
+        return utils.paraTensor(arr);
     }
 
     /**
@@ -95,7 +104,7 @@ public final class Funcional {
      * @return {@code Tensor} que representa o array.
      */
     public Tensor tensor(double[][][][] arr) {
-        return new Tensor(arr);
+        return utils.paraTensor(arr);
     }
 
     /**
@@ -104,7 +113,7 @@ public final class Funcional {
      * @return {@code Tensor} que representa o array.
      */
     public Tensor tensor(double[][][][][] arr) {
-        return new Tensor(arr);
+        return utils.paraTensor(arr);
     }
 
     /**
@@ -154,37 +163,58 @@ public final class Funcional {
     // operações
 
     /**
-     * Realiza a operação {@code A+B}, {@code elemento a elemento}.
+     * Realiza a operação {@code A + B}.
      * @param a {@code Tensor} A.
      * @param b {@code Tensor} B.
      * @return {@code Tensor} resultado.
      */
     public Tensor add(Tensor a, Tensor b) {
-        return new Tensor(a).add(b);
+        try {
+            return new Tensor(a).add(b);
+        } catch(Exception e) {
+            //
+        }
+    
+        // ultimo caso (mais lento)
+        return a.broadcast(b, (_a, _b) -> _a + _b);
     }
 
     /**
-     * Realiza a operação {@code A-B}, {@code elemento a elemento}.
+     * Realiza a operação {@code A - B}.
      * @param a {@code Tensor} A.
      * @param b {@code Tensor} B.
      * @return {@code Tensor} resultado.
      */
     public Tensor sub(Tensor a, Tensor b) {
-        return new Tensor(a).sub(b);
+        try {
+            return new Tensor(a).sub(b);
+        } catch(Exception e) {
+            //
+        }
+    
+        // ultimo caso (mais lento)
+        return a.broadcast(b, (_a, _b) -> _a - _b);
     }
 
     /**
-     * Realiza a operação {@code A*B}, {@code elemento a elemento}.
+     * Realiza a operação {@code A ⊙ B} (produto Hadamard).
      * @param a {@code Tensor} A.
      * @param b {@code Tensor} B.
      * @return {@code Tensor} resultado.
      */
     public Tensor mul(Tensor a, Tensor b) {
-        return new Tensor(a).mul(b);
+        try {
+            return new Tensor(a).mul(b);
+        } catch(Exception e) {
+            //
+        }
+    
+        // ultimo caso (mais lento)
+        return a.broadcast(b, (_a, _b) -> _a * _b);
     }
 
     /**
-     * Realiza a multiplicação matricial entre A e B.
+     * Realiza a operação {@code A * B} (Produto Matricial).
      * @param a {@code Tensor} A.
      * @param b {@code Tensor} B.
      * @return {@code Tensor} resultado.
@@ -194,13 +224,20 @@ public final class Funcional {
     }
 
     /**
-     * Realiza a operação {@code A/B}, {@code elemento a elemento}.
+     * Realiza a operação {@code A / B}.
      * @param a {@code Tensor} A.
      * @param b {@code Tensor} B.
      * @return {@code Tensor} resultado.
      */
     public Tensor div(Tensor a, Tensor b) {
-        return new Tensor(a).div(b);
+        try {
+            return new Tensor(a).mul(b);
+        } catch(Exception e) {
+            //
+        }
+    
+        // ultimo caso (mais lento)
+        return a.broadcast(b, (_a, _b) -> _a / _b);
     }
 
     /**
@@ -209,8 +246,9 @@ public final class Funcional {
      * @param exp expoente.
      * @return {@code Tensor} resultado.
      */
-    public Tensor pow(Tensor t, double exp) {
-        return new Tensor(t).aplicar(x -> Math.pow(x, exp));
+    public Tensor pow(Tensor t, Number exp) {
+        double e = exp.doubleValue();
+        return new Tensor(t).aplicar(x -> Math.pow(x, e));
     }
 
     /**
@@ -614,9 +652,11 @@ public final class Funcional {
      * </h3>
      * <p>
      *      Esse tipo de abordagem leva em consideração que as amostras serão
-     *      todas no formato de {@code arrays}, tanto em X como em Y. Para
-     *      criação de DataLoaders mais completa, use a própia inicialização
-     *      da classe DataLoader.
+     *      todas no formato de {@code arrays}, tanto em X como em Y. 
+     * </p>
+     * <p>
+     *      Para criação de DataLoaders mais completa, use a própia 
+     *      inicialização da classe DataLoader.
      * </p>
      * @param arr {@code array} base.
      * @param in quantidade de dados de entrada (X).
