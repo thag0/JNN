@@ -110,7 +110,7 @@ public class TensorData {
      * @return view da instância local.
      */
     public TensorData view(int inicio, int tam) {
-        if (inicio < 0 || inicio + tam > dados.length) {
+        if (inicio < 0 || tam < 0 || inicio + tam > this.tam) {
             throw new IllegalArgumentException("\nView fora do limite do tensor data.");
         }
         return new TensorData(dados, offset + inicio, tam);
@@ -140,7 +140,7 @@ public class TensorData {
      */
     public void preencher(Number x) {
         final double val = x.doubleValue();
-        Arrays.fill(dados, offset, dados.length, val);
+        Arrays.fill(dados, offset, offset + tam, val);
     }
 
     /**
@@ -155,8 +155,13 @@ public class TensorData {
      * @param arr {@code array} base.
      */
     public void copiar(double[] arr) {
-        final int n = dados.length;
-        System.arraycopy(arr, 0, dados, 0, n);
+        final int n = tam;
+        if (arr.length != n) {
+            throw new IllegalArgumentException(
+                "\nTamanho do array (" + arr.length + ") deve ser igual ao tamanho de dados (" + n + ")."
+            );
+        }
+        System.arraycopy(arr, 0, dados, offset, n);
     }
 
     /**
@@ -214,7 +219,7 @@ public class TensorData {
      * @param id índice baseado no array do conjunto de elementos.
      */
     public void add(double x, int id) {
-        if (id < 0 || id > tam) {
+        if (id < 0 || id >= tam) {
             throw new IllegalArgumentException(
                 "\nÍndice " + id + " inválido."
             );
@@ -238,7 +243,7 @@ public class TensorData {
      * @param id índice baseado no array do conjunto de elementos.
      */
     public void mul(double x, int id) {
-        if (id < 0 || id > tam) {
+        if (id < 0 || id >= tam) {
             throw new IllegalArgumentException(
                 "\nÍndice " + id + " inválido."
             );
@@ -253,7 +258,7 @@ public class TensorData {
      * @param id índice baseado no array do conjunto de elementos.
      */
     public void div(double x, int id) {
-        if (id < 0 || id > tam) {
+        if (id < 0 || id >= tam) {
             throw new IllegalArgumentException(
                 "\nÍndice " + id + " inválido."
             );
@@ -332,6 +337,11 @@ public class TensorData {
 
     /**
      * Retorna o array do conjunto de dados.
+     * <p>
+     *      Essa ação retorna o conjunto completo de dados,
+     *      assim views podem retornar o conjunto de dados original
+     *      da qual foram criadas.
+     * </p>
      * @return referência do conjunto de dados.
      */
     public double[] data() {
@@ -339,7 +349,24 @@ public class TensorData {
     }
 
     /**
+     * Retorna uma cópia do conjunto de dados.
+     * <p>
+     *      Essa ação retorna uma cópia dos dados internos, assim
+     *      views retornam apenas uma cópia do seu próprio conteúdo
+     *      local.
+     * </p>
+     * @return {@code clone} do conjunto de dados.
+     */
+    public double[] paraArray() {
+        return Arrays.copyOfRange(dados, offset, offset + tam);
+    }
+
+    /**
      * Retorna o tamanho do conjunto de dados.
+     * <p>
+     *      O resultado de tam() pode variar se o TensorData
+     *      for uma view de outro conjunto de dados.
+     * </p>
      * @return tamanho do conjunto de dados.
      */
     public int tam() {
@@ -378,7 +405,8 @@ public class TensorData {
 
     @Override
     public TensorData clone() {
-        return new TensorData(dados.length);
+        double[] novo = Arrays.copyOfRange(this.dados, this.offset, this.offset + this.tam);
+        return new TensorData(novo);
     }
 
     /**
