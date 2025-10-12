@@ -208,17 +208,17 @@ public class OpTensor {
 		final double[] dataB = b.paraArray();
 		final double[] dataD = dst.paraArray();
 
-		for (int i = 0; i < linD; i++) {
-			final int baseD = offsetD + i * s0D;
+		for (int i = 0; i < linA; i++) {
 			final int baseA = offsetA + i * s0A;
+			final int baseD = offsetD + i * s0D;
 
-			for (int j = 0; j < colD; j++) {
-				double soma = 0.0;
-				for (int k = 0; k < colA; k++) {
-					soma += dataA[baseA + k * s1A] * dataB[offsetB + k * s0B + j * s1B];
+			for (int k = 0; k < colA; k++) {
+				final double valA = dataA[baseA + k * s1A];
+				final int baseB = offsetB + k * s0B;
+
+				for (int j = 0; j < colB; j++) {
+					dataD[baseD + j * s1D] += valA * dataB[baseB + j * s1B];
 				}
-
-				dataD[baseD + j * s1D] = soma;
 			}
 		}
 

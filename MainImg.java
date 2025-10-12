@@ -91,8 +91,8 @@ public class MainImg {
 	static Modelo criarSequencial(int entradas, int saidas) {
 		Sequencial modelo = new Sequencial(
 			new Entrada(entradas),
-			new Densa(12, "sigmoid"),
-			new Densa(10, "sigmoid"),
+			new Densa(20, "tanh"),
+			new Densa(20, "tanh"),
 			new Densa(saidas, "sigmoid")
 		);
 
