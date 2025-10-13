@@ -1,5 +1,6 @@
 package jnn.treinamento;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -22,6 +23,16 @@ public class TreinoLote extends Treinador {
 	Utils utils = new Utils();
 
 	/**
+	 * Operador multithread.
+	 */
+	ExecutorService exec;
+
+	/**
+	 * Quantidade de threads usadas pelo treinador.
+	 */
+	int threads;
+
+	/**
 	 * Treinador em lotes, atualiza os parâmetros a subamostra
 	 * do dataset fornecido.
 	 * @param historico modelo para treino.
@@ -33,6 +44,12 @@ public class TreinoLote extends Treinador {
 	@Override
 	protected void loop(Tensor[] x, Tensor[] y, Otimizador otm, Perda loss, int amostras, int epochs, boolean logs) {
 		modelo.treino(true);
+
+        threads = (numThreads == 1)
+                ? (int)(Runtime.getRuntime().availableProcessors() * 0.25)
+                : numThreads;
+        if (threads < 1) threads = 1;
+        exec = Executors.newFixedThreadPool(threads);
 
 		if (logs) esconderCursor();
 		Variavel perdaEpoca = new Variavel();
@@ -77,47 +94,51 @@ public class TreinoLote extends Treinador {
 	private void processoLote(Tensor[] loteX, Tensor[] loteY, Perda perda, Variavel perdaEpoca) {
 		int tamLote = loteX.length;
 		int numCamadas = modelo.numCamadas();
-		
-		int threads = numThreads;
-		if (numThreads == 1) {
-			threads = (int)(Runtime.getRuntime().availableProcessors() * 0.25);
-		}
-		if (threads > tamLote) threads = tamLote;
 
 		Modelo[] clones = new Modelo[threads];
 		for (int j = 0; j < clones.length; j++) {
 		    clones[j] = modelo.clone();
 		}
 
-		int blocoThread = tamLote / threads;
-		try (ExecutorService exec = Executors.newFixedThreadPool(threads)) {
-		    for (int t = 0; t < threads; t++) {
-		        final int id = t;
-		        final int inicio = t * blocoThread;
-		        final int fim = (t == threads - 1) ? tamLote : (t + 1) * blocoThread;
+        int blocoThread = Math.max(1, tamLote / threads);
+        CountDownLatch latch = new CountDownLatch(threads);
 
-		        exec.execute(() -> {
-		            for (int j = inicio; j < fim; j++) {
-		                Tensor prev = clones[id].forward(loteX[j]);// forward no clone
-						clones[id].backward(perda.backward(prev, loteY[j]));// backprop no clone
-						
-						if (calcularHistorico) {// feedback de avanço
-							perdaEpoca.add(perda.forward(prev, loteY[j]).item());
-						}
-						
-						// acumular gradientes no modelo original
-						synchronized (modelo) {
-							for (int c = 0; c < numCamadas; c++) {
-								if (modelo.camada(c).treinavel()) {
-									modelo.camada(c).gradKernel().add(clones[id].camada(c).gradKernel());
-									modelo.camada(c).gradBias().add(clones[id].camada(c).gradBias());
-								}
-							}
-		                }
-		            }
-		        });
-		    }
-		}
+        for (int t = 0; t < threads; t++) {
+            final int id = t;
+            final int inicio = t * blocoThread;
+            final int fim = (t == threads - 1) ? tamLote : (t + 1) * blocoThread;
+
+            exec.execute(() -> {
+                try {
+                    for (int j = inicio; j < fim; j++) {
+                        Tensor prev = clones[id].forward(loteX[j]);
+                        clones[id].backward(perda.backward(prev, loteY[j]));
+
+                        if (calcularHistorico) {
+                            perdaEpoca.add(perda.forward(prev, loteY[j]).item());
+                        }
+
+						for (int c = 0; c < numCamadas; c++) {
+							if (modelo.camada(c).treinavel()) {
+								synchronized (modelo) {
+                                    modelo.camada(c).gradKernel().add(clones[id].camada(c).gradKernel());
+                                    modelo.camada(c).gradBias().add(clones[id].camada(c).gradBias());
+                                }
+                            }
+                        }
+                    }
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+		
 	}
 
 }
