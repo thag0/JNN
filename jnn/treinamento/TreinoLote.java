@@ -33,6 +33,12 @@ public class TreinoLote extends Treinador {
 	int threads;
 
 	/**
+	 * Clones do modelo base
+	 * //TODO: utilizar outra abordagem que não envolva clonagem de modelos
+	 */
+	Modelo[] clones;
+
+	/**
 	 * Treinador em lotes, atualiza os parâmetros a subamostra
 	 * do dataset fornecido.
 	 * @param historico modelo para treino.
@@ -43,12 +49,9 @@ public class TreinoLote extends Treinador {
 
 	@Override
 	protected void loop(Tensor[] x, Tensor[] y, Otimizador otm, Perda loss, int amostras, int epochs, boolean logs) {
-		modelo.treino(true);
+        threads = (int) (Runtime.getRuntime().availableProcessors() * 0.25) + 1;
+		if (threads > x.length) threads = x.length;
 
-        threads = (numThreads == 1)
-                ? (int)(Runtime.getRuntime().availableProcessors() * 0.25)
-                : numThreads;
-        if (threads < 1) threads = 1;
         exec = Executors.newFixedThreadPool(threads);
 
 		if (logs) esconderCursor();
@@ -73,15 +76,13 @@ public class TreinoLote extends Treinador {
 			}
 
 			// feedback de avanço
-			if (calcularHistorico) historico.add((perdaEpoca.get()/amostras));
+			if (calcHist) historico.add((perdaEpoca.get()/amostras));
 		}
 
 		if (logs) {
 			exibirCursor();
 			System.out.println();
-		}
-
-		modelo.treino(false);		
+		}	
 	}
 
 	/**
@@ -95,7 +96,7 @@ public class TreinoLote extends Treinador {
 		int tamLote = loteX.length;
 		int numCamadas = modelo.numCamadas();
 
-		Modelo[] clones = new Modelo[threads];
+		clones = new Modelo[threads];
 		for (int j = 0; j < clones.length; j++) {
 		    clones[j] = modelo.clone();
 		}
@@ -114,13 +115,12 @@ public class TreinoLote extends Treinador {
                         Tensor prev = clones[id].forward(loteX[j]);
                         clones[id].backward(perda.backward(prev, loteY[j]));
 
-                        if (calcularHistorico) {
-                            perdaEpoca.add(perda.forward(prev, loteY[j]).item());
-                        }
+						//feedback de avanço
+                        if (calcHist) perdaEpoca.add(perda.forward(prev, loteY[j]).item());
 
 						for (int c = 0; c < numCamadas; c++) {
 							if (modelo.camada(c).treinavel()) {
-								synchronized (modelo) {
+								synchronized (modelo.camada(c)) {
                                     modelo.camada(c).gradKernel().add(clones[id].camada(c).gradKernel());
                                     modelo.camada(c).gradBias().add(clones[id].camada(c).gradBias());
                                 }

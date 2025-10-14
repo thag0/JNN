@@ -40,17 +40,12 @@ public abstract class Treinador implements Cloneable {
 	/**
 	 * Variável de controle para armazenagem do histórico de treino.
 	 */
-	protected boolean calcularHistorico;
+	protected boolean calcHist;
 
 	/**
 	 * Tamanho do lote de treinamento.
 	 */
 	protected int _tamLote;
-
-	/**
-	 * Número de threads para execução paralela no treino em lote.
-	 */
-	protected int numThreads = 1;
 
 	/**
 	 * Construtor implícito.
@@ -60,7 +55,7 @@ public abstract class Treinador implements Cloneable {
 
 		random = new Random();
 		historico = new LinkedList<>();
-		calcularHistorico = false;
+		calcHist = false;
 		this._tamLote = tamLote;
 	}
 
@@ -86,19 +81,7 @@ public abstract class Treinador implements Cloneable {
 	 * @param calcular calcular ou não o histórico de custo.
 	 */
 	public void setHistorico(boolean calcular) {
-		calcularHistorico = calcular;
-	}
-
-	/**
-	 * Configura o número de threads para execução paralela no treino em lote.
-	 * <p>
-	 * 	Essa função só tem efeito em {@link TreinoLote}.
-	 * </p>
-	 * @param threads número de threads.
-	 */
-	public void setThreads(int threads) {
-		if (threads < 1) threads = 1;
-		numThreads = threads;
+		calcHist = calcular;
 	}
 
 	/**
@@ -109,6 +92,7 @@ public abstract class Treinador implements Cloneable {
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
 	public void executar(Tensor[] xs, Tensor[] ys, int epochs, boolean logs) {
+		modelo.treino(true);
 		loop(
 			xs,
 			ys,
@@ -118,6 +102,7 @@ public abstract class Treinador implements Cloneable {
 			epochs,
 			logs
 		);
+		modelo.treino(false);
 	}
 
 	/**
@@ -128,15 +113,7 @@ public abstract class Treinador implements Cloneable {
 	 * @see {@link jnn.dataloader.DataLoader}
 	 */
 	public void executar(DataLoader dl, int epochs, boolean logs) {
-		loop(
-			dl.getX(),
-			dl.getY(),
-			modelo.otm(),
-			modelo.perda(),
-			dl.tam(),
-			epochs,
-			logs
-		);
+		executar(dl.getX(), dl.getY(), epochs, logs);
 	}
 
 	/**

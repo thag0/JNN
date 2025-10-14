@@ -20,21 +20,16 @@ public class Treino extends Treinador {
 
 	@Override
 	protected void loop(Tensor[] x, Tensor[] y, Otimizador otm, Perda loss, int amostras, int epochs, boolean logs) {
-		modelo.treino(true);
-
 		if (logs) esconderCursor();
-		double perdaEpoca;
 		for (int e = 1; e <= epochs; e++) {
+			double perdaEpoca = 0;
 			embaralhar(x, y);
-			perdaEpoca = 0;
 			
 			for (int i = 0; i < amostras; i++) {
 				Tensor prev = modelo.forward(x[i]);
 				
 				//feedback de avanço
-				if (calcularHistorico) {
-					perdaEpoca += loss.forward(prev, y[i]).item();
-				}
+				if (calcHist) perdaEpoca += loss.forward(prev, y[i]).item();
 				
 				modelo.gradZero();
 				backpropagation(loss.backward(prev, y[i]));
@@ -47,15 +42,13 @@ public class Treino extends Treinador {
 			}
 
 			// feedback de avanço
-			if (calcularHistorico) historico.add(perdaEpoca/amostras);
+			if (calcHist) historico.add(perdaEpoca/amostras);
 		}
 
 		if (logs) {
 			exibirCursor();
 			System.out.println();
 		}
-
-		modelo.treino(false);
 	}
 
 }
