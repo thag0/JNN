@@ -466,10 +466,85 @@ public class TensorData {
      * @param fun função base.
      */
     public void aplicar(DoubleUnaryOperator fun) {
-        final int end = offset + tam;
-        for (int i = offset; i < end; i++) {
+        final int inicio = offset;
+        final int fim = inicio + tam();
+
+        for (int i = inicio; i < fim; i++) {
             dados[i] = fun.applyAsDouble(dados[i]);
         }
+    }
+
+    /**
+     * Retorna a soma dos elementos do conjunto de dados.
+     * @return soma dos elementos.
+     */
+    public double soma() {
+        double s = 0.0;
+        final int inicio = offset;
+        final int fim = inicio + tam();
+
+        for (int i = inicio; i < fim; i++) {
+            s += dados[i];
+        }
+
+        return s;      
+    }
+
+    /**
+     * Retorna o valor máximo contido no conjunto de dados.
+     * @return valor máximo.
+     */
+    public double max() {
+        double max = get(0);
+        final int inicio = offset;
+        final int fim = inicio + tam();
+        
+        for (int i = inicio; i < fim; i++) {
+            if (dados[i] > max) max = dados[i];
+        }
+
+        return max;
+    }
+
+    /**
+     * Retorna o valor mínimo contido no conjunto de dados.
+     * @return valor mínimo.
+     */
+    public double min() {
+        double min = get(0);
+        final int inicio = offset;
+        final int fim = inicio + tam();
+
+        for (int i = inicio; i < fim; i++) {
+            if (dados[i] < min) min = dados[i];
+        }
+
+        return min;
+    }
+
+    /**
+     * Retorna a média aritmética dos valores do conjunto de dados.
+     * @return média.
+     */
+    public double media() {
+        return max() / tam();
+    }
+
+    /**
+     * Retorna o desvio padrão dos valores do conjunto de dados.
+     * @return desvio padrão.
+     */
+    public double desvp() {
+        double media = media();
+        double soma = 0;
+        final int inicio = offset;
+        final int fim = inicio + tam();
+
+        for (int i = inicio; i < fim; i++) {
+            soma += Math.pow(dados[i] - media, 2);
+        }
+
+        return Math.sqrt(soma / tam());
     }
 
     /**

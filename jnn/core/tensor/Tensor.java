@@ -1648,7 +1648,11 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return novo {@code Tensor} contendo o resultado.
 	 */
     public Tensor soma() {
-		return reduce(0.0, Double::sum);
+		double soma = dados.soma();
+		return new Tensor(
+			new double[]{ soma },
+			 1
+		);
     }
 
 	/**
@@ -1657,7 +1661,11 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return novo {@code Tensor} contendo o resultado.
 	 */
 	public Tensor media() {
-        return soma().div(tam());
+		double med = dados.media();
+		return new Tensor(
+			new double[]{ med },
+			 1
+		);
     }
 
 	/**
@@ -1666,17 +1674,10 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return novo {@code Tensor} contendo o resultado.
 	 */
 	public Tensor max() {
-		double max = dados.get(0);
-
-		final int n = tam();
-		double[] d = paraArray();
-		for (int i = 1; i < n; i++) {
-			if (d[i] > max) max = d[i];
-		}
-
+		double max = dados.max();
 		return new Tensor(
 			new double[]{ max },
-			1
+			 1
 		);
 	}
 
@@ -1686,17 +1687,10 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return novo {@code Tensor} contendo o resultado.
 	 */
 	public Tensor min() {
-		double min = dados.get(0);
-
-		final int n = tam();
-		double[] d = paraArray();
-		for (int i = 1; i < n; i++) {
-			if (d[i] < min) min = d[i];
-		}
-
+		double min = dados.min();
 		return new Tensor(
 			new double[]{ min },
-			1
+			 1
 		);
 	}
 
@@ -1706,18 +1700,10 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return novo {@code Tensor} contendo o resultado.
      */
 	public Tensor desvp() {
-		double media = media().item();
-		double soma = 0.0d;
-
-		final int n = tam();
-		double[] d = paraArray();
-
-		for (int i = 0; i < n; i++) {
-			soma += Math.pow(d[i] - media, 2);
-		}
-
+		double desvp = dados.desvp();
+		
 		return new Tensor(
-			new double[]{ Math.sqrt(soma/n) },
+			new double[]{ desvp },
 			1
 		);
 	}
