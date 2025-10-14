@@ -169,7 +169,14 @@ public class TensorData {
      * @param td {@code TensorData} base.
      */
     public void copiar(TensorData td) {
-        copiar(td.dados);
+        final int n = tam();
+        if (td.tam() != n) {
+            throw new IllegalArgumentException(
+                "\nTamanhos incompatíveis: " + n + " != " + td.tam()
+            );
+        }
+
+        System.arraycopy(td.dados, td.offset, this.dados, this.offset, n);
     }
     
     /**
