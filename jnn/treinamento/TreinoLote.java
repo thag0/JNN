@@ -82,7 +82,9 @@ public class TreinoLote extends Treinador {
 		if (logs) {
 			exibirCursor();
 			System.out.println();
-		}	
+		}
+
+		exec.close();// tem que ter isso se não o processo do programa não acaba
 	}
 
 	/**
