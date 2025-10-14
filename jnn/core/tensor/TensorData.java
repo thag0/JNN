@@ -173,6 +173,110 @@ public class TensorData {
     }
     
     /**
+     * Realiza a operação {@code A + B}, onde:
+     * <pre>
+     *A = Instância Local
+     *B = Outro TensorData
+     * </pre>
+     * @param td {@code TensorData} base.
+     */
+    public void add(TensorData td) {
+        final int n = tam();
+        if (n != td.tam()) {
+            throw new IllegalArgumentException(
+                "\nAmbos os TensorData devem possuir o mesmo tamanho."
+            );
+        }
+
+        final double[] a = this.dados;
+        final double[] b = td.dados;
+        final int baseA = this.offset;
+        final int baseB = td.offset;
+
+        for (int i = 0; i < n; i++) {
+            a[baseA + i] += b[baseB + i];
+        }
+    }
+
+    /**
+     * Realiza a operação {@code A - B}, onde:
+     * <pre>
+     *A = Instância Local
+     *B = Outro TensorData
+     * </pre>
+     * @param td {@code TensorData} base.
+     */
+    public void sub(TensorData td) {
+        final int n = tam();
+        if (n != td.tam()) {
+            throw new IllegalArgumentException(
+                "\nAmbos os TensorData devem possuir o mesmo tamanho."
+            );
+        }
+
+        final double[] a = this.dados;
+        final double[] b = td.dados;
+        final int baseA = this.offset;
+        final int baseB = td.offset;
+
+        for (int i = 0; i < n; i++) {
+            a[baseA + i] -= b[baseB + i];
+        }
+    }
+
+    /**
+     * Realiza a operação {@code A * B}, onde:
+     * <pre>
+     *A = Instância Local
+     *B = Outro TensorData
+     * </pre>
+     * @param td {@code TensorData} base.
+     */
+    public void mul(TensorData td) {
+        final int n = tam();
+        if (n != td.tam()) {
+            throw new IllegalArgumentException(
+                "\nAmbos os TensorData devem possuir o mesmo tamanho."
+            );
+        }
+
+        final double[] a = this.dados;
+        final double[] b = td.dados;
+        final int baseA = this.offset;
+        final int baseB = td.offset;
+
+        for (int i = 0; i < n; i++) {
+            a[baseA + i] *= b[baseB + i];
+        }
+    }
+
+    /**
+     * Realiza a operação {@code A / B}, onde:
+     * <pre>
+     *A = Instância Local
+     *B = Outro TensorData
+     * </pre>
+     * @param td {@code TensorData} base.
+     */
+    public void div(TensorData td) {
+        final int n = tam();
+        if (n != td.tam()) {
+            throw new IllegalArgumentException(
+                "\nAmbos os TensorData devem possuir o mesmo tamanho."
+            );
+        }
+
+        final double[] a = this.dados;
+        final double[] b = td.dados;
+        final int baseA = this.offset;
+        final int baseB = td.offset;
+
+        for (int i = 0; i < n; i++) {
+            a[baseA + i] /= b[baseB + i];
+        }
+    }
+
+    /**
      * Adiciona um valor em todo o conjunto de dados.
      * @param x valor base.
      */
