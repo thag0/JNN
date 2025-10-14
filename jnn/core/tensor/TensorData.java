@@ -179,7 +179,35 @@ public class TensorData {
 
         System.arraycopy(td.dados, td.offset, this.dados, this.offset, n);
     }
-    
+
+    /**
+     * Realiza a operação {@code A + B*alfa}, onde:
+     * <pre>
+     *A = Instância Local
+     *B = Outro TensorData
+     *Alfa = multiplicador para os elementos de B
+     * </pre>
+     * Equivalente ao {@code axpy} do BLAS {@link https://www.netlib.org/lapack/explore-html/d5/d4b/group__axpy.html}
+     * @param td {@code TensorData} base.
+     */
+    public void add(TensorData td, double alfa) {
+        final int n = tam();
+        if (td.tam() != n) {
+            throw new IllegalArgumentException(
+                "\nTamanhos incompatíveis."
+            );
+        }
+
+        final double[] da = dados;
+        final double[] db = td.dados;
+        final int offA = offset;
+        final int offB = td.offset;
+
+        for (int i = 0; i < n; i++) {
+            da[offA + i] += alfa * db[offB + i];        
+        }
+    }
+
     /**
      * Realiza a operação {@code A + B}, onde:
      * <pre>
@@ -189,21 +217,7 @@ public class TensorData {
      * @param td {@code TensorData} base.
      */
     public void add(TensorData td) {
-        final int n = tam();
-        if (n != td.tam()) {
-            throw new IllegalArgumentException(
-                "\nAmbos os TensorData devem possuir o mesmo tamanho."
-            );
-        }
-
-        final double[] a = this.dados;
-        final double[] b = td.dados;
-        final int baseA = this.offset;
-        final int baseB = td.offset;
-
-        for (int i = 0; i < n; i++) {
-            a[baseA + i] += b[baseB + i];
-        }
+        add(td, 1.0);
     }
 
     /**
@@ -568,6 +582,9 @@ public class TensorData {
         return construirInfo();
     }
 
+    /**
+     * Exibe, via terminal, as informações do conjunto de dados.
+     */
     public void print() {
         System.out.println(construirInfo());
     }
