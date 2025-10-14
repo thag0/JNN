@@ -1,6 +1,7 @@
 package jnn.core.tensor;
 
 import java.util.Arrays;
+import java.util.function.DoubleUnaryOperator;
 
 /**
  * <h2>
@@ -443,6 +444,17 @@ public class TensorData {
 
         for (int i = 0; i < n; i++) {
             dados[offset + i] /= arr[i];
+        }
+    }
+
+    /**
+     * Aplica uma função em todos os elementos do conjunto de dados.
+     * @param fun função base.
+     */
+    public void aplicar(DoubleUnaryOperator fun) {
+        final int end = offset + tam;
+        for (int i = offset; i < end; i++) {
+            dados[i] = fun.applyAsDouble(dados[i]);
         }
     }
 

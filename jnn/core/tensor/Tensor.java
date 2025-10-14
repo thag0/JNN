@@ -846,7 +846,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
             );
         }
 
-		dados.add(t.paraArray());
+		dados.add(t.dados);
 
         return this;
     }
@@ -973,7 +973,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
             );
         }
 
-        dados.sub(t.paraArray());
+        dados.sub(t.dados);
 
         return this;
     }
@@ -1100,7 +1100,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
             );
         }
 
-		dados.mul(t.paraArray());
+		dados.mul(t.dados);
 
         return this;
     }
@@ -1227,7 +1227,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
             );
         }
 
-		dados.div(t.paraArray());
+		dados.div(t.dados);
 
         return this;
     }
@@ -1423,12 +1423,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
     public Tensor aplicar(DoubleUnaryOperator fun) {
-		final int n = tam();
-		double[] d = paraArray();
-		for (int i = 0; i < n; i++) {
-			d[i] = fun.applyAsDouble(d[i]);
-		}
-
+		dados.aplicar(fun);
 		return this;
 	}
 
@@ -1959,12 +1954,15 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		if (!compShape(t)) return false;
 
 		final int n = tam();
-		double[] d = paraArray();
-		double[] td = t.paraArray();
+		double[] d = dados.data();
+		double[] td = t.dados.data();
+
+		final int off1 = offset();
+		final int off2 = t.offset(); 
 		
 		for (int i = 0; i < n; i++) {
-			double a = d[i];
-			double b = td[i];
+			double a =  d[off1 + i];
+			double b = td[off2 + i];
 			if (Math.abs(a - b) > eps) return false;
 		}
 
