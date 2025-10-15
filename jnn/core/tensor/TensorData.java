@@ -194,6 +194,35 @@ public class TensorData {
     }
 
     /**
+     * Calcula o produto interno entre a instância local e o TensorData
+     * fornecido.
+     * Equivalente ao {@code ddot} do BLAS {@link https://www.netlib.org/lapack/explore-html/d0/d8c/group__dot.html}
+     * @param td {@code TensorData} base.
+     * @return valor resultante do produto interno.
+     */
+    public double dot(TensorData td) {
+        final int n = tam();
+        if (td.tam() != n) {
+            throw new IllegalArgumentException(
+                "\nTamanhos incompatíveis."
+            );
+        }
+
+        final double[] da = dados;
+        final double[] db = td.dados;
+        final int offA = offset;
+        final int offB = td.offset;
+
+        double soma = 0.0;
+
+        for (int i = 0; i < n; i++) {
+            soma += da[offA + i] * db[offB + i];
+        }
+
+        return soma;        
+    }
+
+    /**
      * Realiza a operação {@code A + B*alfa}, onde:
      * <pre>
      *A = Instância Local
