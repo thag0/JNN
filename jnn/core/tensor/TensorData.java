@@ -565,6 +565,21 @@ public class TensorData {
     }
 
     /**
+     * Calcula a raiz quadrada de cada elemento do conjunto de dados.
+     * @return TensorData local alterado.
+     */
+    public TensorData sqrt() {
+        final int inicio = offset;
+        final int fim = inicio + tam();
+
+        for (int i = inicio; i < fim; i++) {
+            dados[i] = Math.sqrt(dados[i]);
+        }
+
+        return this;
+    }
+
+    /**
      * Retorna a soma dos elementos do conjunto de dados.
      * @return soma dos elementos.
      */

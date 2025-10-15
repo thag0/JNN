@@ -1,6 +1,7 @@
 package jnn.otimizadores;
 
 import jnn.core.tensor.Tensor;
+import jnn.core.tensor.TensorData;
 
 /**
  * <h2>
@@ -262,17 +263,20 @@ public class Adam extends Otimizador {
 		double fb1 = Math.pow(beta1, iteracoes);
 		double fb2 = Math.pow(beta2, iteracoes);
 		double alfa = tA * Math.sqrt(1.0 - fb2) / (1.0 - fb1);
-		
+
 		for (int i = 0; i < _params.length; i++) {
-			m[i].aplicar(m[i], _grads[i], 
-				(m, g) -> m + ((1.0 - beta1) * (g - m))
-			);
+			TensorData p_i  = _params[i].data();
+			TensorData g_i  = _grads[i].data();
+			TensorData m_i  = m[i].data();
+			TensorData v_i  = v[i].data();
 
-			v[i].aplicar(v[i], _grads[i], 
-				(v, g) -> v + ((1.0 - beta2) * ((g*g) - v))
-			);
+			// m = β1*m + (1-β1)*g
+			m_i.mul(beta1).add(g_i, 1.0 - beta1);
+			
+			TensorData g2 = g_i.clone().mul(g_i);// g²
+			v_i.mul(beta2).add(g2, 1.0 - beta2);// v = β2*v + (1-β2)*(g²)
 
-			if (amsgrad) {
+			if (amsgrad) {//TODO: refatorar isso aqui pra seguir o padrão do restante
 				vc[i].aplicar(v[i], vc[i],
 					(v, vc) -> Math.max(v, vc)
 				);
@@ -280,9 +284,9 @@ public class Adam extends Otimizador {
 				v[i].copiar(vc[i]);
 			}
 
-			_params[i].aplicar(_params[i], m[i], v[i], 
-				(p, m, v) -> p - (((m * alfa) / (Math.sqrt(v) + eps)))
-			);
+			TensorData den = v_i.clone().sqrt().add(eps); // sqrt(v) + eps
+			TensorData res = m_i.clone().div(den).mul(alfa); // res = (alfa * m) / den
+			p_i.sub(res);// p -= (alfa * m) / (sqrt(v) + eps)
 		}
 	}
 
