@@ -130,46 +130,57 @@ public class TensorData {
      * Altera o valor contido no conjunto de dados.
      * @param x valor base.
      * @param id índice linear baseado no array de dados.
+     * @return TensorData local alterado.
      */
-    public void set(Number x, int id) {
+    public TensorData set(Number x, int id) {
         dados[offset + id] = x.doubleValue();
+        return this;
     }
 
     /**
      * Preenche todo o conjunto de dados.
      * @param x valor base.
+     * @return TensorData local alterado.
      */
-    public void preencher(Number x) {
+    public TensorData preencher(Number x) {
         final double val = x.doubleValue();
         Arrays.fill(dados, offset, offset + tam, val);
+        
+        return this;
     }
 
     /**
      * Zera os valores do conjunto de dados.
+     * @return TensorData local alterado.
      */
-    public void zero() {
-        preencher(0);
+    public TensorData zero() {
+        return preencher(0);
     }
 
     /**
      * Copia o conteúdo do array para o conjunto de dados.
      * @param arr {@code array} base.
+     * @return TensorData local alterado.
      */
-    public void copiar(double[] arr) {
+    public TensorData copiar(double[] arr) {
         final int n = tam;
         if (arr.length != n) {
             throw new IllegalArgumentException(
                 "\nTamanho do array (" + arr.length + ") deve ser igual ao tamanho de dados (" + n + ")."
             );
         }
+
         System.arraycopy(arr, 0, dados, offset, n);
+
+        return this;
     }
 
     /**
      * Copia o conteúdo de outro conjunto de dados para a isntância local.
      * @param td {@code TensorData} base.
+     * @return TensorData local alterado.
      */
-    public void copiar(TensorData td) {
+    public TensorData copiar(TensorData td) {
         final int n = tam();
         if (td.tam() != n) {
             throw new IllegalArgumentException(
@@ -178,6 +189,8 @@ public class TensorData {
         }
 
         System.arraycopy(td.dados, td.offset, this.dados, this.offset, n);
+
+        return this;
     }
 
     /**
@@ -189,8 +202,9 @@ public class TensorData {
      * </pre>
      * Equivalente ao {@code axpy} do BLAS {@link https://www.netlib.org/lapack/explore-html/d5/d4b/group__axpy.html}
      * @param td {@code TensorData} base.
+     * @return TensorData local alterado.
      */
-    public void add(TensorData td, double alfa) {
+    public TensorData add(TensorData td, double alfa) {
         final int n = tam();
         if (td.tam() != n) {
             throw new IllegalArgumentException(
@@ -206,6 +220,8 @@ public class TensorData {
         for (int i = 0; i < n; i++) {
             da[offA + i] += alfa * db[offB + i];        
         }
+
+        return this;
     }
 
     /**
@@ -215,9 +231,10 @@ public class TensorData {
      *B = Outro TensorData
      * </pre>
      * @param td {@code TensorData} base.
+     * @return TensorData local alterado.
      */
-    public void add(TensorData td) {
-        add(td, 1.0);
+    public TensorData add(TensorData td) {
+        return add(td, 1.0);
     }
 
     /**
@@ -227,8 +244,9 @@ public class TensorData {
      *B = Outro TensorData
      * </pre>
      * @param td {@code TensorData} base.
+     * @return TensorData local alterado.
      */
-    public void sub(TensorData td) {
+    public TensorData sub(TensorData td) {
         final int n = tam();
         if (n != td.tam()) {
             throw new IllegalArgumentException(
@@ -244,6 +262,8 @@ public class TensorData {
         for (int i = 0; i < n; i++) {
             a[baseA + i] -= b[baseB + i];
         }
+
+        return this;
     }
 
     /**
@@ -253,8 +273,9 @@ public class TensorData {
      *B = Outro TensorData
      * </pre>
      * @param td {@code TensorData} base.
+     * @return TensorData local alterado.
      */
-    public void mul(TensorData td) {
+    public TensorData mul(TensorData td) {
         final int n = tam();
         if (n != td.tam()) {
             throw new IllegalArgumentException(
@@ -270,6 +291,8 @@ public class TensorData {
         for (int i = 0; i < n; i++) {
             a[baseA + i] *= b[baseB + i];
         }
+
+        return this;
     }
 
     /**
@@ -279,8 +302,9 @@ public class TensorData {
      *B = Outro TensorData
      * </pre>
      * @param td {@code TensorData} base.
+     * @return TensorData local alterado.
      */
-    public void div(TensorData td) {
+    public TensorData div(TensorData td) {
         final int n = tam();
         if (n != td.tam()) {
             throw new IllegalArgumentException(
@@ -296,55 +320,68 @@ public class TensorData {
         for (int i = 0; i < n; i++) {
             a[baseA + i] /= b[baseB + i];
         }
+
+        return this;
     }
 
     /**
      * Adiciona um valor em todo o conjunto de dados.
      * @param x valor base.
+     * @return TensorData local alterado.
      */
-    public void add(double x) {
+    public TensorData add(double x) {
         final int n = tam();
         for (int i = 0; i < n; i++) {
             dados[offset + i] += x;
         }
+
+        return this;
     }
     
     /**
      * Subtrai um valor em todo o conjunto de dados.
      * @param x valor base.
+     * @return TensorData local alterado.
      */
-    public void sub(double x) {
-        add(-x);
+    public TensorData sub(double x) {
+        return add(-x);
     }
  
     /**
      * Multiplica um valor em todo o conjunto de dados.
      * @param x valor base.
+     * @return TensorData local alterado.
      */
-    public void mul(double x) {
+    public TensorData mul(double x) {
         final int n = tam();
         for (int i = 0; i < n; i++) {
             dados[offset + i] *= x;
         }
+
+        return this;
     }
     
     /**
      * Divide um valor em todo o conjunto de dados.
      * @param x valor base.
+     * @return TensorData local alterado.
      */
-    public void div(double x) {
+    public TensorData div(double x) {
         final int n = tam();
         for (int i = 0; i < n; i++) {
             dados[offset + i] /= x;
         }
+
+        return this;
     }
 
     /**
      * Adiciona um valor de acordo com um índice linear.
      * @param x valor base.
      * @param id índice baseado no array do conjunto de elementos.
+     * @return TensorData local alterado.
      */
-    public void add(double x, int id) {
+    public TensorData add(double x, int id) {
         if (id < 0 || id >= tam) {
             throw new IllegalArgumentException(
                 "\nÍndice " + id + " inválido."
@@ -352,23 +389,27 @@ public class TensorData {
         }
 
         dados[offset + id] += x;
+
+        return this;
     }
 
     /**
      * Subtrai um valor de acordo com um índice linear.
      * @param x valor base.
      * @param id índice baseado no array do conjunto de elementos.
+     * @return TensorData local alterado.
      */
-    public void sub(double x, int id) {
-        add(-x, id);
+    public TensorData sub(double x, int id) {
+        return add(-x, id);
     }
 
     /**
      * Multiplica um valor de acordo com um índice linear.
      * @param x valor base.
      * @param id índice baseado no array do conjunto de elementos.
+     * @return TensorData local alterado.
      */
-    public void mul(double x, int id) {
+    public TensorData mul(double x, int id) {
         if (id < 0 || id >= tam) {
             throw new IllegalArgumentException(
                 "\nÍndice " + id + " inválido."
@@ -376,14 +417,17 @@ public class TensorData {
         }
 
         dados[offset + id] *= x;
+
+        return this;
     }
 
     /**
      * Divide um valor de acordo com um índice linear.
      * @param x valor base.
      * @param id índice baseado no array do conjunto de elementos.
+     * @return TensorData local alterado.
      */
-    public void div(double x, int id) {
+    public TensorData div(double x, int id) {
         if (id < 0 || id >= tam) {
             throw new IllegalArgumentException(
                 "\nÍndice " + id + " inválido."
@@ -391,13 +435,16 @@ public class TensorData {
         }
 
         dados[offset + id] /= x;
+
+        return this;
     }
 
     /**
      * Adiciona o conteúdo do array ao conjunto de dados.
      * @param arr {@code array} base.
+     * @return TensorData local alterado.
      */
-    public void add(double[] arr) {
+    public TensorData add(double[] arr) {
         final int n = tam();
         if (arr.length != n) {
             throw new IllegalArgumentException(
@@ -408,13 +455,16 @@ public class TensorData {
         for (int i = 0; i < n; i++) {
             dados[offset + i] += arr[i];
         }
+
+        return this;
     }
 
     /**
      * Subtrai o conteúdo do array ao conjunto de dados.
      * @param arr {@code array} base.
+     * @return TensorData local alterado.
      */
-    public void sub(double[] arr) {
+    public TensorData sub(double[] arr) {
         final int n = tam();
         if (arr.length != n) {
             throw new IllegalArgumentException(
@@ -425,13 +475,16 @@ public class TensorData {
         for (int i = 0; i < n; i++) {
             dados[offset + i] -= arr[i];
         }
+
+        return this;
     }
     
     /**
      * Multiplica o conteúdo do array ao conjunto de dados.
      * @param arr {@code array} base.
+     * @return TensorData local alterado.
      */
-    public void mul(double[] arr) {
+    public TensorData mul(double[] arr) {
         final int n = tam();
         if (arr.length != n) {
             throw new IllegalArgumentException(
@@ -442,13 +495,16 @@ public class TensorData {
         for (int i = 0; i < n; i++) {
             dados[offset + i] *= arr[i];
         }
+
+        return this;
     }
     
     /**
      * Divide o conteúdo do array ao conjunto de dados.
      * @param arr {@code array} base.
+     * @return TensorData local alterado.
      */
-    public void div(double[] arr) {
+    public TensorData div(double[] arr) {
         final int n = tam();
         if (arr.length != n) {
             throw new IllegalArgumentException(
@@ -459,19 +515,24 @@ public class TensorData {
         for (int i = 0; i < n; i++) {
             dados[offset + i] /= arr[i];
         }
+    
+        return this;
     }
 
     /**
      * Aplica uma função em todos os elementos do conjunto de dados.
      * @param fun função base.
+     * @return TensorData local alterado.
      */
-    public void aplicar(DoubleUnaryOperator fun) {
+    public TensorData aplicar(DoubleUnaryOperator fun) {
         final int inicio = offset;
         final int fim = inicio + tam();
 
         for (int i = inicio; i < fim; i++) {
             dados[i] = fun.applyAsDouble(dados[i]);
         }
+
+        return this;
     }
 
     /**
