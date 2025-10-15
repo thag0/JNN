@@ -1,6 +1,7 @@
 package jnn.otimizadores;
 
 import jnn.core.tensor.Tensor;
+import jnn.core.tensor.TensorData;
 
 /**
  * <h2>
@@ -57,7 +58,7 @@ public class SGD extends Otimizador {
 	/**
 	 * Valor de taxa de aprendizado do otimizador.
 	 */
-	private final double tA;
+	private final double lr;
 
 	/**
 	 * Valor de taxa de momentum do otimizador.
@@ -77,47 +78,47 @@ public class SGD extends Otimizador {
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient 
 	 * Descent (SGD) </strong> usando os valores de hiperparâmetros fornecidos.
-	 * @param tA taxa de aprendizado do otimizador.
+	 * @param lr taxa de aprendizado do otimizador.
 	 * @param m taxa de momentum do otimizador.
 	 * @param nesterov usar acelerador de nesterov.
 	 */
-	public SGD(Number tA, Number m, boolean nesterov) {
-		double lr = tA.doubleValue();
-		double mm = m.doubleValue();
+	public SGD(Number lr, Number m, boolean nesterov) {
+		double lr_ = lr.doubleValue();
+		double mm_ = m.doubleValue();
 
-		if (lr <= 0) {
+		if (lr_ <= 0) {
 			throw new IllegalArgumentException(
 				"\nTaxa de aprendizado (" + lr + ") inválida."
 			);
 		}
-		if (mm < 0) {         
+		if (mm_ < 0) {         
 			throw new IllegalArgumentException(
-				"\nTaxa de momentum (" + mm + ") inválida."
+				"\nTaxa de momentum (" + mm_ + ") inválida."
 			);
 		}
 
-		this.tA 	  = lr;
-		this.momentum = mm;
+		this.lr 	  = lr_;
+		this.momentum = mm_;
 		this.nesterov = nesterov;
 	}
 
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient 
 	 * Descent (SGD) </strong> usando os valores de hiperparâmetros fornecidos.
-	 * @param tA taxa de aprendizado do otimizador.
+	 * @param lr taxa de aprendizado do otimizador.
 	 * @param m taxa de momentum do otimizador.
 	 */
-	public SGD(Number tA, Number m) {
-		this(tA, m, PADRAO_NESTEROV);
+	public SGD(Number lr, Number m) {
+		this(lr, m, PADRAO_NESTEROV);
 	}
 
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> Stochastic Gradient 
 	 * Descent (SGD) </strong> usando os valores de hiperparâmetros fornecidos.
-	 * @param tA taxa de aprendizado do otimizador.
+	 * @param lr taxa de aprendizado do otimizador.
 	 */
-	public SGD(Number tA) {
-		this(tA, PADRAO_MOMENTUM, PADRAO_NESTEROV);
+	public SGD(Number lr) {
+		this(lr, PADRAO_MOMENTUM, PADRAO_NESTEROV);
 	}
 
 	/**
@@ -146,19 +147,23 @@ public class SGD extends Otimizador {
 	public void atualizar() {
 		verificarConstrucao();
 		
-		for (int i = 0; i < _params.length; i++) {
-			m[i].aplicar(m[i], _grads[i], 
-				(m, g) -> (m * momentum) - (g * tA)
-			);
-			
-			if (nesterov) {
-				_params[i].aplicar(_params[i], m[i], _grads[i], 
-					(p, m, g) -> p + (momentum * m) - (g * tA)
-				);
-			} else {
-				_params[i].add(m[i]);
-			}
-		}
+        final int n = _params.length;
+        for (int i = 0; i < n; i++) {
+            TensorData param = _params[i].data();
+            TensorData grad = _grads[i].data();
+            TensorData mm = m[i].data();
+
+            // m = m * momentum - lr * g
+            mm.mul(momentum).add(grad, -lr);
+
+            if (nesterov) {
+                // p += momentum * m - lr * grad
+                param.add(mm, momentum).add(grad, -lr);
+            } else {
+                // p += m
+                param.add(mm);
+            }
+        }
 	}
 
 	@Override
@@ -166,7 +171,7 @@ public class SGD extends Otimizador {
 		verificarConstrucao();
 		construirInfo();
 		
-		addInfo("Lr: " + tA);
+		addInfo("Lr: " + lr);
 		addInfo("Momentum: " + momentum);
 		addInfo("Nesterov: " + nesterov);
 
