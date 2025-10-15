@@ -153,16 +153,14 @@ public class SGD extends Otimizador {
             TensorData g_i = _grads[i].data();
             TensorData m_i = m[i].data();
 
-            // m = m * momentum - lr * g
+            // m = (m * momentum) - (g * lr)
             m_i.mul(momentum).add(g_i, -lr);
 
-            if (nesterov) {
-                // p += momentum * m - lr * grad
-                p_i.add(m_i, momentum).add(g_i, -lr);
-            } else {
-                // p += m
-                p_i.add(m_i);
-            }
+            if (nesterov) 
+				p_i.add(m_i, momentum).add(g_i, -lr);// p += (momentum * m) - (g * lr)
+            else 
+				p_i.add(m_i);// p += m
+            
         }
 	}
 
