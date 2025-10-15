@@ -1701,7 +1701,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
      */
 	public Tensor desvp() {
 		double desvp = dados.desvp();
-		
+
 		return new Tensor(
 			new double[]{ desvp },
 			1
@@ -1995,6 +1995,20 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		long tamStride = strides.length * 4; // int = 4 bytes
 		return tamObj + tamVars + tamShape + tamStride;
 	}
+
+	/**
+	 * Retorna o conjunto de dados do tensor.
+	 * <p>
+	 *		Essa função expõe os dados internos do tensor, é
+	 *		recomendável não fazer alterações neste conjunto de 
+	 *		dados.
+	 * </p>
+	 * @return Dados do tensor.
+	 */
+	public TensorData data() {
+		return dados;
+	}
+
 
 	/**
 	 * Retorna o conteúdo do tensor no formato de array
