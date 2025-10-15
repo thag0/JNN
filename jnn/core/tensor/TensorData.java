@@ -565,6 +565,36 @@ public class TensorData {
     }
 
     /**
+     * Realiza a multiplicação elemento a elemento entre A e B e adiciona
+     * o resultado na instância local, equivalente a:
+     * <pre>
+     * this += A * B
+     * </pre>
+     * @param a {@code TensorData} A.
+     * @param b {@code TensorData} B.
+     * @return TensorData local alterado.
+     */
+    public TensorData addmul(TensorData a, TensorData b) {
+        final int n = tam();
+        if (a.tam() != n || b.tam() != n) {
+            throw new IllegalArgumentException("\nTamanhos incompatíveis.");
+        }
+
+        final double[] d  = dados;
+        final double[] db = a.dados;
+        final double[] dc = b.dados;
+        final int offA = offset;
+        final int offB = a.offset;
+        final int offC = b.offset;
+
+        for (int i = 0; i < n; i++) {
+            d[offA + i] += db[offB + i] * dc[offC + i];
+        }
+
+        return this;
+    }
+
+    /**
      * Calcula a raiz quadrada de cada elemento do conjunto de dados.
      * @return TensorData local alterado.
      */
