@@ -156,11 +156,11 @@ public class SGD extends Otimizador {
             // m = (m * momentum) - (g * lr)
             m_i.mul(momentum).add(g_i, -lr);
 
-            if (nesterov) 
+            if (nesterov) {
 				p_i.add(m_i, momentum).add(g_i, -lr);// p += (momentum * m) - (g * lr)
-            else 
+			} else {
 				p_i.add(m_i);// p += m
-            
+			}
         }
 	}
 
