@@ -1,6 +1,7 @@
 package jnn.otimizadores;
 
 import jnn.core.tensor.Tensor;
+import jnn.core.tensor.TensorData;
 
 /**
  * <h2>
@@ -59,9 +60,9 @@ public class RMSProp extends Otimizador {
 	private static final double PADRAO_EPS = 1e-8;
 
 	/**
-	 * Valor de taxa de aprendizagem do otimizador.
+	 * Valor de taxa de aprendizagem do otimizador (Learning Rate).
 	 */
-	private final double tA;
+	private final double lr;
 
 	/**
 	 * Usado para evitar divisão por zero.
@@ -81,53 +82,53 @@ public class RMSProp extends Otimizador {
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> RMSProp </strong> 
 	 * usando os valores de hiperparâmetros fornecidos.
-	 * @param tA valor de taxa de aprendizagem.
+	 * @param lr valor de taxa de aprendizagem.
 	 * @param rho fator de decaimento do RMSProp.
 	 * @param eps usado para evitar a divisão por zero.
 	 */
-	public RMSProp(Number tA, Number rho, Number eps) {
-		double lr = tA.doubleValue();
-		double rh = rho.doubleValue();
-		double ep = eps.doubleValue();
+	public RMSProp(Number lr, Number rho, Number eps) {
+		double lr_ = lr.doubleValue();
+		double rho_ = rho.doubleValue();
+		double eps_ = eps.doubleValue();
 
-		if (lr <= 0) {
+		if (lr_ <= 0) {
 			throw new IllegalArgumentException(
-				"\nTaxa de aprendizagem (" + lr + "), inválida."
+				"\nTaxa de aprendizagem (" + lr_ + "), inválida."
 			);
 		}
-		if (rh <= 0) {
+		if (rho_ <= 0) {
 			throw new IllegalArgumentException(
-				"\nTaxa de decaimento (" + rh + "), inválida."
+				"\nTaxa de decaimento (" + rho_ + "), inválida."
 			);
 		}
-		if (ep <= 0) {
+		if (eps_ <= 0) {
 			throw new IllegalArgumentException(
-				"\nEpsilon (" + ep + "), inválido."
+				"\nEpsilon (" + eps_ + "), inválido."
 			);
 		}
 
-		this.tA  = lr;
-		this.rho = rh;
-		this.eps = ep;
+		this.lr  = lr_;
+		this.rho = rho_;
+		this.eps = eps_;
 	}
 
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> RMSProp </strong> 
 	 * usando os valores de hiperparâmetros fornecidos.
-	 * @param tA valor de taxa de aprendizagem.
+	 * @param lr valor de taxa de aprendizagem.
 	 * @param rho fator de decaimento do RMSProp.
 	 */
-	public RMSProp(Number tA, Number rho) {
-		this(tA, rho, PADRAO_EPS);
+	public RMSProp(Number lr, Number rho) {
+		this(lr, rho, PADRAO_EPS);
 	}
 
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> RMSProp </strong> 
 	 * usando os valores de hiperparâmetros fornecidos.
-	 * @param tA valor de taxa de aprendizagem.
+	 * @param lr valor de taxa de aprendizagem.
 	 */
-	public RMSProp(Number tA) {
-		this(tA, PADRAO_RHO, PADRAO_EPS);
+	public RMSProp(Number lr) {
+		this(lr, PADRAO_RHO, PADRAO_EPS);
 	}
 
 	/**
@@ -155,13 +156,17 @@ public class RMSProp extends Otimizador {
 	public void atualizar() {
 		verificarConstrucao();
 		
-		for (int i = 0; i < _params.length; i++) {
-			ac[i].aplicar(ac[i], _grads[i], 
-				(ac, g) -> (rho * ac) + ((1.0 - rho) * (g*g))
-			);
-			_params[i].aplicar(_params[i], _grads[i], ac[i], 
-				(p, g, ac) -> p -= (g * tA) / (Math.sqrt(ac) + eps)
-			);
+		final int n = _params.length;
+		for (int i = 0; i < n; i++) {
+			TensorData p_i  = _params[i].data();
+			TensorData g_i  = _grads[i].data();
+			TensorData ac_i = ac[i].data();
+
+			TensorData g2 = g_i.clone().mul(g_i); // g²
+			ac_i.mul(rho).add(g2, 1.0 - rho);// ac = rho * ac + (1 - rho) * g²
+
+			TensorData den = ac_i.clone().sqrt().add(eps); // sqrt(ac) + eps
+			p_i.sub(g_i.mul(lr).div(den)); // p -= lr * g / (sqrt(ac) + eps)
 		}
 	}
 
@@ -170,7 +175,7 @@ public class RMSProp extends Otimizador {
 		verificarConstrucao();
 		construirInfo();
 		
-		addInfo("Lr: " + tA);
+		addInfo("Lr: " + lr);
 		addInfo("Rho: " + rho);
 		addInfo("Epsilon: " + eps);
 
