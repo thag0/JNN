@@ -134,7 +134,7 @@ public class AdaGrad extends Otimizador {
 			TensorData g_i = _grads[i].data();
 			TensorData ac_i = ac[i].data();
 
-			ac_i.addmul(g_i, g_i);// ac += g²
+			ac_i.addcmul(g_i, g_i, 1.0);// ac += g²
 
 			_params[i].aplicar(_params[i], _grads[i], ac[i], 
 				(p, g, ac) -> p -= ((g * tA) / (Math.sqrt(ac) + eps))

@@ -565,16 +565,23 @@ public class TensorData {
     }
 
     /**
-     * Realiza a multiplicação elemento a elemento entre A e B e adiciona
-     * o resultado na instância local, equivalente a:
+     * Realiza uma multiplicação elemento a elemento entre {@code A} e 
+     * {@code B}, junto da multiplicação de um escalar {@code Alfa} e acumula
+     * o resultado na instância local.
+     * <p>
+     *      Equivalente a:
+     * </p>
      * <pre>
-     * this += A * B
+     * this += alfa * (A * B)
      * </pre>
+     * Essa função foi inspirada no {@code PyTorch}:
+     * {@link https://docs.pytorch.org/docs/stable/generated/torch.addcmul.html}
      * @param a {@code TensorData} A.
      * @param b {@code TensorData} B.
+     * @param alfa {@code valor} escalar multiplicativo.
      * @return TensorData local alterado.
      */
-    public TensorData addmul(TensorData a, TensorData b) {
+    public TensorData addcmul(TensorData a, TensorData b, double alfa) {
         final int n = tam();
         if (a.tam() != n || b.tam() != n) {
             throw new IllegalArgumentException("\nTamanhos incompatíveis.");
@@ -588,7 +595,7 @@ public class TensorData {
         final int offC = b.offset;
 
         for (int i = 0; i < n; i++) {
-            d[offA + i] += db[offB + i] * dc[offC + i];
+            d[offA + i] += alfa * (db[offB + i] * dc[offC + i]);
         }
 
         return this;
