@@ -36,7 +36,7 @@ public class TensorData {
     /**
      * Inicializa um {@code TensorData} a partir de dados bem definidos.
      * <p>
-     *      O conteúdo referenciado como o mesmo do array.
+     *      O conteúdo é referenciado como o mesmo do array.
      * </p>
      * @param arr {@code array} base.
      * @param offset indice inicial a partir do array base.
@@ -753,7 +753,7 @@ public class TensorData {
     @Override
     public TensorData clone() {
         double[] novo = Arrays.copyOfRange(this.dados, this.offset, this.offset + this.tam);
-        return new TensorData(novo);
+        return new TensorData(novo, 0, novo.length);
     }
 
     /**
