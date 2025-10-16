@@ -1409,6 +1409,50 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		return new Tensor(tam()).copiar(this);
 	}
 
+    /**
+     * Realiza uma multiplicação elemento a elemento entre {@code A} e 
+     * {@code B}, junto da multiplicação de um escalar {@code Alfa} e acumula
+     * o resultado na instância local.
+     * <p>
+     *      Equivalente a:
+     * </p>
+     * <pre>
+     * this += alfa * (A * B)
+     * </pre>
+     * Essa função foi inspirada no {@code PyTorch}:
+     * {@link https://docs.pytorch.org/docs/stable/generated/torch.addcmul.html}
+     * @param a {@code Tensor} A.
+     * @param b {@code Tensor} B.
+     * @param alfa {@code valor} escalar multiplicativo.
+	 * @return {@code Tensor} local alterado.
+     */
+	public Tensor addcmul(Tensor a, Tensor b, double alfa) {
+		dados.addcmul(a.dados, b.dados, alfa);
+		return this;
+	}
+
+    /**
+     * Realiza uma divisão elemento a elemento entre {@code A} e 
+     * {@code B}, junto da multiplicação de um escalar {@code Alfa} e acumula
+     * o resultado na instância local.
+     * <p>
+     *      Equivalente a:
+     * </p>
+     * <pre>
+     * this += alfa * (A / B)
+     * </pre>
+     * Essa função foi inspirada no {@code PyTorch}:
+     * {@link https://docs.pytorch.org/docs/stable/generated/torch.addcdiv.html}
+     * @param a {@code Tensor} numerador.
+     * @param b {@code Tensor} denominador.
+     * @param alfa {@code valor} escalar multiplicativo.
+	 * @return {@code Tensor} local alterado.
+     */
+	public Tensor addcdiv(Tensor a, Tensor b, double alfa) {
+		dados.addcdiv(a.dados, b.dados, alfa);
+		return this;
+	}
+
 	/**
 	 * Aplica a função recebida em todos os elementos do tensor.
 	 * <p>
