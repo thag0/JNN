@@ -1,6 +1,7 @@
 package jnn.otimizadores;
 
 import jnn.core.tensor.Tensor;
+import jnn.core.tensor.TensorData;
 
 /**
  * <h2>
@@ -130,7 +131,10 @@ public class AdaGrad extends Otimizador {
 		verificarConstrucao();
 		
 		for (int i = 0; i < _params.length; i++) {
-			ac[i].addmul(_grads[i], _grads[i]);
+			TensorData g_i = _grads[i].data();
+			TensorData ac_i = ac[i].data();
+
+			ac_i.addmul(g_i, g_i);// ac += g²
 
 			_params[i].aplicar(_params[i], _grads[i], ac[i], 
 				(p, g, ac) -> p -= ((g * tA) / (Math.sqrt(ac) + eps))
