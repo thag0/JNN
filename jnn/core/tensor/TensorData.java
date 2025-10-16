@@ -602,6 +602,43 @@ public class TensorData {
     }
 
     /**
+     * Realiza uma divisão elemento a elemento entre {@code A} e 
+     * {@code B}, junto da multiplicação de um escalar {@code Alfa} e acumula
+     * o resultado na instância local.
+     * <p>
+     *      Equivalente a:
+     * </p>
+     * <pre>
+     * this += alfa * (A / B)
+     * </pre>
+     * Essa função foi inspirada no {@code PyTorch}:
+     * {@link https://docs.pytorch.org/docs/stable/generated/torch.addcdiv.html}
+     * @param a {@code TensorData} numerador.
+     * @param b {@code TensorData} denominador.
+     * @param alfa {@code valor} escalar multiplicativo.
+     * @return TensorData local alterado.
+     */
+    public TensorData addcdiv(TensorData a, TensorData b, double alfa) {
+        final int n = tam();
+        if (a.tam() != n || b.tam() != n) {
+            throw new IllegalArgumentException("\nTamanhos incompatíveis.");
+        }
+
+        final double[] d  = dados;
+        final double[] db = a.dados;
+        final double[] dc = b.dados;
+        final int offA = offset;
+        final int offB = a.offset;
+        final int offC = b.offset;
+
+        for (int i = 0; i < n; i++) {
+            d[offA + i] += alfa * (db[offB + i] / dc[offC + i]);
+        }
+
+        return this;
+    }
+
+    /**
      * Calcula a raiz quadrada de cada elemento do conjunto de dados.
      * @return TensorData local alterado.
      */
