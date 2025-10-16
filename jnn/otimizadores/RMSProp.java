@@ -162,11 +162,11 @@ public class RMSProp extends Otimizador {
 			TensorData g_i  = _grads[i].data();
 			TensorData ac_i = ac[i].data();
 
-			TensorData g2 = g_i.clone().mul(g_i); // g²
-			ac_i.mul(rho).add(g2, 1.0 - rho);// ac = rho * ac + (1 - rho) * g²
+			// ac = (rho * ac) + ((1 - rho) * g²)
+			ac_i.mul(rho).addcmul(g_i, g_i, 1.0 - rho);
 
-			TensorData den = ac_i.clone().sqrt().add(eps); // sqrt(ac) + eps
-			p_i.sub(g_i.mul(lr).div(den)); // p -= lr * g / (sqrt(ac) + eps)
+			TensorData den = ac_i.clone().sqrt().add(eps);// sqrt(ac) + eps
+			p_i.addcdiv(g_i, den, -lr);// p -= (lr * g) / (sqrt(ac) + eps)
 		}
 	}
 
