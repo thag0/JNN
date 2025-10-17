@@ -4,44 +4,16 @@ import jnn.core.tensor.Tensor;
 import jnn.core.tensor.TensorData;
 
 /**
- * Implementação do otimizador Adadelta.
+ * <h2>
+ *    Adaptive Delta
+ * </h2>
+ * Implementação do algoritmo de otimização Adadelta.
  * <p>
- * 	Os hiperparâmetros do Adadelta podem ser ajustados para controlar o 
- * 	comportamento do otimizador durante o treinamento.
+ *		O algoritmo ajusta os pesos do modelo usando gradiente descendente adaptativo,
+ *		acumulando a média móvel dos quadrados dos gradientes e dos incrementos dos 
+ *		parâmetros, eliminando a necessidade de uma taxa de aprendizado fixa.
  * </p>
- * <p>
- *    O Adadelta funciona usando a seguinte expressão:
- * </p>
- * <pre>
- *    v += delta
- * </pre>
- * Onde delta é dado por:
- * <pre>
- * delta = √(acd + eps) / √(acg + eps) * g
- * </pre>
- * Onde:
- * <p>
- *    {@code v} - variável que será otimizada.
- * </p>
- * <p>
- *    {@code acd} - Acumulador dos deltas ao quadrado.
- * </p>
- * <p>
- *    {@code acg} - Acumulador dos gradientes ao quadrado.
- * </p>
- * <p>
- *    {@code g} - gradientes correspondente a variável que será otimizada.
- * </p>
- * Os valores dos acumuladores são dados por:
- * <pre>
- *acg = (rho * acg) + ((1 - rho) * g²)
- *acd = (rho * acd) + ((1 - rho) * delta²)
- * </pre>
- * Onde:
- * <p>
- *    {@code rho} - constante de decaimento do otimizador.
- * </p>
- * {@link {@code Artigo}: http://arxiv.org/abs/1212.5701}
+ * {@link {@code Paper}: http://arxiv.org/abs/1212.5701}
  */
 public class Adadelta extends Otimizador {
 
