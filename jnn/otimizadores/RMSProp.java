@@ -7,47 +7,20 @@ import jnn.core.tensor.TensorData;
  * <h2>
  *    Root Mean Square Propagation
  * </h2>
+ * Implementação do algoritmo de otimização RMSProp.
  * <p>
  *    Ele é uma adaptação do Gradiente Descendente Estocástico (SGD) que ajuda a lidar com a
  *    oscilação do gradiente, permitindo que a taxa de aprendizado seja adaptada para cada 
  *    parâmetro individualmente.
  * </p>
- * <p>
- * 	Os hiperparâmetros do RMSProp podem ser ajustados para controlar 
- *    o comportamento do otimizador durante o treinamento.
- * </p>
- * <p>
- *    O RMSProp funciona usando a seguinte expressão:
- * </p>
- * <pre>
- *ac = (rho * ac) + ((1- rho) * g²);
- *v -= (g * tA) / ((√ ac) + eps)
- * </pre>
- * Onde:
- * <p>
- *    {@code v} - variável que será otimizada..
- * </p>
- * <p>
- *    {@code g} - gradiente correspondente a variável
- *    que será otimizada.
- * </p>
- * <p>
- *    {@code tA} - taxa de aprendizagem do otimizador.
- * </p>
- * <p>
- *    {@code ac} - acumulador de gradiente correspondente a variável
- *    que será otimizada.
- * </p>
- * <p>
- *    {@code rho} - taxa de decaimento do otimizador.
- * </p>
+ * {@link {@code Paper}: http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf}
  */
 public class RMSProp extends Otimizador {
 
 	/**
 	 * Valor padrão para a taxa de aprendizagem do otimizador.
 	 */
-	private static final double PADRAO_TA  = 0.001;
+	private static final double PADRAO_LR  = 0.001;
 
 	/**
 	 * Valor padrão para a taxa de decaimeto.
@@ -138,7 +111,7 @@ public class RMSProp extends Otimizador {
 	 * </p>
 	 */
 	public RMSProp() {
-		this(PADRAO_TA, PADRAO_RHO, PADRAO_EPS);
+		this(PADRAO_LR, PADRAO_RHO, PADRAO_EPS);
 	}
 
 	@Override
@@ -165,8 +138,11 @@ public class RMSProp extends Otimizador {
 			// ac = (rho * ac) + ((1 - rho) * g²)
 			ac_i.mul(rho).addcmul(g_i, g_i, 1.0 - rho);
 
-			TensorData den = ac_i.clone().sqrt().add(eps);// sqrt(ac) + eps
-			p_i.addcdiv(g_i, den, -lr);// p -= (lr * g) / (sqrt(ac) + eps)
+			// sqrt(ac) + eps
+			TensorData den = ac_i.clone().sqrt().add(eps);
+
+			// p -= (lr * g) / (sqrt(ac) + eps)
+			p_i.addcdiv(g_i, den, -lr);
 		}
 	}
 
