@@ -1,6 +1,7 @@
 package jnn.otimizadores;
 
 import jnn.core.tensor.Tensor;
+import jnn.core.tensor.TensorData;
 
 /**
  * Implementação do otimizador Adadelta.
@@ -12,36 +13,35 @@ import jnn.core.tensor.Tensor;
  *    O Adadelta funciona usando a seguinte expressão:
  * </p>
  * <pre>
- *    v -= delta
+ *    v += delta
  * </pre>
  * Onde delta é dado por:
  * <pre>
- * delta = √(acAt + eps) / √(ac + eps) * g
+ * delta = √(acd + eps) / √(acg + eps) * g
  * </pre>
  * Onde:
  * <p>
  *    {@code v} - variável que será otimizada.
  * </p>
  * <p>
- *    {@code acAt} - acumulador atualizado correspondente a variável que
- *    será otimizada.
+ *    {@code acd} - Acumulador dos deltas ao quadrado.
  * </p>
  * <p>
- *    {@code ac} - acumulador correspondente a variável que
- *    será otimizada
+ *    {@code acg} - Acumulador dos gradientes ao quadrado.
  * </p>
  * <p>
  *    {@code g} - gradientes correspondente a variável que será otimizada.
  * </p>
- * Os valores do acumulador (ac) e acumulador atualizado (acAt) se dão por:
+ * Os valores dos acumuladores são dados por:
  * <pre>
- *ac   = (rho * ac)   + ((1 - rho) * g²)
- *acAt = (rho * acAt) + ((1 - rho) * delta²)
+ *acg = (rho * acg) + ((1 - rho) * g²)
+ *acd = (rho * acd) + ((1 - rho) * delta²)
  * </pre>
  * Onde:
  * <p>
  *    {@code rho} - constante de decaimento do otimizador.
  * </p>
+ * {@link {@code Artigo}: http://arxiv.org/abs/1212.5701}
  */
 public class Adadelta extends Otimizador {
 
@@ -66,19 +66,19 @@ public class Adadelta extends Otimizador {
 	private final double eps;
 
 	/**
-	 * Acumuladores.
+	 * Acumuladores dos gradientes ao quadrado.
 	 */
-	private Tensor[] ac = {};
+	private Tensor[] acg = {};
+
+	/**
+	 * Acumuladores dos deltas ao quadrado.
+	 */
+	private Tensor[] acd = {};
 
 	/**
 	 * Deltas de atualização
 	 */
 	private Tensor[] deltas = {};
-
-	/**
-	 * Acumuladores atualizados.
-	 */
-	private Tensor[] acAt = {};
 
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> Adadelta </strong> 
@@ -131,9 +131,9 @@ public class Adadelta extends Otimizador {
 		initParams(params, grads);
 
 		for (Tensor param : _params) {
-			ac     = utils.addEmArray(ac,     new Tensor(param.shape()));
+			acg     = utils.addEmArray(acg,     new Tensor(param.shape()));
 			deltas = utils.addEmArray(deltas, new Tensor(param.shape()));
-			acAt   = utils.addEmArray(acAt,   new Tensor(param.shape()));
+			acd   = utils.addEmArray(acd,   new Tensor(param.shape()));
 		}
 
 		_construido = true;// otimizador pode ser usado
@@ -143,20 +143,29 @@ public class Adadelta extends Otimizador {
 	public void atualizar() {
 		verificarConstrucao();
 		
-		for (int i = 0; i < _params.length; i++) {
-			ac[i].aplicar(ac[i], _grads[i],
-				(ac, g) -> (rho * ac) + ((1.0 - rho) * (g*g))
-			);
+		final int n = _params.length;
+		for (int i = 0; i < n; i++) {
+			TensorData p_i   = _params[i].data();
+			TensorData g_i   = _grads[i].data();
+			TensorData acg_i = acg[i].data();// E[g²]
+			TensorData acd_i = acd[i].data();// E[Δx²]
+			TensorData d_i   = deltas[i].data();
 
-			deltas[i].aplicar(acAt[i], ac[i], _grads[i], 
-				(acat, ac, g) -> Math.sqrt(acat + eps) / Math.sqrt(ac + eps) * g
-			);
+			// E[g²] = (rho * E[g²]) + ((1 - rho) * g²)
+			acg_i.mul(rho).addcmul(g_i, g_i, 1.0 - rho);
 
-			acAt[i].aplicar(acAt[i], deltas[i], 
-				(acat, d) -> (rho * acat) + ((1.0 - rho) * (d*d))
-			);
+			// delta = (sqrt(E[Δx²] + eps) / sqrt(E[g²] + eps))
+			TensorData den = acg_i.clone().add(eps).sqrt();
+			TensorData num = acd_i.clone().add(eps).sqrt();
 
-			_params[i].sub(deltas[i]);
+			// delta = - (num/den) * g
+			d_i.copiar(num).mul(-1).div(den).mul(g_i);
+
+			// E[Δx²] = (rho * E[Δx²]) + ((1 - rho) * (delta²))
+			acd_i.mul(rho).addcmul(d_i, d_i, 1.0 - rho);
+			
+			// p += delta
+			p_i.add(d_i);
 		}
 	}
 
