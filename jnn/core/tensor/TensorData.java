@@ -639,6 +639,30 @@ public class TensorData {
     }
 
     /**
+     * Realiza a comparação elemento a elemento entre a instância local e
+     * o conjunto de dados fornecido.
+     * @param td {@code TensorData} para comparação.
+     * @return TensorData local alterado.
+     */
+    public TensorData maxEntre(TensorData td) {
+        final int n = tam();
+        if (td.tam() != n)
+            throw new IllegalArgumentException("\nTamanhos incompatíveis.");
+
+        final double[] da = dados;
+        final double[] db = td.dados;
+        final int offA = offset;
+        final int offB = td.offset;
+
+        for (int i = 0; i < n; i++) {
+            double v = db[offB + i];
+            if (v > da[offA + i]) da[offA + i] = v;
+        }
+
+        return this;
+    }
+
+    /**
      * Calcula a raiz quadrada de cada elemento do conjunto de dados.
      * @return TensorData local alterado.
      */
