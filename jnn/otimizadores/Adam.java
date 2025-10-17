@@ -275,12 +275,10 @@ public class Adam extends Otimizador {
 			// v = β2*v + (1-β2)*(g²)
 			v_i.mul(beta2).addcmul(g_i, g_i, 1.0 - beta2);
 			
-			if (amsgrad) {//TODO: refatorar isso aqui pra seguir o padrão do restante
-				vc[i].aplicar(v[i], vc[i],
-					(v, vc) -> Math.max(v, vc)
-				);
-
-				v[i].copiar(vc[i]);
+			if (amsgrad) {// v = max(v, vc)
+				TensorData vc_i = vc[i].data();
+				vc_i.maxEntre(v_i);
+				v_i.copiar(vc_i);
 			}
 
 			// sqrt(v) + eps
