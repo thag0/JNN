@@ -7,35 +7,10 @@ import jnn.core.tensor.TensorData;
  * <h2>
  *    Stochastic Gradient Descent 
  * </h2>
+ * Implementação do algoritmo de otimização SGD.
  * <p>
  *    Implementação do otimizador do gradiente estocástico com momentum e
  *    acelerador de nesterov.
- * </p>
- * <p>
- *    O SGD funciona usando a seguinte expressão:
- * </p>
- * <pre>
- *m += (m * M) - (g * tA)
- *v += m // apenas com momentum
- *v += (M * m) - (g * tA) // com nesterov
- * </pre>
- * Onde:
- * <p>
- *    {@code v} - variável que será otimizada.
- * </p>
- * <p>
- *    {@code M} - valor de taxa de momentum (ou constante de momentum) 
- *    do otimizador.
- * </p>
- * <p>
- *    {@code m} - valor de momentum da correspondente a variável que será
- *    otimizada.
- * </p>
- * <p>
- *    {@code g} - gradientes correspondente a variável que será otimizada.
- * </p>
- * <p>
- *    {@code tA} - taxa de aprendizado do otimizador.
  * </p>
  */
 public class SGD extends Otimizador {
@@ -43,7 +18,7 @@ public class SGD extends Otimizador {
 	/**
 	 * Taxa de aprendizado padrão do otimizador.
 	 */
-	private static final double PADRAO_TA = 0.01;
+	private static final double PADRAO_LR = 0.01;
 
 	/**
 	 * Taxa de momentum padrão do otimizador.
@@ -129,7 +104,7 @@ public class SGD extends Otimizador {
 	 * </p>
 	 */
 	public SGD() {
-		this(PADRAO_TA, PADRAO_MOMENTUM, PADRAO_NESTEROV);
+		this(PADRAO_LR, PADRAO_MOMENTUM, PADRAO_NESTEROV);
 	}
 
 	@Override
@@ -157,9 +132,11 @@ public class SGD extends Otimizador {
             m_i.mul(momentum).add(g_i, -lr);
 
             if (nesterov) {
-				p_i.add(m_i, momentum).add(g_i, -lr);// p += (momentum * m) - (g * lr)
+				// p += (momentum * m) - (g * lr)
+				p_i.add(m_i, momentum).add(g_i, -lr);
 			} else {
-				p_i.add(m_i);// p += m
+				// p += m
+				p_i.add(m_i);
 			}
         }
 	}
