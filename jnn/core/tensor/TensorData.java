@@ -663,6 +663,21 @@ public class TensorData {
     }
 
     /**
+     * Aplica a função signum em todos os elementos do conjunto de dados.
+     * @return TensorData local alterado.
+     */
+    public TensorData signum() {
+        final int inicio = offset;
+        final int fim = inicio + tam();
+
+        for (int i = inicio; i < fim; i++) {
+            dados[i] = Math.signum(dados[i]);
+        }
+
+        return this;
+    }
+
+    /**
      * Calcula a raiz quadrada de cada elemento do conjunto de dados.
      * @return TensorData local alterado.
      */
