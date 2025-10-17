@@ -15,36 +15,14 @@ import jnn.core.tensor.TensorData;
  *    Devido a natureza do otimizador, pode ser mais vantajoso (para este caso específico)
  *    usar valores de taxa de aprendizagem mais altos.
  * </p>
- * <p>
- *    O Adagrad funciona usando a seguinte expressão:
- * </p>
- * <pre>
- *    v -= (tA * g) / (√ ac + eps)
- * </pre>
- * Onde:
- * <p>
- *    {@code v} - variável que será otimizada.
- * </p>
- * <p>
- *    {@code tA} - taxa de aprendizagem do otimizador.
- * </p>
- * <p>
- *    {@code g} - gradientes correspondente a variável que será otimizada.
- * </p>
- * <p>
- *    {@code ac} - acumulador de gradiente correspondente a variável que
- *    será otimizada
- * </p>
- * <p>
- *    {@code eps} - um valor pequeno para evitar divizões por zero.
- * </p>
+ * {@link {@code Paper}: http://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf}
  */
 public class AdaGrad extends Otimizador {
 
 	/**
 	 * Valor padrão para a taxa de aprendizado do otimizador.
 	 */
-	private static final double PADRAO_TA = 0.5;
+	private static final double PADRAO_LR = 0.5;
 
 	/**
 	 * Valor padrão para o valor de epsilon pro otimizador.
@@ -108,7 +86,7 @@ public class AdaGrad extends Otimizador {
 	 * </p>
 	 */
 	public AdaGrad() {
-		this(PADRAO_TA, PADRAO_EPS);
+		this(PADRAO_LR, PADRAO_EPS);
 	}
 
 	@Override
@@ -130,15 +108,20 @@ public class AdaGrad extends Otimizador {
 	public void atualizar() {
 		verificarConstrucao();
 		
-		for (int i = 0; i < _params.length; i++) {
+		final int n = _params.length;
+		for (int i = 0; i < n; i++) {
 			TensorData p_i = _params[i].data();
 			TensorData g_i = _grads[i].data();
 			TensorData ac_i = ac[i].data();
 
-			ac_i.addcmul(g_i, g_i, 1.0);// ac += g²
+			// ac += g²
+			ac_i.addcmul(g_i, g_i, 1.0);
 
-			TensorData den = ac_i.clone().sqrt().add(eps);// sqrt(ac) + eps
-			p_i.addcdiv(g_i, den, -lr);// p -= (lr * g) / (sqrt(ac) + eps)
+			// sqrt(ac) + eps
+			TensorData den = ac_i.clone().sqrt().add(eps);
+
+			// p -= (lr * g) / (sqrt(ac) + eps)
+			p_i.addcdiv(g_i, den, -lr);
 		}
 	}
 
