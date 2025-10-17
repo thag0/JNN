@@ -272,9 +272,9 @@ public class Adam extends Otimizador {
 			// m = β1*m + (1-β1)*g
 			m_i.mul(beta1).add(g_i, 1.0 - beta1);
 			
-			TensorData g2 = g_i.mul(g_i);// g²
-			v_i.mul(beta2).add(g2, 1.0 - beta2);// v = β2*v + (1-β2)*(g²)
-
+			// v = β2*v + (1-β2)*(g²)
+			v_i.mul(beta2).addcmul(g_i, g_i, 1.0 - beta2);
+			
 			if (amsgrad) {//TODO: refatorar isso aqui pra seguir o padrão do restante
 				vc[i].aplicar(v[i], vc[i],
 					(v, vc) -> Math.max(v, vc)
@@ -283,9 +283,11 @@ public class Adam extends Otimizador {
 				v[i].copiar(vc[i]);
 			}
 
-			TensorData den = v_i.clone().sqrt().add(eps); // sqrt(v) + eps
-			TensorData res = m_i.clone().div(den).mul(alfa); // res = (alfa * m) / den
-			p_i.sub(res);// p -= (alfa * m) / (sqrt(v) + eps)
+			// sqrt(v) + eps
+			TensorData den = v_i.clone().sqrt().add(eps);
+			
+			// p -= (alfa * m) / (sqrt(v) + eps)
+			p_i.addcdiv(m_i, den, -alfa);
 		}
 	}
 
