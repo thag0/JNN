@@ -52,9 +52,9 @@ public class AdaGrad extends Otimizador {
 	private static final double PADRAO_EPS = 1e-8; 
 
 	/**
-	 * Valor de taxa de aprendizado do otimizador.
+	 * Valor de taxa de aprendizado do otimizador (Learning Rate).
 	 */
-	private final double tA;
+	private final double lr;
 
 	/**
 	 * Usado para evitar divisão por zero.
@@ -69,36 +69,36 @@ public class AdaGrad extends Otimizador {
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> AdaGrad </strong> 
 	 * usando os valores de hiperparâmetros fornecidos.
-	 * @param tA valor de taxa de aprendizado.
+	 * @param lr valor de taxa de aprendizado.
 	 * @param eps usado para evitar a divisão por zero.
 	 */
-	public AdaGrad(Number tA, Number eps) {
-		double lr = tA.doubleValue();
-		double e = eps.doubleValue();
+	public AdaGrad(Number lr, Number eps) {
+		double lr_ = lr.doubleValue();
+		double eps_ = eps.doubleValue();
 
-		if (lr <= 0) {
+		if (lr_ <= 0) {
 			throw new IllegalArgumentException(
-				"\nTaxa de aprendizado (" + lr + ") inválida."
+				"\nTaxa de aprendizado (" + lr_ + ") inválida."
 			);
 		}
 
-		if (e <= 0) {
+		if (eps_ <= 0) {
 			throw new IllegalArgumentException(
 				"\nEpsilon (" + eps + ") inválido."
 			);
 		}
 		
-		this.tA  = lr;
-		this.eps = e;
+		this.lr  = lr_;
+		this.eps = eps_;
 	}
 
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> AdaGrad </strong> 
 	 * usando os valores de hiperparâmetros fornecidos.
-	 * @param tA valor de taxa de aprendizado.
+	 * @param lr valor de taxa de aprendizado.
 	 */
-	public AdaGrad(Number tA) {
-		this(tA, PADRAO_EPS);
+	public AdaGrad(Number lr) {
+		this(lr, PADRAO_EPS);
 	}
 
 	/**
@@ -131,14 +131,14 @@ public class AdaGrad extends Otimizador {
 		verificarConstrucao();
 		
 		for (int i = 0; i < _params.length; i++) {
+			TensorData p_i = _params[i].data();
 			TensorData g_i = _grads[i].data();
 			TensorData ac_i = ac[i].data();
 
 			ac_i.addcmul(g_i, g_i, 1.0);// ac += g²
 
-			_params[i].aplicar(_params[i], _grads[i], ac[i], 
-				(p, g, ac) -> p -= ((g * tA) / (Math.sqrt(ac) + eps))
-			);
+			TensorData den = ac_i.clone().sqrt().add(eps);// sqrt(ac) + eps
+			p_i.addcdiv(g_i, den, -lr);// p -= (lr * g) / (sqrt(ac) + eps)
 		}
 	}
 
@@ -147,7 +147,7 @@ public class AdaGrad extends Otimizador {
 		verificarConstrucao();
 		construirInfo();
 		
-		addInfo("Lr: " + tA);
+		addInfo("Lr: " + lr);
 		addInfo("Epsilon: " + eps);
 
 		return super.info();
