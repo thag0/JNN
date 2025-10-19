@@ -771,7 +771,7 @@ public class TensorData {
      * @return média.
      */
     public double media() {
-        return max() / tam();
+        return soma() / tam();
     }
 
     /**
