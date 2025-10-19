@@ -565,6 +565,32 @@ public class TensorData {
     }
 
     /**
+     * Aplica uma função em todos os elementos do conjunto de dados base,
+     * armazenando o resultado neste conjunto local.
+     *
+     * @param td  conjunto de dados base.
+     * @param fun função a ser aplicada em cada elemento de {@code td}.
+     * @return {@code TensorData} local alterado.
+     */
+    public TensorData aplicar(TensorData td, DoubleUnaryOperator fun) {
+        final int n = tam();
+        if (td.tam() != n) {
+            throw new IllegalArgumentException("\nTamanhos incompatíveis entre TensorData.");
+        }
+
+        final double[] da = dados;
+        final double[] db = td.dados;
+        final int offA = offset;
+        final int offB = td.offset;
+
+        for (int i = 0; i < n; i++) {
+            da[offA + i] = fun.applyAsDouble(db[offB + i]);
+        }
+
+        return this;
+    }
+
+    /**
      * Realiza uma multiplicação elemento a elemento entre {@code A} e 
      * {@code B}, junto da multiplicação de um escalar {@code Alfa} e acumula
      * o resultado na instância local.

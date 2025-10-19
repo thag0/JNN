@@ -1492,13 +1492,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 			);
 		}
 
-		final int n = tam();
-		double[] d = paraArray();
-		double[] td = t.paraArray();
-		for (int i = 0; i < n; i++) {
-			d[i] = fun.applyAsDouble(td[i]);
-		}
-
+		dados.aplicar(t.dados, fun);
 		return this;
 	}
 
