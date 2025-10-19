@@ -2,15 +2,15 @@ package exemplos.modelos;
 
 import java.awt.image.BufferedImage;
 
+import externos.lib.ged.Dados;
+import externos.lib.ged.Ged;
+import externos.lib.geim.Geim;
 import jnn.Funcional;
 import jnn.camadas.*;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.modelos.Sequencial;
 import jnn.otimizadores.SGD;
-import lib.ged.Dados;
-import lib.ged.Ged;
-import lib.geim.Geim;
 
 /**
  * Exemplo usando um modelo para se adaptar a uma imagem com o objetivo

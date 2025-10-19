@@ -1,4 +1,4 @@
-package lib.ged;
+package externos.lib.ged;
 
 import java.text.Collator;
 import java.util.ArrayList;

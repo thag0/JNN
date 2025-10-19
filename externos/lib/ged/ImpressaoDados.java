@@ -1,4 +1,4 @@
-package lib.ged;
+package externos.lib.ged;
 
 public class ImpressaoDados {
 	

@@ -1,4 +1,4 @@
-package lib.geim;
+package externos.lib.geim;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

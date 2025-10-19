@@ -1,12 +1,12 @@
-package render;
+package externos.render;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import javax.swing.JFrame;
 
+import externos.render.widgets.TensorImg;
 import jnn.core.tensor.Tensor;
-import render.widgets.TensorImg;
 
 public class JanelaImagem extends JFrame {
 	

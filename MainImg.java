@@ -4,6 +4,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import externos.lib.ged.*;
+import externos.lib.geim.Geim;
+import externos.render.JanelaTreino;
 import jnn.Funcional;
 import jnn.camadas.Densa;
 import jnn.camadas.Entrada;
@@ -13,9 +16,6 @@ import jnn.modelos.Modelo;
 import jnn.modelos.RedeNeural;
 import jnn.modelos.Sequencial;
 import jnn.otimizadores.*;
-import lib.ged.*;
-import lib.geim.Geim;
-import render.JanelaTreino;
 
 public class MainImg {
 	static Ged ged = new Ged();

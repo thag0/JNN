@@ -1,4 +1,4 @@
-package lib.geim;
+package externos.lib.geim;
 
 /**
  * Classe responsável por representar o valor de cor de um pixel de 

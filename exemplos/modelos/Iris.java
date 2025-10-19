@@ -2,6 +2,8 @@ package exemplos.modelos;
 
 import java.text.DecimalFormat;
 
+import externos.lib.ged.Dados;
+import externos.lib.ged.Ged;
 import jnn.Funcional;
 
 import jnn.camadas.Densa;
@@ -14,9 +16,6 @@ import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 
 import jnn.modelos.Sequencial;
-
-import lib.ged.Dados;
-import lib.ged.Ged;
 
 /**
  * Exemplo de criação, treino e validação de um modelo da biblioteca

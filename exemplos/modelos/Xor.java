@@ -2,14 +2,14 @@ package exemplos.modelos;
 
 import java.text.DecimalFormat;
 
+import externos.lib.ged.Dados;
+import externos.lib.ged.Ged;
 import jnn.Funcional;
 import jnn.camadas.*;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.modelos.*;
 import jnn.otimizadores.SGD;
-import lib.ged.Dados;
-import lib.ged.Ged;
 
 public class Xor{
 	static Ged ged = new Ged();

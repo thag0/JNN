@@ -1,4 +1,4 @@
-package render;
+package externos.render;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -6,8 +6,8 @@ import java.io.File;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
+import externos.render.widgets.PainelTreino;
 import jnn.modelos.Modelo;
-import render.widgets.PainelTreino;
 
 public class JanelaTreino extends JFrame {
 

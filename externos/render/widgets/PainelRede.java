@@ -1,4 +1,4 @@
-package render.widgets;
+package externos.render.widgets;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -7,9 +7,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 
+import externos.render.Coordenada;
 import jnn.camadas.Densa;
 import jnn.modelos.RedeNeural;
-import render.Coordenada;
 
 public class PainelRede extends Widget {
 

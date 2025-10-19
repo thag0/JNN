@@ -1,7 +1,7 @@
 package exemplos.tensor;
 
+import externos.lib.ged.Ged;
 import jnn.core.tensor.Tensor;
-import lib.ged.Ged;
 
 /**
  * A

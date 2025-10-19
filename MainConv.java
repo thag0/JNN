@@ -4,6 +4,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import externos.lib.ged.Dados;
+import externos.lib.ged.Ged;
+import externos.lib.geim.Geim;
 import jnn.Funcional;
 import jnn.camadas.*;
 import jnn.core.tensor.Tensor;
@@ -11,9 +14,6 @@ import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
 import jnn.serializacao.Serializador;
-import lib.ged.Dados;
-import lib.ged.Ged;
-import lib.geim.Geim;
 
 public class MainConv {
 
