@@ -129,6 +129,10 @@ public class TreinoLote extends Treinador {
                             }
                         }
                     }
+
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.exit(1);
                 } finally {
                     latch.countDown();
                 }
