@@ -23,8 +23,8 @@ public class MainImg {
 	static Funcional jnn = new Funcional();
 
 	static final int EPOCAS = 5 * 1000;
-	static final double ESCALA_RENDER = 9;
-	static boolean calcularHistorico = true;
+	static final double ESCALA_RENDER = 10;
+	static final boolean historico = true;
 	static final String CAMINHO_HISTORICO = "historico-perda";
 	static final String CAMINHO_IMAGGEM = "./dados/mnist/treino/8/img_0.jpg";
 	// static final String caminhoImagem = "./dados/mnist/treino/7/img_1.jpg";
@@ -33,14 +33,14 @@ public class MainImg {
 	public static void main(String[] args) {      
 		ged.limparConsole();
 
+		BufferedImage imagem = geim.lerImagem(CAMINHO_IMAGGEM);
 		int tamEntrada = 2;
 		int tamSaida = 1;
-		BufferedImage imagem = geim.lerImagem(CAMINHO_IMAGGEM);
 		
 		double[][] dados;
-		if (tamSaida == 1) dados = geim.imagemParaDadosTreinoEscalaCinza(imagem);
+		if 		(tamSaida == 1) dados = geim.imagemParaDadosTreinoEscalaCinza(imagem);
 		else if (tamSaida == 3) dados = geim.imagemParaDadosTreinoRGB(imagem);
-		else return;
+		else throw new IllegalArgumentException("\nImagem deve ser em Escala de Cinza ou RGB");
 
 		double[][] in  = (double[][]) ged.separarDadosEntrada(dados, tamEntrada);
 		double[][] out = (double[][]) ged.separarDadosSaida(dados, tamSaida);
@@ -54,53 +54,62 @@ public class MainImg {
 		Modelo modelo = criarSequencial(tamEntrada, tamSaida);
 		modelo.print();
 
-		// treinar e marcar tempo
-		long horas, minutos, segundos;
-
 		System.out.println("Treinando.");
 		long tempo = treinoEmPainel(modelo, dl, imagem.getWidth(), imagem.getHeight());
-
-		long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempo);
-		horas 	 = segundosTotais / 3600;
-		minutos  = (segundosTotais % 3600) / 60;
-		segundos = segundosTotais % 60;
+		long hrs = TimeUnit.NANOSECONDS.toHours(tempo);
+		long min = TimeUnit.NANOSECONDS.toMinutes(tempo);
+		long sec = TimeUnit.NANOSECONDS.toSeconds(tempo);
 
 		double precisao = (1 - modelo.avaliador().erroMedioQuadrado(x, y).item())*100;
 		System.out.println("Precisão = " + formatarDecimal(precisao, 2) + "%");
 		System.out.println("Perda = " + modelo.avaliar(x, y).item());
-		System.out.println("Tempo de treinamento: " + horas + "h " + minutos + "m " + segundos + "s");
+		System.out.println("Tempo de treinamento: " + hrs + "h " + min + "m " + sec + "s");
 
-		if (calcularHistorico) {
+		if (historico) {
 			exportarHistorico(modelo, CAMINHO_HISTORICO);
 			executarComando("python grafico.py " + CAMINHO_HISTORICO);
 		}
 	}
 
-	static Modelo criarRna(int entradas, int saidas) {
-		Otimizador otm = new SGD(0.001, 0.99);
+	/**
+	 * Cria um modelo MLP.
+	 * @param in quantidade de dados de entrada.
+	 * @param out quantidade de dados de saída.
+	 * @return {@code Modelo} criado.
+	 */
+	static Modelo criarRna(int in, int out) {
+		RedeNeural modelo = new RedeNeural(in, 8, 8, out);
+		
+		Object otm = new SGD(0.001, 0.99);
+		Object loss = "mse";
+		modelo.compilar(otm, loss);
 
-		RedeNeural modelo = new RedeNeural(entradas, 8, 8, saidas);
-		modelo.compilar(otm, "mse");
 		modelo.configurarAtivacao("sigmoid");
 		modelo.configurarAtivacao(modelo.camadaSaida(), "sigmoid");
-		modelo.setHistorico(calcularHistorico);
+		modelo.setHistorico(historico);
 		
 		return modelo;
 	}
 
-	static Modelo criarSequencial(int entradas, int saidas) {
+	/**
+	 * Cria um modelo Sequencial.
+	 * @param in quantidade de dados de entrada.
+	 * @param out quantidade de dados de saída.
+	 * @return {@code Modelo} criado.
+	 */
+	static Modelo criarSequencial(int in, int out) {
 		Sequencial modelo = new Sequencial(
-			new Entrada(entradas),
+			new Entrada(in),
 			new Densa(20, "tanh"),
 			new Densa(20, "tanh"),
-			new Densa(saidas, "sigmoid")
+			new Densa(out, "sigmoid")
 		);
 
 		Object optm = "sgd";
 		Object loss = "mse"; 
 
 		modelo.compilar(optm, loss);
-		modelo.setHistorico(calcularHistorico);
+		modelo.setHistorico(historico);
 
 		return modelo;
 	}
@@ -108,13 +117,12 @@ public class MainImg {
 	/**
 	 * Treina e exibe o resultado da Rede Neural no painel.
 	 * @param modelo modelo de rede neural usado no treino.
+	 * @param loader {@code DataLoader} com dados de treino.
 	 * @param altura altura da janela renderizada.
 	 * @param largura largura da janela renderizada.
-	 * @param x dados de entrada para o treino.
-	 * @param y dados de saída relativos a entrada.
 	 * @return tempo (em nano segundos) do treino.
 	 */
-	static long treinoEmPainel(Modelo modelo, DataLoader dl, int altura, int largura) {
+	static long treinoEmPainel(Modelo modelo, DataLoader loader, int altura, int largura) {
 		final int FPS = 60_000000;
 		final int EPOCAS_POR_FRAME = 55;
 
@@ -134,7 +142,7 @@ public class MainImg {
 		int i = 0;
 		long tempoTreino = System.nanoTime();
 		while (i < EPOCAS && jt.isVisible()) {
-			modelo.treinar(dl, EPOCAS_POR_FRAME, false);
+			modelo.treinar(loader, EPOCAS_POR_FRAME, false);
 			jt.desenharTreino(modelo, i);
 			i += EPOCAS_POR_FRAME;
 
@@ -184,27 +192,20 @@ public class MainImg {
 	/**
 	 * Formata o valor recebido para a quantidade de casas após o ponto
 	 * flutuante.
-	 * @param valor valor alvo.
+	 * @param x valor alvo.
 	 * @param casas quantidade de casas após o ponto flutuante.
 	 * @return
 	 */
-	static String formatarDecimal(double valor, int casas) {
-		String valorFormatado = "";
-
-		String formato = "#.";
-		for (int i = 0; i < casas; i++) formato += "#";
-
-		DecimalFormat df = new DecimalFormat(formato);
-		valorFormatado = df.format(valor);
-
-		return valorFormatado;
+	static String formatarDecimal(double x, int casas) {
+		String formato = "#." + "#".repeat(casas);
+		return new DecimalFormat(formato).format(x);
 	}
 
 	/**
-	 * teste
-	 * @param comando
+	 * Executa um comando do terminald Windows.
+	 * @param comando comando para o prompt.
 	 */
-	public static void executarComando(String comando){
+	static void executarComando(String comando) {
 		try {
 			new ProcessBuilder("cmd", "/c", comando).inheritIO().start().waitFor();
 		} catch (Exception e) {
