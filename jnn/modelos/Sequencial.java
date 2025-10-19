@@ -315,7 +315,7 @@ public class Sequencial extends Modelo {
 
 		treinador().backpropagation(g);
 
-		return camada(0).gradEntrada();// preservar o gradiente do modelo
+		return camada(0).gradEntrada();
 	}
   
 	@Override
