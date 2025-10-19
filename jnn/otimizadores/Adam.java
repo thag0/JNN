@@ -9,117 +9,62 @@ import jnn.core.tensor.TensorData;
  * </h2>
  * Implementação do algoritmo de otimização Adam.
  * <p>
- *    O algoritmo ajusta os pesos do modelo usando o gradiente descendente 
- *    com momento e a estimativa adaptativa de momentos de primeira e segunda ordem.
+ *    O algoritmo ajusta os parâmetros do modelo usando o gradiente descendente 
+ *    com momento e estimativas adaptativas para momentos de primeira e segunda ordem.
  * </p>
- * <p>
- * 	Os hiperparâmetros do Adam podem ser ajustados para controlar o 
- * 	comportamento do otimizador durante o treinamento.
- * </p>
- * <p>
- *    O Adam funciona usando a seguinte expressão:
- * </p>
- * <pre>
- *var -= (alfa * m) / ((√ v) + eps)
- * </pre>
- * Onde:
- * <p>
- *    {@code var} - variável que será otimizada.
- * </p>
- * <p>
- *    {@code alfa} - correção aplicada a taxa de aprendizado.
- * </p>
- * <p>
- *    {@code m} - coeficiente de momentum correspondente a variável que
- *    será otimizada;
- * </p>
- * <p>
- *    {@code v} - coeficiente de momentum de segunda orgem correspondente 
- *    a variável que será otimizada;
- * </p>
- * <p>
- *    {@code eps} - pequeno valor usado para evitar divisão por zero.
- * </p>
- * O valor de {@code alfa} é dado por:
- * <pre>
- * alfa = tA * √(1- beta1ⁱ) / (1 - beta2ⁱ)
- * </pre>
- * Onde:
- * <p>
- *    {@code i} - contador de interações do Adam.
- * </p>
- * As atualizações de momentum de primeira e segunda ordem se dão por:
- *<pre>
- *m += (1 - beta1) * (g  - m)
- *v += (1 - beta2) * (g² - v)
- *</pre>
- * Caso a correção {@code amsgrad} esteja ativa:
- *<pre>
- *v = max(v, vc);
- *</pre>
- * Onde:
- * <p>
- *    {@code beta1 e beta2} - valores de decaimento dos momentums de primeira
- *    e segunda ordem.
- * </p>
- * <p>
- *    {@code g} - gradiente correspondente a variável que será otimizada.
- * </p>
- * <p>
- *    {@code vc} - histórico de atualizações do amsgrad.
- * </p>
+ * {@link {@code Paper}: https://arxiv.org/pdf/1412.6980}
  */
 public class Adam extends Otimizador {
 
 	/**
 	 * Valor de taxa de aprendizado padrão do otimizador.
 	 */
-	private static final double PADRAO_TA = 0.001;
+	static final double PADRAO_LR = 0.001;
 
 	/**
 	 * Valor padrão para o decaimento do momento de primeira ordem.
 	 */
-	private static final double PADRAO_BETA1 = 0.9;
+	static final double PADRAO_BETA1 = 0.9;
  
 	/**
 	 * Valor padrão para o decaimento do momento de segunda ordem.
 	 */
-	private static final double PADRAO_BETA2 = 0.999;
+	static final double PADRAO_BETA2 = 0.999;
 	 
 	/**
 	 * Valor padrão para epsilon.
 	 */
-	private static final double PADRAO_EPS = 1e-8;
+	static final double PADRAO_EPS = 1e-8;
 	 
 	/**
 	 * Valor padrão de correção.
 	 */
-	private static final boolean PADRAO_AMSGRAD = false;
+	static final boolean PADRAO_AMSGRAD = false;
 
 	/**
 	 * Valor de taxa de aprendizado do otimizador (Learning Rate).
 	 */
-	private final double lr;
+	final double lr;
 
 	/**
 	 * Decaimento do momentum.
 	 */
-	private final double beta1;
+	final double beta1;
 	 
 	/**
 	 * Decaimento do momentum de segunda ordem.
 	 */
-	private final double beta2;
+	final double beta2;
 	 
 	/**
 	 * Usado para evitar divisão por zero.
 	 */
-	private final double eps;
+	final double eps;
 
 	/**
 	 * Correção dos valores de velocidade.
 	 */
-	private final boolean amsgrad;
+	final boolean amsgrad;
 
 	/**
 	 * Coeficientes de momentum.
@@ -132,14 +77,24 @@ public class Adam extends Otimizador {
 	private Tensor[] v = {};
 
 	/**
-	 * Coeficientes de segunda ordem corrigidos.
+	 * Coeficientes de momentum corrigidos.
+	 */
+	private Tensor[] mc = {};
+
+	/**
+	 * Coeficientes de momentum de segunda ordem corrigidos.
 	 */
 	private Tensor[] vc = {};
+
+	/**
+	 *  Coeficientes de correção do AMSGrad.
+	 */
+	private Tensor[] ams = {};
 	
 	/**
 	 * Contador de iterações.
 	 */
-	long iteracoes = 0L;
+	long iteracao = 0L;
  
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> Adam </strong> 
@@ -222,7 +177,7 @@ public class Adam extends Otimizador {
 	 * @param amsgrad aplicar correção.
 	 */
 	public Adam(boolean amsgrad) {
-		this(PADRAO_TA, PADRAO_BETA1, PADRAO_BETA2, PADRAO_EPS, amsgrad);
+		this(PADRAO_LR, PADRAO_BETA1, PADRAO_BETA2, PADRAO_EPS, amsgrad);
 	}
 
 	/**
@@ -233,7 +188,7 @@ public class Adam extends Otimizador {
 	 * </p>
 	 */
 	public Adam() {
-		this(PADRAO_TA, PADRAO_BETA1, PADRAO_BETA2, PADRAO_EPS, PADRAO_AMSGRAD);
+		this(PADRAO_LR, PADRAO_BETA1, PADRAO_BETA2, PADRAO_EPS, PADRAO_AMSGRAD);
 	}
 
 	@Override
@@ -243,11 +198,13 @@ public class Adam extends Otimizador {
 		for (Tensor param : _params) {
 			m = utils.addEmArray(m, new Tensor(param.shape()));
 			v = utils.addEmArray(v, new Tensor(param.shape()));
+			mc = utils.addEmArray(mc, new Tensor(param.shape()));
+			vc = utils.addEmArray(vc, new Tensor(param.shape()));
 		}
 
 		if (amsgrad) {
 			for (Tensor param : _params) {
-				vc = utils.addEmArray(vc, new Tensor(param.shape()));
+				ams = utils.addEmArray(ams, new Tensor(param.shape()));
 			}
 		}
 		
@@ -258,34 +215,43 @@ public class Adam extends Otimizador {
 	public void atualizar() {
 		verificarConstrucao();
 		
-		iteracoes++;
-		double fb1 = Math.pow(beta1, iteracoes);
-		double fb2 = Math.pow(beta2, iteracoes);
-		double alfa = lr * Math.sqrt(1.0 - fb2) / (1.0 - fb1);
+		iteracao += 1;
 
-		for (int i = 0; i < _params.length; i++) {
-			TensorData p_i  = _params[i].data();
-			TensorData g_i  = _grads[i].data();
-			TensorData m_i  = m[i].data();
-			TensorData v_i  = v[i].data();
+		double corr1 = Math.pow(beta1, iteracao);
+		double corr2 = Math.pow(beta2, iteracao);
 
-			// m = β1*m + (1-β1)*g
+		final int n = _params.length;
+		for (int i = 0; i < n; i++) {
+			TensorData p_i = _params[i].data();
+			TensorData g_i = _grads[i].data();
+			TensorData m_i = m[i].data();
+			TensorData v_i = v[i].data();
+			TensorData mc_i = mc[i].data();
+			TensorData vc_i = vc[i].data();
+
+			// m = β1*m + (g * (1 - β1))
 			m_i.mul(beta1).add(g_i, 1.0 - beta1);
-			
-			// v = β2*v + (1-β2)*(g²)
+
+			// v = β2*v + (g² * (1 - β2))
 			v_i.mul(beta2).addcmul(g_i, g_i, 1.0 - beta2);
-			
-			if (amsgrad) {// v = max(v, vc)
-				TensorData vc_i = vc[i].data();
-				vc_i.maxEntre(v_i);
-				v_i.copiar(vc_i);
+
+			// m̂ = m / (1 - β1^t)
+			mc_i.copiar(m_i).div(1.0 - corr1);
+
+			// v̂ = v / (1 - β2^t)
+			vc_i.copiar(v_i).div(1.0 - corr2);
+
+			if (amsgrad) {// vc = max(vc, vams)
+				TensorData vams_i = ams[i].data();
+				vams_i.maxEntre(vc_i);
+				vc_i.copiar(vams_i);
 			}
 
-			// sqrt(v) + eps
-			TensorData den = v_i.clone().sqrt().add(eps);
+			// sqrt(v̂) + eps
+			TensorData den = vc_i.clone().sqrt().add(eps);
 			
-			// p -= (alfa * m) / (sqrt(v) + eps)
-			p_i.addcdiv(m_i, den, -alfa);
+			// p -= (lr * m̂) / (sqrt(v̂) + eps)
+			p_i.addcdiv(mc_i, den, -lr);
 		}
 	}
 
@@ -300,7 +266,7 @@ public class Adam extends Otimizador {
 		addInfo("Epsilon: " + eps);
 		addInfo("Amsgrad: " + amsgrad);
 
-		return super.info();
+		return info();
 	}
 
 }
