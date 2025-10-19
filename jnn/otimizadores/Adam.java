@@ -212,8 +212,8 @@ public class Adam extends Otimizador {
 	}
 
 	@Override
-	public void atualizar() {
-		verificarConstrucao();
+	public void update() {
+		checkInicial();
 		
 		iteracao += 1;
 
@@ -257,9 +257,9 @@ public class Adam extends Otimizador {
 
 	@Override
 	public String info() {
-		verificarConstrucao();
-		construirInfo();
+		checkInicial();
 		
+		construirInfo();
 		addInfo("Lr: " + lr);
 		addInfo("Beta1: " + beta1);
 		addInfo("Beta2: " + beta2);

@@ -48,10 +48,10 @@ public abstract class Otimizador {
 	/**
 	 * Verifica se o otimizador pode ser utilizado.
 	 */
-	protected void verificarConstrucao() {
+	protected void checkInicial() {
 		if (!_construido) {
 			throw new IllegalStateException(
-				"\nOtimizador deve ser construído."
+				"\nOtimizador deve ser construído antes de ser utilizado, utilize construir()."
 			);
 		}
 	}
@@ -80,26 +80,26 @@ public abstract class Otimizador {
 			}
 		}
 
-		for (Tensor param : params) {
-			_params = utils.addEmArray(_params, param);	
+		for (Tensor p : params) {
+			_params = utils.addEmArray(_params, p);	
 		}
 
-		for (Tensor grad : grads) {
-			_grads = utils.addEmArray(_grads, grad);
+		for (Tensor g : grads) {
+			_grads = utils.addEmArray(_grads, g);
 		}
 	}
 
 	/**
 	 * Inicializa os parâmetros necessários do otimizador.
 	 * @param params array de {@code Tensor} contendo os parâmetros desejados.
-	 * @param grads array de {@code Tensor} contendo os gradientes desejados.
+	 * @param grads array de {@code Tensor} contendo os gradientes relacionados aos parâmetros.
 	 */
 	public abstract void construir(Tensor[] params, Tensor[] grads);
 
 	/**
 	 * Executa um passo de atualização do otimizador.
 	 */
-	public abstract void atualizar();
+	public abstract void update();
 
 	/**
  	 * Exibe as opções de configurações do otimizador.

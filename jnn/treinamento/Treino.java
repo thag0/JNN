@@ -33,7 +33,7 @@ public class Treino extends Treinador {
 				
 				modelo.gradZero();
 				backpropagation(loss.backward(prev, y[i]));
-				otm.atualizar();
+				otm.update();
 			}
 
 			if (logs) {

@@ -126,8 +126,8 @@ public class RMSProp extends Otimizador {
 	}
 
 	@Override
-	public void atualizar() {
-		verificarConstrucao();
+	public void update() {
+		checkInicial();
 		
 		final int n = _params.length;
 		for (int i = 0; i < n; i++) {
@@ -148,7 +148,7 @@ public class RMSProp extends Otimizador {
 
 	@Override
 	public String info() {
-		verificarConstrucao();
+		checkInicial();
 		construirInfo();
 		
 		addInfo("Lr: " + lr);

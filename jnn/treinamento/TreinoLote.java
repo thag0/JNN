@@ -67,7 +67,7 @@ public class TreinoLote extends Treinador {
 
                 modelo.gradZero();
                 processoLote(loteX, loteY, loss, perdaEpoca);
-                otm.atualizar();      
+                otm.update();      
 			}
 
 			if (logs) {

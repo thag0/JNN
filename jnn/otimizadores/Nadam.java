@@ -170,8 +170,8 @@ public class Nadam extends Otimizador {
 	}
 
 	@Override
-	public void atualizar() {
-		verificarConstrucao();
+	public void update() {
+		checkInicial();
 		
 		iteracoes++;
 		double fb1 = 1.0 - Math.pow(beta1, iteracoes);
@@ -208,7 +208,7 @@ public class Nadam extends Otimizador {
 
 	@Override
 	public String info() {
-		verificarConstrucao();
+		checkInicial();
 		construirInfo();
 		
 		addInfo("Lr: " + lr);
