@@ -49,7 +49,12 @@ public class TreinoLote extends Treinador {
 
 	@Override
 	protected void loop(Tensor[] x, Tensor[] y, Otimizador otm, Perda loss, int amostras, int epochs, boolean logs) {
-        threads = (int) (Runtime.getRuntime().availableProcessors() * 0.25) + 1;
+		if (super.numThreads == 1) {// config padrão
+			threads = (int) (Runtime.getRuntime().availableProcessors() * 0.25) + 1;
+		} else {
+			threads = super.numThreads;
+		}
+
 		if (threads > x.length) threads = x.length;
 
         exec = Executors.newFixedThreadPool(threads);
@@ -61,9 +66,9 @@ public class TreinoLote extends Treinador {
 			perdaEpoca.zero();
 
 			for (int i = 0; i < amostras; i += _tamLote) {
-				int fimId = Math.min(i + _tamLote, amostras);
-				Tensor[] loteX = utils.subArray(x, i, fimId);
-				Tensor[] loteY = utils.subArray(y, i, fimId);
+				int idFim = Math.min(i + _tamLote, amostras);
+				Tensor[] loteX = utils.subArray(x, i, idFim);
+				Tensor[] loteY = utils.subArray(y, i, idFim);
 
                 modelo.gradZero();
                 processoLote(loteX, loteY, loss, perdaEpoca);
