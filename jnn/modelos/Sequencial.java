@@ -7,7 +7,7 @@ import jnn.camadas.Camada;
 import jnn.camadas.Entrada;
 import jnn.core.Dicionario;
 import jnn.core.tensor.Tensor;
-import jnn.treinamento.Treino;
+import jnn.treinamento.Treinador;
 
 /**
  * <h1>
@@ -313,9 +313,12 @@ public class Sequencial extends Modelo {
 	public Tensor backward(Tensor g) {
 		validarCompilacao();
 
-		treinador().backpropagation(g);
+		final int n = numCamadas();
+		for (int i = n-1; i >= 0; i--) {
+			g = camada(i).backward(g);
+		}
 
-		return camada(0).gradEntrada();
+		return g;
 	}
   
 	@Override
@@ -492,7 +495,7 @@ public class Sequencial extends Modelo {
 		clone._otimizador = dicio.getOtimizador(_otimizador.nome());
 		clone._perda = dicio.getPerda(_perda.nome());
 		clone.seedInicial = this.seedInicial;
-		clone._treinador = new Treino(clone);
+		clone._treinador = new Treinador(clone);
 		
 		int nCamadas = numCamadas();
 		clone._camadas = new Camada[nCamadas];

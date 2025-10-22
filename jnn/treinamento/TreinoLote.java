@@ -15,7 +15,7 @@ import jnn.otimizadores.Otimizador;
   * Implementação de treino em lote dos modelos.
  */
 @SuppressWarnings("deprecation")// TODO: remover e adaptar para não usar Variavel
-public class TreinoLote extends Treinador {
+public class TreinoLote extends MetodoTreino {
 	
 	/**
 	 * Utilitário.
@@ -28,9 +28,9 @@ public class TreinoLote extends Treinador {
 	ExecutorService exec;
 
 	/**
-	 * Quantidade de threads usadas pelo treinador.
+	 * 
 	 */
-	int threads;
+	int tamLote;
 
 	/**
 	 * Clones do modelo base
@@ -43,30 +43,25 @@ public class TreinoLote extends Treinador {
 	 * do dataset fornecido.
 	 * @param historico modelo para treino.
 	 */
+	public TreinoLote(Modelo modelo, boolean hist, int tamLote) {
+		super(modelo, hist);
+		this.tamLote = tamLote;
+		System.out.println("Treino lote selecionado.");
+	}
+
 	public TreinoLote(Modelo modelo, int tamLote) {
-		super(modelo, tamLote);
+		this(modelo, false, tamLote);
 	}
 
 	@Override
 	protected void loop(Tensor[] x, Tensor[] y, Otimizador otm, Perda loss, int amostras, int epochs, boolean logs) {
-		if (super.numThreads == 1) {// config padrão
-			threads = (int) (Runtime.getRuntime().availableProcessors() * 0.25) + 1;
-		} else {
-			threads = super.numThreads;
-		}
-
-		if (threads > x.length) threads = x.length;
-
-        exec = Executors.newFixedThreadPool(threads);
-
-		if (logs) esconderCursor();
 		Variavel perdaEpoca = new Variavel();
 		for (int e = 1; e <= epochs; e++) {
 			embaralhar(x, y);
 			perdaEpoca.zero();
 
-			for (int i = 0; i < amostras; i += _tamLote) {
-				int idFim = Math.min(i + _tamLote, amostras);
+			for (int i = 0; i < amostras; i += tamLote) {
+				int idFim = Math.min(i + tamLote, amostras);
 				Tensor[] loteX = utils.subArray(x, i, idFim);
 				Tensor[] loteY = utils.subArray(y, i, idFim);
 
@@ -84,12 +79,30 @@ public class TreinoLote extends Treinador {
 			if (calcHist) historico.add((perdaEpoca.get()/amostras));
 		}
 
-		if (logs) {
-			exibirCursor();
-			System.out.println();
+		exec.close();// tem que ter isso se não o processo do programa não acaba
+	}
+
+	/**
+	 * Adapta a quantidade de threads usadas para prevenir overflow quando
+	 * a quantidade de amostras do lote for diferente do configurado
+	 * <p>
+	 *		Essa assimetria geralmente ocorre no último lote do dataset,
+	 *		quando a quantidade de amostras restante não é perfeitamente divisível
+	 *		pelo tamanho do lote.
+	 * </p>
+	 * @param tamLote tamanho do lote da iteração.
+	 */
+	private void ajustarThreads(int tamLote) {
+		int t = 0;
+
+		if (_threads == 1) {// config padrão
+			t = (int) (Runtime.getRuntime().availableProcessors() * 0.25) + 1;
+		} else {
+			t = _threads;
 		}
 
-		exec.close();// tem que ter isso se não o processo do programa não acaba
+		if (t > tamLote) t = tamLote;
+		_threads = t;
 	}
 
 	/**
@@ -103,18 +116,23 @@ public class TreinoLote extends Treinador {
 		int tamLote = loteX.length;
 		int numCamadas = modelo.numCamadas();
 
-		clones = new Modelo[threads];
+		ajustarThreads(tamLote);
+		exec = Executors.newFixedThreadPool(_threads);
+		
+		System.out.println("Usando " + _threads + " threads.");
+
+		clones = new Modelo[_threads];
 		for (int j = 0; j < clones.length; j++) {
 		    clones[j] = modelo.clone();
 		}
 
-        int blocoThread = Math.max(1, tamLote / threads);
-        CountDownLatch latch = new CountDownLatch(threads);
+        int blocoThread = Math.max(1, tamLote / _threads);
+        CountDownLatch latch = new CountDownLatch(_threads);
 
-        for (int t = 0; t < threads; t++) {
+        for (int t = 0; t < _threads; t++) {
             final int id = t;
             final int inicio = t * blocoThread;
-            final int fim = (t == threads - 1) ? tamLote : (t + 1) * blocoThread;
+            final int fim = (t == _threads - 1) ? tamLote : (t + 1) * blocoThread;
 
             exec.execute(() -> {
                 try {

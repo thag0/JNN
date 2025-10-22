@@ -1,75 +1,62 @@
 package jnn.treinamento;
 
-import java.util.LinkedList;
-import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import jnn.avaliacao.perda.Perda;
-import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;
-import jnn.otimizadores.Otimizador;
 
 /**
  * Interface para treino de modelos da biblioteca.
  */
-public abstract class Treinador implements Cloneable {
+public class Treinador implements Cloneable {
 
 	/**
-	 * Modelo de treino.
+	 * Modelo base para treino.
 	 */
 	protected Modelo modelo;
 
 	/**
-	 * Gerador de números pseudo-aleatórios.
+	 * Formato de execução de treino (amostra-amostra, lotes).
 	 */
-	protected Random random;
+	MetodoTreino metodo;
 
 	/**
-	 * Utilitário.
+	 * Número de threads para execução em paralelo.
 	 */
-	protected Utils utils = new Utils();
+	protected int _numThreads;
 
 	/**
-	 * Histórico de perda do modelo durante o treinamento.
-	 */
-	protected LinkedList<Double> historico;
-	
-	/**
-	 * Variável de controle para armazenagem do histórico de treino.
+	 * Armazenar histórico de perda durante o treino.
 	 */
 	protected boolean calcHist;
 
 	/**
-	 * Tamanho do lote de treinamento.
+	 * Seed para o gerador de número aleatórios.
 	 */
-	protected int _tamLote;
+	protected long seed = 0L;// seed padrão
 
 	/**
-	 * Número de threads para execução em paralelo.
-	 * TODO: refatorar o uso de threads para herdar da classe mãe de uma forma mais automática.
+	 * 
 	 */
-	protected int numThreads = 1;
-
-	/**
-	 * Construtor implícito.
-	 */
-	protected Treinador(Modelo modelo, int tamLote) {
+	public Treinador(Modelo modelo, boolean hist, int numThreads) {
 		this.modelo = modelo;
-
-		random = new Random();
-		historico = new LinkedList<>();
-		calcHist = false;
-		this._tamLote = tamLote;
+		this._numThreads = numThreads;
+		this.calcHist = hist;
 	}
 
 	/**
-	 * Construtor implícito.
+	 * 
 	 */
-	protected Treinador(Modelo modelo) {
-		this(modelo, 1);
+	public Treinador(Modelo modelo) {
+		this(modelo,false, 1);
+	}
+
+	public void setMetodo(MetodoTreino metodo) {
+		if (metodo != null) {
+			this.metodo = metodo;
+		}
 	}
 
 	/**
@@ -77,9 +64,7 @@ public abstract class Treinador implements Cloneable {
 	 * @param seed nova seed.
 	 */
 	public void setSeed(Number seed) {
-		if (seed != null) {
-			random.setSeed(seed.longValue());
-		}
+		this.seed = seed.longValue();
 	}
 
 	/**
@@ -87,15 +72,21 @@ public abstract class Treinador implements Cloneable {
 	 * @param calcular calcular ou não o histórico de custo.
 	 */
 	public void setHistorico(boolean calcular) {
-		calcHist = calcular;
+		this.calcHist = calcular;
 	}
 
 	/**
-	 * Configura o número de threads para o treino em lotes.
-	 * @param threads threads desejadas.
+	 * Ajusta a quantidade de threads para utilizar durante o treino.
+	 * @param n threads desejadas.
 	 */
-	public void setThreads(int threads) {
-		if (threads > 1) numThreads = threads;
+	public void setThreads(int n) {
+		if (n < 1) {
+			throw new IllegalArgumentException(
+				"\nNúmero de threads " + n + " inválido."
+			);
+		}
+
+		_numThreads = n;
 	}
 
 	/**
@@ -103,11 +94,27 @@ public abstract class Treinador implements Cloneable {
 	 * @param xs {@code Tensores} contendos os dados de entrada.
 	 * @param ys {@code Tensores} contendos os dados de saída (rótulos).
 	 * @param epochs quantidade de épocas de treinamento.
+	 * @param tamLote tamanho do lote de amostras.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	public void executar(Tensor[] xs, Tensor[] ys, int epochs, boolean logs) {
-		modelo.treino(true);
-		loop(
+	public void executar(Tensor[] xs, Tensor[] ys, int epochs, int tamLote, boolean logs) {
+		if (tamLote < 1) {
+			throw new IllegalArgumentException(
+				"\nTamanho de lote " + tamLote + " inválido."
+			);
+		}
+
+		if (tamLote == 1) setMetodo(new Treino(modelo));
+		else setMetodo(new TreinoLote(modelo, tamLote));
+
+		metodo.calcHist = calcHist;
+		metodo._threads = _numThreads;
+		
+		// só mexer na seed se for mudada
+		if (seed != 0) metodo.random.setSeed(seed);
+		
+		modelo.treino(true);	
+		metodo.loop(
 			xs,
 			ys,
 			modelo.otm(),
@@ -127,7 +134,19 @@ public abstract class Treinador implements Cloneable {
 	 * @see {@link jnn.dataloader.DataLoader}
 	 */
 	public void executar(DataLoader dl, int epochs, boolean logs) {
-		executar(dl.getX(), dl.getY(), epochs, logs);
+		executar(dl, epochs, 1, logs);
+	}
+
+	/**
+	 * Executa a regra de treino durante um determinado número de épocas.
+	 * @param dl {@code DataLoader} com conjunto de amostras.
+	 * @param epochs quantidade de épocas de treinamento.
+	 * @param tamLote tamanho do lote de amostras.
+	 * @param logs logs para perda durante as épocas de treinamento.
+	 * @see {@link jnn.dataloader.DataLoader}
+	 */
+	public void executar(DataLoader dl, int epochs, int tamLote, boolean logs) {
+		executar(dl.getX(), dl.getY(), epochs, tamLote, logs);
 	}
 
 	/**
@@ -137,7 +156,18 @@ public abstract class Treinador implements Cloneable {
 	 * @param epochs quantidade de épocas de treinamento.
 	 */
 	public void executar(Tensor[] xs, Tensor[] ys, int epochs) {
-		executar(xs, ys, epochs, false);
+		executar(xs, ys, epochs, 1, false);
+	}
+
+	/**
+	 * Executa a regra de treino durante um determinado número de épocas.
+	 * @param xs {@code Tensores} contendos os dados de entrada.
+	 * @param ys {@code Tensores} contendos os dados de saída (rótulos).
+	 * @param tamLote tamanho do lote de amostras.
+	 * @param epochs quantidade de épocas de treinamento.
+	 */
+	public void executar(Tensor[] xs, Tensor[] ys, int tamLote, int epochs) {
+		executar(xs, ys, epochs, tamLote, false);
 	}
 
 	/**
@@ -147,41 +177,16 @@ public abstract class Treinador implements Cloneable {
 	 * @param epochs quantidade de épocas de treinamento.
 	 */
 	public void executar(DataLoader dl, int epochs) {
-		executar(dl, epochs, false);
+		executar(dl, epochs, 1, false);
 	}
-
-	/**
-	 * Loop principal de treino.
-	 * @param x {@code array} de {@code Tensor} com dados de entrada.
-	 * @param y {@code array} de {@code Tensor} com dados de saída.
-	 * @param otm otimizador.
-	 * @param loss função de perda.
-	 * @param amostras quantidade de amostras.
-	 * @param epochs quantidade de épocas de treinamento.
-	 * @param logs exibir logs de avanço;
-	 */
-	protected abstract void loop(Tensor[] x, Tensor[] y, Otimizador otm, Perda loss, int amostras, int epochs, boolean logs);
 
 	/**
 	 * Realiza a retropropagação de gradientes através das camadas do modelo.
-	 * @param grad {@code Tensor} contendo o gradiente em relação a saída prevista
+	 * @param g {@code Tensor} contendo o gradiente em relação a saída prevista
 	 * pelo modelo.
 	 */
-	public void backpropagation(Tensor grad) {
-		final int n = modelo.numCamadas();
-		for (int i = n-1; i >= 0; i--) {
-			grad = modelo.camada(i).backward(grad);
-		}
-	}
-
-	/**
-	 * Embaralha ambos os arrays de entrada e saída.
-	 * @param <T> tipo de dados de entrada e saida.
-	 * @param xs {@code array} com dados de entrada.
-	 * @param ys {@code array} com dados de saída.
-	 */
-	public <T> void embaralhar(T[] xs, T[] ys) {
-		utils.embaralhar(xs, ys, random);
+	public void backpropagation(Tensor g) {
+		metodo.backpropagation(g);
 	}
 
 	/**
@@ -189,14 +194,14 @@ public abstract class Treinador implements Cloneable {
 	 * @return lista de perdas do modelo.
 	 */
 	public double[] hist() {
-		Object[] hist = historico.toArray();
+		Double[] hist = metodo.hist();
 		double[] h = new double[hist.length];
 
 		int t = Runtime.getRuntime().availableProcessors()/2;
 		try (ExecutorService exec = Executors.newFixedThreadPool(t)) {
 			for (int i = 0, n = h.length; i < n; i++) {
 				final int id = i;
-				exec.execute(() -> h[id] = (double)hist[id]);
+				exec.execute(() -> h[id] = hist[id]);
 			}
 		} catch (Exception e) {
 			throw e;
@@ -211,45 +216,6 @@ public abstract class Treinador implements Cloneable {
 	 */
 	public String nome() {
 		return getClass().getSimpleName();
-	}
-
-	@Override
-	public Treinador clone() {
-		try {
-			return (Treinador) super.clone();
-		} catch (CloneNotSupportedException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	/** 
-	 * Esconde o cursor do terminal.
-	 */
-	public void esconderCursor() {
-		System.out.print("\033[?25l");
-	}
-
-	/**
-	 * Exibe o cursor no terminal.
-	 */
-	public void exibirCursor() {
-		System.out.print("\033[?25h");
-	}
-
-	/**
-	 * Atualiza as informações do log de treino.
-	 * @param log informações desejadas.
-	 */
-	public void exibirLogTreino(String log) {
-		System.out.println(log);
-		System.out.print("\033[1A"); // mover pra a linha anterior
-	}
-
-	/**
-	 * Limpa a linha de log
-	 */
-	public void limparLinha() {
-		System.out.print("\033[2K");
 	}
 	
 }

@@ -8,14 +8,18 @@ import jnn.otimizadores.Otimizador;
 /**
   * Implementação de treino dos modelos.
  */
-public class Treino extends Treinador {
+public class Treino extends MetodoTreino {
 
 	/**
 	 * Treinador sequencial, atualiza os parâmetros a cada amostra de dados.
 	 * @param modelo modelo para treino.
 	 */
+	public Treino(Modelo modelo, boolean hist) {
+		super(modelo, hist);
+	}
+
 	public Treino(Modelo modelo) {
-		super(modelo);
+		this(modelo, false);
 	}
 
 	@Override
@@ -49,6 +53,7 @@ public class Treino extends Treinador {
 			exibirCursor();
 			System.out.println();
 		}
+
 	}
 
 }

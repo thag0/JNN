@@ -10,7 +10,7 @@ import jnn.core.Dicionario;
 import jnn.core.tensor.Tensor;
 import jnn.otimizadores.Otimizador;
 import jnn.otimizadores.SGD;
-import jnn.treinamento.Treino;
+import jnn.treinamento.Treinador;
 
 /**
  * <h3>
@@ -448,9 +448,12 @@ public class RedeNeural extends Modelo {
 	public Tensor backward(Tensor g) {
 		validarCompilacao();
 
-		treinador().backpropagation(g);
+		final int n = numCamadas();
+		for (int i = n-1; i >= 0; i--) {
+			g = camada(i).backward(g);
+		}
 
-		return camada(0).gradEntrada();
+		return g;
 	}
 
 	@Override
@@ -723,7 +726,7 @@ public class RedeNeural extends Modelo {
 		clone._otimizador = dicio.getOtimizador(_otimizador.nome());
 		clone._perda = dicio.getPerda(_perda.nome());
 		clone.seedInicial = this.seedInicial;
-		clone._treinador = new Treino(clone);
+		clone._treinador = new Treinador(clone);
 
 		clone._camadas = new Densa[_camadas.length];
 		for (int i = 0; i < _camadas.length; i++) {

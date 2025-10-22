@@ -8,8 +8,6 @@ import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.otimizadores.Otimizador;
 import jnn.treinamento.Treinador;
-import jnn.treinamento.Treino;
-import jnn.treinamento.TreinoLote;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -89,7 +87,7 @@ public abstract class Modelo implements Cloneable {
 	 * Inicialização implicita de um modelo.
 	 */
 	protected Modelo() {
-		_treinador = new Treino(this);
+		_treinador = new Treinador(this);
 		_avaliador = new Avaliador(this);
 		utils = new Utils();
 	}
@@ -348,13 +346,8 @@ public abstract class Modelo implements Cloneable {
 				"\nValor de lote deve ser maior que zero, recebido = " + tamLote
 			);
 		}
-
-		if (!configTreino && tamLote > 1) {
-			_treinador = new TreinoLote(this, tamLote);
-			_treinador.setHistorico(calcularHistorico);
-		}
 		
-		_treinador.executar(xs, ys, epochs, logs);
+		_treinador.executar(xs, ys, epochs, tamLote, logs);
 	}
 	
 	/**
@@ -389,13 +382,8 @@ public abstract class Modelo implements Cloneable {
 				"\nValor de lote deve ser maior que zero, recebido = " + tamLote
 			);
 		}
-
-		if (!configTreino && tamLote > 1) {
-			_treinador = new TreinoLote(this, tamLote);
-			_treinador.setHistorico(calcularHistorico);
-		}
 		
-		_treinador.executar(dl, epochs, logs);
+		_treinador.executar(dl, epochs, tamLote, logs);
 	}
 
 	/**

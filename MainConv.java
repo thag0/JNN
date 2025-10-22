@@ -37,7 +37,7 @@ public class MainConv {
 	// dados de controle
 	static final int NUM_DIGITOS_TREINO = 10;
 	static final int NUM_DIGITOS_TESTE  = NUM_DIGITOS_TREINO;
-	static final int NUM_AMOSTRAS_TREINO = 1_000;
+	static final int NUM_AMOSTRAS_TREINO = 300;
 	static final int NUM_AMOSTRAS_TESTE  = 500;
 	static final int TREINO_EPOCAS = 10;
 	static final int TREINO_LOTE = 64;
@@ -115,6 +115,7 @@ public class MainConv {
 		// );
 
 		modelo.compilar("adam", "entropia-cruzada");
+		modelo.treinador().setThreads(8);
 		
 		return modelo;
 	}
