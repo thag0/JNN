@@ -3,18 +3,17 @@ package jnn.treinamento;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.DoubleAdder;
 
 import jnn.avaliacao.perda.Perda;
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
-import jnn.core.tensor.Variavel;
 import jnn.modelos.Modelo;
 import jnn.otimizadores.Otimizador;
 
 /**
   * Implementação de treino em lote dos modelos.
  */
-@SuppressWarnings("deprecation")// TODO: remover e adaptar para não usar Variavel
 public class TreinoLote extends MetodoTreino {
 	
 	/**
@@ -28,7 +27,7 @@ public class TreinoLote extends MetodoTreino {
 	ExecutorService exec;
 
 	/**
-	 * 
+	 * Tamanho do lote de amostras por iteração
 	 */
 	int tamLote;
 
@@ -46,7 +45,6 @@ public class TreinoLote extends MetodoTreino {
 	public TreinoLote(Modelo modelo, boolean hist, int tamLote) {
 		super(modelo, hist);
 		this.tamLote = tamLote;
-		System.out.println("Treino lote selecionado.");
 	}
 
 	public TreinoLote(Modelo modelo, int tamLote) {
@@ -55,10 +53,11 @@ public class TreinoLote extends MetodoTreino {
 
 	@Override
 	protected void loop(Tensor[] x, Tensor[] y, Otimizador otm, Perda loss, int amostras, int epochs, boolean logs) {
-		Variavel perdaEpoca = new Variavel();
+		if (logs) esconderCursor();
+		
 		for (int e = 1; e <= epochs; e++) {
 			embaralhar(x, y);
-			perdaEpoca.zero();
+			DoubleAdder perdaEpoca = new DoubleAdder();
 
 			for (int i = 0; i < amostras; i += tamLote) {
 				int idFim = Math.min(i + tamLote, amostras);
@@ -72,11 +71,16 @@ public class TreinoLote extends MetodoTreino {
 
 			if (logs) {
 				limparLinha();
-				exibirLogTreino("Época " +  e + "/" + epochs + " -> perda: " + (double)(perdaEpoca.get()/amostras));
+				exibirLogTreino("Época " +  e + "/" + epochs + " -> perda: " + (perdaEpoca.sum()/amostras));
 			}
 
 			// feedback de avanço
-			if (calcHist) historico.add((perdaEpoca.get()/amostras));
+			if (calcHist) historico.add((perdaEpoca.sum()/amostras));
+		}
+
+		if (logs) {
+			exibirCursor();
+			System.out.println();
 		}
 
 		exec.close();// tem que ter isso se não o processo do programa não acaba
@@ -112,14 +116,12 @@ public class TreinoLote extends MetodoTreino {
 	 * @param perda função de perda do modelo.
 	 * @param perdaEpoca valor de perda por época de treinamento.
 	 */
-	private void processoLote(Tensor[] loteX, Tensor[] loteY, Perda perda, Variavel perdaEpoca) {
+	private void processoLote(Tensor[] loteX, Tensor[] loteY, Perda perda, DoubleAdder perdaEpoca) {
 		int tamLote = loteX.length;
 		int numCamadas = modelo.numCamadas();
 
 		ajustarThreads(tamLote);
 		exec = Executors.newFixedThreadPool(_threads);
-		
-		System.out.println("Usando " + _threads + " threads.");
 
 		clones = new Modelo[_threads];
 		for (int j = 0; j < clones.length; j++) {
