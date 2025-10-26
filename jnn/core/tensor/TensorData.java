@@ -884,7 +884,7 @@ public class TensorData {
             // primeiros 5 elementos
             for (int i = 1; i < 5; i++) sb.append(", ").append(get(i));
             // ultimos 5 elementos
-            sb.append(" ... "). append(get(tam-4));
+            sb.append(" ... "). append(get(tam-5));
             for (int i = tam-4; i < tam; i++) sb.append(", ").append(get(i));
         }
 
