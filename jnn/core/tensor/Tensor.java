@@ -280,14 +280,14 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return strides calculados.
 	 */
 	private int[] initStrides(int[] shape) {
-		strides = new int[shape.length];
+		int[] stride = new int[shape.length];
 		
-		strides[shape.length - 1] = 1;
+		stride[shape.length - 1] = 1;
 		for (int i = shape.length - 2; i >= 0; i--) {
-			strides[i] = strides[i + 1] * shape[i + 1];
+			stride[i] = stride[i + 1] * shape[i + 1];
 		}
 
-		return strides;
+		return stride;
 	}
 
 	/**
@@ -372,16 +372,16 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		int[] novoShape = shape.clone();
 		int[] novoStrides = strides.clone();
 
-		int last = ndim - 1;
-		int secondLast = ndim - 2;
+		int ultimo = ndim - 1;
+		int penultimo = ndim - 2;
 
-		int tmpShape = novoShape[secondLast];
-		novoShape[secondLast] = novoShape[last];
-		novoShape[last] = tmpShape;
+		int tmpShape = novoShape[penultimo];
+		novoShape[penultimo] = novoShape[ultimo];
+		novoShape[ultimo] = tmpShape;
 
-		int tmpStride = novoStrides[secondLast];
-		novoStrides[secondLast] = novoStrides[last];
-		novoStrides[last] = tmpStride;
+		int tmpStride = novoStrides[penultimo];
+		novoStrides[penultimo] = novoStrides[ultimo];
+		novoStrides[ultimo] = tmpStride;
 
 		return new Tensor(dados, novoShape, novoStrides);
 	}
