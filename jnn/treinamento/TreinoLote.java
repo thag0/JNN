@@ -22,18 +22,13 @@ public class TreinoLote extends MetodoTreino {
 	Utils utils = new Utils();
 
 	/**
-	 * Operador multithread.
-	 */
-	ExecutorService exec;
-
-	/**
 	 * Tamanho do lote de amostras por iteração
 	 */
 	int tamLote;
 
+	//TODO: utilizar outra abordagem que não envolva clonagem de modelos
 	/**
 	 * Clones do modelo base
-	 * //TODO: utilizar outra abordagem que não envolva clonagem de modelos
 	 */
 	Modelo[] clones;
 
@@ -82,8 +77,6 @@ public class TreinoLote extends MetodoTreino {
 			exibirCursor();
 			System.out.println();
 		}
-
-		exec.close();// tem que ter isso se não o processo do programa não acaba
 	}
 
 	/**
@@ -121,7 +114,7 @@ public class TreinoLote extends MetodoTreino {
 		int numCamadas = modelo.numCamadas();
 
 		ajustarThreads(tamLote);
-		exec = Executors.newFixedThreadPool(_threads);
+		ExecutorService exec = Executors.newFixedThreadPool(_threads);
 
 		clones = new Modelo[_threads];
 		for (int j = 0; j < clones.length; j++) {
@@ -169,7 +162,8 @@ public class TreinoLote extends MetodoTreino {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-		
+
+		exec.shutdown();
 	}
 
 }
