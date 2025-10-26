@@ -266,7 +266,7 @@ public class Adam extends Otimizador {
 		addInfo("Epsilon: " + eps);
 		addInfo("Amsgrad: " + amsgrad);
 
-		return info();
+		return super.info();
 	}
 
 }
