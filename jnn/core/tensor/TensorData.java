@@ -866,6 +866,15 @@ public class TensorData {
     }
 
     /**
+     * Verifica se o conjunto de dados é uma view de outra instância.
+     * @return {@code true} se os dados forem uma view, {@code false} 
+     * caso contrário.
+     */
+    public boolean isView() {
+        return offset > 0 || tam < dados.length;
+    }
+
+    /**
      * Gera uma String personalizada representando o TensorData.
      * @return {@code String} formatada
      */
@@ -889,7 +898,7 @@ public class TensorData {
         }
 
         sb.append("]\n");
-        sb.append(tab).append("View: ").append(offset > 0).append("\n");
+        sb.append(tab).append("View: ").append(isView()).append("\n");
         sb.append(tab).append("Tam: ").append(tam).append("\n");
         sb.append("]");
 
