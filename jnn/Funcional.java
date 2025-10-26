@@ -17,6 +17,7 @@ import jnn.core.Dicionario;
 import jnn.core.OpTensor;
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
+import jnn.core.tensor.TensorConverter;
 import jnn.dataloader.Amostra;
 import jnn.dataloader.DataLoader;
 import jnn.inicializadores.Identidade;
@@ -53,67 +54,30 @@ public final class Funcional {
     // tensor
 
     /**
+     * Inicializa um Tensor a partir de um objeto informado.
+     * @param obj objeto base.
+     * @return {@code Tensor} vazio.
+     */
+    public Tensor tensor(Object obj) {
+        return TensorConverter.tensor(obj);
+    }
+
+    /**
      * Inicializa um tensor vazio com o formato especificado.
      * @param shape formato desejado do tensor.
      * @return {@code Tensor} vazio.
      */
-    public Tensor tensor(int... shape) {
+    public Tensor zeros(int... shape) {
         return new Tensor(shape);
     }
 
     /**
-     * Inicializa um tensor preenchido com o valor informado.
-     * @param x valor desejado.
+     * Inicializa um tensor preenchido com valor 1, baseado no formato especificado.
      * @param shape formato desejado do tensor.
-     * @return {@code Tensor} vazio.
+     * @return {@code Tensor} preenchido.
      */
-    public Tensor tensor(double x, int... shape) {
-        return new Tensor(shape).preencher(x);
-    }
-
-    /**
-     * Inicializa um tensor a partir de um array.
-     * @param arr {@code array} base.
-     * @return {@code Tensor} que representa o array. 
-     */
-    public Tensor tensor(double[] arr) {
-        return utils.paraTensor(arr);
-    }
-
-    /**
-     * Inicializa um tensor a partir de um array 2D.
-     * @param arr {@code array} base.
-     * @return {@code Tensor} que representa o array.
-     */
-    public Tensor tensor(double[][] arr) {
-        return utils.paraTensor(arr);
-    }
-
-    /**
-     * Inicializa um tensor a partir de um array 3D.
-     * @param arr {@code array} base.
-     * @return {@code Tensor} que representa o array.
-     */
-    public Tensor tensor(double[][][] arr) {
-        return utils.paraTensor(arr);
-    }
-
-    /**
-     * Inicializa um tensor a partir de um array 4D.
-     * @param arr {@code array} base.
-     * @return {@code Tensor} que representa o array.
-     */
-    public Tensor tensor(double[][][][] arr) {
-        return utils.paraTensor(arr);
-    }
-
-    /**
-     * Inicializa um tensor a partir de um array 5D.
-     * @param arr {@code array} base.
-     * @return {@code Tensor} que representa o array.
-     */
-    public Tensor tensor(double[][][][][] arr) {
-        return utils.paraTensor(arr);
+    public Tensor ones(int... shape) {
+        return zeros(shape).preencher(1.0);
     }
 
     /**

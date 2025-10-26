@@ -4,6 +4,7 @@ import java.lang.reflect.Array;
 import java.util.Random;
 
 import jnn.core.tensor.Tensor;
+import jnn.core.tensor.TensorConverter;
 
 /**
  * Utilitário geral para a biblioteca.
@@ -308,36 +309,7 @@ public class Utils {
 	 * @return {@code Tensor} com base nos dados do objeto.
 	 */
 	public Tensor paraTensor(Object obj) {
-		if (obj instanceof Tensor) {
-			return (Tensor) obj;
-		}
-		
-		Tensor t = null;
-
-		if (obj instanceof double[]) {
-			double[] arr = (double[]) obj;
-			t = new Tensor(arr, arr.length);
-		
-		} else if (obj instanceof double[][]) {
-			t = new Tensor((double[][]) obj);
-		
-		} else if (obj instanceof double[][][]) {
-			t = new Tensor((double[][][]) obj);
-
-		} else if (obj instanceof double[][][][]) {
-			t = new Tensor((double[][][][]) obj);
-
-		} else if (obj instanceof double[][][][][]) {
-			t = new Tensor((double[][][][][]) obj);
-		
-		} else {
-			throw new IllegalArgumentException(
-				"\nTipo de dado \"" + obj.getClass().getTypeName() + "\"" +
-				" não suportado."
-			);
-		}
-
-		return t;
+		return TensorConverter.tensor(obj);
 	}
 
 }
