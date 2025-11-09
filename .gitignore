@@ -1,0 +1,8 @@
+historico-perda.csv
+Renomear.java
+Playground.java
+/testes/*.java
+/testes/*.py
+
+/bin
+!/bin/*.jar
