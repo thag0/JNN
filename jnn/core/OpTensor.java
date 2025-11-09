@@ -204,9 +204,9 @@ public class OpTensor {
 		final int offsetB = b.offset();
 		final int offsetD = dst.offset();
 
-		final double[] dataA = a.paraArray();
-		final double[] dataB = b.paraArray();
-		final double[] dataD = dst.paraArray();
+		final double[] dataA = a.array();
+		final double[] dataB = b.array();
+		final double[] dataD = dst.array();
 
 		for (int i = 0; i < linA; i++) {
 			final int baseA = offsetA + i * s0A;
@@ -249,8 +249,8 @@ public class OpTensor {
 		int largOut = (largIn + 2 * largPad - largK) / largStd + 1;
 
 		Tensor col = new Tensor(new int[]{canais * altK * largK, altOut * largOut});
-		double[] dadosX = x.paraArray();
-		double[] dadosC = col.paraArray();
+		double[] dadosX = x.array();
+		double[] dadosC = col.array();
 
 		int canalArea = altK * largK;
 		int colunaCol = altOut * largOut;
@@ -364,9 +364,9 @@ public class OpTensor {
 		int largKernel = shapeK[1];
 		int largEntrada = shapeE[1];
 
-		double[] dataE = x.paraArray();
-		double[] dataK = k.paraArray();
-		double[] dataS = dst.paraArray();
+		double[] dataE = x.array();
+		double[] dataK = k.array();
+		double[] dataS = dst.array();
 
 		// lidar com views de tensores
 		int offE = x.offset();
@@ -453,9 +453,9 @@ public class OpTensor {
 		int largKernel = shapeK[1];
 		int largEntrada = shapeE[1];
 
-		double[] dataE = x.paraArray();
-		double[] dataK = k.paraArray();
-		double[] dataS = dst.paraArray();
+		double[] dataE = x.array();
+		double[] dataK = k.array();
+		double[] dataS = dst.array();
 
 		int offE = x.offset();
 		int offK = k.offset();
@@ -543,9 +543,9 @@ public class OpTensor {
 		int altKernel = shapeK[0];
 		int largKernel = shapeK[1];
 
-		double[] dataE = entrada.paraArray();
-		double[] dataK = kernel.paraArray();
-		double[] dataS = saida.paraArray();
+		double[] dataE = entrada.array();
+		double[] dataK = kernel.array();
+		double[] dataS = saida.array();
 
 		// lidar com views de tensores
 		int offE = entrada.offset();
@@ -681,8 +681,8 @@ public class OpTensor {
 			);
 		}
 
-		double[] dataE = x.paraArray();
-		double[] dataS = dst.paraArray();
+		double[] dataE = x.array();
+		double[] dataS = dst.array();
 
 		int canalSizeEntrada = altEntrada * largEntrada;
 		int canalSizeSaida   = altSaida   * largSaida;
@@ -819,8 +819,8 @@ public class OpTensor {
 			);
 		}
 
-		double[] dataE = x.paraArray();
-		double[] dataS = dst.paraArray();
+		double[] dataE = x.array();
+		double[] dataS = dst.array();
 
 		int canalSizeEntrada = altEntrada * largEntrada;
 		int canalSizeSaida   = altSaida   * largSaida;

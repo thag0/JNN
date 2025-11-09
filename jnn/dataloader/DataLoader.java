@@ -95,14 +95,14 @@ public class DataLoader implements Iterable<Amostra> {
             int[] shapeX = a.x().shape();
             int[] shapeY = a.y().shape();
 
-            if (!utils.comparar(shapeX, dados[0].x().shape())) {
+            if (!utils.compArray(shapeX, dados[0].x().shape())) {
                 throw new IllegalArgumentException(
                     "\nFormato de X da amostra " + a.x().shapeStr() + 
                     " deve ser igual ao das amostras de X do DataLoader " + 
                     dados[0].x().shapeStr() 
                 );
             }
-            if (!utils.comparar(shapeY, dados[0].y().shape())) {
+            if (!utils.compArray(shapeY, dados[0].y().shape())) {
                 throw new IllegalArgumentException(
                     "\nFormato de Y da amostra " + a.y().shapeStr() + 
                     " deve ser igual ao das amostras de Y do DataLoader " + 

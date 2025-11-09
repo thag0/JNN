@@ -74,7 +74,7 @@ class SerialConv {
 		}
 		
 		if(camada.temBias()){
-			double[] bias = camada.bias().paraArray();
+			double[] bias = camada.bias().array();
 			for(double valor : bias){
 				escreverDado(valor, tipo, sb);
 				sb.append("\n");               

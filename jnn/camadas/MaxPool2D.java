@@ -289,9 +289,9 @@ public class MaxPool2D extends Camada implements Cloneable{
 		int largGradS   = shapeGradS[2];
 
 		// vetorização
-		double[] dataE  = entrada.paraArray();
-		double[] dataGS = gradSeguinte.paraArray();
-		double[] dataGE = gradEntrada.paraArray();
+		double[] dataE  = entrada.array();
+		double[] dataGS = gradSeguinte.array();
+		double[] dataGE = gradEntrada.array();
 
 		int canalSizeEntrada = altEntrada * largEntrada;
 		int canalSizeGradS   = altGradS * largGradS;
@@ -382,7 +382,7 @@ public class MaxPool2D extends Camada implements Cloneable{
 
 	@Override
 	public double[] saidaParaArray() {
-		return saida().paraArray();
+		return saida().array();
 	}
 
 	@Override

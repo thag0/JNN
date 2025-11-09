@@ -515,7 +515,7 @@ public class DensaLote extends Camada implements Cloneable {
 	@Override
 	public double[] saidaParaArray() {
 		verificarConstrucao();
-		return _saida.paraArray();
+		return _saida.array();
 	}
 
 	@Override

@@ -456,7 +456,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		Tensor bloco = new Tensor(novoShape);
 
 		double[] d = dados.data();
-		double[] bd = bloco.paraArray();
+		double[] bd = bloco.array();
 
 		for (int i = 0; i < n; i++) {
 			int inicio = i * elementos;
@@ -609,7 +609,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		}
 
 		int cont = 0;
-		double[] d = paraArray();
+		double[] d = array();
 		for (int i = 0; i < d1; i++) {
 			for (int j = 0; j < d2; j++) {
 				for (int k = 0; k < d3; k++) {
@@ -656,7 +656,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		}
 
 		int cont = 0;
-		double[] d = paraArray();
+		double[] d = array();
 		for (int i = 0; i < d1; i++) {
 			for (int j = 0; j < d2; j++) {
 				for (int k = 0; k < d3; k++) {
@@ -698,7 +698,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		}
 
 		int cont = 0;
-		double[] d = paraArray();
+		double[] d = array();
 		for (int i = 0; i < d1; i++) {
 			for (int j = 0; j < d2; j++) {
 				for (int k = 0; k < d3; k++) {
@@ -736,7 +736,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		}
 
 		int id = 0;
-		double[] d = paraArray();
+		double[] d = array();
 		for (int i = 0; i < lin; i++) {
 			for (int j = 0; j < col; j++) {
 				d[id++] = arr[i][j];
@@ -1530,9 +1530,9 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		}
 		
 		final int n = tam();
-		double[] td = paraArray();
-		double[] da = a.paraArray();
-		double[] db = b.paraArray();
+		double[] td = array();
+		double[] da = a.array();
+		double[] db = b.array();
 
 		for (int i = 0; i < n; i++) {
 			td[i] = fun.applyAsDouble(da[i], db[i]);
@@ -1578,10 +1578,10 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		}
 
 		final int n = tam();
-		double[] td = paraArray();
-		double[] da = a.paraArray();
-		double[] db = b.paraArray();
-		double[] dc = c.paraArray();
+		double[] td = array();
+		double[] da = a.array();
+		double[] db = b.array();
+		double[] dc = c.array();
 
 		for (int i = 0; i < n; i++) {
 			td[i] = fun.applyAsDouble(da[i], db[i], dc[i]);
@@ -1670,7 +1670,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	public Tensor reduce(Number in, DoubleBinaryOperator fun) {
 		double res = in.doubleValue();
 
-		double[] d = paraArray();
+		double[] d = array();
 		for (double val : d) {
 			res = fun.applyAsDouble(res, val);
 		}
@@ -2041,7 +2041,6 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		return dados;
 	}
 
-
 	/**
 	 * Retorna o conteúdo do tensor no formato de array
 	 * <p>
@@ -2051,7 +2050,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * </p>
 	 * @return conteúdo do tensor.
 	 */
-	public double[] paraArray() {
+	public double[] array() {
 		return dados.data();
 	}
 
@@ -2097,14 +2096,14 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		final String identacao = " ".repeat(4);
 
 		int maxCasasDecimais = 0;
-		for (double valor : paraArray()) {
+		for (double valor : array()) {
 			String valorStr = Double.toString(valor);
 			int decimais = valorStr.length() - valorStr.indexOf('.') - 1;
 			if (decimais > maxCasasDecimais) maxCasasDecimais = decimais;
 		}
 
 		int tamMaximo = -1;
-        for (double valor : paraArray()) {
+        for (double valor : array()) {
             String valorStr = valorStr(valor, maxCasasDecimais);
 			int tamValor = valorStr.length();
             if (tamValor > tamMaximo) tamMaximo = tamValor;
@@ -2364,9 +2363,9 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		int desvioA = this.shape.length < outShape.length ? outShape.length - this.shape.length : 0;
 		int desvioB = t.shape.length < outShape.length ? outShape.length - t.shape.length : 0;
 
-		double[] data = paraArray();
-		double[] td = t.paraArray();
-		double[] bd = out.paraArray();
+		double[] data = array();
+		double[] td = t.array();
+		double[] bd = out.array();
 
 		for (int ids = 0; ids < n; ids++) {
 			int temp = ids;
@@ -2465,7 +2464,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 
 		int[] idIn  = new int[shape.length];
 		int[] idRes = new int[resShape.length];
-		double[] rd = res.paraArray();
+		double[] rd = res.array();
 
 		for (int i = 0; i < res.tam(); i++) {
 			indiceLinear(i, resShape, idRes);

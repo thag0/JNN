@@ -52,16 +52,16 @@ public class Utils {
 
 	/**
 	 * Compara se os dois arrays são igual em tamanho e numericamente.
-	 * @param a1 {@code array} 1.
-	 * @param a2 {@code array} 2.
+	 * @param a {@code array} 1.
+	 * @param b {@code array} 2.
 	 * @return {@code true} se os arrays são igual, {@code false} caso contrário.
 	 */
-	public boolean comparar(int[] a1, int[] a2) {
-		if (a1.length != a2.length) return false;
+	public boolean compArray(int[] a, int[] b) {
+		if (a.length != b.length) return false;
 
-		int n = a1.length;
+		int n = a.length;
 		for (int i = 0; i < n; i++) {
-			if (a1[i] != a2[i]) return false;
+			if (a[i] != b[i]) return false;
 		}
 
 		return true;

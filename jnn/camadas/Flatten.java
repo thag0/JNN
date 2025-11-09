@@ -179,7 +179,7 @@ public class Flatten extends Camada implements Cloneable{
 
 	@Override
 	public double[] saidaParaArray() {
-		return saida().paraArray();
+		return saida().array();
 	}
 
 	@Override

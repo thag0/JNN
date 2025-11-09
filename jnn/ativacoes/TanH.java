@@ -28,8 +28,8 @@ public class TanH extends Ativacao {
 	@Override
 	public void backward(Densa densa) {
 		//aproveitar os resultados pre calculados
-		double[] t = densa._saida.paraArray();
-		double[] g = densa._gradSaida.paraArray();
+		double[] t = densa._saida.array();
+		double[] g = densa._gradSaida.array();
 		double[] d = new double[t.length];
 
 		double ti;

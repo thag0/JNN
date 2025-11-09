@@ -47,14 +47,14 @@ class SerialDensa {
 		//bias
 		sb.append(camada.temBias()).append("\n");
 		
-		double[] pesos = camada.kernel().paraArray();
+		double[] pesos = camada.kernel().array();
 		for (int i = 0; i < pesos.length; i++) {
 			escreverDado(pesos[i], tipo, sb);
 			sb.append("\n");
 		}
 
 		if (camada.temBias()) {
-			double[] bias = camada.bias().paraArray();
+			double[] bias = camada.bias().array();
 			for (int i = 0; i < bias.length; i++) {
 				escreverDado(bias[i], tipo, sb);
 				sb.append("\n");
