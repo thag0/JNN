@@ -19,6 +19,7 @@ if %errorlevel% neq 0 (
 
 echo.
 echo Gerando JAR
+if exist "%BIN_DIR%\jnn.jar" del "%BIN_DIR%\jnn.jar"
 jar cvf "%BIN_DIR%\jnn.jar" -C "%BIN_DIR%" .
 
 echo.
