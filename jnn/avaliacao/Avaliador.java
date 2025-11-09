@@ -60,7 +60,7 @@ public class Avaliador {
 			res += ema.forward(prev[i], real[i]).item();
 		}
 
-		return new Tensor(new double[]{ (res/tam) }, 1);
+		return new Tensor(new double[]{ (res/tam) });
 	}
 
 	/**
@@ -90,7 +90,7 @@ public class Avaliador {
 			res += emql.forward(prev[i], real[i]).item();
 		}
 
-		return new Tensor(new double[]{ (res/tam) }, 1); 
+		return new Tensor(new double[]{ (res/tam) }); 
 	}
 
 	/**
@@ -118,7 +118,7 @@ public class Avaliador {
 			res += ema.forward(prev[i], real[i]).item();
 		}
 
-		return new Tensor(new double[]{ (res/tam) }, 1);
+		return new Tensor(new double[]{ (res/tam) });
 	}
 
 	/**
@@ -159,7 +159,7 @@ public class Avaliador {
 			res += ecc.forward(previsoes[i], real[i]).item();
 		}
 
-		return new Tensor(new double[]{ (res/tam) }, 1);
+		return new Tensor(new double[]{ (res/tam) });
 	}
 
 	/**
@@ -189,7 +189,7 @@ public class Avaliador {
 			res += ecb.forward(prev[i], real[i]).item();
 		}
 
-		return new Tensor(new double[]{ (res/tam) }, 1);
+		return new Tensor(new double[]{ (res/tam) });
 	}
 
 	/**

@@ -25,7 +25,9 @@ public class RMSE extends Perda {
 		}
 		rmse /= tam;
 		
-		return new Tensor(new double[]{ Math.sqrt(rmse) }, 1);
+		return new Tensor(
+			new double[]{ Math.sqrt(rmse) }
+		);
 	}
 	 
 	@Override

@@ -52,7 +52,7 @@ public class Xor{
 		System.out.println("\n-- Tabela verdade --");
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < 2; j++) {
-				Tensor x = new Tensor(new double[]{ i, j }, 2);
+				Tensor x = new Tensor(new double[]{ i, j });
 				Tensor y = modelo.forward(x);
 				System.out.println(i + " ^ " + j + " = " + formatarDecimal(y.item(), 10));
 			}

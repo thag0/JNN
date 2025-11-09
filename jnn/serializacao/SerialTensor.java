@@ -87,7 +87,7 @@ public class SerialTensor {
                 dados[i] = valor;
             }
 
-            tensor = new Tensor(dados, shape);
+            tensor = new Tensor(dados).reshape(shape);
 
         } catch (IOException e) {
             System.out.println("\nErro ao ler dados do tensor:");

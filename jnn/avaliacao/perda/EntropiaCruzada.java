@@ -25,7 +25,9 @@ public class EntropiaCruzada extends Perda {
 			ec += real.get(i) * Math.log(prev.get(i) + eps);
 		}
 		
-		return new Tensor(new double[]{ -ec/tam }, 1);
+		return new Tensor(
+			new double[]{ -ec/tam }
+		);
 	}
 	
 	@Override

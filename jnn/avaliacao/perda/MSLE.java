@@ -25,7 +25,9 @@ public class MSLE extends Perda {
 			emql += d * d;
 		}
 		
-		return new Tensor(new double[]{ (emql/tam) }, 1);
+		return new Tensor(
+			new double[]{ (emql/tam) }
+		);
 	}
 	
 	@Override

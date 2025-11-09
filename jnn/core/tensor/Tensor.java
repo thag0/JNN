@@ -194,7 +194,8 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @param arr {@code array} base.
 	 * @param shape formato desejado.
 	 */
-	public Tensor(double[] arr, int... shape) {
+	public Tensor(double[] arr) {
+		int[] shape = {arr.length};
 		int[] s  = initShape(shape);
 		int tam = calcularTamanho(s);
 		if (tam != arr.length) {
@@ -203,8 +204,8 @@ public class Tensor implements Iterable<Double>, Cloneable {
 				"formato fornecido (" + tam + ")"
 			);
 		}
+		
 		this.shape = s;
-
 		this.strides = initStrides(shape);
 		this.dados = new TensorData(arr);
 	}
@@ -1675,8 +1676,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		}
 
 		return new Tensor(
-			new double[]{ res },
-			1
+			new double[]{ res }
 		);
 	}
 
@@ -1688,8 +1688,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
     public Tensor soma() {
 		double soma = dados.soma();
 		return new Tensor(
-			new double[]{ soma },
-			 1
+			new double[]{ soma }
 		);
     }
 
@@ -1701,8 +1700,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	public Tensor media() {
 		double med = dados.media();
 		return new Tensor(
-			new double[]{ med },
-			 1
+			new double[]{ med }
 		);
     }
 
@@ -1714,8 +1712,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	public Tensor max() {
 		double max = dados.max();
 		return new Tensor(
-			new double[]{ max },
-			 1
+			new double[]{ max }
 		);
 	}
 
@@ -1727,8 +1724,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	public Tensor min() {
 		double min = dados.min();
 		return new Tensor(
-			new double[]{ min },
-			 1
+			new double[]{ min }
 		);
 	}
 
@@ -1739,10 +1735,8 @@ public class Tensor implements Iterable<Double>, Cloneable {
      */
 	public Tensor desvp() {
 		double desvp = dados.desvp();
-
 		return new Tensor(
-			new double[]{ desvp },
-			1
+			new double[]{ desvp }
 		);
 	}
 
@@ -2323,7 +2317,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 
 		// escalar
 		if (numDim() == 1) {
-			return new Tensor(new double[] { dados.get(dim) }, 1);
+			return new Tensor(new double[] { dados.get(dim) });
 		}
 
 		int[] novoShape = Arrays.copyOfRange(shape, 1, shape.length);

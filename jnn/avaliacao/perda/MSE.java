@@ -24,7 +24,9 @@ public class MSE extends Perda {
 			mse += d * d;
 		}
 		
-		return new Tensor(new double[]{ (mse/tam) }, 1);
+		return new Tensor(
+			new double[]{ (mse/tam) }
+		);
 	}
 	
 	@Override

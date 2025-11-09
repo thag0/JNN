@@ -105,7 +105,7 @@ public class Utils {
 
 		Tensor[] arr = new Tensor[n];
 		for (int i = 0; i < n; i++) {
-			arr[i] = new Tensor(new double[]{ array[i] }, 1);
+			arr[i] = new Tensor(new double[]{ array[i] });
 			arr[i].nome("amostra " + i);// ajudar no debug
 		}
 

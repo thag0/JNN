@@ -23,7 +23,9 @@ public class MAE extends Perda {
 			mae += Math.abs(prev.get(i) - real.get(i));
 		}
 		
-		return new Tensor(new double[]{ (mae/tam) }, 1);
+		return new Tensor(
+			new double[]{ (mae/tam) }
+		);
 	}
 	
 	@Override

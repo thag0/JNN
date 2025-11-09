@@ -31,7 +31,7 @@ public class TensorConverter {
         int[] shape = getShape(obj);
         double[] dados = achatarDados(obj, shape);
 
-		return new Tensor(dados, shape);
+		return new Tensor(dados).reshape(shape);
     }
 
     /**

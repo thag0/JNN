@@ -647,8 +647,8 @@ public final class Funcional {
             System.arraycopy(arr[i], x.length, y, 0, y.length);
 
             dl.add(
-                new Tensor(x, x.length),
-                new Tensor(y, y.length)
+                new Tensor(x),
+                new Tensor(y)
             );
         }
 

@@ -33,6 +33,8 @@ public class Acuracia extends Metrica {
 
 		double acc = (double)acertos / n;
 
-		return new Tensor(new double[]{ acc }, 1);
+		return new Tensor(
+			new double[]{ acc }
+		);
 	}
 }
