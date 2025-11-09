@@ -22,6 +22,9 @@ echo Gerando JAR
 jar cvf "%BIN_DIR%\jnn.jar" -C "%BIN_DIR%" .
 
 echo.
-echo Jar gerado
+echo Jar gerado em "%BIN_DIR%"
+
+@REM echo Gerando Doc 
+@REM javadoc -d "%DOC_DIR%" -sourcepath "." -subpackages jnn
 
 echo Build finalizado.
