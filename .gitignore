@@ -4,5 +4,4 @@ Playground.java
 /testes/*.java
 /testes/*.py
 
-/bin
-!/bin/*.jar
+/bin/jnn
