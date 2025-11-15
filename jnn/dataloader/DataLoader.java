@@ -413,4 +413,23 @@ public class DataLoader implements Iterable<Amostra> {
         System.out.print(info());
     }
 
+    /**
+     * Gera um {@code DataLoader} baseado no problema da porta lógica XOR.
+     * @return {@code DataLoader}.
+     */
+    public static DataLoader xor() {
+        DataLoader loader = new DataLoader();
+
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
+                loader.add(
+                    new Tensor(new double[]{ i, j }),
+                    new Tensor(new double[]{ i^j })
+                );
+            }
+        }
+
+        return loader;
+    }
+
 }

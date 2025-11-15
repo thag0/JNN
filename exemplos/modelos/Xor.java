@@ -2,7 +2,6 @@ package exemplos.modelos;
 
 import java.text.DecimalFormat;
 
-import externos.lib.ged.Dados;
 import externos.lib.ged.Ged;
 import jnn.Funcional;
 import jnn.camadas.*;
@@ -15,15 +14,15 @@ public class Xor{
 	static Ged ged = new Ged();
 	static Funcional jnn = new Funcional();
 
-	public static void main(String[] args){
+	static {
 		ged.limparConsole();
+	}
 
-		// Carregando dados e convertendo no DataLoader
-		Dados xor = ged.lerCsv("./dados/csv/xor.csv");
-		double[][] dados = ged.dadosParaDouble(xor);
-		int in  = 2;// Entradas X
-		int out = 1;// Saídas Y
-		DataLoader dXor = jnn.dataloader(dados, in, out);
+	public static void main(String[] args) {
+		// Dados do problema xor
+		DataLoader xor = DataLoader.xor();
+		final int in  = 2;// Entradas X
+		final int out = 1;// Saídas Y
 
 		// Criando de treinando o modelo
 		Sequencial modelo = new Sequencial(
@@ -32,11 +31,11 @@ public class Xor{
 			new Densa(out, "sigmoid")
 		);
 		modelo.compilar(new SGD(0.001, 0.999), "mse");
-		modelo.treinar(dXor, 5_000, false);
+		modelo.treinar(xor, 5_000, false);
 		
 		// Avaliando
-		Tensor[] xs = dXor.getX();
-		Tensor[] ys = dXor.getY();
+		Tensor[] xs = xor.getX();
+		Tensor[] ys = xor.getY();
 		Tensor perda = modelo.avaliar(xs, ys);
 		System.out.println("Perda: " + perda.item());
 
