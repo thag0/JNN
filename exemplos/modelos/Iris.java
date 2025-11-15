@@ -32,7 +32,7 @@ public class Iris {
 
 		// Carregando dados e pré-processando
 		Dados iris = ged.lerCsv("./dados/csv/iris.csv");
-		ged.remLin(iris, 0);// Removendo linha com nomes das categorias
+		ged.dropLin(iris, 0);// Removendo linha com nomes das categorias
 		int[] shape = iris.shape();
 		int ultimoIndice = shape[1]-1;
 		ged.categorizar(iris, ultimoIndice);// Tranformando a ultima coluna em categorização binária

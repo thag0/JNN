@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import ged.Dados;
 import ged.Ged;
 import externos.lib.geim.Geim;
+import externos.lib.geim.Pixel;
 import externos.render.JanelaTreino;
 import jnn.Funcional;
 import jnn.camadas.Densa;
@@ -213,4 +214,171 @@ public class MainImg {
 			e.printStackTrace();
 		}
 	}
+
+	/**
+	 * 
+	 * @param gdi
+	 * @param imagem
+	 * @param modelo
+	 * @param escala
+	 * @param caminho
+	 */
+	public void exportarImagemEscalaCinza(BufferedImage imagem, Modelo modelo, double escala, String caminho) {
+		if (imagem == null) throw new IllegalArgumentException("A imagem fornecida é nula.");
+		if (escala <= 0) throw new IllegalArgumentException("O valor de escala não pode ser menor que 1.");
+		if (modelo.camadaSaida().tamSaida() != 1) {
+			throw new IllegalArgumentException(
+				"O modelo deve trabalhar apenas com uma unidade na camada de saída para a escala de cinza."
+			);
+		}
+
+		int larguraFinal = (int)(imagem.getWidth() * escala);
+		int alturaFinal = (int)(imagem.getHeight() * escala);
+		Pixel[][] imagemAmpliada = geim.gerarEstruturaImagem(larguraFinal, alturaFinal);
+		
+		int alturaImagem = imagemAmpliada.length;
+		int larguraImagem = imagemAmpliada[0].length;
+
+		//gerenciar multithread
+		int numThreads = Runtime.getRuntime().availableProcessors();
+		if (numThreads > 1) {
+			//só pra não sobrecarregar o processador
+			numThreads = (int)(numThreads / 2);
+		}
+
+		Thread[] threads = new Thread[numThreads];
+		Modelo[] clones = new Modelo[numThreads];
+		for (int i = 0; i < numThreads; i++) {
+			clones[i] = modelo.clone();
+		}
+
+		int alturaPorThead = alturaImagem / numThreads;
+
+		for (int i = 0; i < numThreads; i++) {
+			final int id = i;
+			final int inicio = i * alturaPorThead;
+			final int fim = inicio + alturaPorThead;
+			
+			threads[i] = new Thread(() -> {
+				Tensor in = new Tensor(2);
+
+				for (int y = inicio; y < fim; y++) {
+					for (int x = 0; x < larguraImagem; x++) {
+						in.set(((double)x / (larguraImagem-1)), 0);
+						in.set(((double)y / (alturaImagem-1)), 1);
+						double[] saida = new double[1];
+					
+						clones[id].forward(in);
+					
+						saida[0] = clones[id].saidaParaArray()[0] * 255;
+
+						synchronized(imagemAmpliada) {
+							geim.configurarCor(imagemAmpliada, x, y, (int)saida[0], (int)saida[0], (int)saida[0]);
+						}
+					}
+				}
+			});
+
+			threads[i].start();
+		}
+
+		try {
+			for (Thread thread : threads) {
+				thread.join();
+			}
+		} catch(Exception e) {
+			System.out.println("Ocorreu um erro ao tentar salvar a imagem.");
+			e.printStackTrace();
+		}
+
+		geim.exportarPng(imagemAmpliada, caminho);
+	}
+
+	/**
+	 * 
+	 * @param gdi
+	 * @param imagem
+	 * @param modelo
+	 * @param escala
+	 * @param caminho
+	 */
+	public void exportarImagemRGB(BufferedImage imagem, Modelo modelo, double escala, String caminho) {
+		if (imagem == null) throw new IllegalArgumentException("A imagem fornecida é nula.");
+		if (escala <= 0) throw new IllegalArgumentException("O valor de escala não pode ser menor que 1.");
+		if (modelo.camadaSaida().tamSaida() != 3) {
+			throw new IllegalArgumentException(
+				"O modelo deve trabalhar apenas com três neurônios na saída para RGB."
+			);
+		}
+
+		//estrutura de dados da imagem
+		int larguraFinal = (int)(imagem.getWidth() * escala);
+		int alturaFinal = (int)(imagem.getHeight() * escala);
+		Pixel[][] imagemAmpliada = geim.gerarEstruturaImagem(larguraFinal, alturaFinal);
+
+		int alturaImagem = imagemAmpliada.length;
+		int larguraImagem = imagemAmpliada[0].length;
+
+		//gerenciar multithread
+		int numThreads = Runtime.getRuntime().availableProcessors();
+		if (numThreads > 1) {
+			//só pra não sobrecarregar o processador
+			numThreads = (int)(numThreads / 2);
+		}
+
+		Thread[] threads = new Thread[numThreads];
+		Modelo[] redes = new Modelo[numThreads];
+		for (int i = 0; i < numThreads; i++) {
+			redes[i] = modelo.clone();
+		}
+
+		int alturaPorThead = alturaImagem / numThreads;
+
+		for (int i = 0; i < numThreads; i++) {
+			final int id = i;
+			final int inicio = i * alturaPorThead;
+			final int fim = inicio + alturaPorThead;
+			
+			threads[i] = new Thread(() -> {
+				Tensor in = new Tensor(2);
+
+				for (int y = inicio; y < fim; y++) {
+					for (int x = 0; x < larguraImagem; x++) {
+						double[] entrada = new double[2];
+						in.set(((double)x / (larguraImagem-1)), 0);
+						in.set(((double)y / (alturaImagem-1)), 1);
+						double[] saida = new double[3];
+
+						entrada[0] = (double)x / (larguraImagem-1);
+						entrada[1] = (double)y / (alturaImagem-1);
+					
+						redes[id].forward(in);
+						double[] s = redes[id].saidaParaArray();
+					
+						saida[0] = s[0] * 255;
+						saida[1] = s[1] * 255;
+						saida[2] = s[2] * 255;
+
+						synchronized (imagemAmpliada) {
+							geim.configurarCor(imagemAmpliada, x, y, (int)saida[0], (int)saida[1], (int)saida[2]);
+						}
+					}
+				}
+			});
+
+			threads[i].start();
+		}
+
+		try {
+			for (Thread thread : threads) {
+				thread.join();
+			}
+		} catch (Exception e) {
+			System.out.println("Ocorreu um erro ao tentar salvar a imagem.");
+			e.printStackTrace();
+		}
+
+		geim.exportarPng(imagemAmpliada, caminho);
+	}
+
 }
