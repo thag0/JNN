@@ -2,8 +2,8 @@ package exemplos.modelos;
 
 import java.awt.image.BufferedImage;
 
-import externos.lib.ged.Dados;
-import externos.lib.ged.Ged;
+import ged.Ged;
+import ged.Dados;
 import externos.lib.geim.Geim;
 import jnn.Funcional;
 import jnn.camadas.*;

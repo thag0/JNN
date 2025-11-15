@@ -4,8 +4,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import externos.lib.ged.Dados;
-import externos.lib.ged.Ged;
+import ged.Dados;
+import ged.Ged;
 import externos.lib.geim.Geim;
 import jnn.Funcional;
 import jnn.camadas.*;

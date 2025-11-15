@@ -1,6 +1,6 @@
 package exemplos.tensor;
 
-import externos.lib.ged.Ged;
+import ged.Ged;
 import jnn.core.tensor.Tensor;
 
 /**

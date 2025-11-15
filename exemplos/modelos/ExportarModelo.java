@@ -1,6 +1,6 @@
 package exemplos.modelos;
 
-import externos.lib.ged.Ged;
+import ged.Ged;
 import jnn.camadas.Densa;
 import jnn.modelos.Sequencial;
 import jnn.serializacao.Serializador;

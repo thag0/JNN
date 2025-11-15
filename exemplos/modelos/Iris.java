@@ -2,8 +2,8 @@ package exemplos.modelos;
 
 import java.text.DecimalFormat;
 
-import externos.lib.ged.Dados;
-import externos.lib.ged.Ged;
+import ged.Ged;
+import ged.Dados;
 import jnn.Funcional;
 
 import jnn.camadas.Densa;

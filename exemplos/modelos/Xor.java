@@ -2,7 +2,7 @@ package exemplos.modelos;
 
 import java.text.DecimalFormat;
 
-import externos.lib.ged.Ged;
+import ged.Ged;
 import jnn.Funcional;
 import jnn.camadas.*;
 import jnn.core.tensor.Tensor;
