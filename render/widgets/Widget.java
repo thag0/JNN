@@ -1,4 +1,4 @@
-package externos.render.widgets;
+package render.widgets;
 
 import java.awt.Dimension;
 

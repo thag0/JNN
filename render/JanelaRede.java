@@ -1,4 +1,4 @@
-package externos.render;
+package render;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -6,8 +6,8 @@ import java.io.File;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
-import externos.render.widgets.PainelRede;
 import jnn.modelos.RedeNeural;
+import render.widgets.PainelRede;
 
 public class JanelaRede extends JFrame {
 

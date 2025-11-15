@@ -8,7 +8,6 @@ import ged.Dados;
 import ged.Ged;
 import geim.Geim;
 import geim.Imagem;
-import externos.render.JanelaTreino;
 import jnn.Funcional;
 import jnn.camadas.Densa;
 import jnn.camadas.Entrada;
@@ -18,6 +17,7 @@ import jnn.modelos.Modelo;
 import jnn.modelos.RedeNeural;
 import jnn.modelos.Sequencial;
 import jnn.otimizadores.*;
+import render.JanelaTreino;
 
 public class MainImg {
 	static Ged ged = new Ged();

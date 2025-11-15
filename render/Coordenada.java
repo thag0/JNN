@@ -1,4 +1,4 @@
-package externos.render;
+package render;
 
 public class Coordenada {
 	public int x;
