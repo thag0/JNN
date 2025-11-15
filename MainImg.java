@@ -6,8 +6,8 @@ import java.util.concurrent.TimeUnit;
 
 import ged.Dados;
 import ged.Ged;
-import externos.lib.geim.Geim;
-import externos.lib.geim.Pixel;
+import geim.Geim;
+import geim.Imagem;
 import externos.render.JanelaTreino;
 import jnn.Funcional;
 import jnn.camadas.Densa;
@@ -40,8 +40,8 @@ public class MainImg {
 		int tamSaida = 1;
 		
 		double[][] dados;
-		if 		(tamSaida == 1) dados = geim.imagemParaDadosTreinoEscalaCinza(imagem);
-		else if (tamSaida == 3) dados = geim.imagemParaDadosTreinoRGB(imagem);
+		if 		(tamSaida == 1) dados = imagemParaDadosTreinoEscalaCinza(imagem);
+		else if (tamSaida == 3) dados = imagemParaDadosTreinoRGB(imagem);
 		else throw new IllegalArgumentException("\nImagem deve ser em Escala de Cinza ou RGB");
 
 		double[][] in  = (double[][]) ged.separarDadosEntrada(dados, tamEntrada);
@@ -216,15 +216,14 @@ public class MainImg {
 	}
 
 	/**
-	 * 
-	 * @param gdi
-	 * @param imagem
-	 * @param modelo
-	 * @param escala
-	 * @param caminho
+	 * Utiliza o modelo para criar e exportar uma imagem.
+	 * @param modelo modelo para uso.
+	 * @param altBase altura base da imagem.
+	 * @param largBase largura base da imagem.
+	 * @param escala fator de escala para altura e largura final.
+	 * @param caminho caminho para o arquivo.
 	 */
-	public void exportarImagemEscalaCinza(BufferedImage imagem, Modelo modelo, double escala, String caminho) {
-		if (imagem == null) throw new IllegalArgumentException("A imagem fornecida é nula.");
+	static void exportarImagemEscalaCinza(Modelo modelo, int altBase, int largBase, double escala, String caminho) {
 		if (escala <= 0) throw new IllegalArgumentException("O valor de escala não pode ser menor que 1.");
 		if (modelo.camadaSaida().tamSaida() != 1) {
 			throw new IllegalArgumentException(
@@ -232,12 +231,12 @@ public class MainImg {
 			);
 		}
 
-		int larguraFinal = (int)(imagem.getWidth() * escala);
-		int alturaFinal = (int)(imagem.getHeight() * escala);
-		Pixel[][] imagemAmpliada = geim.gerarEstruturaImagem(larguraFinal, alturaFinal);
+		int larguraFinal = (int)(largBase * escala);
+		int alturaFinal = (int)(altBase * escala);
+		Imagem imagemAmpliada = geim.gerarEstruturaImagem(larguraFinal, alturaFinal);
 		
-		int alturaImagem = imagemAmpliada.length;
-		int larguraImagem = imagemAmpliada[0].length;
+		int alturaImagem = imagemAmpliada.altura();
+		int larguraImagem = imagemAmpliada.largura();
 
 		//gerenciar multithread
 		int numThreads = Runtime.getRuntime().availableProcessors();
@@ -273,7 +272,7 @@ public class MainImg {
 						saida[0] = clones[id].saidaParaArray()[0] * 255;
 
 						synchronized(imagemAmpliada) {
-							geim.configurarCor(imagemAmpliada, x, y, (int)saida[0], (int)saida[0], (int)saida[0]);
+							imagemAmpliada.set(x, y, (int)saida[0], (int)saida[0], (int)saida[0]);
 						}
 					}
 				}
@@ -291,19 +290,18 @@ public class MainImg {
 			e.printStackTrace();
 		}
 
-		geim.exportarPng(imagemAmpliada, caminho);
+		imagemAmpliada.paraPNG(caminho);
 	}
 
 	/**
-	 * 
-	 * @param gdi
-	 * @param imagem
-	 * @param modelo
-	 * @param escala
-	 * @param caminho
+	 * Utiliza o modelo para criar e exportar uma imagem.
+	 * @param modelo modelo para uso.
+	 * @param altBase altura base da imagem.
+	 * @param largBase largura base da imagem.
+	 * @param escala fator de escala para altura e largura final.
+	 * @param caminho caminho para o arquivo.
 	 */
-	public void exportarImagemRGB(BufferedImage imagem, Modelo modelo, double escala, String caminho) {
-		if (imagem == null) throw new IllegalArgumentException("A imagem fornecida é nula.");
+	static void exportarImagemRGB(Modelo modelo, int altBase, int largBase, double escala, String caminho) {
 		if (escala <= 0) throw new IllegalArgumentException("O valor de escala não pode ser menor que 1.");
 		if (modelo.camadaSaida().tamSaida() != 3) {
 			throw new IllegalArgumentException(
@@ -312,12 +310,12 @@ public class MainImg {
 		}
 
 		//estrutura de dados da imagem
-		int larguraFinal = (int)(imagem.getWidth() * escala);
-		int alturaFinal = (int)(imagem.getHeight() * escala);
-		Pixel[][] imagemAmpliada = geim.gerarEstruturaImagem(larguraFinal, alturaFinal);
+		int larguraFinal = (int)(largBase * escala);
+		int alturaFinal = (int)(altBase * escala);
+		Imagem imagemAmpliada = geim.gerarEstruturaImagem(larguraFinal, alturaFinal);
 
-		int alturaImagem = imagemAmpliada.length;
-		int larguraImagem = imagemAmpliada[0].length;
+		int alturaImagem = imagemAmpliada.altura();
+		int larguraImagem = imagemAmpliada.largura();
 
 		//gerenciar multithread
 		int numThreads = Runtime.getRuntime().availableProcessors();
@@ -360,7 +358,7 @@ public class MainImg {
 						saida[2] = s[2] * 255;
 
 						synchronized (imagemAmpliada) {
-							geim.configurarCor(imagemAmpliada, x, y, (int)saida[0], (int)saida[1], (int)saida[2]);
+							imagemAmpliada.set(x, y, (int)saida[0], (int)saida[1], (int)saida[2]);
 						}
 					}
 				}
@@ -378,7 +376,90 @@ public class MainImg {
 			e.printStackTrace();
 		}
 
-		geim.exportarPng(imagemAmpliada, caminho);
+		imagemAmpliada.paraPNG(caminho);
+	}
+
+	/**
+	 * Gera um conjunto de dados de treino baseado na imagem.
+	 * @param img imagem base.
+	 * @return dados de treino.
+	 */
+	static double[][] imagemParaDadosTreinoEscalaCinza(BufferedImage imagem) {
+		if (imagem == null) throw new IllegalArgumentException("A imagem fornecida é nula.");
+
+		int larguraImagem = imagem.getWidth();
+		int alturaImagem = imagem.getHeight();
+
+		double[][] dadosImagem = new double[larguraImagem * alturaImagem][3];
+		int[][] vermelho = geim.obterVermelho(imagem);
+		int[][] verde = geim.obterVerde(imagem);
+		int[][] azul = geim.obterAzul(imagem);
+
+		int contador = 0;
+		for (int y = 0; y < alturaImagem; y++) {
+			for (int x = 0; x < larguraImagem; x++) {
+				int r = vermelho[y][x];
+				int g = verde[y][x];
+				int b = azul[y][x];
+
+				// preenchendo os dados na matriz
+				double xNormalizado = (double) x / (larguraImagem - 1);
+				double yNormalizado = (double) y / (alturaImagem - 1);
+				double escalaCinza = (r + g + b) / 3.0;
+				
+				dadosImagem[contador][0] = xNormalizado;// x
+				dadosImagem[contador][1] = yNormalizado;// y
+				dadosImagem[contador][2] = escalaCinza;// escala de cinza
+
+				contador++;
+			}
+		}
+		
+
+		return dadosImagem;
+	}
+
+	/**
+	 * Gera um conjunto de dados de treino baseado na imagem.
+	 * @param img imagem base.
+	 * @return dados de treino.
+	 */
+	static double[][] imagemParaDadosTreinoRGB(BufferedImage imagem) {
+		if (imagem == null) throw new IllegalArgumentException("A imagem fornecida é nula.");
+		int larguraImagem = imagem.getWidth();
+		int alturaImagem = imagem.getHeight();
+
+		double[][] dadosImagem = new double[larguraImagem * alturaImagem][5];
+		int[][] vermelho = geim.obterVermelho(imagem);
+		int[][] verde = geim.obterVerde(imagem);
+		int[][] azul = geim.obterAzul(imagem);
+
+		int contador = 0;
+
+		for (int y = 0; y < alturaImagem; y++) {
+			for (int x = 0; x < larguraImagem; x++) { 
+				int r = vermelho[y][x];
+				int g = verde[y][x];
+				int b = azul[y][x];
+
+				// preenchendo os dados na matriz
+				double xNormalizado = (double) x / (larguraImagem-1);
+				double yNormalizado = (double) y / (alturaImagem-1);  
+				double rNormalizado = (double) r / 255;
+				double gNormalizado = (double) g / 255;
+				double bNormalizado = (double) b / 255;
+
+				dadosImagem[contador][0] =  xNormalizado;// x
+				dadosImagem[contador][1] =  yNormalizado;// y
+				dadosImagem[contador][2] = rNormalizado;// vermelho
+				dadosImagem[contador][3] = gNormalizado;// verde
+				dadosImagem[contador][4] = bNormalizado;// azul
+
+				contador++;
+			}
+		}
+
+		return dadosImagem;
 	}
 
 }

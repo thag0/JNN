@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import ged.Dados;
 import ged.Ged;
-import externos.lib.geim.Geim;
+import geim.Geim;
 import jnn.Funcional;
 import jnn.camadas.*;
 import jnn.core.tensor.Tensor;

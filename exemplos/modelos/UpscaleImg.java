@@ -3,12 +3,14 @@ package exemplos.modelos;
 import java.awt.image.BufferedImage;
 
 import ged.Ged;
+import geim.Imagem;
 import ged.Dados;
-import externos.lib.geim.Geim;
+import geim.Geim;
 import jnn.Funcional;
 import jnn.camadas.*;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
+import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
 import jnn.otimizadores.SGD;
 
@@ -31,7 +33,7 @@ public class UpscaleImg {
 		BufferedImage imagem = geim.lerImagem(caminho);
 
 		// Tratando dados
-		double[][] dados = geim.imagemParaDadosTreinoEscalaCinza(imagem);
+		double[][] dados = imagemParaDadosTreinoEscalaCinza(imagem);
 		int nEntrada = 2;// posição x y do pixel
 		int nSaida = 1;// valor de escala de cinza/brilho do pixel
 		DataLoader img = jnn.dataloader(dados, nEntrada, nSaida);
@@ -59,7 +61,7 @@ public class UpscaleImg {
 
 		// Salvando dados
 		exportarHistoricoPerda(modelo.hist());// histórico de treino para plot
-		geim.exportarImagemEscalaCinza(imagem, modelo, 50, "img");// imagem ampliada
+		exportarImagemEscalaCinza(modelo, imagem.getHeight(), imagem.getWidth(), 50, "img.png");// imagem ampliada
 	}
 
 	/**
@@ -77,4 +79,123 @@ public class UpscaleImg {
 		Dados dados = new Dados(perdas);
 		ged.exportarCsv(dados, "historico-perda");
 	}
+
+	/**
+	 * Gera um conjunto de dados de treino baseado na imagem.
+	 * @param img imagem base.
+	 * @return dados de treino.
+	 */
+	static double[][] imagemParaDadosTreinoEscalaCinza(BufferedImage img) {
+		if (img == null) throw new IllegalArgumentException("A imagem fornecida é nula.");
+
+		int larguraImagem = img.getWidth();
+		int alturaImagem = img.getHeight();
+
+		double[][] dadosImagem = new double[larguraImagem * alturaImagem][3];
+		int[][] vermelho = geim.obterVermelho(img);
+		int[][] verde = geim.obterVerde(img);
+		int[][] azul = geim.obterAzul(img);
+
+		int contador = 0;
+		for (int y = 0; y < alturaImagem; y++) {
+			for (int x = 0; x < larguraImagem; x++) {
+				int r = vermelho[y][x];
+				int g = verde[y][x];
+				int b = azul[y][x];
+
+				// preenchendo os dados na matriz
+				double xNormalizado = (double) x / (larguraImagem - 1);
+				double yNormalizado = (double) y / (alturaImagem - 1);
+				double escalaCinza = (r + g + b) / 3.0;
+				
+				dadosImagem[contador][0] = xNormalizado;// x
+				dadosImagem[contador][1] = yNormalizado;// y
+				dadosImagem[contador][2] = escalaCinza;// escala de cinza
+
+				contador++;
+			}
+		}
+		
+
+		return dadosImagem;
+	}
+
+	/**
+	 * Utiliza o modelo para criar e exportar uma imagem.
+	 * @param modelo modelo para uso.
+	 * @param altBase altura base da imagem.
+	 * @param largBase largura base da imagem.
+	 * @param escala fator de escala para altura e largura final.
+	 * @param caminho caminho para o arquivo.
+	 */
+	static void exportarImagemEscalaCinza(Modelo modelo, int altBase, int largBase, double escala, String caminho) {
+		if (escala <= 0) throw new IllegalArgumentException("O valor de escala não pode ser menor que 1.");
+		if (modelo.camadaSaida().tamSaida() != 1) {
+			throw new IllegalArgumentException(
+				"O modelo deve trabalhar apenas com uma unidade na camada de saída para a escala de cinza."
+			);
+		}
+
+		int larguraFinal = (int)(largBase * escala);
+		int alturaFinal = (int)(altBase * escala);
+		Imagem imagemAmpliada = geim.gerarEstruturaImagem(larguraFinal, alturaFinal);
+		
+		int alturaImagem = imagemAmpliada.altura();
+		int larguraImagem = imagemAmpliada.largura();
+
+		//gerenciar multithread
+		int numThreads = Runtime.getRuntime().availableProcessors();
+		if (numThreads > 1) {
+			//só pra não sobrecarregar o processador
+			numThreads = (int)(numThreads / 2);
+		}
+
+		Thread[] threads = new Thread[numThreads];
+		Modelo[] clones = new Modelo[numThreads];
+		for (int i = 0; i < numThreads; i++) {
+			clones[i] = modelo.clone();
+		}
+
+		int alturaPorThead = alturaImagem / numThreads;
+
+		for (int i = 0; i < numThreads; i++) {
+			final int id = i;
+			final int inicio = i * alturaPorThead;
+			final int fim = inicio + alturaPorThead;
+			
+			threads[i] = new Thread(() -> {
+				Tensor in = new Tensor(2);
+
+				for (int y = inicio; y < fim; y++) {
+					for (int x = 0; x < larguraImagem; x++) {
+						in.set(((double)x / (larguraImagem-1)), 0);
+						in.set(((double)y / (alturaImagem-1)), 1);
+						double[] saida = new double[1];
+					
+						clones[id].forward(in);
+					
+						saida[0] = clones[id].saidaParaArray()[0] * 255;
+
+						synchronized(imagemAmpliada) {
+							imagemAmpliada.set(x, y, (int)saida[0], (int)saida[0], (int)saida[0]);
+						}
+					}
+				}
+			});
+
+			threads[i].start();
+		}
+
+		try {
+			for (Thread thread : threads) {
+				thread.join();
+			}
+		} catch(Exception e) {
+			System.out.println("Ocorreu um erro ao tentar salvar a imagem.");
+			e.printStackTrace();
+		}
+
+		imagemAmpliada.paraPNG(caminho);
+	}
+
 }
