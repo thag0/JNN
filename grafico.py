@@ -7,7 +7,7 @@ if __name__ == '__main__':
       print("Necessário infornar o nome do arquivo csv contendo os dados.")
       exit()
 
-   caminho = sys.argv[1] + '.csv'
+   caminho = sys.argv[1]
    dados = pd.read_csv(caminho)
 
    qtd_amostras = len(dados)

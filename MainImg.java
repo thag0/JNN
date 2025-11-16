@@ -27,7 +27,7 @@ public class MainImg {
 	static final int EPOCAS = 5 * 1000;
 	static final double ESCALA_RENDER = 10;
 	static final boolean historico = true;
-	static final String CAMINHO_HISTORICO = "historico-perda";
+	static final String CAMINHO_HISTORICO = "historico-perda.csv";
 	static final String CAMINHO_IMAGGEM = "./dados/mnist/treino/8/img_0.jpg";
 	// static final String caminhoImagem = "./dados/mnist/treino/7/img_1.jpg";
 	// static final String caminhoImagem = "./dados/32x32/circulos.png";
