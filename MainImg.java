@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 import ged.Dados;
 import ged.Ged;
 import geim.Geim;
-import geim.Imagem;
+import geim.imagem.Imagem;
 import jnn.Funcional;
 import jnn.camadas.Densa;
 import jnn.camadas.Entrada;
@@ -391,9 +391,9 @@ public class MainImg {
 		int alturaImagem = imagem.getHeight();
 
 		double[][] dadosImagem = new double[larguraImagem * alturaImagem][3];
-		int[][] vermelho = geim.obterVermelho(imagem);
-		int[][] verde = geim.obterVerde(imagem);
-		int[][] azul = geim.obterAzul(imagem);
+		int[][] vermelho = geim.getR(imagem);
+		int[][] verde = geim.getG(imagem);
+		int[][] azul = geim.getB(imagem);
 
 		int contador = 0;
 		for (int y = 0; y < alturaImagem; y++) {
@@ -430,9 +430,9 @@ public class MainImg {
 		int alturaImagem = imagem.getHeight();
 
 		double[][] dadosImagem = new double[larguraImagem * alturaImagem][5];
-		int[][] vermelho = geim.obterVermelho(imagem);
-		int[][] verde = geim.obterVerde(imagem);
-		int[][] azul = geim.obterAzul(imagem);
+		int[][] vermelho = geim.getR(imagem);
+		int[][] verde = geim.getG(imagem);
+		int[][] azul = geim.getB(imagem);
 
 		int contador = 0;
 

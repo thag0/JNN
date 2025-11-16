@@ -139,7 +139,7 @@ public class MainConv {
 		BufferedImage img = geim.lerImagem(caminho);
 		double[][] imagem = new double[img.getHeight()][img.getWidth()];
 
-		int[][] cinza = geim.obterCinza(img);
+		int[][] cinza = geim.getGray(img);
 
 		for (int y = 0; y < imagem.length; y++) {
 			for (int x = 0; x < imagem[y].length; x++) {
