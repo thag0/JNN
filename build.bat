@@ -20,11 +20,14 @@ if %errorlevel% neq 0 (
     exit /b %errorlevel%
 )
 
-echo.
-if exist "%BIN_DIR%\jnn.jar" del "%BIN_DIR%\jnn.jar"
+echo. Gerando Jar
 jar cvf "%BIN_DIR%\jnn.jar" -C "%BIN_DIR%" .
 
 @REM echo Gerando Doc 
-@REM javadoc -d "%DOC_DIR%" -sourcepath "." -subpackages jnn
+@REM set DOC_DIR=bin/doc
+@REM if exist "%DOC_DIR%" rmdir /S /Q "%DOC_DIR%"
+@REM mkdir "%DOC_DIR%"
+@REM javadoc -d "%DOC_DIR%" %JAVA_FILES%
+
 
 echo Build finalizado.
