@@ -19,7 +19,7 @@ public abstract class MetodoTreino {
 	/**
 	 * Histórico de perda do modelo durante o treinamento.
 	 */
-	protected LinkedList<Double> historico = new LinkedList<>();;
+	protected LinkedList<Double> historico;
     
 	/**
 	 * Gerador de números pseudo-aleatórios.

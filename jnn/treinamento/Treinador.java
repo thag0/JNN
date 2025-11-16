@@ -1,5 +1,6 @@
 package jnn.treinamento;
 
+import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -21,6 +22,11 @@ public class Treinador implements Cloneable {
 	 * Formato de execução de treino (amostra-amostra, lotes).
 	 */
 	MetodoTreino metodo;
+
+	/**
+	 * Histórico de perda do modelo durante o treinamento.
+	 */
+	protected LinkedList<Double> historico = new LinkedList<>();
 
 	/**
 	 * Número de threads para execução em paralelo.
@@ -50,12 +56,13 @@ public class Treinador implements Cloneable {
 	 * 
 	 */
 	public Treinador(Modelo modelo) {
-		this(modelo,false, 1);
+		this(modelo, false, 1);
 	}
 
 	public void setMetodo(MetodoTreino metodo) {
 		if (metodo != null) {
 			this.metodo = metodo;
+			this.metodo.historico = historico;
 		}
 	}
 
