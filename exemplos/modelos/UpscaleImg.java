@@ -3,7 +3,7 @@ package exemplos.modelos;
 import java.awt.image.BufferedImage;
 
 import ged.Ged;
-import geim.Imagem;
+import geim.imagem.Imagem;
 import ged.Dados;
 import geim.Geim;
 import jnn.Funcional;
@@ -92,9 +92,9 @@ public class UpscaleImg {
 		int alturaImagem = img.getHeight();
 
 		double[][] dadosImagem = new double[larguraImagem * alturaImagem][3];
-		int[][] vermelho = geim.obterVermelho(img);
-		int[][] verde = geim.obterVerde(img);
-		int[][] azul = geim.obterAzul(img);
+		int[][] vermelho = geim.getR(img);
+		int[][] verde = geim.getG(img);
+		int[][] azul = geim.getB(img);
 
 		int contador = 0;
 		for (int y = 0; y < alturaImagem; y++) {
@@ -138,10 +138,10 @@ public class UpscaleImg {
 
 		int larguraFinal = (int)(largBase * escala);
 		int alturaFinal = (int)(altBase * escala);
-		Imagem imagemAmpliada = geim.gerarEstruturaImagem(larguraFinal, alturaFinal);
-		
-		int alturaImagem = imagemAmpliada.altura();
-		int larguraImagem = imagemAmpliada.largura();
+		Imagem ampliada = geim.gerarEstruturaImagem(larguraFinal, alturaFinal);
+
+		int alturaImagem = ampliada.altura();
+		int larguraImagem = ampliada.largura();
 
 		//gerenciar multithread
 		int numThreads = Runtime.getRuntime().availableProcessors();
@@ -176,8 +176,8 @@ public class UpscaleImg {
 					
 						saida[0] = clones[id].saidaParaArray()[0] * 255;
 
-						synchronized(imagemAmpliada) {
-							imagemAmpliada.set(x, y, (int)saida[0], (int)saida[0], (int)saida[0]);
+						synchronized(ampliada) {
+							ampliada.set(x, y, (int)saida[0], (int)saida[0], (int)saida[0]);
 						}
 					}
 				}
@@ -195,7 +195,7 @@ public class UpscaleImg {
 			e.printStackTrace();
 		}
 
-		imagemAmpliada.paraPNG(caminho);
+		ampliada.paraPNG(caminho);
 	}
 
 }
