@@ -2,12 +2,12 @@ package jnn.modelos;
 
 import java.text.DecimalFormat;
 
-import jnn.avaliacao.Avaliador;
 import jnn.camadas.Camada;
 import jnn.camadas.Entrada;
 import jnn.core.Dicionario;
 import jnn.core.tensor.Tensor;
-import jnn.treinamento.Treinador;
+import jnn.metrica.Avaliador;
+import jnn.treino.Treinador;
 
 /**
  * <h1>

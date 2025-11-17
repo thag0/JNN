@@ -1,18 +1,8 @@
 package jnn;
 
-import jnn.ativacoes.Argmax;
-import jnn.ativacoes.Ativacao;
-import jnn.ativacoes.Softmax;
-import jnn.avaliacao.metrica.Acuracia;
-import jnn.avaliacao.metrica.F1Score;
-import jnn.avaliacao.metrica.MatrizConfusao;
-import jnn.avaliacao.perda.EntropiaCruzada;
-import jnn.avaliacao.perda.EntropiaCruzadaBinaria;
-import jnn.avaliacao.perda.MAE;
-import jnn.avaliacao.perda.MSE;
-import jnn.avaliacao.perda.MSLE;
-import jnn.avaliacao.perda.Perda;
-import jnn.avaliacao.perda.RMSE;
+import jnn.acts.Argmax;
+import jnn.acts.Ativacao;
+import jnn.acts.Softmax;
 import jnn.core.Dicionario;
 import jnn.core.OpTensor;
 import jnn.core.Utils;
@@ -22,7 +12,17 @@ import jnn.dataloader.Amostra;
 import jnn.dataloader.DataLoader;
 import jnn.inicializadores.Identidade;
 import jnn.inicializadores.Inicializador;
-import jnn.otimizadores.Otimizador;
+import jnn.metrica.metrica.Acuracia;
+import jnn.metrica.metrica.F1Score;
+import jnn.metrica.metrica.MatrizConfusao;
+import jnn.metrica.perda.EntropiaCruzada;
+import jnn.metrica.perda.EntropiaCruzadaBinaria;
+import jnn.metrica.perda.MAE;
+import jnn.metrica.perda.MSE;
+import jnn.metrica.perda.MSLE;
+import jnn.metrica.perda.Perda;
+import jnn.metrica.perda.RMSE;
+import jnn.otm.Otimizador;
 
 import java.util.random.RandomGenerator;
 

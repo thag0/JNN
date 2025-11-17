@@ -13,7 +13,7 @@ import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
-import jnn.serializacao.Serializador;
+import jnn.serial.Serializador;
 
 public class MainConv {
 

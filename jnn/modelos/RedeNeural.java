@@ -1,16 +1,16 @@
 package jnn.modelos;
 
-import jnn.ativacoes.Ativacao;
-import jnn.avaliacao.Avaliador;
-import jnn.avaliacao.perda.MSE;
-import jnn.avaliacao.perda.Perda;
+import jnn.acts.Ativacao;
 import jnn.camadas.Camada;
 import jnn.camadas.Densa;
 import jnn.core.Dicionario;
 import jnn.core.tensor.Tensor;
-import jnn.otimizadores.Otimizador;
-import jnn.otimizadores.SGD;
-import jnn.treinamento.Treinador;
+import jnn.metrica.Avaliador;
+import jnn.metrica.perda.MSE;
+import jnn.metrica.perda.Perda;
+import jnn.otm.Otimizador;
+import jnn.otm.SGD;
+import jnn.treino.Treinador;
 
 /**
  * <h3>

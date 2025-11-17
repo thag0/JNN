@@ -1,13 +1,13 @@
 package jnn.modelos;
 
-import jnn.avaliacao.Avaliador;
-import jnn.avaliacao.perda.Perda;
 import jnn.camadas.Camada;
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
-import jnn.otimizadores.Otimizador;
-import jnn.treinamento.Treinador;
+import jnn.metrica.Avaliador;
+import jnn.metrica.perda.Perda;
+import jnn.otm.Otimizador;
+import jnn.treino.Treinador;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

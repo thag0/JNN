@@ -8,7 +8,7 @@ import jnn.camadas.*;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.modelos.*;
-import jnn.otimizadores.SGD;
+import jnn.otm.SGD;
 
 public class Xor{
 	static Ged ged = new Ged();

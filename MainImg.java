@@ -16,7 +16,7 @@ import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;
 import jnn.modelos.RedeNeural;
 import jnn.modelos.Sequencial;
-import jnn.otimizadores.*;
+import jnn.otm.*;
 import render.JanelaTreino;
 
 public class MainImg {

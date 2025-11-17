@@ -2,8 +2,8 @@ package jnn.camadas.experimental;
 
 import java.util.Optional;
 
-import jnn.ativacoes.Ativacao;
-import jnn.ativacoes.Linear;
+import jnn.acts.Ativacao;
+import jnn.acts.Linear;
 import jnn.camadas.Camada;
 import jnn.core.Dicionario;
 import jnn.core.OpTensor;

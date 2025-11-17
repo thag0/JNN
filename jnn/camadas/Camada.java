@@ -1,6 +1,6 @@
 package jnn.camadas;
 
-import jnn.ativacoes.Ativacao;
+import jnn.acts.Ativacao;
 import jnn.core.tensor.Tensor;
 
 /**

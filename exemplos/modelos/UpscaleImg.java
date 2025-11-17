@@ -12,7 +12,7 @@ import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
-import jnn.otimizadores.SGD;
+import jnn.otm.SGD;
 
 /**
  * Exemplo usando um modelo para se adaptar a uma imagem com o objetivo
