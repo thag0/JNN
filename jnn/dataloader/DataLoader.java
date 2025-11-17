@@ -6,7 +6,7 @@ import java.util.Random;
 
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
-import jnn.dataloader.Transform.Transform;
+import jnn.dataloader.transform.Transform;
 
 /**
  * <h2>

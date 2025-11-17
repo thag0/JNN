@@ -1,4 +1,4 @@
-package jnn.dataloader.Transform;
+package jnn.dataloader.transform;
 
 import jnn.core.tensor.Tensor;
 
