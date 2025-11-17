@@ -791,6 +791,29 @@ public class TensorData {
         return Math.sqrt(soma / tam());
     }
 
+	/**
+	 * Restringe o conteúdo de dados entre um valor mínimo e máximo.
+	 * @param min valor mínimo.
+	 * @param max valor máximo.
+     * @return TensorData local alterado.
+	 */
+    public TensorData clamp(double min, double max) {
+        if (min >= max) {
+            throw new IllegalArgumentException(
+                "\nValor mínimo não pode ser maior ou igual ao valor máximo."
+            );
+        }
+
+        final int inicio = offset;
+        final int fim = inicio + tam();
+
+        for (int i = inicio; i < fim; i++) {
+            dados[i] = Math.clamp(dados[i], min, max);
+        }
+
+        return this;
+    }
+
     /**
      * Retorna o array do conjunto de dados.
      * <p>

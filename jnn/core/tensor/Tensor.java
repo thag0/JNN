@@ -1741,6 +1741,18 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	}
 
 	/**
+	 * Restringe o conteúdo de dados do tensor entre um valor 
+	 * mínimo e máximo.
+	 * @param min valor mínimo.
+	 * @param max valor máximo.
+	 * @return {@code Tensor} local alterado.
+	 */
+	public Tensor clamp(double min, double max) {
+		dados.clamp(min, max);
+		return this;
+	}
+
+	/**
 	 * Normaliza os valores do tensor dentro do intervalo especificado.
 	 * @param min valor mínimo do intervalo.
 	 * @param max valor máximo do intervalo.
