@@ -417,7 +417,7 @@ public class DataLoader implements Iterable<Amostra> {
      * Gera um {@code DataLoader} baseado no problema da porta lógica XOR.
      * @return {@code DataLoader}.
      */
-    public static DataLoader xor() {
+    public static DataLoader Xor() {
         DataLoader loader = new DataLoader();
 
         for (int i = 0; i < 2; i++) {
@@ -425,6 +425,25 @@ public class DataLoader implements Iterable<Amostra> {
                 loader.add(
                     new Tensor(new double[]{ i, j }),
                     new Tensor(new double[]{ i^j })
+                );
+            }
+        }
+
+        return loader;
+    }
+
+    /**
+     * Gera um {@code DataLoader} baseado no problema da porta lógica AND.
+     * @return {@code DataLoader}.
+     */
+    public static DataLoader And() {
+        DataLoader loader = new DataLoader();
+
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
+                loader.add(
+                    new Tensor(new double[]{ i,j }),
+                    new Tensor(new double[]{ i&j })
                 );
             }
         }

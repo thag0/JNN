@@ -353,8 +353,15 @@ public class DensaLote extends Camada implements Cloneable {
 	}
 
 	public void ajustarParaLote(int tamLote) {
-		_entrada  	= addParam("Entrada", tamLote,  tamEntrada);
-		_saida  	= addParam("Saida", tamLote,  numNeuronios);
+		if (tamLote == 0) {
+			_entrada 	= addParam("Entrada", tamEntrada);
+			_saida 		= addParam("Saida", numNeuronios);
+		
+		} else {
+			_entrada	= addParam("Entrada", tamLote,  tamEntrada);
+			_saida		= addParam("Saida", tamLote,  numNeuronios);
+		}
+
 		_buffer 	 = addParam("Buffer", _saida.shape());
 		_gradSaida 	 = addParam("Grad Saida", _saida.shape());
 		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
@@ -393,7 +400,10 @@ public class DensaLote extends Camada implements Cloneable {
 			if (tamLote != lotes) {
 				ajustarParaLote(lotes);
 			}
-		} else if (x.numDim() != _entrada.numDim()) {
+		} if (x.numDim() == 1) {
+			ajustarParaLote(0);// tirar dimensão do lote
+			
+		} else  {
 			throw new UnsupportedOperationException(
 				"\n Dimensões de X " + x.numDim() + " não suportadas."
 			);

@@ -20,7 +20,7 @@ public class Xor{
 
 	public static void main(String[] args) {
 		// Dados do problema xor
-		DataLoader xor = DataLoader.xor();
+		DataLoader xor = DataLoader.Xor();
 		final int in  = 2;// Entradas X
 		final int out = 1;// Saídas Y
 

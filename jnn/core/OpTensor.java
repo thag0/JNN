@@ -894,19 +894,16 @@ public class OpTensor {
 			gradB.ifPresent(gb -> gb.add(gradS));
 		
 		} else if (gradS.numDim() == 2) {//lote de amostras
-			matmul(entrada.transpor(), gradS, gradK);
-			matmul(gradS, kernel.transpor(), gradE);
+			matmul(entrada.transpor(), gradS, gradK);// testar
+			matmul(gradS, kernel.transpor(), gradE);// testar
 			
+			// ta ok
 			int lotes = gradS.tamDim(0);
 			gradB.ifPresent(gb -> {
 				for (int i = 0; i < lotes; i++) {					
 					gb.add(gradS.subTensor(i));
 				}
 			});
-
-			// gradE.mul(-1);
-			gradK.mul(-1);
-			gradB.get().mul(-1);
 		}
 
 	}
