@@ -9,9 +9,6 @@ import jnn.metrica.perda.Perda;
 import jnn.otm.Otimizador;
 import jnn.treino.Treinador;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 /**
  * <h3>
  *    Modelo base
@@ -246,33 +243,16 @@ public abstract class Modelo implements Cloneable {
 	public Tensor[] forward(Tensor[] xs) {
 		validarCompilacao();
 
+		// TODO adaptar o forward para incluir funcionar em todas as camadas.
+		// até o momento: DensaLote
+
 		utils.validarNaoNulo(xs, "Dados de entrada nulos.");
-
-		final int numEntradas = xs.length;
-		int numThreads = Runtime.getRuntime().availableProcessors();
-		if (numThreads > numEntradas) numThreads = numEntradas;
-
-		Tensor[] prevs = new Tensor[numEntradas];
-		Modelo[] clones = new Modelo[numThreads];
-
-		for (int i = 0; i < numThreads; i++) {
-			clones[i] = clone();
-		}
-
-		int lote = numEntradas / numThreads;
-		try (ExecutorService exec = Executors.newFixedThreadPool(numThreads)) {
-			for (int i = 0; i < numThreads; i++) {
-				final int id = i;
-				final int inicio = i * lote;
-				final int fim = (i == numThreads - 1) ? numEntradas : (i + 1) * lote;
-	
-				exec.execute(() -> {
-					for (int j = inicio; j < fim; j++) {
-						//clone porque a saída é sobrescrita na proxima iteração
-						prevs[j] = clones[id].forward(xs[j]).clone();
-					}
-				});
-			}
+		
+		Tensor y = forward(utils.concatenar(xs));
+		
+		Tensor[] prevs = new Tensor[xs.length];
+		for (int i = 0; i < xs.length; i++) {
+			prevs[i] = new Tensor(y.subTensor(i));
 		}
 
 		return prevs;

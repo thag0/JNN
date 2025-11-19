@@ -37,17 +37,20 @@ public abstract class Perda {
 	 * @param real {@code Tensor} com dados reais.
 	 */
 	protected void verificarDimensoes(Tensor prev, Tensor real) {
-		if (prev.numDim() != 1 || real.numDim() != 1) {
+		final int dimsPrev = prev.numDim();
+		final int dimsReal = real.numDim();
+
+		if (dimsPrev > 2 || dimsReal > 2) {
 			throw new UnsupportedOperationException(
-				"\nAmbos os tensores devem ter apenas uma dimensão."
+				"\nOperação suportada para tensores 1D e 2D, mas " +
+				" prev = " + dimsPrev + "D e real = " + dimsReal + "D."
 			);
 		}
 
-		if (prev.tam() != real.tam()) {
+		if (!prev.compShape(real)) {
 			throw new IllegalArgumentException(
-				"Dimensões de dados previstos (" + prev.tam() + 
-				") diferente da dimensão dos dados reais (" + real.tam() + 
-				")"
+				"\nAs dimensões dos tensores não coincidem, prev = " + prev.shapeStr() +
+				" e real = " + real.shapeStr()
 			);
 		}
 	}

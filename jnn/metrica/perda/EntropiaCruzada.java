@@ -17,25 +17,56 @@ public class EntropiaCruzada extends Perda {
 
 	@Override
 	public Tensor forward(Tensor prev, Tensor real) {
-		super.verificarDimensoes(prev, real);
-		int tam = prev.tam();
+		verificarDimensoes(prev, real);
 		
+		if (prev.numDim() == 1) {
+			int tam = prev.tam();
+			double ec = f(prev, real, tam);
+			
+			return new Tensor(
+				new double[]{ -ec/tam }
+			);
+
+		} else {
+			int lotes = prev.tamDim(0);
+			int amostras = prev.tamDim(1);
+
+			double somaLote = 0;
+			for (int i = 0; i < lotes; i++) {
+				Tensor p = prev.subTensor(i);
+				Tensor r = real.subTensor(i);
+
+				double ec = f(p, r, amostras);
+				somaLote += -ec;
+			}
+
+			return new Tensor(
+				new double[] {somaLote / lotes}
+			);
+		}
+	}
+
+	/**
+	 * Cálculo interno da Cross Entropy.
+	 * @param prev tensor com dados previstos.
+	 * @param real tensor com dados reais.
+	 * @param tam quantidade de amostras.
+	 * @return soma do CE.
+	 */
+	private double f(Tensor prev, Tensor real, int tam) {
 		double ec = 0.0;
 		for (int i = 0; i < tam; i++) {
 			ec += real.get(i) * Math.log(prev.get(i) + eps);
 		}
-		
-		return new Tensor(
-			new double[]{ -ec/tam }
-		);
+
+		return ec;
 	}
 	
 	@Override
 	public Tensor backward(Tensor prev, Tensor real) {
-		super.verificarDimensoes(prev, real);
+		verificarDimensoes(prev, real);
 
-		return prev.map(
-			real,
+		return prev.map(real,
 			(p, r) -> (p - r)
 		);
 	}

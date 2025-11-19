@@ -6,10 +6,8 @@ import ged.Ged;
 import ged.Dados;
 import jnn.Funcional;
 
-import jnn.camadas.Densa;
-import jnn.camadas.Dropout;
 import jnn.camadas.Entrada;
-
+import jnn.camadas.experimental.DensaLote;
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 
@@ -50,11 +48,9 @@ public class Iris {
 		// Criando um modelo
 		Sequencial modelo = new Sequencial(
 			new Entrada(numEntradas),
-			new Densa(12, "tanh"),
-			new Dropout(0.25),
-			new Densa(12, "tanh"),
-			new Dropout(0.25),
-			new Densa(numSaidas, "softmax")
+			new DensaLote(10, "tanh"),
+			new DensaLote(10, "tanh"),
+			new DensaLote(numSaidas, "sigmoid")
 		);
 			
 		modelo.compilar("adam", "entropia-cruzada");
@@ -77,8 +73,9 @@ public class Iris {
 		Tensor matriz = modelo.avaliador().matrizConfusao(testeX, testeY);
 		matriz.nome("Matriz de confusão").print();
 
-		exportarHistorico(modelo.hist(), "historico-perda");
-		executarComando("python grafico.py historico-perda");
+		String nomeArquivo = "historico-perda.csv";
+		exportarHistorico(modelo.hist(), nomeArquivo);
+		executarComando("python grafico.py " + nomeArquivo);
 	}
 
 	/**
