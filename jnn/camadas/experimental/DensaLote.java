@@ -400,7 +400,7 @@ public class DensaLote extends Camada implements Cloneable {
 			if (tamLote != lotes) {
 				ajustarParaLote(lotes);
 			}
-		} if (x.numDim() == 1) {
+		} else if (x.numDim() == 1) {
 			ajustarParaLote(0);// tirar dimensão do lote
 			
 		} else  {
