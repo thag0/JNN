@@ -5,9 +5,8 @@ import java.text.DecimalFormat;
 import ged.Ged;
 import ged.Dados;
 import jnn.Funcional;
-
+import jnn.camadas.Densa;
 import jnn.camadas.Entrada;
-import jnn.camadas.experimental.DensaLote;
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 
@@ -48,9 +47,9 @@ public class Iris {
 		// Criando um modelo
 		Sequencial modelo = new Sequencial(
 			new Entrada(numEntradas),
-			new DensaLote(10, "tanh"),
-			new DensaLote(10, "tanh"),
-			new DensaLote(numSaidas, "sigmoid")
+			new Densa(10, "tanh"),
+			new Densa(10, "tanh"),
+			new Densa(numSaidas, "sigmoid")
 		);
 			
 		modelo.compilar("adam", "entropia-cruzada");

@@ -47,7 +47,7 @@ public class MainConv {
 	static final String CAMINHO_TREINO = "./dados/mnist/treino/";
 	static final String CAMINHO_TESTE = "./dados/mnist/teste/";
 	static final String CAMINHO_SAIDA_MODELO = "./dados/modelos/modelo-treinado.nn";
-	static final String CAMINHO_HISTORICO = "historico-perda";
+	static final String CAMINHO_HISTORICO = "historico-perda.csv";
 
 	public static void main(String[] args) {
 		ged.limparConsole();
@@ -93,28 +93,27 @@ public class MainConv {
 	 * Criação de modelos para testes.
 	 */
 	static Sequencial criarModelo() {
-		Sequencial modelo = new Sequencial(
-			new Entrada(1, 28, 28),
-			new Conv2D(24, new int[]{3, 3}, "relu"),
-			new MaxPool2D(new int[]{2, 2}),
-			new Conv2D(30, new int[]{3, 3}, "relu"),
-			new MaxPool2D(new int[]{2, 2}),
-			new Flatten(),
-			new Densa(100, "tanh"),
-			new Densa(NUM_DIGITOS_TREINO, "softmax")
-		);
-
 		// Sequencial modelo = new Sequencial(
 		// 	new Entrada(1, 28, 28),
+		// 	new Conv2D(24, new int[]{3, 3}, "relu"),
+		// 	new MaxPool2D(new int[]{2, 2}),
+		// 	new Conv2D(30, new int[]{3, 3}, "relu"),
+		// 	new MaxPool2D(new int[]{2, 2}),
 		// 	new Flatten(),
-		// 	new Densa(20, "tanh"),
-		// 	new Densa(20, "tanh"),
-		// 	new Densa(20, "tanh"),
+		// 	new Densa(100, "tanh"),
 		// 	new Densa(NUM_DIGITOS_TREINO, "softmax")
 		// );
 
+		Sequencial modelo = new Sequencial(
+			new Entrada(1, 28, 28),
+			new Flatten(),
+			new Densa(20, "tanh"),
+			new Densa(20, "tanh"),
+			new Densa(20, "tanh"),
+			new Densa(NUM_DIGITOS_TREINO, "sigmoid")
+		);
+
 		modelo.compilar("adam", "entropia-cruzada");
-		modelo.treinador().setThreads(4);
 		
 		return modelo;
 	}

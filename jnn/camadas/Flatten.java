@@ -38,6 +38,16 @@ public class Flatten extends Camada implements Cloneable{
 	private int[] shapeSaida;
 
 	/**
+	 * 
+	 */
+	private int totalFlatten;
+
+	/**
+	 * Auxiliar pra controle de treinamento em lotes.
+	 */
+	private int tamLote;
+
+	/**
 	 * Tensor contendo os valores de entrada para a camada,
 	 * que serão usados para o processo de feedforward.
 	 * <p>
@@ -121,11 +131,9 @@ public class Flatten extends Camada implements Cloneable{
 		}
 
 		shapeEntrada = shape.clone();
+		totalFlatten = tamSaida();
 
-		int tamanho = 1;
-		for (int dim : shapeEntrada) tamanho *= dim;
-
-		shapeSaida = new int[]{tamanho};
+		shapeSaida = new int[]{ totalFlatten };
 
 		_entrada 	 = addParam("Entrada", shapeEntrada);
 		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
@@ -140,6 +148,26 @@ public class Flatten extends Camada implements Cloneable{
 	@Override
 	public void setSeed(Number seed) {}
 
+	@Override
+	public void ajustarParaLote(int tamLote) {
+		if (tamLote == 0) {
+			_entrada 	= addParam("Entrada", shapeEntrada);
+			_saida 		= addParam("Saida", tamSaida());
+		
+		} else {
+			int[] shape = new int[shapeEntrada.length + 1];
+			shape[0] = tamLote;
+			System.arraycopy(shapeEntrada, 0, shape, 1, shapeEntrada.length);
+
+			_entrada	= addParam("Entrada", shape);
+			_saida		= addParam("Saida", tamLote, totalFlatten);
+		}
+
+		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
+		
+		this.tamLote = tamLote;
+	}
+
 	/**
 	 * <h2>
 	 *    Propagação direta através da camada Flatten
@@ -149,6 +177,23 @@ public class Flatten extends Camada implements Cloneable{
 	@Override
 	public Tensor forward(Tensor x) {
 		verificarConstrucao();
+
+		if (x.numDim() == shapeEntrada.length) {
+			ajustarParaLote(0);
+		
+		} else if (x.numDim() == shapeEntrada.length + 1) {
+			int lotes = x.tamDim(0);
+			if (lotes != this.tamLote) {
+				ajustarParaLote(lotes);
+			}
+		}
+		else {
+			throw new UnsupportedOperationException(
+				"Flatten esperava tensor com " + shapeEntrada.length +
+				" ou " + (shapeEntrada.length + 1) +
+				" dimensões. Recebido: " + x.numDim()
+			);
+		}
 
 		_entrada.copiar(x);
 		_saida.copiarElementos(_entrada);
@@ -184,7 +229,15 @@ public class Flatten extends Camada implements Cloneable{
 
 	@Override
 	public int tamSaida() {
-		return saida().tam();
+		// calculo individual baseado na entrada pra 
+		// evitar problemas com lotes
+
+		int tam = 1; 
+		for (int val : shapeEntrada) {
+			tam *= val;
+		}
+
+		return tam;
 	}
 
 	@Override

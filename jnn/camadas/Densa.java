@@ -60,6 +60,11 @@ public class Densa extends Camada implements Cloneable {
 	private int numNeuronios;
 
 	/**
+	 * Auxilar no controle de treinamento em lotes.
+	 */
+	private int tamLote;
+
+	/**
 	 * Tensor contendo os valores dos pesos de cada conexão da
 	 * entrada com a saída da camada.
 	 * <p>
@@ -366,6 +371,24 @@ public class Densa extends Camada implements Cloneable {
 		this.usarBias = usarBias;
 	}
 
+	@Override
+	public void ajustarParaLote(int tamLote) {
+		if (tamLote == 0) {// remover dimensão de lote
+			_entrada = addParam("Entrada", tamEntrada);
+			_saida = addParam("Saida", numNeuronios);
+		
+		} else {
+			_entrada = addParam("Entrada", tamLote,  tamEntrada);
+			_saida = addParam("Saida", tamLote,  numNeuronios);
+		}
+
+		_buffer 	 = addParam("Buffer", _saida.shape());
+		_gradSaida 	 = addParam("Grad Saida", _saida.shape());
+		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
+		
+		this.tamLote = tamLote;
+	}
+
 	/**
 	 * <h2>
 	 *		Propagação direta através da camada Densa
@@ -392,6 +415,22 @@ public class Densa extends Camada implements Cloneable {
 	@Override
 	public Tensor forward(Tensor x) {
 		verificarConstrucao();
+
+		// isso aqui vai ser melhorado
+		if (x.numDim() == 2) {
+			int lotes = x.tamDim(0);
+			if (tamLote != lotes) {
+				ajustarParaLote(lotes);
+			}
+
+		} else if (x.numDim() == 1) {
+			ajustarParaLote(0);
+			
+		} else  {
+			throw new UnsupportedOperationException(
+				"\n Dimensões de X " + x.numDim() + " não suportadas."
+			);
+		}
 
 		_entrada.copiar(x);
 
