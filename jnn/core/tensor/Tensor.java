@@ -532,16 +532,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
 	public Tensor preencherContador(boolean cres) {
-		int tam = tam();
-		double[] d = dados.data();
-
-		if (cres) {
-			for (int i = 0; i < tam; i++) d[i] = i + 1;
-
-		} else {
-			for (int i = 0; i < tam; i++) d[i] = tam - i - 1;
-		}
-
+		dados.preencherContador(cres);
 		return this;
 	}
 

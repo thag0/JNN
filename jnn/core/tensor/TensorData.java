@@ -149,6 +149,21 @@ public class TensorData {
         return this;
     }
 
+    public TensorData preencherContador(boolean cres) {
+        final int tam = tam();
+        if (cres) {
+            for (int i = 0; i < tam; i++) {
+                dados[offset + i] = i+1;
+            }
+        } else {
+            for (int i = 0; i < tam; i++) {
+                dados[offset + i] = tam - i;
+            }
+        }
+
+        return this;
+    }
+
     /**
      * Zera os valores do conjunto de dados.
      * @return TensorData local alterado.
