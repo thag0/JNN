@@ -888,14 +888,14 @@ public class OpTensor {
 	 * @see {@link jnn.camadas.Densa}
 	 */
 	public void backwardDensa(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {	
+		matmul(gradS, kernel.transpor(), gradE);
+		
 		if (gradS.numDim() == 1) {//amostra única
 			matmul(entrada.unsqueeze(0).transpor(), gradS, gradK);
-			matmul(gradS, kernel.transpor(), gradE);
 			gradB.ifPresent(gb -> gb.add(gradS));
 		
 		} else if (gradS.numDim() == 2) {//lote de amostras
 			matmul(entrada.transpor(), gradS, gradK);
-			matmul(gradS, kernel.transpor(), gradE);
 			
 			int lotes = gradS.tamDim(0);
 			gradB.ifPresent(gb -> {
@@ -916,14 +916,24 @@ public class OpTensor {
 	 * @see {@link jnn.camadas.Conv2D}
 	 */
 	public void forwardConv2D(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
+		if (entrada.numDim() == 3) {
+			forwardConv2DNormal(entrada, kernel, bias, saida);	
+		} else {
+			forwardConv2DLotes(entrada, kernel, bias, saida);
+		}
+	}
+
+	/**
+	 * Operador interno da camada Conv2D tradicional.
+	 * @param entrada entrada.
+	 * @param kernel kernel.
+	 * @param bias bias.
+	 * @param saida saída.
+	 */
+	private void forwardConv2DNormal(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
 		int[] shapeK = kernel.shape();
 		final int profEntrada = shapeK[1];
 		final int numFiltros = shapeK[0];
-
-		// NOTA
-		// mesmo paralelizando, não tem ganho.
-		// acredito que essa nova abordagem facilite a paralelização
-		// em melhorias futuras que sejam mais otimizadas
 
 		Tensor[] entradas = new Tensor[profEntrada];
 		for (int i = 0; i < profEntrada; i++) {
@@ -959,7 +969,27 @@ public class OpTensor {
 				}
 			}
 		}
+	}
 
+	/**
+	 * Operador interno da camada Conv2D para lidar com lotes.
+	 * @param entrada entrada.
+	 * @param kernel kernel.
+	 * @param bias bias.
+	 * @param saida saída.
+	 */
+	private void forwardConv2DLotes(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
+		// TODO refatorar para trabalhar com os tensores de forma mais inteligente
+		// por enquanto ta assim por compatibilidade.
+		int lotes = entrada.tamDim(0);
+		for (int i = 0; i < lotes; i++) {
+			forwardConv2DNormal(
+				entrada.subTensor(i),
+				kernel,
+				bias,
+				saida.subTensor(i)
+			);
+		}
 	}
 
 	/**
@@ -1012,7 +1042,24 @@ public class OpTensor {
 	 * @param gradE {@code Tensor} contendo o gradiente em relação à entrada da camada.
 	 * @see {@link jnn.camadas.Conv2D}
 	 */
-	public void backwardConv2D(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
+	public void backwardConv2D(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {	
+		if (entrada.numDim() == 3) {
+			backwardConv2DNormal(entrada, kernel, gradS, gradK, gradB, gradE);
+		} else {
+			backwardConv2DLotes(entrada, kernel, gradS, gradK, gradB, gradE);
+		}
+	}
+
+	/**
+	 * Operador interno da camada Conv2D tradicional.
+	 * @param entrada entrada
+	 * @param kernel kernel
+	 * @param gradS gradS
+	 * @param gradK gradK
+	 * @param gradB gradB
+	 * @param gradE gradE
+	 */
+	private void backwardConv2DNormal(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
 		int[] shapeK = kernel.shape();
 
 		final int numFiltros = shapeK[0];
@@ -1069,7 +1116,32 @@ public class OpTensor {
 				double soma = gradS.subTensor(i).soma().item();
 				gb.add(soma, i);
 			}
-		});
+		});		
+	}
+
+	/**
+	 * Operador interno da camada Conv2D para lidar com lotes.
+	 * @param entrada entrada
+	 * @param kernel kernel
+	 * @param gradS gradS
+	 * @param gradK gradK
+	 * @param gradB gradB
+	 * @param gradE gradE
+	 */
+	private void backwardConv2DLotes(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
+		// TODO refatorar para trabalhar com os tensores de forma mais inteligente
+		// por enquanto ta assim por compatibilidade.
+		int lotes = entrada.tamDim(0);
+		for (int i = 0; i < lotes; i++) {
+			backwardConv2DNormal(
+				entrada.subTensor(i),
+				kernel,
+				gradS.subTensor(i),
+				gradK,
+				gradB,
+				gradE.subTensor(i)
+			);
+		}		
 	}
 
 }

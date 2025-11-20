@@ -115,6 +115,11 @@ public class Conv2D extends Camada implements Cloneable {
 	private boolean usarBias = true;
 
 	/**
+	 * Auxilar no controle de treinamento em lotes.
+	 */
+	private int tamLote;
+
+	/**
 	 * Tensor contendo os valores de resultados intermediários 
 	 * do processamento da camada.
 	 * <p>
@@ -541,6 +546,32 @@ public class Conv2D extends Camada implements Cloneable {
 		this.usarBias = usarBias;
 	}
 
+	@Override
+	public void ajustarParaLote(int tamLote) {
+		final int canais = shapeEntrada[0];
+		final int altIn = shapeEntrada[1];
+		final int largIn = shapeEntrada[2];
+		
+		final int filtros = shapeSaida[0];
+		final int altOut = shapeSaida[1];
+		final int largOut = shapeSaida[2];
+
+		if (tamLote == 0) {
+			_entrada = addParam("Entrada", shapeEntrada);
+			_saida = addParam("Saida", shapeSaida);
+			
+		} else {
+			_entrada = addParam("Entrada", tamLote, canais, altIn, largIn);
+			_saida = addParam("Saida", tamLote, filtros, altOut, largOut);
+		}
+
+		_buffer 	 = addParam("Buffer", _saida.shape());
+		_gradSaida 	 = addParam("Grad Saida", _saida.shape());
+		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
+
+		this.tamLote = tamLote;
+	}
+
 	/**
 	 * <h2>
 	 *    Propagação direta através da camada Convolucional
@@ -563,6 +594,25 @@ public class Conv2D extends Camada implements Cloneable {
 	@Override
 	public Tensor forward(Tensor x) {
 		verificarConstrucao();
+
+		final int numDim = x.numDim();
+
+		if (numDim == 3) {
+			ajustarParaLote(0);
+		
+		} else if (numDim == 4) {
+			int lotes = x.tamDim(0);
+			if (lotes != this.tamLote) {
+				ajustarParaLote(lotes);
+			}
+		
+		} else {
+			throw new UnsupportedOperationException(
+				"Esperado tensor com " + shapeEntrada.length +
+				" ou " + (shapeEntrada.length + 1) +
+				" dimensões. Recebido: " + x.numDim()
+			);
+		}
 
 		_entrada.copiar(x);
 		

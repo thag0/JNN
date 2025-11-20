@@ -37,10 +37,10 @@ public class MainConv {
 	// dados de controle
 	static final int NUM_DIGITOS_TREINO = 10;
 	static final int NUM_DIGITOS_TESTE  = NUM_DIGITOS_TREINO;
-	static final int NUM_AMOSTRAS_TREINO = 1_000;
-	static final int NUM_AMOSTRAS_TESTE  = 500;
+	static final int NUM_AMOSTRAS_TREINO = 200;// max 1000
+	static final int NUM_AMOSTRAS_TESTE  = 200;// max 500
 	static final int TREINO_EPOCAS = 10;
-	static final int TREINO_LOTE = 64;
+	static final int TREINO_LOTE = 32;
 	static final boolean TREINO_LOGS = true;
 
 	// caminhos de arquivos externos
@@ -93,25 +93,26 @@ public class MainConv {
 	 * Criação de modelos para testes.
 	 */
 	static Sequencial criarModelo() {
-		// Sequencial modelo = new Sequencial(
-		// 	new Entrada(1, 28, 28),
-		// 	new Conv2D(24, new int[]{3, 3}, "relu"),
-		// 	new MaxPool2D(new int[]{2, 2}),
-		// 	new Conv2D(30, new int[]{3, 3}, "relu"),
-		// 	new MaxPool2D(new int[]{2, 2}),
-		// 	new Flatten(),
-		// 	new Densa(100, "tanh"),
-		// 	new Densa(NUM_DIGITOS_TREINO, "softmax")
-		// );
-
 		Sequencial modelo = new Sequencial(
 			new Entrada(1, 28, 28),
+			new Conv2D(16, new int[]{3, 3}, "relu"),
+			new Conv2D(10, new int[]{3, 3}, "relu"),
+			// new MaxPool2D(new int[]{2, 2}),
+			// new Conv2D(30, new int[]{3, 3}, "relu"),
+			// new MaxPool2D(new int[]{2, 2}),
 			new Flatten(),
-			new Densa(20, "tanh"),
-			new Densa(20, "tanh"),
-			new Densa(20, "tanh"),
+			new Densa(50, "tanh"),
 			new Densa(NUM_DIGITOS_TREINO, "sigmoid")
 		);
+
+		// Sequencial modelo = new Sequencial(
+		// 	new Entrada(1, 28, 28),
+		// 	new Flatten(),
+		// 	new Densa(20, "tanh"),
+		// 	new Densa(20, "tanh"),
+		// 	new Densa(20, "tanh"),
+		// 	new Densa(NUM_DIGITOS_TREINO, "sigmoid")
+		// );
 
 		modelo.compilar("adam", "entropia-cruzada");
 		
