@@ -1,33 +1,19 @@
 package jnn.core.tensor;
 
 /**
- * <h1> Atenção </h1>
- * <p>
- *      {@code Variavel} está sendo substituído por {@code TensorData}
- *      para aproveitar a maior eficiência de contiguidade em memória e será
- *      removido em versões futuras.
- * </p>
- * Veja: {@link jnn.core.tensor.TensorData}
  * <h2>
- *      Variável primitiva de tensores
+ *      Variável
  * </h2>
- * <p>
- *      Essa é a unidade mais básica de variável usada pela biblioteca.
- * </p>
- *      Implementei isso para poder compartilhar referências de
- *      variáveis entre tensores, principalmente usando operação que
- *      alteram a visualização de tensores mas que devem referencias os
- *      mesmos objetos.
  * <p>
  *      Uma variável é basicamente um valor numérico encapsulado. Ela
  *      pode fazer operações aritméticas simples (soma, subtração, 
  *      multiplicação, divisão) além de operações essenciais como get e set.
  * </p>
  * <p>
- *      As operações não possuem retorno e a alteração do conteúdo é feita localmente.
+ *      As alteram o conteúdo localmente e retornam a instância local para
+ *      faciliar a criação de pipelines.
  * </p>
  */
-@Deprecated
 public class Variavel implements Cloneable {
     
     /**
