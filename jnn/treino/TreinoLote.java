@@ -56,7 +56,7 @@ public class TreinoLote extends MetodoTreino {
 			}
 
 			if (calcHist) {
-				historico.add(perdaEpoca.sum());
+				historico.add(perdaEpoca.sum() / amostras);
 			}
 
 			if (logs) {
@@ -89,7 +89,7 @@ public class TreinoLote extends MetodoTreino {
 
 		if (calcHist) {
 			double l = loss.forward(prev, real).item();
-			perdaEpoca.add(l / loteX.length);
+			perdaEpoca.add(l);
 		}
 	}
 
