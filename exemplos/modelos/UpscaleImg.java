@@ -55,7 +55,7 @@ public class UpscaleImg {
 		// Avaliando o modelo
 		Tensor[] xs = img.getX();
 		Tensor[] ys = img.getY();
-		double precisao = 1 - modelo.avaliador().erroMedioAbsoluto(xs, ys).item();
+		double precisao = 1 - modelo.avaliador().mae(xs, ys).item();
 		System.out.println("Precisão = " + (precisao * 100));
 		System.out.println("Perda = " + modelo.avaliar(xs, ys).item());
 

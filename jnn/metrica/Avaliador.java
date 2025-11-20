@@ -1,5 +1,6 @@
 package jnn.metrica;
 
+import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 import jnn.metrica.metrica.*;
 import jnn.metrica.perda.*;
@@ -9,26 +10,37 @@ import jnn.modelos.Modelo;
  * Contém implementações de métricas para analisar modelos.
  */
 public class Avaliador {
-	private Modelo modelo;
-
-	EntropiaCruzada ecc = new EntropiaCruzada();
-	EntropiaCruzadaBinaria ecb = new EntropiaCruzadaBinaria();
-	Acuracia acuracia = new Acuracia();
-	MatrizConfusao matrizConfusao = new MatrizConfusao();
-	F1Score f1Score = new F1Score();
-	MatrizConfusao mc = new MatrizConfusao();
-	MSE emq = new MSE();
-	MAE ema = new MAE();
-	MSLE emql = new MSLE();   
 
 	/**
-	 * Instancia um novo avaliador destinado a uma Rede Neural.
-	 * @param modelo rede neural para o avaliador.
-	 * @throws IllegalArgumentException se a rede fornecida for nula.
+	 * Modelo base de avaliação.
+	 */
+	private Modelo modelo;
+
+	/**
+	 * Utilitário.
+	 */
+	private Utils utils;
+
+	MSE mse = new MSE();
+	MAE mae = new MAE();
+	MSLE msle = new MSLE();
+	RMSE rmse = new RMSE();
+	EntropiaCruzada ce = new EntropiaCruzada();
+	EntropiaCruzadaBinaria bce = new EntropiaCruzadaBinaria();
+	
+	MatrizConfusao mc = new MatrizConfusao();
+	Acuracia acuracia = new Acuracia();
+	F1Score f1Score = new F1Score();
+
+	/**
+	 * Instancia um novo avaliador destinado a um Modelo.
+	 * @param modelo modelo base.
 	 */
 	public Avaliador(Modelo modelo) {
 		if (modelo == null) {
-			throw new IllegalArgumentException("\nO modelo fornecido não pode ser nulo.");
+			throw new IllegalArgumentException(
+				"\nModelo == null."
+			);
 		}
 
 		this.modelo = modelo;
@@ -40,27 +52,21 @@ public class Avaliador {
 	 * @param real {@code Tensor} com dados reais.
 	 * @return {@code Tensor} contendo o resultado.
 	 */
-	public Tensor erroMedioQuadrado(Tensor prev, Tensor real) {
-		return ema.forward(prev, real);
+	public Tensor mse(Tensor prev, Tensor real) {
+		return mse.forward(prev, real);
 	}
 
 	/**
-	 * Calcula o erro médio quadrado médio em relação aos dados de entrada e 
-	 * saída fornecidos.
-	 * @param entrada {@code Tensores} com dados de entrada para o modelo previstos.
+	 * Calcula o erro médio quadrado em relação aos dados previstos e reais.
+	 * @param prev {@code Tensores} com dados previstos.
 	 * @param real {@code Tensores} com dados reais.
 	 * @return {@code Tensor} contendo o resultado.
 	 */
-	public Tensor erroMedioQuadrado(Tensor[] entrada, Tensor[] real) {
-		Tensor[] prev = modelo.forward(entrada);
-
-		int tam = prev.length;
-		double res = 0;
-		for (int i = 0; i < tam; i++) {
-			res += ema.forward(prev[i], real[i]).item();
-		}
-
-		return new Tensor(new double[]{ (res/tam) });
+	public Tensor mse(Tensor[] prev, Tensor[] real) {
+		return mse(
+			utils.concatenar(prev),
+			utils.concatenar(real)
+		);
 	}
 
 	/**
@@ -70,27 +76,22 @@ public class Avaliador {
 	 * @param real {@code Tensor} com dados reais.
 	 * @return {@code Tensor} contendo o resultado.
 	 */
-	public Tensor erroMedioQuadradoLogaritmico(Tensor prev, Tensor real) {
-		return emql.forward(prev, real);
+	public Tensor msle(Tensor prev, Tensor real) {
+		return msle.forward(prev, real);
 	}
 
 	/**
-	 * Calcula o erro médio quadrado logarítimico médio em relação aos dados 
-	 * de entrada e saída fornecidos.
-	 * @param entrada {@code Tensores} com dados de entrada para o modelo.
+	 * Calcula o erro médio quadrado logarítimico em relação aos dados 
+	 * previstos e reais.
+	 * @param prev {@code Tensores} com dados previstos.
 	 * @param real {@code Tensores} com dados reais.
 	 * @return {@code Tensor} contendo o resultado.
 	 */
-	public Tensor erroMedioQuadradoLogaritmico(Tensor[] entrada, Tensor[] real) {
-		Tensor[] prev = modelo.forward(entrada);
-
-		int tam = entrada.length;
-		double res = 0;
-		for (int i = 0; i < tam; i++) {
-			res += emql.forward(prev[i], real[i]).item();
-		}
-
-		return new Tensor(new double[]{ (res/tam) }); 
+	public Tensor msle(Tensor[] prev, Tensor[] real) {
+		return msle(
+			utils.concatenar(prev),
+			utils.concatenar(real)
+		);
 	}
 
 	/**
@@ -99,26 +100,44 @@ public class Avaliador {
 	 * @param real {@code Tensor} com dados reais.
 	 * @return {@code Tensor} contendo o resultado.
 	 */
-	public Tensor erroMedioAbsoluto(Tensor prev, Tensor real) {
-		return ema.forward(prev, real);
+	public Tensor mae(Tensor prev, Tensor real) {
+		return mae.forward(prev, real);
 	}
 
 	/**
-	 * Calcula o erro médio absoluto entre as saídas previstas pela rede neural e os valores reais.
-	 * @param entrada {@code Tensores} com dados de entrada para o modelo.
+	 * Calcula o erro médio absoluto em relação aos dados previstos e reais.
+	 * @param prev {@code Tensores} com dados previstos.
 	 * @param real {@code Tensores} com dados reais.
 	 * @return {@code Tensor} contendo o resultado.
 	 */
-	public Tensor erroMedioAbsoluto(Tensor[] entrada, Tensor[] real) {
-		Tensor[] prev = modelo.forward(entrada);
+	public Tensor mae(Tensor[] prev, Tensor[] real) {
+		return mae(
+			utils.concatenar(prev),
+			utils.concatenar(real)
+		);
+	}
 
-		int tam = entrada.length;
-		double res = 0;
-		for (int i = 0; i < tam; i++) {
-			res += ema.forward(prev[i], real[i]).item();
-		}
+	/**
+	 * Calcula a raiz do erro médio quadrado em relação aos dados previstos e reais.
+	 * @param prev {@code Tensor} com dados previstos.
+	 * @param real {@code Tensor} com dados reais.
+	 * @return {@code Tensor} contendo o resultado.
+	 */
+	public Tensor rmse(Tensor prev, Tensor real) {
+		return rmse.forward(prev, real);
+	}
 
-		return new Tensor(new double[]{ (res/tam) });
+	/**
+	 * Calcula a raiz do erro médio quadrado em relação aos dados previstos e reais.
+	 * @param prev {@code Tensores} com dados previstos.
+	 * @param real {@code Tensores} com dados reais.
+	 * @return {@code Tensor} contendo o resultado.
+	 */
+	public Tensor rmse(Tensor[] prev, Tensor[] real) {
+		return rmse(
+			utils.concatenar(prev),
+			utils.concatenar(real)
+		);
 	}
 
 	/**
@@ -139,27 +158,22 @@ public class Avaliador {
 	 * @param real {@code Tensor} com dados reais.
 	 * @return {@code Tensor} contendo o resultado.
 	 */
-	public Tensor entropiaCruzada(Tensor previsto, Tensor real) {  
-		return ecc.forward(previsto, real);
+	public Tensor crossEntropy(Tensor prev, Tensor real) {  
+		return ce.forward(prev, real);
 	}
 
 	/**
-	 * Calcula a entropia cruzada entre as saídas previstas pela rede neural
+	 * Calcula a entropia cruzada em relação aos dados previstos e reais.
 	 * e as saídas reais fornecidas.
-	 * @param entrada {@code Tensores} com dados de entrada para o modelo.
+	 * @param prev {@code Tensores} com dados previstos.
 	 * @param real {@code Tensores} com dados reais.
 	 * @return {@code Tensor} contendo o resultado.
 	 */
-	public Tensor entropiaCruzada(Tensor[] entrada, Tensor[] real) {  
-		Tensor[] previsoes = modelo.forward(entrada);
-
-		int tam = entrada.length;
-		double res = 0;
-		for (int i = 0; i < tam; i++) {
-			res += ecc.forward(previsoes[i], real[i]).item();
-		}
-
-		return new Tensor(new double[]{ (res/tam) });
+	public Tensor crossEntropy(Tensor[] prev, Tensor[] real) {  
+		return crossEntropy(
+			utils.concatenar(prev),
+			utils.concatenar(real)
+		);
 	}
 
 	/**
@@ -169,27 +183,22 @@ public class Avaliador {
 	 * @param real {@code Tensor} com dados reais.
 	 * @return {@code Tensor} contendo o resultado.
 	 */
-	public Tensor entropiaCruzadaBinaria(Tensor previsto, Tensor real) {
-		return ecb.forward(previsto, real);
+	public Tensor binaryCrossEntropy(Tensor prev, Tensor real) {
+		return bce.forward(prev, real);
 	}
 
 	/**
 	 * Calcula a entropia cruzada binária entre as saídas previstas pela rede neural
 	 * e as saídas reais fornecidas.
-	 * @param entrada {@code Tensores} com dados de entrada para o modelo.
+	 * @param prev {@code Tensores} com dados previstos.
 	 * @param real {@code Tensores} com dados reais.
 	 * @return {@code Tensor} contendo o resultado.
 	 */
-	public Tensor entropiaCruzadaBinaria(Tensor[] entrada, Tensor[] real) {
-		Tensor[] prev = modelo.forward(entrada);
-
-		int tam = entrada.length;
-		double res = 0;
-		for (int i = 0; i < tam; i++) {
-			res += ecb.forward(prev[i], real[i]).item();
-		}
-
-		return new Tensor(new double[]{ (res/tam) });
+	public Tensor binaryCrossEntropy(Tensor[] prev, Tensor[] real) {
+		return binaryCrossEntropy(
+			utils.concatenar(prev),
+			utils.concatenar(real)
+		);
 	}
 
 	/**

@@ -26,24 +26,23 @@ public class EntropiaCruzada extends Perda {
 			return new Tensor(
 				new double[]{ -ec/tam }
 			);
-
-		} else {
-			int lotes = prev.tamDim(0);
-			int amostras = prev.tamDim(1);
-
-			double somaLote = 0;
-			for (int i = 0; i < lotes; i++) {
-				Tensor p = prev.subTensor(i);
-				Tensor r = real.subTensor(i);
-
-				double ec = f(p, r, amostras);
-				somaLote += -ec;
-			}
-
-			return new Tensor(
-				new double[] {somaLote / lotes}
-			);
 		}
+
+		int lotes = prev.tamDim(0);
+		int amostras = prev.tamDim(1);
+
+		double somaLote = 0;
+		for (int i = 0; i < lotes; i++) {
+			Tensor p = prev.subTensor(i);
+			Tensor r = real.subTensor(i);
+
+			double ec = f(p, r, amostras);
+			somaLote += -ec;
+		}
+
+		return new Tensor(
+			new double[] {somaLote / lotes}
+		);
 	}
 
 	/**

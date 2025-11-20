@@ -32,7 +32,7 @@ public abstract class Perda {
 
 	/**
 	 * Auxiliar para verificar se os tamanhos dos tensores que serão usados
-	 * pelas funções de perda são iguais.
+	 * pelas funções de perda são suportados.
 	 * @param prev {@code Tensor} com dados previstos.
 	 * @param real {@code Tensor} com dados reais.
 	 */

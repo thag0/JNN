@@ -62,7 +62,7 @@ public class MainImg {
 		long min = TimeUnit.NANOSECONDS.toMinutes(tempo);
 		long sec = TimeUnit.NANOSECONDS.toSeconds(tempo);
 
-		double precisao = (1 - modelo.avaliador().erroMedioQuadrado(x, y).item())*100;
+		double precisao = (1 - modelo.avaliador().mse(x, y).item())*100;
 		System.out.println("Precisão = " + formatarDecimal(precisao, 2) + "%");
 		System.out.println("Perda = " + modelo.avaliar(x, y).item());
 		System.out.println("Tempo de treinamento: " + hrs + "h " + min + "m " + sec + "s");

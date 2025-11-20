@@ -24,24 +24,23 @@ public class MSE extends Perda {
 			return new Tensor(
 				new double[]{ (mse/tam) }
 			);
-		
-		} else {
-			final int lotes = prev.tamDim(0);
-			final int amostras = prev.tamDim(1);
+		} 
 
-			double somaLote = 0;
-			for (int i = 0; i < lotes; i++) {
-				Tensor p = prev.subTensor(i);
-				Tensor r = real.subTensor(i);
-				double somaAmostras = f(p, r, amostras);
+		final int lotes = prev.tamDim(0);
+		final int amostras = prev.tamDim(1);
 
-				somaLote += somaAmostras / amostras;
-			}
+		double somaLote = 0;
+		for (int i = 0; i < lotes; i++) {
+			Tensor p = prev.subTensor(i);
+			Tensor r = real.subTensor(i);
+			double somaAmostras = f(p, r, amostras);
 
-			return new Tensor(
-				new double[]{somaLote / lotes}
-			);
+			somaLote += somaAmostras / amostras;
 		}
+
+		return new Tensor(
+			new double[]{somaLote / lotes}
+		);
 	}
 
 	/**
@@ -67,19 +66,17 @@ public class MSE extends Perda {
 
 		if (prev.numDim() == 1) {
 			final int tam = prev.tam();
-	
 			return prev.map(
 				real,
 				(p, r) -> (2.0 / tam) * (p - r)
 			);
+		} 
+	
+		final int lotes = prev.tamDim(0);
+		final int amostras = prev.tamDim(1);
 
-		} else {
-			final int lotes = prev.tamDim(0);
-			final int amostras = prev.tamDim(1);
-
-			return prev.map(real,
-				(p, r) -> (2.0 / amostras) * (p - r) / lotes
-			);
-		}
+		return prev.map(real,
+			(p, r) -> (2.0 / amostras) * (p - r) / lotes
+		);
 	}
 }
