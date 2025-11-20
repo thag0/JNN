@@ -9,6 +9,9 @@ import jnn.metrica.perda.Perda;
 import jnn.otm.Otimizador;
 import jnn.treino.Treinador;
 
+// TODO adaptar o forward e backward para funcionar em todas as camadas.
+// até o momento: DensaLote
+
 /**
  * <h3>
  *    Modelo base
@@ -242,9 +245,6 @@ public abstract class Modelo implements Cloneable {
 	 */
 	public Tensor[] forward(Tensor[] xs) {
 		validarCompilacao();
-
-		// TODO adaptar o forward para incluir funcionar em todas as camadas.
-		// até o momento: DensaLote
 
 		utils.validarNaoNulo(xs, "Dados de entrada nulos.");
 		

@@ -352,8 +352,9 @@ public class DensaLote extends Camada implements Cloneable {
 		this.usarBias = usarBias;
 	}
 
+	@Override
 	public void ajustarParaLote(int tamLote) {
-		if (tamLote == 0) {
+		if (tamLote == 0) {// remover dimensão de lote
 			_entrada 	= addParam("Entrada", tamEntrada);
 			_saida 		= addParam("Saida", numNeuronios);
 		
@@ -365,6 +366,7 @@ public class DensaLote extends Camada implements Cloneable {
 		_buffer 	 = addParam("Buffer", _saida.shape());
 		_gradSaida 	 = addParam("Grad Saida", _saida.shape());
 		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
+		
 		this.tamLote = tamLote;
 	}
 

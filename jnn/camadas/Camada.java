@@ -206,6 +206,18 @@ public abstract class Camada {
 	}
 
 	/**
+	 * Adapta os parâmetros relevante da camada para lidar
+	 * com lotes de dados.
+	 * @param tamLote tamanho do lote de dados.
+	 */
+	public void ajustarParaLote(int tamLote) {
+		// TODO 
+		throw new UnsupportedOperationException(
+			"\nImplementar."
+		);
+	}
+
+	/**
 	 * Propaga os dados de entrada pela camada.
 	 * @param x dados de entrada que serão processados.
 	 * @return {@code Tensor} contendo a saída calculada pela camada.
