@@ -142,13 +142,23 @@ public class Avaliador {
 
 	/**
 	 * Calcula a precisão em relação aos dados de entrada e saída fornecidos.
-	 * @param entrada {@code Tensores} com dados de entrada para o modelo.
-	 * @param real {@code Tensores} com dados reais.
+	 * @param xs {@code Tensores} com dados de entrada para o modelo.
+	 * @param ys {@code Tensores} com dados reais.
 	 * @return {@code Tensor} contendo o resultado.
 	 */
-	public Tensor acuracia(Tensor[] entrada, Tensor[] real) {
-		Tensor[] prevs = modelo.forward(entrada); 
-		return acuracia.forward(prevs, real);
+	public Tensor acuracia(Tensor[] xs, Tensor[] ys) {
+		final int amostras = xs.length;
+		double acc = 0;
+
+		for (int i = 0; i < amostras; i++) {
+			Tensor prev = modelo.forward(xs[i]);
+			Tensor val = acuracia.forward(new Tensor[] {prev}, new Tensor[]{ys[i]});
+			acc += val.item();
+		}
+		
+		return new Tensor(
+			new double[] { acc / amostras }
+		);
 	}
 
 	/**

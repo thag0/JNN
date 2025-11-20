@@ -9,8 +9,8 @@ import jnn.metrica.perda.Perda;
 import jnn.otm.Otimizador;
 import jnn.treino.Treinador;
 
-// TODO adaptar o forward e backward para funcionar em todas as camadas.
-// até o momento: DensaLote
+// TODO adaptar o forward e backward em lotes para funcionar em todas as camadas.
+// até o momento: Densa, Flatten, Conv2D
 
 /**
  * <h3>
@@ -391,15 +391,20 @@ public abstract class Modelo implements Cloneable {
 		validarCompilacao();
 		validarDados(xs, ys);
 
-		Tensor[] prevs = forward(xs);
-		
-		Tensor res = new Tensor(1);
-		int n = prevs.length;
+		// forward individual porque dependendo do tamanho dos
+		// dados passados as camadas vão consumir uma memória
+		// enorme na hora de ajustar pra lote.
+
+		final int n = xs.length;
+		double loss = 0;
 		for (int i = 0; i < n; i++) {
-			res.add(_perda.forward(prevs[i], ys[i]));
+			Tensor prev = forward(xs[i]);
+			loss += _perda.forward(prev, ys[i]).item();
 		}
 
-		return res.div(n);
+		return new Tensor(
+			new double[] { loss / n }
+		);
 	}
 
 	/**
