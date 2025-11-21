@@ -157,7 +157,7 @@ public class TensorData {
             }
         } else {
             for (int i = 0; i < tam; i++) {
-                dados[offset + i] = tam - i;
+                dados[offset + i] = - i -1;
             }
         }
 
