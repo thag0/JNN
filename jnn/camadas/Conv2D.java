@@ -5,7 +5,6 @@ import java.util.Optional;
 import jnn.acts.Ativacao;
 import jnn.acts.Linear;
 import jnn.core.Dicionario;
-import jnn.core.OpTensor;
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 import jnn.inicializadores.GlorotUniforme;
@@ -41,9 +40,9 @@ import jnn.inicializadores.Zeros;
 public class Conv2D extends Camada implements Cloneable {
 
 	/**
-	 * Operador de tensores para a camada.
+	 * Utilitário.
 	 */
-	private OpTensor optensor = new OpTensor();
+	private LayerOps lops = new LayerOps();
 
 	/**
 	 * Utilitário.
@@ -617,7 +616,7 @@ public class Conv2D extends Camada implements Cloneable {
 		_entrada.copiar(x);
 		
 		_buffer.zero();// zerar acumulações anteriores
-		optensor.forwardConv2D(_entrada, _kernel, _bias, _buffer);
+		lops.forwardConv2D(_entrada, _kernel, _bias, _buffer);
 
 		ativacao.forward(_buffer, _saida);
 
@@ -649,7 +648,7 @@ public class Conv2D extends Camada implements Cloneable {
 		ativacao.backward(this);
 
 		_gradEntrada.zero();// zerar acumulações anteriores
-		optensor.backwardConv2D(
+		lops.backwardConv2D(
 			_entrada,
 			_kernel,
 			_gradSaida,
@@ -761,23 +760,23 @@ public class Conv2D extends Camada implements Cloneable {
 		verificarConstrucao();
 
 		Conv2D clone = (Conv2D) super.clone();
-		clone.ativacao 	 = this.ativacao;
-		clone.usarBias   = this.usarBias;
+		clone.ativacao = this.ativacao;
+		clone.usarBias = this.usarBias;
 		clone._treinavel = this._treinavel;
 
-		clone._entrada     = this._entrada.clone();
-		clone._kernel     = this._kernel.clone();
+		clone._entrada = this._entrada.clone();
+		clone._kernel = this._kernel.clone();
 		clone._gradKernel = this._gradKernel.clone();
 		clone._gradEntrada = this._gradEntrada.clone();
 
 		if (temBias()) {
-			clone._bias 	= Optional.of(bias());
+			clone._bias = Optional.of(bias());
 			clone._gradBias = Optional.of(gradBias());
 		}
 
-		clone._buffer   = this._buffer.clone();
-		clone._saida       = this._saida.clone();
-		clone._gradSaida   = this._gradSaida.clone();
+		clone._buffer = this._buffer.clone();
+		clone._saida = this._saida.clone();
+		clone._gradSaida = this._gradSaida.clone();
 
 		return clone;
 	}

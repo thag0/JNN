@@ -5,7 +5,6 @@ import java.util.Optional;
 import jnn.acts.Ativacao;
 import jnn.acts.Linear;
 import jnn.core.Dicionario;
-import jnn.core.OpTensor;
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 import jnn.inicializadores.GlorotUniforme;
@@ -39,9 +38,9 @@ import jnn.inicializadores.Zeros;
 public class Densa extends Camada implements Cloneable {
 
 	/**
-	 * Operador para tensores.
+	 * Utilitário.
 	 */
-	private OpTensor optensor = new OpTensor();
+	private LayerOps lops = new LayerOps();
 
 	/**
 	 * Utilitário.
@@ -435,7 +434,7 @@ public class Densa extends Camada implements Cloneable {
 		_entrada.copiar(x);
 
 		_buffer.zero();
-		optensor.forwardDensa(_entrada, _kernel, _bias, _buffer);
+		lops.forwardDensa(_entrada, _kernel, _bias, _buffer);
 
 		ativacao.forward(_buffer, _saida);
 
@@ -465,7 +464,7 @@ public class Densa extends Camada implements Cloneable {
 		ativacao.backward(this);
 		
 		_gradEntrada.zero();
-		optensor.backwardDensa(
+		lops.backwardDensa(
 			_entrada,
 			_kernel,
 			_gradSaida,
@@ -586,13 +585,13 @@ public class Densa extends Camada implements Cloneable {
 
 		Densa clone = (Densa) super.clone();
 
-		clone.optensor = new OpTensor();
+		clone.lops = new LayerOps();
 		clone.ativacao = new Dicionario().getAtivacao(this.ativacao.nome());
 		clone._treinavel = this._treinavel;
 
 		clone.usarBias = this.usarBias;
 		if (temBias()) {
-			clone._bias 	= Optional.of(bias());
+			clone._bias = Optional.of(bias());
 			clone._gradBias = Optional.of(gradBias());
 		}
 
