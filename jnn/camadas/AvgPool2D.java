@@ -1,6 +1,5 @@
 package jnn.camadas;
 
-import jnn.core.OpTensor;
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 
@@ -35,9 +34,9 @@ import jnn.core.tensor.Tensor;
 public class AvgPool2D extends Camada {
 
 	/**
-	 * Operador para tensores.
+	 * Utilitário.
 	 */
-	OpTensor optensor = new OpTensor();
+	LayerOps lops = new LayerOps();
 
 	/**
 	 * Utilitario.
@@ -53,6 +52,11 @@ public class AvgPool2D extends Camada {
 	 * Dimensões dos dados de saída (canais, altura, largura)
 	 */
 	private int[] shapeSaida = {1, 1, 1};
+
+	/**
+	 * Auxilar no controle de treinamento em lotes.
+	 */
+	private int tamLote;
 
 	/**
 	 * Tensor contendo os dados de entrada da camada.
@@ -237,12 +241,54 @@ public class AvgPool2D extends Camada {
 	public void inicializar() {}
 
 	@Override
+	public void ajustarParaLote(int tamLote) {
+		final int canais = shapeEntrada[0];
+		final int altIn = shapeEntrada[1];
+		final int largIn = shapeEntrada[2];
+		
+		final int altOut = shapeSaida[1];
+		final int largOut = shapeSaida[2];
+
+		if (tamLote == 0) {
+			_entrada = addParam("Entrada", shapeEntrada);
+			_saida = addParam("Saida", shapeSaida);
+			
+		} else {
+			_entrada = addParam("Entrada", tamLote, canais, altIn, largIn);
+			_saida = addParam("Saida", tamLote, canais, altOut, largOut);
+		}
+
+		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
+
+		this.tamLote = tamLote;
+	}
+
+	@Override
 	public Tensor forward(Tensor x) {
 		verificarConstrucao();
 
+		final int numDim = x.numDim();
+
+		if (numDim == 3) {
+			ajustarParaLote(0);
+		
+		} else if (numDim == 4) {
+			int lotes = x.tamDim(0);
+			if (lotes != this.tamLote) {
+				ajustarParaLote(lotes);
+			}
+		
+		} else {
+			throw new UnsupportedOperationException(
+				"Esperado tensor com " + shapeEntrada.length +
+				" ou " + (shapeEntrada.length + 1) +
+				" dimensões. Recebido: " + x.numDim()
+			);
+		}
+
 		_entrada.copiar(x);
 
-		optensor.avgPool2D(_entrada, _saida, _filtro, _stride);
+		lops.forwardAvgPool2D(_entrada, _saida, _filtro, _stride);
 
 		return _saida;
 	}
@@ -251,52 +297,18 @@ public class AvgPool2D extends Camada {
 	public Tensor backward(Tensor g) {
 		verificarConstrucao();
 
-		int canais = shapeEntrada[0];   
-		for (int i = 0; i < canais; i++) {
-			gradAvgPool(_entrada, g, _gradEntrada, i);
+		if (g.numDim() != _entrada.numDim()) {
+			throw new IllegalStateException(
+				"\nEsperado gradiente " + _entrada.numDim() + "D, " +
+				" mas recebido " + g.numDim() + "D."
+			);
 		}
+
+		_gradEntrada.zero();// limpar acumulações anteriores
+
+		lops.backwardAvgPool(_entrada, g, _gradEntrada, _filtro, _stride);
 
 		return _gradEntrada;
-	}
-
-	/**
-	 * Calcula e atualiza os gradientes da camada de Avg Pooling em relação à entrada.
-	 * <p>
-	 *    Retroropaga os gradientes da camada seguinte para a camada de Avg Pooling, considerando 
-	 *    a operação de agrupamento médio. Ela calcula os gradientes em relação à entrada para as 
-	 *    camadas anteriores.
-	 * </p>
-	 * @param entrada entrada da camada.
-	 * @param gradSeguinte gradiente da camada seguinte.
-	 * @param gradEntrada gradiente de entrada da camada de Avg pooling.
-	 * @param prof índice de profundidade da operação.
-	 */
-	private void gradAvgPool(Tensor entrada, Tensor gradSeguinte, Tensor gradEntrada, int prof) {
-		int[] shapeE = entrada.shape();
-		int[] shapeGradS = gradSeguinte.shape();
-
-		int altEntrada  = shapeE[shapeE.length-1];
-		int largEntrada = shapeE[shapeE.length-2];
-		int altGradSeguinte  = shapeGradS[shapeGradS.length-1];
-		int largGradSeguinte = shapeGradS[shapeGradS.length-2];
-
-		for (int i = 0; i < altGradSeguinte; i++) {
-			int linInicio = i * _stride[0];
-			int linFim = Math.min(linInicio + _filtro[0], altEntrada);
-			for (int j = 0; j < largGradSeguinte; j++) {
-				int colInicio = j * _stride[1];
-				int colFim = Math.min(colInicio + _filtro[1], largEntrada);
-
-				double grad = gradSeguinte.get(prof, i, j);
-				double mediaGrad = grad / (_filtro[0] * _filtro[1]);
-
-				for (int lin = linInicio; lin < linFim; lin++) {
-					for (int col = colInicio; col < colFim; col++) {
-						gradEntrada.set(mediaGrad, prof, lin, col);
-					}
-				}
-			}
-		}
 	}
 
 	@Override
@@ -388,7 +400,7 @@ public class AvgPool2D extends Camada {
 	public AvgPool2D clone() {
 		AvgPool2D clone = (AvgPool2D) super.clone();
 
-		clone.optensor = new OpTensor();
+		clone.lops = new LayerOps();
 		clone.utils = new Utils();
 
 		clone._treinavel = this._treinavel;

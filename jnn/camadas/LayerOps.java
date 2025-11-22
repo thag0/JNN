@@ -396,7 +396,6 @@ public class LayerOps {
 	}
 
 	/**
-	 * 
 	 * Operador interno da camada MaxPool2D para lidar com lotes.
 	 * @param entrada entrada.
 	 * @param grad grad.
@@ -411,6 +410,150 @@ public class LayerOps {
 		final int lotes = entrada.tamDim(0);
 		for (int i = 0; i < lotes; i++) {
 			backwardMaxPool2DNormal(
+				entrada.subTensor(i), 
+				grad.subTensor(i), 
+				gradE.subTensor(i), 
+				filtro, 
+				stride
+			);
+		}
+	}
+
+	/**
+	 * Realiza a propagação direta através da camada MaxPool2D.
+	 * @param entrada {@code Tensor} contendo a entrada da camada.
+	 * @param saida {@code Tensor} contendos a saída da camada.
+	 * @param filtro formato do filtro {@code (altura, largura)}
+	 * @param stride formato dos strides {@code (altura, largura)}
+	 */
+	public void forwardAvgPool2D(Tensor entrada, Tensor saida, int[] filtro, int[] stride) {
+		if (entrada.numDim() == 3) {
+			forwardAvgPool2DNormal(entrada, saida, filtro, stride);
+		} else {
+			forwardAvgPool2DLotes(entrada, saida, filtro, stride);
+		}
+	}
+
+	/**
+	 * Operador interno da camada AvgPool2D tradicional.
+	 * @param entrada {@code Tensor} contendo a entrada da camada.
+	 * @param saida {@code Tensor} contendos a saída da camada.
+	 * @param filtro formato do filtro {@code (altura, largura)}
+	 * @param stride formato dos strides {@code (altura, largura)}
+	 */
+	private void forwardAvgPool2DNormal(Tensor entrada, Tensor saida, int[] filtro, int[] stride) {
+		final int canais = entrada.tamDim(0);
+		for (int i = 0; i < canais; i++) {
+			opt.avgPool2D(entrada.subTensor(i), saida.subTensor(i), filtro, stride);
+		}
+	}
+
+	/**
+	 * Operador interno da camada AvgPool2D para lidar com lotes.
+	 * @param entrada {@code Tensor} contendo a entrada da camada.
+	 * @param saida {@code Tensor} contendos a saída da camada.
+	 * @param filtro formato do filtro {@code (altura, largura)}
+	 * @param stride formato dos strides {@code (altura, largura)}
+	 */
+	private void forwardAvgPool2DLotes(Tensor entrada, Tensor saida, int[] filtro, int[] stride) {
+		// TODO refatorar para trabalhar com os tensores de forma mais inteligente
+		// por enquanto ta assim por compatibilidade.
+		final int lotes = entrada.tamDim(0);
+		for (int i = 0; i < lotes; i++) {
+			forwardAvgPool2DNormal(
+				entrada.subTensor(i), 
+				saida.subTensor(i), 
+				filtro, 
+				stride
+			);
+		}
+	}
+
+	/**
+	 * Realiza a propagação reversa através da camada MaxPool2D.
+	 * @param entrada {@code Tensor} contendo a entrada da camada.
+	 * @param grad {@code Tensor} contendo o gradiente da saída da camada.
+	 * @param gradE {@code Tensor} contendo o gradiente em relação a entrada da camada.
+	 * @param filtro formato do filtro {@code (altura, largura)}
+	 * @param stride formato dos strides {@code (altura, largura)}
+	 */
+	public void backwardAvgPool(Tensor entrada, Tensor grad, Tensor gradE, int[] filtro, int[] stride) {
+		if (entrada.numDim() == 3) {
+			backwardAvgPool2DNormal(entrada, grad, gradE, filtro, stride);
+		} else {
+			backwardAvgPool2DLotes(entrada, grad, gradE, filtro, stride);
+		}
+	}
+
+	/**
+	 * Operador interno da camada AvgPool2D tradicional.
+	 * @param entrada {@code Tensor} contendo a entrada da camada.
+	 * @param grad {@code Tensor} contendo o gradiente da saída da camada.
+	 * @param gradE {@code Tensor} contendo o gradiente em relação a entrada da camada.
+	 * @param filtro formato do filtro {@code (altura, largura)}
+	 * @param stride formato dos strides {@code (altura, largura)}
+	 */
+	private void backwardAvgPool2DNormal(Tensor entrada, Tensor grad, Tensor gradE, int[] filtro, int[] stride) {
+		int C = entrada.shape()[0];
+		int Hin  = entrada.shape()[1];
+		int Win  = entrada.shape()[2];
+		int Hout = grad.shape()[1];
+		int Wout = grad.shape()[2];
+
+		int fH = filtro[0];
+		int fW = filtro[1];
+		int sH = stride[0];
+		int sW = stride[1];
+
+		double[] arrGo  = grad.array();
+		double[] arrGi  = gradE.array();
+
+		int offGo  = grad.offset();
+		int offGi  = gradE.offset();
+
+		int[] stGo  = grad.strides();
+		int[] stGi  = gradE.strides();
+
+		int janela = fH * fW;
+
+		for (int c = 0; c < C; c++) {
+			int baseGo  = offGo + c * stGo[0];
+			int baseGi  = offGi + c * stGi[0];
+
+			for (int i = 0; i < Hout; i++) {
+				int linInicio = i * sH;
+				int linFim = Math.min(linInicio + fH, Hin);
+
+				for (int j = 0; j < Wout; j++) {
+					int colInicio = j * sW;
+					int colFim = Math.min(colInicio + fW, Win);
+					double g = arrGo[baseGo + i * stGo[1] + j * stGo[2]] / janela;
+
+					for (int y = linInicio; y < linFim; y++) {
+						int linhaGi = baseGi + y * stGi[1];
+						for (int x = colInicio; x < colFim; x++) {
+							arrGi[linhaGi + x * stGi[2]] += g;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Operador interno da camada AvgPool2D para lidar com lotes.
+	 * @param entrada {@code Tensor} contendo a entrada da camada.
+	 * @param grad {@code Tensor} contendo o gradiente da saída da camada.
+	 * @param gradE {@code Tensor} contendo o gradiente em relação a entrada da camada.
+	 * @param filtro formato do filtro {@code (altura, largura)}
+	 * @param stride formato dos strides {@code (altura, largura)}
+	 */
+	private void backwardAvgPool2DLotes(Tensor entrada, Tensor grad, Tensor gradE, int[] filtro, int[] stride) {
+		// TODO melhorar isso
+		// por enquanto vai ficar assim por compatibilidade.
+		final int lotes = entrada.tamDim(0);
+		for (int i = 0; i < lotes; i++) {
+			backwardAvgPool2DNormal(
 				entrada.subTensor(i), 
 				grad.subTensor(i), 
 				gradE.subTensor(i), 

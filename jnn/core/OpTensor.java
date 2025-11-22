@@ -725,9 +725,9 @@ public class OpTensor {
 	 * @return {@code Tensor} resultado.
 	 */
 	public Tensor avgPool2D(Tensor x, int[] filtro, int[] stride) {
-		if (x.numDim() != 3) {
+		if (x.numDim() != 2) {
 			throw new IllegalArgumentException(
-				"\nEntrada deve ser 3D, mas é " + x.numDim() + "D."
+				"\nEntrada deve ser 2D, mas é " + x.numDim() + "D."
 			);
 		}
 
@@ -748,12 +748,12 @@ public class OpTensor {
 		int[] shapeEntrada = x.shape();
 
 		int[] poolShape = calcShapeConv(
-			new int[] {shapeEntrada[1], shapeEntrada[2]}, 
+			shapeEntrada, 
 			filtro, 
 			stride
 		);
 
-		Tensor pool = new Tensor(shapeEntrada[0], poolShape[0], poolShape[1]);
+		Tensor pool = new Tensor(poolShape[0], poolShape[1]);
 		avgPool2D(x, pool, filtro, stride);
 
 		return pool;		
@@ -767,9 +767,9 @@ public class OpTensor {
 	 * @param stride formato dos strides (altura, largura)
 	 */
 	public void avgPool2D(Tensor x, Tensor dst, int[] filtro, int[] stride) {
-		if (x.numDim() != 3 || dst.numDim() != 3) {
+		if (x.numDim() != 2 || dst.numDim() != 2) {
 			throw new UnsupportedOperationException(
-				"\nAmbos os tensores devem ser 3D, recebido " +
+				"\nAmbos os tensores devem ser 2D, recebido " +
 				" entrada = " + x.numDim() + "D e saida = " + dst.numDim() + "D."
 			);
 		}
@@ -791,14 +791,13 @@ public class OpTensor {
 		int[] shapeEntrada = x.shape();
 		int[] shapeSaida   = dst.shape();
 
-		int canais      = shapeEntrada[0];
-		int altEntrada  = shapeEntrada[1];
-		int largEntrada = shapeEntrada[2];
-		int altSaida    = shapeSaida[1];
-		int largSaida   = shapeSaida[2];
+		int altEntrada  = shapeEntrada[0];
+		int largEntrada = shapeEntrada[1];
+		int altSaida    = shapeSaida[0];
+		int largSaida   = shapeSaida[1];
 
 		int[] shapeEsp = calcShapeConv(
-			new int[]{ altEntrada, largEntrada}, 
+			shapeEntrada, 
 			filtro,
 			stride
 		);
@@ -813,36 +812,39 @@ public class OpTensor {
 		double[] dataE = x.array();
 		double[] dataS = dst.array();
 
-		int canalSizeEntrada = altEntrada * largEntrada;
-		int canalSizeSaida   = altSaida   * largSaida;
+		int offE = x.offset();
+		int[] strE = x.strides();
 
-		for (int c = 0; c < canais; c++) {
-			int baseEntrada = c * canalSizeEntrada;
-			int baseSaida   = c * canalSizeSaida;
+		int offS = dst.offset();
+		int[] strS = dst.strides();
 
-			for (int i = 0; i < altSaida; i++) {
-				int linInicio = i * stride[0];
-				int linFim    = Math.min(linInicio + filtro[0], altEntrada);
+		int fH = filtro[0];
+		int fW = filtro[1];
+		int sH = stride[0];
+		int sW = stride[1];
 
-				for (int j = 0; j < largSaida; j++) {
-					int colInicio = j * stride[1];
-					int colFim    = Math.min(colInicio + filtro[1], largEntrada);
+		for (int i = 0; i < altSaida; i++) {
+			int linInicio = i * sH;
+			int linFim = Math.min(linInicio + fH, altEntrada);
 
-					double soma = 0;
-					int cont = 0;
+			for (int j = 0; j < largSaida; j++) {
+				int colInicio = j * sW;
+				int colFim = Math.min(colInicio + fW, largEntrada);
 
-					for (int l = linInicio; l < linFim; l++) {
-						int idLinha = baseEntrada + l * largEntrada;
-						for (int m = colInicio; m < colFim; m++) {
-							soma += dataE[idLinha + m];
-							cont++;
-						}
+				double soma = 0;
+				int cont = 0;
+				for (int l = linInicio; l < linFim; l++) {
+					int baseLinha = offE + l * strE[0];
+					for (int m = colInicio; m < colFim; m++) {
+						soma += dataE[baseLinha + m * strE[1]];
+						cont++;
 					}
-
-					dataS[baseSaida + i * largSaida + j] = (soma / cont);
 				}
+				
+				dataS[offS + i * strS[0] + j * strS[1]] = soma / cont;
 			}
 		}
+		
 	}
 	
 	/**

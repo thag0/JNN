@@ -96,9 +96,9 @@ public class MainConv {
 		Sequencial modelo = new Sequencial(
 			new Entrada(1, 28, 28),
 			new Conv2D(16, new int[]{3, 3}, "relu"),
-			new MaxPool2D(new int[]{2, 2}),
+			new AvgPool2D(new int[]{2, 2}),
 			new Conv2D(24, new int[]{3, 3}, "relu"),
-			new MaxPool2D(new int[]{2, 2}),
+			new AvgPool2D(new int[]{2, 2}),
 			new Flatten(),
 			new Densa(100, "tanh"),
 			new Densa(NUM_DIGITOS_TREINO, "sigmoid")
