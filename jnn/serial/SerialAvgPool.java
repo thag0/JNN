@@ -2,7 +2,7 @@ package jnn.serial;
 
 import java.io.BufferedReader;
 
-import jnn.camadas.AvgPool2D;
+import jnn.camadas.pooling.AvgPool2D;
 
 class SerialAvgPool {
 

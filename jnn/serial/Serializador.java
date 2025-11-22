@@ -7,13 +7,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import jnn.camadas.AvgPool2D;
 import jnn.camadas.Camada;
 import jnn.camadas.Conv2D;
 import jnn.camadas.Densa;
 import jnn.camadas.Dropout;
 import jnn.camadas.Flatten;
-import jnn.camadas.MaxPool2D;
+import jnn.camadas.pooling.AvgPool2D;
+import jnn.camadas.pooling.MaxPool2D;
 import jnn.core.Dicionario;
 import jnn.metrica.perda.Perda;
 import jnn.modelos.RedeNeural;

@@ -9,6 +9,8 @@ import ged.Ged;
 import geim.Geim;
 import jnn.Funcional;
 import jnn.camadas.*;
+import jnn.camadas.pooling.AvgPool2D;
+import jnn.camadas.pooling.MaxPool2D;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;

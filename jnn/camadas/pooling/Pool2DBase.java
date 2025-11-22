@@ -1,37 +1,15 @@
-package jnn.camadas;
+package jnn.camadas.pooling;
 
+import jnn.camadas.Camada;
+import jnn.camadas.LayerOps;
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 
 /**
- * <h1>
- *    Camada de agrupamento médio
- * </h1>
- * <p>
- *    A camada de agrupamento médio é um componente utilizado para reduzir a 
- *    dimensionalidade espacial dos dados, preservando as características mais 
- *    importantes para a saída.
- * </p>
- * <p>
- *    Durante a operação de agrupamento médio, a entrada é dividida em regiões 
- *    menores usando uma máscara e a média de cada região é calculada e salva. 
- *    Essencialmente, a camada realiza a operação de subamostragem, calculando a 
- *    média das informações em cada região.
- * </p>
- * Exemplo simples de operação Avg Pooling para uma região 2x2 com máscara 2x2:
- * <pre>
- *entrada = [
- *    [[1, 2],
- *     [3, 4]]
- *]
- * 
- *saida = [2.5]
- * </pre>
- * <p>
- *    A camada de avg pooling não possui parâmetros treináveis nem função de ativação.
- * </p>
+ * Camada base para facilitar novas implementações de operações
+ * personalizadas de pooling.
  */
-public class AvgPool2D extends Camada {
+public abstract class Pool2DBase extends Camada {
 
 	/**
 	 * Utilitário.
@@ -43,20 +21,20 @@ public class AvgPool2D extends Camada {
 	 */
 	Utils utils = new Utils();
 
-	/**
-	 * Dimensões dos dados de entrada (canais, altura, largura)
-	 */
-	private int[] shapeEntrada = {1, 1, 1};
+    /**
+     * Formato de entrada da camada em {@code (canais, altura, largura)}
+     */
+    protected int[] shapeEntrada = {1, 1, 1};
 
-	/**
-	 * Dimensões dos dados de saída (canais, altura, largura)
-	 */
-	private int[] shapeSaida = {1, 1, 1};
+    /**
+     * Formato de saída da camada em {@code (canais, altura, largura)}
+     */
+    protected int[] shapeSaida = {1, 1, 1};
 
 	/**
 	 * Auxilar no controle de treinamento em lotes.
 	 */
-	private int tamLote;
+	protected int tamLote;
 
 	/**
 	 * Tensor contendo os dados de entrada da camada.
@@ -104,25 +82,26 @@ public class AvgPool2D extends Camada {
 	/**
 	 * Formato do filtro de pooling (altura, largura).
 	 */
-	private int[] _filtro;
+	protected int[] _filtro;
 
 	/**
 	 * Valores de stride (altura, largura).
 	 */
-	private int[] _stride;
+	protected int[] _stride;
 
-	/**
-	 * Instancia uma nova camada de average pooling, definindo o formato do filtro 
-	 * e os strides (passos) que serão aplicados em cada entrada da camada.
-	 * <p>
-	 *    O formato do filtro e dos strides devem conter as dimensões da entrada 
-	 *    da camada (altura, largura).
-	 * </p>
-	 * @param filtro formato do filtro de average pooling.
-	 * @param stride strides que serão aplicados ao filtro.
-	 */
-	public AvgPool2D(int[] filtro, int[] stride) {
+    /**
+     * Identificador de operação (max, avg)
+     */
+    protected String modo;
+
+    /**
+     * Construtor interno.
+     * @param filtro formato do filtro {@code altura, largura}.
+     * @param stride formato dos strides {@code altura, largura}.
+     */
+    protected Pool2DBase(int[] filtro, int[] stride) {
 		utils.validarNaoNulo(filtro, "Formato do filtro nulo.");
+        utils.validarNaoNulo(stride, "Formato de stride nulo.");
 
 		if (filtro.length != 2) {
 			throw new IllegalArgumentException(
@@ -135,8 +114,6 @@ public class AvgPool2D extends Camada {
 				"\nOs valores de dimensões do filtro devem ser maiores que zero."
 			);
 		}
-
-		utils.validarNaoNulo(stride, "Formato de stride nulo.");
 
 		if (stride.length != 2) {
 			throw new IllegalArgumentException(
@@ -152,58 +129,10 @@ public class AvgPool2D extends Camada {
 
 		this._filtro = filtro.clone();
 		this._stride = stride.clone();
-	}
+    }
 
-	/**
-	 * Instancia uma nova camada de average pooling, definindo o formato do
-	 * filtro que será aplicado em cada entrada da camada.
-	 * <p>
-	 *    O formato do filtro deve conter as dimensões da entrada da
-	 *    camada (altura, largura).
-	 * </p>
-	 * <p>
-	 *    Por padrão, os valores de strides serão os mesmos usados para
-	 *    as dimensões do filtro, exemplo:
-	 * </p>
-	 * <pre>
-	 *filtro = (2, 2)
-	 *stride = (2, 2) // valor padrão
-	 * </pre>
-	 * @param filtro formato do filtro de average pooling.
-	 */
-	public AvgPool2D(int[] filtro) {
-		this(filtro, filtro.clone());
-	}
-
-	/**
-	 * Instancia uma nova camada de average pooling, definindo o formato do filtro, 
-	 * formato de entrada e os strides (passos) que serão aplicados em cada entrada 
-	 * da camada.
-	 * <p>
-	 *    O formato do filtro e dos strides devem conter as dimensões da entrada 
-	 *    da camada (altura, largura).
-	 * </p>
-	 * A camada será automaticamente construída usando o formato de entrada especificado.
-	 * @param entrada formato de entrada para a camada.
-	 * @param filtro formato do filtro de average pooling.
-	 * @param stride strides que serão aplicados ao filtro.
-	 */
-	public AvgPool2D(int[] entrada, int[] filtro, int[] stride) {
-		this(filtro, stride);
-		construir(entrada);
-	}
-
-	/**
-	 * Constroi a camada AvgPooling, inicializando seus atributos.
-	 * <p>
-	 *    O formato de entrada da camada deve seguir o padrão:
-	 * </p>
-	 * <pre>
-	 *    formEntrada = (canais, altura, largura)
-	 * </pre>
-	 */
-	@Override
-	public void construir(int[] shape) {
+    @Override
+    public void construir(int[] shape) {
 		utils.validarNaoNulo(shape, "Formato de entrada nulo.");
 		
 		if (shape.length != 3) {
@@ -235,10 +164,10 @@ public class AvgPool2D extends Camada {
 		_saida 		 = addParam("Saida", shapeSaida);
 
 		_construida = true;// camada pode ser usada
-	}
+    }
 
-	@Override
-	public void inicializar() {}
+    @Override
+    public void inicializar() {}
 
 	@Override
 	public void ajustarParaLote(int tamLote) {
@@ -263,8 +192,8 @@ public class AvgPool2D extends Camada {
 		this.tamLote = tamLote;
 	}
 
-	@Override
-	public Tensor forward(Tensor x) {
+    @Override
+    public Tensor forward(Tensor x) {
 		verificarConstrucao();
 
 		final int numDim = x.numDim();
@@ -288,13 +217,22 @@ public class AvgPool2D extends Camada {
 
 		_entrada.copiar(x);
 
-		lops.forwardAvgPool2D(_entrada, _saida, _filtro, _stride);
+        if (modo.equals("avg")) {
+            lops.forwardAvgPool2D(_entrada, _saida, _filtro, _stride);
+        } else if (modo.equals("max")) {
+            lops.forwardMaxPool2D(_entrada, _saida, _filtro, _stride);
+        
+        } else {
+            throw new UnsupportedOperationException(
+                "\nModo \"" + modo + "\" sem suporte."
+            );
+        }
 
 		return _saida;
-	}
-	
-	@Override
-	public Tensor backward(Tensor g) {
+    }
+
+    @Override
+    public Tensor backward(Tensor g) {
 		verificarConstrucao();
 
 		if (g.numDim() != _entrada.numDim()) {
@@ -306,28 +244,43 @@ public class AvgPool2D extends Camada {
 
 		_gradEntrada.zero();// limpar acumulações anteriores
 
-		lops.backwardAvgPool(_entrada, g, _gradEntrada, _filtro, _stride);
+        if (modo.equals("avg")) {
+            lops.backwardAvgPool(_entrada, g, _gradEntrada, _filtro, _stride);
+        
+        } else if (modo.equals("max")) {
+            lops.backwardMaxPool2D(_entrada, g, _gradEntrada, _filtro, _stride);
+        
+        } else {
+            throw new UnsupportedOperationException(
+                "\nModo \"" + modo + "\" sem suporte."
+            ); 
+        }
 
 		return _gradEntrada;
-	}
+    }
 
-	@Override
-	public Tensor saida() {
-		verificarConstrucao();
+    @Override
+    public Tensor saida() {
+        verificarConstrucao();
 		return _saida;
-	}
+    }
 
-	@Override
-	public int[] shapeSaida() {
-		verificarConstrucao();
-		return shapeSaida;
-	}
-
-	@Override
-	public int[] shapeEntrada() {
+    @Override
+    public int[] shapeEntrada() {
 		verificarConstrucao();
 		return shapeEntrada;
-	}
+    }
+
+    @Override
+    public int[] shapeSaida() {
+        verificarConstrucao();
+		return shapeSaida;
+    }
+
+    @Override
+    public int numParams() {
+        return 0;
+    }
 
 	/**
 	 * Retorna o formato do filtro (altura, largura) usado pela camada.
@@ -335,10 +288,7 @@ public class AvgPool2D extends Camada {
 	 */
 	public int[] formatoFiltro() {
 		verificarConstrucao();
-		return new int[]{
-			_filtro[0],
-			_filtro[1]
-		};
+		return _filtro.clone();
 	}
 
 	/**
@@ -347,15 +297,7 @@ public class AvgPool2D extends Camada {
 	 */
 	public int[] formatoStride() {
 		verificarConstrucao();
-		return new int[]{
-			_stride[0],
-			_stride[1]
-		};
-	}
-
-	@Override
-	public int numParams() {
-		return 0;
+		return _stride.clone();
 	}
 
 	@Override
@@ -397,8 +339,8 @@ public class AvgPool2D extends Camada {
 	}
 
 	@Override
-	public AvgPool2D clone() {
-		AvgPool2D clone = (AvgPool2D) super.clone();
+	public Pool2DBase clone() {
+		Pool2DBase clone = (Pool2DBase) super.clone();
 
 		clone.lops = new LayerOps();
 		clone.utils = new Utils();
@@ -418,5 +360,5 @@ public class AvgPool2D extends Camada {
 
 		return clone;
 	}
-
+    
 }

@@ -2,7 +2,7 @@ package jnn.serial;
 
 import java.io.BufferedReader;
 
-import jnn.camadas.MaxPool2D;
+import jnn.camadas.pooling.MaxPool2D;
 
 class SerialMaxPool {
 
