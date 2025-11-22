@@ -596,9 +596,9 @@ public class OpTensor {
 	 * @return {@code Tensor} resultado.
 	 */
 	public Tensor maxPool2D(Tensor x, int[] filtro, int[] stride) {
-		if (x.numDim() != 3) {
+		if (x.numDim() != 2) {
 			throw new IllegalArgumentException(
-				"\nEntrada deve ser 3D, mas é " + x.numDim() + "D."
+				"\nEntrada deve ser 2D, mas é " + x.numDim() + "D."
 			);
 		}
 
@@ -619,12 +619,12 @@ public class OpTensor {
 		int[] shapeEntrada = x.shape();
 
 		int[] poolShape = calcShapeConv(
-			new int[] {shapeEntrada[1], shapeEntrada[2]}, 
+			shapeEntrada, 
 			filtro, 
 			stride
 		);
 
-		Tensor pool = new Tensor(shapeEntrada[0], poolShape[0], poolShape[1]);
+		Tensor pool = new Tensor(poolShape[0], poolShape[1]);
 		maxPool2D(x, pool, filtro, stride);
 
 		return pool;
@@ -638,80 +638,71 @@ public class OpTensor {
 	 * @param stride formato dos strides (altura, largura)
 	 */
 	public void maxPool2D(Tensor x, Tensor dst, int[] filtro, int[] stride) {
-		if (x.numDim() != 3 || dst.numDim() != 3) {
-			throw new UnsupportedOperationException(
-				"\nAmbos os tensores devem ser 3D, recebido " +
-				" entrada = " + x.numDim() + "D e saida = " + dst.numDim() + "D."
+		if (x.numDim() != 2 || dst.numDim() != 2) {
+			throw new IllegalArgumentException(
+				"maxPool2D agora aceita apenas tensores 2D. Entrada=" +
+				x.numDim() + "D, Saída=" + dst.numDim() + "D."
 			);
 		}
 
 		if (filtro.length != 2) {
-			throw new IllegalArgumentException(
-				"\nFormato do filtro deve conter dois elementos, " +
-				" recebido " + filtro.length
-			);
+			throw new IllegalArgumentException("Filtro deve ser [fH, fW]");
 		}
 
 		if (stride.length != 2) {
+			throw new IllegalArgumentException("Stride deve ser [sH, sW]");
+		}
+
+		int H = x.shape()[0];
+		int W = x.shape()[1];
+
+		int H_out = dst.shape()[0];
+		int W_out = dst.shape()[1];
+
+		int[] esperado = calcShapeConv(new int[]{H, W}, filtro, stride);
+		if (esperado[0] != H_out || esperado[1] != W_out) {
 			throw new IllegalArgumentException(
-				"\nFormato do stride deve conter dois elementos, " +
-				" recebido " + filtro.length
+				"Saída esperada = [" + esperado[0] + "," + esperado[1] +
+				"] mas recebeu " + dst.shapeStr()
 			);
 		}
 
-		int[] shapeEntrada = x.shape();
-		int[] shapeSaida = dst.shape();
+		double[] arrIn  = x.array();
+		double[] arrOut = dst.array();
 
-		int canais = shapeEntrada[0];
-		int altEntrada  = shapeEntrada[1];
-		int largEntrada = shapeEntrada[2];
-		int altSaida  = shapeSaida[1];
-		int largSaida = shapeSaida[2];
+		int baseOffsetIn  = x.offset();
+		int baseOffsetOut = dst.offset();
 
-		int[] shapeEsp = calcShapeConv(
-			new int[]{ altEntrada, largEntrada}, 
-			filtro,
-			stride
-		);
-		
-		if (altSaida != shapeEsp[0] || largSaida != shapeEsp[1]) {
-			throw new IllegalArgumentException(
-				"\nDimensão de saída esperada (" + shapeEsp[0] + ", " + shapeEsp[1] + "), mas" +
-				" recebido " + dst.shapeStr()
-			);
-		}
+		int inStrideH  = x.strides()[0];
+		int inStrideW  = x.strides()[1];
+		int outStrideH = dst.strides()[0];
+		int outStrideW = dst.strides()[1];
 
-		double[] dataE = x.array();
-		double[] dataS = dst.array();
+		int fH = filtro[0];
+		int fW = filtro[1];
+		int sH = stride[0];
+		int sW = stride[1];
 
-		int canalSizeEntrada = altEntrada * largEntrada;
-		int canalSizeSaida   = altSaida   * largSaida;
 		double maxVal, val;
 
-		for (int c = 0; c < canais; c++) {
-			int baseEntrada = c * canalSizeEntrada;
-			int baseSaida   = c * canalSizeSaida;
+		for (int i = 0; i < H_out; i++) {
+			int linInicio = i * sH;
+			int linFim = Math.min(linInicio + fH, H);
 
-			for (int i = 0; i < altSaida; i++) {
-				int linInicio = i * stride[0];
-				int linFim = Math.min(linInicio + filtro[0], altEntrada);
+			for (int j = 0; j < W_out; j++) {
+				int colInicio = j * sW;
+				int colFim = Math.min(colInicio + fW, W);
+				maxVal = Double.NEGATIVE_INFINITY;
 
-				for (int j = 0; j < largSaida; j++) {
-					int colInicio = j * stride[1];
-					int colFim = Math.min(colInicio + filtro[1], largEntrada);
-
-					maxVal = Double.NEGATIVE_INFINITY;
-
-					for (int l = linInicio; l < linFim; l++) {
-						int idLinha = baseEntrada + l * largEntrada;
-						for (int m = colInicio; m < colFim; m++) {
-							val = dataE[idLinha + m];
-							if (val > maxVal) maxVal = val;
-						}
+				for (int l = linInicio; l < linFim; l++) {
+					int baseLinha = baseOffsetIn + l * inStrideH;
+					for (int m = colInicio; m < colFim; m++) {
+						val = arrIn[baseLinha + m * inStrideW];
+						if (val > maxVal) maxVal = val;
 					}
-
-					dataS[baseSaida + i * largSaida + j] = maxVal;
 				}
+
+				arrOut[baseOffsetOut + i * outStrideH + j * outStrideW] = maxVal;
 			}
 		}
 	}

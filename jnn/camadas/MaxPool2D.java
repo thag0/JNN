@@ -1,6 +1,5 @@
 package jnn.camadas;
 
-import jnn.core.OpTensor;
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 
@@ -37,9 +36,9 @@ import jnn.core.tensor.Tensor;
 public class MaxPool2D extends Camada implements Cloneable{
 
 	/**
-	 * Operador para tensores.
+	 * Utilitário.
 	 */
-	OpTensor optensor = new OpTensor();
+	LayerOps lops = new LayerOps();
 
 	/**
 	 * Utilitario.
@@ -55,6 +54,11 @@ public class MaxPool2D extends Camada implements Cloneable{
 	 * Dimensões dos dados de saída (canais, altura, largura)
 	 */
 	private int[] shapeSaida = {1, 1, 1};
+
+	/**
+	 * Auxilar no controle de treinamento em lotes.
+	 */
+	private int tamLote;
 
 	/**
 	 * Tensor contendo os dados de entrada da camada.
@@ -247,12 +251,54 @@ public class MaxPool2D extends Camada implements Cloneable{
 	public void inicializar() {}
 
 	@Override
+	public void ajustarParaLote(int tamLote) {
+		final int canais = shapeEntrada[0];
+		final int altIn = shapeEntrada[1];
+		final int largIn = shapeEntrada[2];
+		
+		final int altOut = shapeSaida[1];
+		final int largOut = shapeSaida[2];
+
+		if (tamLote == 0) {
+			_entrada = addParam("Entrada", shapeEntrada);
+			_saida = addParam("Saida", shapeSaida);
+			
+		} else {
+			_entrada = addParam("Entrada", tamLote, canais, altIn, largIn);
+			_saida = addParam("Saida", tamLote, canais, altOut, largOut);
+		}
+
+		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
+
+		this.tamLote = tamLote;
+	}
+
+	@Override
 	public Tensor forward(Tensor x) {
 		verificarConstrucao();
 
+		final int numDim = x.numDim();
+
+		if (numDim == 3) {
+			ajustarParaLote(0);
+		
+		} else if (numDim == 4) {
+			int lotes = x.tamDim(0);
+			if (lotes != this.tamLote) {
+				ajustarParaLote(lotes);
+			}
+		
+		} else {
+			throw new UnsupportedOperationException(
+				"Esperado tensor com " + shapeEntrada.length +
+				" ou " + (shapeEntrada.length + 1) +
+				" dimensões. Recebido: " + x.numDim()
+			);
+		}
+
 		_entrada.copiar(x);
 
-		optensor.maxPool2D(_entrada, _saida, _filtro, _stride);
+		lops.forwardMaxPool2D(_entrada, _saida, _filtro, _stride);
 
 		return _saida;
 	}
@@ -261,78 +307,20 @@ public class MaxPool2D extends Camada implements Cloneable{
 	public Tensor backward(Tensor g) {
 		verificarConstrucao();
 
-		gradMaxPool(_entrada, g, _gradEntrada);
+		if (g.numDim() != _entrada.numDim()) {
+			throw new IllegalStateException(
+				"\nEsperado gradiente " + _entrada.numDim() + "D, " +
+				" mas recebido " + g.numDim() + "D."
+			);
+		}
+
+		_gradEntrada.zero();// limpar acumulações anteriores
+
+		lops.backwardMaxPool2D(_entrada, g, _gradEntrada, _filtro, _stride);
 
 		return _gradEntrada;
 	}
-	
-	/**
-	 * Calcula e atualiza os gradientes da camada de Max Pooling em relação à entrada.
-	 * <p>
-	 *    Retroropaga os gradientes da camada seguinte para a camada de Max Pooling, considerando 
-	 *    a operação de agrupamento máximo. Ela calcula os gradientes em relação à entrada para as 
-	 *    camadas anteriores.
-	 * </p>
-	 * @param entrada entrada da camada.
-	 * @param gradSeguinte gradiente da camada seguinte.
-	 * @param gradEntrada gradiente de entrada da camada de max pooling.
-	 */
-	private void gradMaxPool(Tensor entrada, Tensor gradSeguinte, Tensor gradEntrada) {
-		int[] shapeEntrada = entrada.shape();
-		int[] shapeGradS   = gradSeguinte.shape();
 
-		int canais      = shapeEntrada[0];
-		int altEntrada  = shapeEntrada[1];
-		int largEntrada = shapeEntrada[2];
-
-		int altGradS    = shapeGradS[1];
-		int largGradS   = shapeGradS[2];
-
-		// vetorização
-		double[] dataE  = entrada.array();
-		double[] dataGS = gradSeguinte.array();
-		double[] dataGE = gradEntrada.array();
-
-		int canalSizeEntrada = altEntrada * largEntrada;
-		int canalSizeGradS   = altGradS * largGradS;
-		double val, valMax;
-
-		for (int c = 0; c < canais; c++) {
-			int baseEntrada = c * canalSizeEntrada;
-			int baseGradS   = c * canalSizeGradS;
-
-			for (int i = 0; i < altGradS; i++) {
-				int linInicio = i * _stride[0];
-				int linFim    = Math.min(linInicio + _filtro[0], altEntrada);
-
-				for (int j = 0; j < largGradS; j++) {
-					int colInicio = j * _stride[1];
-					int colFim    = Math.min(colInicio + _filtro[1], largEntrada);
-
-					valMax = Double.NEGATIVE_INFINITY;
-					int linMax = linInicio;
-					int colMax = colInicio;
-
-					// Encontrar posição do máximo
-					for (int y = linInicio; y < linFim; y++) {
-						int idLinha = baseEntrada + y * largEntrada;
-						for (int x = colInicio; x < colFim; x++) {
-							val = dataE[idLinha + x];
-							if (val > valMax) {
-								valMax = val;
-								linMax = y;
-								colMax = x;
-							}
-						}
-					}
-
-					dataGE[baseEntrada + linMax * largEntrada + colMax] += dataGS[baseGradS + i * largGradS + j];
-				}
-			}
-		}
-
-	}
- 
 	@Override
 	public int[] shapeEntrada() {
 		verificarConstrucao();
@@ -427,7 +415,7 @@ public class MaxPool2D extends Camada implements Cloneable{
 	public MaxPool2D clone() {
 		MaxPool2D clone = (MaxPool2D) super.clone();
 
-		clone.optensor = new OpTensor();
+		clone.lops = new LayerOps();
 		clone.utils = new Utils();
 
 		clone._treinavel = this._treinavel;

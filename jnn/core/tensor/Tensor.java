@@ -445,27 +445,23 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return {@code Tensor} com as modificações.
 	 */
 	public Tensor bloco(int n) {
-		if (numDim() != 1) {
-			throw new UnsupportedOperationException(
-				"\nSem suporte para tensor com mais de uma dimensão."
-			);
-		}
+		int[] oldShape = shape();
+		int oldSize = tam();
+		double[] src = dados.data();
 
-		int elementos = tam();
-		int[] novoShape = {n, elementos};
-		Tensor bloco = new Tensor(novoShape);
+		int[] newShape = new int[oldShape.length + 1];
+		newShape[0] = n;
+		System.arraycopy(oldShape, 0, newShape, 1, oldShape.length);
 
-		double[] d = dados.data();
-		double[] bd = bloco.array();
+		Tensor out = new Tensor(newShape);
+		double[] dst = out.array();
 
 		for (int i = 0; i < n; i++) {
-			int inicio = i * elementos;
-			for (int j = 0; j < elementos; j++) {
-				bd[inicio + j] = d[j];
-			}
+			int offset = i * oldSize;
+			System.arraycopy(src, 0, dst, offset, oldSize);
 		}
 
-		return bloco;
+		return out;
 	}
 
     /**

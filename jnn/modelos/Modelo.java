@@ -10,7 +10,7 @@ import jnn.otm.Otimizador;
 import jnn.treino.Treinador;
 
 // TODO adaptar o forward e backward em lotes para funcionar em todas as camadas.
-// até o momento: Densa, Flatten, Conv2D
+// até o momento: Densa, Flatten, Conv2D, MaxPooling2D
 
 /**
  * <h3>

@@ -267,4 +267,157 @@ public class LayerOps {
 		}		
 	}
 
+	/**
+	 * Realiza a propagação direta através da camada MaxPool2D.
+	 * @param entrada {@code Tensor} contendo a entrada da camada.
+	 * @param saida {@code Tensor} contendos a saída da camada.
+	 * @param filtro formato do filtro {@code (altura, largura)}
+	 * @param stride formato dos strides {@code (altura, largura)}
+	 */
+	public void forwardMaxPool2D(Tensor entrada, Tensor saida, int[] filtro, int[] stride) {
+		if (entrada.numDim() == 3) {
+			forwardMaxPool2DNormal(entrada, saida, filtro, stride);
+		} else {
+			forwardMaxPool2DLotes(entrada, saida, filtro, stride);
+		}
+	}
+
+	/**
+	 * Operador interno da camada MaxPool2D tradicional
+	 * @param entrada entrada.
+	 * @param saida saida.
+	 * @param filtro filtro.
+	 * @param stride stride.
+	 */
+	private void forwardMaxPool2DNormal(Tensor entrada, Tensor saida, int[] filtro, int[] stride) {
+		final int canais = entrada.tamDim(0);
+		for (int i = 0; i < canais; i++) {
+			opt.maxPool2D(entrada.subTensor(i), saida.subTensor(i), filtro, stride);
+		}
+	}
+
+	/**
+	 * Operador interno da camada MaxPool2D para lidar com lotes
+	 * @param entrada entrada.
+	 * @param saida saida.
+	 * @param filtro filtro.
+	 * @param stride stride.
+	 */
+	private void forwardMaxPool2DLotes(Tensor entrada, Tensor saida, int[] filtro, int[] stride) {
+		// TODO refatorar para trabalhar com os tensores de forma mais inteligente
+		// por enquanto ta assim por compatibilidade.
+		final int lotes = entrada.tamDim(0);
+		for (int i = 0; i < lotes; i++) {
+			forwardMaxPool2DNormal(
+				entrada.subTensor(i), 
+				saida.subTensor(i), 
+				filtro, 
+				stride
+			);
+		}
+	}
+
+	/**
+	 * Realiza a propagação reversa através da camada MaxPool2D.
+	 * @param entrada {@code Tensor} contendo a entrada da camada.
+	 * @param grad {@code Tensor} contendo o gradiente da saída da camada.
+	 * @param gradE {@code Tensor} contendo o gradiente em relação a entrada da camada.
+	 * @param filtro formato do filtro {@code (altura, largura)}
+	 * @param stride formato dos strides {@code (altura, largura)}
+	 */
+	public void backwardMaxPool2D(Tensor entrada, Tensor grad, Tensor gradE, int[] filtro, int[] stride) {
+		if (entrada.numDim() == 3) {
+			backwardMaxPool2DNormal(entrada, grad, gradE, filtro, stride);
+		} else {
+			backwardMaxPool2DLotes(entrada, grad, gradE, filtro, stride);
+		}
+	}
+
+	/**
+	 * Operador interno da camada MaxPool2D tradicional.
+	 * @param entrada entrada.
+	 * @param grad grad.
+	 * @param gradE gradE.
+	 * @param filtro filtro.
+	 * @param stride stride.
+	 */
+	private void backwardMaxPool2DNormal(Tensor entrada, Tensor grad, Tensor gradE, int[] filtro, int[] stride) {
+		int[] shapeEntrada = entrada.shape();
+		int[] shapeGradS   = grad.shape();
+
+		int canais      = shapeEntrada[0];
+		int altEntrada  = shapeEntrada[1];
+		int largEntrada = shapeEntrada[2];
+
+		int altGradS    = shapeGradS[1];
+		int largGradS   = shapeGradS[2];
+
+		double[] dataE  = entrada.array();
+		double[] dataGS = grad.array();
+		double[] dataGE = gradE.array();
+
+		int canalSizeEntrada = altEntrada * largEntrada;
+		int canalSizeGradS   = altGradS * largGradS;
+		double val, valMax;
+
+		for (int c = 0; c < canais; c++) {
+			int baseEntrada = c * canalSizeEntrada;
+			int baseGradS   = c * canalSizeGradS;
+
+			for (int i = 0; i < altGradS; i++) {
+				int linInicio = i * stride[0];
+				int linFim    = Math.min(linInicio + filtro[0], altEntrada);
+
+				for (int j = 0; j < largGradS; j++) {
+					int colInicio = j * stride[1];
+					int colFim    = Math.min(colInicio + filtro[1], largEntrada);
+
+					valMax = Double.NEGATIVE_INFINITY;
+					int linMax = linInicio;
+					int colMax = colInicio;
+
+					// Encontrar posição do máximo
+					for (int y = linInicio; y < linFim; y++) {
+						int idLinha = baseEntrada + y * largEntrada;
+						for (int x = colInicio; x < colFim; x++) {
+							val = dataE[idLinha + x];
+							if (val > valMax) {
+								valMax = val;
+								linMax = y;
+								colMax = x;
+							}
+						}
+					}
+
+					dataGE[baseEntrada + linMax * largEntrada + colMax] += dataGS[baseGradS + i * largGradS + j];
+				}
+			}
+		}
+	}
+
+	/**
+	 * 
+	 * Operador interno da camada MaxPool2D para lidar com lotes.
+	 * @param entrada entrada.
+	 * @param grad grad.
+	 * @param gradE gradE.
+	 * @param filtro filtro.
+	 * @param stride stride.
+	 */
+	private void backwardMaxPool2DLotes(Tensor entrada, Tensor grad, Tensor gradE, int[] filtro, int[] stride) {
+		// TODO melhorar isso
+		// por enquanto vai ficar assim por compatibilidade.
+
+		final int lotes = entrada.tamDim(0);
+		for (int i = 0; i < lotes; i++) {
+			backwardMaxPool2DNormal(
+				entrada.subTensor(i), 
+				grad.subTensor(i), 
+				gradE.subTensor(i), 
+				filtro, 
+				stride
+			);
+		}
+	}
+
 }

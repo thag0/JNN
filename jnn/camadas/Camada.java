@@ -211,7 +211,6 @@ public abstract class Camada {
 	 * @param tamLote tamanho do lote de dados.
 	 */
 	public void ajustarParaLote(int tamLote) {
-		// TODO 
 		throw new UnsupportedOperationException(
 			"\nImplementar."
 		);
