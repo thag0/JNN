@@ -76,17 +76,17 @@ public class Dicionario {
     /**
      * Converte a ativação lida em uma instância de função
      * de ativação correspondente.
-     * @param ativacao tipo função de ativação.
+     * @param act tipo função de ativação.
      * @return instância da função de ativação lida.
      */
-	public Ativacao getAtivacao(Object ativacao) {
-		utils.validarNaoNulo(ativacao, "Ativação nula.");
+	public Ativacao getAtivacao(Object act) {
+		utils.validarNaoNulo(act, "act == null.");
 		
-		if (ativacao instanceof Ativacao) {
-			return (Ativacao) ativacao;
+		if (act instanceof Ativacao) {
+			return (Ativacao) act;
 		
-		} else if (ativacao instanceof String) {
-			String nome = (String) ativacao;
+		} else if (act instanceof String) {
+			String nome = (String) act;
 			switch (tratarNome(nome)) {
 				case "argmax"     : return new Argmax();
 				case "elu"        : return new ELU();
@@ -110,7 +110,7 @@ public class Dicionario {
 
 		} else {
 			throw new IllegalArgumentException(
-				"\nTipo de dado \"" + ativacao.getClass().getTypeName() + "\" não suportado."
+				"\nTipo de dado \"" + act.getClass().getTypeName() + "\" não suportado."
 			);
 		}
 	}
@@ -118,17 +118,17 @@ public class Dicionario {
     /**
      * Converte o otimizador lido em uma instância de 
      * otimizador correspondente.
-     * @param otimizador tipode de otimizador.
+     * @param otm tipode de otimizador.
      * @return instância do otimizador lido.
      */
-	public Otimizador getOtimizador(Object otimizador) {
-		utils.validarNaoNulo(otimizador, "Otimizador nulo.");
+	public Otimizador getOtimizador(Object otm) {
+		utils.validarNaoNulo(otm, "otm == null.");
 
-		if (otimizador instanceof Otimizador) {
-			return (Otimizador) otimizador;
+		if (otm instanceof Otimizador) {
+			return (Otimizador) otm;
 
-		} else if (otimizador instanceof String) {
-			String nome = (String) otimizador;
+		} else if (otm instanceof String) {
+			String nome = (String) otm;
 			switch (tratarNome(nome)){
 				case "adadelta":  return new Adadelta();
 				case "adagrad":   return new AdaGrad();
@@ -145,7 +145,7 @@ public class Dicionario {
 
 		} else {
 			throw new IllegalArgumentException(
-				"\nTipo de dado \"" + otimizador.getClass().getTypeName() + "\" não suportado."
+				"\nTipo de dado \"" + otm.getClass().getTypeName() + "\" não suportado."
 			);
 		}
 	}
@@ -153,17 +153,17 @@ public class Dicionario {
     /**
      * Converte a função de perda recebida em uma instância de função
      * de perda.
-     * @param perda tipo de função de perda.
+     * @param loss tipo de função de perda.
      * @return instância da função de perda lida.
      */
-	public Perda getPerda(Object perda) {
-		utils.validarNaoNulo(perda, "Função de perda nula.");
+	public Perda getPerda(Object loss) {
+		utils.validarNaoNulo(loss, "loss == null.");
 
-		if (perda instanceof Perda) {
-			return (Perda) perda;
+		if (loss instanceof Perda) {
+			return (Perda) loss;
 
-		} else if (perda instanceof String) {
-			String nome = (String) perda;
+		} else if (loss instanceof String) {
+			String nome = (String) loss;
 			switch (tratarNome(nome)) {
 				case "mse"                    : return new MSE();
 				case "mae"                    : return new MAE();
@@ -178,7 +178,7 @@ public class Dicionario {
 			}           
 		} else {
 			throw new IllegalArgumentException(
-				"\nTipo de dado \"" + perda.getClass().getTypeName() + "\" não suportado."
+				"\nTipo de dado \"" + loss.getClass().getTypeName() + "\" não suportado."
 			);
 		}
 		
@@ -186,17 +186,17 @@ public class Dicionario {
 
     /**
      * Converte o inicializador recebido em uma instância de inicializador.
-     * @param inicializador tipo de inicializador.
+     * @param ini tipo de inicializador.
      * @return instância do inicializador lido.
      */
-	public Inicializador getInicializador(Object inicializador) {
-		utils.validarNaoNulo(inicializador, "Inicializador nulo.");
+	public Inicializador getInicializador(Object ini) {
+		utils.validarNaoNulo(ini, "ini == null.");
 
-		if (inicializador instanceof Inicializador) {
-			return (Inicializador) inicializador;
+		if (ini instanceof Inicializador) {
+			return (Inicializador) ini;
 		
-		} else if (inicializador instanceof String) {
-			String nome = (String) inicializador;
+		} else if (ini instanceof String) {
+			String nome = (String) ini;
 			switch (tratarNome(nome)) {
 				case "aleatorio"           : return new Aleatorio();
 				case "aleatoriopositivo"   : return new AleatorioPositivo();
@@ -216,7 +216,7 @@ public class Dicionario {
 		
 		} else {
 			throw new IllegalArgumentException(
-				"\nTipo de dado \"" + inicializador.getClass().getTypeName() + "\" não suportado."
+				"\nTipo de dado \"" + ini.getClass().getTypeName() + "\" não suportado."
 			);
 		}
 

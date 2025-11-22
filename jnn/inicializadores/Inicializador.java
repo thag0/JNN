@@ -26,9 +26,11 @@ public abstract class Inicializador {
 	 * @param seed nova seed de início.
 	 */
 	public void setSeed(Number seed) {
-		if (seed != null) {
-			random.setSeed(seed.longValue());
+		if (seed == null) {
+			throw new NullPointerException("\nseed == null.");
 		}
+
+		random.setSeed(seed.longValue());
 	}
 
 	/**

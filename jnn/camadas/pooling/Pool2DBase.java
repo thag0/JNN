@@ -266,13 +266,13 @@ public abstract class Pool2DBase extends Camada {
     }
 
     @Override
-    public int[] shapeEntrada() {
+    public int[] shapeIn() {
 		verificarConstrucao();
 		return shapeEntrada;
     }
 
     @Override
-    public int[] shapeSaida() {
+    public int[] shapeOut() {
         verificarConstrucao();
 		return shapeSaida;
     }
@@ -318,7 +318,7 @@ public abstract class Pool2DBase extends Camada {
 		sb.append(pad).append("Entrada: " + utils.shapeStr(shapeEntrada) + "\n");
 		sb.append(pad).append("Filtro: " + utils.shapeStr(_filtro) + "\n");
 		sb.append(pad).append("Strides: " + utils.shapeStr(_stride) + "\n");
-		sb.append(pad).append("Saída: " + utils.shapeStr(shapeSaida()) + "\n");
+		sb.append(pad).append("Saída: " + utils.shapeStr(shapeOut()) + "\n");
 
 		sb.append("]\n");
 

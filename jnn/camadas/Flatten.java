@@ -14,7 +14,7 @@ import jnn.core.tensor.Tensor;
  *    A camada de flatten não possui parâmetros treináveis nem função de ativação.
  * </p>
  */
-public class Flatten extends Camada implements Cloneable{
+public class Flatten extends Camada implements Cloneable {
 
 	/**
 	 * Utilitário.
@@ -24,10 +24,10 @@ public class Flatten extends Camada implements Cloneable{
 	/**
 	 * Array contendo o formato de entrada da camada, de acordo com o formato:
 	 * <pre>
-	 *    entrada = (..., profundidade, altura, largura)
+	 *    entrada = (..., canais, altura, largura)
 	 * </pre>
 	 */
-	private int[] shapeEntrada;
+	private int[] shapeIn;
 
 	/**
 	 * Array contendo o formato de saida da camada, de acordo com o formato:
@@ -35,10 +35,10 @@ public class Flatten extends Camada implements Cloneable{
 	 *    saida = (elementosTotaisEntrada)
 	 * </pre>
 	 */
-	private int[] shapeSaida;
+	private int[] shapeOut;
 
 	/**
-	 * 
+	 * Quatidade de elementos computados ao final do achatamento.
 	 */
 	private int totalFlatten;
 
@@ -54,7 +54,7 @@ public class Flatten extends Camada implements Cloneable{
 	 *    O formato da entrada é dado por:
 	 * </p>
 	 * <pre>
-	 *    entrada = (..., profundidade, altura, largura)
+	 *    entrada = (..., canais, altura, largura)
 	 * </pre>
 	 */
 	public Tensor _entrada;
@@ -97,12 +97,12 @@ public class Flatten extends Camada implements Cloneable{
 	 *    O formato de entrada da camada deve seguir o formato:
 	 * </p>
 	 * <pre>
-	 *    formEntrada = (profundidade, altura, largura)
+	 *    formEntrada = (canais, altura, largura)
 	 * </pre>
-	 * @param formEntrada formato dos dados de entrada para a camada.
+	 * @param entrada formato dos dados de entrada para a camada.
 	 */
-	public Flatten(int[] formEntrada) {
-		construir(formEntrada);
+	public Flatten(int[] entrada) {
+		construir(entrada);
 	}
 
 	/**
@@ -112,17 +112,17 @@ public class Flatten extends Camada implements Cloneable{
 	 *    cada dimensão de entrada da camada, e deve estar no formato:
 	 * </p>
 	 * <pre>
-	 *    entrada = (profundidade, altura, largura)
+	 *    entrada = (canais, altura, largura)
 	 * </pre>
 	 * Também pode ser aceito um objeto de entrada contendo apenas dois elementos,
 	 * eles serão formatados como:
 	 * <pre>
-	 *    entrada = ( altura, largura)
+	 *    entrada = (altura, largura)
 	 * </pre>
 	 */
 	@Override
 	public void construir(int[] shape) {
-		utils.validarNaoNulo(shape, "Formato de entrada nulo.");
+		utils.validarNaoNulo(shape, "shape == null.");
 
 		if (!utils.apenasMaiorZero(shape)) {
 			throw new IllegalArgumentException(
@@ -130,14 +130,14 @@ public class Flatten extends Camada implements Cloneable{
 			);
 		}
 
-		shapeEntrada = shape.clone();
+		shapeIn = shape.clone();
 		totalFlatten = tamSaida();
 
-		shapeSaida = new int[]{ totalFlatten };
+		shapeOut = new int[]{ totalFlatten };
 
-		_entrada 	 = addParam("Entrada", shapeEntrada);
+		_entrada 	 = addParam("Entrada", shapeIn);
 		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
-		_saida 		 = addParam("Saida", shapeSaida);
+		_saida 		 = addParam("Saida", shapeOut);
 
 		_construida = true;// camada pode ser usada.
 	}
@@ -151,13 +151,13 @@ public class Flatten extends Camada implements Cloneable{
 	@Override
 	public void ajustarParaLote(int tamLote) {
 		if (tamLote == 0) {
-			_entrada 	= addParam("Entrada", shapeEntrada);
+			_entrada 	= addParam("Entrada", shapeIn);
 			_saida 		= addParam("Saida", tamSaida());
 		
 		} else {
-			int[] shape = new int[shapeEntrada.length + 1];
+			int[] shape = new int[shapeIn.length + 1];
 			shape[0] = tamLote;
-			System.arraycopy(shapeEntrada, 0, shape, 1, shapeEntrada.length);
+			System.arraycopy(shapeIn, 0, shape, 1, shapeIn.length);
 
 			_entrada	= addParam("Entrada", shape);
 			_saida		= addParam("Saida", tamLote, totalFlatten);
@@ -178,10 +178,10 @@ public class Flatten extends Camada implements Cloneable{
 	public Tensor forward(Tensor x) {
 		verificarConstrucao();
 
-		if (x.numDim() == shapeEntrada.length) {
+		if (x.numDim() == shapeIn.length) {
 			ajustarParaLote(0);
 		
-		} else if (x.numDim() == shapeEntrada.length + 1) {
+		} else if (x.numDim() == shapeIn.length + 1) {
 			int lotes = x.tamDim(0);
 			if (lotes != this.tamLote) {
 				ajustarParaLote(lotes);
@@ -189,9 +189,8 @@ public class Flatten extends Camada implements Cloneable{
 		}
 		else {
 			throw new UnsupportedOperationException(
-				"Flatten esperava tensor com " + shapeEntrada.length +
-				" ou " + (shapeEntrada.length + 1) +
-				" dimensões. Recebido: " + x.numDim()
+				"Esperado tensor " + shapeIn.length + "D ou " +
+				(shapeIn.length + 1) + "D, mas recebido: " + x.numDim() + "D."
 			);
 		}
 
@@ -233,7 +232,7 @@ public class Flatten extends Camada implements Cloneable{
 		// evitar problemas com lotes
 
 		int tam = 1; 
-		for (int val : shapeEntrada) {
+		for (int val : shapeIn) {
 			tam *= val;
 		}
 
@@ -241,9 +240,9 @@ public class Flatten extends Camada implements Cloneable{
 	}
 
 	@Override
-	public int[] shapeEntrada() {
+	public int[] shapeIn() {
 		verificarConstrucao();
-		return shapeEntrada.clone();
+		return shapeIn.clone();
 	}
 
 	/**
@@ -257,12 +256,9 @@ public class Flatten extends Camada implements Cloneable{
 	 * @return formato de saída da camada
 	 */
 	 @Override
-	public int[] shapeSaida() {
+	public int[] shapeOut() {
 		verificarConstrucao();
-		
-		return new int[]{
-			tamSaida()
-		};
+		return _saida.shape().clone();
 	}
 
 	@Override
@@ -285,7 +281,7 @@ public class Flatten extends Camada implements Cloneable{
 		
 		sb.append(nome() + " (id " + id + ") = [\n");
 
-		sb.append(pad).append("Entrada: " + utils.shapeStr(shapeEntrada) + "\n");
+		sb.append(pad).append("Entrada: " + utils.shapeStr(shapeIn) + "\n");
 		sb.append(pad).append("Saída: (1, " + tamSaida() + ")\n");
 
 		sb.append("]\n");
@@ -314,8 +310,8 @@ public class Flatten extends Camada implements Cloneable{
 		clone.treinando = this.treinando;
 		clone._construida = this._construida;
 
-		clone.shapeEntrada = shapeEntrada.clone();
-		clone.shapeSaida = shapeSaida.clone();
+		clone.shapeIn = shapeIn.clone();
+		clone.shapeOut = shapeOut.clone();
 
 		clone._entrada = _entrada.clone();
 		clone._gradEntrada = _gradEntrada.clone();

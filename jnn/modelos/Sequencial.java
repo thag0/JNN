@@ -253,7 +253,7 @@ public class Sequencial extends Modelo {
 		}
 
 		if (camada(0) instanceof Entrada) {
-			int[] shape = camada(0).shapeSaida();
+			int[] shape = camada(0).shapeOut();
 
 			// remover camada de entrada do modelo
 			Camada[] temp = camadas();
@@ -280,7 +280,7 @@ public class Sequencial extends Modelo {
 		for (int i = 0; i < numCamadas(); i++) {
 			Camada camada = camada(i);
 			
-			if (i != 0) camada.construir(camada(i-1).shapeSaida());
+			if (i != 0) camada.construir(camada(i-1).shapeOut());
 			if (seedInicial != 0) camada.setSeed(seedInicial);
 			
 			camada.inicializar();
@@ -442,10 +442,10 @@ public class Sequencial extends Modelo {
 			String nomeCamada = camada.id + " - " + camada.nome();
 			
 			//formato de entrada
-			String formEntrada = utils.shapeStr(camada.shapeEntrada());
+			String formEntrada = utils.shapeStr(camada.shapeIn());
 			
 			//formato de saída
-			String formSaida = utils.shapeStr(camada.shapeSaida());
+			String formSaida = utils.shapeStr(camada.shapeOut());
 
 			//função de ativação
 			String ativacao;

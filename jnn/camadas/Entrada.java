@@ -86,13 +86,13 @@ public class Entrada extends Camada {
 	}
 
 	@Override
-	public int[] shapeEntrada() {
+	public int[] shapeIn() {
 		return shape;
 	}
 
 	@Override
-	public int[] shapeSaida() {
-		return shapeEntrada();
+	public int[] shapeOut() {
+		return shapeIn();
 	}
 
 	@Override

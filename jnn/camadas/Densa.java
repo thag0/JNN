@@ -425,7 +425,7 @@ public class Densa extends Camada implements Cloneable {
 		} else if (x.numDim() == 1) {
 			ajustarParaLote(0);
 			
-		} else  {
+		} else {
 			throw new UnsupportedOperationException(
 				"\n Dimensões de X " + x.numDim() + " não suportadas."
 			);
@@ -614,7 +614,7 @@ public class Densa extends Camada implements Cloneable {
 	 * @return formato de entrada da camada.
 	 */
 	@Override
-	public int[] shapeEntrada() {
+	public int[] shapeIn() {
 		verificarConstrucao();
 		return _entrada.shape();
 	}
@@ -632,7 +632,7 @@ public class Densa extends Camada implements Cloneable {
 	 * @return formato de saída da camada
 	 */
 	@Override
-	public int[] shapeSaida() {
+	public int[] shapeOut() {
 		verificarConstrucao();
 		return _saida.shape();
 	}

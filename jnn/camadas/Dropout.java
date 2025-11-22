@@ -36,8 +36,11 @@ public class Dropout extends Camada implements Cloneable {
 	/**
 	 * Formato de entrada da camada.
 	 */
-	int[] shapeEntrada;
+	private int[] shapeIn;
 
+	/**
+	 * Controle da dimensão base da camada.
+	 */
 	private int dimBase;
 
 	/**
@@ -79,12 +82,12 @@ public class Dropout extends Camada implements Cloneable {
 	/**
 	 * Gerador de valores aleatórios.
 	 */
-	Random random = new Random();// implementar configuração de seed
+	private Random random = new Random();
 
 	/**
 	 * Utilitário.
 	 */
-	Utils utils = new Utils();
+	private Utils utils = new Utils();
 
 	/**
 	 * Instancia uma nova camada de dropout, definindo a taxa
@@ -120,7 +123,7 @@ public class Dropout extends Camada implements Cloneable {
 	public Dropout(Number taxa) {
 		double t = taxa.doubleValue();
 		
-		if (t <= 0 || t >= 1) {
+		if (t < 0 || t >= 1) {
 			throw new IllegalArgumentException(
 				"\nTaxa de dropout deve estar entre 0 e 1, " + 
 				"recebido: " + taxa
@@ -146,9 +149,9 @@ public class Dropout extends Camada implements Cloneable {
 			);
 		}
 
-		shapeEntrada = shape.clone();
+		shapeIn = shape.clone();
 
-		_entrada 	 = addParam("Entrada", shapeEntrada);
+		_entrada 	 = addParam("Entrada", shapeIn);
 		_mascara 	 = addParam("Mascara", _entrada.shape());
 		_saida 		 = addParam("Saida", _entrada.shape());
 		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
@@ -163,20 +166,23 @@ public class Dropout extends Camada implements Cloneable {
 
 	@Override
 	public void setSeed(Number seed) {
-		if (seed != null) {
-			random.setSeed(seed.longValue());
+		if (seed == null) {
+			throw new NullPointerException("\nseed == null.");
 		}
+
+		random.setSeed(seed.longValue());
 	}
 
 	@Override
 	public void ajustarParaLote(int tamLote) {
 		if (tamLote == 0) {
-			_entrada = addParam("Entrada", shapeEntrada);
+			_entrada = addParam("Entrada", shapeIn);
 			
 		} else {
-			int[] shape = new int[shapeEntrada.length + 1];
+			int[] shape = new int[shapeIn.length + 1];
 			shape[0] = tamLote;
-			System.arraycopy(shapeEntrada, 0, shape, 1, shapeEntrada.length);
+			System.arraycopy(shapeIn, 0, shape, 1, shapeIn.length);
+
 			_entrada = addParam("Entrada", shape);
 		}
 		
@@ -288,14 +294,14 @@ public class Dropout extends Camada implements Cloneable {
 	}
 
 	@Override
-	public int[] shapeEntrada() {
+	public int[] shapeIn() {
 		verificarConstrucao();
-		return shapeEntrada.clone();
+		return shapeIn.clone();
 	}
 
 	@Override
-	public int[] shapeSaida() {
-		return shapeEntrada();
+	public int[] shapeOut() {
+		return shapeIn();
 	}
 
 	@Override
@@ -308,7 +314,7 @@ public class Dropout extends Camada implements Cloneable {
 	 * @return taxa de dropout da camada.
 	 */
 	public double taxa() {
-		return this.taxa;
+		return taxa;
 	}
 
 	@Override
@@ -316,7 +322,7 @@ public class Dropout extends Camada implements Cloneable {
 		verificarConstrucao();
 
 		Dropout clone = (Dropout) super.clone();
-		clone.shapeEntrada = this.shapeEntrada.clone();
+		clone.shapeIn = this.shapeIn.clone();
 		clone.taxa = this.taxa;
 		clone.random = new Random();
 
@@ -338,8 +344,8 @@ public class Dropout extends Camada implements Cloneable {
 		sb.append(nome() + " (id " + this.id + ") = [\n");
 
 		sb.append(pad).append("Taxa: " + taxa() + "\n");
-		sb.append(pad).append("Entrada: " + utils.shapeStr(shapeEntrada) + "\n");
-		sb.append(pad).append("Saída: " + utils.shapeStr(shapeEntrada) + "\n");
+		sb.append(pad).append("Entrada: " + utils.shapeStr(shapeIn) + "\n");
+		sb.append(pad).append("Saída: " + utils.shapeStr(shapeIn) + "\n");
 
 		sb.append("]\n");
 

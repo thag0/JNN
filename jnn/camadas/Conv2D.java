@@ -52,10 +52,10 @@ public class Conv2D extends Camada implements Cloneable {
 	/**
 	 * Formato de entrada da camada convolucional, dado por:
 	 * <pre>
-	 *    form = (profundidade, altura, largura)
+	 *    form = (canais, altura, largura)
 	 * </pre>
 	 */
-	private final int[] shapeEntrada = {1, 1, 1};
+	private final int[] shapeIn = {1, 1, 1};
 
 	/**
 	 * Formato de cada filtro da camada convolucional, dado por:
@@ -68,10 +68,10 @@ public class Conv2D extends Camada implements Cloneable {
 	/**
 	 * Formato de saída da camada convolucional, dado por:
 	 * <pre>
-	 *    form = (numFiltros, altura, largura)
+	 *    form = (filtros, altura, largura)
 	 * </pre>
 	 */
-	private final int[] shapeSaida = {1, 1, 1};
+	private final int[] shapeOut = {1, 1, 1};
 
 	/**
 	 * Tensor contendo os valores de entrada para a camada,
@@ -80,7 +80,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 *    O formato da entrada é dado por:
 	 * </p>
 	 * <pre>
-	 *    entrada = (profundidade, altura, largura)
+	 *    entrada = (canais, altura, largura)
 	 * </pre>
 	 */
 	public Tensor _entrada;
@@ -91,7 +91,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 *    O formato dos filtros é dado por:
 	 * </p>
 	 * <pre>
-	 *    kernel = (numFiltros, profEntrada, altFiltro, largFiltro)
+	 *    kernel = (filtros, canais, altFiltro, largFiltro)
 	 * </pre>
 	 */
 	public Tensor _kernel;
@@ -125,7 +125,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 *    O formato buffer é dado por:
 	 * </p>
 	 * <pre>
-	 *    buffer = (numFiltros, altSaida, largSaida)
+	 *    buffer = (filtros, altSaida, largSaida)
 	 * </pre>
 	 */
 	public Tensor _buffer;
@@ -136,7 +136,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 *    O formato da saída é dado por:
 	 * </p>
 	 * <pre>
-	 *    saida = (numFiltros, altSaida, largSaida)
+	 *    saida = (filtros, altura, largura)
 	 * </pre>
 	 */
 	public Tensor _saida;
@@ -148,7 +148,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 *    O formato do gradiente de entrada é dado por:
 	 * </p>
 	 * <pre>
-	 *    gradEntrada = (profEntrada, alturaEntrada, larguraEntrada)
+	 *    gradEntrada = (canais, altura, largura)
 	 * </pre>
 	 */
 	public Tensor _gradEntrada;
@@ -160,7 +160,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 *    O formato dos gradientes da saída é dado por:
 	 * </p>
 	 * <pre>
-	 *    gradSaida = (numFiltros, alturaSaida, larguraSaida)
+	 *    gradSaida = (filtros, altura, largura)
 	 * </pre>
 	 */
 	public Tensor _gradSaida;
@@ -172,7 +172,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 *    O formato dos gradientes para os filtros é dado por:
 	 * </p>
 	 * <pre>
-	 * gradFiltros = (numFiltros, profundidadeEntrada, alturaFiltro, larguraFiltro)
+	 * gradFiltros = (filtros, canais, alturaFiltro, larguraFiltro)
 	 * </pre>
 	 */
 	public Tensor _gradKernel;
@@ -343,34 +343,33 @@ public class Conv2D extends Camada implements Cloneable {
 	 * @param iniBias inicializador para os bias.
 	 */
 	public Conv2D(int filtros, int[] filtro, Object act, Object iniKernel, Object iniBias) {
-		utils.validarNaoNulo(filtro, "O formato do filtro não pode ser nulo.");
+		utils.validarNaoNulo(filtro, "filtro == null.");
 
 		//formado dos filtros
-		int[] formFiltro = (int[]) filtro;
-		if (formFiltro.length != 2) {
+		int[] f = (int[]) filtro;
+		if (f.length != 2) {
 			throw new IllegalArgumentException(
 				"\nO formato dos filtros deve conter 2 elementos (altura, largura), " +
-				"recebido: " + formFiltro.length
+				"recebido: " + f.length
 			);
 		}
 
-		if (!utils.apenasMaiorZero(formFiltro)) {
+		if (!utils.apenasMaiorZero(f)) {
 			throw new IllegalArgumentException(
 				"\nOs valores de formato para os filtros devem ser maiores que zero."
 			);      
 		}
 
-		shapeFiltro[0] = formFiltro[0];
-		shapeFiltro[1] = formFiltro[1];
-
-		// número de filtros
 		if (filtros < 1) {
 			throw new IllegalArgumentException(
 				"\nO número de filtros deve ser maior que zero, recebido: " + filtros
 			);
 		}
+		
+		shapeFiltro[0] = f[0];
+		shapeFiltro[1] = f[1];
 
-		shapeSaida[0] = filtros;
+		shapeOut[0] = filtros;
 		
 		Dicionario dicio = new Dicionario();
 		if (act != null) this.ativacao = dicio.getAtivacao(act);
@@ -485,36 +484,35 @@ public class Conv2D extends Camada implements Cloneable {
 			);
 		}
 
-		shapeEntrada[0] = shape[0];// canais
-		shapeEntrada[1] = shape[1];// altura
-		shapeEntrada[2] = shape[2];// largura
+		shapeIn[0] = shape[0];// canais
+		shapeIn[1] = shape[1];// altura
+		shapeIn[2] = shape[2];// largura
 
 		//dim -> ((entrada - filtro) / stride) + 1
-		shapeSaida[1] = shapeEntrada[1] - shapeFiltro[0] + 1;
-		shapeSaida[2] = shapeEntrada[2] - shapeFiltro[1] + 1;
+		shapeOut[1] = shapeIn[1] - shapeFiltro[0] + 1;
+		shapeOut[2] = shapeIn[2] - shapeFiltro[1] + 1;
 
-		if (shapeSaida[1] < 1 || shapeSaida[2] < 1) {
+		if (shapeOut[1] < 1 || shapeOut[2] < 1) {
 			throw new IllegalArgumentException(
 				"\nCamada não pode ser construida:" +
 				"\nFormato de entrada " + utils.shapeStr(shape) +
 				" e formato dos filtros " + 
-				utils.shapeStr(new int[]{shapeSaida[0], shapeFiltro[0], shapeFiltro[1]}) +
-				" resultam num formato de saída inválido " + utils.shapeStr(shapeSaida)
+				utils.shapeStr(new int[]{shapeOut[0], shapeFiltro[0], shapeFiltro[1]}) +
+				" resultam num formato de saída inválido " + utils.shapeStr(shapeOut)
 			);
 		}
 
-		//inicialização dos parâmetros necessários
-		_entrada      = addParam("Entrada", shapeEntrada);
+		_entrada      = addParam("Entrada", shapeIn);
 		_gradEntrada  = addParam("Grad Entrada", _entrada.shape());
-		_kernel       = addParam("Kernel", shapeSaida[0], shapeEntrada[0], shapeFiltro[0], shapeFiltro[1]);
+		_kernel       = addParam("Kernel", shapeOut[0], shapeIn[0], shapeFiltro[0], shapeFiltro[1]);
 		_gradKernel   = addParam("Grad Kernel", _kernel.shape());
-		_saida        = addParam("Saida", shapeSaida);
+		_saida        = addParam("Saida", shapeOut);
 		_buffer 	  = addParam("Buffer", _saida.shape());
 		_gradSaida    = addParam("Grad Saida", _saida.shape());
 
 		if (usarBias) {
-			_bias      = Optional.of(addParam("Bias", shapeSaida[0]));
-			_gradBias  = Optional.of(addParam("GradBias", shapeSaida[0]));
+			_bias      = Optional.of(addParam("Bias", shapeOut[0]));
+			_gradBias  = Optional.of(addParam("GradBias", _bias.get().shape()));
 		}
 		
 		_treinavel = true;// camada pode ser treinada.
@@ -547,17 +545,17 @@ public class Conv2D extends Camada implements Cloneable {
 
 	@Override
 	public void ajustarParaLote(int tamLote) {
-		final int canais = shapeEntrada[0];
-		final int altIn = shapeEntrada[1];
-		final int largIn = shapeEntrada[2];
+		final int canais = shapeIn[0];
+		final int altIn = shapeIn[1];
+		final int largIn = shapeIn[2];
 		
-		final int filtros = shapeSaida[0];
-		final int altOut = shapeSaida[1];
-		final int largOut = shapeSaida[2];
+		final int filtros = shapeOut[0];
+		final int altOut = shapeOut[1];
+		final int largOut = shapeOut[2];
 
 		if (tamLote == 0) {
-			_entrada = addParam("Entrada", shapeEntrada);
-			_saida = addParam("Saida", shapeSaida);
+			_entrada = addParam("Entrada", shapeIn);
+			_saida = addParam("Saida", shapeOut);
 			
 		} else {
 			_entrada = addParam("Entrada", tamLote, canais, altIn, largIn);
@@ -607,9 +605,9 @@ public class Conv2D extends Camada implements Cloneable {
 		
 		} else {
 			throw new UnsupportedOperationException(
-				"Esperado tensor com " + shapeEntrada.length +
-				" ou " + (shapeEntrada.length + 1) +
-				" dimensões. Recebido: " + x.numDim()
+				"Esperado tensor " + shapeIn.length + "D (canais, altura, largura) ou " +
+				(shapeIn.length + 1) + "D (lotes, canais, altura, largura) " +
+				", mas recebido: " + x.numDim() + "D."
 			);
 		}
 
@@ -674,7 +672,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 */
 	public int numFiltros() {
 		verificarConstrucao();
-		return this.shapeSaida[0];
+		return shapeOut[0];
 	}
 
 	@Override
@@ -723,9 +721,9 @@ public class Conv2D extends Camada implements Cloneable {
 		sb.append(nome() + " (id " + id + ") = [\n");
 
 		sb.append(pad).append("Ativação: " + ativacao.nome() + "\n");
-		sb.append(pad).append("Entrada: " + utils.shapeStr(shapeEntrada) + "\n");
+		sb.append(pad).append("Entrada: " + utils.shapeStr(shapeIn) + "\n");
 		sb.append(pad).append("Filtros: " + numFiltros() + "\n");
-		sb.append(pad).append("Saida: " + utils.shapeStr(shapeSaida) + "\n");
+		sb.append(pad).append("Saida: " + utils.shapeStr(shapeOut) + "\n");
 		sb.append("\n");
 
 		sb.append(pad + "Kernel: " + _kernel.shapeStr() + "\n");
@@ -790,9 +788,9 @@ public class Conv2D extends Camada implements Cloneable {
 	 * @return formato de entrada da camada.
 	 */
 	@Override
-	public int[] shapeEntrada() {
+	public int[] shapeIn() {
 		verificarConstrucao();
-		return shapeEntrada.clone();
+		return shapeIn.clone();
 	}
  
 	/**
@@ -804,9 +802,9 @@ public class Conv2D extends Camada implements Cloneable {
 	 * @return formato de saída da camada.
 	 */
 	@Override
-	public int[] shapeSaida() {
+	public int[] shapeOut() {
 		verificarConstrucao();
-		return shapeSaida.clone();
+		return shapeOut.clone();
 	}
 
 	/**

@@ -115,24 +115,6 @@ public abstract class Camada {
 	 * Configura a função de ativação da camada através de uma instância 
 	 * de {@code Ativacao} que será usada para ativar seus neurônios.
 	 * <p>
-	 *    Ativações disponíveis:
-	 * </p>
-	 * <ul>
-	 *    <li> ReLU. </li>
-	 *    <li> Sigmoid. </li>
-	 *    <li> TanH. </li>
-	 *    <li> Leaky ReLU. </li>
-	 *    <li> ELU .</li>
-	 *    <li> Swish. </li>
-	 *    <li> GELU. </li>
-	 *    <li> Linear. </li>
-	 *    <li> Seno. </li>
-	 *    <li> Argmax. </li>
-	 *    <li> Softmax. </li>
-	 *    <li> Softplus. </li>
-	 *    <li> ArcTan. </li>
-	 * </ul>
-	 * <p>
 	 *    Configurando a ativação da camada usando uma instância de função 
 	 *    de ativação aumenta a liberdade de personalização dos hiperparâmetros
 	 *    que algumas funções podem ter.
@@ -212,7 +194,7 @@ public abstract class Camada {
 	 */
 	public void ajustarParaLote(int tamLote) {
 		throw new UnsupportedOperationException(
-			"\nImplementar."
+			"\nNão implementado."
 		);
 	}
 
@@ -250,13 +232,13 @@ public abstract class Camada {
 	 * Retorna o formado dos dados de entrada suportados pela camada.
 	 * @return formato de entrada da camada.
 	 */
-	public abstract int[] shapeEntrada();
+	public abstract int[] shapeIn();
 
 	/**
 	 * Retorna o formado dos dos dados de saída gerados pela camada.
 	 * @return formato de saída da camada.
 	 */
-	public abstract int[] shapeSaida();
+	public abstract int[] shapeOut();
 
 	/**
 	 * Retorna a saída da camada no formato de array.

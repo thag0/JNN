@@ -83,13 +83,13 @@ public class ReLU extends Camada implements Cloneable {
     }
 
     @Override
-    public int[] shapeEntrada() {
+    public int[] shapeIn() {
         return shapeEntrada;
     }
 
     @Override
-    public int[] shapeSaida() {
-        return shapeEntrada();
+    public int[] shapeOut() {
+        return shapeIn();
     }
 
     @Override
