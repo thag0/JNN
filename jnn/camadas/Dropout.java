@@ -38,6 +38,13 @@ public class Dropout extends Camada implements Cloneable {
 	 */
 	int[] shapeEntrada;
 
+	private int dimBase;
+
+	/**
+	 * Auxilar no controle de treinamento em lotes.
+	 */
+	private int tamLote;
+
 	/**
 	 * Tensor contendo os valores de entrada para a camada.
 	 */
@@ -145,6 +152,8 @@ public class Dropout extends Camada implements Cloneable {
 		_mascara 	 = addParam("Mascara", _entrada.shape());
 		_saida 		 = addParam("Saida", _entrada.shape());
 		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
+
+		dimBase = _entrada.numDim();
 		
 		_construida = true;// camada pode ser usada
 	}
@@ -157,6 +166,25 @@ public class Dropout extends Camada implements Cloneable {
 		if (seed != null) {
 			random.setSeed(seed.longValue());
 		}
+	}
+
+	@Override
+	public void ajustarParaLote(int tamLote) {
+		if (tamLote == 0) {
+			_entrada = addParam("Entrada", shapeEntrada);
+			
+		} else {
+			int[] shape = new int[shapeEntrada.length + 1];
+			shape[0] = tamLote;
+			System.arraycopy(shapeEntrada, 0, shape, 1, shapeEntrada.length);
+			_entrada = addParam("Entrada", shape);
+		}
+		
+		_saida = addParam("Saida", _entrada.shape());
+		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
+		_mascara = addParam("Mascara", _entrada.shape());
+
+		this.tamLote = tamLote;
 	}
 
 	/**
@@ -177,6 +205,25 @@ public class Dropout extends Camada implements Cloneable {
 	@Override
 	public Tensor forward(Tensor x) {
 		verificarConstrucao();
+
+		final int numDim = x.numDim();
+
+		if (numDim == dimBase) {
+			ajustarParaLote(0);
+		
+		} else if (numDim == dimBase + 1) {
+			int lotes = x.tamDim(0);
+			if (lotes != this.tamLote) {
+				ajustarParaLote(lotes);
+			}
+		
+		} else {
+			throw new UnsupportedOperationException(
+				"Esperado tensor com " + dimBase +
+				" ou " + (dimBase + 1) +
+				" dimensões. Recebido: " + x.numDim()
+			);
+		}
 
 		_entrada.copiar(x);
 
