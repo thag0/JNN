@@ -2273,7 +2273,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @param caminho caminho de destino.
 	 */
 	public void salvar(String caminho) {
-		new SerialTensor().serializar(this, caminho);
+		new SerialTensor().salvar(this, caminho);
 	}
 
 	/**

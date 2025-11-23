@@ -1,20 +1,22 @@
 package jnn.serial;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Iterator;
 
 import jnn.core.tensor.Tensor;
 
 /**
  * Interface para io de tensores.
  */
-public class SerialTensor {
+public class SerialTensor extends SerialBase {
 
+    /**
+     * Formato padrão do Tensor.
+     */
     final String FORMATO = ".tensor";
 
     /**
@@ -23,78 +25,74 @@ public class SerialTensor {
     public SerialTensor() {}
     
 	/**
-	 * Exporta os dados do tensor num arquivo externo.
-     * @param t {@code Tensor} desejado.
-     * @param caminho caminho de destino.
+	 * Exporta os dados do tensor num arquivo {@code .tensor}.
+     * @param t {@code Tensor} base.
+     * @param caminho caminho de destino, deve conter a extensão {@code .tensor}.
      */
-    public void serializar(Tensor t, String caminho) {
-		File arquivo = new File(caminho);
-		if (!arquivo.getName().toLowerCase().endsWith(FORMATO)) {
-			throw new IllegalArgumentException(
-				"\nO caminho deve conter a extensão " + FORMATO
-			);
-		}
-
-        StringBuilder sb = new StringBuilder();
-
-        for (int dim : t.shape()) {
-            sb.append(dim).append(" ");
+    public void salvar(Tensor t, String caminho) {
+        File arquivo = new File(caminho);
+        if (!arquivo.getName().toLowerCase().endsWith(FORMATO)) {
+            throw new IllegalArgumentException("O caminho deve conter a extensão " + FORMATO);
         }
 
-        Iterator<Double> it = t.iterator();
-        while (it.hasNext()) {
-            sb.append("\n").append(it.next().doubleValue());
+        int[] shape = t.shape();
+        int dims = shape.length;
+
+        try (DataOutputStream out = new DataOutputStream(new FileOutputStream(arquivo))) {
+            escrever(out, dims);
+            escrever(out, shape);
+
+            // copiar internamente o conteúdo pra tratar casos de views
+            double[] data = t.data().paraArray();
+            escrever(out, data);
+
+        } catch (IOException e) {
+            System.out.println("\nErro ao salvar Tensor");
+            e.printStackTrace();
         }
-
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(caminho))) {
-			bw.write(sb.toString());
-
-	 	} catch (IOException e) {
-			System.out.println("\nErro ao salvar tensor:");
-			System.out.println(e.getMessage());
-		}
     }
 
     /**
-     * Carrega um {@code Tensor} a partir de um arquivo externo.
-     * @param caminho caminho do arquivo {@code .tensor}.
-     * @return {@code Tensor} lido.
+     * Carrega um {@code Tensor} a partir de um arquivo {@code .tensor}.
+     * @param caminho caminho do arquivo, deve conter a extensão {@code .tensor}.
+     * @return {@code Tensor} carregado.
      */
     public Tensor ler(String caminho) {
-		File arquivo = new File(caminho);
-		if (!arquivo.getName().toLowerCase().endsWith(FORMATO)) {
-			throw new IllegalArgumentException(
-				"\nO caminho deve conter a extensão " + FORMATO
-			);
-		}
-
-        Tensor tensor = null; 
-
-        try (BufferedReader br = new BufferedReader(new FileReader(caminho))) {
-            String[] shapeStr = br.readLine().split(" ");
-            int n = shapeStr.length;
-            
-            int tamanho = 1;
-            int[] shape = new int[n];
-            for (int i = 0; i < n; i++) {
-                shape[i] = Integer.parseInt(shapeStr[i]);
-                tamanho *= shape[i];
-            }
-
-            double[] dados = new double[tamanho];
-            for (int i = 0; i < tamanho; i++) {
-                double valor = Double.parseDouble(br.readLine());
-                dados[i] = valor;
-            }
-
-            tensor = new Tensor(dados).reshape(shape);
-
-        } catch (IOException e) {
-            System.out.println("\nErro ao ler dados do tensor:");
-			System.out.println(e.getMessage());       
+        File arquivo = new File(caminho);
+        if (!arquivo.getName().toLowerCase().endsWith(FORMATO)) {
+            throw new IllegalArgumentException("O caminho deve conter a extensão " + FORMATO);
         }
 
-        return tensor;
+        Tensor t = null;
+
+        try (DataInputStream in = new DataInputStream(new FileInputStream(arquivo))) {
+            // numero de dimensoes
+            int dims = lerInt(in);
+
+            // shape
+            int[] shape = new int[dims];
+            int[] arrS = lerArrInt(in, dims);
+            
+            int tam = 1;
+            for (int i = 0; i < dims; i++) {
+                shape[i] = arrS[i];
+                tam *= shape[i];
+            }
+
+            // dados
+            double[] dados = new double[tam];
+            double[] arrD = lerArrDouble(in, tam); 
+            System.arraycopy(arrD, 0, dados, 0, tam);
+
+            t = new Tensor(dados).reshape(shape);
+
+        } catch (IOException e) {
+            System.out.println("Erro ao ler tensor: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return t;
+
     }
 
 }
