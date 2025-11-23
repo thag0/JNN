@@ -9,7 +9,6 @@ import ged.Ged;
 import geim.Geim;
 import jnn.Funcional;
 import jnn.camadas.*;
-import jnn.camadas.pooling.AvgPool2D;
 import jnn.camadas.pooling.MaxPool2D;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
@@ -36,13 +35,14 @@ public class MainConv {
 
 	// += 1min 59s - 500 amostras - 8 epocas - 32 lote
 	// += 5min 15s - 1000 amostras - 10 epocas - 64 lote
+	// += 2min 12s - 1000 amostras - 10 epocas - 64 lote (paralelizando forward e backward da Conv2D)
 	// dados de controle
 	static final int NUM_DIGITOS_TREINO = 10;
 	static final int NUM_DIGITOS_TESTE  = NUM_DIGITOS_TREINO;
-	static final int NUM_AMOSTRAS_TREINO = 500;// max 1000
+	static final int NUM_AMOSTRAS_TREINO = 1_000;// max 1000
 	static final int NUM_AMOSTRAS_TESTE  = 500;// max 500
 	static final int TREINO_EPOCAS = 10;
-	static final int TREINO_LOTE = 32;
+	static final int TREINO_LOTE = 64;
 	static final boolean TREINO_LOGS = true;
 
 	// caminhos de arquivos externos
@@ -103,7 +103,7 @@ public class MainConv {
 			new MaxPool2D(new int[]{2, 2}),
 			new Flatten(),
 			new Densa(100, "tanh"),
-			new Dropout(0.2),
+			new Dropout(0.25),
 			new Densa(NUM_DIGITOS_TREINO, "sigmoid")
 		);
 

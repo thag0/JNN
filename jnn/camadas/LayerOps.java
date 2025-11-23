@@ -1,6 +1,8 @@
 package jnn.camadas;
 
 import java.util.Optional;
+import java.util.concurrent.ForkJoinPool;
+import java.util.stream.IntStream;
 
 import jnn.core.OpTensor;
 import jnn.core.tensor.Tensor;
@@ -11,6 +13,18 @@ import jnn.core.tensor.Tensor;
 public class LayerOps {
 
     OpTensor opt = new OpTensor();
+
+	/**
+	 * Operador para paralelização.
+	 * <p>
+	 *		Por enquanto em testes usar a metade dos cores da cpu foi
+	 *		a abordagem mais ideal entre {@code Uso de CPU x Tempo}
+	 * </p>
+	 * // TODO adicionar abordagens mais flexíveis para setar as threads desejadas.
+	 */
+	private final ForkJoinPool pool = new ForkJoinPool(
+		Runtime.getRuntime().availableProcessors() / 2
+	);
 
     /**
      * Utilitário para operações de forward e backward de camadas.
@@ -142,17 +156,26 @@ public class LayerOps {
 	 * @param saida saída.
 	 */
 	private void forwardConv2DLotes(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
-		// TODO refatorar para trabalhar com os tensores de forma mais inteligente
-		// por enquanto ta assim por compatibilidade.
 		int lotes = entrada.tamDim(0);
-		for (int i = 0; i < lotes; i++) {
-			forwardConv2DNormal(
-				entrada.subTensor(i),
-				kernel,
-				bias,
-				saida.subTensor(i)
-			);
-		}
+		// for (int i = 0; i < lotes; i++) {
+		// 	forwardConv2DNormal(
+		// 		entrada.subTensor(i),
+		// 		kernel,
+		// 		bias,
+		// 		saida.subTensor(i)
+		// 	);
+		// }
+
+		pool.submit(() -> {
+			IntStream.range(0, lotes).parallel().forEach(i -> {
+				forwardConv2DNormal(
+					entrada.subTensor(i),
+					kernel,
+					bias,
+					saida.subTensor(i)
+				);
+			});
+		}).join();
 	}
 
 	/**
@@ -252,19 +275,50 @@ public class LayerOps {
 	 * @param gradE gradE
 	 */
 	private void backwardConv2DLotes(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
-		// TODO refatorar para trabalhar com os tensores de forma mais inteligente
-		// por enquanto ta assim por compatibilidade.
 		int lotes = entrada.tamDim(0);
-		for (int i = 0; i < lotes; i++) {
-			backwardConv2DNormal(
-				entrada.subTensor(i),
-				kernel,
-				gradS.subTensor(i),
-				gradK,
-				gradB,
-				gradE.subTensor(i)
-			);
-		}		
+		// for (int i = 0; i < lotes; i++) {
+		// 	backwardConv2DNormal(
+		// 		entrada.subTensor(i),
+		// 		kernel,
+		// 		gradS.subTensor(i),
+		// 		gradK,
+		// 		gradB,
+		// 		gradE.subTensor(i)
+		// 	);
+		// }
+
+		Tensor[] localK = new Tensor[lotes];
+		Tensor[] localB = gradB.isPresent() ? new Tensor[lotes] : null;
+
+		pool.submit(() -> {
+			IntStream.range(0, lotes).parallel().forEach(i -> {
+				localK[i] = new Tensor(gradK.shape());
+				if (gradB.isPresent()) {
+					localB[i] = new Tensor(gradB.get().shape());
+				}
+				
+				backwardConv2DNormal(
+					entrada.subTensor(i),
+					kernel,
+					gradS.subTensor(i),
+					localK[i],
+					Optional.of(localB[i]),
+					gradE.subTensor(i)
+				);
+			});
+		}).join();
+
+		for (Tensor grad : localK) {
+			gradK.add(grad);
+		}
+
+		if (gradB.isPresent()) {
+			Tensor gb = gradB.get();
+			for (Tensor grad : localB) {
+				gb.add(grad);
+			}
+		}
+
 	}
 
 	/**
