@@ -2,7 +2,6 @@ package jnn.acts;
 
 import jnn.camadas.Conv2D;
 import jnn.camadas.Densa;
-import jnn.core.OpTensor;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -10,11 +9,6 @@ import jnn.core.tensor.Tensor;
  * dentro dos modelos.
  */
 public class Softmax extends Ativacao {
-
-	/**
-	 * Operador para tensores.
-	 */
-	OpTensor opt = new OpTensor();
 
 	/**
 	 * Instancia a função de ativação Softmax.
@@ -49,12 +43,6 @@ public class Softmax extends Ativacao {
 
 	@Override
 	public void forward(Tensor x, Tensor dest) {
-		if (x.tam() != dest.tam()) {
-			throw new IllegalArgumentException(
-				"\nTamanho do tensor de entrada (" + x.numDim() + ") " +
-				"deve ser igual ao tamanho do tensor de saída (" + dest.numDim() + ")"
-			);
-		}
 		if (x.compShape(dest) == false) {
 			throw new IllegalArgumentException(
 				"\nFormato do tensor de entrada (" + x.shapeStr() + ") " +
@@ -64,29 +52,12 @@ public class Softmax extends Ativacao {
 
 		int[] shape = x.shape();
 		if (shape.length == 1) {
-			int cols = shape[0];
-			double somaExp = 0;
-			for (int i = 0; i < cols; i++) {
-				somaExp += Math.exp(x.get(i));
-			}
-			for (int i = 0; i < cols; i++) {
-				double s = Math.exp(x.get(i)) / somaExp;
-				dest.set(s, i);
-			}
+			forward1D(x, dest);
 
 		} else if (shape.length == 2) {
 			int lin = shape[0];
-			int col = shape[1];
-	
 			for (int i = 0; i < lin; i++) {
-				double somaExp = 0;
-				for (int j = 0; j < col; j++) {
-					somaExp += Math.exp(x.get(i, j));
-				}
-				for (int j = 0; j < col; j++) {
-					double s = Math.exp(x.get(i, j)) / somaExp;
-					dest.set(s, i, j);
-				}
+				forward1D(x.subTensor(i), dest.subTensor(i));
 			}
 
 		} else {
@@ -96,30 +67,72 @@ public class Softmax extends Ativacao {
 		}
 	}
 
+	/**
+	 * Função interna pra calcular softmax
+	 * @param x {@code Tensor} de entrada.
+	 * @param dst {@code Tensor} de destino.
+	 */
+	private void forward1D(Tensor x, Tensor dst) {
+		int tam = x.tamDim(0);
+		double soma = 0;
+		
+		for (int i = 0; i < tam; i++) {
+			soma += Math.exp(x.get(i));
+		}
+
+		for (int i = 0; i < tam; i++) {
+			double s = Math.exp(x.get(i)) / soma;
+			dst.set(s, i);
+		}	
+	}
+
 	@Override
 	public void backward(Densa camada) {
-		int n = camada._buffer.tam();
-		Tensor ident = new Tensor(n, n);
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < n; j++) {
-				ident.set((i == j ? 1.0 : 0.0), i, j);
-			}
-		}
+		final int numDim = camada._saida.numDim();
 		
-		Tensor tmp = camada.saida().bloco(n);
-		Tensor transp = tmp.transpor();
+		if (numDim == 1) {
+			backward1D(camada._saida, camada._gradSaida);
+			
+		} else if (numDim == 2) {
+			final int lin = camada._saida.tamDim(0);
+			for (int i = 0; i < lin; i++) {
+				backward1D(
+					camada._saida.subTensor(i),
+					camada._gradSaida.subTensor(i)
+				);
+			}
+		
+		} else {
+			throw new UnsupportedOperationException(
+				"\nSem suporte."
+			);
+		}
 
-		opt.matmul(
-			camada._gradSaida, 
-			opt.mathad(tmp, opt.matsub(ident, transp)),
-			camada._gradSaida
-		);
+	}
+
+	/**
+	 * Função interna pra retropropagar softmax.
+	 * @param softmax saida da camada (resultado do softmax).
+	 * @param g gradiente de saída da camada.
+	 */
+	private void backward1D(Tensor softmax, Tensor g) {
+		int tam = softmax.tamDim(0);
+
+		double p = 0;
+		for (int i = 0; i < tam; i++) {
+			p += g.get(i) * softmax.get(i);
+		}
+
+		for (int i = 0; i < tam; i++) {
+			double gi = softmax.get(i) * (g.get(i) - p);
+			g.set(gi, i);
+		}
 	}
 
 	@Override
 	public void backward(Conv2D camada) {
 		throw new UnsupportedOperationException(
-			"\nSem suporte para derivada " + nome() + " em camadas convolucionais."
+			"\nSem suporte para Conv2D."
 		);
 	}
 

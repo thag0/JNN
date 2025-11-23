@@ -445,23 +445,23 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return {@code Tensor} com as modificações.
 	 */
 	public Tensor bloco(int n) {
-		int[] oldShape = shape();
-		int oldSize = tam();
-		double[] src = dados.data();
+		int[] shapeAntigo = shape();
+		int tamAntigo = tam();
+		double[] dt = dados.data();
 
-		int[] newShape = new int[oldShape.length + 1];
-		newShape[0] = n;
-		System.arraycopy(oldShape, 0, newShape, 1, oldShape.length);
+		int[] shapeNovo = new int[shapeAntigo.length + 1];
+		shapeNovo[0] = n;
+		System.arraycopy(shapeAntigo, 0, shapeNovo, 1, shapeAntigo.length);
 
-		Tensor out = new Tensor(newShape);
-		double[] dst = out.array();
+		Tensor bloco = new Tensor(shapeNovo);
+		double[] db = bloco.array();
 
 		for (int i = 0; i < n; i++) {
-			int offset = i * oldSize;
-			System.arraycopy(src, 0, dst, offset, oldSize);
+			int offset = i * tamAntigo;
+			System.arraycopy(dt, 0, db, offset, tamAntigo);
 		}
 
-		return out;
+		return bloco;
 	}
 
     /**
