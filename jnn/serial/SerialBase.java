@@ -25,12 +25,23 @@ class SerialBase {
     }
 
     /**
+     * Grava o conteúdo de um valor primitivo {@code boolean}.
+     * @param dos {@code DataOutputStream} gravador.
+     * @param val valor desejado.
+     * @throws IOException caso ocorra um erro.
+     */
+    public void escrever(DataOutputStream dos, boolean val) throws IOException {
+        dos.writeBoolean(val);
+    }
+
+    /**
      * Grava o conteúdo de um array primitivo {@code int[]}.
      * @param dos {@code DataOutputStream} gravador.
      * @param arr {@code array} desejado.
      * @throws IOException caso ocorra um erro.
      */
     public void escrever(DataOutputStream dos, int[] arr) throws IOException {
+        dos.writeInt(arr.length);
         for (int val : arr) {
             dos.writeInt(val);
         }
@@ -43,9 +54,22 @@ class SerialBase {
      * @throws IOException caso ocorra um erro.
      */
     public void escrever(DataOutputStream dos, double[] arr) throws IOException {
+        dos.writeInt(arr.length);
         for (double val : arr) {
             dos.writeDouble(val);
         }
+    }
+
+    /**
+     * Grava o conteúdo de uma {@code String}.
+     * @param dos {@code DataOutputStream} gravador.
+     * @param s {@code String} desejada.
+     * @throws IOException caso ocorra um erro.
+     */
+    public void escrever(DataOutputStream dos, String s) throws IOException {
+        byte[] bytes = s.getBytes("UTF-8");
+        dos.writeInt(bytes.length);
+        dos.write(bytes);
     }
 
     /**
@@ -65,7 +89,9 @@ class SerialBase {
      * @return array lido.
      * @throws IOException caso ocorra um erro.
      */
-    public int[] lerArrInt(DataInputStream dis, int tam) throws IOException {
+    public int[] lerArrInt(DataInputStream dis) throws IOException {
+        int tam = dis.readInt();// considerando que já escreve o tamanho.
+        
         int[] arr = new int[tam];
         for (int i = 0; i < tam; i++) {
             arr[i] = dis.readInt();
@@ -81,7 +107,9 @@ class SerialBase {
      * @return array lido.
      * @throws IOException caso ocorra um erro.
      */
-    public double[] lerArrDouble(DataInputStream dis, int tam) throws IOException {
+    public double[] lerArrDouble(DataInputStream dis) throws IOException {
+        int tam = dis.readInt();// considerando que já escreve o tamanho.
+
         double[] arr = new double[tam];
         for (int i = 0; i < tam; i++) {
             arr[i] = dis.readDouble();

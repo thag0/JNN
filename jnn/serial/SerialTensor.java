@@ -36,10 +36,8 @@ public class SerialTensor extends SerialBase {
         }
 
         int[] shape = t.shape();
-        int dims = shape.length;
 
         try (DataOutputStream out = new DataOutputStream(new FileOutputStream(arquivo))) {
-            escrever(out, dims);
             escrever(out, shape);
 
             // copiar internamente o conteúdo pra tratar casos de views
@@ -66,24 +64,11 @@ public class SerialTensor extends SerialBase {
         Tensor t = null;
 
         try (DataInputStream in = new DataInputStream(new FileInputStream(arquivo))) {
-            // numero de dimensoes
-            int dims = lerInt(in);
-
             // shape
-            int[] shape = new int[dims];
-            int[] arrS = lerArrInt(in, dims);
-            
-            int tam = 1;
-            for (int i = 0; i < dims; i++) {
-                shape[i] = arrS[i];
-                tam *= shape[i];
-            }
+            int[] shape = lerArrInt(in);
 
             // dados
-            double[] dados = new double[tam];
-            double[] arrD = lerArrDouble(in, tam); 
-            System.arraycopy(arrD, 0, dados, 0, tam);
-
+            double[] dados = lerArrDouble(in);
             t = new Tensor(dados).reshape(shape);
 
         } catch (IOException e) {
