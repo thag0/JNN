@@ -1,4 +1,4 @@
-package exemplos.modelos;
+package exemplos;
 
 import java.text.DecimalFormat;
 
@@ -6,9 +6,9 @@ import ged.Ged;
 import ged.Dados;
 import jnn.Funcional;
 import jnn.camadas.Densa;
+import jnn.camadas.Dropout;
 import jnn.camadas.Entrada;
 import jnn.core.Utils;
-import jnn.core.tensor.Tensor;
 
 import jnn.dataloader.DataLoader;
 
@@ -20,13 +20,27 @@ import jnn.modelos.Sequencial;
  * @see {@code Iris:} {@link https://gist.github.com/netj/8836201}
  */
 public class Iris {
+
+	/**
+	 * Gerenciador de dados.
+	 */
 	static Ged ged = new Ged();
+	
+	/**
+	 * Utilitário.
+	 */
 	static Utils utils = new Utils();
+	
+	/**
+	 * Interface funcional.
+	 */
 	static Funcional jnn = new Funcional();
 	
-	public static void main(String[] args){
+	static {
 		ged.limparConsole();
-
+	}
+	
+	public static void main(String[] args){
 		// Carregando dados e pré-processando
 		Dados iris = ged.lerCsv("./dados/csv/iris.csv");
 		ged.dropLin(iris, 0);// Removendo linha com nomes das categorias
@@ -38,43 +52,52 @@ public class Iris {
 		int numEntradas = 4;// dados de entrada (features)
 		int numSaidas = 3;// rótulos (classes)
 		double[][] dados = ged.dadosParaDouble(iris);
-		DataLoader dIris = jnn.dataloader(dados, numEntradas, numSaidas);// Gerando o dataset
-		dIris.embaralhar();
-		DataLoader[] ds = dIris.separar(0.75, 0.25);// separando 75% treino, 25% teste
+
+		// Gerando o dataset
+		DataLoader loader = jnn.dataloader(dados, numEntradas, numSaidas);
+		loader.embaralhar();
+		DataLoader[] ds = loader.separar(0.75, 0.25);// separando 75% treino, 25% teste
 		DataLoader treino = ds[0];
-		DataLoader teste  = ds[1];
 		
 		// Criando um modelo
 		Sequencial modelo = new Sequencial(
 			new Entrada(numEntradas),
 			new Densa(10, "tanh"),
+			new Dropout(0.25),
 			new Densa(10, "tanh"),
-			new Densa(numSaidas, "sigmoid")
+			new Dropout(0.25),
+			new Densa(numSaidas, "softmax")
 		);
 			
 		modelo.compilar("adam", "entropia-cruzada");
-		modelo.setHistorico(true);
+		modelo.setHistorico(true);// guardar valores de perda do treino
 		
 		treino.print();
 		modelo.print();
 
-		// Treinando
 		modelo.treinar(treino, 500, 12, true);
 		
 		// Avaliando o modelo
-		Tensor[] testeX = teste.getX();
-		Tensor[] testeY = teste.getY();
-		double acc = modelo.avaliador().acuracia(testeX, testeY).item();
+		DataLoader teste  = ds[1];
+		System.out.println("Perda = " + modelo.avaliar(teste).item());
+		double acc = modelo.avaliador().acuracia(teste).item();
 		System.out.println("Acurácia = " + formatarDecimal(acc*100, 4) + "%");
-		System.out.println("Perda = " + modelo.avaliar(testeX, testeY).item());
 
 		// Matriz de confusão
-		Tensor matriz = modelo.avaliador().matrizConfusao(testeX, testeY);
-		matriz.nome("Matriz de confusão").print();
+		modelo
+		.avaliador()
+		.matrizConfusao(teste)
+		.nome("Matriz de confusão")
+		.print();
 
 		String nomeArquivo = "historico-perda.csv";
 		exportarHistorico(modelo.hist(), nomeArquivo);
-		executarComando("python grafico.py " + nomeArquivo);
+
+		try {
+			executarComando("python grafico.py " + nomeArquivo);
+		} catch (Exception e) {
+			// 
+		}
 	}
 
 	/**

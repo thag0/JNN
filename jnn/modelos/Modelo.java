@@ -9,9 +9,6 @@ import jnn.metrica.perda.Perda;
 import jnn.otm.Otimizador;
 import jnn.treino.Treinador;
 
-// TODO adaptar o forward e backward em lotes para funcionar em todas as camadas.
-// até o momento: Densa, Flatten, Conv2D, MaxPooling2D
-
 /**
  * <h3>
  *    Modelo base
@@ -260,7 +257,7 @@ public abstract class Modelo implements Cloneable {
 
 	/**
 	 * Realiza a propagação reversa do gradiente através do modelo.
-	 * @param g {@code Tensor}  contendo o gradiente da perda em relação a saída do modelo.
+	 * @param g {@code Tensor} contendo o gradiente da perda em relação a saída do modelo.
 	 * @return {@code Tensor} contendo o gradiente da perda em relação a entrada do modelo.
 	 */
 	public abstract Tensor backward(Tensor g);
@@ -332,23 +329,23 @@ public abstract class Modelo implements Cloneable {
 	
 	/**
 	 * Treina o modelo de acordo com as configurações predefinidas.
-	 * @param dl {@code DataLoader} com dados de treino.
+	 * @param loader {@code DataLoader} com dados de treino.
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	public void treinar(DataLoader dl, int epochs, boolean logs) {
-		treinar(dl, epochs, 1, logs);
+	public void treinar(DataLoader loader, int epochs, boolean logs) {
+		treinar(loader, epochs, 1, logs);
 	}
 
 	/**
 	 * Treina o modelo de acordo com as configurações predefinidas
 	 * utilizando o treinamento em lotes.
-	 * @param dl {@code DataLoader} com dados de treino.
+	 * @param loader {@code DataLoader} com dados de treino.
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param tamLote tamanho do lote de treinamento.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	public void treinar(DataLoader dl, int epochs, int tamLote, boolean logs) {
+	public void treinar(DataLoader loader, int epochs, int tamLote, boolean logs) {
 		validarCompilacao();
 
 		if (epochs < 1) {
@@ -363,7 +360,7 @@ public abstract class Modelo implements Cloneable {
 			);
 		}
 		
-		_treinador.executar(dl, epochs, tamLote, logs);
+		_treinador.executar(loader, epochs, tamLote, logs);
 	}
 
 	/**
@@ -374,8 +371,7 @@ public abstract class Modelo implements Cloneable {
 	public abstract void treino(boolean treinando);
 
 	/**
-	 * Avalia o modelo, calculando o seu valor de perda fazendo uso da função 
-	 * de perda que foi configurada.
+	 * Avalia o modelo, utilizando a função de perda configurada.
 	 * <p>
 	 *    É possível utilizar outras funções de perda mesmo que sejam diferentes
 	 *    da que o modelo usa, através de:
@@ -385,7 +381,7 @@ public abstract class Modelo implements Cloneable {
 	 * </pre>
 	 * @param xs {@code Tensores} contendo dados de entrada.
 	 * @param ys {@code Tensores} contendo dados de saída correspondente as entradas fornecidas.
-	 * @return {@code Tensor} contendo valor de perda do modelo.
+	 * @return {@code Tensor} contendo valor de perda.
 	 */
 	public Tensor avaliar(Tensor[] xs, Tensor[] ys) {
 		validarCompilacao();
@@ -405,6 +401,22 @@ public abstract class Modelo implements Cloneable {
 		return new Tensor(
 			new double[] { loss / n }
 		);
+	}
+
+	/**
+	 * Avalia o modelo, utilizando a função de perda configurada.
+	 * <p>
+	 *    É possível utilizar outras funções de perda mesmo que sejam diferentes
+	 *    da que o modelo usa, através de:
+	 * </p>
+	 * <pre>
+	 * modelo.avaliador()
+	 * </pre>
+	 * @param loader {@code DataLoader} contendo dados de avaliação.
+	 * @return {@code Tensor} contendo valor de perda.
+	 */
+	public Tensor avaliar(DataLoader loader) {
+		return avaliar(loader.getX(), loader.getY());
 	}
 
 	/**

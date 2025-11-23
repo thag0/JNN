@@ -1,4 +1,4 @@
-package exemplos.modelos;
+package exemplos;
 
 import ged.Ged;
 import jnn.camadas.Densa;
@@ -8,7 +8,7 @@ import jnn.serial.Serializador;
 /**
  * Exemplo básico de serialização de um modelo em um arquivo externo.
  */
-public class ExportarModelo {
+public class ModelIO {
 	static Ged ged = new Ged();
 
 	public static void main(String[] args){

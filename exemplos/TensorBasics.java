@@ -1,4 +1,4 @@
-package exemplos.tensor;
+package exemplos;
 
 import ged.Ged;
 import jnn.core.tensor.Tensor;

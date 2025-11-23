@@ -2,6 +2,7 @@ package jnn.metrica;
 
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
+import jnn.dataloader.DataLoader;
 import jnn.metrica.metrica.*;
 import jnn.metrica.perda.*;
 import jnn.modelos.Modelo;
@@ -141,27 +142,6 @@ public class Avaliador {
 	}
 
 	/**
-	 * Calcula a precisão em relação aos dados de entrada e saída fornecidos.
-	 * @param xs {@code Tensores} com dados de entrada para o modelo.
-	 * @param ys {@code Tensores} com dados reais.
-	 * @return {@code Tensor} contendo o resultado.
-	 */
-	public Tensor acuracia(Tensor[] xs, Tensor[] ys) {
-		final int amostras = xs.length;
-		double acc = 0;
-
-		for (int i = 0; i < amostras; i++) {
-			Tensor prev = modelo.forward(xs[i]);
-			Tensor val = acuracia.forward(new Tensor[] {prev}, new Tensor[]{ys[i]});
-			acc += val.item();
-		}
-		
-		return new Tensor(
-			new double[] { acc / amostras }
-		);
-	}
-
-	/**
 	 * Calcula a entropia cruzada em relação aos dados previstos e reais.
 	 * e as saídas reais fornecidas.
 	 * @param prev {@code Tensor} com dados previstos.
@@ -212,35 +192,94 @@ public class Avaliador {
 	}
 
 	/**
-	 * Calcula a matriz de confusão para avaliar o desempenho da rede em classificação.
-	 * <p>
-	 *    A matriz de confusão mostra a contagem de amostras que foram classificadas de forma 
-	 *    correta ou não em cada classe. As linhas representam as classes reais e as colunas as 
-	 *    classes previstas pela rede.
-	 * </p>
-	 * @param entrada {@code Tensores} com dados de entrada para o modelo.
-	 * @param real {@code Tensores} com dados reais.
+	 * Calcula a precisão em relação aos dados de entrada e saída fornecidos.
+	 * @param xs {@code Tensores} com dados de entrada para o modelo.
+	 * @param ys {@code Tensores} com dados reais.
 	 * @return {@code Tensor} contendo o resultado.
 	 */
-	public Tensor matrizConfusao(Tensor[] entrada, Tensor[] saidas) {
-		Tensor[] prevs = modelo.forward(entrada);
-		return mc.forward(prevs, saidas);
+	public Tensor acuracia(Tensor[] xs, Tensor[] ys) {
+		final int amostras = xs.length;
+		double acc = 0;
+
+		for (int i = 0; i < amostras; i++) {
+			Tensor prev = modelo.forward(xs[i]);
+			Tensor val = acuracia.forward(new Tensor[] {prev}, new Tensor[]{ys[i]});
+			acc += val.item();
+		}
+		
+		return new Tensor(
+			new double[] { acc / amostras }
+		);
 	}
 
 	/**
-	 * Calcula o F1-Score ponderado para o modelo de rede neural em relação às entradas e 
-	 * saídas fornecidas.
-	 * <p>
-	 *    O F1-Score é uma métrica que combina a precisão e o recall para avaliar o desempenho 
-	 *    de um modelo de classificação. Ele é especialmente útil quando se lida com classes 
-	 *    desbalanceadas ou quando se deseja equilibrar a precisão e o recall.
-	 * </p>
-	 * @param entrada {@code Tensores} com dados de entrada para o modelo.
-	 * @param real {@code Tensores} com dados reais.
-	 * @return {@code Tensor} contendo o resultado.
+	 * Calcula a precisão em relação aos dados de entrada e saída fornecidos.
+	 * @param loader {@code DataLoader} contendo dataset de teste.
+	 * @return {@code Tensor} resultado.
 	 */
-	public Tensor f1Score(Tensor[] entrada, Tensor[] real) {
-		Tensor[] prevs = modelo.forward(entrada);
-		return f1Score.forward(prevs, real);
+	public Tensor acuracia(DataLoader loader) {
+		return acuracia(loader.getX(), loader.getY());
+	}
+
+	/**
+	 * Calcula a matriz de confusão.
+	 * <p>
+	 *		A matriz de confusão mostra a contagem de amostras que foram 
+	 * 		classificadas de forma ccorreta ou não em cada classe. As linhas 
+	 *		representam as classes reais e as colunas as classes previstas.
+	 * </p>
+	 * @param prev {@code Tensores} com dados de entrada para o modelo.
+	 * @param real {@code Tensores} com dados reais.
+	 * @return {@code Tensor} resultado.
+	 */
+	public Tensor matrizConfusao(Tensor[] xs, Tensor[] ys) {
+		Tensor[] prevs = modelo.forward(xs);
+		return mc.forward(prevs, ys);
+	}
+
+	/**
+	 * Calcula a matriz de confusão a partir de um conjunto de dados.
+	 * <p>
+	 *		A matriz de confusão mostra a contagem de amostras que foram 
+	 * 		classificadas de forma ccorreta ou não em cada classe. As linhas 
+	 *		representam as classes reais e as colunas as classes previstas.
+	 * </p>
+	 * @param loader {@code DataLoader} contendo dataset de teste.
+	 * @return {@code Tensor} resultado.
+	 */
+	public Tensor matrizConfusao(DataLoader loader) {
+		return matrizConfusao(loader.getX(), loader.getY());
+	}
+
+	/**
+	 * Calcula o F1-Score ponderado.
+	 * <p>
+	 *		O F1-Score é uma métrica que combina a precisão e o recall para 
+	 *		avaliar o desempenho de um modelo de classificação. Ele é especialmente 
+	 *		útil quando se lida com classes desbalanceadas ou quando se deseja equilibrar 
+	 *		a precisão e o recall.
+	 * </p>
+	 * @param xs {@code Tensores} com dados de entrada.
+	 * @param ys {@code Tensores} com dados reais relacionados a entrada.
+	 * @return {@code Tensor} resultado.
+	 */
+	public Tensor f1Score(Tensor[] xs, Tensor[] ys) {
+		Tensor[] prevs = modelo.forward(xs);
+		return f1Score.forward(prevs, ys);
+	}
+
+	/**
+	 * Calcula o F1-Score ponderado.
+	 * <p>
+	 *		O F1-Score é uma métrica que combina a precisão e o recall para 
+	 *		avaliar o desempenho de um modelo de classificação. Ele é especialmente 
+	 *		útil quando se lida com classes desbalanceadas ou quando se deseja equilibrar 
+	 *		a precisão e o recall.
+	 * </p>
+	 * @param loader {@code DataLoader} contendo dataset de teste.
+	 * @return {@code Tensor} resultado.
+	 */
+	public Tensor f1Score(DataLoader loader) {
+		return f1Score(loader.getX(), loader.getY());
 	}
 }

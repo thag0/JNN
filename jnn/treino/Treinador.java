@@ -111,7 +111,7 @@ public class Treinador implements Cloneable {
 			);
 		}
 
-		if (tamLote == 1) setMetodo(new Treino(modelo));
+		if (tamLote < 2) setMetodo(new Treino(modelo));
 		else setMetodo(new TreinoLote(modelo, tamLote));
 
 		metodo.calcHist = calcHist;
@@ -135,25 +135,25 @@ public class Treinador implements Cloneable {
 
 	/**
 	 * Executa a regra de treino durante um determinado número de épocas.
-	 * @param dl {@code DataLoader} com conjunto de amostras.
+	 * @param loader {@code DataLoader} com conjunto de amostras.
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 * @see {@link jnn.dataloader.DataLoader}
 	 */
-	public void executar(DataLoader dl, int epochs, boolean logs) {
-		executar(dl, epochs, 1, logs);
+	public void executar(DataLoader loader, int epochs, boolean logs) {
+		executar(loader, epochs, 1, logs);
 	}
 
 	/**
 	 * Executa a regra de treino durante um determinado número de épocas.
-	 * @param dl {@code DataLoader} com conjunto de amostras.
+	 * @param loader {@code DataLoader} com conjunto de amostras.
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param tamLote tamanho do lote de amostras.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 * @see {@link jnn.dataloader.DataLoader}
 	 */
-	public void executar(DataLoader dl, int epochs, int tamLote, boolean logs) {
-		executar(dl.getX(), dl.getY(), epochs, tamLote, logs);
+	public void executar(DataLoader loader, int epochs, int tamLote, boolean logs) {
+		executar(loader.getX(), loader.getY(), epochs, tamLote, logs);
 	}
 
 	/**
@@ -183,8 +183,8 @@ public class Treinador implements Cloneable {
 	 * @param ys {@code Tensores} contendos os dados de saída (rótulos).
 	 * @param epochs quantidade de épocas de treinamento.
 	 */
-	public void executar(DataLoader dl, int epochs) {
-		executar(dl, epochs, 1, false);
+	public void executar(DataLoader loader, int epochs) {
+		executar(loader, epochs, 1, false);
 	}
 
 	/**

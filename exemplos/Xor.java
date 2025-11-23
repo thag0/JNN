@@ -1,4 +1,4 @@
-package exemplos.modelos;
+package exemplos;
 
 import java.text.DecimalFormat;
 
