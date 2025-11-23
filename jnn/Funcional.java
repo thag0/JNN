@@ -24,6 +24,7 @@ import jnn.metrica.perda.Perda;
 import jnn.metrica.perda.RMSE;
 import jnn.otm.Otimizador;
 
+import java.util.Random;
 import java.util.random.RandomGenerator;
 
 /**
@@ -47,7 +48,7 @@ public final class Funcional {
     Utils utils = new Utils();
 
     /**
-     * Interface para algumas funcionalidades da biblioteca.
+     * Interface funcional.
      */
     public Funcional() {}
 
@@ -55,11 +56,11 @@ public final class Funcional {
 
     /**
      * Inicializa um Tensor a partir de um objeto informado.
-     * @param obj objeto base.
-     * @return {@code Tensor} vazio.
+     * @param arr {@code array} base.
+     * @return {@code Tensor} com dados baseados no array.
      */
-    public Tensor tensor(Object obj) {
-        return TensorConverter.tensor(obj);
+    public Tensor tensor(Object arr) {
+        return TensorConverter.tensor(arr);
     }
 
     /**
@@ -118,8 +119,10 @@ public final class Funcional {
      * @return {@code Tensor} aleatório.
      */
     public Tensor random(RandomGenerator gen, int... shape) {
+        RandomGenerator rng = gen == null ? new Random() : gen;
+
         Tensor t = new Tensor(shape);
-        t.aplicar(_ -> gen.nextDouble(-1.0, 1.0));
+        t.aplicar(_ -> rng.nextDouble(-1.0, 1.0));
 
         return t;
     }
@@ -294,12 +297,75 @@ public final class Funcional {
     }
 
     /**
-     * Calcula a ativação Tangente Hiperbólica aos elementos do tensor.
-     * @param t {@code Tensor} desejado.
-     * @return {@code Tensor} com resultado aplicado.
+     * Calcula a {@code Tangente Hiperbócila} dos elementos do tensor.
+     * @param t {@code Tensor} base.
+     * @return {@code Tensor} resultado.
      */
     public Tensor tanh(Tensor t) {
         return new Tensor(t).tanh();
+    }
+
+    /**
+     * Calcula o {@code Arco Tangente} dos elementos do tensor.
+     * @param t {@code Tensor} base.
+     * @return {@code Tensor} resultado.
+     */
+    public Tensor atan(Tensor t) {
+        return new Tensor(t).atan();
+    }
+
+    /**
+     * Calcula o valor do {@code Seno} dos elementos do tensor.
+     * @param t {@code Tensor} base.
+     * @return {@code Tensor} resultado.
+     */
+    public Tensor sin(Tensor t) {
+        return new Tensor(t).sin();
+    }
+
+    /**
+     * Calcula o valor do {@code Cosseno} dos elementos do tensor.
+     * @param t {@code Tensor} base.
+     * @return {@code Tensor} resultado.
+     */
+    public Tensor cos(Tensor t) {
+        return new Tensor(t).cos();
+    }
+
+    /**
+     * Calcula o valor da {@code Tangente} dos elementos do tensor.
+     * @param t {@code Tensor} base.
+     * @return {@code Tensor} resultado.
+     */
+    public Tensor tan(Tensor t) {
+        return new Tensor(t).tan();
+    }
+
+    /**
+     * Calcula o valor {@code Absoluto} dos elementos do tensor.
+     * @param t {@code Tensor} base.
+     * @return {@code Tensor} resultado.
+     */
+    public Tensor abs(Tensor t) {
+        return new Tensor(t).abs();
+    }
+
+    /**
+     * Calcula o valor {@code Exponencial} dos elementos do tensor.
+     * @param t {@code Tensor} base.
+     * @return {@code Tensor} resultado.
+     */
+    public Tensor exp(Tensor t) {
+        return new Tensor(t).exp();
+    }
+
+    /**
+     * Calcula o valor {@code Logarítmo} dos elementos do tensor.
+     * @param t {@code Tensor} base.
+     * @return {@code Tensor} resultado.
+     */
+    public Tensor log(Tensor t) {
+        return new Tensor(t).log();
     }
 
     /**
@@ -377,7 +443,7 @@ public final class Funcional {
      * @param real {@code Tensor} com dados reais.
      * @return {@code Tensor} contendo o resultado.
      */
-    public Tensor entropiaCruzada(Tensor prev, Tensor real) {
+    public Tensor crossEntropy(Tensor prev, Tensor real) {
         return new EntropiaCruzada().forward(prev, real);
     }
 
@@ -388,7 +454,7 @@ public final class Funcional {
      * @param real {@code Tensor} com dados reais.
      * @return {@code Tensor} contendo o resultado.
      */
-    public Tensor entropiaCruzadaBinaria(Tensor prev, Tensor real) {
+    public Tensor binaryCrossEntropy(Tensor prev, Tensor real) {
         return new EntropiaCruzadaBinaria().forward(prev, real);
     }
 
@@ -491,11 +557,11 @@ public final class Funcional {
 
     /**
      * Retorna uma função de perda com base no nome informado.
-     * @param perda nome da função de perda desejado.
+     * @param loss nome da função de perda desejado.
      * @return {@code Perda} buscada.
      */
-    public Perda getPerda(String perda) {
-        return dicionario.getPerda(perda);
+    public Perda getPerda(String loss) {
+        return dicionario.getPerda(loss);
     }
 
     /**
@@ -508,15 +574,6 @@ public final class Funcional {
     }
 
     // transformações de dados
-
-    /**
-     * Converte o objeto em um {@code Tensor}.
-     * @param obj objeto base.
-     * @return representação do objeto em um {@code Tensor}.
-     */
-    public Tensor paraTensor(Object obj) {
-        return utils.paraTensor(obj);
-    }
 
     /**
      * Transforma o conteúdo do array em tensores individuais.
@@ -561,7 +618,7 @@ public final class Funcional {
 	 * @param max valor máximo do intervalo.
      * @return {@code Tensor} normalizado.
      */
-    public Tensor normalizar(Tensor t, double min, double max) {
+    public Tensor norm(Tensor t, Number min, Number max) {
         Tensor norm = new Tensor(t);
         return norm.norm(min, max);
     }
