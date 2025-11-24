@@ -1,4 +1,4 @@
-package jnn.serial;
+package jnn.io.seriais;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

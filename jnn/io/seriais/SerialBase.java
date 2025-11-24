@@ -1,4 +1,4 @@
-package jnn.serial;
+package jnn.io.seriais;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -7,7 +7,7 @@ import java.io.IOException;
 /**
  * Base de serialização de elementos da biblioteca.
  */
-class SerialBase {
+public abstract class SerialBase {
 
     /**
      * Base de serialização de elementos da biblioteca.
@@ -22,6 +22,16 @@ class SerialBase {
      */
     public void escrever(DataOutputStream dos, int val) throws IOException {
         dos.writeInt(val);
+    }
+
+    /**
+     * Grava o conteúdo de um valor primitivo {@code double}.
+     * @param dos {@code DataOutputStream} gravador.
+     * @param val valor desejado.
+     * @throws IOException caso ocorra um erro.
+     */
+    public void escrever(DataOutputStream dos, double val) throws IOException {
+        dos.writeDouble(val);
     }
 
     /**
@@ -83,6 +93,20 @@ class SerialBase {
     }
 
     /**
+     * Lê o conteúdo de um valor primitivo {@code double}.
+     * @param dis {@code DataInputStream} leitor.
+     * @return valor lido.
+     * @throws IOException caso ocorra um erro.
+     */
+    public double lerDouble(DataInputStream dis) throws IOException {
+        return dis.readDouble();
+    }
+
+    public boolean lerBoolean(DataInputStream dis) throws IOException {
+        return dis.readBoolean();
+    }
+
+    /**
      * Lê o conteúdo de um array primitivo {@code int[]}.
      * @param dis {@code DataInputStream} leitor.
      * @param tam tamanho do array.
@@ -118,4 +142,11 @@ class SerialBase {
         return arr;
     }
     
+    public String lerString(DataInputStream in) throws IOException {
+        int tam = in.readInt();
+        byte[] bytes = new byte[tam];
+        in.readFully(bytes);
+        return new String(bytes, "UTF-8");
+    }
+
 }

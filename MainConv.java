@@ -12,9 +12,9 @@ import jnn.camadas.*;
 import jnn.camadas.pooling.MaxPool2D;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
+import jnn.io.Serializador;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
-import jnn.serial.Serializador;
 
 public class MainConv {
 
@@ -42,7 +42,7 @@ public class MainConv {
 	static final int NUM_AMOSTRAS_TREINO = 1_000;// max 1000
 	static final int NUM_AMOSTRAS_TESTE  = 500;// max 500
 	static final int TREINO_EPOCAS = 10;
-	static final int TREINO_LOTE = 128;
+	static final int TREINO_LOTE = 32;
 	static final boolean TREINO_LOGS = true;
 
 	// caminhos de arquivos externos
@@ -97,13 +97,12 @@ public class MainConv {
 	static Sequencial criarModelo() {
 		Sequencial modelo = new Sequencial(
 			new Entrada(1, 28, 28),
-			new Conv2D(16, new int[]{3, 3}, "relu"),
+			new Conv2D(22, new int[]{3, 3}, "relu"),
 			new MaxPool2D(new int[]{2, 2}),
-			new Conv2D(24, new int[]{3, 3}, "relu"),
+			new Conv2D(26, new int[]{3, 3}, "relu"),
 			new MaxPool2D(new int[]{2, 2}),
 			new Flatten(),
-			new Densa(100, "tanh"),
-			new Dropout(0.25),
+			new Densa(80, "tanh"),
 			new Densa(NUM_DIGITOS_TREINO, "softmax")
 		);
 
@@ -127,9 +126,7 @@ public class MainConv {
 	 * @param caminho caminho de destino.
 	 */
 	static void salvarModelo(Sequencial modelo, String caminho) {
-		String tipo = "double";
-		System.out.println("Exportando modelo (" + tipo + ").");
-		new Serializador().salvar(modelo, caminho, tipo);
+		new Serializador().salvar(modelo, caminho);
 	}
 
 	/**

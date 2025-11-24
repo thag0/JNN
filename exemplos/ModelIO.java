@@ -2,8 +2,8 @@ package exemplos;
 
 import ged.Ged;
 import jnn.camadas.Densa;
+import jnn.io.Serializador;
 import jnn.modelos.Sequencial;
-import jnn.serial.Serializador;
 
 /**
  * Exemplo básico de serialização de um modelo em um arquivo externo.

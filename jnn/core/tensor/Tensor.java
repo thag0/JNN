@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.DoubleUnaryOperator;
 
-import jnn.serial.SerialTensor;
+import jnn.io.seriais.SerialTensor;
 
 import java.util.function.DoubleBinaryOperator;
 
