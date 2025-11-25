@@ -125,7 +125,7 @@ public class Treinador implements Cloneable {
 			xs,
 			ys,
 			modelo.otm(),
-			modelo.perda(),
+			modelo.loss(),
 			xs.length,
 			epochs,
 			logs

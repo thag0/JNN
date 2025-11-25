@@ -179,11 +179,11 @@ public class Utils {
 			String str;
 
 			if (msg == null) {
-				str = "Objeto recebido é nulo.";
+				str = "obj == null.";
 				
 			} else {
 				msg = msg.trim();
-				str = msg.isEmpty() ? "Objeto recebido é nulo." : msg;
+				str = msg.isEmpty() ? "obj == null." : msg;
 			}
 
 			throw new NullPointerException("\n" + str);

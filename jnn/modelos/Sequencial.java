@@ -213,11 +213,11 @@ public class Sequencial extends Modelo {
 	 *    já que é necessário saber o formato de entrada do modelo.
 	 * </p>
 	 * Ao adicionar novas camadas, o modelo precisará ser compilado novamente.
-	 * @param camada nova camada.
+	 * @param c nova camada.
 	 * @throws IllegalArgumentException se a camada fornecida for nula,
 	 */
-	public void add(Camada camada) {
-		_camadas = utils.addEmArray(_camadas, camada);
+	public void add(Camada c) {
+		_camadas = utils.addEmArray(_camadas, c);
 		_compilado = false;
 	}
 
@@ -246,7 +246,7 @@ public class Sequencial extends Modelo {
 	}
 
 	@Override
-	public void compilar(Object otimizador, Object perda) {
+	public void compilar(Object otm, Object loss) {
 		if (camadas().length < 1) {
 			throw new IllegalStateException(
 				"\nNão há camadas no modelo."
@@ -291,49 +291,25 @@ public class Sequencial extends Modelo {
 		if (seedInicial != 0) _treinador.setSeed(seedInicial);
 		
 		Dicionario dicio = new Dicionario();
-		_perda = dicio.getPerda(perda);
+		_perda = dicio.getPerda(loss);
 		
-		_otimizador = dicio.getOtimizador(otimizador);
+		_otimizador = dicio.getOtimizador(otm);
 		_otimizador.construir(params(), grads());
 		
 		_compilado = true;// modelo pode ser usado.
 	}
 
 	@Override
-	public Tensor forward(Tensor x) {
-		validarCompilacao();
-
-		for (Camada camada : camadas()) {
-			x = camada.forward(x);
-		}
-
-		return x;
-	}
-
-	@Override
 	public Tensor backward(Tensor g) {
 		validarCompilacao();
-
+		
+		// talvez melhorar isso aqui criando um Iterator reverso
 		final int n = numCamadas();
 		for (int i = n-1; i >= 0; i--) {
 			g = camada(i).backward(g);
 		}
 
 		return g;
-	}
-  
-	@Override
-	public void gradZero() {
-		for (Camada camada : camadas()) {
-			if (camada.treinavel()) camada.gradZero();
-		}
-	}
-
-	@Override
-	public void treino(boolean treinando) {
-		for (Camada camada : camadas()) {
-			camada.setTreino(treinando);
-		}
 	}
 
 	@Override
@@ -365,38 +341,6 @@ public class Sequencial extends Modelo {
 	}
 
 	@Override
-	public Tensor[] params() {
-		Tensor[] params = new Tensor[0];
-
-		for (Camada camada : camadas()) {
-			if (camada.treinavel()) {
-				params = utils.addEmArray(params, camada.kernel());
-				if (camada.temBias()) {
-					params = utils.addEmArray(params, camada.bias());
-				}
-			}
-		}
-
-		return params;
-	}
-
-	@Override
-	public Tensor[] grads() {
-		Tensor[] grads = new Tensor[0];
-
-		for (Camada camada : camadas()) {
-			if (camada.treinavel()) {
-				grads = utils.addEmArray(grads, camada.gradKernel());
-				if (camada.temBias()) {
-					grads = utils.addEmArray(grads, camada.gradBias());
-				}
-			}
-		}
-
-		return grads;
-	}
-
-	@Override
 	public double[] saidaParaArray() {
 		validarCompilacao();
 		return camadaSaida().saida().array();
@@ -405,17 +349,6 @@ public class Sequencial extends Modelo {
 	@Override
 	public String nome() {
 		return nome;
-	}
-
-	@Override
-	public int numParams() {
-		int params = 0;
-
-		for (Camada camada : camadas()) {
-			params += camada.numParams();
-		}
-
-		return params;
 	}
 
 	@Override
@@ -437,7 +370,7 @@ public class Sequencial extends Modelo {
 			)
 		);
 
-		for (Camada camada : camadas()) {
+		for (Camada camada : this) {
 			
 			//identificador da camada
 			String nomeCamada = camada.id + " - " + camada.nome();

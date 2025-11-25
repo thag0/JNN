@@ -393,7 +393,7 @@ public class RedeNeural extends Modelo {
 	}
 
 	@Override
-	public void compilar(Object otimizador, Object perda) {
+	public void compilar(Object otm, Object loss) {
 		_camadas = new Densa[_arq.length-1];
 		_camadas[0] = new Densa(_arq[1]);
 		_camadas[0].setBias(bias);
@@ -414,62 +414,25 @@ public class RedeNeural extends Modelo {
 
 		if (seedInicial != 0) _treinador.setSeed(seedInicial);
 
-		_perda = dic.getPerda(perda);
-		_otimizador = dic.getOtimizador(otimizador);
+		_perda = dic.getPerda(loss);
+		_otimizador = dic.getOtimizador(otm);
 
 		_otimizador.construir(params(), grads());
 
 		_compilado = true;
 	}
 
-	/**
-	 * Alimenta os dados pela rede neural usando o método de feedforward através do conjunto
-	 * de dados fornecido. 
-	 * <p>
-	 *    Os dados são alimentados para as entradas dos neurônios e é calculado o produto junto 
-	 *    com os pesos. No final é aplicado a função de ativação da camada no neurônio e o resultado 
-	 *    fica armazenado na saída dele.
-	 * </p>
-	 * @param x dados usados para alimentar a camada de entrada.
-	 * @throws IllegalArgumentException se o modelo não foi compilado previamente.
-	 * @throws IllegalArgumentException se o tamanho dos dados de entrada for diferente da capacidade
-	 * de entrada da rede.
-	 */
-	@Override
-	public Tensor forward(Tensor x) {
-		validarCompilacao();
-
-		for (Densa camada : camadas()) {
-			x = camada.forward(x);
-		}
-
-		return x;
-	}
-
 	@Override
 	public Tensor backward(Tensor g) {
 		validarCompilacao();
-
+		
+		// talvez melhorar isso aqui criando um Iterator reverso
 		final int n = numCamadas();
 		for (int i = n-1; i >= 0; i--) {
 			g = camada(i).backward(g);
 		}
 
 		return g;
-	}
-
-	@Override
-	public void gradZero() {
-		for (int i = 0; i < _camadas.length; i++) {
-			_camadas[i].gradZero();
-		}
-	}
-
-	@Override
-	public void treino(boolean treinando) {
-		for (Camada camada : _camadas) {
-			camada.setTreino(treinando);
-		}
 	}
 
 	/**
@@ -515,38 +478,6 @@ public class RedeNeural extends Modelo {
 		return _camadas[_camadas.length-1];
 	}
 
-	@Override
-	public Tensor[] params() {
-		Tensor[] params = new Tensor[0];
-
-		for (Densa camada : camadas()) {
-			if (camada.treinavel()) {
-				params = utils.addEmArray(params, camada.kernel());
-				if (camada.temBias()) {
-					params = utils.addEmArray(params, camada.bias());
-				}
-			}
-		}
-
-		return params;
-	}
-
-	@Override
-	public Tensor[] grads() {
-		Tensor[] grads = new Tensor[0];
-
-		for (Densa camada : camadas()) {
-			if (camada.treinavel()) {
-				grads = utils.addEmArray(grads, camada.gradKernel());
-				if (camada.temBias()) {
-					grads = utils.addEmArray(grads, camada.gradBias());
-				}
-			}
-		}
-
-		return grads;
-	}
-
 	/**
 	 * Retorna os dados de saída da última camada da Rede Neural. 
 	 * <p>
@@ -590,24 +521,6 @@ public class RedeNeural extends Modelo {
 	@Override
 	public String nome() {
 		return this.nome;
-	}
-
-	/**
-	 * Retorna a quantidade total de parâmetros da rede.
-	 * <p>
-	 *    isso inclui todos os pesos de todos os neurônios presentes 
-	 *    (incluindo o peso adicional do bias).
-	 * </p>
-	 * @return quantiade de parâmetros total da rede.
-	 */
-	@Override
-	public int numParams() {
-		int params = 0;
-		for (Camada camada : _camadas) {
-			params += camada.numParams();
-		}
-
-		return params;
 	}
 
 	/**

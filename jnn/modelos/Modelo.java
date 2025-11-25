@@ -10,9 +10,9 @@ import jnn.otm.Otimizador;
 import jnn.treino.Treinador;
 
 /**
- * <h3>
+ * <h2>
  *    Modelo base
- * </h3>
+ * </h2>
  * Inteface para modelos criados dentro da biblioteca.
  */
 public abstract class Modelo implements Cloneable, Iterable<Camada> {
@@ -144,11 +144,11 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	/**
 	 * Configura a função de perda que será utilizada durante o processo
 	 * de treinamento do modelo.
-	 * @param perda nova função de perda.
+	 * @param loss nova função de perda.
 	 */
-	public void setPerda(Perda perda) {
-		utils.validarNaoNulo(perda, "Função de perda nula.");
-		_perda = perda;
+	public void setPerda(Perda loss) {
+		utils.validarNaoNulo(loss, "loss == null.");
+		_perda = loss;
 	}
 
 	/**
@@ -160,22 +160,10 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 *    padrão, o que pode ajudar a melhorar o desempenho de aprendizado do 
 	 *    modelo em cenários específicos.
 	 * </p>
-	 * Otimizadores disponíveis.
-	 * <ol>
-	 *    <li> GD (Gradient Descent) </li>
-	 *    <li> SGD (Stochastic Gradient Descent) </li>
-	 *    <li> AdaGrad </li>
-	 *    <li> RMSProp </li>
-	 *    <li> Adam  </li>
-	 *    <li> Nadam </li>
-	 *    <li> AMSGrad </li>
-	 *    <li> Adadelta </li>
-	 *    <li> Lion </li>
-	 * </ol>
 	 * @param otm novo otimizador.
 	 */
 	public void setOtimizador(Otimizador otm) {
-		utils.validarNaoNulo(otm, "Otimizador nulo.");
+		utils.validarNaoNulo(otm, "otm == null.");
 		_otimizador = otm;
 	}
 
@@ -184,7 +172,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * @param t {@code Treinador} novo.
 	 */
 	public void setTreinador(Treinador t) {
-		utils.validarNaoNulo(t, "Treinador nulo.");
+		utils.validarNaoNulo(t, "t == null.");
 		_treinador = t;
 		configTreino = true;
 	}
@@ -212,7 +200,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * treino, pode ser uma {@code String} referente ao nome ou uma {@code instância} 
 	 * já inicializada.
 	 */
-	public abstract void compilar(Object otimizador, Object perda);
+	public abstract void compilar(Object otm, Object loss);
 
 	/**
 	 * Auxiliar na verificação da compilação do modelo.
@@ -226,12 +214,19 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	}
 
 	/**
-	 * Alimenta o modelo com os dados de entrada.
-	 * @param x {@code Tensor} contendo dados de entrada que 
-	 * serão propagados através do modelo.
+	 * Propaga os dados de entrada através das camadas do modelo.
+	 * @param x {@code Tensor} de entrada.
 	 * @return {@code Tensor} contendo a saída prevista pelo modelo.
 	 */
-	public abstract Tensor forward(Tensor x);
+	public Tensor forward(Tensor x) {
+		validarCompilacao();
+
+		for (Camada camada : this) {
+			x = camada.forward(x);
+		}
+
+		return x;
+	}
 
 	/**
 	 * Alimenta o modelo com vários dados de entrada.
@@ -243,7 +238,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	public Tensor[] forward(Tensor[] xs) {
 		validarCompilacao();
 
-		utils.validarNaoNulo(xs, "Dados de entrada nulos.");
+		utils.validarNaoNulo(xs, "xs == null.");
 		
 		Tensor y = forward(utils.concatenar(xs));
 		
@@ -268,7 +263,11 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 *    Apenas camadas treináveis são afetadas.
 	 * </p>
 	 */
-	public abstract void gradZero();
+	public void gradZero() {
+		for (Camada camada : this) {
+			if (camada.treinavel()) camada.gradZero();
+		}
+	}
 
 	/**
 	 * Realiza as verificações necessárias nos dados usados pelo modelo.
@@ -277,8 +276,8 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * @param ys array contendos dados de saída.
 	 */
 	private <T> void validarDados(T[] xs, T[] ys) {
-		utils.validarNaoNulo(xs, "Dados de entrada nulos.");
-		utils.validarNaoNulo(ys, "Dados de saida nulos.");
+		utils.validarNaoNulo(xs, "xs == null.");
+		utils.validarNaoNulo(ys, "ys == null.");
  
 		if (xs.length != ys.length) {
 			throw new IllegalArgumentException(
@@ -296,7 +295,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
 	public void treinar(Tensor[] xs, Tensor[] ys, int epochs, boolean logs) {
-		treinar(xs, ys, epochs, 1, logs);
+		treinar(xs, ys, epochs, 0, logs);
 	}
 	
 	/**
@@ -334,7 +333,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
 	public void treinar(DataLoader loader, int epochs, boolean logs) {
-		treinar(loader, epochs, 1, logs);
+		treinar(loader, epochs, 0, logs);
 	}
 
 	/**
@@ -365,10 +364,14 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 
 	/**
 	 * Configura o modelo para o modo de treino
-	 * @param treinando {@code true} caso o modelo deva estar no modo treino,
+	 * @param is {@code true} caso o modelo deva estar no modo treino,
 	 * {@code false} caso contrário.
 	 */
-	public abstract void treino(boolean treinando);
+	public void treino(boolean is) {
+		for (Camada camada : this) {
+			camada.setTreino(is);
+		}
+	}
 
 	/**
 	 * Avalia o modelo, utilizando a função de perda configurada.
@@ -452,7 +455,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * Retorna a função de perda configurada do modelo.
 	 * @return função de perda atual do modelo.
 	 */
-	public Perda perda() {
+	public Perda loss() {
 		validarCompilacao();
 		return _perda;
 	}
@@ -491,7 +494,20 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * Onde: {@code k = kernel} e {@code b = bias}.
 	 * @return array de {@code Tensor} contendo os parâmetros do modelo.
 	 */
-	public abstract Tensor[] params();
+	public Tensor[] params() {
+		Tensor[] params = new Tensor[0];
+
+		for (Camada camada : this) {
+			if (camada.treinavel()) {
+				params = utils.addEmArray(params, camada.kernel());
+				if (camada.temBias()) {
+					params = utils.addEmArray(params, camada.bias());
+				}
+			}
+		}
+
+		return params;
+	}
 
 	/**
 	 * Retorna o conjunto de gradientes em relação aos parâmetros do modelo.
@@ -504,7 +520,20 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * Onde: {@code gk = gradKernel} e {@code gb = gradBias}.
 	 * @return array de {@code Tensor} contendo os gradientes do modelo.
 	 */
-	public abstract Tensor[] grads();
+	public Tensor[] grads() {
+		Tensor[] grads = {};
+
+		for (Camada camada : this) {
+			if (camada.treinavel()) {
+				grads = utils.addEmArray(grads, camada.gradKernel());
+				if (camada.temBias()) {
+					grads = utils.addEmArray(grads, camada.gradBias());
+				}
+			}
+		}
+
+		return grads;
+	}
 	
 	/**
 	 * Retorna um array contendo a saída serializada do modelo.
@@ -517,7 +546,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * @param arr array para cópia.
 	 */
 	public void copiarDaSaida(double[] arr) {
-		utils.validarNaoNulo(arr, "Array nulo.");
+		utils.validarNaoNulo(arr, "arr == null.");
 		
 		double[] saida = saidaParaArray();
 		
@@ -546,7 +575,15 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * </p>
 	 * @return quantidade de parâmetros total do modelo.
 	 */
-	public abstract int numParams();
+	public int numParams() {
+		int params = 0;
+
+		for (Camada camada : this) {
+			params += camada.numParams();
+		}
+
+		return params;
+	}
 
 	/**
 	 * Retorna a quantidade de camadas presente no modelo.

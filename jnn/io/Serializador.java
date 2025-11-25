@@ -62,7 +62,7 @@ public class Serializador extends SerialBase {
 			escrever(out, arq);
 			escrever(out, modelo.temBias());
 			escrever(out, modelo.otm().nome());
-			escrever(out, modelo.perda().nome());
+			escrever(out, modelo.loss().nome());
 
 			for (Densa camada : modelo.camadas()) {
 				serialCamada.serializar(camada, out);
@@ -97,7 +97,7 @@ public class Serializador extends SerialBase {
 		try (DataOutputStream out = new DataOutputStream(new FileOutputStream(arquivo))) {
 			escrever(out, modelo.numCamadas());
 			escrever(out, modelo.otm().nome());
-			escrever(out, modelo.perda().nome());
+			escrever(out, modelo.loss().nome());
 
 			for (Camada camada : modelo.camadas()) {
 				serialCamada.serializar(camada, out);
