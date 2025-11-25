@@ -15,7 +15,7 @@ import jnn.treino.Treinador;
  * </h3>
  * Inteface para modelos criados dentro da biblioteca.
  */
-public abstract class Modelo implements Cloneable {
+public abstract class Modelo implements Cloneable, Iterable<Camada> {
 
 	/**
 	 * Nome da instância do modelo.

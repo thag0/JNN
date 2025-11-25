@@ -1,6 +1,7 @@
 package jnn.modelos;
 
 import java.text.DecimalFormat;
+import java.util.Iterator;
 
 import jnn.camadas.Camada;
 import jnn.camadas.Entrada;
@@ -506,4 +507,10 @@ public class Sequencial extends Modelo {
 
 		return clone;
 	}
+
+	@Override
+	public Iterator<Camada> iterator() {
+		return new ModelIterator(_camadas);
+	}
+
 }

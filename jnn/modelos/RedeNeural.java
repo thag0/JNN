@@ -1,5 +1,7 @@
 package jnn.modelos;
 
+import java.util.Iterator;
+
 import jnn.acts.Ativacao;
 import jnn.camadas.Camada;
 import jnn.camadas.Densa;
@@ -736,4 +738,10 @@ public class RedeNeural extends Modelo {
 
 		return clone;
 	}
+
+	@Override
+	public Iterator<Camada> iterator() {
+		return new ModelIterator(_camadas);
+	}
+
 }
