@@ -10,7 +10,6 @@ import geim.Geim;
 import jnn.Funcional;
 import jnn.camadas.*;
 import jnn.camadas.pooling.MaxPool2D;
-import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.io.Serializador;
 import jnn.modelos.Modelo;
@@ -41,8 +40,8 @@ public class MainConv {
 	static final int NUM_DIGITOS_TESTE  = NUM_DIGITOS_TREINO;
 	static final int NUM_AMOSTRAS_TREINO = 1_000;// max 1000
 	static final int NUM_AMOSTRAS_TESTE  = 500;// max 500
-	static final int TREINO_EPOCAS = 10;
-	static final int TREINO_LOTE = 32;
+	static final int TREINO_EPOCAS = 30;
+	static final int TREINO_LOTE = 64;
 	static final boolean TREINO_LOGS = true;
 
 	// caminhos de arquivos externos
@@ -54,13 +53,13 @@ public class MainConv {
 	public static void main(String[] args) {
 		ged.limparConsole();
 
-		DataLoader dl = new DataLoader(
+		DataLoader dlTreino = new DataLoader(
 			jnn.arrayParaTensores(carregarDadosMNIST(CAMINHO_TREINO, NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO)),
 			jnn.arrayParaTensores(criarRotulosMNIST(NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO))
 		);
-		dl.transformX(a -> a.div(255));//normalizar entrada entre 0 e 1
+		dlTreino.transformX(a -> a.div(255));//normalizar entrada entre 0 e 1
 
-		dl.print();
+		dlTreino.print();
 
 		Sequencial modelo = criarModelo();
 		modelo.setHistorico(true);
@@ -68,7 +67,7 @@ public class MainConv {
 
 		System.out.println("Treinando.");
 		long tempo = System.nanoTime();
-			modelo.treinar(dl, TREINO_EPOCAS, TREINO_LOTE, TREINO_LOGS);
+			modelo.treinar(dlTreino, TREINO_EPOCAS, TREINO_LOTE, TREINO_LOGS);
 		tempo = System.nanoTime() - tempo;
 
 		long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempo);
@@ -77,14 +76,16 @@ public class MainConv {
 		long segundos = segundosTotais % 60;
 
 		System.out.println("\nTempo de treino: " + horas + "h " + minutos + "min " + segundos + "s");
-		System.out.print("Treino -> perda: " + modelo.avaliar(dl.getX(), dl.getY()).item() + " - ");
-		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(dl.getX(), dl.getY()).item() * 100), 4) + "%");
+		System.out.print("Treino -> perda: " + modelo.avaliar(dlTreino).item() + " - ");
+		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(dlTreino).item() * 100), 4) + "%");
 
 		System.out.println("\nCarregando dados de teste.");
-		final Tensor[] testeX = jnn.arrayParaTensores(carregarDadosMNIST(CAMINHO_TESTE, NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE));
-		final Tensor[] testeY = jnn.arrayParaTensores(criarRotulosMNIST(NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE));
-		System.out.print("Teste -> perda: " + modelo.avaliar(testeX, testeY).item() + " - ");
-		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(testeX, testeY).item() * 100), 4) + "%");
+		DataLoader dlTeste = new DataLoader(
+			jnn.arrayParaTensores(carregarDadosMNIST(CAMINHO_TESTE, NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE)),
+			jnn.arrayParaTensores(criarRotulosMNIST(NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE))
+		);
+		System.out.print("Teste -> perda: " + modelo.avaliar(dlTeste).item() + " - ");
+		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(dlTeste).item() * 100), 4) + "%");
 
 		exportarHistorico(modelo, CAMINHO_HISTORICO);
 		salvarModelo(modelo, CAMINHO_SAIDA_MODELO);
@@ -97,12 +98,13 @@ public class MainConv {
 	static Sequencial criarModelo() {
 		Sequencial modelo = new Sequencial(
 			new Entrada(1, 28, 28),
-			new Conv2D(22, new int[]{3, 3}, "relu"),
+			new Conv2D(24, new int[]{3, 3}, "relu"),
 			new MaxPool2D(new int[]{2, 2}),
 			new Conv2D(26, new int[]{3, 3}, "relu"),
 			new MaxPool2D(new int[]{2, 2}),
 			new Flatten(),
-			new Densa(80, "tanh"),
+			new Densa(100, "tanh"),
+			new Dropout(0.2),
 			new Densa(NUM_DIGITOS_TREINO, "softmax")
 		);
 
@@ -222,8 +224,6 @@ public class MainConv {
 				rotulos[indice][numero] = 1;
 			}
 		}
-		
-		System.out.println("Rótulos gerados de 0 a " + (digitos-1) + ".");
 
 		return rotulos;
 	}
