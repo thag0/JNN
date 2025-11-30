@@ -20,7 +20,7 @@ public abstract class SerialBase {
      * @param val valor desejado.
      * @throws IOException caso ocorra um erro.
      */
-    public void escrever(DataOutputStream dos, int val) throws IOException {
+    protected void escrever(DataOutputStream dos, int val) throws IOException {
         dos.writeInt(val);
     }
 
@@ -30,7 +30,7 @@ public abstract class SerialBase {
      * @param val valor desejado.
      * @throws IOException caso ocorra um erro.
      */
-    public void escrever(DataOutputStream dos, double val) throws IOException {
+    protected void escrever(DataOutputStream dos, double val) throws IOException {
         dos.writeDouble(val);
     }
 
@@ -40,7 +40,7 @@ public abstract class SerialBase {
      * @param val valor desejado.
      * @throws IOException caso ocorra um erro.
      */
-    public void escrever(DataOutputStream dos, boolean val) throws IOException {
+    protected void escrever(DataOutputStream dos, boolean val) throws IOException {
         dos.writeBoolean(val);
     }
 
@@ -50,7 +50,7 @@ public abstract class SerialBase {
      * @param arr {@code array} desejado.
      * @throws IOException caso ocorra um erro.
      */
-    public void escrever(DataOutputStream dos, int[] arr) throws IOException {
+    protected void escrever(DataOutputStream dos, int[] arr) throws IOException {
         dos.writeInt(arr.length);
         for (int val : arr) {
             dos.writeInt(val);
@@ -63,7 +63,7 @@ public abstract class SerialBase {
      * @param arr {@code array} desejado.
      * @throws IOException caso ocorra um erro.
      */
-    public void escrever(DataOutputStream dos, double[] arr) throws IOException {
+    protected void escrever(DataOutputStream dos, double[] arr) throws IOException {
         dos.writeInt(arr.length);
         for (double val : arr) {
             dos.writeDouble(val);
@@ -76,7 +76,7 @@ public abstract class SerialBase {
      * @param s {@code String} desejada.
      * @throws IOException caso ocorra um erro.
      */
-    public void escrever(DataOutputStream dos, String s) throws IOException {
+    protected void escrever(DataOutputStream dos, String s) throws IOException {
         byte[] bytes = s.getBytes("UTF-8");
         dos.writeInt(bytes.length);
         dos.write(bytes);
@@ -88,7 +88,7 @@ public abstract class SerialBase {
      * @return valor lido.
      * @throws IOException caso ocorra um erro.
      */
-    public int lerInt(DataInputStream dis) throws IOException {
+    protected int lerInt(DataInputStream dis) throws IOException {
         return dis.readInt();
     }
 
@@ -98,11 +98,11 @@ public abstract class SerialBase {
      * @return valor lido.
      * @throws IOException caso ocorra um erro.
      */
-    public double lerDouble(DataInputStream dis) throws IOException {
+    protected double lerDouble(DataInputStream dis) throws IOException {
         return dis.readDouble();
     }
 
-    public boolean lerBoolean(DataInputStream dis) throws IOException {
+    protected boolean lerBoolean(DataInputStream dis) throws IOException {
         return dis.readBoolean();
     }
 
@@ -113,7 +113,7 @@ public abstract class SerialBase {
      * @return array lido.
      * @throws IOException caso ocorra um erro.
      */
-    public int[] lerArrInt(DataInputStream dis) throws IOException {
+    protected int[] lerArrInt(DataInputStream dis) throws IOException {
         int tam = dis.readInt();// considerando que já escreve o tamanho.
         
         int[] arr = new int[tam];
@@ -131,7 +131,7 @@ public abstract class SerialBase {
      * @return array lido.
      * @throws IOException caso ocorra um erro.
      */
-    public double[] lerArrDouble(DataInputStream dis) throws IOException {
+    protected double[] lerArrDouble(DataInputStream dis) throws IOException {
         int tam = dis.readInt();// considerando que já escreve o tamanho.
 
         double[] arr = new double[tam];
@@ -142,7 +142,7 @@ public abstract class SerialBase {
         return arr;
     }
     
-    public String lerString(DataInputStream in) throws IOException {
+    protected String lerString(DataInputStream in) throws IOException {
         int tam = in.readInt();
         byte[] bytes = new byte[tam];
         in.readFully(bytes);

@@ -1,5 +1,7 @@
 package jnn.io.seriais;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -7,7 +9,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
+
 import jnn.core.tensor.Tensor;
+import jnn.core.tensor.TensorConverter;
 
 /**
  * Interface para io de tensores.
@@ -77,7 +82,55 @@ public class SerialTensor extends SerialBase {
         }
 
         return t;
+    }
 
+    /**
+     * Lê uma imagem de um arquivo externo e converte em um {@code Tensor}.
+     * @param caminho caminho da imagem, deve conter a extensão do arquivo.
+     * @return {@code Tensor} convertido.
+     */
+    public Tensor lerImagem(String caminho) {
+        try {
+            BufferedImage base = ImageIO.read(new File(caminho));
+            
+            int largura = base.getWidth();
+            int altura = base.getHeight();
+            
+            BufferedImage img = new BufferedImage(
+                largura,
+                altura,
+                BufferedImage.TYPE_INT_ARGB
+            );
+            
+            Graphics2D g2 = img.createGraphics();
+            g2.drawImage(base, 0, 0, null);
+            g2.dispose();
+            
+            int[] buff = img.getRGB(0, 0, largura, altura, null, 0, largura);
+            int[][][] data = new int[3][altura][largura];
+            boolean cinza = true;
+            
+            for (int y = 0; y < altura; y++) {
+                for (int x = 0; x < largura; x++) {
+                    int pixel = buff[y * largura + x];
+
+                    int r = (pixel >> 16) & 0xFF;
+                    int g = (pixel >> 8) & 0xFF;
+                    int b = pixel & 0xFF;
+
+                    data[0][y][x] = r;
+                    data[1][y][x] = g;
+                    data[2][y][x] = b;
+                
+                    if (cinza && !(r == g && g == b)) cinza = false;
+                }
+            }
+
+            return TensorConverter.tensor(cinza ? data[0] : data);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Erro ao ler imagem: " + caminho, e);
+        }
     }
 
 }
