@@ -56,11 +56,6 @@ public class MainConv {
 
 		dlTreino.print();
 
-		dlTreino.get(NUM_AMOSTRAS_TREINO * 9).y().print();
-		dlTreino.get(NUM_AMOSTRAS_TREINO * 9 + 1).y().print();
-		dlTreino.get(NUM_AMOSTRAS_TREINO * 9 + 2).y().print();
-		System.exit(0);
-
 		Sequencial modelo = criarModelo();
 		modelo.setHistorico(true);
 		modelo.print();
