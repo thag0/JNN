@@ -1,4 +1,3 @@
-import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -6,12 +5,13 @@ import java.util.concurrent.TimeUnit;
 
 import ged.Dados;
 import ged.Ged;
-import geim.Geim;
 import jnn.Funcional;
 import jnn.camadas.*;
 import jnn.camadas.pooling.MaxPool2D;
+import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.io.Serializador;
+import jnn.io.seriais.SerialTensor;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
 
@@ -21,11 +21,6 @@ public class MainConv {
 	 * Gerenciador de dados.
 	 */
 	static Ged ged = new Ged();
-
-	/**
-	 * Gerenciador de imagens.
-	 */
-	static Geim geim = new Geim();
 
 	/**
 	 * Interface da biblioteca.
@@ -40,7 +35,7 @@ public class MainConv {
 	static final int NUM_DIGITOS_TESTE  = NUM_DIGITOS_TREINO;
 	static final int NUM_AMOSTRAS_TREINO = 1_000;// max 1000
 	static final int NUM_AMOSTRAS_TESTE  = 500;// max 500
-	static final int TREINO_EPOCAS = 30;
+	static final int TREINO_EPOCAS = 10;
 	static final int TREINO_LOTE = 64;
 	static final boolean TREINO_LOGS = true;
 
@@ -54,12 +49,17 @@ public class MainConv {
 		ged.limparConsole();
 
 		DataLoader dlTreino = new DataLoader(
-			jnn.arrayParaTensores(carregarDadosMNIST(CAMINHO_TREINO, NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO)),
-			jnn.arrayParaTensores(criarRotulosMNIST(NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO))
+			carregarAmostrasMNIST(CAMINHO_TREINO, NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO),
+			criarRotulosMNIST(NUM_AMOSTRAS_TREINO, NUM_DIGITOS_TREINO)
 		);
 		dlTreino.transformX(a -> a.div(255));//normalizar entrada entre 0 e 1
 
 		dlTreino.print();
+
+		dlTreino.get(NUM_AMOSTRAS_TREINO * 9).y().print();
+		dlTreino.get(NUM_AMOSTRAS_TREINO * 9 + 1).y().print();
+		dlTreino.get(NUM_AMOSTRAS_TREINO * 9 + 2).y().print();
+		System.exit(0);
 
 		Sequencial modelo = criarModelo();
 		modelo.setHistorico(true);
@@ -81,8 +81,8 @@ public class MainConv {
 
 		System.out.println("\nCarregando dados de teste.");
 		DataLoader dlTeste = new DataLoader(
-			jnn.arrayParaTensores(carregarDadosMNIST(CAMINHO_TESTE, NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE)),
-			jnn.arrayParaTensores(criarRotulosMNIST(NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE))
+			carregarAmostrasMNIST(CAMINHO_TESTE, NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE),
+			criarRotulosMNIST(NUM_AMOSTRAS_TESTE, NUM_DIGITOS_TESTE)
 		);
 		System.out.print("Teste -> perda: " + modelo.avaliar(dlTeste).item() + " - ");
 		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(dlTeste).item() * 100), 4) + "%");
@@ -98,9 +98,9 @@ public class MainConv {
 	static Sequencial criarModelo() {
 		Sequencial modelo = new Sequencial(
 			new Entrada(1, 28, 28),
-			new Conv2D(24, new int[]{3, 3}, "relu"),
+			new Conv2D(32, new int[]{3, 3}, "relu"),
 			new MaxPool2D(new int[]{2, 2}),
-			new Conv2D(26, new int[]{3, 3}, "relu"),
+			new Conv2D(20, new int[]{3, 3}, "relu"),
 			new MaxPool2D(new int[]{2, 2}),
 			new Flatten(),
 			new Densa(100, "tanh"),
@@ -132,26 +132,6 @@ public class MainConv {
 	}
 
 	/**
-	 * Converte uma imagem numa matriz contendo seus valores de brilho entre 0 e 1.
-	 * @param caminho caminho da imagem.
-	 * @return matriz contendo os valores de brilho da imagem.
-	 */
-	static double[][] carregarImagem(String caminho) {
-		BufferedImage img = geim.lerImagem(caminho);
-		double[][] imagem = new double[img.getHeight()][img.getWidth()];
-
-		int[][] cinza = geim.getGray(img);
-
-		for (int y = 0; y < imagem.length; y++) {
-			for (int x = 0; x < imagem[y].length; x++) {
-				imagem[y][x] = cinza[y][x];
-			}
-		}
-
-		return imagem;
-	}
-
-	/**
 	 * Carrega as imagens do conjunto de dados {@code MNIST}.
 	 * <p>
 	 *    Nota
@@ -175,10 +155,11 @@ public class MainConv {
 	 * @param digitos quantidade de dígitos, iniciando do dígito 0.
 	 * @return dados carregados.
 	 */
-	static double[][][][] carregarDadosMNIST(String caminho, int amostras, int digitos) {
-		final double[][][][] imagens = new double[digitos * amostras][1][][];
-		final int numThreads = Runtime.getRuntime().availableProcessors() / 2;
-  
+	static Tensor[] carregarAmostrasMNIST(String caminho, int amostras, int digitos) {
+		final Tensor[] arr = new Tensor[digitos * amostras];
+		final int numThreads = Runtime.getRuntime().availableProcessors();
+		SerialTensor st = new SerialTensor();
+
 		try (ExecutorService exec = Executors.newFixedThreadPool(numThreads)) {
 			int id = 0;
 			for (int digito = 0; digito < digitos; digito++) {
@@ -188,8 +169,8 @@ public class MainConv {
 					
 					exec.submit(() -> {
 						try {
-							double[][] imagem = carregarImagem(caminhoCompleto);
-							imagens[indice][0] = imagem;
+							Tensor img = st.lerImagem(caminhoCompleto);
+							arr[indice] = img.unsqueeze(0); // ser 3d
 						} catch (Exception e) {
 							System.out.println(e.getMessage());
 							System.exit(1);
@@ -204,10 +185,10 @@ public class MainConv {
 			System.out.println(e.getMessage());
 		}
   
-		System.out.println("Imagens carregadas (" + imagens.length + ").");
+		System.out.println("Imagens carregadas (" + arr.length + ").");
   
-		return imagens;
-  	}
+		return arr;		
+	}
 
 	/**
 	 * Gera os rótulos do conjunto de dados {@code MNIST}.
@@ -215,13 +196,16 @@ public class MainConv {
 	 * @param digitos quantidade de dítigos, começando do 0.
 	 * @return dados carregados.
 	 */
-	static double[][] criarRotulosMNIST(int amostras, int digitos) {
-		double[][] rotulos = new double[digitos * amostras][digitos];
+	static Tensor[] criarRotulosMNIST(int amostras, int digitos) {
+		Tensor[] rotulos = new Tensor[digitos * amostras]; 
 
-		for (int numero = 0; numero < digitos; numero++) {
-			for (int i = 0; i < amostras; i++) {
-				int indice = numero * amostras + i;
-				rotulos[indice][numero] = 1;
+		for (int digito = 0; digito < digitos; digito++) {
+			for (int amostra = 0; amostra < amostras; amostra++) {
+				double[] data = new double[digitos];
+				data[digito] = 1;
+				
+				int indice = digito * amostras + amostra;
+				rotulos[indice] = new Tensor(data);
 			}
 		}
 
