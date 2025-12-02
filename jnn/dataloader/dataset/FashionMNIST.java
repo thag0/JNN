@@ -1,3 +1,5 @@
+package jnn.dataloader.dataset;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
@@ -27,17 +29,17 @@ public class FashionMNIST {
     /**
      * Fonte dos dados.
      */
-    private static final String BASE = "http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/";
+    static private final String BASE = "http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/";
 
     /**
      * Mapeamento dos dados.
      */
-    private static final Map<String, String> ARQUIVOS = new HashMap<>(); 
+    static private final Map<String, String> ARQUIVOS = new HashMap<>(); 
 
     /**
      * Caminho dos arquivos do dataset
      */
-    private static Path cacheDir = Paths.get(System.getProperty("user.home"), ".jnn/datasets", "fashion-mnist");
+    static private Path cacheDir = Paths.get(System.getProperty("user.home"), ".jnn/datasets", "fashion-mnist");
 
     static {
         try { 

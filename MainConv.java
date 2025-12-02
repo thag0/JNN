@@ -10,6 +10,7 @@ import jnn.camadas.*;
 import jnn.camadas.pooling.MaxPool2D;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
+import jnn.dataloader.dataset.MNIST;
 import jnn.io.Serializador;
 import jnn.io.seriais.SerialTensor;
 import jnn.modelos.Modelo;

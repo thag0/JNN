@@ -1,3 +1,5 @@
+package jnn.dataloader.dataset;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
@@ -27,18 +29,21 @@ public class MNIST {
     /**
      * Fonte dos dados.
      */
-    private static final String BASE = "https://storage.googleapis.com/cvdf-datasets/mnist/";
+    static private final String BASE = "https://storage.googleapis.com/cvdf-datasets/mnist/";
 
     /**
      * Mapeamento dos dados.
      */
-    private static final Map<String, String> ARQUIVOS = new HashMap<>(); 
+    static private final Map<String, String> ARQUIVOS = new HashMap<>(); 
 
     /**
      * Caminho dos arquivos do dataset
      */
-    private static Path cacheDir = Paths.get(System.getProperty("user.home"), ".jnn/datasets", "mnist");
+    static private Path cacheDir = Paths.get(System.getProperty("user.home"), ".jnn/datasets", "mnist");
 
+    /**
+     * 
+     */
     static {
         try { Files.createDirectories(cacheDir); } catch (IOException e) {}
         ARQUIVOS.put("treino-x", "train-images-idx3-ubyte.gz");
