@@ -1,8 +1,12 @@
 package jnn.dataloader;
 
 import java.text.DecimalFormat;
+
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
+import java.util.function.Predicate;
 
 import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
@@ -195,6 +199,62 @@ public class DataLoader implements Iterable<Amostra> {
         }
         
         return this;
+    }
+
+    /**
+     * Aplica um filtro a nos dados de {@code X} do DataLoader, retornando um
+     * novo subconjunto de dados com seu resultado.
+     * @param p filtro que será aplicado em cada amostra de X.
+     * @return {@code DataLoader} contendo o subconjunto filtrado.
+     */
+    public DataLoader filterX(Predicate<Tensor> p) {
+        List<Tensor> xs = new ArrayList<>(); 
+        List<Tensor> ys = new ArrayList<>();
+
+        final int n = tam();
+        for (int i = 0; i < n; i++) {
+            Amostra a = dados[i];
+
+            if (p.test(a.x())) {
+                xs.add(a.x());
+                ys.add(a.y());
+            }
+        }
+    
+        Tensor[] t = {};
+
+        return new DataLoader(
+            xs.toArray(t),
+            ys.toArray(t)
+        );
+    }
+
+    /**
+     * Aplica um filtro a nos dados de Y do DataLoader, retornando um
+     * novo subconjunto de dados com seu resultado.
+     * @param p filtro que será aplicado em cada amostra de Y.
+     * @return {@code DataLoader} contendo o subconjunto filtrado.
+     */
+    public DataLoader filterY(Predicate<Tensor> p) {
+        List<Tensor> xs = new ArrayList<>(); 
+        List<Tensor> ys = new ArrayList<>();
+
+        final int n = tam();
+        for (int i = 0; i < n; i++) {
+            Amostra a = dados[i];
+
+            if (p.test(a.y())) {
+                xs.add(a.x());
+                ys.add(a.y());
+            }
+        }
+    
+        Tensor[] t = {};
+
+        return new DataLoader(
+            xs.toArray(t),
+            ys.toArray(t)
+        );
     }
 
     /**
