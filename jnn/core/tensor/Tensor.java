@@ -2504,4 +2504,70 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		}
 	}
 
+	/**
+	 * Retorna o índice onde existe o maior valor em uma dimensão especificada.
+	 * @param eixo dimensão desejada.
+	 * @return novo {@code Tensor}.
+	 */
+	public Tensor argmax(int eixo) {
+		if (eixo < 0 || eixo >= shape.length) {
+			throw new IllegalArgumentException(
+				"\nEixo (" + eixo + ") inválido."
+			);
+		}
+
+		if (shape.length == 1) {
+			int arg = 0;
+			double maxVal = Double.NEGATIVE_INFINITY;
+			for (int i = 0; i < shape[0]; i++) {
+				double v = dados.get(i);
+				if (v > maxVal) {
+					maxVal = v;
+					arg = i;
+				}
+			}
+
+			Tensor res = new Tensor(1);
+			res.set(arg, 0);
+			return res;
+		}
+
+		int[] shapeRes = new int[shape.length - 1];
+		for (int i = 0, j = 0; i < shape.length; i++) {
+			if (i != eixo) shapeRes[j++] = shape[i];
+		}
+
+		Tensor res = new Tensor(shapeRes);
+
+		int[] idIn  = new int[shape.length];
+		int[] idRes = new int[shapeRes.length];
+		double[] rd = res.array();
+
+		for (int i = 0; i < res.tam(); i++) {
+			indiceLinear(i, shapeRes, idRes);
+
+			for (int j = 0, k = 0; j < shape.length; j++) {
+				if (j == eixo) continue;
+				idIn[j] = idRes[k++];
+			}
+
+			double maxVal = Double.NEGATIVE_INFINITY;
+			int maxIdx = 0;
+
+			for (int a = 0; a < shape[eixo]; a++) {
+				idIn[eixo] = a;
+				double v = get(idIn);
+
+				if (v > maxVal) {
+					maxVal = v;
+					maxIdx = a;
+				}
+			}
+
+			rd[i] = maxIdx;
+		}
+
+		return res;
+	}
+
 }
