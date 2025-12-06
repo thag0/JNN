@@ -390,15 +390,20 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 		validarCompilacao();
 		validarDados(xs, ys);
 
-		// forward individual porque dependendo do tamanho dos
-		// dados passados as camadas vão consumir uma memória
-		// enorme na hora de ajustar pra lote.
+		// esse tamamho foi o mais ou menos ideial pra não ficar usando
+		// tanta memória e teve um leve ganho em tempo de execução.
+		final int batch = 32;
 
 		final int n = xs.length;
 		double loss = 0;
-		for (int i = 0; i < n; i++) {
-			Tensor prev = forward(xs[i]);
-			loss += _perda.forward(prev, ys[i]).item();
+		for (int i = 0; i < n; i += batch) {
+			int inicio = i;
+			int fim = Math.min(inicio + batch, n);
+			Tensor x = utils.concatenar(utils.subArray(xs, inicio, fim));
+			Tensor y = utils.concatenar(utils.subArray(ys, inicio, fim));
+			
+			Tensor prev = forward(x);
+			loss += _perda.forward(prev, y).item();
 		}
 
 		return new Tensor(
