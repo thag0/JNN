@@ -69,6 +69,35 @@ public class FashionMNIST {
     }
 
     /**
+     * Retorna as classes correspondentes aos dados de saída do dataset.
+     * <p>
+     *      Exemplo
+     * </p>
+     * <pre>
+     *String labels = FashionMNIST.labels();
+     *int label = (int) y.argmax().item();
+     *labels.get(label);//retorna a classe correspondente
+     * </pre>
+     * @return {@code HashMap} que liga os dítigos aos labels correspondentes.
+     */
+    public static HashMap<Integer, String> labels() {
+        HashMap<Integer, String> labels = new HashMap<>(10);
+
+        labels.put(0, "T-shirt/top");
+        labels.put(1, "Trouser");
+        labels.put(2, "Pullover");
+        labels.put(3, "Dress");
+        labels.put(4, "Coat");
+        labels.put(5, "Sandal");
+        labels.put(6, "Shirt");
+        labels.put(7, "Sneaker");
+        labels.put(8, "Bag");
+        labels.put(9, "Ankle boot");
+
+        return labels;
+    }
+
+    /**
      * Carregamento genérnico.
      * @param caminhoX dados de treino.
      * @param caminhoY dados de teste.

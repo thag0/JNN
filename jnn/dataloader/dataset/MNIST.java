@@ -69,6 +69,28 @@ public class MNIST {
     }
 
     /**
+     * Retorna as classes correspondentes aos dados de saída do dataset.
+     * <p>
+     *      Exemplo
+     * </p>
+     * <pre>
+     *String labels = MNIST.labels();
+     *int label = (int) y.argmax().item();
+     *labels.get(label);//retorna a classe correspondente ao dígito
+     * </pre>
+     * @return {@code HashMap} que liga os dítigos aos labels correspondentes.
+     */
+    public static HashMap<Integer, String> labels() {
+        HashMap<Integer, String> labels = new HashMap<>(10);
+    
+        for (int i = 0; i < 10; i++) {
+            labels.put(i, "Digito " + i);
+        }
+
+        return labels;
+    }
+
+    /**
      * Carregamento genérnico.
      * @param caminhoX dados de treino.
      * @param caminhoY dados de teste.
