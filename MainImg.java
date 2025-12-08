@@ -24,18 +24,17 @@ public class MainImg {
 	static Geim geim = new Geim();
 	static Funcional jnn = new Funcional();
 
-	static final int EPOCAS = 5 * 1000;
+	static final int EPOCAS = 10 * 1000;
 	static final double ESCALA_RENDER = 10;
 	static final boolean historico = true;
 	static final String CAMINHO_HISTORICO = "historico-perda.csv";
-	static final String CAMINHO_IMAGGEM = "./dados/mnist/treino/8/img_0.jpg";
-	// static final String caminhoImagem = "./dados/mnist/treino/7/img_1.jpg";
+	static final String CAMINHO_IMAGEM = "./dados/mnist/img_0.png";
 	// static final String caminhoImagem = "./dados/32x32/circulos.png";
 
 	public static void main(String[] args) {      
 		ged.limparConsole();
 
-		BufferedImage imagem = geim.lerImagem(CAMINHO_IMAGGEM);
+		BufferedImage imagem = geim.lerImagem(CAMINHO_IMAGEM);
 		int tamEntrada = 2;
 		int tamSaida = 1;
 		
@@ -62,8 +61,6 @@ public class MainImg {
 		long min = TimeUnit.NANOSECONDS.toMinutes(tempo);
 		long sec = TimeUnit.NANOSECONDS.toSeconds(tempo);
 
-		double precisao = (1 - modelo.avaliador().mse(x, y).item())*100;
-		System.out.println("Precisão = " + formatarDecimal(precisao, 2) + "%");
 		System.out.println("Perda = " + modelo.avaliar(x, y).item());
 		System.out.println("Tempo de treinamento: " + hrs + "h " + min + "m " + sec + "s");
 

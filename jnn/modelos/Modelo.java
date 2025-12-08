@@ -295,7 +295,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
 	public void treinar(Tensor[] xs, Tensor[] ys, int epochs, boolean logs) {
-		treinar(xs, ys, epochs, 0, logs);
+		treinar(xs, ys, epochs, 1, logs);
 	}
 	
 	/**
@@ -333,7 +333,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
 	public void treinar(DataLoader loader, int epochs, boolean logs) {
-		treinar(loader, epochs, 0, logs);
+		treinar(loader, epochs, 1, logs);
 	}
 
 	/**
