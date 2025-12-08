@@ -1,0 +1,45 @@
+package jnn.core.parallel;
+
+import java.util.concurrent.ForkJoinPool;
+
+/**
+ * Molde de criação para multiprocessamento.
+ */
+public class PoolFactory {
+    
+    /**
+     * Quantidade de threads padrão por pool.
+     */
+    static int numThreads = Runtime.getRuntime().availableProcessors() / 2;
+
+    /**
+     * Cria uma nova instância de {@code ForkJoinPool}
+     * @return {@code ForkJoinPool}
+     */
+    public static synchronized ForkJoinPool pool() {
+        return new ForkJoinPool(numThreads);
+    }
+
+    /**
+     * Configura um novo valor padrão para criação de novas pools.
+     * @param t quantidade de threads desejada.
+     */
+    public static synchronized void setThreads(int t) {
+        if (t < 1) {
+            throw new IllegalArgumentException(
+                "\nValor de threads " + t + " inválido."
+            );
+        }
+
+        numThreads = t;
+    }
+
+    /**
+     * Retorna a quantidade de threads configurada para novas pools.
+     * @return número de threads.
+     */
+    public static synchronized int getThreads() {
+        return numThreads;
+    }
+
+}

@@ -5,6 +5,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.stream.IntStream;
 
 import jnn.core.OpTensor;
+import jnn.core.parallel.PoolFactory;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -16,15 +17,8 @@ public class LayerOps {
 
 	/**
 	 * Operador para paralelização.
-	 * <p>
-	 *		Por enquanto em testes usar a metade dos cores da cpu foi
-	 *		a abordagem mais ideal entre {@code Uso de CPU x Tempo}
-	 * </p>
-	 * // TODO adicionar abordagens mais flexíveis para setar as threads desejadas.
 	 */
-	private final ForkJoinPool pool = new ForkJoinPool(
-		Runtime.getRuntime().availableProcessors() / 2
-	);
+	private final ForkJoinPool pool = PoolFactory.pool();
 
     /**
      * Utilitário para operações de forward e backward de camadas.
