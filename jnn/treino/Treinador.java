@@ -1,9 +1,9 @@
 package jnn.treino;
 
 import java.util.LinkedList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 
+import jnn.core.parallel.PoolFactory;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;
@@ -204,8 +204,10 @@ public class Treinador implements Cloneable {
 		Double[] hist = metodo.hist();
 		double[] h = new double[hist.length];
 
-		int t = Runtime.getRuntime().availableProcessors()/2;
-		try (ExecutorService exec = Executors.newFixedThreadPool(t)) {
+		final int threads = PoolFactory.getThreads();
+		PoolFactory.setThreads(Runtime.getRuntime().availableProcessors()/2);
+
+		try (ForkJoinPool exec = PoolFactory.pool()) {
 			for (int i = 0, n = h.length; i < n; i++) {
 				final int id = i;
 				exec.execute(() -> h[id] = hist[id]);
@@ -213,6 +215,8 @@ public class Treinador implements Cloneable {
 		} catch (Exception e) {
 			throw e;
 		}
+
+		PoolFactory.setThreads(threads);
 
 		return h;
 	}
