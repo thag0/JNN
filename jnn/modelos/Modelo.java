@@ -403,7 +403,10 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 			Tensor y = utils.concatenar(utils.subArray(ys, inicio, fim));
 			
 			Tensor prev = forward(x);
-			loss += _perda.forward(prev, y).item();
+
+			double lossLote = _perda.forward(prev, y).item();
+			int tamLote = fim - inicio;
+			loss += lossLote * tamLote;
 		}
 
 		return new Tensor(

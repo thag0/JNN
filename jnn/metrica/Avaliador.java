@@ -20,7 +20,7 @@ public class Avaliador {
 	/**
 	 * Utilitário.
 	 */
-	private Utils utils;
+	private Utils utils = new Utils();
 
 	MSE mse = new MSE();
 	MAE mae = new MAE();
@@ -198,17 +198,24 @@ public class Avaliador {
 	 * @return {@code Tensor} contendo o resultado.
 	 */
 	public Tensor acuracia(Tensor[] xs, Tensor[] ys) {
-		final int amostras = xs.length;
-		double acc = 0;
-
-		for (int i = 0; i < amostras; i++) {
-			Tensor prev = modelo.forward(xs[i]);
-			Tensor val = acuracia.forward(new Tensor[] {prev}, new Tensor[]{ys[i]});
-			acc += val.item();
+		final int n = xs.length;
+		int batch = 32;
+		
+		double acertos = 0;
+		for (int i = 0; i < n; i += batch) {
+			int inicio = i;
+			int fim = Math.min(inicio + batch, n);
+			Tensor[] x = utils.subArray(xs, inicio, fim);
+			Tensor[] y = utils.subArray(ys, inicio, fim);
+			Tensor[] prev = modelo.forward(x);
+			
+			double accLote = acuracia.forward(prev, y).item();
+			int tamLote = fim - inicio;
+			acertos += accLote * tamLote;
 		}
 		
 		return new Tensor(
-			new double[] { acc / amostras }
+			new double[] { acertos / n }
 		);
 	}
 

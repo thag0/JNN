@@ -89,7 +89,8 @@ public class TreinoLote extends MetodoTreino {
 
 		if (calcHist) {
 			double l = loss.forward(prev, real).item();
-			perdaEpoca.add(l);
+			int n = loteX.length;
+			perdaEpoca.add(l * n);
 		}
 	}
 

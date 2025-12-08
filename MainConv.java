@@ -96,7 +96,6 @@ public class MainConv {
 		// 	new Flatten(),
 		// 	new Densa(20, "tanh"),
 		// 	new Densa(20, "tanh"),
-		// 	new Densa(20, "tanh"),
 		// 	new Densa(10, "sigmoid")
 		// );
 
