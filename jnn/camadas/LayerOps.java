@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
-import java.util.stream.IntStream;
 
 import jnn.core.OpTensor;
 import jnn.core.parallel.PoolFactory;
@@ -286,27 +285,33 @@ public class LayerOps {
 		Tensor[] localK = new Tensor[lotes];
 		Tensor[] localB = gradB.isPresent() ? new Tensor[lotes] : null;
 
-		pool.submit(() -> {
-			IntStream.range(0, lotes).parallel().forEach(i -> {
-				localK[i] = new Tensor(gradK.shape());
+		List<ForkJoinTask<?>> tarefas = new ArrayList<>(lotes);
+
+		for (int i = 0; i < lotes; i++) {
+			final int id = i;
+
+			ForkJoinTask<?> tarefa = pool.submit(() -> {
+				localK[id] = new Tensor(gradK.shape());
 				if (gradB.isPresent()) {
-					localB[i] = new Tensor(gradB.get().shape());
+					localB[id] = new Tensor(gradB.get().shape());
 				}
-				
+	
 				backwardConv2DNormal(
-					entrada.subTensor(i),
+					entrada.subTensor(id),
 					kernel,
-					gradS.subTensor(i),
-					localK[i],
-					Optional.of(localB[i]),
-					gradE.subTensor(i)
+					gradS.subTensor(id),
+					localK[id],
+					Optional.of(localB[id]),
+					gradE.subTensor(id)
 				);
 			});
-		}).join();
 
-		for (Tensor grad : localK) {
-			gradK.add(grad);
+			tarefas.add(tarefa);
 		}
+
+		for (var tarefa : tarefas) tarefa.join();
+
+		for (Tensor grad : localK) gradK.add(grad);
 
 		if (gradB.isPresent()) {
 			Tensor gb = gradB.get();
@@ -314,7 +319,6 @@ public class LayerOps {
 				gb.add(grad);
 			}
 		}
-
 	}
 
 	/**
