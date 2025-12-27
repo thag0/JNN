@@ -204,19 +204,13 @@ public class Treinador implements Cloneable {
 		Double[] hist = metodo.hist();
 		double[] h = new double[hist.length];
 
-		final int threads = PoolFactory.getThreads();
-		PoolFactory.setThreads(Runtime.getRuntime().availableProcessors()/2);
-
-		try (ForkJoinPool exec = PoolFactory.pool()) {
-			for (int i = 0, n = h.length; i < n; i++) {
+		final int t = Runtime.getRuntime().availableProcessors();
+		try (ForkJoinPool pool = PoolFactory.pool(t)) {
+			for (int i = 0; i < h.length; i++) {
 				final int id = i;
-				exec.execute(() -> h[id] = hist[id]);
+				pool.execute(() -> h[id] = hist[id]);
 			}
-		} catch (Exception e) {
-			throw e;
 		}
-
-		PoolFactory.setThreads(threads);
 
 		return h;
 	}

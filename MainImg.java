@@ -1,7 +1,6 @@
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 
 import ged.Dados;
@@ -11,6 +10,7 @@ import geim.imagem.Imagem;
 import jnn.Funcional;
 import jnn.camadas.Densa;
 import jnn.camadas.Entrada;
+import jnn.core.parallel.PoolFactory;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;
@@ -170,21 +170,19 @@ public class MainImg {
 	static void exportarHistorico(Modelo modelo, String caminho) {
 		System.out.println("Exportando histórico de perda");
 		double[] perdas = modelo.hist();
-		double[][] dadosPerdas = new double[perdas.length][1];
+		double[][] valores = new double[perdas.length][1];
 
-		try (ExecutorService exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()/2)) {
-			final int n = dadosPerdas.length;
-			for (int i = 0; i < n; i++) {
+		final int t = Runtime.getRuntime().availableProcessors();
+		try (ForkJoinPool pool = PoolFactory.pool(t)) {
+			for (int i = 0, n = valores.length; i < n; i++) {
 				final int id = i;
-				exec.submit(() -> {
-					dadosPerdas[id][0] = perdas[id];
+				pool.submit(() -> {
+					valores[id][0] = perdas[id];
 				});
 			}
-		} catch (Exception e) {
-			throw e;
 		}
 
-		Dados dados = new Dados(dadosPerdas);
+		Dados dados = new Dados(valores);
 		ged.exportarCsv(dados, caminho);
 	}
 

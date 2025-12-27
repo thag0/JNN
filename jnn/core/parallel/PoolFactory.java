@@ -13,11 +13,20 @@ public class PoolFactory {
     static int numThreads = Runtime.getRuntime().availableProcessors() / 2;
 
     /**
-     * Cria uma nova instância de {@code ForkJoinPool}
+     * Cria uma nova pool de threads utilizando o valor padrão.
      * @return {@code ForkJoinPool}
      */
     public static synchronized ForkJoinPool pool() {
         return new ForkJoinPool(numThreads);
+    }
+
+    /**
+     * Cria uma nova pool de threads utilizando o valor padrão.
+     * @param t número de threads desejadas para pool.
+     * @return {@code ForkJoinPool}
+     */
+    public static synchronized ForkJoinPool pool(int t) {
+        return new ForkJoinPool(t);
     }
 
     /**
