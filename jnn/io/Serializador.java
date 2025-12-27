@@ -94,6 +94,8 @@ public class Serializador extends SerialBase {
 			);
 		}
 
+		modelo.loteZero();
+
 		try (DataOutputStream out = new DataOutputStream(new FileOutputStream(arquivo))) {
 			escrever(out, modelo.numCamadas());
 			escrever(out, modelo.otm().nome());

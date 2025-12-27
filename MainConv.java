@@ -29,7 +29,7 @@ public class MainConv {
 	static Funcional jnn = new Funcional();
 
 	// controle de treino
-	static final int TREINO_EPOCAS = 20;
+	static final int TREINO_EPOCAS = 10;
 	static final int TREINO_LOTE = 64;
 	static final boolean TREINO_LOGS = true;
 
@@ -43,6 +43,7 @@ public class MainConv {
 		ged.limparConsole();
 
 		DataLoader dlTreino = MNIST.treino();
+		dlTreino = new DataLoader(dlTreino.getLote(0, 12_000));
 		dlTreino.transformX(a -> a.div(255));//normalizar entrada entre 0 e 1
 
 		dlTreino.print();
@@ -83,11 +84,10 @@ public class MainConv {
 			new Entrada(1, 28, 28),
 			new Conv2D(20, new int[]{3, 3}, "relu"),
 			new MaxPool2D(new int[]{2, 2}),
-			new Conv2D(28, new int[]{3, 3}, "relu"),
+			new Conv2D(24, new int[]{3, 3}, "relu"),
 			new MaxPool2D(new int[]{2, 2}),
 			new Flatten(),
-			new Densa(80, "tanh"),
-			new Dropout(0.2),
+			new Densa(60, "tanh"),
 			new Densa(10, "softmax")
 		);
 

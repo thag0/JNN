@@ -1,7 +1,10 @@
 package jnn.camadas;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
 import java.util.stream.IntStream;
 
 import jnn.core.OpTensor;
@@ -18,7 +21,7 @@ public class LayerOps {
 	/**
 	 * Operador para paralelização.
 	 */
-	private final ForkJoinPool pool = PoolFactory.pool();
+	private final ForkJoinPool pool = PoolFactory.pool(Runtime.getRuntime().availableProcessors() / 2);
 
     /**
      * Utilitário para operações de forward e backward de camadas.
@@ -151,25 +154,34 @@ public class LayerOps {
 	 */
 	private void forwardConv2DLotes(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
 		int lotes = entrada.tamDim(0);
-		// for (int i = 0; i < lotes; i++) {
-		// 	forwardConv2DNormal(
-		// 		entrada.subTensor(i),
-		// 		kernel,
-		// 		bias,
-		// 		saida.subTensor(i)
-		// 	);
-		// }
 
-		pool.submit(() -> {
-			IntStream.range(0, lotes).parallel().forEach(i -> {
+		Tensor[] saidaLocal = new Tensor[lotes];
+		List<ForkJoinTask<?>> tarefas = new ArrayList<>(lotes);
+
+		for (int i = 0; i < lotes; i++) {
+			final int id = i;
+
+			tarefas.add(pool.submit(() -> {
+				Tensor tmp = new Tensor(saida.subTensor(id).shape());
+
 				forwardConv2DNormal(
-					entrada.subTensor(i),
+					entrada.subTensor(id),
 					kernel,
 					bias,
-					saida.subTensor(i)
+					tmp
 				);
-			});
-		}).join();
+
+				saidaLocal[id] = tmp;
+			}));
+		}
+
+		for (ForkJoinTask<?> t : tarefas) {
+			t.join();
+		}
+
+		for (int i = 0; i < lotes; i++) {
+			saida.subTensor(i).copiar(saidaLocal[i]);
+		}
 	}
 
 	/**
@@ -270,16 +282,6 @@ public class LayerOps {
 	 */
 	private void backwardConv2DLotes(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
 		int lotes = entrada.tamDim(0);
-		// for (int i = 0; i < lotes; i++) {
-		// 	backwardConv2DNormal(
-		// 		entrada.subTensor(i),
-		// 		kernel,
-		// 		gradS.subTensor(i),
-		// 		gradK,
-		// 		gradB,
-		// 		gradE.subTensor(i)
-		// 	);
-		// }
 
 		Tensor[] localK = new Tensor[lotes];
 		Tensor[] localB = gradB.isPresent() ? new Tensor[lotes] : null;

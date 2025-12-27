@@ -542,6 +542,15 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 
 		return grads;
 	}
+
+	/**
+	 * Remove as dimensões de lote das camadas do modelo.
+	 */
+	public void loteZero() {
+		for (Camada camada : this) {
+			camada.ajustarParaLote(0);
+		}
+	}
 	
 	/**
 	 * Retorna um array contendo a saída serializada do modelo.
