@@ -10,7 +10,7 @@ import jnn.camadas.*;
 import jnn.camadas.pooling.MaxPool2D;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
-import jnn.dataloader.dataset.MNIST;
+import jnn.dataloader.dataset.CIFAR10;
 import jnn.io.Serializador;
 import jnn.io.seriais.SerialTensor;
 import jnn.modelos.Modelo;
@@ -29,7 +29,7 @@ public class MainConv {
 	static Funcional jnn = new Funcional();
 
 	// controle de treino
-	static final int TREINO_EPOCAS = 10;
+	static final int TREINO_EPOCAS = 15;
 	static final int TREINO_LOTE = 64;
 	static final boolean TREINO_LOGS = true;
 
@@ -42,9 +42,7 @@ public class MainConv {
 	public static void main(String[] args) {
 		ged.limparConsole();
 
-		DataLoader dlTreino = MNIST.treino();
-		dlTreino = new DataLoader(dlTreino.getLote(0, 12_000));
-		dlTreino.transformX(a -> a.div(255));//normalizar entrada entre 0 e 1
+		DataLoader dlTreino = CIFAR10.treino();
 
 		dlTreino.print();
 
@@ -67,7 +65,7 @@ public class MainConv {
 		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(dlTreino).item() * 100), 4) + "%");
 
 		System.out.println("\nCarregando dados de teste.");
-		DataLoader dlTeste = MNIST.teste();
+		DataLoader dlTeste = CIFAR10.teste();
 		System.out.print("Teste -> perda: " + modelo.avaliar(dlTeste).item() + " - ");
 		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(dlTeste).item() * 100), 4) + "%");
 
@@ -81,13 +79,13 @@ public class MainConv {
 	 */
 	static Sequencial criarModelo() {
 		Sequencial modelo = new Sequencial(
-			new Entrada(1, 28, 28),
-			new Conv2D(20, new int[]{3, 3}, "relu"),
-			new MaxPool2D(new int[]{2, 2}),
+			new Entrada(3, 32, 32),
 			new Conv2D(24, new int[]{3, 3}, "relu"),
 			new MaxPool2D(new int[]{2, 2}),
+			new Conv2D(30, new int[]{3, 3}, "relu"),
+			new MaxPool2D(new int[]{2, 2}),
 			new Flatten(),
-			new Densa(60, "tanh"),
+			new Densa(100, "tanh"),
 			new Densa(10, "softmax")
 		);
 
