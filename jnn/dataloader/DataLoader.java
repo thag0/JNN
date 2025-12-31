@@ -320,7 +320,7 @@ public class DataLoader implements Iterable<Amostra> {
      * @param tam tamanho do subconjunto.
      * @return lote de dados.
      */
-    public Amostra[] getLote(int in, int tam) {
+    public Amostra[] lote(int in, int tam) {
         if (in < 0) {
             throw new IllegalArgumentException(
                 "\nInicio deve ser maior ou igual a zero, mas recebido " + in
@@ -331,6 +331,17 @@ public class DataLoader implements Iterable<Amostra> {
         Amostra[] lote = utils.subArray(dados, in, fim);
 
         return lote;
+    }
+
+    /**
+     * Retorna um novo {@code DataLoader} a partir de um subconjunto
+     * de amostras.
+     * @param in índice inicial.
+     * @param tam tamanho final.
+     * @return {@code DataLoader} com subamostras.
+     */
+    public DataLoader subLoader(int in, int tam) {
+        return new DataLoader(lote(in ,tam));
     }
 
     /**
