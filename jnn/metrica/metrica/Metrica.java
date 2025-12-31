@@ -1,6 +1,5 @@
 package jnn.metrica.metrica;
 
-import jnn.core.Utils;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -10,11 +9,6 @@ import jnn.core.tensor.Tensor;
  * </p>
  */
 abstract class Metrica {
-
-	/**
-	 * Utilitário.
-	 */
-	Utils utils = new Utils();
 
 	/**
 	 * Verifica se os dados previstos e reais possuem a mesma quantidade

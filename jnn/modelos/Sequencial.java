@@ -6,6 +6,7 @@ import java.util.Iterator;
 import jnn.camadas.Camada;
 import jnn.camadas.Entrada;
 import jnn.core.Dicionario;
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 import jnn.metrica.Avaliador;
 import jnn.treino.Treinador;
@@ -191,7 +192,7 @@ public class Sequencial extends Modelo {
 	public Sequencial(Camada... camadas) {
 		this();// evitar repetição de código
 
-		utils.validarNaoNulo(camadas, "Conjunto de camadas nulo.");
+		JNNutils.validarNaoNulo(camadas, "camadas == null.");
 
 		if (camadas.length < 1) {
 			throw new IllegalArgumentException(
@@ -217,7 +218,7 @@ public class Sequencial extends Modelo {
 	 * @throws IllegalArgumentException se a camada fornecida for nula,
 	 */
 	public void add(Camada c) {
-		_camadas = utils.addEmArray(_camadas, c);
+		_camadas = JNNutils.addEmArray(_camadas, c);
 		_compilado = false;
 	}
 
@@ -376,10 +377,10 @@ public class Sequencial extends Modelo {
 			String nomeCamada = camada.id + " - " + camada.nome();
 			
 			//formato de entrada
-			String formEntrada = utils.shapeStr(camada.shapeIn());
+			String formEntrada = JNNutils.shapeStr(camada.shapeIn());
 			
 			//formato de saída
-			String formSaida = utils.shapeStr(camada.shapeOut());
+			String formSaida = JNNutils.shapeStr(camada.shapeOut());
 
 			//função de ativação
 			String ativacao;

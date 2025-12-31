@@ -1,7 +1,7 @@
 package jnn.camadas.atv;
 
 import jnn.camadas.Camada;
-import jnn.core.Utils;
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 
 public class Sigmoid extends Camada implements Cloneable {
@@ -10,7 +10,6 @@ public class Sigmoid extends Camada implements Cloneable {
     Tensor _saida;
     Tensor _gradEntrada;
     Tensor _gradSaida;
-    Utils utils = new Utils();
 
     private int[] shapeEntrada;
 
@@ -22,7 +21,7 @@ public class Sigmoid extends Camada implements Cloneable {
 
     @Override
     public void construir(int[] shape) {
-		utils.validarNaoNulo(shape, "Formato de entrada nulo.");
+		JNNutils.validarNaoNulo(shape, "shape == null.");
 
 		if (shape.length < 1) {
 			throw new IllegalArgumentException(
@@ -30,7 +29,7 @@ public class Sigmoid extends Camada implements Cloneable {
 			);
 		}
 
-		if (!utils.apenasMaiorZero(shape)) {
+		if (!JNNutils.apenasMaiorZero(shape)) {
 			throw new IllegalArgumentException(
 				"\nValores do formato de entrada devem ser maiores que zero."
 			);

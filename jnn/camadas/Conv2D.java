@@ -5,7 +5,7 @@ import java.util.Optional;
 import jnn.acts.Ativacao;
 import jnn.acts.Linear;
 import jnn.core.Dicionario;
-import jnn.core.Utils;
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 import jnn.inicializadores.GlorotUniforme;
 import jnn.inicializadores.Inicializador;
@@ -43,11 +43,6 @@ public class Conv2D extends Camada implements Cloneable {
 	 * Utilitário.
 	 */
 	private LayerOps lops = new LayerOps();
-
-	/**
-	 * Utilitário.
-	 */
-	private Utils utils = new Utils();
 
 	/**
 	 * Formato de entrada da camada convolucional, dado por:
@@ -343,7 +338,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 * @param iniBias inicializador para os bias.
 	 */
 	public Conv2D(int filtros, int[] filtro, Object act, Object iniKernel, Object iniBias) {
-		utils.validarNaoNulo(filtro, "filtro == null.");
+		JNNutils.validarNaoNulo(filtro, "filtro == null.");
 
 		//formado dos filtros
 		int[] f = (int[]) filtro;
@@ -354,7 +349,7 @@ public class Conv2D extends Camada implements Cloneable {
 			);
 		}
 
-		if (!utils.apenasMaiorZero(f)) {
+		if (!JNNutils.apenasMaiorZero(f)) {
 			throw new IllegalArgumentException(
 				"\nOs valores de formato para os filtros devem ser maiores que zero."
 			);      
@@ -468,7 +463,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 */
 	@Override
 	public void construir(int[] shape) {
-		utils.validarNaoNulo(shape, "Formato de entrada nulo.");
+		JNNutils.validarNaoNulo(shape, "shape == null.");
 
 		if (shape.length != 3) {
 			throw new IllegalArgumentException(
@@ -477,7 +472,7 @@ public class Conv2D extends Camada implements Cloneable {
 			);
 		}
 
-		if (!utils.apenasMaiorZero(shape)) {
+		if (!JNNutils.apenasMaiorZero(shape)) {
 			throw new IllegalArgumentException(
 				"\nOs valores de dimensões de entrada para a camada " + nome() + 
 				" devem ser maiores que zero."
@@ -495,10 +490,10 @@ public class Conv2D extends Camada implements Cloneable {
 		if (shapeOut[1] < 1 || shapeOut[2] < 1) {
 			throw new IllegalArgumentException(
 				"\nCamada não pode ser construida:" +
-				"\nFormato de entrada " + utils.shapeStr(shape) +
+				"\nFormato de entrada " + JNNutils.shapeStr(shape) +
 				" e formato dos filtros " + 
-				utils.shapeStr(new int[]{shapeOut[0], shapeFiltro[0], shapeFiltro[1]}) +
-				" resultam num formato de saída inválido " + utils.shapeStr(shapeOut)
+				JNNutils.shapeStr(new int[]{shapeOut[0], shapeFiltro[0], shapeFiltro[1]}) +
+				" resultam num formato de saída inválido " + JNNutils.shapeStr(shapeOut)
 			);
 		}
 
@@ -721,9 +716,9 @@ public class Conv2D extends Camada implements Cloneable {
 		sb.append(nome() + " (id " + id + ") = [\n");
 
 		sb.append(pad).append("Ativação: " + ativacao.nome() + "\n");
-		sb.append(pad).append("Entrada: " + utils.shapeStr(shapeIn) + "\n");
+		sb.append(pad).append("Entrada: " + JNNutils.shapeStr(shapeIn) + "\n");
 		sb.append(pad).append("Filtros: " + numFiltros() + "\n");
-		sb.append(pad).append("Saida: " + utils.shapeStr(shapeOut) + "\n");
+		sb.append(pad).append("Saida: " + JNNutils.shapeStr(shapeOut) + "\n");
 		sb.append("\n");
 
 		sb.append(pad + "Kernel: " + _kernel.shapeStr() + "\n");

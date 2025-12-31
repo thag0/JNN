@@ -1,6 +1,6 @@
 package jnn.metrica;
 
-import jnn.core.Utils;
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.metrica.metrica.*;
@@ -16,11 +16,6 @@ public class Avaliador {
 	 * Modelo base de avaliação.
 	 */
 	private Modelo modelo;
-
-	/**
-	 * Utilitário.
-	 */
-	private Utils utils = new Utils();
 
 	MSE mse = new MSE();
 	MAE mae = new MAE();
@@ -65,8 +60,8 @@ public class Avaliador {
 	 */
 	public Tensor mse(Tensor[] prev, Tensor[] real) {
 		return mse(
-			utils.concatenar(prev),
-			utils.concatenar(real)
+			JNNutils.concatenar(prev),
+			JNNutils.concatenar(real)
 		);
 	}
 
@@ -90,8 +85,8 @@ public class Avaliador {
 	 */
 	public Tensor msle(Tensor[] prev, Tensor[] real) {
 		return msle(
-			utils.concatenar(prev),
-			utils.concatenar(real)
+			JNNutils.concatenar(prev),
+			JNNutils.concatenar(real)
 		);
 	}
 
@@ -113,8 +108,8 @@ public class Avaliador {
 	 */
 	public Tensor mae(Tensor[] prev, Tensor[] real) {
 		return mae(
-			utils.concatenar(prev),
-			utils.concatenar(real)
+			JNNutils.concatenar(prev),
+			JNNutils.concatenar(real)
 		);
 	}
 
@@ -136,8 +131,8 @@ public class Avaliador {
 	 */
 	public Tensor rmse(Tensor[] prev, Tensor[] real) {
 		return rmse(
-			utils.concatenar(prev),
-			utils.concatenar(real)
+			JNNutils.concatenar(prev),
+			JNNutils.concatenar(real)
 		);
 	}
 
@@ -161,8 +156,8 @@ public class Avaliador {
 	 */
 	public Tensor crossEntropy(Tensor[] prev, Tensor[] real) {  
 		return crossEntropy(
-			utils.concatenar(prev),
-			utils.concatenar(real)
+			JNNutils.concatenar(prev),
+			JNNutils.concatenar(real)
 		);
 	}
 
@@ -186,8 +181,8 @@ public class Avaliador {
 	 */
 	public Tensor binaryCrossEntropy(Tensor[] prev, Tensor[] real) {
 		return binaryCrossEntropy(
-			utils.concatenar(prev),
-			utils.concatenar(real)
+			JNNutils.concatenar(prev),
+			JNNutils.concatenar(real)
 		);
 	}
 
@@ -205,8 +200,8 @@ public class Avaliador {
 		for (int i = 0; i < n; i += batch) {
 			int inicio = i;
 			int fim = Math.min(inicio + batch, n);
-			Tensor[] x = utils.subArray(xs, inicio, fim);
-			Tensor[] y = utils.subArray(ys, inicio, fim);
+			Tensor[] x = JNNutils.subArray(xs, inicio, fim);
+			Tensor[] y = JNNutils.subArray(ys, inicio, fim);
 			Tensor[] prev = modelo.forward(x);
 			
 			double accLote = acuracia.forward(prev, y).item();

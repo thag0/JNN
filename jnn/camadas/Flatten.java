@@ -1,6 +1,6 @@
 package jnn.camadas;
 
-import jnn.core.Utils;
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -15,11 +15,6 @@ import jnn.core.tensor.Tensor;
  * </p>
  */
 public class Flatten extends Camada implements Cloneable {
-
-	/**
-	 * Utilitário.
-	 */
-	private Utils utils = new Utils();
 
 	/**
 	 * Array contendo o formato de entrada da camada, de acordo com o formato:
@@ -122,9 +117,9 @@ public class Flatten extends Camada implements Cloneable {
 	 */
 	@Override
 	public void construir(int[] shape) {
-		utils.validarNaoNulo(shape, "shape == null.");
+		JNNutils.validarNaoNulo(shape, "shape == null.");
 
-		if (!utils.apenasMaiorZero(shape)) {
+		if (!JNNutils.apenasMaiorZero(shape)) {
 			throw new IllegalArgumentException(
 				"\nOs valores do formato de entrada devem ser maiores que zero."
 			);
@@ -281,7 +276,7 @@ public class Flatten extends Camada implements Cloneable {
 		
 		sb.append(nome() + " (id " + id + ") = [\n");
 
-		sb.append(pad).append("Entrada: " + utils.shapeStr(shapeIn) + "\n");
+		sb.append(pad).append("Entrada: " + JNNutils.shapeStr(shapeIn) + "\n");
 		sb.append(pad).append("Saída: (1, " + tamSaida() + ")\n");
 
 		sb.append("]\n");

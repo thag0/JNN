@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
 
-import jnn.core.Utils;
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.transform.Transform;
 
@@ -29,11 +29,6 @@ public class DataLoader implements Iterable<Amostra> {
      * Conjunto de elementos.
      */
     Amostra[] dados = {};
-
-    /**
-     * Utilitário.
-     */
-    Utils utils = new Utils();
 
     /**
      * Inicializa um DataLoader vazio.
@@ -99,14 +94,14 @@ public class DataLoader implements Iterable<Amostra> {
             int[] shapeX = a.x().shape();
             int[] shapeY = a.y().shape();
 
-            if (!utils.compArray(shapeX, dados[0].x().shape())) {
+            if (!JNNutils.compArray(shapeX, dados[0].x().shape())) {
                 throw new IllegalArgumentException(
                     "\nFormato de X da amostra " + a.x().shapeStr() + 
                     " deve ser igual ao das amostras de X do DataLoader " + 
                     dados[0].x().shapeStr() 
                 );
             }
-            if (!utils.compArray(shapeY, dados[0].y().shape())) {
+            if (!JNNutils.compArray(shapeY, dados[0].y().shape())) {
                 throw new IllegalArgumentException(
                     "\nFormato de Y da amostra " + a.y().shapeStr() + 
                     " deve ser igual ao das amostras de Y do DataLoader " + 
@@ -115,7 +110,7 @@ public class DataLoader implements Iterable<Amostra> {
             }
         }
 
-        dados = utils.addEmArray(dados, a);
+        dados = JNNutils.addEmArray(dados, a);
     }
 
     /**
@@ -130,19 +125,19 @@ public class DataLoader implements Iterable<Amostra> {
 
     /**
      * Embaralha os dados do DataLoader usando o algoritmo Fisher-Yates
-     * @see {@link jnn.core.Utils} 
+     * @see {@link jnn.core.JNNutils} 
      */
     public void embaralhar() {
-        utils.embaralhar(dados, null);
+        JNNutils.embaralhar(dados, null);
     }
 
     /**
      * Embaralha os dados do DataLoader usando o algoritmo Fisher-Yates.
      * @param rng gerador de números aleatórios desejado.
-     * @see {@link jnn.core.Utils} 
+     * @see {@link jnn.core.JNNutils} 
      */
     public void embaralhar(Random rng) {
-        utils.embaralhar(dados, rng);
+        JNNutils.embaralhar(dados, rng);
     }
 
     /**
@@ -277,8 +272,8 @@ public class DataLoader implements Iterable<Amostra> {
         int tam = tam();
         int n1 = (int) (tam * p1);
     
-        DataLoader dl1 = new DataLoader(utils.subArray(dados, 0, n1));
-        DataLoader dl2 = new DataLoader(utils.subArray(dados, n1, tam));
+        DataLoader dl1 = new DataLoader(JNNutils.subArray(dados, 0, n1));
+        DataLoader dl2 = new DataLoader(JNNutils.subArray(dados, n1, tam));
 
         return new DataLoader[] {
             dl1, dl2
@@ -328,7 +323,7 @@ public class DataLoader implements Iterable<Amostra> {
         }
 
         int fim = Math.min(in + tam, tam());
-        Amostra[] lote = utils.subArray(dados, in, fim);
+        Amostra[] lote = JNNutils.subArray(dados, in, fim);
 
         return lote;
     }

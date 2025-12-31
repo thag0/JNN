@@ -3,7 +3,7 @@ package jnn.treino;
 import java.util.LinkedList;
 import java.util.Random;
 
-import jnn.core.Utils;
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 import jnn.metrica.perda.Perda;
 import jnn.modelos.Modelo;
@@ -25,11 +25,6 @@ public abstract class MetodoTreino {
 	 * Gerador de números pseudo-aleatórios.
 	 */
 	protected Random random;
-
-	/**
-	 * Utilitário.
-	 */
-	protected Utils utils = new Utils();
 
 	/**
 	 * Quantidade de threads usadas pelo treinador.
@@ -101,7 +96,7 @@ public abstract class MetodoTreino {
 	 * @param ys {@code array} com dados de saída.
 	 */
 	protected <T> void embaralhar(T[] xs, T[] ys) {
-		utils.embaralhar(xs, ys, random);
+		JNNutils.embaralhar(xs, ys, random);
 	}
 
 	/** 

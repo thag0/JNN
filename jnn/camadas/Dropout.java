@@ -2,7 +2,7 @@ package jnn.camadas;
 
 import java.util.Random;
 
-import jnn.core.Utils;
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -85,11 +85,6 @@ public class Dropout extends Camada implements Cloneable {
 	private Random random = new Random();
 
 	/**
-	 * Utilitário.
-	 */
-	private Utils utils = new Utils();
-
-	/**
 	 * Instancia uma nova camada de dropout, definindo a taxa
 	 * de abandono que será usada durante o processo de treinamento.
 	 * @param entrada formato de entrada da camada.
@@ -135,7 +130,7 @@ public class Dropout extends Camada implements Cloneable {
 
 	@Override
 	public void construir(int[] shape) {
-		utils.validarNaoNulo(shape, "Formato de entrada nulo.");
+		JNNutils.validarNaoNulo(shape, "shape == null.");
 
 		if (shape.length < 1) {
 			throw new IllegalArgumentException(
@@ -143,7 +138,7 @@ public class Dropout extends Camada implements Cloneable {
 			);
 		}
 
-		if (!utils.apenasMaiorZero(shape)) {
+		if (!JNNutils.apenasMaiorZero(shape)) {
 			throw new IllegalArgumentException(
 				"\nValores do formato de entrada devem ser maiores que zero."
 			);
@@ -344,8 +339,8 @@ public class Dropout extends Camada implements Cloneable {
 		sb.append(nome() + " (id " + this.id + ") = [\n");
 
 		sb.append(pad).append("Taxa: " + taxa() + "\n");
-		sb.append(pad).append("Entrada: " + utils.shapeStr(shapeIn) + "\n");
-		sb.append(pad).append("Saída: " + utils.shapeStr(shapeIn) + "\n");
+		sb.append(pad).append("Entrada: " + JNNutils.shapeStr(shapeIn) + "\n");
+		sb.append(pad).append("Saída: " + JNNutils.shapeStr(shapeIn) + "\n");
 
 		sb.append("]\n");
 

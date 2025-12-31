@@ -1,7 +1,7 @@
 package jnn.modelos;
 
 import jnn.camadas.Camada;
-import jnn.core.Utils;
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.metrica.Avaliador;
@@ -73,7 +73,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	/**
 	 * Utilitário.
 	 */
-	protected Utils utils;
+	protected JNNutils utils;
 	
 	/**
 	 * Auxiliar de verificação da alteração do método de treino.
@@ -86,7 +86,6 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	protected Modelo() {
 		_treinador = new Treinador(this);
 		_avaliador = new Avaliador(this);
-		utils = new Utils();
 	}
 
 	/**
@@ -118,7 +117,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * @param seed nova seed.
 	 */
 	public void setSeed(Number seed) {
-		utils.validarNaoNulo(seed, "Seed nula.");
+		JNNutils.validarNaoNulo(seed, "seed == null.");
 		seedInicial = seed.longValue();
 	}
 
@@ -147,7 +146,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * @param loss nova função de perda.
 	 */
 	public void setPerda(Perda loss) {
-		utils.validarNaoNulo(loss, "loss == null.");
+		JNNutils.validarNaoNulo(loss, "loss == null.");
 		_perda = loss;
 	}
 
@@ -163,7 +162,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * @param otm novo otimizador.
 	 */
 	public void setOtimizador(Otimizador otm) {
-		utils.validarNaoNulo(otm, "otm == null.");
+		JNNutils.validarNaoNulo(otm, "otm == null.");
 		_otimizador = otm;
 	}
 
@@ -172,7 +171,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * @param t {@code Treinador} novo.
 	 */
 	public void setTreinador(Treinador t) {
-		utils.validarNaoNulo(t, "t == null.");
+		JNNutils.validarNaoNulo(t, "t == null.");
 		_treinador = t;
 		configTreino = true;
 	}
@@ -238,9 +237,9 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	public Tensor[] forward(Tensor[] xs) {
 		validarCompilacao();
 
-		utils.validarNaoNulo(xs, "xs == null.");
+		JNNutils.validarNaoNulo(xs, "xs == null.");
 		
-		Tensor y = forward(utils.concatenar(xs));
+		Tensor y = forward(JNNutils.concatenar(xs));
 		
 		Tensor[] prevs = new Tensor[xs.length];
 		for (int i = 0; i < xs.length; i++) {
@@ -276,8 +275,8 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * @param ys array contendos dados de saída.
 	 */
 	private <T> void validarDados(T[] xs, T[] ys) {
-		utils.validarNaoNulo(xs, "xs == null.");
-		utils.validarNaoNulo(ys, "ys == null.");
+		JNNutils.validarNaoNulo(xs, "xs == null.");
+		JNNutils.validarNaoNulo(ys, "ys == null.");
  
 		if (xs.length != ys.length) {
 			throw new IllegalArgumentException(
@@ -399,8 +398,8 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 		for (int i = 0; i < n; i += batch) {
 			int inicio = i;
 			int fim = Math.min(inicio + batch, n);
-			Tensor x = utils.concatenar(utils.subArray(xs, inicio, fim));
-			Tensor y = utils.concatenar(utils.subArray(ys, inicio, fim));
+			Tensor x = JNNutils.concatenar(JNNutils.subArray(xs, inicio, fim));
+			Tensor y = JNNutils.concatenar(JNNutils.subArray(ys, inicio, fim));
 			
 			Tensor prev = forward(x);
 
@@ -507,9 +506,9 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 
 		for (Camada camada : this) {
 			if (camada.treinavel()) {
-				params = utils.addEmArray(params, camada.kernel());
+				params = JNNutils.addEmArray(params, camada.kernel());
 				if (camada.temBias()) {
-					params = utils.addEmArray(params, camada.bias());
+					params = JNNutils.addEmArray(params, camada.bias());
 				}
 			}
 		}
@@ -533,9 +532,9 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 
 		for (Camada camada : this) {
 			if (camada.treinavel()) {
-				grads = utils.addEmArray(grads, camada.gradKernel());
+				grads = JNNutils.addEmArray(grads, camada.gradKernel());
 				if (camada.temBias()) {
-					grads = utils.addEmArray(grads, camada.gradBias());
+					grads = JNNutils.addEmArray(grads, camada.gradBias());
 				}
 			}
 		}
@@ -563,7 +562,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * @param arr array para cópia.
 	 */
 	public void copiarDaSaida(double[] arr) {
-		utils.validarNaoNulo(arr, "arr == null.");
+		JNNutils.validarNaoNulo(arr, "arr == null.");
 		
 		double[] saida = saidaParaArray();
 		

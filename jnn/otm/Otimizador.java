@@ -1,6 +1,6 @@
 package jnn.otm;
 
-import jnn.core.Utils;
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -24,11 +24,6 @@ public abstract class Otimizador {
 	 * Conjunto de gradientes dos parâmetros.
 	 */
 	protected Tensor[] _grads = {};
-
-	/**
-	 * Utilitário.
-	 */
-	protected Utils utils = new Utils();
 
 	/**
 	 * Buffer de informações sobre o otimizador.
@@ -81,11 +76,11 @@ public abstract class Otimizador {
 		}
 
 		for (Tensor p : params) {
-			_params = utils.addEmArray(_params, p);	
+			_params = JNNutils.addEmArray(_params, p);	
 		}
 
 		for (Tensor g : grads) {
-			_grads = utils.addEmArray(_grads, g);
+			_grads = JNNutils.addEmArray(_grads, g);
 		}
 	}
 

@@ -1,5 +1,6 @@
 package jnn.otm;
 
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 import jnn.core.tensor.TensorData;
 
@@ -160,10 +161,10 @@ public class Nadam extends Otimizador {
 		for (Tensor param : _params) {
 			int[] shape = param.shape();
 
-			m  = utils.addEmArray(m,  new Tensor(shape));
-			v  = utils.addEmArray(v,  new Tensor(shape));
-			mc = utils.addEmArray(mc, new Tensor(shape));
-			vc = utils.addEmArray(vc, new Tensor(shape));
+			m  = JNNutils.addEmArray(m,  new Tensor(shape));
+			v  = JNNutils.addEmArray(v,  new Tensor(shape));
+			mc = JNNutils.addEmArray(mc, new Tensor(shape));
+			vc = JNNutils.addEmArray(vc, new Tensor(shape));
 		}
 
 		_construido = true;// otimizador pode ser usado

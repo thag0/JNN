@@ -9,19 +9,19 @@ import jnn.core.tensor.TensorConverter;
 /**
  * Utilitário geral para a biblioteca.
  */
-public class Utils {
+public final class JNNutils {
 
 	/**
 	 * Utilitário geral para a biblioteca.
 	 */
-	public Utils() {}
+	private JNNutils() {}
 
 	/**
 	 * Retorna o último índice válido do array.
 	 * @param arr array base.
 	 * @return último índice.
 	 */
-	public int ultimoIndice(Object arr) {
+	public static int ultimoIndice(Object arr) {
 		if (arr instanceof int[]) {
 			int[] a = (int[]) arr;
 
@@ -42,7 +42,7 @@ public class Utils {
 	 * @param arr array base.
 	 * @return resultado da verificação.
 	 */
-	public boolean apenasMaiorZero(int[] arr) {
+	public static boolean apenasMaiorZero(int[] arr) {
 		for (int i = 0; i < arr.length; i++) {
 			if (arr[i] < 1) return false;
 		}
@@ -56,7 +56,7 @@ public class Utils {
 	 * @param b {@code array} 2.
 	 * @return {@code true} se os arrays são igual, {@code false} caso contrário.
 	 */
-	public boolean compArray(int[] a, int[] b) {
+	public static boolean compArray(int[] a, int[] b) {
 		if (a.length != b.length) return false;
 
 		int n = a.length;
@@ -79,7 +79,7 @@ public class Utils {
 	 * @param arr array desejado.
 	 * @return formato das dimensões do array
 	 */
-	public String shapeStr(int[] arr) {
+	public static String shapeStr(int[] arr) {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("(");
@@ -100,7 +100,7 @@ public class Utils {
 	 * @param array array desejado.
 	 * @return array de {@code Tensores}.
 	 */
-	public Tensor[] arrayParaTensores(double[] array) {
+	public static Tensor[] arrayParaTensores(double[] array) {
 		int n = array.length;
 
 		Tensor[] arr = new Tensor[n];
@@ -118,7 +118,7 @@ public class Utils {
 	 * @param array array desejado.
 	 * @return array de {@code Tensores}.
 	 */
-	public Tensor[] arrayParaTensores(double[][] array) {
+	public static Tensor[] arrayParaTensores(double[][] array) {
 		int lin = array.length;
 		int col = array[0].length;
 
@@ -138,7 +138,7 @@ public class Utils {
 	 * @param array array desejado.
 	 * @return array de {@code Tensores}.
 	 */
-	public Tensor[] arrayParaTensores(double[][][] array) {
+	public static Tensor[] arrayParaTensores(double[][][] array) {
 		Tensor[] arr = new Tensor[array.length];
 
 		int n = array.length;
@@ -156,7 +156,7 @@ public class Utils {
 	 * @param array array desejado.
 	 * @return array de {@code Tensores}.
 	 */
-	public Tensor[] arrayParaTensores(double[][][][] array) {
+	public static Tensor[] arrayParaTensores(double[][][][] array) {
 		Tensor[] arr = new Tensor[array.length];
 
 		int n = array.length;
@@ -174,7 +174,7 @@ public class Utils {
 	 * @param msg mensagem personalizada de erro.
 	 * @throws NullPointerException caso o objeto seja nulo.
 	 */
-	public void validarNaoNulo(Object obj, String msg) {
+	public static void validarNaoNulo(Object obj, String msg) {
 		if (obj == null) {
 			String str;
 
@@ -197,7 +197,7 @@ public class Utils {
 	 * @param elm elemento para adição.
 	 * @return novo array com elemento adicionado.
 	 */
-	public <T> T[] addEmArray(T[] arr, T elm) {
+	public static <T> T[] addEmArray(T[] arr, T elm) {
 		validarNaoNulo(arr, "Array nulo");
 		validarNaoNulo(elm, "elemento nulo");
 		
@@ -218,7 +218,7 @@ public class Utils {
 	 * @param fim índice final (exclusivo).
 	 * @return sub conjunto dos dados fornecidos.
 	 */
-    public <T> T[] subArray(T[] arr, int inicio, int fim) {
+    public static <T> T[] subArray(T[] arr, int inicio, int fim) {
         if (inicio < 0 || fim > arr.length || inicio >= fim) {
             throw new IllegalArgumentException(
 				"\nÍndices de início ou fim inválidos, (i = " + inicio + ", f = " + fim + ")."
@@ -239,7 +239,7 @@ public class Utils {
 	 * @param ts array de {@code Tensor}.
 	 * @return {@code Tensor} concatenado.
 	 */
-	public Tensor concatenar(Tensor[] ts) {
+	public static Tensor concatenar(Tensor[] ts) {
 		int batch = ts.length;
 
 		int[] shape = ts[0].shape();
@@ -263,7 +263,7 @@ public class Utils {
 	 * @param arr {@code array} base.
 	 * @param rng gerador de números aleatórios base.
 	 */
-	public <T> void embaralhar(T[] arr, Random rng) {
+	public static <T> void embaralhar(T[] arr, Random rng) {
 		int n = arr.length;
 		Random r = rng == null ? new Random() : rng;
 		
@@ -284,7 +284,7 @@ public class Utils {
 	 * @param arr2 {@code array} 2.
 	 * @param rng gerador de números aleatórios base.
 	 */
-	public <T> void embaralhar(T[] arr1, T[] arr2, Random rng) {
+	public static <T> void embaralhar(T[] arr1, T[] arr2, Random rng) {
 		int n = arr1.length;
 		Random r = rng == null ? new Random() : rng;
 		
@@ -308,7 +308,7 @@ public class Utils {
 	 * @param obj objeto desejado.
 	 * @return {@code Tensor} com base nos dados do objeto.
 	 */
-	public Tensor paraTensor(Object obj) {
+	public static Tensor paraTensor(Object obj) {
 		return TensorConverter.tensor(obj);
 	}
 

@@ -5,7 +5,7 @@ import java.util.Optional;
 import jnn.acts.Ativacao;
 import jnn.acts.Linear;
 import jnn.core.Dicionario;
-import jnn.core.Utils;
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 import jnn.inicializadores.GlorotUniforme;
 import jnn.inicializadores.Inicializador;
@@ -41,11 +41,6 @@ public class Densa extends Camada implements Cloneable {
 	 * Utilitário.
 	 */
 	private LayerOps lops = new LayerOps();
-
-	/**
-	 * Utilitário.
-	 */
-	private Utils utils = new Utils();
 
 	/**
 	 * Variável controlador para o tamanho de entrada da camada densa.
@@ -306,7 +301,7 @@ public class Densa extends Camada implements Cloneable {
 	 */
 	@Override
 	public void construir(int[] shape) {
-		utils.validarNaoNulo(shape, "Formato de entrada nulo.");
+		JNNutils.validarNaoNulo(shape, "shape == null.");
 
 		if (shape.length != 1) {
 			throw new IllegalArgumentException(

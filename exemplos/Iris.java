@@ -8,7 +8,6 @@ import jnn.Funcional;
 import jnn.camadas.Densa;
 import jnn.camadas.Dropout;
 import jnn.camadas.Entrada;
-import jnn.core.Utils;
 
 import jnn.dataloader.DataLoader;
 
@@ -25,11 +24,6 @@ public class Iris {
 	 * Gerenciador de dados.
 	 */
 	static Ged ged = new Ged();
-	
-	/**
-	 * Utilitário.
-	 */
-	static Utils utils = new Utils();
 	
 	/**
 	 * Interface funcional.

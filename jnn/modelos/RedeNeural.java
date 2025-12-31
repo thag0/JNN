@@ -6,6 +6,7 @@ import jnn.acts.Ativacao;
 import jnn.camadas.Camada;
 import jnn.camadas.Densa;
 import jnn.core.Dicionario;
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 import jnn.metrica.Avaliador;
 import jnn.metrica.perda.MSE;
@@ -113,7 +114,7 @@ public class RedeNeural extends Modelo {
 	 * @throws IllegalArgumentException se os valores fornecidos forem menores que um.
 	 */
 	public RedeNeural(int... arq) {
-		utils.validarNaoNulo(arq, "A arquitetura fornecida não deve ser nula.");
+		JNNutils.validarNaoNulo(arq, "arq == null.");
 
 		if (arq.length < 2) {
 			throw new IllegalArgumentException(
@@ -235,33 +236,15 @@ public class RedeNeural extends Modelo {
 	 *    Letras maiúsculas e minúsculas não serão diferenciadas.
 	 * </p>
 	 * <p>
-	 *    Segue a lista das funções de ativação disponíveis:
-	 * </p>
-	 * <ul>
-	 *    <li> ReLU. </li>
-	 *    <li> Sigmoid. </li>
-	 *    <li> TanH. </li>
-	 *    <li> Leaky ReLU. </li>
-	 *    <li> ELU .</li>
-	 *    <li> Swish. </li>
-	 *    <li> GELU. </li>
-	 *    <li> Linear. </li>
-	 *    <li> Seno. </li>
-	 *    <li> Argmax. </li>
-	 *    <li> Softmax. </li>
-	 *    <li> Softplus. </li>
-	 *    <li> ArcTan. </li>
-	 * </ul>
-	 * <p>
 	 *    {@code A função de ativação padrão é a Linear para todas as camadas}
 	 * </p>
 	 * @param camada camada que será configurada.
-	 * @param ativacao instância da função de ativação.
+	 * @param act instância da função de ativação.
 	 * @throws IllegalArgumentException se o modelo não foi compilado previamente.
 	 */
-	public void configurarAtivacao(Densa camada, Ativacao ativacao) {
-		utils.validarNaoNulo(camada, "A camada não pode ser nula.");
-		camada.setAtivacao(ativacao);
+	public void configurarAtivacao(Densa camada, Ativacao act) {
+		JNNutils.validarNaoNulo(camada, "camada == null");
+		camada.setAtivacao(act);
 	}
 
 	/**
@@ -271,33 +254,15 @@ public class RedeNeural extends Modelo {
 	 *    Letras maiúsculas e minúsculas não serão diferenciadas.
 	 * </p>
 	 * <p>
-	 *    Segue a lista das funções de ativação disponíveis:
-	 * </p>
-	 * <ul>
-	 *    <li> ReLU. </li>
-	 *    <li> Sigmoid. </li>
-	 *    <li> TanH. </li>
-	 *    <li> Leaky ReLU. </li>
-	 *    <li> ELU .</li>
-	 *    <li> Swish. </li>
-	 *    <li> GELU. </li>
-	 *    <li> Linear. </li>
-	 *    <li> Seno. </li>
-	 *    <li> Argmax. </li>
-	 *    <li> Softmax. </li>
-	 *    <li> Softplus. </li>
-	 *    <li> ArcTan. </li>
-	 * </ul>
-	 * <p>
 	 *    {@code A função de ativação padrão é a Linear para todas as camadas}
 	 * </p>
 	 * @param camada camada que será configurada.
-	 * @param ativacao nome da função de ativação.
+	 * @param act nome da função de ativação.
 	 * @throws IllegalArgumentException se o modelo não foi compilado previamente.
 	 */
-	public void configurarAtivacao(Densa camada, String ativacao) {
-		utils.validarNaoNulo(camada, "A camada não pode ser nula.");
-		camada.setAtivacao(ativacao);
+	public void configurarAtivacao(Densa camada, String act) {
+		JNNutils.validarNaoNulo(camada, "camada == null.");
+		camada.setAtivacao(act);
 	}
 
 	/**
@@ -350,15 +315,15 @@ public class RedeNeural extends Modelo {
 	 * <p>
 	 *    Valor de otimizador configurado previamente é mantido.
 	 * </p>
-	 * @param perda função de perda da Rede Neural usada durante o treinamento.
+	 * @param loss função de perda da Rede Neural usada durante o treinamento.
 	 * @throws IllegalArgumentException se a função de perda for nula.
 	 */
-	public void compilar(Perda perda) {
-		utils.validarNaoNulo(perda, "A função de perda não pode ser nula.");
+	public void compilar(Perda loss) {
+		JNNutils.validarNaoNulo(loss, "loss == null.");
 
 		//usando valores de configuração prévia, se forem criados
 		Otimizador o = (_otimizador == null) ? new SGD() : _otimizador;
-		compilar(o, perda);
+		compilar(o, loss);
 	}
 
 	/**
@@ -381,15 +346,15 @@ public class RedeNeural extends Modelo {
 	 * <p>
 	 *    Valor de função de perda configurada previamente é mantido.
 	 * </p>
-	 * @param otimizador otimizador que será usando para o treino da Rede Neural.
+	 * @param otm otimizador que será usando para o treino da Rede Neural.
 	 * @throws IllegalArgumentException se o otimizador ou inicializador forem nulos.
 	 */
-	public void compilar(Otimizador otimizador) {
-		utils.validarNaoNulo(otimizador, "O otimizador fornecido não pode ser nulo.");
+	public void compilar(Otimizador otm) {
+		JNNutils.validarNaoNulo(otm, "otm == null.");
 
 		//usando valores de configuração prévia, se forem criados.
 		Perda p = (_perda == null) ? new MSE() : _perda;
-		compilar(otimizador, p);
+		compilar(otm, p);
 	}
 
 	@Override

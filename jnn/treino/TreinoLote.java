@@ -2,7 +2,7 @@ package jnn.treino;
 
 import java.util.concurrent.atomic.DoubleAdder;
 
-import jnn.core.Utils;
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 import jnn.metrica.perda.Perda;
 import jnn.modelos.Modelo;
@@ -12,11 +12,6 @@ import jnn.otm.Otimizador;
   * Implementação de treino em lote dos modelos.
  */
 public class TreinoLote extends MetodoTreino {
-	
-	/**
-	 * Utilitário.
-	 */
-	Utils utils = new Utils();
 
 	/**
 	 * Tamanho do lote de amostras por iteração
@@ -47,8 +42,8 @@ public class TreinoLote extends MetodoTreino {
 
 			for (int i = 0; i < amostras; i += tamLote) {
 				int idFim = Math.min(i + tamLote, amostras);
-				Tensor[] loteX = utils.subArray(x, i, idFim);
-				Tensor[] loteY = utils.subArray(y, i, idFim);
+				Tensor[] loteX = JNNutils.subArray(x, i, idFim);
+				Tensor[] loteY = JNNutils.subArray(y, i, idFim);
 
                 modelo.gradZero();
 				processoLote(loteX, loteY, loss, perdaEpoca);
@@ -80,9 +75,9 @@ public class TreinoLote extends MetodoTreino {
 	 * @param perdaEpoca valor de perda por época de treinamento.
 	 */
 	private void processoLote(Tensor[] loteX, Tensor[] loteY, Perda loss, DoubleAdder perdaEpoca) {
-		Tensor real = utils.concatenar(loteY);
+		Tensor real = JNNutils.concatenar(loteY);
 
-		Tensor prev = modelo.forward(utils.concatenar(loteX));
+		Tensor prev = modelo.forward(JNNutils.concatenar(loteX));
 		Tensor g = loss.backward(prev, real);
 		
 		modelo.backward(g);

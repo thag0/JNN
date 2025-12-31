@@ -1,5 +1,6 @@
 package jnn.otm;
 
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 import jnn.core.tensor.TensorData;
 
@@ -196,15 +197,15 @@ public class Adam extends Otimizador {
 		initParams(params, grads);
 
 		for (Tensor param : _params) {
-			m = utils.addEmArray(m, new Tensor(param.shape()));
-			v = utils.addEmArray(v, new Tensor(param.shape()));
-			mc = utils.addEmArray(mc, new Tensor(param.shape()));
-			vc = utils.addEmArray(vc, new Tensor(param.shape()));
+			m = JNNutils.addEmArray(m, new Tensor(param.shape()));
+			v = JNNutils.addEmArray(v, new Tensor(param.shape()));
+			mc = JNNutils.addEmArray(mc, new Tensor(param.shape()));
+			vc = JNNutils.addEmArray(vc, new Tensor(param.shape()));
 		}
 
 		if (amsgrad) {
 			for (Tensor param : _params) {
-				ams = utils.addEmArray(ams, new Tensor(param.shape()));
+				ams = JNNutils.addEmArray(ams, new Tensor(param.shape()));
 			}
 		}
 		

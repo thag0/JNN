@@ -1,6 +1,6 @@
 package jnn.camadas;
 
-import jnn.core.Utils;
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -30,11 +30,6 @@ import jnn.core.tensor.Tensor;
 public class Entrada extends Camada {
 
 	/**
-	 * Utilitário.
-	 */
-	private Utils utils = new Utils();
-
-	/**
 	 * Formato usado para entrada de um modelo.
 	 */
 	private int[] shape;
@@ -45,7 +40,7 @@ public class Entrada extends Camada {
 	 * @param shape formato de entrada usado para o modelo em que a camada estiver.
 	 */
 	public Entrada(int... shape) {
-		utils.validarNaoNulo(shape, "Formato recebido é nulo.");
+		JNNutils.validarNaoNulo(shape, "Formato recebido é nulo.");
 
 		if (shape.length < 1) {
 			throw new UnsupportedOperationException(
@@ -53,7 +48,7 @@ public class Entrada extends Camada {
 			);
 		}
 
-		if (!utils.apenasMaiorZero(shape)) {
+		if (!JNNutils.apenasMaiorZero(shape)) {
 			throw new IllegalArgumentException(
 				"\nOs elementos do formato devem ser maiores que zero."
 			);

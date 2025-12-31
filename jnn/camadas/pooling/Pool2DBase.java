@@ -2,7 +2,7 @@ package jnn.camadas.pooling;
 
 import jnn.camadas.Camada;
 import jnn.camadas.LayerOps;
-import jnn.core.Utils;
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -15,11 +15,6 @@ public abstract class Pool2DBase extends Camada {
 	 * Utilitário.
 	 */
 	LayerOps lops = new LayerOps();
-
-	/**
-	 * Utilitario.
-	 */
-	Utils utils = new Utils();
 
     /**
      * Formato de entrada da camada em {@code (canais, altura, largura)}
@@ -100,8 +95,8 @@ public abstract class Pool2DBase extends Camada {
      * @param stride formato dos strides {@code altura, largura}.
      */
     protected Pool2DBase(int[] filtro, int[] stride) {
-		utils.validarNaoNulo(filtro, "Formato do filtro nulo.");
-        utils.validarNaoNulo(stride, "Formato de stride nulo.");
+		JNNutils.validarNaoNulo(filtro, "filtro == null.");
+        JNNutils.validarNaoNulo(stride, "stride == null.");
 
 		if (filtro.length != 2) {
 			throw new IllegalArgumentException(
@@ -109,7 +104,7 @@ public abstract class Pool2DBase extends Camada {
 			);
 		}
 
-		if (!utils.apenasMaiorZero(filtro)) {
+		if (!JNNutils.apenasMaiorZero(filtro)) {
 			throw new IllegalArgumentException(
 				"\nOs valores de dimensões do filtro devem ser maiores que zero."
 			);
@@ -121,7 +116,7 @@ public abstract class Pool2DBase extends Camada {
 			);
 		}
 
-		if (!utils.apenasMaiorZero(stride)) {
+		if (!JNNutils.apenasMaiorZero(stride)) {
 			throw new IllegalArgumentException(
 				"\nOs valores para os strides devem ser maiores que zero."
 			);
@@ -133,7 +128,7 @@ public abstract class Pool2DBase extends Camada {
 
     @Override
     public void construir(int[] shape) {
-		utils.validarNaoNulo(shape, "Formato de entrada nulo.");
+		JNNutils.validarNaoNulo(shape, "shape == null.");
 		
 		if (shape.length != 3) {
 			throw new IllegalArgumentException(
@@ -153,9 +148,9 @@ public abstract class Pool2DBase extends Camada {
 		if (shapeSaida[1] < 1 || shapeSaida[2] < 1) {
 			throw new IllegalArgumentException(
 				"\nCamada não pode ser construida:" +
-				"\nFormato de entrada " + utils.shapeStr(shape) +
-				" e formato dos filtros " + utils.shapeStr(_filtro) +
-				" resultam num formato de saída inválido " + utils.shapeStr(shapeSaida)
+				"\nFormato de entrada " + JNNutils.shapeStr(shape) +
+				" e formato dos filtros " + JNNutils.shapeStr(_filtro) +
+				" resultam num formato de saída inválido " + JNNutils.shapeStr(shapeSaida)
 			);
 		}
 		
@@ -219,7 +214,8 @@ public abstract class Pool2DBase extends Camada {
 
         if (modo.equals("avg")) {
             lops.forwardAvgPool2D(_entrada, _saida, _filtro, _stride);
-        } else if (modo.equals("max")) {
+        
+		} else if (modo.equals("max")) {
             lops.forwardMaxPool2D(_entrada, _saida, _filtro, _stride);
         
         } else {
@@ -315,10 +311,10 @@ public abstract class Pool2DBase extends Camada {
 		
 		sb.append(nome() + " (id " + this.id + ") = [\n");
 
-		sb.append(pad).append("Entrada: " + utils.shapeStr(shapeEntrada) + "\n");
-		sb.append(pad).append("Filtro: " + utils.shapeStr(_filtro) + "\n");
-		sb.append(pad).append("Strides: " + utils.shapeStr(_stride) + "\n");
-		sb.append(pad).append("Saída: " + utils.shapeStr(shapeOut()) + "\n");
+		sb.append(pad).append("Entrada: " + JNNutils.shapeStr(shapeEntrada) + "\n");
+		sb.append(pad).append("Filtro: " + JNNutils.shapeStr(_filtro) + "\n");
+		sb.append(pad).append("Strides: " + JNNutils.shapeStr(_stride) + "\n");
+		sb.append(pad).append("Saída: " + JNNutils.shapeStr(shapeOut()) + "\n");
 
 		sb.append("]\n");
 
@@ -343,7 +339,6 @@ public abstract class Pool2DBase extends Camada {
 		Pool2DBase clone = (Pool2DBase) super.clone();
 
 		clone.lops = new LayerOps();
-		clone.utils = new Utils();
 
 		clone._treinavel = this._treinavel;
 		clone.treinando = this.treinando;

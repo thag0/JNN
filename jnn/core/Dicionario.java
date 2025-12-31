@@ -48,11 +48,6 @@ import jnn.otm.SGD;
  */
 public class Dicionario {
 
-	/**
-	 * Utilitário.
-	 */
-	private Utils utils = new Utils();
-
     /**
      * Tradutor para as funções de ativação, otimizadores, funções de perda 
      * e inicializadores.
@@ -80,7 +75,7 @@ public class Dicionario {
      * @return instância da função de ativação lida.
      */
 	public Ativacao getAtivacao(Object act) {
-		utils.validarNaoNulo(act, "act == null.");
+		JNNutils.validarNaoNulo(act, "act == null.");
 		
 		if (act instanceof Ativacao) {
 			return (Ativacao) act;
@@ -122,7 +117,7 @@ public class Dicionario {
      * @return instância do otimizador lido.
      */
 	public Otimizador getOtimizador(Object otm) {
-		utils.validarNaoNulo(otm, "otm == null.");
+		JNNutils.validarNaoNulo(otm, "otm == null.");
 
 		if (otm instanceof Otimizador) {
 			return (Otimizador) otm;
@@ -157,7 +152,7 @@ public class Dicionario {
      * @return instância da função de perda lida.
      */
 	public Perda getPerda(Object loss) {
-		utils.validarNaoNulo(loss, "loss == null.");
+		JNNutils.validarNaoNulo(loss, "loss == null.");
 
 		if (loss instanceof Perda) {
 			return (Perda) loss;
@@ -190,7 +185,7 @@ public class Dicionario {
      * @return instância do inicializador lido.
      */
 	public Inicializador getInicializador(Object ini) {
-		utils.validarNaoNulo(ini, "ini == null.");
+		JNNutils.validarNaoNulo(ini, "ini == null.");
 
 		if (ini instanceof Inicializador) {
 			return (Inicializador) ini;

@@ -4,7 +4,7 @@ import java.util.function.DoubleUnaryOperator;
 
 import jnn.camadas.Conv2D;
 import jnn.camadas.Densa;
-import jnn.core.Utils;
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -48,17 +48,12 @@ public abstract class Ativacao {
 	protected DoubleUnaryOperator _dx;
 
 	/**
-	 * Utilitário.
-	 */
-	protected Utils utils = new Utils();
-
-	/**
 	 * Configura a função de ativação e sua derivada para uso.
 	 * @param fx função de ativação.
 	 * @param dx deriviada da função de ativação
 	 */
 	public void construir(DoubleUnaryOperator fx, DoubleUnaryOperator dx) {
-		utils.validarNaoNulo(fx, "Função de ativação nula.");
+		JNNutils.validarNaoNulo(fx, "fx == null.");
 
 		_fx = fx;
 		_dx = dx;

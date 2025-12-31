@@ -1,5 +1,6 @@
 package jnn.otm;
 
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 import jnn.core.tensor.TensorData;
 
@@ -119,7 +120,7 @@ public class RMSProp extends Otimizador {
 		initParams(params, grads);
 
 		for (Tensor param : _params) {
-			ac = utils.addEmArray(ac, new Tensor(param.shape()));
+			ac = JNNutils.addEmArray(ac, new Tensor(param.shape()));
 		}
 		
 		_construido = true;// otimizador pode ser usado

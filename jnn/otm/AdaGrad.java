@@ -1,5 +1,6 @@
 package jnn.otm;
 
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 import jnn.core.tensor.TensorData;
 
@@ -95,7 +96,7 @@ public class AdaGrad extends Otimizador {
 		
 		double valorInicial = 0.1;
 		for (Tensor param : _params) {
-			ac = utils.addEmArray(
+			ac = JNNutils.addEmArray(
 				ac,
 				new Tensor(param.shape()).preencher(valorInicial)
 			);
