@@ -15,7 +15,7 @@ import jnn.core.tensor.Tensor;
  */
 public class LayerOps {
 
-    Backend opt = Backend.cpu();
+    Backend backend = Backend.cpu();
 
 	/**
 	 * Operador para paralelização.
@@ -36,7 +36,7 @@ public class LayerOps {
 	 * @see {@link jnn.camadas.Densa}
 	 */
 	public void forwardDensa(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
-		opt.matmul(entrada, kernel, saida);
+		backend.matmul(entrada, kernel, saida);
 
 		bias.ifPresent(b -> {
 			if (entrada.numDim() == 1) {//amostra única
@@ -61,14 +61,14 @@ public class LayerOps {
 	 * @see {@link jnn.camadas.Densa}
 	 */
 	public void backwardDensa(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
-		opt.matmul(gradS, kernel.transpor(), gradE);
+		backend.matmul(gradS, kernel.transpor(), gradE);
 		
 		if (gradS.numDim() == 1) {//amostra única
-			opt.matmul(entrada.unsqueeze(0).transpor(), gradS, gradK);
+			backend.matmul(entrada.unsqueeze(0).transpor(), gradS, gradK);
 			gradB.ifPresent(gb -> gb.add(gradS));
 		
 		} else if (gradS.numDim() == 2) {//lote de amostras
-			opt.matmul(entrada.transpor(), gradS, gradK);
+			backend.matmul(entrada.transpor(), gradS, gradK);
 			
 			int lotes = gradS.tamDim(0);
 			gradB.ifPresent(gb -> {
@@ -130,7 +130,7 @@ public class LayerOps {
 			Tensor b = bias.get();
 			for (int i = 0; i < numFiltros; i++) {
 				for (int e = 0; e < profEntrada; e++) {
-					opt.corr2D(entradas[e], kernels[i][e], saidas[i]);
+					backend.corr2D(entradas[e], kernels[i][e], saidas[i]);
 				}
 				saidas[i].add(b.get(i));
 			}
@@ -138,7 +138,7 @@ public class LayerOps {
 		} else {
 			for (int i = 0; i < numFiltros; i++) {
 				for (int e = 0; e < profEntrada; e++) {
-					opt.corr2D(entradas[e], kernels[i][e], saidas[i]);
+					backend.corr2D(entradas[e], kernels[i][e], saidas[i]);
 				}
 			}
 		}
@@ -237,7 +237,7 @@ public class LayerOps {
 
 		for (int e = 0; e < profEntrada; e++) {
 			for (int f = 0; f < numFiltros; f++) {
-				opt.conv2DFull(gsSaida[f], kernels[f][e], gsEntrada[e]);
+				backend.conv2DFull(gsSaida[f], kernels[f][e], gsEntrada[e]);
 			}
 		}
 
@@ -257,7 +257,7 @@ public class LayerOps {
 
 		for (int f = 0; f < numFiltros; f++) {
 			for (int e = 0; e < profEntrada; e++) {
-				opt.corr2D(entradas[e], gsSaida[f], gsKernels[f][e]);	
+				backend.corr2D(entradas[e], gsSaida[f], gsKernels[f][e]);	
 			}
 		}
 
@@ -346,7 +346,7 @@ public class LayerOps {
 	private void forwardMaxPool2DNormal(Tensor entrada, Tensor saida, int[] filtro, int[] stride) {
 		final int canais = entrada.tamDim(0);
 		for (int i = 0; i < canais; i++) {
-			opt.maxPool2D(entrada.subTensor(i), saida.subTensor(i), filtro, stride);
+			backend.maxPool2D(entrada.subTensor(i), saida.subTensor(i), filtro, stride);
 		}
 	}
 
@@ -498,7 +498,7 @@ public class LayerOps {
 	private void forwardAvgPool2DNormal(Tensor entrada, Tensor saida, int[] filtro, int[] stride) {
 		final int canais = entrada.tamDim(0);
 		for (int i = 0; i < canais; i++) {
-			opt.avgPool2D(entrada.subTensor(i), saida.subTensor(i), filtro, stride);
+			backend.avgPool2D(entrada.subTensor(i), saida.subTensor(i), filtro, stride);
 		}
 	}
 
