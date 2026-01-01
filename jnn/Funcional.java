@@ -5,7 +5,7 @@ import jnn.acts.Ativacao;
 import jnn.acts.Softmax;
 import jnn.core.Dicionario;
 import jnn.core.JNNutils;
-import jnn.core.OpTensor;
+import jnn.core.backend.Backend;
 import jnn.core.tensor.Tensor;
 import jnn.core.tensor.TensorConverter;
 import jnn.dataloader.Amostra;
@@ -40,7 +40,7 @@ public final class Funcional {
     /**
      * Operador para tensores.
      */
-    OpTensor opt = new OpTensor();
+    Backend opt = Backend.cpu();
 
     /**
      * Interface funcional.

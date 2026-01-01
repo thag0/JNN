@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 
-import jnn.core.OpTensor;
+import jnn.core.backend.Backend;
 import jnn.core.parallel.PoolFactory;
 import jnn.core.tensor.Tensor;
 
@@ -15,7 +15,7 @@ import jnn.core.tensor.Tensor;
  */
 public class LayerOps {
 
-    OpTensor opt = new OpTensor();
+    Backend opt = Backend.cpu();
 
 	/**
 	 * Operador para paralelização.

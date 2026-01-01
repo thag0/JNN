@@ -97,7 +97,7 @@ public class MainConv {
 		// 	new Densa(10, "sigmoid")
 		// );
 
-		modelo.compilar("adam", "entropia-cruzada");
+		modelo.compilar("sgd", "entropia-cruzada");
 		
 		return modelo;
 	}
