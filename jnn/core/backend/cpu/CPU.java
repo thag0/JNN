@@ -8,7 +8,7 @@ import jnn.core.tensor.Tensor;
 /**
  * Implementações em cpu das operações internas da biblioteca.
  */
-public class CPU extends Backend {
+public final class CPU extends Backend {
     
     @Override
     public Tensor matadd(Tensor a, Tensor b) {
