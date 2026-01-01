@@ -29,8 +29,8 @@ public class MainConv {
 	static Funcional jnn = new Funcional();
 
 	// controle de treino
-	static final int TREINO_EPOCAS = 10;
-	static final int TREINO_LOTE = 64;
+	static final int TREINO_EPOCAS = 15;
+	static final int TREINO_LOTE = 32;
 	static final boolean TREINO_LOGS = true;
 
 	// caminhos de arquivos externos
@@ -42,7 +42,7 @@ public class MainConv {
 	public static void main(String[] args) {
 		ged.limparConsole();
 
-		DataLoader dlTreino = CIFAR10.treino().subLoader(0, 10_000);
+		DataLoader dlTreino = CIFAR10.treino().subLoader(0, 15_000);
 
 		dlTreino.print();
 
@@ -80,13 +80,11 @@ public class MainConv {
 	static Sequencial criarModelo() {
 		Sequencial modelo = new Sequencial(
 			new Entrada(3, 32, 32),
-			new Conv2D(20, new int[]{3, 3}, "relu"),
-			new Conv2D(20, new int[]{3, 3}, "relu"),
+			new Conv2D(32, new int[]{3, 3}, "relu"),
 			new MaxPool2D(new int[]{2, 2}),
-			new Conv2D(24, new int[]{3, 3}, "relu"),
-			new Conv2D(24, new int[]{3, 3}, "relu"),
+			new Conv2D(64, new int[]{3, 3}, "relu"),
 			new MaxPool2D(new int[]{2, 2}),
-			new Conv2D(30, new int[]{3, 3}, "relu"),
+			new Conv2D(128, new int[]{3, 3}, "relu"),
 			new Flatten(),
 			new Densa(10, "softmax")
 		);
