@@ -189,10 +189,10 @@ public class ConvCPU {
 		return conv;
 	}
 
-	public static void conv2DFull(Tensor entrada, Tensor kernel, Tensor saida) {
-		int[] shapeE = entrada.shape();
-		int[] shapeK = kernel.shape();
-		int[] shapeS = saida.shape();
+	public static void conv2DFull(Tensor x, Tensor k, Tensor dst) {
+		int[] shapeE = x.shape();
+		int[] shapeK = k.shape();
+		int[] shapeS = dst.shape();
 
 		if (shapeE.length > 2 || shapeK.length > 2 || shapeS.length > 2) {
 			throw new IllegalArgumentException(
@@ -209,7 +209,7 @@ public class ConvCPU {
 		if (altSaida != altEsp || largSaida != largEsp) {
 			throw new IllegalArgumentException(
 				"\nDimensão de saída esperada (" + altEsp + ", " + largEsp + "), mas" +
-				" recebido " + saida.shapeStr()
+				" recebido " + dst.shapeStr()
 			);
 		}
 
@@ -218,14 +218,14 @@ public class ConvCPU {
 		int altKernel = shapeK[0];
 		int largKernel = shapeK[1];
 
-		double[] dataE = entrada.array();
-		double[] dataK = kernel.array();
-		double[] dataS = saida.array();
+		double[] dataE = x.array();
+		double[] dataK = k.array();
+		double[] dataS = dst.array();
 
 		// lidar com views de tensores
-		int offE = entrada.offset();
-		int offK = kernel.offset();
-		int offS = saida.offset();
+		int offE = x.offset();
+		int offK = k.offset();
+		int offS = dst.offset();
 
 		double soma;
 		for (int i = 0; i < altEsp; i++) {
