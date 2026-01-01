@@ -20,7 +20,7 @@ public class LayerOps {
 	/**
 	 * Operador para paralelização.
 	 */
-	private final ForkJoinPool pool = PoolFactory.pool(Runtime.getRuntime().availableProcessors() / 2);
+	private final ForkJoinPool pool = PoolFactory.pool();
 
     /**
      * Utilitário para operações de forward e backward de camadas.
@@ -91,8 +91,14 @@ public class LayerOps {
 	public void forwardConv2D(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
 		if (entrada.numDim() == 3) {
 			forwardConv2DNormal(entrada, kernel, bias, saida);	
-		} else {
+		
+		} else if (entrada.numDim() == 4) {
 			forwardConv2DLotes(entrada, kernel, bias, saida);
+		
+		} else {
+			throw new IllegalArgumentException(
+				"\nTamanho de entrada deve ser 3 ou 4, recebido " + entrada.numDim()
+			);
 		}
 	}
 
@@ -196,8 +202,14 @@ public class LayerOps {
 	public void backwardConv2D(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {	
 		if (entrada.numDim() == 3) {
 			backwardConv2DNormal(entrada, kernel, gradS, gradK, gradB, gradE);
-		} else {
+		
+		} else if (entrada.numDim() == 4) {
 			backwardConv2DLotes(entrada, kernel, gradS, gradK, gradB, gradE);
+		
+		} else {
+			throw new IllegalArgumentException(
+				"\nTamanho de entrada deve ser 3 ou 4, recebido " + entrada.numDim()
+			);
 		}
 	}
 
