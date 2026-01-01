@@ -12,92 +12,92 @@ public class CPU extends Backend {
     
     @Override
     public Tensor matadd(Tensor a, Tensor b) {
-		return OpsLinear.matadd(a, b);
+		return LinearCPU.matadd(a, b);
     }
 
     @Override
 	public Tensor matsub(Tensor a, Tensor b) {
-		return OpsLinear.matsub(a, b);
+		return LinearCPU.matsub(a, b);
     }
 
     @Override
 	public Tensor mathad(Tensor a, Tensor b) {
-		return OpsLinear.mathad(a, b);
+		return LinearCPU.mathad(a, b);
 	}
 
     @Override
 	public Tensor matdiv(Tensor a, Tensor b) {
-		return OpsLinear.matdiv(a, b);
+		return LinearCPU.matdiv(a, b);
 	}
 
     @Override
 	public Tensor matmul(Tensor a, Tensor b) {
-		return OpsLinear.matmul(a, b);
+		return LinearCPU.matmul(a, b);
 	}
 
     @Override
 	public void matmul(Tensor a, Tensor b, Tensor dst) {
-        OpsLinear.matmul(a, b, dst);
+        LinearCPU.matmul(a, b, dst);
 	}
 
     @Override
 	public Tensor corr2D(Tensor x, Tensor k) {
-		return OpsConv.corr2D(x, k);
+		return ConvCPU.corr2D(x, k);
 	}
 
     @Override
 	public void corr2D(Tensor x, Tensor k, Tensor dst) {
-        OpsConv.corr2D(x, k, dst);
+        ConvCPU.corr2D(x, k, dst);
 	}
 
     @Override
 	public Tensor conv2D(Tensor x, Tensor k) {
-		return OpsConv.conv2D(x, k);
+		return ConvCPU.conv2D(x, k);
 	}
 
     @Override
 	public void conv2D(Tensor x, Tensor k, Tensor dst) {
-		OpsConv.conv2D(x, k, dst);
+		ConvCPU.conv2D(x, k, dst);
 	}
 
     @Override
 	public Tensor conv2DFull(Tensor x, Tensor k) {
-		return OpsConv.conv2DFull(x, k);
+		return ConvCPU.conv2DFull(x, k);
 	}
 
     @Override
 	public void conv2DFull(Tensor x, Tensor k, Tensor dst) {
-		OpsConv.conv2DFull(x, k, dst);
+		ConvCPU.conv2DFull(x, k, dst);
 	}
 
     @Override
 	public Tensor maxPool2D(Tensor x, int[] filtro) {
-		return OpsPooling.maxPool2D(x, filtro);
+		return PoolingCPU.maxPool2D(x, filtro);
 	}
 
     @Override
 	public Tensor maxPool2D(Tensor x, int[] filtro, int[] stride) {
-		return OpsPooling.maxPool2D(x, filtro, stride);
+		return PoolingCPU.maxPool2D(x, filtro, stride);
 	}
 
     @Override
 	public void maxPool2D(Tensor x, Tensor dst, int[] filtro, int[] stride) {
-		OpsPooling.maxPool2D(x, dst, filtro, stride);
+		PoolingCPU.maxPool2D(x, dst, filtro, stride);
 	}
 
     @Override
 	public Tensor avgPool2D(Tensor x, int[] stride) {
-		return OpsPooling.avgPool2D(x, stride);
+		return PoolingCPU.avgPool2D(x, stride);
 	}
 
     @Override
 	public Tensor avgPool2D(Tensor x, int[] filtro, int[] stride) {
-		return OpsPooling.avgPool2D(x, filtro, stride);		
+		return PoolingCPU.avgPool2D(x, filtro, stride);		
 	}
 
     @Override
 	public void avgPool2D(Tensor x, Tensor dst, int[] filtro, int[] stride) {
-		OpsPooling.avgPool2D(x, dst, filtro, stride);
+		PoolingCPU.avgPool2D(x, dst, filtro, stride);
 	}
 
 	/**

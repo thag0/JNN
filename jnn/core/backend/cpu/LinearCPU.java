@@ -5,7 +5,7 @@ import jnn.core.tensor.Tensor;
 /**
  * 
  */
-public class OpsLinear {
+public class LinearCPU {
     
     public static Tensor matadd(Tensor a, Tensor b) {
 		if (!a.compShape(b)) {

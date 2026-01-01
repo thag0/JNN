@@ -2,7 +2,7 @@ package jnn.core.backend.cpu;
 
 import jnn.core.tensor.Tensor;
 
-public class OpsConv {
+public class ConvCPU {
     
 	private static int[] calcShapeConv(int[] entrada, int[] filtro, int[] stride) {
 		if (entrada.length != 2 || filtro.length != 2 || stride.length != 2) {
