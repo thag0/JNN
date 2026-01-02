@@ -102,6 +102,14 @@ public abstract class Backend {
 	 */
 	public abstract void conv2DFull(Tensor entrada, Tensor kernel, Tensor saida);
 
+	public abstract void conv2DFull(
+		double[] dataX, int offX,
+		double[] dataK, int offK,
+		double[] dataDst, int offDst,
+		int W, int H,
+		int kW, int kH
+	);
+
 	/**
 	 * Realiza a operação de agrupamento máximo.
 	 * @param x {@code Tensor} de entrada.

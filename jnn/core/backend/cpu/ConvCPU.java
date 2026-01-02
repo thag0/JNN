@@ -280,4 +280,36 @@ public class ConvCPU {
 
 	}
 
+	public static void conv2DFull(double[] dataX, int offX, double[] dataK, int offK, double[] dataDst, int offDst, int W, int H, int kW, int kH) {
+		final int outH = H + kH - 1;
+		final int outW = W + kW - 1;
+
+		for (int i = 0; i < outH; i++) {
+			final int baseOut = offDst + i * outW;
+
+			for (int j = 0; j < outW; j++) {
+				double sum = 0.0;
+
+				for (int kh = 0; kh < kH; kh++) {
+					int inRow = i - kh;
+					if (inRow < 0 || inRow >= H) continue;
+
+					final int baseIn = offX + inRow * W;
+					final int baseK  = offK + kh * kW;
+
+					for (int kw = 0; kw < kW; kw++) {
+						int inCol = j - kw;
+						if (inCol < 0 || inCol >= W) continue;
+
+						sum += dataK[baseK + kw] *
+							dataX[baseIn + inCol];
+					}
+				}
+
+				dataDst[baseOut + j] += sum;
+			}
+		}
+	}
+
+
 }

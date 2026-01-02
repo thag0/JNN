@@ -229,63 +229,97 @@ public class LayerOps {
 	 * @param gradE gradE
 	 */
 	private void backwardConv2DNormal(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
-		int[] shapeK = kernel.shape();
+		final int[] shapeX = entrada.shape();
+		final int[] shapeK = kernel.shape();
+		final int[] shapeGS = gradS.shape();
 
-		final int numFiltros = shapeK[0];
-		final int profEntrada = shapeK[1];
+		final int filtros  = shapeK[0];
+		final int canais  = shapeK[1];
 
-		Tensor[] gsSaida = new Tensor[numFiltros];
-		for (int i = 0; i < numFiltros; i++) {
-			gsSaida[i] = gradS.subTensor(i);
-		}
+		final int altX  = shapeX[1];
+		final int largX  = shapeX[2];
 
-		// gradiente em relação as entradas
-		Tensor[][] kernels = new Tensor[numFiltros][profEntrada];
-		for (int i = 0; i < numFiltros; i++) {
-			Tensor ki = kernel.subTensor(i);
-			for (int j = 0; j < profEntrada; j++) {
-				kernels[i][j] = ki.subTensor(j);
+		final int altK = shapeK[2];
+		final int largK = shapeK[3];
+
+		final int altS = shapeGS[1];
+		final int largS = shapeGS[2];
+
+		final int areaX  = altX * largX;
+		final int areaK  = altK * largK;
+		final int areaGS = altS * largS;
+
+		final double[] dataX  = entrada.array();
+		final double[] dataK  = kernel.array();
+		final double[] dataGS = gradS.array();
+		final double[] dataGK = gradK.array();
+		final double[] dataGE = gradE.array();
+
+		final int offXBase  = entrada.offset();
+		final int offKBase  = kernel.offset();
+		final int offGSBase = gradS.offset();
+		final int offGKBase = gradK.offset();
+		final int offGEBase = gradE.offset();
+
+		for (int f = 0; f < filtros; f++) {
+			final int offGS = offGSBase + f * areaGS;
+			for (int c = 0; c < canais; c++) {
+				final int offK  = offKBase  + (f * canais + c) * areaK;
+				final int offGE = offGEBase + c * areaX;
+
+				backend.conv2DFull(
+					dataGS, offGS,
+					dataK,  offK,
+					dataGE, offGE,
+					largS, altS,
+					largK, altK
+				);
 			}
 		}
 
-		Tensor[] gsEntrada = new Tensor[profEntrada];
-		for (int i = 0; i < profEntrada; i++) {
-			gsEntrada[i] = gradE.subTensor(i);
-		}
+		if (gradB.isPresent()) {
+			Tensor gb = gradB.get();
 
-		for (int e = 0; e < profEntrada; e++) {
-			for (int f = 0; f < numFiltros; f++) {
-				backend.conv2DFull(gsSaida[f], kernels[f][e], gsEntrada[e]);
+			for (int f = 0; f < filtros; f++) {
+				final int offGS = offGSBase + f * areaGS;
+				for (int c = 0; c < canais; c++) {
+					final int offX  = offXBase  + c * areaX;
+					final int offGK = offGKBase + (f * canais + c) * areaK;
+	
+					backend.corr2D(
+						dataX,  offX,
+						dataGS, offGS,
+						dataGK, offGK,
+						largX, altX,
+						largS, altS
+					);
+				}
+
+				double somaBias = 0;
+				for (int i = 0; i < areaGS; i++) {
+					somaBias += dataGS[offGS + i];
+				}
+				gb.add(somaBias, f);
+			}
+			
+		} else {
+			for (int f = 0; f < filtros; f++) {
+				final int offGS = offGSBase + f * areaGS;
+				for (int c = 0; c < canais; c++) {
+					final int offX  = offXBase  + c * areaX;
+					final int offGK = offGKBase + (f * canais + c) * areaK;
+	
+					backend.corr2D(
+						dataX,  offX,
+						dataGS, offGS,
+						dataGK, offGK,
+						largX, altX,
+						largS, altS
+					);
+				}
 			}
 		}
 
-		// gradiente em relação aos kernels
-		Tensor[] entradas = new Tensor[profEntrada];
-		for (int i = 0; i < profEntrada; i++) {
-			entradas[i] = entrada.subTensor(i);
-		}
-
-		Tensor[][] gsKernels = new Tensor[numFiltros][profEntrada];
-		for (int i = 0; i < numFiltros; i++) {
-			Tensor ki = gradK.subTensor(i);
-			for (int j = 0; j < profEntrada; j++) {
-				gsKernels[i][j] = ki.subTensor(j);
-			}
-		}
-
-		for (int f = 0; f < numFiltros; f++) {
-			for (int e = 0; e < profEntrada; e++) {
-				backend.corr2D(entradas[e], gsSaida[f], gsKernels[f][e]);	
-			}
-		}
-
-		// gradiente em relação aos bias
-		gradB.ifPresent(gb -> {
-			for (int i = 0; i < numFiltros; i++) {
-				double soma = gradS.subTensor(i).soma().item();
-				gb.add(soma, i);
-			}
-		});		
 	}
 
 	/**

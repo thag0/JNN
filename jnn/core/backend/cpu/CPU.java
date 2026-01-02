@@ -55,6 +55,17 @@ public final class CPU extends Backend {
 		ConvCPU.conv2DFull(x, k, dst);
 	}
 
+	@Override
+	public void conv2DFull(
+		double[] dataX, int offX,
+		double[] dataK, int offK,
+		double[] dataDst, int offDst,
+		int W, int H,
+		int kW, int kH
+	) {
+		ConvCPU.conv2DFull(dataX, offX, dataK, offK, dataDst, offDst, W, H, kW, kH);
+	}
+
     @Override
 	public Tensor maxPool2D(Tensor x, int[] filtro) {
 		return PoolingCPU.maxPool2D(x, filtro);
