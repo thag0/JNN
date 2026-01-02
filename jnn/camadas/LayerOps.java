@@ -110,42 +110,50 @@ public class LayerOps {
 	 * @param saida saída.
 	 */
 	private void forwardConv2DNormal(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
-		int[] shapeK = kernel.shape();
+		final int[] shapeK = kernel.shape();
+		final int[] shapeX = entrada.shape();
+
 		final int profEntrada = shapeK[1];
 		final int numFiltros = shapeK[0];
 
-		Tensor[] entradas = new Tensor[profEntrada];
-		for (int i = 0; i < profEntrada; i++) {
-			entradas[i] = entrada.subTensor(i);
-		}
+		int H = shapeX[1];
+		int W = shapeX[2];
+		int kH = shapeK[2];
+		int kW = shapeK[3];
 
-		Tensor[][] kernels = new Tensor[numFiltros][profEntrada];
-		for (int i = 0; i < numFiltros; i++) {
-			Tensor ki = kernel.subTensor(i);
-			for (int j = 0; j < profEntrada; j++) {
-				kernels[i][j] = ki.subTensor(j);
+		int areaX = H * W;
+		int areaK = kH * kW;
+		int areaS = (H - kH + 1) * (W - kW + 1);
+
+		double[] dataX = entrada.array();
+		double[] dataK = kernel.array();
+		double[] dataS = saida.array();
+
+		int offXBase = entrada.offset();
+		int offKBase = kernel.offset();
+		int offSBase = saida.offset();
+
+		for (int f = 0; f < numFiltros; f++) {
+			int offS = offSBase + f * areaS;
+
+			for (int c = 0; c < profEntrada; c++) {
+				int offX = offXBase + c * areaX;
+				int offK  = offKBase + (f * profEntrada + c) * areaK;
+
+				backend.corr2D(
+					dataX, offX,
+					dataK, offK,
+					dataS, offS,
+					W, H,
+					kW, kH
+				);
 			}
 		}
-
-		Tensor[] saidas = new Tensor[numFiltros];
-		for (int i = 0; i < numFiltros; i++) {
-			saidas[i] = saida.subTensor(i);
-		}
-
+				
 		if (bias.isPresent()) {
 			Tensor b = bias.get();
 			for (int i = 0; i < numFiltros; i++) {
-				for (int e = 0; e < profEntrada; e++) {
-					backend.corr2D(entradas[e], kernels[i][e], saidas[i]);
-				}
-				saidas[i].add(b.get(i));
-			}
-
-		} else {
-			for (int i = 0; i < numFiltros; i++) {
-				for (int e = 0; e < profEntrada; e++) {
-					backend.corr2D(entradas[e], kernels[i][e], saidas[i]);
-				}
+				saida.subTensor(i).add(b.get(i));
 			}
 		}
 	}
@@ -159,6 +167,7 @@ public class LayerOps {
 	 */
 	private void forwardConv2DLotes(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
 		int lotes = entrada.tamDim(0);
+		final int[] shapeSaida = saida.subTensor(0).shape();
 
 		Tensor[] saidaLocal = new Tensor[lotes];
 		List<ForkJoinTask<?>> tarefas = new ArrayList<>(lotes);
@@ -167,7 +176,7 @@ public class LayerOps {
 			final int id = i;
 
 			tarefas.add(pool.submit(() -> {
-				Tensor tmp = new Tensor(saida.subTensor(id).shape());
+				Tensor tmp = new Tensor(shapeSaida);
 
 				forwardConv2DNormal(
 					entrada.subTensor(id),
@@ -180,11 +189,8 @@ public class LayerOps {
 			}));
 		}
 
-		for (ForkJoinTask<?> t : tarefas) {
-			t.join();
-		}
-
-		for (int i = 0; i < lotes; i++) {
+		for (int i = 0; i < tarefas.size(); i++) {
+			tarefas.get(i).join();
 			saida.subTensor(i).copiar(saidaLocal[i]);
 		}
 	}

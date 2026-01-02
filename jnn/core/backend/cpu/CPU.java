@@ -50,6 +50,11 @@ public final class CPU extends Backend {
         ConvCPU.corr2D(x, k, dst);
 	}
 
+	@Override
+	public void corr2D(double[] dataX, int offX, double[] dataK, int offK, double[] dataDst, int offDst, int W, int H, int kW, int kH) {
+		ConvCPU.corr2D(dataX, offX, dataK, offK, dataDst, offDst, W, H, kW, kH);
+	}
+
     @Override
 	public Tensor conv2D(Tensor x, Tensor k) {
 		return ConvCPU.conv2D(x, k);

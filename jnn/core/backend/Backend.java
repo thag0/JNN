@@ -86,6 +86,23 @@ public abstract class Backend {
 	public abstract void corr2D(Tensor x, Tensor k, Tensor dst);
 
 	/**
+	 * Método especial para camadas convolucionais.
+	 * @param dataX conjunto de dados de entrada.
+	 * @param offX offset dos dados de entrada.
+	 * @param dataK conjunto de dados do kernel.
+	 * @param offK offset dos dados do kernel.
+	 * @param dataDst conjunto de dados de destino.
+	 * @param offDst offset dos dados de destino.
+	 * @param W largura da entrada.
+	 * @param H altura da entrada.
+	 * @param kW largura do kernel.
+	 * @param kH altura do kernel.
+	 */
+	public abstract void corr2D(
+		double[] dataX, int offX, double[] dataK, int offK, double[] dataDst, int offDst, int W, int H,int kW, int kH
+	);
+
+	/**
 	 * Realiza a operação de convolução entre o tensor de entrada e o kernel.
 	 * @param x {@code Tensor} de entrada.
 	 * @param k {@code Tensor} utilizado para filtro.

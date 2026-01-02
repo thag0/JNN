@@ -94,6 +94,33 @@ public class ConvCPU {
 
 	}
 
+	public static void corr2D(double[] dataX, int offX,double[] dataK, int offK,double[] dataDst, int offDst,int W, int H,int kW, int kH) {
+		final int outH = H - kH + 1;
+		final int outW = W - kW + 1;
+
+		for (int i = 0; i < outH; i++) {
+			int baseOut = offDst + i * outW;
+			int baseIn  = offX   + i * W;
+
+			for (int j = 0; j < outW; j++) {
+				double sum = 0.0;
+
+				int inColBase = baseIn + j;
+
+				for (int kh = 0; kh < kH; kh++) {
+					int inRow = inColBase + kh * W;
+					int kRow  = offK + kh * kW;
+
+					for (int kw = 0; kw < kW; kw++) {
+						sum += dataX[inRow + kw] * dataK[kRow + kw];
+					}
+				}
+
+				dataDst[baseOut + j] += sum;
+			}
+		}
+	}
+
 	public static Tensor conv2D(Tensor x, Tensor k) {
 		if (x.numDim() != 2 || k.numDim() != 2) {
 			throw new IllegalArgumentException(
