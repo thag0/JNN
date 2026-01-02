@@ -9,26 +9,6 @@ import jnn.core.tensor.Tensor;
  * Implementações em cpu das operações internas da biblioteca.
  */
 public final class CPU extends Backend {
-    
-    @Override
-    public Tensor matadd(Tensor a, Tensor b) {
-		return LinearCPU.matadd(a, b);
-    }
-
-    @Override
-	public Tensor matsub(Tensor a, Tensor b) {
-		return LinearCPU.matsub(a, b);
-    }
-
-    @Override
-	public Tensor mathad(Tensor a, Tensor b) {
-		return LinearCPU.mathad(a, b);
-	}
-
-    @Override
-	public Tensor matdiv(Tensor a, Tensor b) {
-		return LinearCPU.matdiv(a, b);
-	}
 
     @Override
 	public Tensor matmul(Tensor a, Tensor b) {

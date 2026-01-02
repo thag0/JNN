@@ -21,38 +21,6 @@ public abstract class Backend {
 	}
 
 	/**
-	 * Realiza a operação {@code A + B}.
-	 * @param a {@code Tensor} A.
-	 * @param b {@code Tensor} B.
-	 * @return {@code Tensor} resultado.
-	 */
-	public abstract Tensor matadd(Tensor a, Tensor b);
-
-	/**
-	 * Realiza a operação {@code A - B}.
-	 * @param a {@code Tensor} A.
-	 * @param b {@code Tensor} B.
-	 * @return {@code Tensor} resultado.
-	 */
-	public abstract Tensor matsub(Tensor a, Tensor b);
-
-	/**
-	 * Realiza a operação {@code A ⊙ B}.
-	 * @param a {@code Tensor} A.
-	 * @param b {@code Tensor} B.
-	 * @return {@code Tensor} resultado.
-	 */
-	public abstract Tensor mathad(Tensor a, Tensor b);
-
-	/**
-	 * Realiza a operação {@code A / B}.
-	 * @param a {@code Tensor} A.
-	 * @param b {@code Tensor} B.
-	 * @return {@code Tensor} resultado.
-	 */
-	public abstract Tensor matdiv(Tensor a, Tensor b);
-
-	/**
 	 * Realiza a operação {@code  A * B}
 	 * @param a {@code Tensor} A.
 	 * @param b {@code Tensor} B.

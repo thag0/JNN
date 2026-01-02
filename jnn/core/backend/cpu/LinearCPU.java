@@ -15,12 +15,6 @@ public class LinearCPU {
 			);
 		}
 
-		if (a.numDim() != 2) {
-			throw new UnsupportedOperationException(
-				"\nOs tensores devem ter duas dimensões"
-			);
-		}
-
 		return a.map(b, (x, y) -> x + y);
     }
 
@@ -29,12 +23,6 @@ public class LinearCPU {
 			throw new IllegalArgumentException(
 				"\nDimensões do tensor A " + a.shapeStr() + 
 				" e B " + b.shapeStr() + " devem ser iguais."
-			);
-		}
-
-		if (a.numDim() != 2) {
-			throw new UnsupportedOperationException(
-				"\nOs tensores devem ter duas dimensões"
 			);
 		}
 
@@ -49,12 +37,6 @@ public class LinearCPU {
 			);
 		}
 
-		if (a.numDim() != 2) {
-			throw new UnsupportedOperationException(
-				"\nOs tensores devem ter duas dimensões"
-			);
-		}
-
 		return a.map(b, (x, y) -> x * y);
 	}
 
@@ -65,13 +47,6 @@ public class LinearCPU {
 				" e B " + b.shapeStr() + " devem ser iguais."
 			);
 		}
-
-		if (a.numDim() != 2) {
-			throw new UnsupportedOperationException(
-				"\nOs tensores devem ter duas dimensões"
-			);
-		}
-
 		return a.map(b, (x, y) -> x / y);
 	}
 
