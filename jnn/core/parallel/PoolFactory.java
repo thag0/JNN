@@ -8,9 +8,15 @@ import java.util.concurrent.ForkJoinPool;
 public class PoolFactory {
     
     /**
+     * Máxima quantidade de threads disponível para a JVM.
+     */
+    static final int MAX_DISPONIVEL = Runtime.getRuntime().availableProcessors();
+
+    /**
      * Quantidade de threads padrão por pool.
      */
-    static int numThreads = Runtime.getRuntime().availableProcessors() / 2;
+    static int numThreads = MAX_DISPONIVEL / 2;
+
 
     /**
      * Cria uma nova pool de threads utilizando o valor padrão.
