@@ -2443,6 +2443,44 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	}
 
 	/**
+	 * Retorna uma versão contígua do tensor, baseada na estrutura row-major.
+	 * <p>
+	 *		Caso o tensor já seja contíguo, retorna ele mesmo.
+	 * </p>
+	 * @return tensor contíguo.
+	 */
+	public Tensor contiguous() {
+		if (isContiguous()) return this;
+		
+		final double[] dados = array();
+		final int offset = offset();
+
+		Tensor contg = new Tensor(shape);
+		double[] dst = contg.array();
+
+		int ndim = shape.length;
+		int tam = contg.tam();
+		int[] ids = new int[ndim];
+
+		for (int linear = 0; linear < tam; linear++) {
+			int idBase = offset;
+			for (int d = 0; d < ndim; d++) {
+				idBase += ids[d] * strides[d];
+			}
+
+			dst[linear] = dados[idBase];
+
+			for (int d = ndim - 1; d >= 0; d--) {
+				ids[d]++;
+				if (ids[d] < shape[d]) break;
+				ids[d] = 0;
+			}
+		}
+
+		return contg;
+	}
+
+	/**
 	 * Retorna a soma dos elementos ao longo de um eixo específico.
 	 * @param eixo eixo ao longo do qual será feita a soma.
 	 * @return {@code Tensor} resultante com o eixo reduzido.
