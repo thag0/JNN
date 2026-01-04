@@ -15,12 +15,15 @@ import jnn.core.tensor.Tensor;
  */
 public class LayerOps {
 
+	/**
+	 * Operador interno.
+	 */
     Backend backend = Backend.cpu();
 
 	/**
 	 * Operador para paralelização.
 	 */
-	private final ForkJoinPool pool = PoolFactory.pool();
+	private final ForkJoinPool pool = PoolFactory.pool(Runtime.getRuntime().availableProcessors());
 
     /**
      * Utilitário para operações de forward e backward de camadas.
@@ -113,46 +116,46 @@ public class LayerOps {
 		final int[] shapeK = kernel.shape();
 		final int[] shapeX = entrada.shape();
 
-		final int profEntrada = shapeK[1];
-		final int numFiltros = shapeK[0];
+		final int canais = shapeK[1];
+		final int filtros = shapeK[0];
 
-		int H = shapeX[1];
-		int W = shapeX[2];
-		int kH = shapeK[2];
-		int kW = shapeK[3];
+		final int altX = shapeX[1];
+		final int largX = shapeX[2];
+		final int altK = shapeK[2];
+		final int largK = shapeK[3];
 
-		int areaX = H * W;
-		int areaK = kH * kW;
-		int areaS = (H - kH + 1) * (W - kW + 1);
+		final int areaX = altX * largX;
+		final int areaK = altK * largK;
+		final int areaS = (altX - altK + 1) * (largX - largK + 1);
 
-		double[] dataX = entrada.array();
-		double[] dataK = kernel.array();
-		double[] dataS = saida.array();
+		final double[] dataX = entrada.array();
+		final double[] dataK = kernel.array();
+		final double[] dataS = saida.array();
 
-		int offXBase = entrada.offset();
-		int offKBase = kernel.offset();
-		int offSBase = saida.offset();
+		final int offXBase = entrada.offset();
+		final int offKBase = kernel.offset();
+		final int offSBase = saida.offset();
 
-		for (int f = 0; f < numFiltros; f++) {
+		for (int f = 0; f < filtros; f++) {
 			int offS = offSBase + f * areaS;
 
-			for (int c = 0; c < profEntrada; c++) {
+			for (int c = 0; c < canais; c++) {
 				int offX = offXBase + c * areaX;
-				int offK  = offKBase + (f * profEntrada + c) * areaK;
+				int offK  = offKBase + (f * canais + c) * areaK;
 
 				backend.corr2D(
 					dataX, offX,
 					dataK, offK,
 					dataS, offS,
-					W, H,
-					kW, kH
+					largX, altX,
+					largK, altK
 				);
 			}
 		}
 				
 		if (bias.isPresent()) {
 			Tensor b = bias.get();
-			for (int i = 0; i < numFiltros; i++) {
+			for (int i = 0; i < filtros; i++) {
 				saida.subTensor(i).add(b.get(i));
 			}
 		}
@@ -166,33 +169,70 @@ public class LayerOps {
 	 * @param saida saída.
 	 */
 	private void forwardConv2DLotes(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
-		int lotes = entrada.tamDim(0);
-		final int[] shapeSaida = saida.subTensor(0).shape();
-
-		Tensor[] saidaLocal = new Tensor[lotes];
-		List<ForkJoinTask<?>> tarefas = new ArrayList<>(lotes);
-
-		for (int i = 0; i < lotes; i++) {
-			final int id = i;
-
+		final int[] shapeX = entrada.shape();
+		final int[] shapeK = kernel.shape();
+		
+		final int lotes = shapeX[0];
+		final int canais = shapeX[1];
+		final int altX = shapeX[2];
+		final int largX = shapeX[3];
+		
+		final int filtros = shapeK[0];
+		final int atlK = shapeK[2];
+		final int largK = shapeK[3];
+		
+		final int altS = altX - atlK + 1;
+		final int largS = largX - largK + 1;
+		
+		final int areaX = altX * largX;
+		final int areaK = atlK * largK;
+		final int areaY = altS * largS;
+		
+		final double[] x = entrada.array();
+		final double[] k = kernel.array();
+		final double[] s = saida.array();
+		
+		final int offXBase = entrada.offset();
+		final int offKBase = kernel.offset();
+		final int offYBase = saida.offset();
+		
+		List<ForkJoinTask<?>> tarefas = new ArrayList<>(filtros);
+		
+		for (int f = 0; f < filtros; f++) {
+			final int filtro = f;
+			
 			tarefas.add(pool.submit(() -> {
-				Tensor tmp = new Tensor(shapeSaida);
-
-				forwardConv2DNormal(
-					entrada.subTensor(id),
-					kernel,
-					bias,
-					tmp
-				);
-
-				saidaLocal[id] = tmp;
+				int offKf = offKBase + filtro * canais * areaK;
+				double biasF = bias.isPresent() ? bias.get().get(filtro) : 0.0;
+				
+				for (int l = 0; l < lotes; l++) {
+					int offY = offYBase + (l * filtros + filtro) * areaY;	
+					for (int c = 0; c < canais; c++) {
+						int offX = offXBase + (l * canais + c) * areaX;
+						int offK = offKf + c * areaK;
+						
+						backend.corr2D(
+							x, offX,
+							k, offK,
+							s, offY,
+							largX, altX,
+							largK, atlK
+						);
+					}
+					
+					if (bias.isPresent()) {
+						for (int i = 0; i < areaY; i++) {
+							s[offY + i] += biasF;
+						}
+					}
+				}
 			}));
 		}
-
-		for (int i = 0; i < tarefas.size(); i++) {
-			tarefas.get(i).join();
-			saida.subTensor(i).copiar(saidaLocal[i]);
+		
+		for (ForkJoinTask<?> t : tarefas) {
+			t.join();
 		}
+		
 	}
 
 	/**
@@ -332,45 +372,90 @@ public class LayerOps {
 	 * @param gradE gradE
 	 */
 	private void backwardConv2DLotes(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
-		int lotes = entrada.tamDim(0);
+		final int[] shapeX = entrada.shape();
+		final int[] shapeK = kernel.shape();
 
-		Tensor[] localK = new Tensor[lotes];
-		Tensor[] localB = gradB.isPresent() ? new Tensor[lotes] : null;
-
-		List<ForkJoinTask<?>> tarefas = new ArrayList<>(lotes);
-
-		for (int i = 0; i < lotes; i++) {
-			final int id = i;
-
-			ForkJoinTask<?> tarefa = pool.submit(() -> {
-				localK[id] = new Tensor(gradK.shape());
-				if (gradB.isPresent()) {
-					localB[id] = new Tensor(gradB.get().shape());
+		final int lotes = shapeX[0];
+		final int canais = shapeX[1];
+		final int altX = shapeX[2];
+		final int largX = shapeX[3];
+	
+		final int filtros  = shapeK[0];
+		final int altK = shapeK[2];
+		final int largK = shapeK[3];
+	
+		final int altS  = altX  - altK  + 1;
+		final int largS = largX - largK + 1;
+	
+		final int areaX  = altX * largX;
+		final int areaK  = altK * largK;
+		final int areaGS = altS * largS;
+	
+		final double[] x  = entrada.array();
+		final double[] k  = kernel.array();
+		final double[] gs = gradS.array();
+		final double[] gk = gradK.array();
+		final double[] ge = gradE.array();
+	
+		final int offXBase  = entrada.offset();
+		final int offKBase  = kernel.offset();
+		final int offGSBase = gradS.offset();
+		final int offGEBase = gradE.offset();
+	
+		List<ForkJoinTask<?>> tarefas = new ArrayList<>(filtros);
+	
+		for (int f = 0; f < filtros; f++) {
+			final int filtro = f;
+			
+			tarefas.add(pool.submit(() -> {
+				final int offKf = offKBase + filtro * canais * areaK;
+				double somaBiasLocal = 0;
+	
+				for (int l = 0; l < lotes; l++) {
+					final int offGS = offGSBase + (l * filtros + filtro) * areaGS;
+					for (int c = 0; c < canais; c++) {
+						int offGE = offGEBase + (l * canais + c) * areaX;
+						int offK  = offKf + c * areaK;
+	
+						backend.conv2DFull(
+							gs, offGS,
+							k,  offK,
+							ge, offGE,
+							largS, altS,
+							largK, altK
+						);
+					}
+	
+					for (int c = 0; c < canais; c++) {
+						int offX  = offXBase + (l * canais + c) * areaX;
+						int offGK = offKf + c * areaK;
+	
+						backend.corr2D(
+							x,  offX,
+							gs, offGS,
+							gk, offGK,
+							largX, altX,
+							largS, altS
+						);
+					}
+	
+					if (gradB.isPresent()) {
+						for (int i = 0; i < areaGS; i++) {
+							somaBiasLocal += gs[offGS + i];
+						}
+					}
 				}
 	
-				backwardConv2DNormal(
-					entrada.subTensor(id),
-					kernel,
-					gradS.subTensor(id),
-					localK[id],
-					Optional.of(localB[id]),
-					gradE.subTensor(id)
-				);
-			});
-
-			tarefas.add(tarefa);
+				if (gradB.isPresent()) {
+					gradB.get().add(somaBiasLocal, filtro);
+				}
+			}));
+		}
+	
+		for (ForkJoinTask<?> t : tarefas) {
+			t.join();
 		}
 
-		for (var tarefa : tarefas) tarefa.join();
-
-		for (Tensor grad : localK) gradK.add(grad);
-
-		if (gradB.isPresent()) {
-			Tensor gb = gradB.get();
-			for (Tensor grad : localB) {
-				gb.add(grad);
-			}
-		}
 	}
 
 	/**

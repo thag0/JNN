@@ -29,7 +29,7 @@ public class MainConv {
 	static Funcional jnn = new Funcional();
 
 	// controle de treino
-	static final int TREINO_EPOCAS = 5;
+	static final int TREINO_EPOCAS = 20;
 	static final int TREINO_LOTE = 64;
 	static final boolean TREINO_LOGS = true;
 
@@ -42,7 +42,7 @@ public class MainConv {
 	public static void main(String[] args) {
 		ged.limparConsole();
 
-		DataLoader dlTreino = MNIST.treino();
+		DataLoader dlTreino = MNIST.treino().subLoader(0, 20_000);
 		dlTreino.print();
 
 		Sequencial modelo = criarModelo();
