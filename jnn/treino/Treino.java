@@ -25,27 +25,41 @@ public class Treino extends MetodoTreino {
 	@Override
 	protected void loop(Tensor[] x, Tensor[] y, Otimizador otm, Perda loss, int amostras, int epochs, boolean logs) {
 		if (logs) esconderCursor();
+		long tempo = 0;
+
 		for (int e = 1; e <= epochs; e++) {
+			if (logs) tempo = System.nanoTime();
+
 			double perdaEpoca = 0;
 			embaralhar(x, y);
 			
 			for (int i = 0; i < amostras; i++) {
 				Tensor prev = modelo.forward(x[i]);
 				
-				//feedback de avanço
 				if (calcHist) perdaEpoca += loss.forward(prev, y[i]).item();
 				
 				modelo.gradZero();
 				backpropagation(loss.backward(prev, y[i]));
 				otm.update();
 			}
-
+			
 			if (logs) {
+				tempo = System.nanoTime() - tempo;
 				limparLinha();
-				exibirLogTreino("Época " +  e + "/" + epochs + " -> perda: " + (double)(perdaEpoca/amostras));
+				String log = "Época " +  e + "/" + epochs + " -> perda: " + (float)(perdaEpoca/amostras);
+
+				long segundos = (long) tempo / 1_000_000_000;
+				long min = (segundos / 60);
+				long seg = segundos % 60;
+				if (segundos < 60) {
+					log += String.format(" (%ds)", segundos);
+				} else {
+					log += String.format(" (%dmin %ds)", min, seg);
+				}
+
+				exibirLogTreino(log);
 			}
 
-			// feedback de avanço
 			if (calcHist) historico.add(perdaEpoca/amostras);
 		}
 

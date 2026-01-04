@@ -1,6 +1,4 @@
 import java.text.DecimalFormat;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import ged.Dados;
@@ -8,11 +6,9 @@ import ged.Ged;
 import jnn.Funcional;
 import jnn.camadas.*;
 import jnn.camadas.pooling.MaxPool2D;
-import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.dataloader.dataset.MNIST;
 import jnn.io.Serializador;
-import jnn.io.seriais.SerialTensor;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
 
@@ -29,7 +25,7 @@ public class MainConv {
 	static Funcional jnn = new Funcional();
 
 	// controle de treino
-	static final int TREINO_EPOCAS = 20;
+	static final int TREINO_EPOCAS = 5;
 	static final int TREINO_LOTE = 64;
 	static final boolean TREINO_LOGS = true;
 
@@ -42,7 +38,7 @@ public class MainConv {
 	public static void main(String[] args) {
 		ged.limparConsole();
 
-		DataLoader dlTreino = MNIST.treino().subLoader(0, 20_000);
+		DataLoader dlTreino = MNIST.treino().subLoader(0, 5_000);
 		dlTreino.print();
 
 		Sequencial modelo = criarModelo();
@@ -68,9 +64,10 @@ public class MainConv {
 		System.out.print("Teste -> perda: " + modelo.avaliar(dlTeste).item() + " - ");
 		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(dlTeste).item() * 100), 4) + "%");
 
-		exportarHistorico(modelo, CAMINHO_HISTORICO);
 		salvarModelo(modelo, CAMINHO_SAIDA_MODELO);
-		MainImg.executarComando("python grafico.py " + CAMINHO_HISTORICO);
+
+		exportarHistorico(modelo, CAMINHO_HISTORICO);
+		executarComando("python grafico.py " + CAMINHO_HISTORICO);
 	}
 
 	/*
@@ -110,87 +107,6 @@ public class MainConv {
 	}
 
 	/**
-	 * Carrega as imagens do conjunto de dados {@code MNIST}.
-	 * <p>
-	 *    Nota
-	 * </p>
-	 * O diretório deve conter subdiretórios, cada um contendo o conjunto de 
-	 * imagens de cada dígito, exemplo:
-	 * <pre>
-	 *"mnist/treino/0"
-	 *"mnist/treino/1"
-	 *"mnist/treino/2"
-	 *"mnist/treino/3"
-	 *"mnist/treino/4"
-	 *"mnist/treino/5"
-	 *"mnist/treino/6"
-	 *"mnist/treino/7"
-	 *"mnist/treino/8"
-	 *"mnist/treino/9"
-	 * </pre>
-	 * @param caminho caminho do diretório das imagens.
-	 * @param amostras quantidade de amostras por dígito
-	 * @param digitos quantidade de dígitos, iniciando do dígito 0.
-	 * @return dados carregados.
-	 */
-	static Tensor[] carregarAmostrasMNIST(String caminho, int amostras, int digitos) {
-		final Tensor[] arr = new Tensor[digitos * amostras];
-		final int numThreads = Runtime.getRuntime().availableProcessors();
-		SerialTensor st = new SerialTensor();
-
-		try (ExecutorService exec = Executors.newFixedThreadPool(numThreads)) {
-			int id = 0;
-			for (int digito = 0; digito < digitos; digito++) {
-				for (int amostra = 0; amostra < amostras; amostra++) {
-					final String caminhoCompleto = caminho + digito + "/img_" + amostra + ".jpg";
-					final int indice = id;
-					
-					exec.submit(() -> {
-						try {
-							Tensor img = st.lerImagem(caminhoCompleto);
-							arr[indice] = img.unsqueeze(0); // ser 3d
-						} catch (Exception e) {
-							System.out.println(e.getMessage());
-							System.exit(1);
-						}
-					});
-
-					id++;
-				}
-			}
-  
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
-  
-		System.out.println("Imagens carregadas (" + arr.length + ").");
-  
-		return arr;		
-	}
-
-	/**
-	 * Gera os rótulos do conjunto de dados {@code MNIST}.
-	 * @param amostras quantidades de amostras por dítigo.
-	 * @param digitos quantidade de dítigos, começando do 0.
-	 * @return dados carregados.
-	 */
-	static Tensor[] criarRotulosMNIST(int amostras, int digitos) {
-		Tensor[] rotulos = new Tensor[digitos * amostras]; 
-
-		for (int digito = 0; digito < digitos; digito++) {
-			for (int amostra = 0; amostra < amostras; amostra++) {
-				double[] data = new double[digitos];
-				data[digito] = 1;
-				
-				int indice = digito * amostras + amostra;
-				rotulos[indice] = new Tensor(data);
-			}
-		}
-
-		return rotulos;
-	}
-
-	/**
 	 * Formata o valor recebido para a quantidade de casas após o ponto
 	 * flutuante.
 	 * @param valor valor alvo.
@@ -224,4 +140,17 @@ public class MainConv {
 		Dados dados = new Dados(dadosPerdas);
 		ged.exportarCsv(dados, caminho);
 	}
+
+	/**
+	 * Executa um comando do terminald Windows.
+	 * @param comando comando para o prompt.
+	 */
+	static void executarComando(String comando) {
+		try {
+			new ProcessBuilder("cmd", "/c", comando).inheritIO().start().waitFor();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 }

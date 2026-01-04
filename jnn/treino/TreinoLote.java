@@ -35,8 +35,11 @@ public class TreinoLote extends MetodoTreino {
 	@Override
 	protected void loop(Tensor[] x, Tensor[] y, Otimizador otm, Perda loss, int amostras, int epochs, boolean logs) {
 		if (logs) esconderCursor();
-		
+		long tempo = 0;
+
 		for (int e = 1; e <= epochs; e++) {
+			if (logs) tempo = System.nanoTime();
+
 			embaralhar(x, y);
 			DoubleAdder perdaEpoca = new DoubleAdder();
 
@@ -49,16 +52,26 @@ public class TreinoLote extends MetodoTreino {
 				processoLote(loteX, loteY, loss, perdaEpoca);
                 otm.update();      
 			}
-
-			if (calcHist) {
-				historico.add(perdaEpoca.sum() / amostras);
-			}
-
-			if (logs) {
-				limparLinha();
-				exibirLogTreino("Época " +  e + "/" + epochs + " -> perda: " + (perdaEpoca.sum()/amostras));
-			}
 			
+			if (logs) {
+				tempo = System.nanoTime() - tempo;
+
+				limparLinha();
+				String log = "[Época " + e + "/" + epochs + "] loss: " + (float)(perdaEpoca.sum()/amostras);
+
+				long segundos = (long) tempo / 1_000_000_000;
+				long min = (segundos / 60);
+				long seg = segundos % 60;
+				if (segundos < 60) {
+					log += String.format(" (%ds)", segundos);
+				} else {
+					log += String.format(" (%dmin %ds)", min, seg);
+				}
+
+				exibirLogTreino(log);
+			}
+
+			if (calcHist) historico.add(perdaEpoca.sum() / amostras);			
 		}
 
 		if (logs) {
