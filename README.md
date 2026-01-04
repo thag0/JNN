@@ -67,3 +67,10 @@ Por enquanto a implementação mais fácil de fazer foi criar a camada de Dropou
 
 ![exemplo-dropout](https://github.com/thag0/JNN/assets/91092364/1bb9cba6-75cf-4b12-9db0-b18a06dce20d)
 *Exemplo de modelo usando camadas de abandono (dropout), valores arbitrários.*
+
+# **Adicionais**
+Caso queira ajustar a quantidade de threads alocadas para a biblioteca, chame antes do inicio das inicializações:
+```
+int threads = //valor desejado
+PoolFactory.setThreads(threads);
+```
