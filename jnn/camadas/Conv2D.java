@@ -667,7 +667,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 */
 	public int numFiltros() {
 		verificarConstrucao();
-		return shapeOut[0];
+		return _kernel.tamDim(0);
 	}
 
 	@Override

@@ -491,7 +491,7 @@ public class Densa extends Camada implements Cloneable {
 	 */
 	public int numNeuronios() {
 		verificarConstrucao();
-		return _kernel.shape()[1];
+		return _kernel.tamDim(1);
 	}
 
 	@Override
