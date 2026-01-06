@@ -25,13 +25,11 @@ public class MainConv {
 	static Funcional jnn = new Funcional();
 
 	// controle de treino
-	static final int TREINO_EPOCAS = 15;
-	static final int TREINO_LOTE = 128;
+	static final int TREINO_EPOCAS = 10;
+	static final int TREINO_LOTE = 64;
 	static final boolean TREINO_LOGS = true;
 
 	// caminhos de arquivos externos
-	static final String CAMINHO_TREINO = "./dados/mnist/treino/";
-	static final String CAMINHO_TESTE = "./dados/mnist/teste/";
 	static final String CAMINHO_SAIDA_MODELO = "./dados/modelos/modelo-treinado.nn";
 	static final String CAMINHO_HISTORICO = "historico-perda.csv";
 
@@ -81,7 +79,7 @@ public class MainConv {
 			new Conv2D(28, new int[]{3, 3}, "relu"),
 			new MaxPool2D(new int[]{2, 2}),
 			new Flatten(),
-			new Densa(60, "relu"),
+			new Densa(80, "relu"),
 			new Densa(10, "softmax")
 		);
 
