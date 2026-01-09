@@ -7,6 +7,25 @@ static inline int jnn_native_num_threads() {
     return p > 1 ? p / 2 : 1;
 }
 
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
+    omp_set_num_threads(jnn_native_num_threads());
+    return JNI_VERSION_1_8;
+}
+
+JNIEXPORT void JNICALL
+Java_jnn_nativo_JNNNative_setThreads(
+    JNIEnv* env, jclass cls, jint n
+) {
+    (void) env;
+    (void) cls;
+
+    if (n < 1) {
+        n = 1;
+    }
+
+    omp_set_num_threads((int)n);
+}
+
 JNIEXPORT void JNICALL
 Java_jnn_nativo_JNNNative_matmul(
     JNIEnv* env, jclass cls,
@@ -16,13 +35,13 @@ Java_jnn_nativo_JNNNative_matmul(
     jint M, jint K, jint N
 ) {
     (void) cls;
+    
     jboolean isCopyA, isCopyB, isCopyC;
 
-    double* A = (*env)->GetDoubleArrayElements(env, aArr, &isCopyA);
-    double* B = (*env)->GetDoubleArrayElements(env, bArr, &isCopyB);
-    double* C = (*env)->GetDoubleArrayElements(env, cArr, &isCopyC);
+    double* restrict A = (*env)->GetPrimitiveArrayCritical(env, aArr, NULL);
+    double* restrict B = (*env)->GetPrimitiveArrayCritical(env, bArr, NULL);
+    double* restrict C = (*env)->GetPrimitiveArrayCritical(env, cArr, NULL);
 
-    omp_set_num_threads(jnn_native_num_threads());
     #pragma omp parallel for schedule(static)
     for (int i = 0; i < M; i++) {
         int baseA = offA + i * s0A;
@@ -38,9 +57,9 @@ Java_jnn_nativo_JNNNative_matmul(
         }
     }
 
-    (*env)->ReleaseDoubleArrayElements(env, aArr, A, JNI_ABORT);
-    (*env)->ReleaseDoubleArrayElements(env, bArr, B, JNI_ABORT);
-    (*env)->ReleaseDoubleArrayElements(env, cArr, C, 0);
+    (*env)->ReleasePrimitiveArrayCritical(env, aArr, A, JNI_ABORT);
+    (*env)->ReleasePrimitiveArrayCritical(env, bArr, B, JNI_ABORT);
+    (*env)->ReleasePrimitiveArrayCritical(env, cArr, C, 0);
 }
 
 JNIEXPORT void JNICALL
@@ -70,16 +89,13 @@ Java_jnn_nativo_JNNNative_conv2dForward(
     const int areaK = kH * kW;
     const int areaY = outH * outW;
 
-    omp_set_num_threads(jnn_native_num_threads());
-    #pragma omp parallel for collapse(2) schedule(static)
+    #pragma omp parallel for schedule(static)
     for (int b = 0; b < BATCH; b++) {
         for (int f = 0; f < COUT; f++) {
-
             const int offXb  = offX + b * CIN * areaX;
             const int offYb  = offY + b * COUT * areaY;
             const int offYbf = offYb + f * areaY;
             const int offKf  = offK + f * CIN * areaK;
-
             const double bias = hasBias ? B[offB + f] : 0.0;
 
             for (int i = 0; i < outH; i++) {
@@ -227,7 +243,6 @@ Java_jnn_nativo_JNNNative_conv2dBackward(
     const int areaK = altK * largK;
     const int areaGS = altS * largS;
 
-    omp_set_num_threads(jnn_native_num_threads());
     #pragma omp parallel for schedule(static)
     for (int f = 0; f < filtros; f++) {
         const int filtro = f;

@@ -40,6 +40,12 @@ public final class JNNNative {
     private JNNNative() {}
 
     /**
+     * Altera a quantidade de threads usadas pelo código nativo.
+     * @param t quantidade desejada de threads.
+    */
+    public static native void setThreads(int t);
+
+    /**
      * Experimental
      */
     public static native void matmul(
