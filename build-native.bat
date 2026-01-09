@@ -9,8 +9,6 @@ set DLL=jnn_native.dll
 
 if not exist "%OUT_DIR%" mkdir "%OUT_DIR%"
 
-echo Compilando JNI...
-
 gcc ^
  -O2 ^
  -shared ^
@@ -28,9 +26,6 @@ if errorlevel 1 (
     exit /b 1
 )
 
-echo Copiando dependencias OpenMP...
-
-REM ajuste conforme seu MinGW
 copy C:\mingw64\bin\libgomp-1.dll "%OUT_DIR%"
 copy C:\mingw64\bin\libgcc_s_seh-1.dll "%OUT_DIR%"
 copy C:\mingw64\bin\libwinpthread-1.dll "%OUT_DIR%"

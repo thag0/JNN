@@ -8,7 +8,6 @@ set JAVA_FILES=
 if exist bin rmdir /S /Q bin
 mkdir "%BIN_DIR%"
 
-echo Coletando arquivos Java...
 for /R "%SRC_DIR%" %%f in (*.java) do (
     set JAVA_FILES=!JAVA_FILES! "%%f"
 )

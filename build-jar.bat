@@ -4,8 +4,6 @@ setlocal
 set BIN_CLASSES=bin\classes
 set OUT_JAR=bin\jnn.jar
 
-echo Gerando JAR...
-
 jar cvf "%OUT_JAR%" ^
  -C "%BIN_CLASSES%" . ^
  -C bin native
