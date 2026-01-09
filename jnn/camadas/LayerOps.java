@@ -9,6 +9,7 @@ import java.util.concurrent.ForkJoinTask;
 import jnn.core.backend.Backend;
 import jnn.core.parallel.PoolFactory;
 import jnn.core.tensor.Tensor;
+import jnn.nativo.JNNNative;
 
 /**
  * Utilitário para operações de forward e backward de camadas.
@@ -171,15 +172,29 @@ public class LayerOps {
 	private void forwardConv2DLotes(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
 		final int[] shapeX = entrada.shape();
 		final int[] shapeK = kernel.shape();
-		
 		final int lotes = shapeX[0];
 		final int canais = shapeX[1];
+		final int filtros = shapeK[0];
 		final int altX = shapeX[2];
 		final int largX = shapeX[3];
 		
-		final int filtros = shapeK[0];
 		final int atlK = shapeK[2];
 		final int largK = shapeK[3];
+
+		if (Backend.jni) {
+			JNNNative.conv2dForward(
+				entrada.array(), entrada.offset(),
+				kernel.array(), kernel.offset(),
+				bias.isPresent() ? bias.get().array() : null,
+				bias.isPresent() ? bias.get().offset() : 0,
+				bias.isPresent(),
+				saida.array(), saida.offset(),
+				lotes, canais, filtros,
+				altX, largX,
+				atlK, largK
+			);
+			return;
+		}
 		
 		final int altS = altX - atlK + 1;
 		final int largS = largX - largK + 1;
@@ -245,7 +260,7 @@ public class LayerOps {
 	 * @param gradE {@code Tensor} contendo o gradiente em relação à entrada da camada.
 	 * @see {@link jnn.camadas.Conv2D}
 	 */
-	public void backwardConv2D(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {	
+	public void backwardConv2D(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
 		if (entrada.numDim() == 3) {
 			backwardConv2DNormal(entrada, kernel, gradS, gradK, gradB, gradE);
 		
@@ -384,6 +399,22 @@ public class LayerOps {
 		final int altK = shapeK[2];
 		final int largK = shapeK[3];
 	
+		if (Backend.jni) {
+			JNNNative.conv2dBackward(
+				entrada.array(), entrada.offset(),
+				kernel.array(), kernel.offset(),
+				gradS.array(), gradS.offset(),
+				gradK.array(), gradK.offset(),
+				gradB.isPresent() ? gradB.get().array() : null,
+				gradB.isPresent() ? gradB.get().offset() : 0,
+				gradB.isPresent(),
+				gradE.array(), gradE.offset(),
+				lotes, canais, filtros, altX, largX, altK, largK
+			);
+
+			return;
+		}
+
 		final int altS  = altX  - altK  + 1;
 		final int largS = largX - largK + 1;
 	
@@ -415,7 +446,7 @@ public class LayerOps {
 					final int offGS = offGSBase + (l * filtros + filtro) * areaGS;
 					for (int c = 0; c < canais; c++) {
 						int offGE = offGEBase + (l * canais + c) * areaX;
-						int offK  = offKf + c * areaK;
+						int offK  = offKf + (c * areaK);
 	
 						backend.conv2DFull(
 							gs, offGS,

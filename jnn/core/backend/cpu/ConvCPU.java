@@ -67,7 +67,6 @@ public class ConvCPU {
 		double[] dataK = k.array();
 		double[] dataS = dst.array();
 
-		// lidar com views de tensores
 		int offE = x.offset();
 		int offK = k.offset();
 		int offS = dst.offset();

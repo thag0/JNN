@@ -1,5 +1,6 @@
 package jnn.core.backend.cpu;
 
+import jnn.nativo.JNNNative;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -147,5 +148,57 @@ public class LinearCPU {
 		}
 
 	}
+
+	public static void matmul_jni(Tensor a, Tensor b, Tensor dst) {
+		if (a.numDim() > 2 || b.numDim() > 2 || dst.numDim() > 2)
+			throw new IllegalArgumentException(
+				"\nOs tensores devem conter até duas dimensões, mas contêm " +
+				"A = " + a.numDim() + " B = " + b.numDim() + " Dest = " + dst.numDim()
+			);
+
+		final int[] shapeA = a.shape();
+		final int[] shapeB = b.shape();
+		final int[] shapeD = dst.shape();
+
+		final int M = shapeA.length == 1 ? 1 : shapeA[0];
+		final int K = shapeA.length == 1 ? shapeA[0] : shapeA[1];
+		final int Kb = shapeB.length == 1 ? 1 : shapeB[0];
+		final int N = shapeB.length == 1 ? shapeB[0] : shapeB[1];
+
+		if (K != Kb) {
+			throw new IllegalArgumentException(
+				"Dimensões incompatíveis para multiplicação: A = " + a.shapeStr() + 
+				", B = " + b.shapeStr()
+			);
+		}
+
+		final int linD = shapeD.length == 1 ? 1 : shapeD[0];
+		final int colD = shapeD.length == 1 ? shapeD[0] : shapeD[1];
+
+		if (M != linD || N != colD) {
+			throw new IllegalArgumentException(
+				"Dimensões de saída inválidas, esperado (" + M + "," + N + "), mas recebido " + dst.shapeStr()
+			);
+		}
+
+		final int[] stridesA = a.strides();
+		final int[] stridesB = b.strides();
+		final int[] stridesD = dst.strides();
+
+		final int s0A = stridesA.length == 1 ? 1 : stridesA[0];
+		final int s1A = stridesA.length == 1 ? 1 : stridesA[1];
+		final int s0B = stridesB.length == 1 ? 1 : stridesB[0];
+		final int s1B = stridesB.length == 1 ? 1 : stridesB[1];
+		final int s0C = stridesD.length == 1 ? 1 : stridesD[0];
+		final int s1C = stridesD.length == 1 ? 1 : stridesD[1];
+
+		JNNNative.matmul(
+			a.array(), a.offset(), s0A, s1A,
+			b.array(), b.offset(), s0B, s1B,
+			dst.array(), dst.offset(), s0C, s1C,
+			M, K, N
+		);
+	}
+
 
 }

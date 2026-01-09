@@ -12,6 +12,8 @@ import jnn.core.tensor.Tensor;
  */
 public abstract class Backend {
 
+	public static boolean jni = false;
+
 	/**
 	 * Retorna as implementações em {@code CPU} da biblioteca.
 	 * @return {@code Backend} em CPU.
@@ -35,7 +37,6 @@ public abstract class Backend {
 	 * @param dst {@code Tensor} de destino.
 	 */
 	public abstract void matmul(Tensor a, Tensor b, Tensor dst);
-
 
 	/**
 	 * Realiza a operação de correlação cruzada entre o tensor de entrada e o kernel.

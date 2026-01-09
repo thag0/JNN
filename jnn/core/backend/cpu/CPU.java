@@ -1,5 +1,7 @@
 package jnn.core.backend.cpu;
 
+import java.util.Optional;
+
 import jnn.core.backend.Backend;
 import jnn.core.tensor.Tensor;
 
@@ -15,7 +17,8 @@ public final class CPU extends Backend {
 
     @Override
 	public void matmul(Tensor a, Tensor b, Tensor dst) {
-        LinearCPU.matmul(a, b, dst);
+		if (jni) LinearCPU.matmul_jni(a, b, dst);
+		else LinearCPU.matmul(a, b, dst);
 	}
 
     @Override
@@ -96,66 +99,104 @@ public final class CPU extends Backend {
 
 	/**
 	 * Experimental
+	 * @param x {@code Tensor} de entrada.
+	 * @param altK altura do kernel (filtro).
+	 * @param largK largura do kernel (filtro).
+	 * @param altStd altura do stride.
+	 * @param largStd largura do stride.
+	 * @param altPad altura do padding.
+	 * @param largPad largura do padding.
+	 * @return {@code Tensor} convertido para o formato {@code im2col}.
 	 */
-	public Tensor im2col(Tensor x, int kH, int kW) {
-		// x: (B, C, H, W)
+	public Tensor im2col(Tensor x, int altK, int largK, int altStd, int largStd, int altPad, int largPad) {
 		int[] shape = x.shape();
-		if (shape.length != 4) {
-			throw new IllegalArgumentException(
-				"im2col espera tensor 4D (B, C, H, W)"
-			);
+		if (shape.length != 3) {
+			throw new IllegalArgumentException("O tensor de entrada deve ter formato [C, H, W].");
 		}
 
-		final int B = shape[0];
-		final int C = shape[1];
-		final int H = shape[2];
-		final int W = shape[3];
+		int canais = shape[0];
+		int altIn = shape[1];
+		int largIn = shape[2];
 
-		final int outH = H - kH + 1;
-		final int outW = W - kW + 1;
+		int altOut = (altIn + 2 * altPad - altK) / altStd + 1;
+		int largOut = (largIn + 2 * largPad - largK) / largStd + 1;
 
-		final int lins = B * outH * outW;
-		final int cols = C * kH * kW;
+		Tensor col = new Tensor(new int[]{canais * altK * largK, altOut * largOut});
+		double[] dadosX = x.array();
+		double[] dadosC = col.array();
 
-		Tensor col = new Tensor(lins, cols);
+		int canalArea = altK * largK;
+		int colunaCol = altOut * largOut;
 
-		final double[] dataX   = x.array();
-		final double[] dataCol = col.array();
+		// Iteração principal
+		for (int c = 0; c < canais; c++) {
+			for (int kh = 0; kh < altK; kh++) {
+				for (int kw = 0; kw < largK; kw++) {
+					int linhaBase = c * canalArea + kh * largK + kw;
+					int outIndex = 0;
+					int inY0 = kh - altPad;
 
-		final int offXBase   = x.offset();
-		final int offColBase = col.offset();
-		
-		final int areaHW = H * W;
-		int lin = 0;
-		for (int b = 0; b < B; b++) {
-			final int offXB = offXBase + b * C * areaHW;
+					for (int y = 0; y < altOut; y++) {
+						int inY = inY0 + y * altStd;
+						int inX0 = kw - largPad;
 
-			for (int oy = 0; oy < outH; oy++) {
-				for (int ox = 0; ox < outW; ox++) {
+						for (int x2 = 0; x2 < largOut; x2++) {
+							int inX = inX0 + x2 * largStd;
 
-					int colBase = offColBase + lin * cols;
-					int idxCol = colBase;
-
-					for (int c = 0; c < C; c++) {
-						final int offXC = offXB + c * areaHW;
-
-						for (int ky = 0; ky < kH; ky++) {
-							final int inY = oy + ky;
-							final int baseIn = offXC + inY * W;
-
-							for (int kx = 0; kx < kW; kx++) {
-								dataCol[idxCol++] =
-									dataX[baseIn + (ox + kx)];
+							if (inY >= 0 && inY < altIn && inX >= 0 && inX < largIn) {
+								dadosC[linhaBase * colunaCol + outIndex] = dadosX[c * altIn * largIn + inY * largIn + inX];
+							} else {
+								dadosC[linhaBase * colunaCol + outIndex] = 0.0;
 							}
+
+							outIndex++;
 						}
 					}
-
-					lin++;
 				}
 			}
 		}
 
 		return col;
+	}
+
+	/**
+	 * Experimental
+	 * @param entrada
+	 * @param kernel
+	 * @param bias
+	 * @param saida
+	 */
+	public void forwardConv2DIm2col(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
+		int[] kShape = kernel.shape();// (filtros, canais, kH, kW)
+		int numFiltros = kShape[0];
+		int canais = kShape[1];
+		int kH = kShape[2];
+		int kW = kShape[3];
+		int padH = 0; 
+		int padW = 0;
+		int strideH = 1;
+		int strideW = 1;
+
+		int H = entrada.tamDim(1);
+		int W = entrada.tamDim(2);
+		int outH = (H + 2 * padH - kH) / strideH + 1;
+		int outW = (W + 2 * padW - kW) / strideW + 1;
+
+		Tensor im2Col = im2col(entrada, kH, kW, strideH, strideW, padH, padW);
+		Tensor flatK = kernel.reshape(numFiltros, canais * kH * kW); 
+
+		Tensor res = new Tensor(numFiltros, outH * outW);
+		matmul(flatK, im2Col, res);
+
+		res = res.reshape(numFiltros, outH, outW);
+		saida.copiar(res);
+		
+		bias.ifPresent(b -> {
+			for (int f = 0; f < numFiltros; f++) {
+				double x = b.get(f);
+				saida.subTensor(f).add(x);
+			}
+		});
 	}
 
 }

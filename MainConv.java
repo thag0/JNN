@@ -6,6 +6,7 @@ import ged.Ged;
 import jnn.Funcional;
 import jnn.camadas.*;
 import jnn.camadas.pooling.MaxPool2D;
+import jnn.core.backend.Backend;
 import jnn.dataloader.DataLoader;
 import jnn.dataloader.dataset.MNIST;
 import jnn.io.Serializador;
@@ -38,6 +39,8 @@ public class MainConv {
 
 		DataLoader dlTreino = MNIST.treino();
 		dlTreino.print();
+
+		Backend.jni = true;
 
 		Sequencial modelo = criarModelo();
 		modelo.setHistorico(true);

@@ -4,5 +4,6 @@ Playground.java
 /testes/*.java
 /testes/*.py
 
-/bin/jnn
+/bin/classes
+/bin/native
 /bin/doc
