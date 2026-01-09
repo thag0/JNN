@@ -4,11 +4,8 @@ Playground.java
 Conv.java
 Benchmark.java
 
-/testes/*.java
-/testes/*.py
+/testes/bin
 
 /bin/classes
 /bin/native
 /bin/doc
-
-/testes/bin

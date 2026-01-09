@@ -42,7 +42,7 @@ public class MainConv {
 
 		Backend.jni = true;
 
-		Sequencial modelo = criarModelo();
+		Sequencial modelo = criarModelo(true);
 		modelo.setHistorico(true);
 		modelo.print();
 
@@ -74,25 +74,30 @@ public class MainConv {
 	/*
 	 * Criação de modelos para testes.
 	 */
-	static Sequencial criarModelo() {
-		Sequencial modelo = new Sequencial(
-			new Entrada(1, 28, 28),
-			new Conv2D(32, new int[]{3, 3}, "relu"),
-			new MaxPool2D(new int[]{2, 2}),
-			new Conv2D(28, new int[]{3, 3}, "relu"),
-			new MaxPool2D(new int[]{2, 2}),
-			new Flatten(),
-			new Densa(80, "relu"),
-			new Densa(10, "softmax")
-		);
+	static Sequencial criarModelo(boolean mlp) {
+		Sequencial modelo = null;
 
-		// Sequencial modelo = new Sequencial(
-		// 	new Entrada(1, 28, 28),
-		// 	new Flatten(),
-		// 	new Densa(20, "tanh"),
-		// 	new Densa(20, "tanh"),
-		// 	new Densa(10, "sigmoid")
-		// );
+		if (mlp) {
+			modelo = new Sequencial(
+				new Entrada(1, 28, 28),
+				new Flatten(),
+				new Densa(30, "tanh"),
+				new Densa(30, "tanh"),
+				new Densa(10, "sigmoid")
+			);
+
+		} else {
+			modelo = new Sequencial(
+				new Entrada(1, 28, 28),
+				new Conv2D(32, new int[]{3, 3}, "relu"),
+				new MaxPool2D(new int[]{2, 2}),
+				new Conv2D(28, new int[]{3, 3}, "relu"),
+				new MaxPool2D(new int[]{2, 2}),
+				new Flatten(),
+				new Densa(80, "relu"),
+				new Densa(10, "softmax")
+			);
+		}
 
 		modelo.compilar("adam", "entropia-cruzada");
 		
