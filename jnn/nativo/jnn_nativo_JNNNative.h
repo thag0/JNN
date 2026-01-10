@@ -9,6 +9,14 @@ extern "C" {
 #endif
 /*
  * Class:     jnn_nativo_JNNNative
+ * Method:    setThreads
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_jnn_nativo_JNNNative_setThreads
+  (JNIEnv *, jclass, jint);
+
+/*
+ * Class:     jnn_nativo_JNNNative
  * Method:    matmul
  * Signature: ([DIII[DIII[DIIIIII)V
  */

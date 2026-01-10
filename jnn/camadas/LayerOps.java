@@ -433,30 +433,17 @@ public class LayerOps {
 		final int offGSBase = gradS.offset();
 		final int offGEBase = gradE.offset();
 	
-		List<ForkJoinTask<?>> tarefas = new ArrayList<>(filtros);
+		List<ForkJoinTask<?>> tarefas1 = new ArrayList<>(filtros);
 	
 		for (int f = 0; f < filtros; f++) {
 			final int filtro = f;
 			
-			tarefas.add(pool.submit(() -> {
+			tarefas1.add(pool.submit(() -> {
 				final int offKf = offKBase + filtro * canais * areaK;
 				double somaBiasLocal = 0;
-	
+
 				for (int l = 0; l < lotes; l++) {
 					final int offGS = offGSBase + (l * filtros + filtro) * areaGS;
-					for (int c = 0; c < canais; c++) {
-						int offGE = offGEBase + (l * canais + c) * areaX;
-						int offK  = offKf + (c * areaK);
-	
-						backend.conv2DFull(
-							gs, offGS,
-							k,  offK,
-							ge, offGE,
-							largS, altS,
-							largK, altK
-						);
-					}
-	
 					for (int c = 0; c < canais; c++) {
 						int offX  = offXBase + (l * canais + c) * areaX;
 						int offGK = offKf + c * areaK;
@@ -483,7 +470,38 @@ public class LayerOps {
 			}));
 		}
 	
-		for (ForkJoinTask<?> t : tarefas) {
+		for (ForkJoinTask<?> t : tarefas1) {
+			t.join();
+		}
+
+		// tem que ser assim porque se juntar tudo no mesmo loop por filtros
+		// acaba dando race condition no gradiente de entrada
+
+		List<ForkJoinTask<?>> tarefas2 = new ArrayList<>(lotes);
+
+		for (int l = 0; l < lotes; l++) {
+			final int lote = l;
+
+			tarefas2.add(pool.submit(() -> {
+				for (int c = 0; c < canais; c++) {
+					int offGE = offGEBase + (lote * canais + c) * areaX;
+					for (int f = 0; f < filtros; f++) {
+						int offGS = offGSBase + (lote * filtros + f) * areaGS;
+						int offK  = offKBase  + (f * canais + c) * areaK;
+
+						backend.conv2DFull(
+							gs, offGS,
+							k,  offK,
+							ge, offGE,
+							largS, altS,
+							largK, altK
+						);
+					}
+				}
+			}));
+		}
+
+		for (ForkJoinTask<?> t : tarefas2) {
 			t.join();
 		}
 

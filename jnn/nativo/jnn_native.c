@@ -213,7 +213,6 @@ static inline void corr2d(
     }
 }
 
-
 JNIEXPORT void JNICALL
 Java_jnn_nativo_JNNNative_conv2dBackward(
     JNIEnv* env, jclass cls,
@@ -243,7 +242,7 @@ Java_jnn_nativo_JNNNative_conv2dBackward(
     const int areaK = altK * largK;
     const int areaGS = altS * largS;
 
-    #pragma omp parallel for schedule(static)
+    #pragma omp parallel for schedule(static) 
     for (int f = 0; f < filtros; f++) {
         const int filtro = f;
 
@@ -253,22 +252,8 @@ Java_jnn_nativo_JNNNative_conv2dBackward(
         for (int l = 0; l < lotes; l++) {
             const int offGS = offGSbase + (l * filtros + f) * areaGS;
             for (int c = 0; c < canais; c++) {
-                int offGE = offGEbase + (l * canais + c) * areaX;
-                int offK = offKf + (c * areaK);
-
-                conv2d_full(
-                    GS, offGS,
-                    K, offK,
-                    GE, offGE,
-                    altS, largS,
-                    altK, largK
-                );
-            }
-
-            for (int c = 0; c < canais; c++) {
                 int offX = offXbase + (l * canais + c) * areaX;
                 int offGK = offKf + c * areaK;
-
                 corr2d(
                     X, offX,
                     GS, offGS,
@@ -287,6 +272,24 @@ Java_jnn_nativo_JNNNative_conv2dBackward(
 
         if (hasBias) {
             GB[offGBbase + f] += somaBiasLocal;
+        }
+    }
+
+    #pragma omp parallel for collapse(2) schedule(static)
+    for (int l = 0; l < lotes; l++) {
+        for (int c = 0; c < canais; c++) {
+            int offGE = offGEbase + (l * canais + c) * areaX;
+            for (int f = 0; f < filtros; f++) {
+                int offGS = offGSbase + (l * filtros + f) * areaGS;
+                int offK  = offKbase  + (f * canais + c) * areaK;
+                conv2d_full(
+                    GS, offGS,
+                    K,  offK,
+                    GE, offGE,
+                    largS, altS,
+                    largK, altK
+                );
+            }
         }
     }
 

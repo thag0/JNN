@@ -4,6 +4,7 @@ setlocal enabledelayedexpansion
 set SRC_DIR=jnn
 set BIN_DIR=bin\classes
 set JAVA_FILES=
+set JNI_HEADERS=jnn/nativo
 
 if exist bin rmdir /S /Q bin
 mkdir "%BIN_DIR%"
@@ -15,6 +16,7 @@ for /R "%SRC_DIR%" %%f in (*.java) do (
 javac ^
  -g ^
  -parameters ^
+ -h %JNI_HEADERS% ^
  -d "%BIN_DIR%" ^
  -sourcepath "%SRC_DIR%" ^
  %JAVA_FILES%

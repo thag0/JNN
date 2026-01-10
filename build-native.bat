@@ -51,6 +51,7 @@ gcc ^
  -fopenmp ^
  -I"%JAVA_HOME%\include" ^
  -I"%JAVA_HOME%\include\win32" ^
+ -I"jnn\nativo" ^
  "%SRC%" ^
  -o "%OUT_DIR%\%DLL%"
 
