@@ -67,6 +67,18 @@ Para ativar o uso de JNI basta adicionar estre trecho no início do programa:
 JNNNative.jni = true;
 ```
 
+Compile com
+
+```
+javac -cp "jnn.jar" NomeDoPrograma.java
+```
+
+E rode com
+
+```
+java --enable-native-access=ALL-UNNAMED -cp "jnn.jar" NomeDoPrograma
+```
+
 Importante reforçar que o jni por enquanto suporta apenas windows_x64 e que o usuário deve ter instalado o OpenMP na máquina.
 
 # **Adicionais**
