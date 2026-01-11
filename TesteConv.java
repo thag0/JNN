@@ -33,7 +33,7 @@ public class TesteConv {
 	static final boolean EXPORTAR_HIST = true;
 
 	// caminhos de arquivos externos
-	static final String CAMINHO_SAIDA_MODELO = "./modelos/modelo-treinado.nn";
+	static final String CAMINHO_SAIDA_MODELO = "./dados/modelos/modelo-treinado.nn";
 	static final String CAMINHO_HISTORICO = "historico-perda.csv";
 
 	public static void main(String[] args) {
