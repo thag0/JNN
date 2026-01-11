@@ -236,7 +236,7 @@ Java_jnn_nativo_JNNNative_conv2dBackward(
 ) {
     (void) cls;
     
-    double* restrict X  = (*env)->GetPrimitiveArrayCritical(env, XArr, NULL);
+    double *restrict X  = (*env)->GetPrimitiveArrayCritical(env, XArr, NULL);
     double* restrict K  = (*env)->GetPrimitiveArrayCritical(env, KArr, NULL);
     double* restrict GS = (*env)->GetPrimitiveArrayCritical(env, gradSArr, NULL);
     double* restrict GK = (*env)->GetPrimitiveArrayCritical(env, gradKArr, NULL);
