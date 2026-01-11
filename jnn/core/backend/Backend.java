@@ -12,6 +12,9 @@ import jnn.core.tensor.Tensor;
  */
 public abstract class Backend {
 
+	/**
+	 * Decide se o backend aproveitará funções nativas para aceleração.
+	 */
 	public static boolean jni = false;
 
 	/**

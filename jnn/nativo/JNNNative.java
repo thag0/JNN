@@ -7,6 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
+/**
+ * Interface para implementação nativa em C.
+ */
 public final class JNNNative {
 
     /**
@@ -86,7 +89,23 @@ public final class JNNNative {
     );
 
     /**
-     * Experimental
+     * Realiza a progração direta através da camada Conv2D.
+     * @param X entrada.
+     * @param offX offset de entrada.
+     * @param K kernel.
+     * @param offK offset do kernel.
+     * @param B bias (se houver).
+     * @param offB offset do bias (se houver).
+     * @param hasBias verificador do bias.
+     * @param Y saída.
+     * @param offY offset da saída.
+     * @param lotes quantidade de lotes de entrada.
+     * @param canais quantidade de canais de entrada.
+     * @param filtros quantidade de kernels.
+     * @param altX altura da entrada.
+     * @param largX largura da entrada.
+     * @param altK altura do kernel.
+     * @param largK largura do kernel.
      */
     public static native void conv2dForward(
         double[] X, int offX,
@@ -94,11 +113,32 @@ public final class JNNNative {
         double[] B, int offB, boolean hasBias,
         double[] Y, int offY,
         int lotes, int canais, int filtros,
-        int atlX, int largX,
+        int altX, int largX,
         int altK, int largK
     );
+
     /**
-     * Experimental
+     * Realiza a progração reversa através da camada Conv2D.
+     * @param X entrada.
+     * @param offX offset de entrada.
+     * @param K kernel.
+     * @param offK offset do kernel.
+     * @param GS gradiente de saída.
+     * @param offGS offset do gradiente de saída.
+     * @param GK gradiente do kernel.
+     * @param offGK offset do gradiente do kernel.
+     * @param GB gradiente do bias (se houver).
+     * @param offGB offset do gradiente do bias (se houver).
+     * @param temBias verificador do bias.
+     * @param GE gradiente de entrada.
+     * @param offGE offset do gradiente de entrada.
+     * @param lotes quantidade de lotes de entrada.
+     * @param canais quantidade de canais de entrada.
+     * @param filtros quantidade de kernels.
+     * @param altX altura da entrada.
+     * @param largX largura da entrada.
+     * @param altK altura do kernel.
+     * @param largK largura do kernel.
      */
     public static native void conv2dBackward(
         double[] X, int offX,
@@ -110,6 +150,110 @@ public final class JNNNative {
         int lotes, int canais, int filtros,
         int altX, int largX,
         int altK, int largK    
+    );
+    
+    /**
+     * Realiza a propagação direta através da camada de MaxPooling2D.
+     * @param X entrada.
+     * @param offX offset de entrada.
+     * @param Y destino.
+     * @param offY offset do destino.
+     * @param canais quantidade de canais de entrada.
+     * @param altX altura da entrada.
+     * @param largX largura da entrada.
+     * @param altFiltro altura do filtro de pooling.
+     * @param largFiltro largura do filtro de pooling.
+     * @param altStride altura do stride de pooling.
+     * @param largStride largura do stride de pooling.
+     */
+    public static native void maxPool2dForward(
+        double[] X, int offX,
+        double[] Y, int offY,
+        int canais,
+        int altX, int largX,
+        int altFiltro, int largFiltro,
+        int altStride, int largStride
+    );
+
+    /**
+     * Realiza a propagação direta através da camada de MaxPooling2D 
+     * com lotes de dados de entrada.
+     * @param X entrada.
+     * @param offX offset de entrada.
+     * @param Y destino.
+     * @param offY offset do destino.
+     * @param lotes quantidade de lotes de entrada.
+     * @param canais quantidade de canais de entrada.
+     * @param altX altura da entrada.
+     * @param largX largura da entrada.
+     * @param altFiltro altura do filtro de pooling.
+     * @param largFiltro largura do filtro de pooling.
+     * @param altStride altura do stride de pooling.
+     * @param largStride largura do stride de pooling.
+     */
+    public static native void maxPool2dForwardLotes(
+        double[] X, int offX,
+        double[] Y, int offY,
+        int lotes, int canais,
+        int altX, int largX,
+        int altFiltro, int largFiltro,
+        int altStride, int largStride
+    );
+
+    /**
+     * Realiza a progração reversa pela camada MaxPool2D.
+     * @param X entrada.
+     * @param offX offset de entrada.
+     * @param canais canais de entrada.
+     * @param altX altura da entrada.
+     * @param largX largura da entrada.
+     * @param G gradientede saída da camada.
+     * @param offG offset do gradiente de saída.
+     * @param altG altura do gradiente de saída.
+     * @param largG largura do gradiente de saída.
+     * @param GE gradiente de entrada da camada.
+     * @param offGE offset do gradiente de entrada.
+     * @param altFiltro altura do filtro de pooling.
+     * @param largFiltro largura do filtro de pooling.
+     * @param altStride altura do stride de pooling.
+     * @param largStride largura do stride de pooling.
+     */
+    public static native void maxPool2dBackward(
+        double[] X, int offX,
+        int canais, int altX, int largX,
+        double[] G, int offG,
+        int altG, int largG,
+        double[] GE, int offGE,
+        int altFiltro, int largFiltro,
+        int altStride, int largStride
+    );
+
+    /**
+     * Realiza a progração reversa pela camada MaxPool2D com
+     * lotes de dados.
+     * @param X entrada.
+     * @param G gradiente de saída da camada.
+     * @param GE gradiente de entrada da camada.
+     * @param lotes quantidade de lotes.
+     * @param canais quantidade de canais de entrada.
+     * @param altX altura da entrada.
+     * @param largX largura da entrada.
+     * @param altG altura do gradiente de saída.
+     * @param largG largura do gradiente de saída.
+     * @param altFiltro altura do filtro de pooling.
+     * @param largFiltro largura do filtro de pooling.
+     * @param altStride altura do stride de pooling.
+     * @param largStride largura do stride de pooling.
+     */
+    public static native void maxPool2dBackwardLotes(
+        double[] X,
+        double[] G,
+        double[] GE,
+        int lotes, int canais,
+        int altX, int largX,
+        int altG, int largG,
+        int altFiltro, int largFiltro,
+        int altStride, int largStride
     );
 
 }

@@ -42,7 +42,8 @@ set DLL=jnn_native.dll
 set SRC=^
 jnn\nativo\jnn_native_common.c ^
 jnn\nativo\jnn_native_mm.c ^
-jnn\nativo\jnn_native_conv2d.c
+jnn\nativo\jnn_native_conv2d.c ^
+jnn\nativo\jnn_native_pool.c
 
 if not exist "%OUT_DIR%" mkdir "%OUT_DIR%"
 

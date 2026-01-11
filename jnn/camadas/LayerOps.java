@@ -531,8 +531,26 @@ public class LayerOps {
 	 */
 	private void forwardMaxPool2DNormal(Tensor entrada, Tensor saida, int[] filtro, int[] stride) {
 		final int canais = entrada.tamDim(0);
+		
+		if (Backend.jni) {
+			JNNNative.maxPool2dForward(
+				entrada.array(), entrada.offset(),
+				saida.array(), saida.offset(),
+				canais, entrada.tamDim(1), entrada.tamDim(2),
+				filtro[0], filtro[1],
+				stride[0], stride[1]
+			);
+			
+			return;
+		} 
+
 		for (int i = 0; i < canais; i++) {
-			backend.maxPool2D(entrada.subTensor(i), saida.subTensor(i), filtro, stride);
+			backend.maxPool2D(
+				entrada.subTensor(i), 
+				saida.subTensor(i), 
+				filtro, 
+				stride
+			);
 		}
 	}
 
@@ -544,8 +562,21 @@ public class LayerOps {
 	 * @param stride stride.
 	 */
 	private void forwardMaxPool2DLotes(Tensor entrada, Tensor saida, int[] filtro, int[] stride) {
-		// TODO refatorar para trabalhar com os tensores de forma mais inteligente
-		// por enquanto ta assim por compatibilidade.
+		if (Backend.jni) {
+			JNNNative.maxPool2dForwardLotes(
+				entrada.array(), entrada.offset(),
+				saida.array(), saida.offset(),
+				entrada.tamDim(0),
+				entrada.tamDim(1),
+				entrada.tamDim(2),
+				entrada.tamDim(3),
+				filtro[0], filtro[1],
+				stride[0], stride[1]
+			);
+			return;
+		}
+
+		// isso aqui vai melhorar ainda
 		final int lotes = entrada.tamDim(0);
 		for (int i = 0; i < lotes; i++) {
 			forwardMaxPool2DNormal(
@@ -582,6 +613,20 @@ public class LayerOps {
 	 * @param stride stride.
 	 */
 	private void backwardMaxPool2DNormal(Tensor entrada, Tensor grad, Tensor gradE, int[] filtro, int[] stride) {
+		if (Backend.jni) {
+			JNNNative.maxPool2dBackward(
+				entrada.array(), entrada.offset(),
+				entrada.tamDim(0),
+				entrada.tamDim(1), entrada.tamDim(2),
+				grad.array(), grad.offset(), grad.tamDim(1), grad.tamDim(2),
+				gradE.array(), gradE.offset(), 
+				filtro[0], filtro[1],
+				stride[0], stride[1]
+			);
+
+			return;
+		}
+
 		int[] shapeEntrada = entrada.shape();
 		int[] shapeGradS   = grad.shape();
 
@@ -644,10 +689,23 @@ public class LayerOps {
 	 * @param stride stride.
 	 */
 	private void backwardMaxPool2DLotes(Tensor entrada, Tensor grad, Tensor gradE, int[] filtro, int[] stride) {
-		// TODO melhorar isso
-		// por enquanto vai ficar assim por compatibilidade.
-
 		final int lotes = entrada.tamDim(0);
+		
+		if (Backend.jni) {
+			JNNNative.maxPool2dBackwardLotes(
+				entrada.array(),
+				grad.array(),
+				gradE.array(),
+				lotes, entrada.tamDim(1),
+				entrada.tamDim(2), entrada.tamDim(3),
+				grad.tamDim(2), grad.tamDim(3),
+				filtro[0], filtro[1],
+				stride[0], stride[1]
+			);
+			return;
+		}
+
+		// isso ainda vai melhorar
 		for (int i = 0; i < lotes; i++) {
 			backwardMaxPool2DNormal(
 				entrada.subTensor(i), 

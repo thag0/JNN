@@ -39,6 +39,38 @@ JNIEXPORT void JNICALL Java_jnn_nativo_JNNNative_conv2dForward
 JNIEXPORT void JNICALL Java_jnn_nativo_JNNNative_conv2dBackward
   (JNIEnv *, jclass, jdoubleArray, jint, jdoubleArray, jint, jdoubleArray, jint, jdoubleArray, jint, jdoubleArray, jint, jboolean, jdoubleArray, jint, jint, jint, jint, jint, jint, jint, jint);
 
+/*
+ * Class:     jnn_nativo_JNNNative
+ * Method:    maxPool2dForward
+ * Signature: ([DI[DIIIIIIII)V
+ */
+JNIEXPORT void JNICALL Java_jnn_nativo_JNNNative_maxPool2dForward
+  (JNIEnv *, jclass, jdoubleArray, jint, jdoubleArray, jint, jint, jint, jint, jint, jint, jint, jint);
+
+/*
+ * Class:     jnn_nativo_JNNNative
+ * Method:    maxPool2dForwardLotes
+ * Signature: ([DI[DIIIIIIIII)V
+ */
+JNIEXPORT void JNICALL Java_jnn_nativo_JNNNative_maxPool2dForwardLotes
+  (JNIEnv *, jclass, jdoubleArray, jint, jdoubleArray, jint, jint, jint, jint, jint, jint, jint, jint, jint);
+
+/*
+ * Class:     jnn_nativo_JNNNative
+ * Method:    maxPool2dBackward
+ * Signature: ([DIIII[DIII[DIIIII)V
+ */
+JNIEXPORT void JNICALL Java_jnn_nativo_JNNNative_maxPool2dBackward
+  (JNIEnv *, jclass, jdoubleArray, jint, jint, jint, jint, jdoubleArray, jint, jint, jint, jdoubleArray, jint, jint, jint, jint, jint);
+
+/*
+ * Class:     jnn_nativo_JNNNative
+ * Method:    maxPool2dBackwardLotes
+ * Signature: ([D[D[DIIIIIIIIII)V
+ */
+JNIEXPORT void JNICALL Java_jnn_nativo_JNNNative_maxPool2dBackwardLotes
+  (JNIEnv *, jclass, jdoubleArray, jdoubleArray, jdoubleArray, jint, jint, jint, jint, jint, jint, jint, jint, jint, jint);
+
 #ifdef __cplusplus
 }
 #endif
