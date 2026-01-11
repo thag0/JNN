@@ -59,14 +59,15 @@ Sequencial modelo = new Sequencial(
 <img src="https://github.com/user-attachments/assets/347ab287-eb99-4b6c-9fa1-55dd18756a0f"/>
 *Exemplo de treino com o modelo sequencial, usando o otimizador sgd (Stochastic Gradient Descent) e função de perda mse (Mean Squared Error)*
 
-# **Regularização**
+# **Interface com código nativo**
+Para acelerar processos críticos que demandam muito tempo em java, implementei a aceleração usando código nativo em C, por enquanto essas funcionalidades estão beneficiando apenas as camadas Densa e Conv2D (que são as mais pesadas), mas tenho interesse em expandir esse cenário de aceleração e quem sabe futuramente implementar cuda.
 
-Esta ainda é uma etapa um pouco nova mas que deverá tomar mais forma futuramente.
+Para ativar o uso de JNI basta adicionar estre trecho no início do programa:
+```
+JNNNative.jni = true;
+```
 
-Por enquanto a implementação mais fácil de fazer foi criar a camada de Dropout, que aleatoriamente durante o treinamento desliga algumas unidades para que elas não tenham contribuição no resultado final.
-
-![exemplo-dropout](https://github.com/thag0/JNN/assets/91092364/1bb9cba6-75cf-4b12-9db0-b18a06dce20d)
-*Exemplo de modelo usando camadas de abandono (dropout), valores arbitrários.*
+Importante reforçar que o jni por enquanto suporta apenas windows_x64 e que o usuário deve ter instalado o OpenMP na máquina.
 
 # **Adicionais**
 Caso queira ajustar a quantidade de threads alocadas para a biblioteca, chame antes do inicio das inicializações:
