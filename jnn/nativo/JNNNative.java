@@ -8,7 +8,17 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 public final class JNNNative {
+
+    /**
+     * Nome da biblioteca dinâmica (windows).
+     */
+    static final String nomeDLL = "jnn_native.dll";
     
+    /**
+     * Caminho dentro do arquivo final .jar
+     */
+    static final String caminhoDLL = "/native/win64/";
+
     static {
         try {
             carregarDoJar();
@@ -18,20 +28,22 @@ public final class JNNNative {
         }
     }
 
+    /**
+     * Tenta carregar o arquivo dll.
+     * @throws IOException caso ocora algum erro.
+     */
     private static void carregarDoJar() throws IOException {
-        String nomeDLL = "jnn_native.dll";
+        InputStream is = JNNNative.class.getResourceAsStream(caminhoDLL + nomeDLL);
 
-        InputStream in = JNNNative.class.getResourceAsStream("/native/win64/" + nomeDLL);
-
-        if (in == null) {
+        if (is == null) {
             throw new FileNotFoundException("\nDLL não encontrada: " + nomeDLL);
         }
 
-        Path tempDir = Files.createTempDirectory("jnn_native");
-        tempDir.toFile().deleteOnExit();
+        Path tmp = Files.createTempDirectory("jnn_native");
+        tmp.toFile().deleteOnExit();
 
-        Path dll = tempDir.resolve(nomeDLL);
-        Files.copy(in, dll, StandardCopyOption.REPLACE_EXISTING);
+        Path dll = tmp.resolve(nomeDLL);
+        Files.copy(is, dll, StandardCopyOption.REPLACE_EXISTING);
         dll.toFile().deleteOnExit();
 
         System.load(dll.toAbsolutePath().toString());
