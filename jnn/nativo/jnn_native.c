@@ -80,7 +80,7 @@ Java_jnn_nativo_JNNNative_conv2dForward(
     JNIEnv* env, jclass cls,
     jdoubleArray XArr, jint offX,
     jdoubleArray KArr, jint offK,
-    jdoubleArray BArr, jint offB, jboolean hasBias,
+    jdoubleArray BArr, jint offB, jboolean temBias,
     jdoubleArray YArr, jint offY,
     jint lotes, jint canais, jint filtros,
     jint altX, jint largX,
@@ -91,9 +91,7 @@ Java_jnn_nativo_JNNNative_conv2dForward(
     double* restrict X = (*env)->GetPrimitiveArrayCritical(env, XArr, NULL);
     double* restrict K = (*env)->GetPrimitiveArrayCritical(env, KArr, NULL);
     double* restrict Y = (*env)->GetPrimitiveArrayCritical(env, YArr, NULL);
-    double* restrict B = hasBias
-        ? (*env)->GetPrimitiveArrayCritical(env, BArr, NULL)
-        : NULL;
+    double* restrict B = temBias ? (*env)->GetPrimitiveArrayCritical(env, BArr, NULL) : NULL;
 
     const int altS = altX - altK + 1;
     const int largS = largX - largK + 1;
@@ -102,20 +100,20 @@ Java_jnn_nativo_JNNNative_conv2dForward(
     const int areaK = altK * largK;
     const int areaS = altS * largS;
 
-    #pragma omp parallel for schedule(static)
+    #pragma omp parallel for collapse(2) schedule(static)
     for (int b = 0; b < lotes; b++) {
         for (int f = 0; f < filtros; f++) {
             const int offXb  = offX + b * canais * areaX;
             const int offYb  = offY + b * filtros * areaS;
             const int offYbf = offYb + f * areaS;
             const int offKf  = offK + f * canais * areaK;
-            const double bias = hasBias ? B[offB + f] : 0.0;
+            const double bias = temBias ? B[offB + f] : 0.0;
 
             for (int i = 0; i < altS; i++) {
-                double* restrict yRow = Y + offYbf + i * largS;
+                double* restrict linDst = Y + offYbf + i * largS;
 
                 for (int j = 0; j < largS; j++) {
-                    yRow[j] = bias;
+                    linDst[j] = bias;
                 }
             }
 
@@ -124,18 +122,19 @@ Java_jnn_nativo_JNNNative_conv2dForward(
                 const int offKc = offKf + c * areaK;
 
                 for (int kh = 0; kh < altK; kh++) {
-                    const int kRow = offKc + kh * largK;
+                    const int linK = offKc + kh * largK;
 
                     for (int kw = 0; kw < largK; kw++) {
-                        const double kval = K[kRow + kw];
+                        const double kval = K[linK + kw];
                         const int xBase = offXc + kh * largX + kw;
 
                         for (int i = 0; i < altS; i++) {
-                            double* restrict yRow = Y + offYbf + i * largS;
-                            const double* restrict xRow = X + xBase + i * largX;
+                            double* restrict linDst = Y + offYbf + i * largS;
+                            const double* restrict linX = X + xBase + i * largX;
 
+                            #pragma omp simd
                             for (int j = 0; j < largS; j++) {
-                                yRow[j] += xRow[j] * kval;
+                                linDst[j] += linX[j] * kval;
                             }
                         }
                     }
@@ -148,7 +147,7 @@ Java_jnn_nativo_JNNNative_conv2dForward(
     (*env)->ReleasePrimitiveArrayCritical(env, KArr, K, JNI_ABORT);
     (*env)->ReleasePrimitiveArrayCritical(env, YArr, Y, 0);
 
-    if (hasBias) {
+    if (temBias) {
         (*env)->ReleasePrimitiveArrayCritical(env, BArr, B, JNI_ABORT);
     }
 }
