@@ -43,7 +43,7 @@ set DLL=jnn_native.dll
 if not exist "%OUT_DIR%" mkdir "%OUT_DIR%"
 
 gcc ^
- -O2 ^
+ -O3 ^
  -shared ^
  -march=x86-64 ^
  -mtune=generic ^

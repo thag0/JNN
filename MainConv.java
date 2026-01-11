@@ -42,7 +42,7 @@ public class MainConv {
 
 		Backend.jni = true;
 
-		Sequencial modelo = criarModelo(true);
+		Sequencial modelo = cnn();
 		modelo.setHistorico(true);
 		modelo.print();
 
@@ -71,37 +71,44 @@ public class MainConv {
 		executarComando("python grafico.py " + CAMINHO_HISTORICO);
 	}
 
-	/*
-	 * Criação de modelos para testes.
+	/**
+	 * Cria um modelo Multilayer Perceptron.
+	 * @return {@code Sequencial}.
 	 */
-	static Sequencial criarModelo(boolean mlp) {
-		Sequencial modelo = null;
-
-		if (mlp) {
-			modelo = new Sequencial(
-				new Entrada(1, 28, 28),
-				new Flatten(),
-				new Densa(30, "tanh"),
-				new Densa(30, "tanh"),
-				new Densa(10, "sigmoid")
-			);
-
-		} else {
-			modelo = new Sequencial(
-				new Entrada(1, 28, 28),
-				new Conv2D(32, new int[]{3, 3}, "relu"),
-				new MaxPool2D(new int[]{2, 2}),
-				new Conv2D(28, new int[]{3, 3}, "relu"),
-				new MaxPool2D(new int[]{2, 2}),
-				new Flatten(),
-				new Densa(80, "relu"),
-				new Densa(10, "softmax")
-			);
-		}
+	static Sequencial mlp() {
+		Sequencial modelo = new Sequencial(
+			new Entrada(1, 28, 28),
+			new Flatten(),
+			new Densa(40, "tanh"),
+			new Densa(40, "tanh"),
+			new Densa(40, "tanh"),
+			new Densa(10, "sigmoid")
+		);
 
 		modelo.compilar("adam", "entropia-cruzada");
 		
 		return modelo;
+	}
+
+	/**
+	 * Cria um modelo Convoluiconal.
+	 * @return {@code Sequencial}.
+	 */
+	static Sequencial cnn() {
+		Sequencial modelo = new Sequencial(
+			new Entrada(1, 28, 28),
+			new Conv2D(32, new int[]{3, 3}, "relu"),
+			new MaxPool2D(new int[]{2, 2}),
+			new Conv2D(32, new int[]{3, 3}, "relu"),
+			new MaxPool2D(new int[]{2, 2}),
+			new Flatten(),
+			new Densa(128, "relu"),
+			new Densa(10, "softmax")
+		);
+
+		modelo.compilar("adam", "entropia-cruzada");
+		
+		return modelo;		
 	}
 
 	/**

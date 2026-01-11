@@ -14,7 +14,7 @@ public final class JNNNative {
             carregarDoJar();
         
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao carregar JNI", e);
+            throw new RuntimeException("\nErro ao carregar JNI", e);
         }
     }
 
@@ -24,7 +24,7 @@ public final class JNNNative {
         InputStream in = JNNNative.class.getResourceAsStream("/native/win64/" + nomeDLL);
 
         if (in == null) {
-            throw new FileNotFoundException("DLL não encontrada dentro do JAR");
+            throw new FileNotFoundException("\nDLL não encontrada: " + nomeDLL);
         }
 
         Path tempDir = Files.createTempDirectory("jnn_native");
@@ -46,13 +46,31 @@ public final class JNNNative {
     public static native void setThreads(int t);
 
     /**
-     * Experimental
+     * Realiza a multiplicação matricial entre A e B.
+     * <p>
+     *      Essa função já assume que A e B são compatíveis.
+     * </p>
+     * @param A conjunto de elementos de A.
+     * @param offA offset de A.
+     * @param s0A stride de linhas de A.
+     * @param s1A stride de colunas de A.
+     * @param B conjunto de elementos de B.
+     * @param offB offset de B.
+     * @param s0B stride de linhas de B.
+     * @param s1B stride de colunas de B.
+     * @param C conjunto de elementos do destino.
+     * @param offC offset do Destino.
+     * @param s0C stride de linhas do destino.
+     * @param s1C stride de colunas do destino.
+     * @param linA linhas de A.
+     * @param colA colunas de A.
+     * @param colB colunas de B.
      */
     public static native void matmul(
         double[] A, int offA, int s0A, int s1A,
         double[] B, int offB, int s0B, int s1B,
         double[] C, int offC, int s0C, int s1C,
-        int M, int K, int N
+        int linA, int colA, int colB
     );
 
     /**
@@ -63,9 +81,9 @@ public final class JNNNative {
         double[] K, int offK,
         double[] B, int offB, boolean hasBias,
         double[] Y, int offY,
-        int BATCH, int CIN, int COUT,
-        int H, int W,
-        int kH, int kW
+        int lotes, int canais, int filtros,
+        int atlX, int largX,
+        int altK, int largK
     );
     /**
      * Experimental

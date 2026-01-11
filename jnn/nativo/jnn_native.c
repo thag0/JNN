@@ -32,7 +32,7 @@ Java_jnn_nativo_JNNNative_matmul(
     jdoubleArray aArr, jint offA, jint s0A, jint s1A,
     jdoubleArray bArr, jint offB, jint s0B, jint s1B,
     jdoubleArray cArr, jint offC, jint s0C, jint s1C,
-    jint M, jint K, jint N
+    jint linA, jint colA, jint colB
 ) {
     (void) cls;
     
@@ -42,17 +42,30 @@ Java_jnn_nativo_JNNNative_matmul(
     double* restrict B = (*env)->GetPrimitiveArrayCritical(env, bArr, NULL);
     double* restrict C = (*env)->GetPrimitiveArrayCritical(env, cArr, NULL);
 
+    const int blocoColA = 64;
+    const int blocoColB = 64;
+
     #pragma omp parallel for schedule(static)
-    for (int i = 0; i < M; i++) {
-        int baseA = offA + i * s0A;
-        int baseC = offC + i * s0C;
+    for (int i = 0; i < linA; i++) {
 
-        for (int k = 0; k < K; k++) {
-            double valA = A[baseA + k * s1A];
-            int baseB = offB + k * s0B;
+        const int baseA = offA + i * s0A;
+        const int baseC = offC + i * s0C;
 
-            for (int j = 0; j < N; j++) {
-                C[baseC + j * s1C] += valA * B[baseB + j * s1B];
+        for (int kk = 0; kk < colA; kk += blocoColA) {
+            const int fimK = (kk + blocoColA < colA) ? kk + blocoColA : colA;
+
+            for (int jj = 0; jj < colB; jj += blocoColB) {
+                const int fimJ = (jj + blocoColB < colB) ? jj + blocoColB : colB;
+
+                for (int k = kk; k < fimK; k++) {
+                    const double valA = A[baseA + k * s1A];
+                    const int baseB = offB + k * s0B;
+
+                    #pragma omp simd
+                    for (int j = jj; j < fimJ; j++) {
+                        C[baseC + j * s1C] += valA * B[baseB + j * s1B];
+                    }
+                }
             }
         }
     }
@@ -69,9 +82,9 @@ Java_jnn_nativo_JNNNative_conv2dForward(
     jdoubleArray KArr, jint offK,
     jdoubleArray BArr, jint offB, jboolean hasBias,
     jdoubleArray YArr, jint offY,
-    jint BATCH, jint CIN, jint COUT,
-    jint H, jint W,
-    jint kH, jint kW
+    jint lotes, jint canais, jint filtros,
+    jint altX, jint largX,
+    jint altK, jint largK
 ) {
     (void) cls;
 
@@ -82,51 +95,46 @@ Java_jnn_nativo_JNNNative_conv2dForward(
         ? (*env)->GetPrimitiveArrayCritical(env, BArr, NULL)
         : NULL;
 
-    const int outH = H - kH + 1;
-    const int outW = W - kW + 1;
+    const int altS = altX - altK + 1;
+    const int largS = largX - largK + 1;
 
-    const int areaX = H * W;
-    const int areaK = kH * kW;
-    const int areaY = outH * outW;
+    const int areaX = altX * largX;
+    const int areaK = altK * largK;
+    const int areaS = altS * largS;
 
     #pragma omp parallel for schedule(static)
-    for (int b = 0; b < BATCH; b++) {
-        for (int f = 0; f < COUT; f++) {
-            const int offXb  = offX + b * CIN * areaX;
-            const int offYb  = offY + b * COUT * areaY;
-            const int offYbf = offYb + f * areaY;
-            const int offKf  = offK + f * CIN * areaK;
+    for (int b = 0; b < lotes; b++) {
+        for (int f = 0; f < filtros; f++) {
+            const int offXb  = offX + b * canais * areaX;
+            const int offYb  = offY + b * filtros * areaS;
+            const int offYbf = offYb + f * areaS;
+            const int offKf  = offK + f * canais * areaK;
             const double bias = hasBias ? B[offB + f] : 0.0;
 
-            for (int i = 0; i < outH; i++) {
-                double* restrict yRow =
-                    Y + offYbf + i * outW;
+            for (int i = 0; i < altS; i++) {
+                double* restrict yRow = Y + offYbf + i * largS;
 
-                for (int j = 0; j < outW; j++) {
+                for (int j = 0; j < largS; j++) {
                     yRow[j] = bias;
                 }
             }
 
-            for (int c = 0; c < CIN; c++) {
+            for (int c = 0; c < canais; c++) {
                 const int offXc = offXb + c * areaX;
                 const int offKc = offKf + c * areaK;
 
-                for (int kh = 0; kh < kH; kh++) {
-                    const int kRow = offKc + kh * kW;
+                for (int kh = 0; kh < altK; kh++) {
+                    const int kRow = offKc + kh * largK;
 
-                    for (int kw = 0; kw < kW; kw++) {
+                    for (int kw = 0; kw < largK; kw++) {
                         const double kval = K[kRow + kw];
+                        const int xBase = offXc + kh * largX + kw;
 
-                        const int xBase = offXc + kh * W + kw;
+                        for (int i = 0; i < altS; i++) {
+                            double* restrict yRow = Y + offYbf + i * largS;
+                            const double* restrict xRow = X + xBase + i * largX;
 
-                        for (int i = 0; i < outH; i++) {
-                            double* restrict yRow =
-                                Y + offYbf + i * outW;
-
-                            const double* restrict xRow =
-                                X + xBase + i * W;
-
-                            for (int j = 0; j < outW; j++) {
+                            for (int j = 0; j < largS; j++) {
                                 yRow[j] += xRow[j] * kval;
                             }
                         }
@@ -145,70 +153,70 @@ Java_jnn_nativo_JNNNative_conv2dForward(
     }
 }
 
-static inline void conv2d_full(
-    const double* restrict dataX, int offX,   // gradS
-    const double* restrict dataK, int offK,   // kernel
-    double* restrict dataDst, int offDst,     // gradE
-    int W, int H,                             // dimensões de gradS
-    int kW, int kH
+static inline void corr2d(
+    const double* restrict dataX, int offX,
+    const double* restrict dataK, int offK,
+    double* restrict dataDst, int offDst,
+    int altX, int largX,
+    int altK, int largK
 ) {
-    const int outH = H + kH - 1;
-    const int outW = W + kW - 1;
+    const int altS = altX - altK + 1;
+    const int largS = largX - largK + 1;
 
-    for (int i = 0; i < outH; i++) {
-        const int baseOut = offDst + i * outW;
+    for (int i = 0; i < altS; i++) {
+        int baseS = offDst + i * largS;
+        int baseX = offX + i * largX;
 
-        for (int j = 0; j < outW; j++) {
-            double sum = 0.0;
+        for (int j = 0; j < largS; j++) {
+            double soma = 0.0;
+            int colBaseX = baseX + j;
 
-            for (int kh = 0; kh < kH; kh++) {
-                int inRow = i - kh;
-                if (inRow < 0 || inRow >= H) continue;
+            for (int kh = 0; kh < altK; kh++) {
+                int linX = colBaseX + kh * largX;
+                int linK = offK + kh * largK;
 
-                int baseIn = offX + inRow * W;
-                int baseK = offK + kh * kW;
-
-                for (int kw = 0; kw < kW; kw++) {
-                    int inCol = j - kw;
-                    if (inCol < 0 || inCol >= W) continue;
-
-                    sum += dataK[baseK + kw] * dataX[baseIn + inCol];
+                for (int kw = 0; kw < largK; kw++) {
+                    soma += dataX[linX + kw] * dataK[linK + kw];
                 }
             }
 
-            dataDst[baseOut + j] += sum;
+            dataDst[baseS + j] += soma;
         }
     }
 }
 
-static inline void corr2d(
-    const double* restrict dataX, int offX,   // entrada X
-    const double* restrict dataK, int offK,   // gradS
-    double* restrict dataDst, int offDst,     // gradK
-    int W, int H,                             // dimensões da entrada X
-    int kW, int kH
+static inline void conv2d_full(
+    const double* restrict dataX, int offX,
+    const double* restrict dataK, int offK,
+    double* restrict dataDst, int offDst,
+    int altX, int largX,
+    int altK, int largK
 ) {
-    const int outH = H - kH + 1;
-    const int outW = W - kW + 1;
+    const int altS = altX + altK - 1;
+    const int largS = largX + largK - 1;
 
-    for (int i = 0; i < outH; i++) {
-        int baseOut = offDst + i * outW;
-        int baseIn = offX + i * W;
+    for (int i = 0; i < altS; i++) {
+        const int baseS = offDst + i * largS;
 
-        for (int j = 0; j < outW; j++) {
-            double sum = 0.0;
-            int inColBase = baseIn + j;
+        for (int j = 0; j < largS; j++) {
+            double soma = 0.0;
 
-            for (int kh = 0; kh < kH; kh++) {
-                int inRow = inColBase + kh * W;
-                int kRow = offK + kh * kW;
+            for (int kh = 0; kh < altK; kh++) {
+                int linX = i - kh;
+                if (linX < 0 || linX >= altX) continue;
 
-                for (int kw = 0; kw < kW; kw++) {
-                    sum += dataX[inRow + kw] * dataK[kRow + kw];
+                int baseX = offX + linX * largX;
+                int baseK = offK + kh * largK;
+
+                for (int kw = 0; kw < largK; kw++) {
+                    int colX = j - kw;
+                    if (colX < 0 || colX >= largX) continue;
+
+                    soma += dataK[baseK + kw] * dataX[baseX + colX];
                 }
             }
 
-            dataDst[baseOut + j] += sum;
+            dataDst[baseS + j] += soma;
         }
     }
 }
@@ -220,7 +228,7 @@ Java_jnn_nativo_JNNNative_conv2dBackward(
     jdoubleArray KArr,  jint offKbase,
     jdoubleArray gradSArr, jint offGSbase,
     jdoubleArray gradKArr, jint offGKbase,
-    jdoubleArray gradBArr, jint offGBbase, jboolean hasBias,
+    jdoubleArray gradBArr, jint offGBbase, jboolean temBias,
     jdoubleArray gradEArr, jint offGEbase,
     jint lotes, jint canais, jint filtros,
     jint altX, jint largX,
@@ -233,7 +241,7 @@ Java_jnn_nativo_JNNNative_conv2dBackward(
     double* restrict GS = (*env)->GetPrimitiveArrayCritical(env, gradSArr, NULL);
     double* restrict GK = (*env)->GetPrimitiveArrayCritical(env, gradKArr, NULL);
     double* restrict GE = (*env)->GetPrimitiveArrayCritical(env, gradEArr, NULL);
-    double* restrict GB = hasBias ? (*env)->GetPrimitiveArrayCritical(env, gradBArr, NULL) : NULL;
+    double* restrict GB = temBias ? (*env)->GetPrimitiveArrayCritical(env, gradBArr, NULL) : NULL;
 
     const int altS = altX - altK + 1;
     const int largS = largX - largK + 1;
@@ -263,14 +271,14 @@ Java_jnn_nativo_JNNNative_conv2dBackward(
                 );
             }
 
-            if (hasBias) {
+            if (temBias) {
                 for (int i = 0; i < areaGS; i++) {
                     somaBiasLocal += GS[offGS + i];
                 }
             }
         }
 
-        if (hasBias) {
+        if (temBias) {
             GB[offGBbase + f] += somaBiasLocal;
         }
     }
@@ -286,8 +294,8 @@ Java_jnn_nativo_JNNNative_conv2dBackward(
                     GS, offGS,
                     K,  offK,
                     GE, offGE,
-                    largS, altS,
-                    largK, altK
+                    altS, largS,
+                    altK, largK
                 );
             }
         }
@@ -299,7 +307,7 @@ Java_jnn_nativo_JNNNative_conv2dBackward(
     (*env)->ReleasePrimitiveArrayCritical(env, gradKArr, GK, 0);
     (*env)->ReleasePrimitiveArrayCritical(env, gradEArr, GE, 0);
 
-    if (hasBias) {
+    if (temBias) {
         (*env)->ReleasePrimitiveArrayCritical(env, gradBArr, GB, 0);
     }
 }
