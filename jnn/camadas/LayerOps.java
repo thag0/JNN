@@ -24,7 +24,7 @@ public class LayerOps {
 	/**
 	 * Operador para paralelização.
 	 */
-	private final ForkJoinPool pool = PoolFactory.pool(Runtime.getRuntime().availableProcessors());
+	private final ForkJoinPool pool = PoolFactory.pool();
 
     /**
      * Utilitário para operações de forward e backward de camadas.

@@ -8,7 +8,7 @@ import jnn.camadas.*;
 import jnn.camadas.pooling.MaxPool2D;
 import jnn.core.backend.Backend;
 import jnn.dataloader.DataLoader;
-import jnn.dataloader.dataset.MNIST;
+import jnn.dataloader.dataset.CIFAR10;
 import jnn.io.Serializador;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
@@ -37,7 +37,7 @@ public class MainConv {
 	public static void main(String[] args) {
 		ged.limparConsole();
 
-		DataLoader dlTreino = MNIST.treino();
+		DataLoader dlTreino = CIFAR10.treino();
 		dlTreino.print();
 
 		Backend.jni = true;
@@ -57,11 +57,12 @@ public class MainConv {
 		long segundos = segundosTotais % 60;
 
 		System.out.println("\nTempo de treino: " + horas + "h " + minutos + "min " + segundos + "s");
-		System.out.print("Treino -> perda: " + modelo.avaliar(dlTreino).item() + " - ");
-		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(dlTreino).item() * 100), 4) + "%");
+		
+		// System.out.print("Treino -> perda: " + modelo.avaliar(dlTreino).item() + " - ");
+		// System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(dlTreino).item() * 100), 4) + "%");
 
 		System.out.println("\nCarregando dados de teste.");
-		DataLoader dlTeste = MNIST.teste();
+		DataLoader dlTeste = CIFAR10.teste();
 		System.out.print("Teste -> perda: " + modelo.avaliar(dlTeste).item() + " - ");
 		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(dlTeste).item() * 100), 4) + "%");
 
@@ -96,11 +97,13 @@ public class MainConv {
 	 */
 	static Sequencial cnn() {
 		Sequencial modelo = new Sequencial(
-			new Entrada(1, 28, 28),
-			new Conv2D(32, new int[]{3, 3}, "relu"),
+			new Entrada(3, 32, 32),
+			new Conv2D(64, new int[]{3, 3}, "relu"),
 			new MaxPool2D(new int[]{2, 2}),
-			new Conv2D(32, new int[]{3, 3}, "relu"),
+			new Conv2D(64, new int[]{3, 3}, "relu"),
+			new Conv2D(64, new int[]{3, 3}, "relu"),
 			new MaxPool2D(new int[]{2, 2}),
+			new Conv2D(128, new int[]{3, 3}, "relu"),
 			new Flatten(),
 			new Densa(128, "relu"),
 			new Densa(10, "softmax")

@@ -3,45 +3,45 @@
 JNIEXPORT void JNICALL
 Java_jnn_nativo_JNNNative_matmul(
     JNIEnv* env, jclass cls,
-    jdoubleArray aArr, jint offA, jint s0A, jint s1A,
-    jdoubleArray bArr, jint offB, jint s0B, jint s1B,
-    jdoubleArray cArr, jint offC, jint s0C, jint s1C,
-    jint linA, jint colA, jint colB
+    jdoubleArray A_arr, jint off_a, jint std_a_0, jint std_a_1,
+    jdoubleArray B_arr, jint off_b, jint std_b_0, jint std_b_1,
+    jdoubleArray C_arr, jint off_c, jint std_c_0, jint std_c_1,
+    jint lin_a, jint col_a, jint col_b
 ) {
     (void) cls;
 
-    double* restrict A = (*env)->GetPrimitiveArrayCritical(env, aArr, NULL);
-    double* restrict B = (*env)->GetPrimitiveArrayCritical(env, bArr, NULL);
-    double* restrict C = (*env)->GetPrimitiveArrayCritical(env, cArr, NULL);
+    double* restrict A = (*env)->GetPrimitiveArrayCritical(env, A_arr, NULL);
+    double* restrict B = (*env)->GetPrimitiveArrayCritical(env, B_arr, NULL);
+    double* restrict C = (*env)->GetPrimitiveArrayCritical(env, C_arr, NULL);
 
-    const int blocoColA = 64;
-    const int blocoColB = 64;
+    const int bloco_col_a = 64;
+    const int bloco_col_b = 64;
 
     #pragma omp parallel for schedule(static)
-    for (int i = 0; i < linA; i++) {
-        const int baseA = offA + i * s0A;
-        const int baseC = offC + i * s0C;
+    for (int i = 0; i < lin_a; i++) {
+        const int base_a = off_a + i * std_a_0;
+        const int base_c = off_c + i * std_c_0;
 
-        for (int kk = 0; kk < colA; kk += blocoColA) {
-            const int fimK = (kk + blocoColA < colA) ? kk + blocoColA : colA;
+        for (int kk = 0; kk < col_a; kk += bloco_col_a) {
+            const int fim_k = (kk + bloco_col_a < col_a) ? kk + bloco_col_a : col_a;
 
-            for (int jj = 0; jj < colB; jj += blocoColB) {
-                const int fimJ = (jj + blocoColB < colB) ? jj + blocoColB : colB;
+            for (int jj = 0; jj < col_b; jj += bloco_col_b) {
+                const int fim_j = (jj + bloco_col_b < col_b) ? jj + bloco_col_b : col_b;
 
-                for (int k = kk; k < fimK; k++) {
-                    const double valA = A[baseA + k * s1A];
-                    const int baseB = offB + k * s0B;
+                for (int k = kk; k < fim_k; k++) {
+                    const double val_a = A[base_a + k * std_a_1];
+                    const int base_b = off_b + k * std_b_0;
 
                     #pragma omp simd
-                    for (int j = jj; j < fimJ; j++) {
-                        C[baseC + j * s1C] += valA * B[baseB + j * s1B];
+                    for (int j = jj; j < fim_j; j++) {
+                        C[base_c + j * std_c_1] += val_a * B[base_b + j * std_b_1];
                     }
                 }
             }
         }
     }
 
-    (*env)->ReleasePrimitiveArrayCritical(env, aArr, A, JNI_ABORT);
-    (*env)->ReleasePrimitiveArrayCritical(env, bArr, B, JNI_ABORT);
-    (*env)->ReleasePrimitiveArrayCritical(env, cArr, C, 0);
+    (*env)->ReleasePrimitiveArrayCritical(env, A_arr, A, JNI_ABORT);
+    (*env)->ReleasePrimitiveArrayCritical(env, B_arr, B, JNI_ABORT);
+    (*env)->ReleasePrimitiveArrayCritical(env, C_arr, C, 0);
 }

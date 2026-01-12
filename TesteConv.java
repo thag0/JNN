@@ -40,12 +40,13 @@ public class TesteConv {
 		ged.limparConsole();
 
 		Backend.jni = true;
+		System.out.println("JNI: " + Backend.jni);
 
 		DataLoader dlTreino = MNIST.treino();
 		dlTreino.print();
 
 		Sequencial modelo = criarModelo();
-		modelo.setHistorico(true);
+		modelo.setHistorico(EXPORTAR_HIST);
 		modelo.print();
 
 		System.out.println("Treinando.");
@@ -54,13 +55,11 @@ public class TesteConv {
 		tempo = System.nanoTime() - tempo;
 
 		long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempo);
-		long horas = segundosTotais / 3600;
-		long minutos = (segundosTotais % 3600) / 60;
-		long segundos = segundosTotais % 60;
+		long hrs = segundosTotais / 3600;
+		long min = (segundosTotais % 3600) / 60;
+		long seg = segundosTotais % 60;
 
-		System.out.println("\nTempo de treino: " + horas + "h " + minutos + "min " + segundos + "s");
-		System.out.print("Treino -> perda: " + modelo.avaliar(dlTreino).item() + " - ");
-		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(dlTreino).item() * 100), 4) + "%");
+		System.out.println("\nTempo de treino: " + hrs + "h " + min + "min " + seg + "s");
 
 		System.out.println("\nCarregando dados de teste.");
 		DataLoader dlTeste = MNIST.teste();
