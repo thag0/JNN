@@ -6,7 +6,7 @@ set OUT_JAR=bin\jnn.jar
 
 jar cvf "%OUT_JAR%" ^
  -C "%BIN_CLASSES%" . ^
- -C bin native
+ -C bin nativo
 
 if errorlevel 1 (
     echo ERRO ao gerar JAR

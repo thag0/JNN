@@ -36,14 +36,14 @@ echo JAVA_HOME=%JAVA_HOME%
 
 @rem build jni
 
-set OUT_DIR=bin\native\win64
+set OUT_DIR=bin\nativo\cpu\win64
 set DLL=jnn_native.dll
 
 set SRC=^
-jnn\nativo\jnn_native_common.c ^
-jnn\nativo\jnn_native_mm.c ^
-jnn\nativo\jnn_native_conv2d.c ^
-jnn\nativo\jnn_native_pool.c
+jnn\nativo\cpu\jnn_native_common.c ^
+jnn\nativo\cpu\jnn_native_mm.c ^
+jnn\nativo\cpu\jnn_native_conv2d.c ^
+jnn\nativo\cpu\jnn_native_pool.c
 
 if not exist "%OUT_DIR%" mkdir "%OUT_DIR%"
 
@@ -56,7 +56,7 @@ gcc ^
  -fopenmp ^
  -I"%JAVA_HOME%\include" ^
  -I"%JAVA_HOME%\include\win32" ^
- -I"jnn\nativo" ^
+ -I"jnn\nativo\cpu" ^
  %SRC% ^
  -o "%OUT_DIR%\%DLL%"
 

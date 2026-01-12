@@ -20,7 +20,7 @@ public final class JNNNative {
     /**
      * Caminho dentro do arquivo final .jar
      */
-    static final String caminhoDLL = "/native/win64/";
+    static final String caminhoDLL = "/nativo/cpu/win64/";
 
     static {
         try {

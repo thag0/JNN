@@ -1,7 +1,7 @@
 package jnn.core.backend.cpu;
 
-import jnn.nativo.JNNNative;
 import jnn.core.tensor.Tensor;
+import jnn.nativo.JNNNative;
 
 /**
  * 
