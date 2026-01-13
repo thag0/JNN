@@ -11,12 +11,12 @@ for %%K in (
 		set "JDK_VERSION=%%B"
 		for /f "tokens=2,*" %%C in ('reg query %%K\!JDK_VERSION! /v JavaHome 2^>nul') do (
 			set "JAVA_HOME=%%D"
-			goto :jdk_found
+			goto :jdk_achado
 		)
 	)
 )
 
-:jdk_found
+:jdk_achado
 
 if not defined JAVA_HOME (
   echo ERRO: Nenhum JDK encontrado no sistema.
@@ -31,8 +31,7 @@ if not exist "%JAVA_HOME%\include\jni.h" (
 	exit /b 1
 )
 
-echo JDK detectado automaticamente:
-echo JAVA_HOME=%JAVA_HOME%
+echo JDK encontrado: %JAVA_HOME%
 
 @rem build jni
 
@@ -40,10 +39,12 @@ set OUT_DIR=bin\nativo\cpu\win64
 set DLL=jnn_native.dll
 
 set SRC=^
-jnn\nativo\cpu\jnn_native_common.c ^
-jnn\nativo\cpu\jnn_native_mm.c ^
-jnn\nativo\cpu\jnn_native_conv2d.c ^
-jnn\nativo\cpu\jnn_native_pool.c
+ jnn\nativo\jni\jnn_jni.c ^
+ jnn\nativo\dispatch\dispatcher.c ^
+ jnn\nativo\cpu\common.c ^
+ jnn\nativo\cpu\matmul.c ^
+ jnn\nativo\cpu\conv2d.c ^
+ jnn\nativo\cpu\maxpool.c
 
 if not exist "%OUT_DIR%" mkdir "%OUT_DIR%"
 
@@ -56,7 +57,10 @@ gcc ^
  -fopenmp ^
  -I"%JAVA_HOME%\include" ^
  -I"%JAVA_HOME%\include\win32" ^
+ -I"jnn\nativo" ^
  -I"jnn\nativo\cpu" ^
+ -I"jnn\nativo\dispatch" ^
+ -I"jnn\nativo\jni" ^
  %SRC% ^
  -o "%OUT_DIR%\%DLL%"
 
