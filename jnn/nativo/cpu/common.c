@@ -1,4 +1,4 @@
-#include "jnn_native_common.h"
+#include "common.h"
 
 JNIEXPORT jint JNICALL
 JNI_OnLoad(JavaVM* vm, void* reserved) {
@@ -10,9 +10,7 @@ JNI_OnLoad(JavaVM* vm, void* reserved) {
 }
 
 JNIEXPORT void JNICALL
-Java_jnn_nativo_JNNNative_setThreads(
-    JNIEnv* env, jclass cls, jint n
-) {
+Java_jnn_nativo_JNNNative_setThreads(JNIEnv* env, jclass cls, jint n) {
     (void) env;
     (void) cls;
 

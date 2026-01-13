@@ -4,14 +4,13 @@
     #include <jni.h>
     #include <omp.h>
 
+    // Configura a quantidade de threads usadas pelo código nativo.
     static inline int jnn_native_num_threads() {
         int p = omp_get_num_procs();
         return p > 1 ? p / 2 : 1;
     }
 
     JNIEXPORT void JNICALL
-    Java_jnn_nativo_JNNNative_setThreads(
-        JNIEnv* env, jclass cls, jint n
-    );
+    Java_jnn_nativo_JNNNative_setThreads(JNIEnv* env, jclass cls, jint n);
 
 #endif

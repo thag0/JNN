@@ -536,7 +536,8 @@ public class LayerOps {
 			JNNNative.maxPool2dForward(
 				entrada.array(), entrada.offset(),
 				saida.array(), saida.offset(),
-				canais, entrada.tamDim(1), entrada.tamDim(2),
+				1, canais, 
+				entrada.tamDim(1), entrada.tamDim(2),
 				filtro[0], filtro[1],
 				stride[0], stride[1]
 			);
@@ -563,13 +564,11 @@ public class LayerOps {
 	 */
 	private void forwardMaxPool2DLotes(Tensor entrada, Tensor saida, int[] filtro, int[] stride) {
 		if (Backend.jni) {
-			JNNNative.maxPool2dForwardLotes(
+			JNNNative.maxPool2dForward(
 				entrada.array(), entrada.offset(),
 				saida.array(), saida.offset(),
-				entrada.tamDim(0),
-				entrada.tamDim(1),
-				entrada.tamDim(2),
-				entrada.tamDim(3),
+				entrada.tamDim(0), entrada.tamDim(1),
+				entrada.tamDim(2), entrada.tamDim(3),
 				filtro[0], filtro[1],
 				stride[0], stride[1]
 			);
@@ -616,10 +615,11 @@ public class LayerOps {
 		if (Backend.jni) {
 			JNNNative.maxPool2dBackward(
 				entrada.array(), entrada.offset(),
-				entrada.tamDim(0),
-				entrada.tamDim(1), entrada.tamDim(2),
-				grad.array(), grad.offset(), grad.tamDim(1), grad.tamDim(2),
-				gradE.array(), gradE.offset(), 
+				grad.array(), grad.offset(),
+				gradE.array(), gradE.offset(),
+				1, entrada.tamDim(1),
+				entrada.tamDim(2), entrada.tamDim(3),
+				grad.tamDim(2), grad.tamDim(3),
 				filtro[0], filtro[1],
 				stride[0], stride[1]
 			);
@@ -692,10 +692,10 @@ public class LayerOps {
 		final int lotes = entrada.tamDim(0);
 		
 		if (Backend.jni) {
-			JNNNative.maxPool2dBackwardLotes(
-				entrada.array(),
-				grad.array(),
-				gradE.array(),
+			JNNNative.maxPool2dBackward(
+				entrada.array(), entrada.offset(),
+				grad.array(), grad.offset(),
+				gradE.array(), gradE.offset(),
 				lotes, entrada.tamDim(1),
 				entrada.tamDim(2), entrada.tamDim(3),
 				grad.tamDim(2), grad.tamDim(3),

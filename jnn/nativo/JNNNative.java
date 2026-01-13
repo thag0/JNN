@@ -151,29 +151,6 @@ public final class JNNNative {
         int altX, int largX,
         int altK, int largK    
     );
-    
-    /**
-     * Realiza a propagação direta através da camada de MaxPooling2D.
-     * @param X entrada.
-     * @param offX offset de entrada.
-     * @param Y destino.
-     * @param offY offset do destino.
-     * @param canais quantidade de canais de entrada.
-     * @param altX altura da entrada.
-     * @param largX largura da entrada.
-     * @param altFiltro altura do filtro de pooling.
-     * @param largFiltro largura do filtro de pooling.
-     * @param altStride altura do stride de pooling.
-     * @param largStride largura do stride de pooling.
-     */
-    public static native void maxPool2dForward(
-        double[] X, int offX,
-        double[] Y, int offY,
-        int canais,
-        int altX, int largX,
-        int altFiltro, int largFiltro,
-        int altStride, int largStride
-    );
 
     /**
      * Realiza a propagação direta através da camada de MaxPooling2D 
@@ -191,39 +168,11 @@ public final class JNNNative {
      * @param altStride altura do stride de pooling.
      * @param largStride largura do stride de pooling.
      */
-    public static native void maxPool2dForwardLotes(
+    public static native void maxPool2dForward(
         double[] X, int offX,
         double[] Y, int offY,
         int lotes, int canais,
         int altX, int largX,
-        int altFiltro, int largFiltro,
-        int altStride, int largStride
-    );
-
-    /**
-     * Realiza a progração reversa pela camada MaxPool2D.
-     * @param X entrada.
-     * @param offX offset de entrada.
-     * @param canais canais de entrada.
-     * @param altX altura da entrada.
-     * @param largX largura da entrada.
-     * @param G gradientede saída da camada.
-     * @param offG offset do gradiente de saída.
-     * @param altG altura do gradiente de saída.
-     * @param largG largura do gradiente de saída.
-     * @param GE gradiente de entrada da camada.
-     * @param offGE offset do gradiente de entrada.
-     * @param altFiltro altura do filtro de pooling.
-     * @param largFiltro largura do filtro de pooling.
-     * @param altStride altura do stride de pooling.
-     * @param largStride largura do stride de pooling.
-     */
-    public static native void maxPool2dBackward(
-        double[] X, int offX,
-        int canais, int altX, int largX,
-        double[] G, int offG,
-        int altG, int largG,
-        double[] GE, int offGE,
         int altFiltro, int largFiltro,
         int altStride, int largStride
     );
@@ -245,10 +194,10 @@ public final class JNNNative {
      * @param altStride altura do stride de pooling.
      * @param largStride largura do stride de pooling.
      */
-    public static native void maxPool2dBackwardLotes(
-        double[] X,
-        double[] G,
-        double[] GE,
+    public static native void maxPool2dBackward(
+        double[] X, int offX,
+        double[] G, int offG,
+        double[] GE, int offGE,
         int lotes, int canais,
         int altX, int largX,
         int altG, int largG,
