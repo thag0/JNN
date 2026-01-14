@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 
-import jnn.core.backend.Backend;
+import jnn.core.ops.Ops;
 import jnn.core.parallel.PoolFactory;
 import jnn.core.tensor.Tensor;
 import jnn.nativo.JNNNative;
@@ -19,7 +19,7 @@ public class LayerOps {
 	/**
 	 * Operador interno.
 	 */
-    Backend backend = Backend.cpu();
+    Ops ops = Ops.get();
 
 	/**
 	 * Operador para paralelização.
@@ -40,7 +40,7 @@ public class LayerOps {
 	 * @see {@link jnn.camadas.Densa}
 	 */
 	public void forwardDensa(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
-		backend.matmul(entrada, kernel, saida);
+		ops.matmul(entrada, kernel, saida);
 
 		bias.ifPresent(b -> {
 			if (entrada.numDim() == 1) {//amostra única
@@ -65,14 +65,14 @@ public class LayerOps {
 	 * @see {@link jnn.camadas.Densa}
 	 */
 	public void backwardDensa(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
-		backend.matmul(gradS, kernel.transpor(), gradE);
+		ops.matmul(gradS, kernel.transpor(), gradE);
 		
 		if (gradS.numDim() == 1) {//amostra única
-			backend.matmul(entrada.unsqueeze(0).transpor(), gradS, gradK);
+			ops.matmul(entrada.unsqueeze(0).transpor(), gradS, gradK);
 			gradB.ifPresent(gb -> gb.add(gradS));
 		
 		} else if (gradS.numDim() == 2) {//lote de amostras
-			backend.matmul(entrada.transpor(), gradS, gradK);
+			ops.matmul(entrada.transpor(), gradS, gradK);
 			
 			int lotes = gradS.tamDim(0);
 			gradB.ifPresent(gb -> {
@@ -144,7 +144,7 @@ public class LayerOps {
 				int offX = offXBase + c * areaX;
 				int offK  = offKBase + (f * canais + c) * areaK;
 
-				backend.corr2D(
+				ops.corr2D(
 					dataX, offX,
 					dataK, offK,
 					dataS, offS,
@@ -181,7 +181,7 @@ public class LayerOps {
 		final int atlK = shapeK[2];
 		final int largK = shapeK[3];
 
-		if (Backend.jni) {
+		if (JNNNative.jni) {
 			JNNNative.conv2dForward(
 				entrada.array(), entrada.offset(),
 				kernel.array(), kernel.offset(),
@@ -226,7 +226,7 @@ public class LayerOps {
 						int offX = offXBase + (l * canais + c) * areaX;
 						int offK = offKf + c * areaK;
 						
-						backend.corr2D(
+						ops.corr2D(
 							x, offX,
 							k, offK,
 							s, offY,
@@ -322,7 +322,7 @@ public class LayerOps {
 				final int offK  = offKBase  + (f * canais + c) * areaK;
 				final int offGE = offGEBase + c * areaX;
 
-				backend.conv2DFull(
+				ops.conv2DFull(
 					dataGS, offGS,
 					dataK,  offK,
 					dataGE, offGE,
@@ -341,7 +341,7 @@ public class LayerOps {
 					final int offX  = offXBase  + c * areaX;
 					final int offGK = offGKBase + (f * canais + c) * areaK;
 	
-					backend.corr2D(
+					ops.corr2D(
 						dataX,  offX,
 						dataGS, offGS,
 						dataGK, offGK,
@@ -364,7 +364,7 @@ public class LayerOps {
 					final int offX  = offXBase  + c * areaX;
 					final int offGK = offGKBase + (f * canais + c) * areaK;
 	
-					backend.corr2D(
+					ops.corr2D(
 						dataX,  offX,
 						dataGS, offGS,
 						dataGK, offGK,
@@ -399,7 +399,7 @@ public class LayerOps {
 		final int altK = shapeK[2];
 		final int largK = shapeK[3];
 	
-		if (Backend.jni) {
+		if (JNNNative.jni) {
 			JNNNative.conv2dBackward(
 				entrada.array(), entrada.offset(),
 				kernel.array(), kernel.offset(),
@@ -448,7 +448,7 @@ public class LayerOps {
 						int offX  = offXBase + (l * canais + c) * areaX;
 						int offGK = offKf + c * areaK;
 	
-						backend.corr2D(
+						ops.corr2D(
 							x,  offX,
 							gs, offGS,
 							gk, offGK,
@@ -489,7 +489,7 @@ public class LayerOps {
 						int offGS = offGSBase + (lote * filtros + f) * areaGS;
 						int offK  = offKBase  + (f * canais + c) * areaK;
 
-						backend.conv2DFull(
+						ops.conv2DFull(
 							gs, offGS,
 							k,  offK,
 							ge, offGE,
@@ -532,7 +532,7 @@ public class LayerOps {
 	private void forwardMaxPool2DNormal(Tensor entrada, Tensor saida, int[] filtro, int[] stride) {
 		final int canais = entrada.tamDim(0);
 		
-		if (Backend.jni) {
+		if (JNNNative.jni) {
 			JNNNative.maxPool2dForward(
 				entrada.array(), entrada.offset(),
 				saida.array(), saida.offset(),
@@ -546,7 +546,7 @@ public class LayerOps {
 		} 
 
 		for (int i = 0; i < canais; i++) {
-			backend.maxPool2D(
+			ops.maxPool2D(
 				entrada.subTensor(i), 
 				saida.subTensor(i), 
 				filtro, 
@@ -563,7 +563,7 @@ public class LayerOps {
 	 * @param stride stride.
 	 */
 	private void forwardMaxPool2DLotes(Tensor entrada, Tensor saida, int[] filtro, int[] stride) {
-		if (Backend.jni) {
+		if (JNNNative.jni) {
 			JNNNative.maxPool2dForward(
 				entrada.array(), entrada.offset(),
 				saida.array(), saida.offset(),
@@ -612,7 +612,7 @@ public class LayerOps {
 	 * @param stride stride.
 	 */
 	private void backwardMaxPool2DNormal(Tensor entrada, Tensor grad, Tensor gradE, int[] filtro, int[] stride) {
-		if (Backend.jni) {
+		if (JNNNative.jni) {
 			JNNNative.maxPool2dBackward(
 				entrada.array(), entrada.offset(),
 				grad.array(), grad.offset(),
@@ -691,7 +691,7 @@ public class LayerOps {
 	private void backwardMaxPool2DLotes(Tensor entrada, Tensor grad, Tensor gradE, int[] filtro, int[] stride) {
 		final int lotes = entrada.tamDim(0);
 		
-		if (Backend.jni) {
+		if (JNNNative.jni) {
 			JNNNative.maxPool2dBackward(
 				entrada.array(), entrada.offset(),
 				grad.array(), grad.offset(),
@@ -742,7 +742,7 @@ public class LayerOps {
 	private void forwardAvgPool2DNormal(Tensor entrada, Tensor saida, int[] filtro, int[] stride) {
 		final int canais = entrada.tamDim(0);
 		for (int i = 0; i < canais; i++) {
-			backend.avgPool2D(entrada.subTensor(i), saida.subTensor(i), filtro, stride);
+			ops.avgPool2D(entrada.subTensor(i), saida.subTensor(i), filtro, stride);
 		}
 	}
 

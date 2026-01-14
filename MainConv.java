@@ -6,12 +6,12 @@ import ged.Ged;
 import jnn.Funcional;
 import jnn.camadas.*;
 import jnn.camadas.pooling.MaxPool2D;
-import jnn.core.backend.Backend;
 import jnn.dataloader.DataLoader;
 import jnn.dataloader.dataset.CIFAR10;
 import jnn.io.Serializador;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
+import jnn.nativo.JNNNative;
 
 public class MainConv {
 
@@ -40,7 +40,7 @@ public class MainConv {
 		DataLoader dlTreino = CIFAR10.treino();
 		dlTreino.print();
 
-		Backend.jni = true;
+		JNNNative.jni = true;
 
 		Sequencial modelo = cnn();
 		modelo.setHistorico(true);

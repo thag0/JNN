@@ -22,6 +22,11 @@ public final class JNNNative {
      */
     static final String caminhoDLL = "/nativo/cpu/win64/";
 
+    /**
+     * Controla se operações internas usarão backend nativo.
+     */
+    public static boolean jni = false;
+
     static {
         try {
             carregarDoJar();

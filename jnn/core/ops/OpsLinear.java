@@ -1,4 +1,4 @@
-package jnn.core.backend.cpu;
+package jnn.core.ops;
 
 import jnn.core.tensor.Tensor;
 import jnn.nativo.JNNNative;
@@ -6,7 +6,7 @@ import jnn.nativo.JNNNative;
 /**
  * 
  */
-public class LinearCPU {
+public class OpsLinear {
     
     public static Tensor matadd(Tensor a, Tensor b) {
 		if (!a.compShape(b)) {

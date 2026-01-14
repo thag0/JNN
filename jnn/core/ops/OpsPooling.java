@@ -1,8 +1,8 @@
-package jnn.core.backend.cpu;
+package jnn.core.ops;
 
 import jnn.core.tensor.Tensor;
 
-public class PoolingCPU {
+public class OpsPooling {
     
 	private static int[] calcShapeConv(int[] entrada, int[] filtro, int[] stride) {
 		if (entrada.length != 2 || filtro.length != 2 || stride.length != 2) {

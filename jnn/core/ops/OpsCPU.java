@@ -1,59 +1,59 @@
-package jnn.core.backend.cpu;
+package jnn.core.ops;
 
 import java.util.Optional;
 
-import jnn.core.backend.Backend;
 import jnn.core.tensor.Tensor;
+import jnn.nativo.JNNNative;
 
 /**
- * Implementações em cpu das operações internas da biblioteca.
+ * Implementações java em cpu das operações internas da biblioteca.
  */
-public final class CPU extends Backend {
+public final class OpsCPU extends Ops {
 
     @Override
 	public Tensor matmul(Tensor a, Tensor b) {
-		return LinearCPU.matmul(a, b);
+		return OpsLinear.matmul(a, b);
 	}
 
     @Override
 	public void matmul(Tensor a, Tensor b, Tensor dst) {
-		if (jni) LinearCPU.matmul_jni(a, b, dst);
-		else LinearCPU.matmul(a, b, dst);
+		if (JNNNative.jni) OpsLinear.matmul_jni(a, b, dst);
+		else OpsLinear.matmul(a, b, dst);
 	}
 
     @Override
 	public Tensor corr2D(Tensor x, Tensor k) {
-		return ConvCPU.corr2D(x, k);
+		return OpsConv.corr2D(x, k);
 	}
 
     @Override
 	public void corr2D(Tensor x, Tensor k, Tensor dst) {
-        ConvCPU.corr2D(x, k, dst);
+        OpsConv.corr2D(x, k, dst);
 	}
 
 	@Override
 	public void corr2D(double[] dataX, int offX, double[] dataK, int offK, double[] dataDst, int offDst, int W, int H, int kW, int kH) {
-		ConvCPU.corr2D(dataX, offX, dataK, offK, dataDst, offDst, W, H, kW, kH);
+		OpsConv.corr2D(dataX, offX, dataK, offK, dataDst, offDst, W, H, kW, kH);
 	}
 
     @Override
 	public Tensor conv2D(Tensor x, Tensor k) {
-		return ConvCPU.conv2D(x, k);
+		return OpsConv.conv2D(x, k);
 	}
 
     @Override
 	public void conv2D(Tensor x, Tensor k, Tensor dst) {
-		ConvCPU.conv2D(x, k, dst);
+		OpsConv.conv2D(x, k, dst);
 	}
 
     @Override
 	public Tensor conv2DFull(Tensor x, Tensor k) {
-		return ConvCPU.conv2DFull(x, k);
+		return OpsConv.conv2DFull(x, k);
 	}
 
     @Override
 	public void conv2DFull(Tensor x, Tensor k, Tensor dst) {
-		ConvCPU.conv2DFull(x, k, dst);
+		OpsConv.conv2DFull(x, k, dst);
 	}
 
 	@Override
@@ -64,37 +64,37 @@ public final class CPU extends Backend {
 		int W, int H,
 		int kW, int kH
 	) {
-		ConvCPU.conv2DFull(dataX, offX, dataK, offK, dataDst, offDst, W, H, kW, kH);
+		OpsConv.conv2DFull(dataX, offX, dataK, offK, dataDst, offDst, W, H, kW, kH);
 	}
 
     @Override
 	public Tensor maxPool2D(Tensor x, int[] filtro) {
-		return PoolingCPU.maxPool2D(x, filtro);
+		return OpsPooling.maxPool2D(x, filtro);
 	}
 
     @Override
 	public Tensor maxPool2D(Tensor x, int[] filtro, int[] stride) {
-		return PoolingCPU.maxPool2D(x, filtro, stride);
+		return OpsPooling.maxPool2D(x, filtro, stride);
 	}
 
     @Override
 	public void maxPool2D(Tensor x, Tensor dst, int[] filtro, int[] stride) {
-		PoolingCPU.maxPool2D(x, dst, filtro, stride);
+		OpsPooling.maxPool2D(x, dst, filtro, stride);
 	}
 
     @Override
 	public Tensor avgPool2D(Tensor x, int[] stride) {
-		return PoolingCPU.avgPool2D(x, stride);
+		return OpsPooling.avgPool2D(x, stride);
 	}
 
     @Override
 	public Tensor avgPool2D(Tensor x, int[] filtro, int[] stride) {
-		return PoolingCPU.avgPool2D(x, filtro, stride);		
+		return OpsPooling.avgPool2D(x, filtro, stride);		
 	}
 
     @Override
 	public void avgPool2D(Tensor x, Tensor dst, int[] filtro, int[] stride) {
-		PoolingCPU.avgPool2D(x, dst, filtro, stride);
+		OpsPooling.avgPool2D(x, dst, filtro, stride);
 	}
 
 	/**

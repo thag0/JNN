@@ -1,6 +1,5 @@
-package jnn.core.backend;
+package jnn.core.ops;
 
-import jnn.core.backend.cpu.CPU;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -10,19 +9,14 @@ import jnn.core.tensor.Tensor;
  *		Utilitário auxliar em operações utilizando {@code Tensor}
  * @see {@link jnn.core.tensor.Tensor}
  */
-public abstract class Backend {
-
-	/**
-	 * Decide se o backend aproveitará funções nativas para aceleração.
-	 */
-	public static boolean jni = false;
+public abstract class Ops {
 
 	/**
 	 * Retorna as implementações em {@code CPU} da biblioteca.
 	 * @return {@code Backend} em CPU.
 	 */
-	public static Backend cpu() {
-		return new CPU();
+	public static Ops get() {
+		return new OpsCPU();
 	}
 
 	/**
