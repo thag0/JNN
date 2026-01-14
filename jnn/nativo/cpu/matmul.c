@@ -1,4 +1,3 @@
-#include "common.h"
 #include "matmul.h"
 
 void cpu_matmul(const matmul_params_t* params) {

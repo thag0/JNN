@@ -1,4 +1,3 @@
-#include "common.h"
 #include "conv2d.h"
 
 static inline void corr2d(

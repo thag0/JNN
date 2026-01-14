@@ -1,4 +1,3 @@
-#include "common.h"
 #include "maxpool.h"
 #include <stdio.h>
 
