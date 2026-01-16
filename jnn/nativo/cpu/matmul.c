@@ -1,8 +1,8 @@
 #include "matmul.h"
 
 void cpu_matmul(const matmul_params_t* params) {
-    double* restrict A = params->A;
-    double* restrict B = params->B;
+    const double* restrict A = params->A;
+    const double* restrict B = params->B;
     double* restrict DST = params->DST;
 
     const int lin_a = params->lin_a;

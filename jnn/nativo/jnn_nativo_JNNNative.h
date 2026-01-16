@@ -7,12 +7,24 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#undef jnn_nativo_JNNNative_JNNNative_BACKEND_CPU
+#define jnn_nativo_JNNNative_JNNNative_BACKEND_CPU 1L
+#undef jnn_nativo_JNNNative_JNNNative_BACKEND_OCL
+#define jnn_nativo_JNNNative_JNNNative_BACKEND_OCL 2L
 /*
  * Class:     jnn_nativo_JNNNative
  * Method:    setThreads
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL Java_jnn_nativo_JNNNative_setThreads
+  (JNIEnv *, jclass, jint);
+
+/*
+ * Class:     jnn_nativo_JNNNative
+ * Method:    setBackend
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_jnn_nativo_JNNNative_setBackend
   (JNIEnv *, jclass, jint);
 
 /*

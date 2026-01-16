@@ -1,9 +1,38 @@
 #include <jni.h>
+#include <omp.h>
 
 #include "dispatcher.h"
 #include "matmul.h"
 #include "conv2d.h"
 #include "maxpool.h"
+
+static inline int jnn_native_num_threads() {
+    int p = omp_get_num_procs();
+    return p > 1 ? p / 2 : 1;
+}
+
+JNIEXPORT jint JNICALL
+JNI_OnLoad(JavaVM* vm, void* reserved) {
+    (void) vm;
+    (void) reserved;
+
+    omp_set_num_threads(jnn_native_num_threads());
+    return JNI_VERSION_1_8;
+}
+
+JNIEXPORT void JNICALL
+Java_jnn_nativo_JNNNative_setThreads(JNIEnv* env, jclass cls, jint n) {
+    (void) env;
+    (void) cls;
+
+    if (n < 1) n = 1;
+    omp_set_num_threads((int)n);
+}
+
+JNIEXPORT void JNICALL 
+Java_jnn_nativo_JNNNative_setBackend(JNIEnv * env, jclass cls, jint backend) {
+    jnn_set_backend(backend);
+}
 
 JNIEXPORT void JNICALL
 Java_jnn_nativo_JNNNative_matmul(

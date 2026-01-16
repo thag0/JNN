@@ -27,6 +27,10 @@ public final class JNNNative {
      */
     public static boolean jni = false;
 
+    public static final int JNNNative_BACKEND_CPU = 1;
+
+    public static final int JNNNative_BACKEND_OCL = 2;
+
     static {
         try {
             carregarDoJar();
@@ -35,6 +39,13 @@ public final class JNNNative {
             throw new RuntimeException("\nErro ao carregar JNI", e);
         }
     }
+
+    static byte[] loadKernel(String path) throws IOException {
+        try (InputStream is = JNNNative.class.getResourceAsStream(path)) {
+            if (is == null) throw new FileNotFoundException(path);
+            return is.readAllBytes();
+        }
+    }  
 
     /**
      * Tenta carregar o arquivo dll.
@@ -64,6 +75,8 @@ public final class JNNNative {
      * @param t quantidade desejada de threads.
     */
     public static native void setThreads(int t);
+
+    public static native void setBackend(int backend);
 
     /**
      * Realiza a multiplicação matricial entre A e B.

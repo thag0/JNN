@@ -100,48 +100,52 @@ void cpu_conv2d_forward(const conv2d_fwd_params_t* params) {
 
     // implementação seca pra enxugar desempenho
 
-    #pragma omp parallel for collapse(2) schedule(static)
-    for (int b = 0; b < lotes; b++) {
-        for (int f = 0; f < filtros; f++) {
-            const int off_x_b  = off_x + b * canais * area_x;
-            const int off_y_b  = off_dst + b * filtros * area_s;
-            const int off_y_b_f = off_y_b + f * area_s;
-            const int off_k_f  = off_k + f * canais * area_k;
-            const double bias = temBias ? B[off_b + f] : 0.0;
+    int BI = 4;
+    int BJ = 16;
 
-            for (int i = 0; i < alt_s; i++) {
-                double* restrict lin_dst = DST + off_y_b_f + i * larg_s;
+    #pragma omp parallel for schedule(static)
+    for (int bf = 0; bf < lotes * filtros; bf++) {
+        int b = bf / filtros;
+        int f = bf % filtros;
+        const int off_x_b  = off_x + b * canais * area_x;
+        const int off_y_b  = off_dst + b * filtros * area_s;
+        const int off_y_b_f = off_y_b + f * area_s;
+        const int off_k_f  = off_k + f * canais * area_k;
+        const double bias = temBias ? B[off_b + f] : 0.0;
 
-                for (int j = 0; j < larg_s; j++) {
-                    lin_dst[j] = bias;
-                }
+        for (int i = 0; i < alt_s; i++) {
+            double* restrict lin_dst = DST + off_y_b_f + i * larg_s;
+
+            for (int j = 0; j < larg_s; j++) {
+                lin_dst[j] = bias;
             }
+        }
 
-            for (int c = 0; c < canais; c++) {
-                const int off_x_c = off_x_b + c * area_x;
-                const int off_k_c = off_k_f + c * area_k;
+        for (int c = 0; c < canais; c++) {
+            const int off_x_c = off_x_b + c * area_x;
+            const int off_k_c = off_k_f + c * area_k;
 
-                for (int kh = 0; kh < alt_k; kh++) {
-                    const int lin_k = off_k_c + kh * larg_k;
+            for (int kh = 0; kh < alt_k; kh++) {
+                const int lin_k = off_k_c + kh * larg_k;
 
-                    for (int kw = 0; kw < larg_k; kw++) {
-                        const double val_k = K[lin_k + kw];
-                        const int x_base = off_x_c + kh * larg_x + kw;
+                for (int kw = 0; kw < larg_k; kw++) {
+                    const double val_k = K[lin_k + kw];
+                    const int x_base = off_x_c + kh * larg_x + kw;
 
-                        for (int i = 0; i < alt_s; i++) {
-                            double* restrict lin_dst = DST + off_y_b_f + i * larg_s;
-                            const double* restrict lin_x = X + x_base + i * larg_x;
+                    for (int i = 0; i < alt_s; i++) {
+                        double* restrict lin_dst = DST + off_y_b_f + i * larg_s;
+                        const double* restrict lin_x = X + x_base + i * larg_x;
 
-                            #pragma omp simd
-                            for (int j = 0; j < larg_s; j++) {
-                                lin_dst[j] += lin_x[j] * val_k;
-                            }
+                        #pragma omp simd
+                        for (int j = 0; j < larg_s; j++) {
+                            lin_dst[j] += lin_x[j] * val_k;
                         }
                     }
                 }
             }
         }
     }
+    
 }
 
 void cpu_conv2d_backward(const conv2d_bwd_params_t* params) {

@@ -41,7 +41,6 @@ set DLL=jnn_native.dll
 set SRC=^
  jnn\nativo\jni\jnn_jni.c ^
  jnn\nativo\dispatch\dispatcher.c ^
- jnn\nativo\cpu\common.c ^
  jnn\nativo\cpu\matmul.c ^
  jnn\nativo\cpu\conv2d.c ^
  jnn\nativo\cpu\maxpool.c
