@@ -12,10 +12,15 @@ public class Seno extends Ativacao {
 	/**
 	 * Instancia a função de ativação Seno.
 	 */
-	public Seno() {
-		construir(
-			x -> Math.sin(x), 
-			x -> Math.cos(x)
-		);
+	public Seno() { }
+
+	@Override
+	protected double fx(double x) {
+		return Math.sin(x);
+	}
+
+	@Override
+	public double dx(double x) {
+		return Math.cos(x);
 	}
 }

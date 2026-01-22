@@ -4,7 +4,6 @@ import java.util.function.DoubleUnaryOperator;
 
 import jnn.camadas.Conv2D;
 import jnn.camadas.Densa;
-import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -47,16 +46,12 @@ public abstract class Ativacao {
 	 */
 	protected DoubleUnaryOperator _dx;
 
-	/**
-	 * Configura a função de ativação e sua derivada para uso.
-	 * @param fx função de ativação.
-	 * @param dx deriviada da função de ativação
-	 */
-	public void construir(DoubleUnaryOperator fx, DoubleUnaryOperator dx) {
-		JNNutils.validarNaoNulo(fx, "fx == null.");
+	protected double fx(double x) {
+		throw new UnsupportedOperationException("\nNão implementado.");
+	}
 
-		_fx = fx;
-		_dx = dx;
+	protected double dx(double x) {
+		throw new UnsupportedOperationException("\nNão implementado.");
 	}
 
 	/**
@@ -65,7 +60,16 @@ public abstract class Ativacao {
 	 * @param dest {@code Tensor} de destino.
 	 */
 	public void forward(Tensor x, Tensor dest) {
-		dest.aplicar(x, _fx);
+		final int offX = x.offset();
+		final int offS = dest.offset();
+		final double[] dataX = x.array();
+		final double[] dataS = dest.array();
+
+		final int tam = x.tam();
+
+		for (int i = 0; i < tam; i++) {
+			dataS[offX + i] = fx(dataX[offS + i]);
+		}
 	}
 
 	/**
@@ -88,9 +92,19 @@ public abstract class Ativacao {
 	 */
 	public void backward(Tensor x, Tensor g, Tensor dest) {
 		// derivada da entrada * gradiente
-		dest.aplicar(x, g, 
-			(in, grad) -> _dx.applyAsDouble(in) * grad
-		);
+
+		final int offX = x.offset();
+		final int offG = g.offset();
+		final int offS = dest.offset();
+		final double[] dataX = x.array();
+		final double[] dataG = g.array();
+		final double[] dataS = dest.array();
+
+		final int tam = x.tam();
+
+		for (int i = 0; i < tam; i++) {
+			dataS[offX + i] = dx(dataX[offS + i]) * dataG[offG + i];
+		}
 	}
 
 	/**

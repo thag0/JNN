@@ -15,10 +15,16 @@ public class Linear extends Ativacao {
 	/**
 	 * Instancia a função de ativação Linear.
 	 */
-	public Linear() {
-		construir(
-			x -> x,
-			_ -> 1.0
-		);
+	public Linear() { }
+
+	@Override
+	protected double fx(double x) {
+		return x;
 	}
+
+	@Override
+	protected double dx(double x) {
+		return 1;
+	}
+
 }

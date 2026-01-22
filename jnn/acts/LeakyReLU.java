@@ -11,6 +11,11 @@ package jnn.acts;
 public class LeakyReLU extends Ativacao {
 
 	/**
+	 * Constante alfa;
+	 */
+	private double alfa = 0.01;
+
+	/**
 	 * Instancia a função de ativação LeakyReLU com seu valor de alfa configurável.
 	 * <p>
 	 *    A ativação LeakyReLU funciona semelhante a função ReLU, retornando o próprio 
@@ -20,12 +25,7 @@ public class LeakyReLU extends Ativacao {
 	 * @param alfa novo valor alfa.
 	 */
 	public LeakyReLU(Number alfa) {
-		double a = alfa.doubleValue();
-
-		construir(
-			x -> (x > 0.0) ? x   : a*x,
-			x -> (x > 0.0) ? 1.0 : a
-		);
+		this.alfa = alfa.doubleValue();
 	}
 
 	/**
@@ -41,5 +41,15 @@ public class LeakyReLU extends Ativacao {
 	 */
 	public LeakyReLU() {
 		this(0.01);
+	}
+
+	@Override
+	protected double fx(double x) {
+		return (x > 0.0) ? x : alfa * x;
+	}
+
+	@Override
+	protected double dx(double x) {
+		return (x > 0.0) ? 1.0 : alfa;
 	}
 }

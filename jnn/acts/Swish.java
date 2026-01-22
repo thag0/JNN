@@ -13,17 +13,20 @@ public class Swish extends Ativacao {
 	/**
 	 * Instancia a função de ativação Swish.
 	 */
-	public Swish() {
-		construir(
-			x -> x * sigmoid(x), 
-			x -> {
-				double sig = sigmoid(x);
-				return sig + (x * sig * (1.0 - sig));
-			}
-		);
+	public Swish() { }
+
+	@Override
+	protected double fx(double x) {
+		return x * sigmoid(x);
 	}
 
-	private double sigmoid(double x) {
+	@Override
+	protected double dx(double x) {
+		double sig = sigmoid(x);
+		return sig + (x * sig * (1.0 - sig));		
+	}
+
+	final private double sigmoid(double x) {
 		return 1.0 / (1.0 + Math.exp(-x));
 	}
 }

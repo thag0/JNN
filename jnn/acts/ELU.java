@@ -11,17 +11,17 @@ package jnn.acts;
 public class ELU extends Ativacao {
 
 	/**
+	 * Constante alfa.
+	 */
+	private double alfa = 0.01;
+
+	/**
 	 * Instancia a função de ativação ELU com 
 	 * seu valor de alfa configurável.
 	 * @param alfa novo valor alfa.
 	 */
 	public ELU(Number alfa) {
-		double a = alfa.doubleValue();
-
-		construir(
-			x -> (x > 0.0) ? x   : a * (Math.exp(x) - 1.0),
-			x -> (x > 0.0) ? 1.0 : a * Math.exp(x)
-		);
+		this.alfa = alfa.doubleValue();
 	}
 
 	/**
@@ -34,4 +34,15 @@ public class ELU extends Ativacao {
 	public ELU() {
 		this(0.01);
 	}
+
+	@Override
+	protected double fx(double x) {
+		return (x > 0.0) ? x : alfa * (Math.exp(x) - 1.0); 
+	}
+
+	@Override
+	protected double dx(double x) {
+		return (x > 0.0) ? 1.0 : alfa * Math.exp(x); 
+	}
+
 }

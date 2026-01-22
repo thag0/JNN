@@ -15,14 +15,17 @@ public class TanH extends Ativacao {
 	/**
 	 * Instancia a função de ativação TanH.
 	 */
-	public TanH() {
-		construir(
-			x -> (2.0 / (1.0 + Math.exp(-2.0 * x))) - 1.0, 
-			x -> {
-				double t = (2.0 / (1.0 + Math.exp(-2.0 * x))) - 1.0;
-				return 1.0 - (t * t);
-			}
-		);
+	public TanH() {	}
+
+	@Override
+	protected double fx(double x) {
+		return 2.0 / (1.0 + Math.exp(-2.0 * x)) - 1.0;
+	}
+
+	@Override
+	protected double dx(double x) {
+		double t = fx(x);
+		return 1.0 - (t * t);		
 	}
 
 	@Override

@@ -15,14 +15,17 @@ public class Sigmoid extends Ativacao {
 	/**
 	 * Instancia a função de ativação Sigmoid.
 	 */
-	public Sigmoid() {
-		construir(
-			x -> 1.0 / (1.0 + Math.exp(-x)),
-			x -> { 
-				double s = 1.0 / (1.0 + Math.exp(-x));
-				return s * (1.0 - s);
-			}
-		);
+	public Sigmoid() { }
+
+	@Override
+	protected double fx(double x) {
+		return 1.0 / (1.0 + Math.exp(-x));
+	}
+
+	@Override
+	protected double dx(double x) {
+		double s = fx(x);
+		return s * (1.0 - s);		
 	}
 
 	@Override

@@ -13,18 +13,23 @@ package jnn.acts;
 public class SELU extends Ativacao {
 
 	/**
+	 * Constante alfa;
+	 */
+	private double alfa;
+
+	/**
+	 * Fator de escala
+	 */
+	private double escala;
+
+	/**
 	 * Instancia a função de ativação SELU com os parâmetros alpha e scale especificados.
 	 * @param alfa constante alfa.
 	 * @param escala constante de escala.
 	 */
 	public SELU(Number alfa, Number escala) {
-		double a = alfa.doubleValue();
-		double e = escala.doubleValue();
-
-		construir(
-			x -> (x > 0.0) ? e * x : e * a * (Math.exp(x) - 1.0),
-			x -> (x > 0.0) ? e     : e * a * Math.exp(x)
-		);
+		this.alfa = alfa.doubleValue();
+		this.escala = escala.doubleValue();
 	}
 
 	/**
@@ -32,6 +37,16 @@ public class SELU extends Ativacao {
 	 */
 	public SELU() {
 		this(1.67326324, 1.05070098);
+	}
+
+	@Override
+	protected double fx(double x) {
+		return (x > 0.0) ? escala * x : escala * alfa * (Math.exp(x) - 1.0);
+	}
+
+	@Override
+	protected double dx(double x) {
+		return (x > 0.0) ? escala : escala * alfa * Math.exp(x);
 	}
 
 }
