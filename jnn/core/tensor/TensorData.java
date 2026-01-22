@@ -17,12 +17,12 @@ public class TensorData {
     /**
      * Array de elementos.
      */
-    private double[] dados;
+    private final double[] dados;
 
     /**
      * Índice inicial. (para views)
      */
-    private int offset;
+    private final int offset;
 
     /**
      * Tamanho do conjunto de dados.
@@ -31,7 +31,7 @@ public class TensorData {
      *      o conjunto for uma view de outro TensorData.
      * </p>
      */
-    private int tam; 
+    private final int tam; 
 
     /**
      * Inicializa um {@code TensorData} a partir de dados bem definidos.

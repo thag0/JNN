@@ -33,9 +33,6 @@ void cpu_conv2d_forward(const conv2d_fwd_params_t* params) {
 
     // implementação seca pra enxugar desempenho
 
-    int BI = 4;
-    int BJ = 16;
-
     #pragma omp parallel for schedule(static)
     for (int bf = 0; bf < lotes * filtros; bf++) {
         int b = bf / filtros;
@@ -48,7 +45,6 @@ void cpu_conv2d_forward(const conv2d_fwd_params_t* params) {
 
         for (int i = 0; i < alt_s; i++) {
             double* restrict lin_dst = DST + off_y_b_f + i * larg_s;
-
             for (int j = 0; j < larg_s; j++) {
                 lin_dst[j] = bias;
             }
@@ -188,4 +184,5 @@ void cpu_conv2d_backward(const conv2d_bwd_params_t* params) {
             }
         }
     }
+
 }
