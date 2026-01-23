@@ -40,6 +40,8 @@ public class LayerOps {
 	 * @see {@link jnn.camadas.Densa}
 	 */
 	public void forwardDensa(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
+		saida.zero();// zerar acumulos anteriores
+
 		ops.matmul(entrada, kernel, saida);
 
 		bias.ifPresent(b -> {
@@ -114,6 +116,8 @@ public class LayerOps {
 	 * @param saida saída.
 	 */
 	private void forwardConv2DNormal(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
+		saida.zero();// zerar acumulos anteriores
+
 		final int[] shapeK = kernel.shape();
 		final int[] shapeX = entrada.shape();
 
@@ -195,6 +199,8 @@ public class LayerOps {
 			);
 			return;
 		}
+
+		saida.zero();// zerar acúmulos anteriores
 		
 		final int altS = altX - atlK + 1;
 		final int largS = largX - largK + 1;

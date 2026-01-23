@@ -608,7 +608,6 @@ public class Conv2D extends Camada implements Cloneable {
 
 		_entrada.copiar(x);
 		
-		_buffer.zero();// zerar acumulações anteriores
 		lops.forwardConv2D(_entrada, _kernel, _bias, _buffer);
 
 		ativacao.forward(_buffer, _saida);

@@ -428,7 +428,6 @@ public class Densa extends Camada implements Cloneable {
 
 		_entrada.copiar(x);
 
-		_buffer.zero();
 		lops.forwardDensa(_entrada, _kernel, _bias, _buffer);
 
 		ativacao.forward(_buffer, _saida);

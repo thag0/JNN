@@ -144,7 +144,10 @@ public class TensorData {
      */
     public TensorData preencher(Number x) {
         final double val = x.doubleValue();
-        Arrays.fill(dados, offset, offset + tam, val);
+        
+        for (int i = 0; i < tam; i++) {
+            dados[offset + i] = val;
+        }
         
         return this;
     }
