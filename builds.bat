@@ -1,10 +1,19 @@
 @echo off
+setlocal
 
-@rem - arquivos principais
-@REM javac -cp "bin\jnn.jar;lib\ged.jar" -d testes/bin MainConv.java
+rem dir base
+set OUT_DIR=testes\bin
 
-@rem -arquivos de testes
-@REM javac -cp "bin\jnn.jar;lib\ged.jar;lib\geim.jar" -d testes/bin Benchmark.java
-@REM javac -cp "bin\jnn.jar;lib\ged.jar;lib\geim.jar" -d testes/bin Conv.java
-javac -cp "bin\jnn.jar;lib\ged.jar;" -d testes/bin TesteConv.java
-@REM javac -cp "bin\jnn.jar;lib\ged.jar;lib\geim.jar" -d testes/bin TesteJNI.java
+rem class path
+set CP_JNN_GED=bin\jnn.jar;lib\ged.jar
+set CP_JNN_GED_GEIM=bin\jnn.jar;lib\ged.jar;lib\geim.jar
+
+if not exist %OUT_DIR% mkdir %OUT_DIR%
+
+
+rem javac -cp "%CP_JNN_GED%" -d %OUT_DIR% MainConv.java
+rem javac -cp "%CP_JNN_GED_GEIM%" -d %OUT_DIR% Benchmark.java
+javac -cp "%CP_JNN_GED_GEIM%" -d %OUT_DIR% Conv.java
+rem javac -cp "%CP_JNN_GED%" -d %OUT_DIR% TesteConv.java
+rem javac -cp "%CP_JNN_GED_GEIM%" -d %OUT_DIR% TesteJNI.java
+rem javac -cp "%CP_JNN_GED_GEIM%" -d %OUT_DIR% exemplos\Iris.java

@@ -31,8 +31,6 @@ if not exist "%JAVA_HOME%\include\jni.h" (
 	exit /b 1
 )
 
-echo JDK encontrado: %JAVA_HOME%
-
 @rem build jni
 
 set OUT_DIR=bin\nativo\cpu\win64
@@ -51,8 +49,9 @@ gcc ^
  -O3 ^
  -shared ^
  -march=x86-64 ^
- -mtune=generic ^
  -fno-fast-math ^
+ -mtune=generic ^
+ -mfma ^
  -fopenmp ^
  -I"%JAVA_HOME%\include" ^
  -I"%JAVA_HOME%\include\win32" ^

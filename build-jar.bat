@@ -4,7 +4,7 @@ setlocal
 set BIN_CLASSES=bin\classes
 set OUT_JAR=bin\jnn.jar
 
-jar cvf "%OUT_JAR%" ^
+jar cf "%OUT_JAR%" ^
  -C "%BIN_CLASSES%" . ^
  -C bin nativo
 
