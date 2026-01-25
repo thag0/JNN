@@ -1,7 +1,5 @@
 package jnn.camadas;
 
-import java.util.Random;
-
 import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 
@@ -80,11 +78,6 @@ public class Dropout extends Camada implements Cloneable {
 	public Tensor _gradEntrada;
 
 	/**
-	 * Gerador de valores aleatórios.
-	 */
-	private Random random = new Random();
-
-	/**
 	 * Instancia uma nova camada de dropout, definindo a taxa
 	 * de abandono que será usada durante o processo de treinamento.
 	 * @param entrada formato de entrada da camada.
@@ -92,21 +85,9 @@ public class Dropout extends Camada implements Cloneable {
 	 * taxa de abandono da camada.
 	 * @param seed seed usada para o gerador de números aleatórios da camada.
 	 */
-	public Dropout(int[] entrada, Number taxa, Number seed) {
-		this(taxa, seed);
-		construir(entrada);
-	}
-
-	/**
-	 * Instancia uma nova camada de dropout, definindo a taxa
-	 * de abandono que será usada durante o processo de treinamento.
-	 * @param taxa taxa de dropout, um valor entre 0 e 1 representando a
-	 * taxa de abandono da camada.
-	 * @param seed seed usada para o gerador de números aleatórios da camada.
-	 */
-	public Dropout(Number taxa, Number seed) {
+	public Dropout(int[] entrada, Number taxa) {
 		this(taxa);
-		setSeed(seed);
+		construir(entrada);
 	}
 
 	/**
@@ -158,15 +139,6 @@ public class Dropout extends Camada implements Cloneable {
 
 	@Override
 	public void inicializar() {}
-
-	@Override
-	public void setSeed(Number seed) {
-		if (seed == null) {
-			throw new NullPointerException("\nseed == null.");
-		}
-
-		random.setSeed(seed.longValue());
-	}
 
 	@Override
 	public void ajustarParaLote(int tamLote) {
@@ -256,7 +228,7 @@ public class Dropout extends Camada implements Cloneable {
 	 */
 	private void gerarMascaras() {
 		_mascara.aplicar(
-			_ ->  (random.nextDouble() >= taxa) ? (1.0 / (1.0 - taxa)) : 0.0
+			_ ->  (JNNutils.randDouble() >= taxa) ? (1.0 / (1.0 - taxa)) : 0.0
 		);
 	}
 
@@ -319,7 +291,6 @@ public class Dropout extends Camada implements Cloneable {
 		Dropout clone = (Dropout) super.clone();
 		clone.shapeIn = this.shapeIn.clone();
 		clone.taxa = this.taxa;
-		clone.random = new Random();
 
 		clone._entrada = this._entrada.clone();
 		clone._mascara = this._mascara.clone();
@@ -339,8 +310,8 @@ public class Dropout extends Camada implements Cloneable {
 		sb.append(nome() + " (id " + this.id + ") = [\n");
 
 		sb.append(pad).append("Taxa: " + taxa() + "\n");
-		sb.append(pad).append("Entrada: " + JNNutils.shapeStr(shapeIn) + "\n");
-		sb.append(pad).append("Saída: " + JNNutils.shapeStr(shapeIn) + "\n");
+		sb.append(pad).append("Entrada: " + JNNutils.arrayStr(shapeIn) + "\n");
+		sb.append(pad).append("Saída: " + JNNutils.arrayStr(shapeIn) + "\n");
 
 		sb.append("]\n");
 

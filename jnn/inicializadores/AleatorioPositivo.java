@@ -1,5 +1,6 @@
 package jnn.inicializadores;
 
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -30,16 +31,6 @@ public class AleatorioPositivo extends Inicializador {
 	}
 
 	/**
-	 * Instancia um inicializador de valores aleatórios positivos.
-	 * @param max valor máximo de aleatorização.
-	 * @param seed seed usada pelo gerador de números aleatórios.
-	 */
-	public AleatorioPositivo(Number max, Number seed) {
-		this(max);
-		setSeed(seed);
-	}
-
-	/**
 	 * Instancia um inicializador de valores aleatórios positivos
 	 * com seed aleatória.
 	 */
@@ -47,17 +38,9 @@ public class AleatorioPositivo extends Inicializador {
 		this(1.0);
 	}
 
-	/**
-	 * Instancia um inicializador de valores aleatórios positivos.
-	 * @param seed seed usada pelo gerador de números aleatórios.
-	 */
-	public AleatorioPositivo(long seed) {
-		this(1.0, seed);
-	}
-
 	@Override
 	public void forward(Tensor tensor) {
-		tensor.aplicar(_ -> super.random.nextDouble(0, max));
+		tensor.aplicar(_ -> JNNutils.randDouble(0, max));
 	}
 	
 }

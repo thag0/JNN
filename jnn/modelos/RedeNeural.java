@@ -373,7 +373,6 @@ public class RedeNeural extends Modelo {
 
 		for (int i = 0; i < _camadas.length; i++) {
 			_camadas[i].setId(i);
-			if (seedInicial != 0) _camadas[i].setSeed(seedInicial);
 			_camadas[i].inicializar();
 		}
 

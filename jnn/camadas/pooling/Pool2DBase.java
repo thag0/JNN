@@ -148,9 +148,9 @@ public abstract class Pool2DBase extends Camada {
 		if (shapeSaida[1] < 1 || shapeSaida[2] < 1) {
 			throw new IllegalArgumentException(
 				"\nCamada não pode ser construida:" +
-				"\nFormato de entrada " + JNNutils.shapeStr(shape) +
-				" e formato dos filtros " + JNNutils.shapeStr(_filtro) +
-				" resultam num formato de saída inválido " + JNNutils.shapeStr(shapeSaida)
+				"\nFormato de entrada " + JNNutils.arrayStr(shape) +
+				" e formato dos filtros " + JNNutils.arrayStr(_filtro) +
+				" resultam num formato de saída inválido " + JNNutils.arrayStr(shapeSaida)
 			);
 		}
 		
@@ -311,10 +311,10 @@ public abstract class Pool2DBase extends Camada {
 		
 		sb.append(nome() + " (id " + this.id + ") = [\n");
 
-		sb.append(pad).append("Entrada: " + JNNutils.shapeStr(shapeEntrada) + "\n");
-		sb.append(pad).append("Filtro: " + JNNutils.shapeStr(_filtro) + "\n");
-		sb.append(pad).append("Strides: " + JNNutils.shapeStr(_stride) + "\n");
-		sb.append(pad).append("Saída: " + JNNutils.shapeStr(shapeOut()) + "\n");
+		sb.append(pad).append("Entrada: " + JNNutils.arrayStr(shapeEntrada) + "\n");
+		sb.append(pad).append("Filtro: " + JNNutils.arrayStr(_filtro) + "\n");
+		sb.append(pad).append("Strides: " + JNNutils.arrayStr(_stride) + "\n");
+		sb.append(pad).append("Saída: " + JNNutils.arrayStr(shapeOut()) + "\n");
 
 		sb.append("]\n");
 

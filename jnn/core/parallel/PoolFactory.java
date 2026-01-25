@@ -15,7 +15,7 @@ public class PoolFactory {
     /**
      * Quantidade de threads padrão por pool.
      */
-    static int numThreads = MAX_DISPONIVEL / 2;
+    static int numThreads = MAX_DISPONIVEL / 2;// normalmente threads físicas.
 
 
     /**

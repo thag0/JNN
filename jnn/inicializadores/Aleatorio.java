@@ -1,5 +1,6 @@
 package jnn.inicializadores;
 
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -38,17 +39,6 @@ public class Aleatorio extends Inicializador {
 	}
 
 	/**
-	 * Instancia um inicializador de valores aleatórios.
-	 * @param min valor mínimo de aleatorização.
-	 * @param max valor máximo de aleatorização.
-	 * @param seed seed usada pelo gerador de números aleatórios.
-	 */
-	public Aleatorio(Number min, Number max, Number seed) {
-		this(min, max);
-		setSeed(seed);
-	}
-
-	/**
 	 * Instancia um inicializador de valores aleatórios com seed
 	 * também aleatória.
 	 */
@@ -56,17 +46,9 @@ public class Aleatorio extends Inicializador {
 		this(-1.0, 1.0);
 	}
 
-	/**
-	 * Instancia um inicializador de valores aleatórios.
-	 * @param seed seed usada pelo gerador de números aleatórios.
-	 */
-	public Aleatorio(Number seed) {
-		this(-1.0, 1.0, seed);
-	}
-
 	@Override
 	public void forward(Tensor tensor) {
-		tensor.aplicar(_ -> super.random.nextDouble(min, max));
+		tensor.aplicar(_ -> JNNutils.randDouble(min, max));
 	}
 	
 }

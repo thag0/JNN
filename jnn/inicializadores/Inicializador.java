@@ -1,7 +1,5 @@
 package jnn.inicializadores;
 
-import java.util.Random;
-
 import jnn.core.tensor.Tensor;
 
 /**
@@ -11,27 +9,9 @@ import jnn.core.tensor.Tensor;
 public abstract class Inicializador {
 
 	/**
-	 * Gerador de números pseudo aleatórios compartilhado
-	 * para as classes filhas.
-	 */
-	protected Random random = new Random();
-
-	/**
 	 * Inicialização com seed aleatória
 	 */
 	protected Inicializador() {}
-
-	/**
-	 * Configura o início do gerador aleatório.
-	 * @param seed nova seed de início.
-	 */
-	public void setSeed(Number seed) {
-		if (seed == null) {
-			throw new NullPointerException("\nseed == null.");
-		}
-
-		random.setSeed(seed.longValue());
-	}
 
 	/**
 	 * Calcula os valores de fanIn e fanOut para ser usado pelos inicializadores.
@@ -70,9 +50,9 @@ public abstract class Inicializador {
 
 	/**
 	 * Inicializa todos os valores tensor.
-	 * @param tensor tensor desejado.
+	 * @param t tensor desejado.
 	 */
-	public abstract void forward(Tensor tensor);
+	public abstract void forward(Tensor t);
 
 	/**
 	 * Retorna o nome do inicializador.

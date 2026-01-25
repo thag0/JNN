@@ -342,12 +342,6 @@ public class Densa extends Camada implements Cloneable {
 	}
 
 	@Override
-	public void setSeed(Number seed) {
-		iniKernel.setSeed(seed);
-		iniBias.setSeed(seed);
-	}
-
-	@Override
 	public void inicializar() {
 		verificarConstrucao();
 

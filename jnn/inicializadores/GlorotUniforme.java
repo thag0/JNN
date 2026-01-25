@@ -1,5 +1,6 @@
 package jnn.inicializadores;
 
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -12,14 +13,6 @@ public class GlorotUniforme extends Inicializador {
 	 * aleatória.
 	 */
 	public GlorotUniforme() {}
-	
-	/**
-	 * Instancia um inicializador Xavier para tensores.
-	 * @param seed seed usada pelo gerador de números aleatórios.
-	 */
-	public GlorotUniforme(Number seed) {
-		setSeed(seed);
-	}
 
 	@Override
 	public void forward(Tensor tensor) {
@@ -29,6 +22,6 @@ public class GlorotUniforme extends Inicializador {
 		int fout = fans[1];
 		double limite = Math.sqrt(6.0 / (fin + fout));
 
-		tensor.aplicar(_ -> super.random.nextDouble() * (2.0 * limite) - limite);
+		tensor.aplicar(_ -> JNNutils.randDouble() * (2.0 * limite) - limite);
 	}
 }

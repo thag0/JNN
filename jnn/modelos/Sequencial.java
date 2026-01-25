@@ -283,7 +283,6 @@ public class Sequencial extends Modelo {
 			Camada camada = camada(i);
 			
 			if (i != 0) camada.construir(camada(i-1).shapeOut());
-			if (seedInicial != 0) camada.setSeed(seedInicial);
 			
 			camada.inicializar();
 			camada.setId(i);
@@ -377,10 +376,10 @@ public class Sequencial extends Modelo {
 			String nomeCamada = camada.id + " - " + camada.nome();
 			
 			//formato de entrada
-			String formEntrada = JNNutils.shapeStr(camada.shapeIn());
+			String formEntrada = JNNutils.arrayStr(camada.shapeIn());
 			
 			//formato de saída
-			String formSaida = JNNutils.shapeStr(camada.shapeOut());
+			String formSaida = JNNutils.arrayStr(camada.shapeOut());
 
 			//função de ativação
 			String ativacao;

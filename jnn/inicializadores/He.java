@@ -1,5 +1,6 @@
 package jnn.inicializadores;
 
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -13,21 +14,12 @@ public class He extends Inicializador {
 	 */
 	public He() {}
 
-	/**
-	 * Instancia um inicializador He para tensores com seed
-	 * aleatória.
-	 * @param seed seed usada pelo gerador de números aleatórios.
-	 */
-	public He(Number seed) {
-		setSeed(seed);
-	}
-
 	@Override
 	public void forward(Tensor tensor) {
 		int fanIn = calcularFans(tensor)[0];
 		double desvP = Math.sqrt(2.0 / fanIn);
 
-		tensor.aplicar(_ -> random.nextGaussian()*desvP);
+		tensor.aplicar(_ -> JNNutils.randGaussian() * desvP);
 	}
 
 }

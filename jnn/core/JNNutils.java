@@ -12,29 +12,61 @@ import jnn.core.tensor.TensorConverter;
 public final class JNNutils {
 
 	/**
+	 * Gerador de números aleatórios.
+	 */
+	private static Random rng = new Random();
+
+	/**
 	 * Utilitário geral para a biblioteca.
 	 */
 	private JNNutils() {}
+
+	/**
+	 * Configura a seed do gerador de números aleatórios.
+	 * @param seed nova seed.
+	 */
+	public static void randSeed(long seed) {
+		rng.setSeed(seed);
+	}
+
+	/**
+	 * Retorna um número normalmente distribuído com média = 0 
+	 * e desvio padrão = 1.
+	 * @return valor gerado.
+	 */
+	public static double randGaussian() {
+		return rng.nextGaussian();
+	}
+
+	/**
+	 * Retorna um número aleatório uniformemente distribuído com 
+	 * média = 0 e desvio padrão = 1.
+	 * @return valor gerado.
+	 */
+	public static double randDouble() {
+		return rng.nextDouble();
+	}
+
+	/**
+	 * Retorna um número aleatório de acordo com o intervalo especificado.
+	 * @param min valor mínimo (inclusivo).
+	 * @param max valor valor máximo (exclusivo).
+	 * @return valor gerado.
+	 */
+	public static double randDouble(double min, double max) {
+		return rng.nextDouble(min, max);
+	}
 
 	/**
 	 * Retorna o último índice válido do array.
 	 * @param arr array base.
 	 * @return último índice.
 	 */
-	public static int ultimoIndice(Object arr) {
-		if (arr instanceof int[]) {
-			int[] a = (int[]) arr;
-
-			if (a.length == 0) {
-				throw new IllegalArgumentException("\nArray de tamanho 0.");
-			}
-
-			return a.length-1;
-		} else {
-			throw new IllegalArgumentException(
-				"Tipo de dado (" + arr.getClass().getTypeName() + ") não suportado."
-			);
+	public static int ultimoIndice(int[] arr) {
+		if (arr.length == 0) {
+			throw new IllegalArgumentException("\nArray de tamanho 0.");
 		}
+		return arr.length-1;
 	}
 
 	/**
@@ -56,7 +88,7 @@ public final class JNNutils {
 	 * @param b {@code array} 2.
 	 * @return {@code true} se os arrays são igual, {@code false} caso contrário.
 	 */
-	public static boolean compArray(int[] a, int[] b) {
+	public static boolean arrayComp(int[] a, int[] b) {
 		if (a.length != b.length) return false;
 
 		int n = a.length;
@@ -79,7 +111,7 @@ public final class JNNutils {
 	 * @param arr array desejado.
 	 * @return formato das dimensões do array
 	 */
-	public static String shapeStr(int[] arr) {
+	public static String arrayStr(int[] arr) {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("(");
@@ -261,16 +293,16 @@ public final class JNNutils {
 	 * Embaralha o array usando o algoritmo Fisher-Yates.
 	 * @param <T> tipo de dados de entrada e saida.
 	 * @param arr {@code array} base.
-	 * @param rng gerador de números aleatórios base.
+	 * @param r gerador de números aleatórios base.
 	 */
-	public static <T> void embaralhar(T[] arr, Random rng) {
+	public static <T> void embaralhar(T[] arr, Random r) {
 		int n = arr.length;
-		Random r = rng == null ? new Random() : rng;
+		Random rand = r == null ? rng : r;
 		
 		T temp;
 		int i, idRng;
 		for (i = n - 1; i > 0; i--) {
-			idRng = r.nextInt(i+1);
+			idRng = rand.nextInt(i+1);
 			temp = arr[i];
 			arr[i] = arr[idRng];
 			arr[idRng] = temp;
@@ -282,16 +314,16 @@ public final class JNNutils {
 	 * @param <T> tipo de dados de entrada e saida.
 	 * @param arr1 {@code array} 1.
 	 * @param arr2 {@code array} 2.
-	 * @param rng gerador de números aleatórios base.
+	 * @param r gerador de números aleatórios base.
 	 */
-	public static <T> void embaralhar(T[] arr1, T[] arr2, Random rng) {
+	public static <T> void embaralhar(T[] arr1, T[] arr2, Random r) {
 		int n = arr1.length;
-		Random r = rng == null ? new Random() : rng;
+		Random rand = r == null ? rng : r;
 		
 		T temp;
 		int i, idRng;
 		for (i = n - 1; i > 0; i--) {
-			idRng = r.nextInt(i+1);
+			idRng = rand.nextInt(i+1);
 			
 			temp = arr1[i];
 			arr1[i] = arr1[idRng];

@@ -141,9 +141,6 @@ public class Flatten extends Camada implements Cloneable {
 	public void inicializar() {}
 
 	@Override
-	public void setSeed(Number seed) {}
-
-	@Override
 	public void ajustarParaLote(int tamLote) {
 		if (tamLote == 0) {
 			_entrada 	= addParam("Entrada", shapeIn);
@@ -276,7 +273,7 @@ public class Flatten extends Camada implements Cloneable {
 		
 		sb.append(nome() + " (id " + id + ") = [\n");
 
-		sb.append(pad).append("Entrada: " + JNNutils.shapeStr(shapeIn) + "\n");
+		sb.append(pad).append("Entrada: " + JNNutils.arrayStr(shapeIn) + "\n");
 		sb.append(pad).append("Saída: (1, " + tamSaida() + ")\n");
 
 		sb.append("]\n");

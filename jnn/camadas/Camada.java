@@ -167,17 +167,6 @@ public abstract class Camada {
 	}
 
 	/**
-	 * Configura uma seed fixa para geradores de números aleatórios da
-	 * camada.
-	 * @param seed nova seed.
-	 */
-	public void setSeed(Number seed) {
-		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui configuração de seed."
-		); 
-	}
-
-	/**
 	 * Inicializa um {@code Tensor} vazio com nome especificado.
 	 * @param shape {@code array} contendo os valores das dimensões do tensor.
 	 * @param nome {@code String} contendo nome desejado.
