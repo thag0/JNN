@@ -11,6 +11,6 @@ set CP_JNN_GED_GEIM=bin\jnn.jar;lib\ged.jar;lib\geim.jar;testes\bin
 @REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED%" MainConv
 @REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED_GEIM%" Conv
 rem java %ENABLE_NATIVE% -cp "%CP_JNN_GED_GEIM%" Benchmark
-java %ENABLE_NATIVE% -cp "%CP_JNN_GED%" TesteConv 0
+java %ENABLE_NATIVE% -cp "%CP_JNN_GED%" TesteConv 1
 @REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED_GEIM%" TesteJNI
 @REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED_GEIM%" exemplos.Iris
