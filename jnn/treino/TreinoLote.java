@@ -1,7 +1,5 @@
 package jnn.treino;
 
-import java.util.concurrent.atomic.DoubleAdder;
-
 import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 import jnn.metrica.perda.Perda;
@@ -41,7 +39,7 @@ public class TreinoLote extends MetodoTreino {
 			if (logs) tempo = System.nanoTime();
 
 			embaralhar(x, y);
-			DoubleAdder perdaEpoca = new DoubleAdder();
+			double perdaEpoca = 0;
 
 			for (int i = 0; i < amostras; i += tamLote) {
 				int idFim = Math.min(i + tamLote, amostras);
@@ -49,7 +47,7 @@ public class TreinoLote extends MetodoTreino {
 				Tensor[] loteY = JNNutils.subArray(y, i, idFim);
 
                 modelo.gradZero();
-				processoLote(loteX, loteY, loss, perdaEpoca);
+				perdaEpoca += processoLote(loteX, loteY, loss);
                 otm.update();      
 			}
 			
@@ -57,7 +55,7 @@ public class TreinoLote extends MetodoTreino {
 				tempo = System.nanoTime() - tempo;
 
 				limparLinha();
-				String log = "[Época " + e + "/" + epochs + "] loss: " + (float)(perdaEpoca.sum()/amostras);
+				String log = "[Época " + e + "/" + epochs + "] loss: " + (float)(perdaEpoca/amostras);
 
 				long segundos = (long) tempo / 1_000_000_000;
 				long min = (segundos / 60);
@@ -71,7 +69,7 @@ public class TreinoLote extends MetodoTreino {
 				exibirLogTreino(log);
 			}
 
-			if (calcHist) historico.add(perdaEpoca.sum() / amostras);			
+			if (calcHist) historico.add(perdaEpoca / amostras);			
 		}
 
 		if (logs) {
@@ -87,7 +85,7 @@ public class TreinoLote extends MetodoTreino {
 	 * @param loss função de perda do modelo.
 	 * @param perdaEpoca valor de perda por época de treinamento.
 	 */
-	private void processoLote(Tensor[] loteX, Tensor[] loteY, Perda loss, DoubleAdder perdaEpoca) {
+	private double processoLote(Tensor[] loteX, Tensor[] loteY, Perda loss) {
 		Tensor real = JNNutils.concatenar(loteY);
 
 		Tensor prev = modelo.forward(JNNutils.concatenar(loteX));
@@ -98,8 +96,10 @@ public class TreinoLote extends MetodoTreino {
 		if (calcHist) {
 			double l = loss.forward(prev, real).item();
 			int n = loteX.length;
-			perdaEpoca.add(l * n);
+			return l * n;
 		}
+
+		return 0;// não registrar perda
 	}
 
 }
