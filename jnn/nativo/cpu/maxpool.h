@@ -16,19 +16,12 @@ typedef struct {
     int larg_pool;
     int alt_std;
     int larg_std;
-
-    int off_x;
-    int off_y;
 } maxpool2d_fwd_params_t;
 
 typedef struct {
     const double* X;
     const double* GS;
     double* GE;
-
-    int off_x;
-    int off_gs;
-    int off_ge;
 
     int lotes;
     int canais;

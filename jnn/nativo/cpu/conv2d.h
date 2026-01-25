@@ -1,16 +1,12 @@
 #pragma once
+
 #include <stdbool.h>
 
-typedef struct {
+typedef struct conv2d_fwd_params_t {
     const double* restrict X;
     const double* restrict K;
     const double* restrict B;
     double* restrict DST;
-
-    int off_x;
-    int off_k;
-    int off_b;
-    int off_dst;
 
     int lotes;
     int canais;
@@ -32,13 +28,6 @@ typedef struct {
     double* restrict GK;
     double* restrict GE;
     double* restrict GB;
-
-    int off_x;
-    int off_k;
-    int off_gs;
-    int off_gk;
-    int off_ge;
-    int off_gb;
 
     int lotes;
     int canais;

@@ -9,8 +9,6 @@ extern "C" {
 #endif
 #undef jnn_nativo_JNNNative_JNNNative_BACKEND_CPU
 #define jnn_nativo_JNNNative_JNNNative_BACKEND_CPU 1L
-#undef jnn_nativo_JNNNative_JNNNative_BACKEND_OCL
-#define jnn_nativo_JNNNative_JNNNative_BACKEND_OCL 2L
 /*
  * Class:     jnn_nativo_JNNNative
  * Method:    setThreads
@@ -38,34 +36,34 @@ JNIEXPORT void JNICALL Java_jnn_nativo_JNNNative_matmul
 /*
  * Class:     jnn_nativo_JNNNative
  * Method:    conv2dForward
- * Signature: ([DI[DI[DIZ[DIIIIIIII)V
+ * Signature: ([D[D[DZ[DIIIIIII)V
  */
 JNIEXPORT void JNICALL Java_jnn_nativo_JNNNative_conv2dForward
-  (JNIEnv *, jclass, jdoubleArray, jint, jdoubleArray, jint, jdoubleArray, jint, jboolean, jdoubleArray, jint, jint, jint, jint, jint, jint, jint, jint);
+  (JNIEnv *, jclass, jdoubleArray, jdoubleArray, jdoubleArray, jboolean, jdoubleArray, jint, jint, jint, jint, jint, jint, jint);
 
 /*
  * Class:     jnn_nativo_JNNNative
  * Method:    conv2dBackward
- * Signature: ([DI[DI[DI[DI[DIZ[DIIIIIIII)V
+ * Signature: ([D[D[D[D[DZ[DIIIIIII)V
  */
 JNIEXPORT void JNICALL Java_jnn_nativo_JNNNative_conv2dBackward
-  (JNIEnv *, jclass, jdoubleArray, jint, jdoubleArray, jint, jdoubleArray, jint, jdoubleArray, jint, jdoubleArray, jint, jboolean, jdoubleArray, jint, jint, jint, jint, jint, jint, jint, jint);
+  (JNIEnv *, jclass, jdoubleArray, jdoubleArray, jdoubleArray, jdoubleArray, jdoubleArray, jboolean, jdoubleArray, jint, jint, jint, jint, jint, jint, jint);
 
 /*
  * Class:     jnn_nativo_JNNNative
  * Method:    maxPool2dForward
- * Signature: ([DI[DIIIIIIIII)V
+ * Signature: ([D[DIIIIIIII)V
  */
 JNIEXPORT void JNICALL Java_jnn_nativo_JNNNative_maxPool2dForward
-  (JNIEnv *, jclass, jdoubleArray, jint, jdoubleArray, jint, jint, jint, jint, jint, jint, jint, jint, jint);
+  (JNIEnv *, jclass, jdoubleArray, jdoubleArray, jint, jint, jint, jint, jint, jint, jint, jint);
 
 /*
  * Class:     jnn_nativo_JNNNative
  * Method:    maxPool2dBackward
- * Signature: ([DI[DI[DIIIIIIIIIII)V
+ * Signature: ([D[D[DIIIIIIIIII)V
  */
 JNIEXPORT void JNICALL Java_jnn_nativo_JNNNative_maxPool2dBackward
-  (JNIEnv *, jclass, jdoubleArray, jint, jdoubleArray, jint, jdoubleArray, jint, jint, jint, jint, jint, jint, jint, jint, jint, jint, jint);
+  (JNIEnv *, jclass, jdoubleArray, jdoubleArray, jdoubleArray, jint, jint, jint, jint, jint, jint, jint, jint, jint, jint);
 
 #ifdef __cplusplus
 }

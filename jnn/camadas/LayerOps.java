@@ -187,12 +187,11 @@ public class LayerOps {
 
 		if (JNNNative.jni) {
 			JNNNative.conv2dForward(
-				entrada.array(), entrada.offset(),
-				kernel.array(), kernel.offset(),
+				entrada.array(),
+				kernel.array(),
 				bias.isPresent() ? bias.get().array() : null,
-				bias.isPresent() ? bias.get().offset() : 0,
 				bias.isPresent(),
-				saida.array(), saida.offset(),
+				saida.array(),
 				lotes, canais, filtros,
 				altX, largX,
 				altK, largK
@@ -418,15 +417,16 @@ public class LayerOps {
 	
 		if (JNNNative.jni) {
 			JNNNative.conv2dBackward(
-				entrada.array(), entrada.offset(),
-				kernel.array(), kernel.offset(),
-				gradS.array(), gradS.offset(),
-				gradK.array(), gradK.offset(),
+				entrada.array(),
+				kernel.array(),
+				gradS.array(),
+				gradK.array(),
 				gradB.isPresent() ? gradB.get().array() : null,
-				gradB.isPresent() ? gradB.get().offset() : 0,
 				gradB.isPresent(),
-				gradE.array(), gradE.offset(),
-				lotes, canais, filtros, altX, largX, altK, largK
+				gradE.array(),
+				lotes, canais, filtros, 
+				altX, largX, 
+				altK, largK
 			);
 
 			return;
@@ -583,11 +583,16 @@ public class LayerOps {
 		final int canais = entrada.tamDim(0);
 		
 		if (JNNNative.jni) {
+			final int lotes = 1;
+			final int altX = entrada.tamDim(1);
+			final int largX = entrada.tamDim(2);
+			
 			JNNNative.maxPool2dForward(
-				entrada.array(), entrada.offset(),
-				saida.array(), saida.offset(),
-				1, canais, 
-				entrada.tamDim(1), entrada.tamDim(2),
+				entrada.array(),
+				saida.array(),
+				lotes,
+				canais, 
+				altX, largX,
 				filtro[0], filtro[1],
 				stride[0], stride[1]
 			);
@@ -613,20 +618,28 @@ public class LayerOps {
 	 * @param stride stride.
 	 */
 	private void forwardMaxPool2DLotes(Tensor entrada, Tensor saida, int[] filtro, int[] stride) {
+		final int lotes = entrada.tamDim(0);
+		
 		if (JNNNative.jni) {
+			final int canais = entrada.tamDim(1);
+			final int altX = entrada.tamDim(2);
+			final int largX = entrada.tamDim(3);
+
 			JNNNative.maxPool2dForward(
-				entrada.array(), entrada.offset(),
-				saida.array(), saida.offset(),
-				entrada.tamDim(0), entrada.tamDim(1),
-				entrada.tamDim(2), entrada.tamDim(3),
+				entrada.array(),
+				saida.array(),
+				lotes,
+				canais,
+				altX,
+				largX,
 				filtro[0], filtro[1],
 				stride[0], stride[1]
 			);
+
 			return;
 		}
 
 		// isso aqui vai melhorar ainda
-		final int lotes = entrada.tamDim(0);
 		for (int i = 0; i < lotes; i++) {
 			forwardMaxPool2DNormal(
 				entrada.subTensor(i), 
@@ -662,14 +675,25 @@ public class LayerOps {
 	 * @param stride stride.
 	 */
 	private void backwardMaxPool2DNormal(Tensor entrada, Tensor grad, Tensor gradE, int[] filtro, int[] stride) {
+		final int canais = entrada.tamDim(0);
+		final int altX = entrada.tamDim(1);
+		final int largX = entrada.tamDim(2);
+		final int altG = grad.tamDim(1);
+		final int largG = grad.tamDim(2);
+
 		if (JNNNative.jni) {
+			final int lotes = 1;
+
 			JNNNative.maxPool2dBackward(
-				entrada.array(), entrada.offset(),
-				grad.array(), grad.offset(),
-				gradE.array(), gradE.offset(),
-				1, entrada.tamDim(1),
-				entrada.tamDim(2), entrada.tamDim(3),
-				grad.tamDim(2), grad.tamDim(3),
+				entrada.array(),
+				grad.array(),
+				gradE.array(),
+				lotes, 
+				canais,
+				altX,
+				largX,
+				altG,
+				largG,
 				filtro[0], filtro[1],
 				stride[0], stride[1]
 			);
@@ -677,35 +701,25 @@ public class LayerOps {
 			return;
 		}
 
-		int[] shapeEntrada = entrada.shape();
-		int[] shapeGradS   = grad.shape();
-
-		int canais      = shapeEntrada[0];
-		int altEntrada  = shapeEntrada[1];
-		int largEntrada = shapeEntrada[2];
-
-		int altGradS    = shapeGradS[1];
-		int largGradS   = shapeGradS[2];
-
 		double[] dataE  = entrada.array();
 		double[] dataGS = grad.array();
 		double[] dataGE = gradE.array();
 
-		int canalSizeEntrada = altEntrada * largEntrada;
-		int canalSizeGradS   = altGradS * largGradS;
+		int canalSizeEntrada = altX * largX;
+		int canalSizeGradS   = altG * largG;
 		double val, valMax;
 
 		for (int c = 0; c < canais; c++) {
 			int baseEntrada = c * canalSizeEntrada;
 			int baseGradS   = c * canalSizeGradS;
 
-			for (int i = 0; i < altGradS; i++) {
+			for (int i = 0; i < altG; i++) {
 				int linInicio = i * stride[0];
-				int linFim    = Math.min(linInicio + filtro[0], altEntrada);
+				int linFim    = Math.min(linInicio + filtro[0], altX);
 
-				for (int j = 0; j < largGradS; j++) {
+				for (int j = 0; j < largG; j++) {
 					int colInicio = j * stride[1];
-					int colFim    = Math.min(colInicio + filtro[1], largEntrada);
+					int colFim    = Math.min(colInicio + filtro[1], largX);
 
 					valMax = Double.NEGATIVE_INFINITY;
 					int linMax = linInicio;
@@ -713,7 +727,7 @@ public class LayerOps {
 
 					// Encontrar posição do máximo
 					for (int y = linInicio; y < linFim; y++) {
-						int idLinha = baseEntrada + y * largEntrada;
+						int idLinha = baseEntrada + y * largX;
 						for (int x = colInicio; x < colFim; x++) {
 							val = dataE[idLinha + x];
 							if (val > valMax) {
@@ -724,7 +738,7 @@ public class LayerOps {
 						}
 					}
 
-					dataGE[baseEntrada + linMax * largEntrada + colMax] += dataGS[baseGradS + i * largGradS + j];
+					dataGE[baseEntrada + linMax * largX + colMax] += dataGS[baseGradS + i * largG + j];
 				}
 			}
 		}
@@ -742,13 +756,22 @@ public class LayerOps {
 		final int lotes = entrada.tamDim(0);
 		
 		if (JNNNative.jni) {
+			final int canais = entrada.tamDim(1);
+			final int altX = entrada.tamDim(2);
+			final int largX = entrada.tamDim(3);
+			final int altG = grad.tamDim(2);
+			final int largG = grad.tamDim(3);
+
 			JNNNative.maxPool2dBackward(
-				entrada.array(), entrada.offset(),
-				grad.array(), grad.offset(),
-				gradE.array(), gradE.offset(),
-				lotes, entrada.tamDim(1),
-				entrada.tamDim(2), entrada.tamDim(3),
-				grad.tamDim(2), grad.tamDim(3),
+				entrada.array(),
+				grad.array(),
+				gradE.array(),
+				lotes,
+				canais, 
+				altX,
+				largX,
+				altG,
+				largG,
 				filtro[0], filtro[1],
 				stride[0], stride[1]
 			);
@@ -804,7 +827,6 @@ public class LayerOps {
 	 * @param stride formato dos strides {@code (altura, largura)}
 	 */
 	private void forwardAvgPool2DLotes(Tensor entrada, Tensor saida, int[] filtro, int[] stride) {
-		// TODO refatorar para trabalhar com os tensores de forma mais inteligente
 		// por enquanto ta assim por compatibilidade.
 		final int lotes = entrada.tamDim(0);
 		for (int i = 0; i < lotes; i++) {

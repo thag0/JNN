@@ -5,9 +5,6 @@ void cpu_maxpool2d_forward(const maxpool2d_fwd_params_t* params) {
     const double* restrict X = params->X;
     double* Y = params->Y;
 
-    const int off_x = params->off_x;
-    const int off_y = params->off_y;
-
     const int alt_x = params->alt_x;
     const int larg_x = params->larg_x;
     const int alt_pool = params->alt_pool;
@@ -31,8 +28,8 @@ void cpu_maxpool2d_forward(const maxpool2d_fwd_params_t* params) {
     for (int b = 0; b < lotes; b++) {
         for (int c = 0; c < canais; c++) {
 
-            const int off_x_bc = off_x + b * std_lote_x + c * area_x;
-            const int off_y_bc = off_y + b * std_lote_y + c * area_y;
+            const int off_x_bc = b * std_lote_x + c * area_x;
+            const int off_y_bc = b * std_lote_y + c * area_y;
 
             for (int i = 0; i < alt_y; i++) {
                 const int base_x_h = off_x_bc + i * alt_std * larg_x;
@@ -62,10 +59,6 @@ void cpu_maxpool2d_backward(const maxpool2d_bwd_params_t* params) {
     const double* restrict GS = params->GS;
     double* restrict GE = params->GE;
 
-    const int off_x = params->off_x;
-    const int off_gs = params->off_gs;
-    const int off_ge = params->off_ge;
-
     const int lotes = params->lotes;
     const int canais = params->canais;
 
@@ -89,9 +82,9 @@ void cpu_maxpool2d_backward(const maxpool2d_bwd_params_t* params) {
     for (int bc = 0; bc < lotes * canais; bc++) {
         const int b = bc / canais;
         const int c = bc % canais;
-        const int base_x  = off_x  + b * bloco_e  + c * area_x;
-        const int base_gs = off_gs + b * bloco_gs + c * area_gs;
-        const int base_ge = off_ge + b * bloco_e  + c * area_x;
+        const int base_x  = b * bloco_e  + c * area_x;
+        const int base_gs = b * bloco_gs + c * area_gs;
+        const int base_ge = b * bloco_e  + c * area_x;
 
         for (int i = 0; i < alt_gs; i++) {
             const int lin_ini = i * alt_std;

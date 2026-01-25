@@ -44,26 +44,27 @@ Java_jnn_nativo_JNNNative_matmul(
 ) {
     (void) cls;
 
-    matmul_params_t p;
+    matmul_params_t p = {
+        .A = (*env)->GetPrimitiveArrayCritical(env, A_arr, NULL),
+        .B = (*env)->GetPrimitiveArrayCritical(env, B_arr, NULL),
+        .DST = (*env)->GetPrimitiveArrayCritical(env, C_arr, NULL),
+    
+        .off_a = off_a,
+        .off_b = off_b,
+        .off_dst = off_c,
+    
+        .std_a_0 = std_a_0,
+        .std_a_1 = std_a_1,
+        .std_b_0 = std_b_0,
+        .std_b_1 = std_b_1,
+        .std_c_0 = std_c_0,
+        .std_c_1 = std_c_1,
+    
+        .lin_a = lin_a,
+        .col_a = col_a,
+        .col_b = col_b
+    };
 
-    p.A = (*env)->GetPrimitiveArrayCritical(env, A_arr, NULL);
-    p.B = (*env)->GetPrimitiveArrayCritical(env, B_arr, NULL);
-    p.DST = (*env)->GetPrimitiveArrayCritical(env, C_arr, NULL);
-
-    p.off_a = off_a;
-    p.off_b = off_b;
-    p.off_dst = off_c;
-
-    p.std_a_0 = std_a_0;
-    p.std_a_1 = std_a_1;
-    p.std_b_0 = std_b_0;
-    p.std_b_1 = std_b_1;
-    p.std_c_0 = std_c_0;
-    p.std_c_1 = std_c_1;
-
-    p.lin_a = lin_a;
-    p.col_a = col_a;
-    p.col_b = col_b;
 
     jnn_matmul_dispatcher(&p);
 
@@ -75,13 +76,18 @@ Java_jnn_nativo_JNNNative_matmul(
 JNIEXPORT void JNICALL
 Java_jnn_nativo_JNNNative_conv2dForward(
     JNIEnv* env, jclass cls,
-    jdoubleArray X_arr, jint off_x,
-    jdoubleArray K_arr, jint off_k,
-    jdoubleArray B_arr, jint off_b, jboolean temBias,
-    jdoubleArray DST_arr, jint off_dst,
-    jint lotes, jint canais, jint filtros,
-    jint alt_x, jint larg_x,
-    jint alt_k, jint larg_k
+    jdoubleArray X_arr,
+    jdoubleArray K_arr,
+    jdoubleArray B_arr,
+    jboolean temBias,
+    jdoubleArray DST_arr,
+    jint lotes, 
+    jint canais, 
+    jint filtros,
+    jint alt_x, 
+    jint larg_x,
+    jint alt_k, 
+    jint larg_k
 ) {
     (void) cls;
 
@@ -95,11 +101,6 @@ Java_jnn_nativo_JNNNative_conv2dForward(
         .K = K,
         .B = B,
         .DST = DST,
-
-        .off_x = off_x,
-        .off_k = off_k,
-        .off_b = off_b,
-        .off_dst = off_dst,
 
         .lotes   = lotes,
         .canais  = canais,
@@ -127,15 +128,20 @@ Java_jnn_nativo_JNNNative_conv2dForward(
 JNIEXPORT void JNICALL
 Java_jnn_nativo_JNNNative_conv2dBackward(
     JNIEnv* env, jclass cls,
-    jdoubleArray X_arr,  jint off_x,
-    jdoubleArray K_arr,  jint off_k,
-    jdoubleArray GS_arr, jint off_gs,
-    jdoubleArray GK_arr, jint off_gk,
-    jdoubleArray GB_arr, jint off_gb, jboolean temBias,
-    jdoubleArray GE_arr, jint off_ge,
-    jint lotes, jint canais, jint filtros,
-    jint alt_x, jint larg_x,
-    jint alt_k, jint larg_k
+    jdoubleArray X_arr,
+    jdoubleArray K_arr,
+    jdoubleArray GS_arr,
+    jdoubleArray GK_arr,
+    jdoubleArray GB_arr, 
+    jboolean temBias,
+    jdoubleArray GE_arr,
+    jint lotes, 
+    jint canais, 
+    jint filtros,
+    jint alt_x, 
+    jint larg_x,
+    jint alt_k, 
+    jint larg_k
 ) {
     (void) cls;
 
@@ -153,13 +159,6 @@ Java_jnn_nativo_JNNNative_conv2dBackward(
         .GK = GK,
         .GE = GE,
         .GB = GB,
-
-        .off_x  = off_x,
-        .off_k  = off_k,
-        .off_gs = off_gs,
-        .off_gk = off_gk,
-        .off_ge = off_ge,
-        .off_gb = off_gb,
 
         .lotes   = lotes,
         .canais  = canais,
@@ -189,12 +188,16 @@ Java_jnn_nativo_JNNNative_conv2dBackward(
 JNIEXPORT void JNICALL
 Java_jnn_nativo_JNNNative_maxPool2dForward(
     JNIEnv* env, jclass cls,
-    jdoubleArray x_arr, jint off_x,
-    jdoubleArray y_arr, jint off_y,
-    jint lotes, jint canais,
-    jint alt_x, jint larg_x,
-    jint alt_pool, jint larg_pool,
-    jint alt_std, jint larg_std
+    jdoubleArray x_arr,
+    jdoubleArray y_arr,
+    jint lotes, 
+    jint canais,
+    jint alt_x, 
+    jint larg_x,
+    jint alt_pool, 
+    jint larg_pool,
+    jint alt_std, 
+    jint larg_std
 ) {
     (void) cls;
 
@@ -204,8 +207,6 @@ Java_jnn_nativo_JNNNative_maxPool2dForward(
     maxpool2d_fwd_params_t p = {
         .X = X,
         .Y = Y,
-        .off_x = off_x,
-        .off_y = off_y,
         .lotes = lotes,
         .canais = canais,
         .alt_x = alt_x,
@@ -225,16 +226,20 @@ Java_jnn_nativo_JNNNative_maxPool2dForward(
 JNIEXPORT void JNICALL
 Java_jnn_nativo_JNNNative_maxPool2dBackward(
     JNIEnv* env, jclass cls,
-    jdoubleArray x_arr, jint off_x,
-    jdoubleArray gs_arr, jint off_gs,
-    jdoubleArray ge_arr, jint off_ge,
-    jint lotes, jint canais,
-    jint alt_x, jint larg_x,
-    jint alt_gs, jint larg_gs,
-    jint alt_pool, jint larg_pool,
-    jint alt_std, jint larg_std
+    jdoubleArray x_arr,
+    jdoubleArray gs_arr,
+    jdoubleArray ge_arr,
+    jint lotes, 
+    jint canais,
+    jint alt_x, 
+    jint larg_x,
+    jint alt_gs, 
+    jint larg_gs,
+    jint alt_pool, 
+    jint larg_pool,
+    jint alt_std, 
+    jint larg_std
 ) {
-
     double* X = (*env)->GetPrimitiveArrayCritical(env, x_arr, NULL);
     double* GS = (*env)->GetPrimitiveArrayCritical(env, gs_arr, NULL);
     double* GE = (*env)->GetPrimitiveArrayCritical(env, ge_arr, NULL);
@@ -243,9 +248,6 @@ Java_jnn_nativo_JNNNative_maxPool2dBackward(
         .X = X,
         .GS = GS,
         .GE = GE,
-        .off_x = off_x,
-        .off_gs = off_gs,
-        .off_ge = off_ge,
         .lotes = lotes,
         .canais = canais,
         .alt_x = alt_x,

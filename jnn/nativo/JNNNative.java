@@ -27,25 +27,19 @@ public final class JNNNative {
      */
     public static boolean jni = false;
 
+    /**
+     * Backend com implementações focadas em cpu.
+     */
     public static final int JNNNative_BACKEND_CPU = 1;
-
-    public static final int JNNNative_BACKEND_OCL = 2;
 
     static {
         try {
             carregarDoJar();
         
         } catch (Exception e) {
-            throw new RuntimeException("\nErro ao carregar JNI", e);
+            throw new RuntimeException("\nErro ao carregar DLL", e);
         }
     }
-
-    static byte[] loadKernel(String path) throws IOException {
-        try (InputStream is = JNNNative.class.getResourceAsStream(path)) {
-            if (is == null) throw new FileNotFoundException(path);
-            return is.readAllBytes();
-        }
-    }  
 
     /**
      * Tenta carregar o arquivo dll.
@@ -76,6 +70,10 @@ public final class JNNNative {
     */
     public static native void setThreads(int t);
 
+    /**
+     * Configura o backend nativo.
+     * @param backend novo backend.
+     */
     public static native void setBackend(int backend);
 
     /**
@@ -109,14 +107,10 @@ public final class JNNNative {
     /**
      * Realiza a progração direta através da camada Conv2D.
      * @param X entrada.
-     * @param offX offset de entrada.
      * @param K kernel.
-     * @param offK offset do kernel.
      * @param B bias (se houver).
-     * @param offB offset do bias (se houver).
      * @param hasBias verificador do bias.
      * @param Y saída.
-     * @param offY offset da saída.
      * @param lotes quantidade de lotes de entrada.
      * @param canais quantidade de canais de entrada.
      * @param filtros quantidade de kernels.
@@ -126,30 +120,29 @@ public final class JNNNative {
      * @param largK largura do kernel.
      */
     public static native void conv2dForward(
-        double[] X, int offX,
-        double[] K, int offK,
-        double[] B, int offB, boolean hasBias,
-        double[] Y, int offY,
-        int lotes, int canais, int filtros,
-        int altX, int largX,
-        int altK, int largK
+        double[] X,
+        double[] K,
+        double[] B,
+        boolean hasBias,
+        double[] Y,
+        int lotes, 
+        int canais, 
+        int filtros,
+        int altX,
+        int largX,
+        int altK,
+        int largK
     );
 
     /**
      * Realiza a progração reversa através da camada Conv2D.
      * @param X entrada.
-     * @param offX offset de entrada.
      * @param K kernel.
-     * @param offK offset do kernel.
      * @param GS gradiente de saída.
-     * @param offGS offset do gradiente de saída.
      * @param GK gradiente do kernel.
-     * @param offGK offset do gradiente do kernel.
      * @param GB gradiente do bias (se houver).
-     * @param offGB offset do gradiente do bias (se houver).
      * @param temBias verificador do bias.
      * @param GE gradiente de entrada.
-     * @param offGE offset do gradiente de entrada.
      * @param lotes quantidade de lotes de entrada.
      * @param canais quantidade de canais de entrada.
      * @param filtros quantidade de kernels.
@@ -159,24 +152,27 @@ public final class JNNNative {
      * @param largK largura do kernel.
      */
     public static native void conv2dBackward(
-        double[] X, int offX,
-        double[] K, int offK,
-        double[] GS, int offGS,
-        double[] GK, int offGK,
-        double[] GB, int offGB, boolean temBias,
-        double[] GE, int offGE,
-        int lotes, int canais, int filtros,
-        int altX, int largX,
-        int altK, int largK    
+        double[] X,
+        double[] K,
+        double[] GS,
+        double[] GK,
+        double[] GB,
+        boolean temBias,
+        double[] GE,
+        int lotes,
+        int canais,
+        int filtros,
+        int altX,
+        int largX,
+        int altK,
+        int largK  
     );
 
     /**
      * Realiza a propagação direta através da camada de MaxPooling2D 
      * com lotes de dados de entrada.
      * @param X entrada.
-     * @param offX offset de entrada.
      * @param Y destino.
-     * @param offY offset do destino.
      * @param lotes quantidade de lotes de entrada.
      * @param canais quantidade de canais de entrada.
      * @param altX altura da entrada.
@@ -187,12 +183,16 @@ public final class JNNNative {
      * @param largStride largura do stride de pooling.
      */
     public static native void maxPool2dForward(
-        double[] X, int offX,
-        double[] Y, int offY,
-        int lotes, int canais,
-        int altX, int largX,
-        int altFiltro, int largFiltro,
-        int altStride, int largStride
+        double[] X,
+        double[] Y,
+        int lotes,
+        int canais,
+        int altX,
+        int largX,
+        int altFiltro,
+        int largFiltro,
+        int altStride,
+        int largStride
     );
 
     /**
@@ -213,14 +213,19 @@ public final class JNNNative {
      * @param largStride largura do stride de pooling.
      */
     public static native void maxPool2dBackward(
-        double[] X, int offX,
-        double[] G, int offG,
-        double[] GE, int offGE,
-        int lotes, int canais,
-        int altX, int largX,
-        int altG, int largG,
-        int altFiltro, int largFiltro,
-        int altStride, int largStride
+        double[] X,
+        double[] G,
+        double[] GE,
+        int lotes,
+        int canais,
+        int altX,
+        int largX,
+        int altG,
+        int largG,
+        int altFiltro,
+        int largFiltro,
+        int altStride,
+        int largStride
     );
 
 }
