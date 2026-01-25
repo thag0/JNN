@@ -1,5 +1,8 @@
 @echo off
-chcp 65001 > nul
+
+@REM utf-8
+chcp 65001 > nul 
+
 setlocal enabledelayedexpansion
 
 set SRC_DIR=jnn
@@ -12,14 +15,12 @@ mkdir "%BIN_DIR%"
 
 if exist "%TMP_FILE%" del "%TMP_FILE%"
 
-rem --- gera lista de arquivos java ---
 for /R "%SRC_DIR%" %%f in (*.java) do (
     set "FILE=%%f"
     set "FILE=!FILE:\=/!"
     echo "!FILE!" >> "%TMP_FILE%"
 )
 
-rem --- compila usando arquivo de argumentos ---
 javac ^
  -g ^
  -parameters ^
