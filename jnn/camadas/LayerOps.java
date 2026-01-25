@@ -182,7 +182,7 @@ public class LayerOps {
 		final int altX = shapeX[2];
 		final int largX = shapeX[3];
 		
-		final int atlK = shapeK[2];
+		final int altK = shapeK[2];
 		final int largK = shapeK[3];
 
 		if (JNNNative.jni) {
@@ -195,63 +195,74 @@ public class LayerOps {
 				saida.array(), saida.offset(),
 				lotes, canais, filtros,
 				altX, largX,
-				atlK, largK
+				altK, largK
 			);
+
 			return;
 		}
 
-		saida.zero();// zerar acúmulos anteriores
-		
-		final int altS = altX - atlK + 1;
+		final int altS = altX - altK + 1;
 		final int largS = largX - largK + 1;
-		
+
 		final int areaX = altX * largX;
-		final int areaK = atlK * largK;
-		final int areaY = altS * largS;
-		
-		final double[] x = entrada.array();
-		final double[] k = kernel.array();
-		final double[] s = saida.array();
-		
+		final int areaK = altK * largK;
+		final int areaS = altS * largS;
+
+		final double[] dataX = entrada.array();
+		final double[] dataK = kernel.array();
+		final double[] dataS = saida.array();
+		final double[] dataB = bias.isPresent() ? bias.get().array() : null;
+
 		final int offXBase = entrada.offset();
 		final int offKBase = kernel.offset();
 		final int offYBase = saida.offset();
-		
+
 		List<ForkJoinTask<?>> tarefas = new ArrayList<>(filtros);
 		
 		for (int f = 0; f < filtros; f++) {
 			final int filtro = f;
 			
 			tarefas.add(pool.submit(() -> {
-				int offKf = offKBase + filtro * canais * areaK;
-				double biasF = bias.isPresent() ? bias.get().get(filtro) : 0.0;
+				final int offKf = offKBase + filtro * canais * areaK;
+				final double biasF = (dataB != null) ? dataB[filtro] : 0.0f;
 				
 				for (int l = 0; l < lotes; l++) {
-					int offY = offYBase + (l * filtros + filtro) * areaY;	
-					for (int c = 0; c < canais; c++) {
-						int offX = offXBase + (l * canais + c) * areaX;
-						int offK = offKf + c * areaK;
-						
-						ops.corr2D(
-							x, offX,
-							k, offK,
-							s, offY,
-							largX, altX,
-							largK, atlK
-						);
+					final int offY = offYBase + (l * filtros + filtro) * areaS;
+					final int offX_l = offXBase + (l * canais) * areaX;
+
+					for (int i = 0; i < areaS; i++) {
+						dataS[offY + i] = biasF;
 					}
-					
-					if (bias.isPresent()) {
-						for (int i = 0; i < areaY; i++) {
-							s[offY + i] += biasF;
+
+					for (int c = 0; c < canais; c++) {
+						final int offX_lc = offX_l + c * areaX;
+						final int offK_fc = offKf + c * areaK;
+
+						for (int kh = 0; kh < altK; kh++) {
+							final int off_k_lin = offK_fc + kh * largK;
+							final int x_base_h = offX_lc + kh * largX;
+
+							for (int kw = 0; kw < largK; kw++) {
+								final double valK = dataK[off_k_lin + kw];
+								final int x_base_w = x_base_h + kw;
+
+								for (int i = 0; i < altS; i++) {
+									final int out_idx = offY + i * largS;
+									final int in_idx = x_base_w + i * largX;
+
+									for (int j = 0; j < largS; j++) {
+										dataS[out_idx + j] += dataX[in_idx + j] * valK;
+									}
+								}
+							}
 						}
 					}
 				}
 			}));
 		}
 		
-		for (ForkJoinTask<?> t : tarefas) {
-			t.join();
+		for (int i = 0; i < tarefas.size(); i++) {
+			tarefas.get(i).join();
 		}
 		
 	}
@@ -421,87 +432,120 @@ public class LayerOps {
 			return;
 		}
 
-		final int altS  = altX  - altK  + 1;
+		final int altS = altX - altK + 1;
 		final int largS = largX - largK + 1;
-	
-		final int areaX  = altX * largX;
-		final int areaK  = altK * largK;
+
+		final int areaX = altX * largX;
+		final int areaK = altK * largK;
 		final int areaGS = altS * largS;
-	
-		final double[] x  = entrada.array();
-		final double[] k  = kernel.array();
-		final double[] gs = gradS.array();
-		final double[] gk = gradK.array();
-		final double[] ge = gradE.array();
-	
-		final int offXBase  = entrada.offset();
-		final int offKBase  = kernel.offset();
+
+		final double[] dataX = entrada.array();
+		final double[] dataK = kernel.array();
+		final double[] dataGS = gradS.array();
+		final double[] dataGK = gradK.array();
+		final double[] dataGE = gradE.array();
+		
+		final int offXBase = entrada.offset();
+		final int offKBase = kernel.offset();
 		final int offGSBase = gradS.offset();
+		final int offGKBase = gradK.offset();
 		final int offGEBase = gradE.offset();
-	
+
+		final boolean temBias = gradB.isPresent();
+		final double[] dataGB = temBias ? gradB.get().array() : null;
+		final int offGBBase = temBias ? gradB.get().offset() : 0;
+
 		List<ForkJoinTask<?>> tarefas1 = new ArrayList<>(filtros);
-	
+
 		for (int f = 0; f < filtros; f++) {
 			final int filtro = f;
 			
 			tarefas1.add(pool.submit(() -> {
-				final int offKf = offKBase + filtro * canais * areaK;
+				final int offGKf = offGKBase + filtro * canais * areaK;
 				double somaBiasLocal = 0;
 
 				for (int l = 0; l < lotes; l++) {
-					final int offGS = offGSBase + (l * filtros + filtro) * areaGS;
-					for (int c = 0; c < canais; c++) {
-						int offX  = offXBase + (l * canais + c) * areaX;
-						int offGK = offKf + c * areaK;
-	
-						ops.corr2D(
-							x,  offX,
-							gs, offGS,
-							gk, offGK,
-							largX, altX,
-							largS, altS
-						);
-					}
-	
-					if (gradB.isPresent()) {
+					final int offGSlf = offGSBase + (l * filtros + filtro) * areaGS;
+					final int offXl = offXBase + l * canais * areaX;
+
+					if (temBias) {
 						for (int i = 0; i < areaGS; i++) {
-							somaBiasLocal += gs[offGS + i];
+							somaBiasLocal += dataGS[offGSlf + i];
+						}
+					}
+
+					for (int c = 0; c < canais; c++) {
+						final int offXc = offXl + c * areaX;
+						final int offGKc = offGKf + c * areaK;
+
+						for (int kh = 0; kh < altK; kh++) {
+							final int offGKlin = offGKc + kh * largK;
+							final int offXh = offXc + kh * largX;
+
+							for (int kw = 0; kw < largK; kw++) {
+								final int offXw = offXh + kw;
+								double valGrad = 0;
+								
+								for (int i = 0; i < altS; i++) {
+									final int idGS = offGSlf + i * largS;
+									final int idX = offXw + i * largX;
+									
+									for (int j = 0; j < largS; j++) {
+										valGrad += dataX[idX + j] * dataGS[idGS + j];
+									}
+								}
+								
+								dataGK[offGKlin + kw] += valGrad;
+							}
 						}
 					}
 				}
-	
-				if (gradB.isPresent()) {
-					gradB.get().add(somaBiasLocal, filtro);
+				
+				if (temBias) {
+					dataGB[offGBBase + filtro] += somaBiasLocal; 
 				}
+				
 			}));
 		}
-	
+
 		for (ForkJoinTask<?> t : tarefas1) {
 			t.join();
 		}
 
-		// tem que ser assim porque se juntar tudo no mesmo loop por filtros
-		// acaba dando race condition no gradiente de entrada
-
 		List<ForkJoinTask<?>> tarefas2 = new ArrayList<>(lotes);
 
 		for (int l = 0; l < lotes; l++) {
+			
 			final int lote = l;
-
 			tarefas2.add(pool.submit(() -> {
-				for (int c = 0; c < canais; c++) {
-					int offGE = offGEBase + (lote * canais + c) * areaX;
-					for (int f = 0; f < filtros; f++) {
-						int offGS = offGSBase + (lote * filtros + f) * areaGS;
-						int offK  = offKBase  + (f * canais + c) * areaK;
+				final int offGEl = offGEBase + lote * canais * areaX;
+				final int offGSl = offGSBase + lote * filtros * areaGS;
 
-						ops.conv2DFull(
-							gs, offGS,
-							k,  offK,
-							ge, offGE,
-							largS, altS,
-							largK, altK
-						);
+				for (int c = 0; c < canais; c++) {
+					final int offGEc = offGEl + c * areaX;
+					
+					for (int f = 0; f < filtros; f++) {
+						final int offGSf = offGSl + f * areaGS;
+						final int offKfc = offKBase + (f * canais + c) * areaK;
+
+						for (int kh = 0; kh < altK; kh++) {
+							final int offKlin = offKfc + kh * largK;
+							final int offGEh = offGEc + kh * largX;
+
+							for (int kw = 0; kw < largK; kw++) {
+								final double valK = dataK[offKlin + kw];
+								final int offGEw = offGEh + kw;
+
+								for (int i = 0; i < altS; i++) {
+									final int idGE = offGEw + i * largX;
+									final int idGS = offGSf + i * largS;
+
+									for (int j = 0; j < largS; j++) {
+										dataGE[idGE + j] += dataGS[idGS + j] * valK;
+									}
+								}
+							}
+						}
 					}
 				}
 			}));
