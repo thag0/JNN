@@ -133,20 +133,82 @@ public class OpsLinear {
 		final double[] dataB = b.array();
 		final double[] dataD = dst.array();
 
+		if (s1A == 1 && s1B == 1 && s1D == 1) {// tensores contiguos
+			matmulFastPath(
+				dataA, dataB, dataD, offsetA, offsetB, offsetD, linA, colA, colB, s0A, s0B, s0D
+			);
+		} else {
+			matmulGenerico(
+				dataA, dataB, dataD, offsetA, offsetB, offsetD, linA, colA, colB, s0A, s1A, s0B, s1B, s0D, s1D
+			);
+		}
+
+	}
+
+	private static void matmulFastPath(
+		double[] A, double[] B, double[] C, 
+		int offA, int offB, int offC,
+		int linA, int colA, int colB,
+		int s0A, int s0B, int s0C) {
+
+		final int BK = 64;
+		final int BJ = 64;
+
 		for (int i = 0; i < linA; i++) {
-			final int baseA = offsetA + i * s0A;
-			final int baseD = offsetD + i * s0D;
+			final int baseA = offA + i * s0A;
+			final int baseC = offC + i * s0C;
 
-			for (int k = 0; k < colA; k++) {
-				final double valA = dataA[baseA + k * s1A];
-				final int baseB = offsetB + k * s0B;
+			for (int kk = 0; kk < colA; kk += BK) {
+				final int kEnd = Math.min(kk + BK, colA);
 
-				for (int j = 0; j < colB; j++) {
-					dataD[baseD + j * s1D] += valA * dataB[baseB + j * s1B];
+				for (int jj = 0; jj < colB; jj += BJ) {
+					final int jEnd = Math.min(jj + BJ, colB);
+
+					for (int k = kk; k < kEnd; k++) {
+						final double valA = A[baseA + k];
+						final int baseB = offB + k * s0B;
+
+						for (int j = jj; j < jEnd; j++) {
+							C[baseC + j] += valA * B[baseB + j];
+						}
+					}
 				}
 			}
 		}
+	}
 
+	private static void matmulGenerico(
+		double[] A, double[] B, double[] C,
+		int offA, int offB, int offC,
+		int linA, int colA, int colB,
+		int s0A, int s1A,
+		int s0B, int s1B,
+		int s0C, int s1C) {
+
+		final int BK = 64;
+		final int BJ = 64;
+
+		for (int i = 0; i < linA; i++) {
+			final int baseA = offA + i * s0A;
+			final int baseC = offC + i * s0C;
+
+			for (int kk = 0; kk < colA; kk += BK) {
+				final int kEnd = Math.min(kk + BK, colA);
+
+				for (int jj = 0; jj < colB; jj += BJ) {
+					final int jEnd = Math.min(jj + BJ, colB);
+
+					for (int k = kk; k < kEnd; k++) {
+						final double valA = A[baseA + k * s1A];
+						final int baseB = offB + k * s0B;
+
+						for (int j = jj; j < jEnd; j++) {
+							C[baseC + j * s1C] += valA * B[baseB + j * s1B];
+						}
+					}
+				}
+			}
+		}
 	}
 
 	public static void matmul_jni(Tensor a, Tensor b, Tensor dst) {
@@ -160,12 +222,12 @@ public class OpsLinear {
 		final int[] shapeB = b.shape();
 		final int[] shapeD = dst.shape();
 
-		final int M = shapeA.length == 1 ? 1 : shapeA[0];
-		final int K = shapeA.length == 1 ? shapeA[0] : shapeA[1];
-		final int Kb = shapeB.length == 1 ? 1 : shapeB[0];
-		final int N = shapeB.length == 1 ? shapeB[0] : shapeB[1];
+		final int linA = shapeA.length == 1 ? 1 : shapeA[0];
+		final int colA = shapeA.length == 1 ? shapeA[0] : shapeA[1];
+		final int linB = shapeB.length == 1 ? 1 : shapeB[0];
+		final int colB = shapeB.length == 1 ? shapeB[0] : shapeB[1];
 
-		if (K != Kb) {
+		if (colA != linB) {
 			throw new IllegalArgumentException(
 				"Dimensões incompatíveis para multiplicação: A = " + a.shapeStr() + 
 				", B = " + b.shapeStr()
@@ -175,9 +237,9 @@ public class OpsLinear {
 		final int linD = shapeD.length == 1 ? 1 : shapeD[0];
 		final int colD = shapeD.length == 1 ? shapeD[0] : shapeD[1];
 
-		if (M != linD || N != colD) {
+		if (linA != linD || colB != colD) {
 			throw new IllegalArgumentException(
-				"Dimensões de saída inválidas, esperado (" + M + "," + N + "), mas recebido " + dst.shapeStr()
+				"Dimensões de saída inválidas, esperado (" + linA + "," + colB + "), mas recebido " + dst.shapeStr()
 			);
 		}
 
@@ -196,7 +258,7 @@ public class OpsLinear {
 			a.array(), a.offset(), s0A, s1A,
 			b.array(), b.offset(), s0B, s1B,
 			dst.array(), dst.offset(), s0C, s1C,
-			M, K, N
+			linA, colA, colB
 		);
 	}
 

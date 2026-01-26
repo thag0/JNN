@@ -27,37 +27,48 @@ void cpu_conv2d_forward(const conv2d_fwd_params_t* params) {
     #pragma omp parallel for collapse(2) schedule(static)
     for (int b = 0; b < lotes; b++) {
         for (int f = 0; f < filtros; f++) {
-            const int off_x_bf = b * canais * area_x;
-            const int off_y_bf = (b * filtros + f) * area_s;
-            const int off_k_f  = f * canais * area_k;
-    
-            const double bias = temBias ? B[f] : 0.0;
-    
-            for (int i = 0; i < alt_s; i++) {
-                double* restrict lin_dst = DST + off_y_bf + i * larg_s;
-                for (int j = 0; j < larg_s; j++) {
-                    lin_dst[j] = bias;
+
+            const int off_x_b = b * canais * area_x;
+            const int off_y   = (b * filtros + f) * area_s;
+            const int off_k_f = f * canais * area_k;
+
+            if (temBias) {
+                const double bias = B[f];
+                for (int i = 0; i < alt_s; i++) {
+                    double* restrict dst = DST + off_y + i * larg_s;
+                    #pragma omp simd
+                    for (int j = 0; j < larg_s; j++) {
+                        dst[j] = bias;
+                    }
+                }
+            } else {
+                for (int i = 0; i < alt_s; i++) {
+                    double* restrict dst = DST + off_y + i * larg_s;
+                    #pragma omp simd
+                    for (int j = 0; j < larg_s; j++) {
+                        dst[j] = 0.0;
+                    }
                 }
             }
-    
+
             for (int c = 0; c < canais; c++) {
-                const int off_x_c = off_x_bf + c * area_x;
-                const int off_k_c = off_k_f  + c * area_k;
-    
+                const int off_x_c = off_x_b + c * area_x;
+                const int off_k_c = off_k_f + c * area_k;
+
                 for (int kh = 0; kh < alt_k; kh++) {
                     const int lin_k = off_k_c + kh * larg_k;
-    
-                    for (int kw = 0; kw < larg_k; kw++) {
-                        const double val_k = K[lin_k + kw];
-                        const int x_base = off_x_c + kh * larg_x + kw;
-    
-                        for (int i = 0; i < alt_s; i++) {
-                            const double* restrict lin_x = X   + x_base + i * larg_x;
-                            double* restrict lin_dst     = DST + off_y_bf + i * larg_s;
-    
+
+                    for (int i = 0; i < alt_s; i++) {
+                        double* restrict dst = DST + off_y + i * larg_s;
+                        const double* restrict lin_X = X + off_x_c + (i + kh) * larg_x;
+
+                        for (int kw = 0; kw < larg_k; kw++) {
+                            const double val_k = K[lin_k + kw];
+                            const double* restrict x = lin_X + kw;
+
                             #pragma omp simd
                             for (int j = 0; j < larg_s; j++) {
-                                lin_dst[j] += lin_x[j] * val_k;
+                                dst[j] += x[j] * val_k;
                             }
                         }
                     }
@@ -94,13 +105,15 @@ void cpu_conv2d_backward(const conv2d_bwd_params_t* params) {
     const int area_k  = alt_k * larg_k;
     const int area_gs = alt_s * larg_s;
 
-    #pragma omp parallel for schedule(static)
-    for (int f = 0; f < filtros; f++) {
-        if (temBias) {
+    if (temBias) {
+        #pragma omp parallel for schedule(static)
+        for (int f = 0; f < filtros; f++) {
             double soma_bias = 0.0;
 
+            const int f_offset = f * area_gs;
+
             for (int l = 0; l < lotes; l++) {
-                const double* ptr_gs = GS + (l * filtros + f) * area_gs;
+                const double* ptr_gs = GS + l * filtros * area_gs + f_offset;
 
                 #pragma omp simd reduction(+:soma_bias)
                 for (int i = 0; i < area_gs; i++) {
@@ -110,18 +123,23 @@ void cpu_conv2d_backward(const conv2d_bwd_params_t* params) {
 
             GB[f] += soma_bias;
         }
+    }
 
-        // grad kernel
+    #pragma omp parallel for schedule(static)
+    for (int f = 0; f < filtros; f++) {
+        const int f_gs_offset = f * area_gs;
+        const int f_k_offset  = f * canais * area_k;
+
         for (int c = 0; c < canais; c++) {
-            double* base_ptr_gk = GK + (f * canais + c) * area_k;
+            double* base_ptr_gk = GK + f_k_offset + c * area_k;
 
             for (int kh = 0; kh < alt_k; kh++) {
                 for (int kw = 0; kw < larg_k; kw++) {
                     double soma = 0.0;
 
                     for (int l = 0; l < lotes; l++) {
-                        const double* ptr_gs = GS + (l * filtros + f) * area_gs;
-                        const double* ptr_x  = X  + (l * canais  + c) * area_x;
+                        const double* ptr_gs = GS + l * filtros * area_gs + f_gs_offset;
+                        const double* ptr_x = X  + l * canais  * area_x  + c * area_x;
                         const double* janela_x = ptr_x + kh * larg_x + kw;
 
                         for (int i = 0; i < alt_s; i++) {
