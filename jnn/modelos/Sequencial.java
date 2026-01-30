@@ -341,7 +341,7 @@ public class Sequencial extends Modelo {
 	}
 
 	@Override
-	public double[] saidaParaArray() {
+	public float[] saidaParaArray() {
 		validarCompilacao();
 		return camadaSaida().saida().array();
 	}

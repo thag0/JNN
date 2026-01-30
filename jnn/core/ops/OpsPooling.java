@@ -86,8 +86,8 @@ public class OpsPooling {
 			);
 		}
 
-		double[] arrIn  = x.array();
-		double[] arrOut = dst.array();
+		float[] arrIn  = x.array();
+		float[] arrOut = dst.array();
 
 		int baseOffsetIn  = x.offset();
 		int baseOffsetOut = dst.offset();
@@ -102,7 +102,7 @@ public class OpsPooling {
 		int sH = stride[0];
 		int sW = stride[1];
 
-		double maxVal, val;
+		float maxVal, val;
 
 		for (int i = 0; i < H_out; i++) {
 			int linInicio = i * sH;
@@ -111,7 +111,7 @@ public class OpsPooling {
 			for (int j = 0; j < W_out; j++) {
 				int colInicio = j * sW;
 				int colFim = Math.min(colInicio + fW, W);
-				maxVal = Double.NEGATIVE_INFINITY;
+				maxVal = Float.NEGATIVE_INFINITY;
 
 				for (int l = linInicio; l < linFim; l++) {
 					int baseLinha = baseOffsetIn + l * inStrideH;
@@ -208,8 +208,8 @@ public class OpsPooling {
 			);
 		}
 
-		double[] dataE = x.array();
-		double[] dataS = dst.array();
+		float[] dataE = x.array();
+		float[] dataS = dst.array();
 
 		int offE = x.offset();
 		int[] strE = x.strides();
@@ -230,7 +230,7 @@ public class OpsPooling {
 				int colInicio = j * sW;
 				int colFim = Math.min(colInicio + fW, largEntrada);
 
-				double soma = 0;
+				float soma = 0.0f;
 				int cont = 0;
 				for (int l = linInicio; l < linFim; l++) {
 					int baseLinha = offE + l * strE[0];

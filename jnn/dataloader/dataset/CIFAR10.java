@@ -175,17 +175,17 @@ public class CIFAR10 {
 
             int label = dados[offset] & 0xFF;
 
-            double[] img = new double[IMG_BYTES];
+            float[] img = new float[IMG_BYTES];
 
             for (int p = 0; p < IMG_BYTES; p++) {
-                img[p] = (dados[offset + 1 + p] & 0xFF) / 255.0;
+                img[p] = (dados[offset + 1 + p] & 0xFF) / 255.0f;
             }
 
             // CIFAR vem em RRR.. GGG.. BBB..
             Tensor x = new Tensor(img).reshape(3, IMG_TAM, IMG_TAM);
 
-            double[] y = new double[NUM_CLASSES];
-            y[label] = 1.0;
+            float[] y = new float[NUM_CLASSES];
+            y[label] = 1.0f;
 
             imagens.add(x);
             labels.add(new Tensor(y));

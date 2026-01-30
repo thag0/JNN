@@ -16,13 +16,13 @@ public class Atan extends Ativacao {
 	public Atan() { }
 
 	@Override
-	protected double fx(double x) {
-		return Math.atan(x); 
+	protected float fx(float x) {
+		return (float) Math.atan(x); 
 	}
 
 	@Override
-	protected double dx(double x) {
-		return 1.0 / (1.0 + (x * x)); 
+	protected float dx(float x) {
+		return 1.0f / (1.0f + (x * x)); 
 	}
 
 }

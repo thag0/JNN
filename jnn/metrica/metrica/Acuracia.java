@@ -31,10 +31,10 @@ public class Acuracia extends Metrica {
 			if (idPrev == idReal) acertos++;
 		}
 
-		double acc = (double)acertos / n;
+		float acc = (float) acertos / n;
 
 		return new Tensor(
-			new double[]{ acc }
+			new float[]{ acc }
 		);
 	}
 }

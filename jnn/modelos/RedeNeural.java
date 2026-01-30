@@ -451,7 +451,7 @@ public class RedeNeural extends Modelo {
 	 * @throws IllegalArgumentException se o modelo não foi compilado previamente.
 	 */
 	@Override
-	public double[] saidaParaArray() {
+	public float[] saidaParaArray() {
 		validarCompilacao();
 		return camadaSaida().saidaParaArray();
 	}

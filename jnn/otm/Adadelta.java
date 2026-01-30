@@ -21,22 +21,22 @@ public class Adadelta extends Otimizador {
 	/**
 	 * Valor padrão para a taxa de decaimento.
 	 */
-	private static final double PADRAO_RHO = 0.99;
+	private static final float PADRAO_RHO = 0.99f;
 
 	/**
 	 * Valor padrão para epsilon.
 	 */
-	private static final double PADRAO_EPS = 1e-8;
+	private static final float PADRAO_EPS = 1e-8f;
 
 	/**
 	 * Constante de decaimento do otimizador.
 	 */
-	private final double rho;
+	private final float rho;
 
 	/**
 	 * Valor usado para evitar divisão por zero.
 	 */
-	private final double eps;
+	private final float eps;
 
 	/**
 	 * Acumuladores dos gradientes ao quadrado.
@@ -60,8 +60,8 @@ public class Adadelta extends Otimizador {
 	 * @param eps pequeno valor usado para evitar a divisão por zero.
 	 */
 	public Adadelta(Number rho, Number eps) {
-		double r = rho.doubleValue();
-		double e = eps.doubleValue();
+		float r = rho.floatValue();
+		float e = eps.floatValue();
 
 		if (r <= 0) {
 			throw new IllegalArgumentException(
@@ -104,9 +104,9 @@ public class Adadelta extends Otimizador {
 		initParams(params, grads);
 
 		for (Tensor param : _params) {
-			acg     = JNNutils.addEmArray(acg,     new Tensor(param.shape()));
+			acg = JNNutils.addEmArray(acg, new Tensor(param.shape()));
 			deltas = JNNutils.addEmArray(deltas, new Tensor(param.shape()));
-			acd   = JNNutils.addEmArray(acd,   new Tensor(param.shape()));
+			acd = JNNutils.addEmArray(acd, new Tensor(param.shape()));
 		}
 
 		_construido = true;// otimizador pode ser usado
@@ -125,7 +125,7 @@ public class Adadelta extends Otimizador {
 			TensorData d_i   = deltas[i].data();
 
 			// E[g²] = (rho * E[g²]) + ((1 - rho) * g²)
-			acg_i.mul(rho).addcmul(g_i, g_i, 1.0 - rho);
+			acg_i.mul(rho).addcmul(g_i, g_i, 1.0f - rho);
 
 			// delta = (sqrt(E[Δx²] + eps) / sqrt(E[g²] + eps))
 			TensorData den = acg_i.clone().add(eps).sqrt();
@@ -135,7 +135,7 @@ public class Adadelta extends Otimizador {
 			d_i.copiar(num).mul(-1).div(den).mul(g_i);
 
 			// E[Δx²] = (rho * E[Δx²]) + ((1 - rho) * (delta²))
-			acd_i.mul(rho).addcmul(d_i, d_i, 1.0 - rho);
+			acd_i.mul(rho).addcmul(d_i, d_i, 1.0f - rho);
 			
 			// p += delta
 			p_i.add(d_i);

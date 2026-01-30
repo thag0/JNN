@@ -16,12 +16,12 @@ public class ReLU extends Ativacao {
 	public ReLU() {}
 
 	@Override
-	protected double fx(double x) {
+	protected float fx(float x) {
 		return x > 0 ? x : 0; 
 	}
 
 	@Override
-	protected double dx(double x) {
+	protected float dx(float x) {
 		return x > 0 ? 1 : 0; 
 	}
 

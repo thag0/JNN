@@ -1,7 +1,5 @@
 package jnn.acts;
 
-import java.util.function.DoubleUnaryOperator;
-
 import jnn.camadas.Conv2D;
 import jnn.camadas.Densa;
 import jnn.core.tensor.Tensor;
@@ -36,21 +34,11 @@ import jnn.core.tensor.Tensor;
  */
 public abstract class Ativacao {
 
-	/**
-	 * Função de ativação.
-	 */
-	protected DoubleUnaryOperator _fx;
-
-	/**
-	 * Derivada da função de ativação.
-	 */
-	protected DoubleUnaryOperator _dx;
-
-	protected double fx(double x) {
+	protected float fx(float x) {
 		throw new UnsupportedOperationException("\nNão implementado.");
 	}
 
-	protected double dx(double x) {
+	protected float dx(float x) {
 		throw new UnsupportedOperationException("\nNão implementado.");
 	}
 
@@ -62,8 +50,8 @@ public abstract class Ativacao {
 	public void forward(Tensor x, Tensor dest) {
 		final int offX = x.offset();
 		final int offS = dest.offset();
-		final double[] dataX = x.array();
-		final double[] dataS = dest.array();
+		final float[] dataX = x.array();
+		final float[] dataS = dest.array();
 
 		final int tam = x.tam();
 
@@ -96,9 +84,9 @@ public abstract class Ativacao {
 		final int offX = x.offset();
 		final int offG = g.offset();
 		final int offS = dest.offset();
-		final double[] dataX = x.array();
-		final double[] dataG = g.array();
-		final double[] dataS = dest.array();
+		final float[] dataX = x.array();
+		final float[] dataG = g.array();
+		final float[] dataS = dest.array();
 
 		final int tam = x.tam();
 

@@ -26,7 +26,7 @@ public abstract class Inicializador {
 			fans[0] = shape[0];
 			fans[1] = shape[0];
 		
-		}else if (shape.length == 2) { //2D
+		} else if (shape.length == 2) { //2D
 			fans[0] = shape[0];
 			fans[1] = shape[1];
 		

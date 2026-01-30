@@ -50,7 +50,7 @@ public class LayerOps {
 
 			} else if (entrada.numDim() == 2) {//lote de amostras
 				saida.copiar(
-					saida.broadcast(b, Double::sum)
+					saida.broadcast(b, (_s, _b) -> _s + _b)
 				);
 			}
 		});
@@ -133,9 +133,9 @@ public class LayerOps {
 		final int areaK = altK * largK;
 		final int areaS = (altX - altK + 1) * (largX - largK + 1);
 
-		final double[] dataX = entrada.array();
-		final double[] dataK = kernel.array();
-		final double[] dataS = saida.array();
+		final float[] dataX = entrada.array();
+		final float[] dataK = kernel.array();
+		final float[] dataS = saida.array();
 
 		final int offXBase = entrada.offset();
 		final int offKBase = kernel.offset();
@@ -207,10 +207,10 @@ public class LayerOps {
 		final int areaK = altK * largK;
 		final int areaS = altS * largS;
 
-		final double[] dataX = entrada.array();
-		final double[] dataK = kernel.array();
-		final double[] dataS = saida.array();
-		final double[] dataB = bias.isPresent() ? bias.get().array() : null;
+		final float[] dataX = entrada.array();
+		final float[] dataK = kernel.array();
+		final float[] dataS = saida.array();
+		final float[] dataB = bias.isPresent() ? bias.get().array() : null;
 
 		final int offXBase = entrada.offset();
 		final int offKBase = kernel.offset();
@@ -223,7 +223,7 @@ public class LayerOps {
 			
 			tarefas.add(pool.submit(() -> {
 				final int offKf = offKBase + filtro * canais * areaK;
-				final double biasF = (dataB != null) ? dataB[filtro] : 0.0f;
+				final float biasF = (dataB != null) ? dataB[filtro] : 0.0f;
 				
 				for (int l = 0; l < lotes; l++) {
 					final int offY = offYBase + (l * filtros + filtro) * areaS;
@@ -242,7 +242,7 @@ public class LayerOps {
 							final int x_base_h = offX_lc + kh * largX;
 
 							for (int kw = 0; kw < largK; kw++) {
-								final double valK = dataK[off_k_lin + kw];
+								final float valK = dataK[off_k_lin + kw];
 								final int x_base_w = x_base_h + kw;
 
 								for (int i = 0; i < altS; i++) {
@@ -320,11 +320,11 @@ public class LayerOps {
 		final int areaK  = altK * largK;
 		final int areaGS = altS * largS;
 
-		final double[] dataX  = entrada.array();
-		final double[] dataK  = kernel.array();
-		final double[] dataGS = gradS.array();
-		final double[] dataGK = gradK.array();
-		final double[] dataGE = gradE.array();
+		final float[] dataX  = entrada.array();
+		final float[] dataK  = kernel.array();
+		final float[] dataGS = gradS.array();
+		final float[] dataGK = gradK.array();
+		final float[] dataGE = gradE.array();
 
 		final int offXBase  = entrada.offset();
 		final int offKBase  = kernel.offset();
@@ -366,7 +366,7 @@ public class LayerOps {
 					);
 				}
 
-				double somaBias = 0;
+				float somaBias = 0.0f;
 				for (int i = 0; i < areaGS; i++) {
 					somaBias += dataGS[offGS + i];
 				}
@@ -439,11 +439,11 @@ public class LayerOps {
 		final int areaK = altK * largK;
 		final int areaGS = altS * largS;
 
-		final double[] dataX = entrada.array();
-		final double[] dataK = kernel.array();
-		final double[] dataGS = gradS.array();
-		final double[] dataGK = gradK.array();
-		final double[] dataGE = gradE.array();
+		final float[] dataX = entrada.array();
+		final float[] dataK = kernel.array();
+		final float[] dataGS = gradS.array();
+		final float[] dataGK = gradK.array();
+		final float[] dataGE = gradE.array();
 		
 		final int offXBase = entrada.offset();
 		final int offKBase = kernel.offset();
@@ -452,7 +452,7 @@ public class LayerOps {
 		final int offGEBase = gradE.offset();
 
 		final boolean temBias = gradB.isPresent();
-		final double[] dataGB = temBias ? gradB.get().array() : null;
+		final float[] dataGB = temBias ? gradB.get().array() : null;
 		final int offGBBase = temBias ? gradB.get().offset() : 0;
 
 		List<ForkJoinTask<?>> tarefas1 = new ArrayList<>(filtros);
@@ -462,7 +462,7 @@ public class LayerOps {
 			
 			tarefas1.add(pool.submit(() -> {
 				final int offGKf = offGKBase + filtro * canais * areaK;
-				double somaBiasLocal = 0;
+				float somaBiasLocal = 0.0f;
 
 				for (int l = 0; l < lotes; l++) {
 					final int offGSlf = offGSBase + (l * filtros + filtro) * areaGS;
@@ -484,7 +484,7 @@ public class LayerOps {
 
 							for (int kw = 0; kw < largK; kw++) {
 								final int offXw = offXh + kw;
-								double valGrad = 0;
+								float valGrad = 0.0f;
 								
 								for (int i = 0; i < altS; i++) {
 									final int idGS = offGSlf + i * largS;
@@ -533,7 +533,7 @@ public class LayerOps {
 							final int offGEh = offGEc + kh * largX;
 
 							for (int kw = 0; kw < largK; kw++) {
-								final double valK = dataK[offKlin + kw];
+								final float valK = dataK[offKlin + kw];
 								final int offGEw = offGEh + kw;
 
 								for (int i = 0; i < altS; i++) {
@@ -701,13 +701,13 @@ public class LayerOps {
 			return;
 		}
 
-		double[] dataE  = entrada.array();
-		double[] dataGS = grad.array();
-		double[] dataGE = gradE.array();
+		float[] dataE  = entrada.array();
+		float[] dataGS = grad.array();
+		float[] dataGE = gradE.array();
 
 		int canalSizeEntrada = altX * largX;
 		int canalSizeGradS   = altG * largG;
-		double val, valMax;
+		float val, valMax;
 
 		for (int c = 0; c < canais; c++) {
 			int baseEntrada = c * canalSizeEntrada;
@@ -721,7 +721,7 @@ public class LayerOps {
 					int colInicio = j * stride[1];
 					int colFim    = Math.min(colInicio + filtro[1], largX);
 
-					valMax = Double.NEGATIVE_INFINITY;
+					valMax = Float.NEGATIVE_INFINITY;
 					int linMax = linInicio;
 					int colMax = colInicio;
 
@@ -875,8 +875,8 @@ public class LayerOps {
 		int sH = stride[0];
 		int sW = stride[1];
 
-		double[] arrGo  = grad.array();
-		double[] arrGi  = gradE.array();
+		float[] arrGo  = grad.array();
+		float[] arrGi  = gradE.array();
 
 		int offGo  = grad.offset();
 		int offGi  = gradE.offset();
@@ -897,7 +897,7 @@ public class LayerOps {
 				for (int j = 0; j < Wout; j++) {
 					int colInicio = j * sW;
 					int colFim = Math.min(colInicio + fW, Win);
-					double g = arrGo[baseGo + i * stGo[1] + j * stGo[2]] / janela;
+					float g = arrGo[baseGo + i * stGo[1] + j * stGo[2]] / janela;
 
 					for (int y = linInicio; y < linFim; y++) {
 						int linhaGi = baseGi + y * stGi[1];

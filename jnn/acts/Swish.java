@@ -16,17 +16,17 @@ public class Swish extends Ativacao {
 	public Swish() { }
 
 	@Override
-	protected double fx(double x) {
+	protected float fx(float x) {
 		return x * sigmoid(x);
 	}
 
 	@Override
-	protected double dx(double x) {
-		double sig = sigmoid(x);
-		return sig + (x * sig * (1.0 - sig));		
+	protected float dx(float x) {
+		float sig = sigmoid(x);
+		return sig + (x * sig * (1.0f - sig));		
 	}
 
-	final private double sigmoid(double x) {
-		return 1.0 / (1.0 + Math.exp(-x));
+	final private float sigmoid(float x) {
+		return 1.0f / (float) (1.0 + Math.exp(-x));
 	}
 }

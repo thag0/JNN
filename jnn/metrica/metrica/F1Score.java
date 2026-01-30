@@ -22,10 +22,10 @@ public class F1Score extends Metrica {
 	@Override
 	public Tensor forward(Tensor[] prev, Tensor[] real) {
 		Tensor mat = super.matrizConfusao(prev, real);
-		double f1score = f1score(mat);
+		float f1score = f1score(mat);
 
 		return new Tensor(
-			new double[]{ f1score }
+			new float[]{ f1score }
 		);
 	}
 
@@ -34,17 +34,16 @@ public class F1Score extends Metrica {
 	 * @param mat martiz de confusão
 	 * @return f1 score.
 	 */
-	private double f1score(Tensor mat) {
+	private float f1score(Tensor mat) {
 		int nClasses = mat.shape()[0];
 
-		double[] precisao = new double[nClasses];
-		double[] recall = new double[nClasses];
+		float[] precisao = new float[nClasses];
+		float[] recall   = new float[nClasses];
 
 		for (int i = 0; i < nClasses; i++) {
 			int vp = (int) mat.get(i, i);// verdadeiro positivo
 			int fp = 0;// falso positivo
 			int fn = 0;// falso negativo
-
 
 			for (int j = 0; j < nClasses; j++) {
 				if (j != i) {
@@ -54,16 +53,16 @@ public class F1Score extends Metrica {
 			}
 
 			// formulas da precisão e recall
-			if ((vp + fp) > 0) precisao[i] = vp / (double)(vp + fp);
-			else precisao[i] = 0.0;
+			if ((vp + fp) > 0) precisao[i] = vp / (float)(vp + fp);
+			else precisao[i] = 0.0f;
 
-			if ((vp + fn) > 0) recall[i] = vp / (double)(vp + fn);
-			else recall[i] = 0.0;
+			if ((vp + fn) > 0) recall[i] = vp / (float)(vp + fn);
+			else recall[i] = 0.0f;
 		}
 
-		double somaF1 = 0.0;
+		float somaF1 = 0.0f;
 		for (int i = 0; i < nClasses; i++) {
-			double f1Classe = 2.0 * (precisao[i] * recall[i]) / (precisao[i] + recall[i]);
+			float f1Classe = 2.0f * (precisao[i] * recall[i]) / (precisao[i] + recall[i]);
 			somaF1 += f1Classe;
 		}
 

@@ -39,7 +39,7 @@ public class TreinoLote extends MetodoTreino {
 			if (logs) tempo = System.nanoTime();
 
 			embaralhar(x, y);
-			double perdaEpoca = 0;
+			float perdaEpoca = 0.0f;
 
 			for (int i = 0; i < amostras; i += tamLote) {
 				int idFim = Math.min(i + tamLote, amostras);
@@ -55,7 +55,7 @@ public class TreinoLote extends MetodoTreino {
 				tempo = System.nanoTime() - tempo;
 
 				limparLinha();
-				String log = "[Época " + e + "/" + epochs + "] loss: " + (float)(perdaEpoca/amostras);
+				String log = "[Época " + e + "/" + epochs + "] loss: " + (perdaEpoca/amostras);
 
 				long segundos = (long) tempo / 1_000_000_000;
 				long min = (segundos / 60);
@@ -85,7 +85,7 @@ public class TreinoLote extends MetodoTreino {
 	 * @param loss função de perda do modelo.
 	 * @param perdaEpoca valor de perda por época de treinamento.
 	 */
-	private double processoLote(Tensor[] loteX, Tensor[] loteY, Perda loss) {
+	private float processoLote(Tensor[] loteX, Tensor[] loteY, Perda loss) {
 		Tensor real = JNNutils.concatenar(loteY);
 
 		Tensor prev = modelo.forward(JNNutils.concatenar(loteX));
@@ -94,12 +94,12 @@ public class TreinoLote extends MetodoTreino {
 		modelo.backward(g);
 
 		if (calcHist) {
-			double l = loss.forward(prev, real).item();
+			float l = loss.forward(prev, real).item();
 			int n = loteX.length;
 			return l * n;
 		}
 
-		return 0;// não registrar perda
+		return 0.0f;// não registrar perda
 	}
 
 }

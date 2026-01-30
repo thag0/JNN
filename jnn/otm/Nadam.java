@@ -21,42 +21,42 @@ public class Nadam extends Otimizador {
 	/**
 	 * Valor padrão para a taxa de aprendizado do otimizador.
 	 */
-	private static final double PADRAO_LR = 0.001;
+	private static final float PADRAO_LR = 0.001f;
 
 	/**
 	 * Valor padrão para o decaimento do momento de primeira ordem.
 	 */
-	private static final double PADRAO_BETA1 = 0.9;
+	private static final float PADRAO_BETA1 = 0.9f;
 
 	/**
 	 * Valor padrão para o decaimento do momento de segunda ordem.
 	 */
-	private static final double PADRAO_BETA2 = 0.999;
+	private static final float PADRAO_BETA2 = 0.999f;
 	
 	/**
 	 * Valor padrão para epsilon.
 	 */
-	private static final double PADRAO_EPS = 1e-8;
+	private static final float PADRAO_EPS = 1e-7f;
 
 	/**
 	 * Valor de taxa de aprendizado do otimizador.
 	 */
-	private final double lr;
+	private final float lr;
 
 	/**
 	 * Usado para evitar divisão por zero.
 	 */
-	private final double eps;
+	private final float eps;
 
 	/**
 	 * decaimento do momentum.
 	 */
-	private final double beta1;
+	private final float beta1;
 
 	/**
 	 * decaimento do momentum de segunda ordem.
 	 */
-	private final double beta2;
+	private final float beta2;
 
 	/**
 	 * Coeficientes de momentum.
@@ -92,10 +92,10 @@ public class Nadam extends Otimizador {
 	 * @param eps usado para evitar a divisão por zero.
 	 */
 	public Nadam(Number lr, Number beta1, Number beta2, Number eps) {
-		double lr_ = lr.doubleValue();
-		double b1_ = beta1.doubleValue();
-		double b2_ = beta2.doubleValue();
-		double ep_ = eps.doubleValue();
+		float lr_ = lr.floatValue();
+		float b1_ = beta1.floatValue();
+		float b2_ = beta2.floatValue();
+		float ep_ = eps.floatValue();
 
 		if (lr_ <= 0) {
 			throw new IllegalArgumentException(
@@ -175,8 +175,8 @@ public class Nadam extends Otimizador {
 		checkInicial();
 		
 		iteracoes++;
-		double fb1 = 1.0 - Math.pow(beta1, iteracoes);
-		double fb2 = 1.0 - Math.pow(beta2, iteracoes);
+		float fb1 = 1.0f - (float) Math.pow(beta1, iteracoes);
+		float fb2 = 1.0f - (float) Math.pow(beta2, iteracoes);
 		
 		final int n = _params.length;
 		for (int i = 0; i < n; i++) {
@@ -188,13 +188,13 @@ public class Nadam extends Otimizador {
 			TensorData vc_i  = vc[i].data();
 
 			// m = β1*m + (1-β1)*g
-			m_i.mul(beta1).add(g_i, 1.0 - beta1);
+			m_i.mul(beta1).add(g_i, 1.0f - beta1);
 
 			// v = β2*v + (1-β2)*(g²)
-			v_i.mul(beta2).addcmul(g_i, g_i, 1.0 - beta2);
+			v_i.mul(beta2).addcmul(g_i, g_i, 1.0f - beta2);
 
 			// m̂ = (β1 * m + (1-β1)*g) / (1 - β1^t)
-        	mc_i.copiar(m_i).mul(beta1).add(g_i, 1.0 - beta1).div(fb1);
+        	mc_i.copiar(m_i).mul(beta1).add(g_i, 1.0f - beta1).div(fb1);
 			
 			// v̂ = v/(1-β2^t)
 			vc_i.copiar(v_i).div(fb2);

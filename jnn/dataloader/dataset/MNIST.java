@@ -194,7 +194,7 @@ public class MNIST {
         Tensor[] imgs = new Tensor[numImagens];
 
         for (int i = 0; i < numImagens; i++) {
-            double[] arr = new double[linhas * colunas];
+            float[] arr = new float[linhas * colunas];
 
             for (int p = 0; p < arr.length; p++) {
                 arr[p] = (buffer.get() & 0xFF) / 255.0f;
@@ -221,8 +221,8 @@ public class MNIST {
 
         for (int i = 0; i < total; i++) {
             int label = buffer.get() & 0xFF;
-            double[] data = new double[10];
-            data[label] = 1.0;
+            float[] data = new float[10];
+            data[label] = 1.0f;
 
             labels[i] = new Tensor(data).nome("Label-" + label);
         }

@@ -49,7 +49,7 @@ gcc ^
  -O3 ^
  -shared ^
  -march=x86-64 ^
- -fno-fast-math ^
+ -ffast-math ^
  -mtune=generic ^
  -mfma ^
  -fopenmp ^

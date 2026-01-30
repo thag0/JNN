@@ -11,7 +11,7 @@ public class AleatorioPositivo extends Inicializador {
 	/**
 	 * Valor máximo de aleatorização.
 	 */
-	private final double max;
+	private final float max;
 
 	/**
 	 * Instancia um inicializador de valores aleatórios positivos
@@ -19,7 +19,7 @@ public class AleatorioPositivo extends Inicializador {
 	 * @param max valor máximo de aleatorização.
 	 */
 	public AleatorioPositivo(Number max) {
-		double m = max.doubleValue();
+		float m = max.floatValue();
 
 		if (m <= 0) {
 			throw new IllegalArgumentException(
@@ -40,7 +40,7 @@ public class AleatorioPositivo extends Inicializador {
 
 	@Override
 	public void forward(Tensor tensor) {
-		tensor.aplicar(_ -> JNNutils.randDouble(0, max));
+		tensor.aplicar(_ -> JNNutils.randFloat(0, max));
 	}
 	
 }

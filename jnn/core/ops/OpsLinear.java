@@ -129,9 +129,9 @@ public class OpsLinear {
 		final int offsetB = b.offset();
 		final int offsetD = dst.offset();
 
-		final double[] dataA = a.array();
-		final double[] dataB = b.array();
-		final double[] dataD = dst.array();
+		final float[] dataA = a.array();
+		final float[] dataB = b.array();
+		final float[] dataD = dst.array();
 
 		if (s1A == 1 && s1B == 1 && s1D == 1) {// tensores contiguos
 			matmulFastPath(
@@ -146,7 +146,7 @@ public class OpsLinear {
 	}
 
 	private static void matmulFastPath(
-		double[] A, double[] B, double[] C, 
+		float[] A, float[] B, float[] C, 
 		int offA, int offB, int offC,
 		int linA, int colA, int colB,
 		int s0A, int s0B, int s0C) {
@@ -165,7 +165,7 @@ public class OpsLinear {
 					final int jEnd = Math.min(jj + BJ, colB);
 
 					for (int k = kk; k < kEnd; k++) {
-						final double valA = A[baseA + k];
+						final float valA = A[baseA + k];
 						final int baseB = offB + k * s0B;
 
 						for (int j = jj; j < jEnd; j++) {
@@ -178,7 +178,7 @@ public class OpsLinear {
 	}
 
 	private static void matmulGenerico(
-		double[] A, double[] B, double[] C,
+		float[] A, float[] B, float[] C,
 		int offA, int offB, int offC,
 		int linA, int colA, int colB,
 		int s0A, int s1A,
@@ -199,7 +199,7 @@ public class OpsLinear {
 					final int jEnd = Math.min(jj + BJ, colB);
 
 					for (int k = kk; k < kEnd; k++) {
-						final double valA = A[baseA + k * s1A];
+						final float valA = A[baseA + k * s1A];
 						final int baseB = offB + k * s0B;
 
 						for (int j = jj; j < jEnd; j++) {

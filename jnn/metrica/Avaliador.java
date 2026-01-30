@@ -196,7 +196,7 @@ public class Avaliador {
 		final int n = xs.length;
 		int batch = 32;
 		
-		double acertos = 0;
+		float acertos = 0;
 		for (int i = 0; i < n; i += batch) {
 			int inicio = i;
 			int fim = Math.min(inicio + batch, n);
@@ -204,13 +204,13 @@ public class Avaliador {
 			Tensor[] y = JNNutils.subArray(ys, inicio, fim);
 			Tensor[] prev = modelo.forward(x);
 			
-			double accLote = acuracia.forward(prev, y).item();
+			float accLote = acuracia.forward(prev, y).item();
 			int tamLote = fim - inicio;
 			acertos += accLote * tamLote;
 		}
 		
 		return new Tensor(
-			new double[] { acertos / n }
+			new float[] { acertos / n }
 		);
 	}
 

@@ -13,7 +13,7 @@ public class ELU extends Ativacao {
 	/**
 	 * Constante alfa.
 	 */
-	private double alfa = 0.01;
+	private float alfa = 0.01f;
 
 	/**
 	 * Instancia a função de ativação ELU com 
@@ -21,7 +21,7 @@ public class ELU extends Ativacao {
 	 * @param alfa novo valor alfa.
 	 */
 	public ELU(Number alfa) {
-		this.alfa = alfa.doubleValue();
+		this.alfa = alfa.floatValue();
 	}
 
 	/**
@@ -36,13 +36,13 @@ public class ELU extends Ativacao {
 	}
 
 	@Override
-	protected double fx(double x) {
-		return (x > 0.0) ? x : alfa * (Math.exp(x) - 1.0); 
+	protected float fx(float x) {
+		return (x > 0.0) ? x : alfa * (float) (Math.exp(x) - 1.0); 
 	}
 
 	@Override
-	protected double dx(double x) {
-		return (x > 0.0) ? 1.0 : alfa * Math.exp(x); 
+	protected float dx(float x) {
+		return (x > 0.0) ? 1.0f : alfa * (float) Math.exp(x); 
 	}
 
 }

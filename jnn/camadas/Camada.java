@@ -233,7 +233,7 @@ public abstract class Camada {
 	 * Retorna a saída da camada no formato de array.
 	 * @return saída da camada.
 	 */
-	public double[] saidaParaArray() {
+	public float[] saidaParaArray() {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui retorno de saída para array."
 		);    

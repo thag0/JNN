@@ -56,7 +56,7 @@ public class Sigmoid extends Camada implements Cloneable {
 
 		_entrada.copiar(x);
 
-        _saida.aplicar(_entrada, v -> 1.0 / (1.0 + Math.exp(-v)));
+        _saida.aplicar(_entrada, v -> 1.0f / (float) (1.0 + Math.exp(-v)));
 
         return _saida;
     }
@@ -69,7 +69,7 @@ public class Sigmoid extends Camada implements Cloneable {
 
         _gradEntrada.aplicar(
             _gradSaida, _saida,
-            (grad, s) -> grad * (s * (1.0 - s))
+            (grad, s) -> grad * (s * (1.0f - s))
         );
 
         return _gradEntrada;

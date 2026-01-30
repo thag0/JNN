@@ -40,7 +40,7 @@ class SerialDropout extends SerialBase {
 	 */
 	public Dropout ler(DataInputStream dis) throws IOException {
 		int[] shapeIn = lerArrInt(dis);
-		double taxa = lerDouble(dis);
+		float taxa = lerFloat(dis);
 
 		Dropout camada = new Dropout(taxa);
 		camada.construir(shapeIn);

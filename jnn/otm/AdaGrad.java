@@ -23,22 +23,22 @@ public class AdaGrad extends Otimizador {
 	/**
 	 * Valor padrão para a taxa de aprendizado do otimizador.
 	 */
-	private static final double PADRAO_LR = 0.5;
+	private static final float PADRAO_LR = 0.5f;
 
 	/**
 	 * Valor padrão para o valor de epsilon pro otimizador.
 	 */
-	private static final double PADRAO_EPS = 1e-8; 
+	private static final float PADRAO_EPS = 1e-7f; 
 
 	/**
 	 * Valor de taxa de aprendizado do otimizador (Learning Rate).
 	 */
-	private final double lr;
+	private final float lr;
 
 	/**
 	 * Usado para evitar divisão por zero.
 	 */
-	private final double eps;
+	private final float eps;
 
 	/**
 	 * Acumuladores.
@@ -52,8 +52,8 @@ public class AdaGrad extends Otimizador {
 	 * @param eps usado para evitar a divisão por zero.
 	 */
 	public AdaGrad(Number lr, Number eps) {
-		double lr_ = lr.doubleValue();
-		double eps_ = eps.doubleValue();
+		float lr_ = lr.floatValue();
+		float eps_ = eps.floatValue();
 
 		if (lr_ <= 0) {
 			throw new IllegalArgumentException(
@@ -94,7 +94,7 @@ public class AdaGrad extends Otimizador {
 	public void construir(Tensor[] params, Tensor[] grads) {
 		initParams(params, grads);
 		
-		double valorInicial = 0.1;
+		float valorInicial = 0.1f;
 		for (Tensor param : _params) {
 			ac = JNNutils.addEmArray(
 				ac,
@@ -116,7 +116,7 @@ public class AdaGrad extends Otimizador {
 			TensorData ac_i = ac[i].data();
 
 			// ac += g²
-			ac_i.addcmul(g_i, g_i, 1.0);
+			ac_i.addcmul(g_i, g_i, 1.0f);
 
 			// sqrt(ac) + eps
 			TensorData den = ac_i.clone().sqrt().add(eps);

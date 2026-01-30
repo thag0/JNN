@@ -19,17 +19,12 @@ public abstract class MetodoTreino {
 	/**
 	 * Histórico de perda do modelo durante o treinamento.
 	 */
-	protected LinkedList<Double> historico;
+	protected LinkedList<Float> historico;
     
 	/**
 	 * Gerador de números pseudo-aleatórios.
 	 */
 	protected Random random;
-
-	/**
-	 * Quantidade de threads usadas pelo treinador.
-	 */
-	protected int _threads = 1;
 
 	/**
 	 * Variável de controle para armazenagem do histórico de treino.
@@ -133,8 +128,8 @@ public abstract class MetodoTreino {
 	 * Retorna os valores do histórico de perdas do modelo durante o treino.
 	 * @return
 	 */
-	public Double[] hist() {
-		return historico.toArray(new Double[]{});
+	public Float[] hist() {
+		return historico.toArray(new Float[]{});
 	}
 	
 }

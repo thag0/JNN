@@ -18,12 +18,12 @@ public class Linear extends Ativacao {
 	public Linear() { }
 
 	@Override
-	protected double fx(double x) {
+	protected float fx(float x) {
 		return x;
 	}
 
 	@Override
-	protected double dx(double x) {
+	protected float dx(float x) {
 		return 1;
 	}
 

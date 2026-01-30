@@ -15,12 +15,12 @@ public class SELU extends Ativacao {
 	/**
 	 * Constante alfa;
 	 */
-	private double alfa;
+	private float alfa;
 
 	/**
 	 * Fator de escala
 	 */
-	private double escala;
+	private float escala;
 
 	/**
 	 * Instancia a função de ativação SELU com os parâmetros alpha e scale especificados.
@@ -28,25 +28,25 @@ public class SELU extends Ativacao {
 	 * @param escala constante de escala.
 	 */
 	public SELU(Number alfa, Number escala) {
-		this.alfa = alfa.doubleValue();
-		this.escala = escala.doubleValue();
+		this.alfa = alfa.floatValue();
+		this.escala = escala.floatValue();
 	}
 
 	/**
 	 * Instancia a função de ativação SELU.
 	 */
 	public SELU() {
-		this(1.67326324, 1.05070098);
+		this(1.673263, 1.050700);
 	}
 
 	@Override
-	protected double fx(double x) {
-		return (x > 0.0) ? escala * x : escala * alfa * (Math.exp(x) - 1.0);
+	protected float fx(float x) {
+		return (x > 0.0) ? escala * x : escala * alfa * (float) (Math.exp(x) - 1.0);
 	}
 
 	@Override
-	protected double dx(double x) {
-		return (x > 0.0) ? escala : escala * alfa * Math.exp(x);
+	protected float dx(float x) {
+		return (x > 0.0) ? escala : escala * alfa * (float) Math.exp(x);
 	}
 
 }

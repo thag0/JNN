@@ -37,9 +37,9 @@ Java_jnn_nativo_JNNNative_setBackend(JNIEnv * env, jclass cls, jint backend) {
 JNIEXPORT void JNICALL
 Java_jnn_nativo_JNNNative_matmul(
     JNIEnv* env, jclass cls,
-    jdoubleArray A_arr, jint off_a, jint std_a_0, jint std_a_1,
-    jdoubleArray B_arr, jint off_b, jint std_b_0, jint std_b_1,
-    jdoubleArray C_arr, jint off_c, jint std_c_0, jint std_c_1,
+    jfloatArray A_arr, jint off_a, jint std_a_0, jint std_a_1,
+    jfloatArray B_arr, jint off_b, jint std_b_0, jint std_b_1,
+    jfloatArray C_arr, jint off_c, jint std_c_0, jint std_c_1,
     jint lin_a, jint col_a, jint col_b
 ) {
     (void) cls;
@@ -76,11 +76,11 @@ Java_jnn_nativo_JNNNative_matmul(
 JNIEXPORT void JNICALL
 Java_jnn_nativo_JNNNative_conv2dForward(
     JNIEnv* env, jclass cls,
-    jdoubleArray X_arr,
-    jdoubleArray K_arr,
-    jdoubleArray B_arr,
+    jfloatArray X_arr,
+    jfloatArray K_arr,
+    jfloatArray B_arr,
     jboolean temBias,
-    jdoubleArray DST_arr,
+    jfloatArray DST_arr,
     jint lotes, 
     jint canais, 
     jint filtros,
@@ -91,10 +91,10 @@ Java_jnn_nativo_JNNNative_conv2dForward(
 ) {
     (void) cls;
 
-    double* restrict X = (*env)->GetPrimitiveArrayCritical(env, X_arr, NULL);
-    double* restrict K = (*env)->GetPrimitiveArrayCritical(env, K_arr, NULL);
-    double* restrict DST = (*env)->GetPrimitiveArrayCritical(env, DST_arr, NULL);
-    double* restrict B = temBias ? (*env)->GetPrimitiveArrayCritical(env, B_arr, NULL) : NULL;
+    float* restrict X = (*env)->GetPrimitiveArrayCritical(env, X_arr, NULL);
+    float* restrict K = (*env)->GetPrimitiveArrayCritical(env, K_arr, NULL);
+    float* restrict DST = (*env)->GetPrimitiveArrayCritical(env, DST_arr, NULL);
+    float* restrict B = temBias ? (*env)->GetPrimitiveArrayCritical(env, B_arr, NULL) : NULL;
 
     conv2d_fwd_params_t p = {
         .X = X,
@@ -128,13 +128,13 @@ Java_jnn_nativo_JNNNative_conv2dForward(
 JNIEXPORT void JNICALL
 Java_jnn_nativo_JNNNative_conv2dBackward(
     JNIEnv* env, jclass cls,
-    jdoubleArray X_arr,
-    jdoubleArray K_arr,
-    jdoubleArray GS_arr,
-    jdoubleArray GK_arr,
-    jdoubleArray GB_arr, 
+    jfloatArray X_arr,
+    jfloatArray K_arr,
+    jfloatArray GS_arr,
+    jfloatArray GK_arr,
+    jfloatArray GB_arr, 
     jboolean temBias,
-    jdoubleArray GE_arr,
+    jfloatArray GE_arr,
     jint lotes, 
     jint canais, 
     jint filtros,
@@ -145,12 +145,12 @@ Java_jnn_nativo_JNNNative_conv2dBackward(
 ) {
     (void) cls;
 
-    double* X  = (*env)->GetPrimitiveArrayCritical(env, X_arr, NULL);
-    double* K  = (*env)->GetPrimitiveArrayCritical(env, K_arr, NULL);
-    double* GS = (*env)->GetPrimitiveArrayCritical(env, GS_arr, NULL);
-    double* GK = (*env)->GetPrimitiveArrayCritical(env, GK_arr, NULL);
-    double* GE = (*env)->GetPrimitiveArrayCritical(env, GE_arr, NULL);
-    double* GB = temBias ? (*env)->GetPrimitiveArrayCritical(env, GB_arr, NULL) : NULL;
+    float* X  = (*env)->GetPrimitiveArrayCritical(env, X_arr, NULL);
+    float* K  = (*env)->GetPrimitiveArrayCritical(env, K_arr, NULL);
+    float* GS = (*env)->GetPrimitiveArrayCritical(env, GS_arr, NULL);
+    float* GK = (*env)->GetPrimitiveArrayCritical(env, GK_arr, NULL);
+    float* GE = (*env)->GetPrimitiveArrayCritical(env, GE_arr, NULL);
+    float* GB = temBias ? (*env)->GetPrimitiveArrayCritical(env, GB_arr, NULL) : NULL;
 
     conv2d_bwd_params_t p = {
         .X  = X,
@@ -188,8 +188,8 @@ Java_jnn_nativo_JNNNative_conv2dBackward(
 JNIEXPORT void JNICALL
 Java_jnn_nativo_JNNNative_maxPool2dForward(
     JNIEnv* env, jclass cls,
-    jdoubleArray x_arr,
-    jdoubleArray y_arr,
+    jfloatArray x_arr,
+    jfloatArray y_arr,
     jint lotes, 
     jint canais,
     jint alt_x, 
@@ -201,8 +201,8 @@ Java_jnn_nativo_JNNNative_maxPool2dForward(
 ) {
     (void) cls;
 
-    double* X = (*env)->GetPrimitiveArrayCritical(env, x_arr, NULL);
-    double* Y = (*env)->GetPrimitiveArrayCritical(env, y_arr, NULL);
+    float* X = (*env)->GetPrimitiveArrayCritical(env, x_arr, NULL);
+    float* Y = (*env)->GetPrimitiveArrayCritical(env, y_arr, NULL);
 
     maxpool2d_fwd_params_t p = {
         .X = X,
@@ -226,9 +226,9 @@ Java_jnn_nativo_JNNNative_maxPool2dForward(
 JNIEXPORT void JNICALL
 Java_jnn_nativo_JNNNative_maxPool2dBackward(
     JNIEnv* env, jclass cls,
-    jdoubleArray x_arr,
-    jdoubleArray gs_arr,
-    jdoubleArray ge_arr,
+    jfloatArray x_arr,
+    jfloatArray gs_arr,
+    jfloatArray ge_arr,
     jint lotes, 
     jint canais,
     jint alt_x, 
@@ -240,9 +240,9 @@ Java_jnn_nativo_JNNNative_maxPool2dBackward(
     jint alt_std, 
     jint larg_std
 ) {
-    double* X = (*env)->GetPrimitiveArrayCritical(env, x_arr, NULL);
-    double* GS = (*env)->GetPrimitiveArrayCritical(env, gs_arr, NULL);
-    double* GE = (*env)->GetPrimitiveArrayCritical(env, ge_arr, NULL);
+    float* X = (*env)->GetPrimitiveArrayCritical(env, x_arr, NULL);
+    float* GS = (*env)->GetPrimitiveArrayCritical(env, gs_arr, NULL);
+    float* GE = (*env)->GetPrimitiveArrayCritical(env, ge_arr, NULL);
 
     maxpool2d_bwd_params_t p = {
         .X = X,

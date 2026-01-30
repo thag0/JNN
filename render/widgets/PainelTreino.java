@@ -42,13 +42,13 @@ public class PainelTreino extends Widget {
       
       
       if (nSaida == 1) {//escala de cinza
-         double[] saida = modelo.saidaParaArray();//saida 1D
-         double s = saida[0];
+         float[] saida = modelo.saidaParaArray();//saida 1D
+         float s = saida[0];
 
          for (y = 0; y < this.altura; y++) {
             for (x = 0; x < this.largura; x++) {
-               in.set(((double)x / this.largura), 0);
-               in.set(((double)y / this.altura), 0);
+               in.set(((float)x / this.largura), 0);
+               in.set(((float)y / this.altura), 0);
 
                modelo.forward(in);
 
@@ -63,15 +63,15 @@ public class PainelTreino extends Widget {
          } 
 
       } else if (nSaida == 3) {//rgb
-         double[] saida = modelo.saidaParaArray();//saida 3D
-         double saidaR = saida[0];
-         double saidaG = saida[1];
-         double saidaB = saida[2];
+         float[] saida = modelo.saidaParaArray();//saida 3D
+         float saidaR = saida[0];
+         float saidaG = saida[1];
+         float saidaB = saida[2];
          
          for (y = 0; y < this.altura; y++) {
             for (x = 0; x < this.largura; x++) {
-               in.set(((double)x / this.largura), 0);
-               in.set(((double)y / this.altura), 0);
+               in.set(((float)x / this.largura), 0);
+               in.set(((float)y / this.altura), 0);
 
                modelo.forward(in);
 
@@ -112,13 +112,13 @@ public class PainelTreino extends Widget {
    
    private void calcCinza(Modelo modelo, int y) {
       Tensor in = new Tensor(2);
-      in.set(((double) y / altura), 1);
+      in.set(((float) y / altura), 1);
 
       int[] pixels = new int[largura];
       int cinza, r, g, b;
 
       for (int x = 0; x < largura; x++) {
-         in.set(((double) x / largura), 0);
+         in.set(((float) x / largura), 0);
          cinza = (int)(modelo.forward(in).get(0) * 255);
             
          r = cinza;
@@ -132,12 +132,12 @@ public class PainelTreino extends Widget {
 
    private void calcRgb(Modelo modelo, int y) {
       Tensor in = new Tensor(2);
-      in.set(((double) y / altura), 1);
+      in.set(((float) y / altura), 1);
 
       int[] pixels = new int[largura];
-      double[] saida = new double[3];
+      float[] saida = new float[3];
       for (int x = 0; x < largura; x++) {
-         in.set(((double) x / largura), 0);
+         in.set(((float) x / largura), 0);
          
          modelo.forward(in);
          modelo.copiarDaSaida(saida);

@@ -21,32 +21,32 @@ public class RMSProp extends Otimizador {
 	/**
 	 * Valor padrão para a taxa de aprendizagem do otimizador.
 	 */
-	private static final double PADRAO_LR  = 0.001;
+	private static final float PADRAO_LR  = 0.001f;
 
 	/**
 	 * Valor padrão para a taxa de decaimeto.
 	 */
-	private static final double PADRAO_RHO = 0.99;
+	private static final float PADRAO_RHO = 0.99f;
 
 	/**
 	 * Valor padrão para epsilon.
 	 */
-	private static final double PADRAO_EPS = 1e-8;
+	private static final float PADRAO_EPS = 1e-7f;
 
 	/**
 	 * Valor de taxa de aprendizagem do otimizador (Learning Rate).
 	 */
-	private final double lr;
+	private final float lr;
 
 	/**
 	 * Usado para evitar divisão por zero.
 	 */
-	private final double eps;
+	private final float eps;
 
 	/**
 	 * Fator de decaimento.
 	 */
-	private final double rho;
+	private final float rho;
 
 	/**
 	 * Acumuladores para os.
@@ -61,9 +61,9 @@ public class RMSProp extends Otimizador {
 	 * @param eps usado para evitar a divisão por zero.
 	 */
 	public RMSProp(Number lr, Number rho, Number eps) {
-		double lr_ = lr.doubleValue();
-		double rho_ = rho.doubleValue();
-		double eps_ = eps.doubleValue();
+		float lr_ = lr.floatValue();
+		float rho_ = rho.floatValue();
+		float eps_ = eps.floatValue();
 
 		if (lr_ <= 0) {
 			throw new IllegalArgumentException(
@@ -137,7 +137,7 @@ public class RMSProp extends Otimizador {
 			TensorData ac_i = ac[i].data();
 
 			// ac = (rho * ac) + ((1 - rho) * g²)
-			ac_i.mul(rho).addcmul(g_i, g_i, 1.0 - rho);
+			ac_i.mul(rho).addcmul(g_i, g_i, 1.0f - rho);
 
 			// sqrt(ac) + eps
 			TensorData den = ac_i.clone().sqrt().add(eps);

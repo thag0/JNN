@@ -11,12 +11,12 @@ public class Aleatorio extends Inicializador {
 	/**
 	 * Valor mínimo de aleatorização.
 	 */
-	private final double min;
+	private final float min;
 
 	/**
 	 * Valor máximo de aleatorização.
 	 */
-	private final double max;
+	private final float max;
 
 	/**
 	 * Instancia um inicializador de valores aleatórios com seed
@@ -25,8 +25,8 @@ public class Aleatorio extends Inicializador {
 	 * @param max valor máximo de aleatorização.
 	 */
 	public Aleatorio(Number min, Number max) {
-		double mi = min.doubleValue();
-		double ma = max.doubleValue();
+		float mi = min.floatValue();
+		float ma = max.floatValue();
 		if (mi >= ma) {
 			throw new IllegalArgumentException(
 				"\nValor mínimo (" + min +") " +
@@ -48,7 +48,7 @@ public class Aleatorio extends Inicializador {
 
 	@Override
 	public void forward(Tensor tensor) {
-		tensor.aplicar(_ -> JNNutils.randDouble(min, max));
+		tensor.aplicar(_ -> JNNutils.randFloat(min, max));
 	}
 	
 }

@@ -25,13 +25,13 @@ public abstract class SerialBase {
     }
 
     /**
-     * Grava o conteúdo de um valor primitivo {@code double}.
+     * Grava o conteúdo de um valor primitivo {@code float}.
      * @param dos {@code DataOutputStream} gravador.
      * @param val valor desejado.
      * @throws IOException caso ocorra um erro.
      */
-    protected void escrever(DataOutputStream dos, double val) throws IOException {
-        dos.writeDouble(val);
+    protected void escrever(DataOutputStream dos, float val) throws IOException {
+        dos.writeFloat(val);
     }
 
     /**
@@ -58,15 +58,15 @@ public abstract class SerialBase {
     }
 
     /**
-     * Grava o conteúdo de um array primitivo {@code double[]}.
+     * Grava o conteúdo de um array primitivo {@code float[]}.
      * @param dos {@code DataOutputStream} gravador.
      * @param arr {@code array} desejado.
      * @throws IOException caso ocorra um erro.
      */
-    protected void escrever(DataOutputStream dos, double[] arr) throws IOException {
+    protected void escrever(DataOutputStream dos, float[] arr) throws IOException {
         dos.writeInt(arr.length);
-        for (double val : arr) {
-            dos.writeDouble(val);
+        for (float val : arr) {
+            dos.writeFloat(val);
         }
     }
 
@@ -93,13 +93,13 @@ public abstract class SerialBase {
     }
 
     /**
-     * Lê o conteúdo de um valor primitivo {@code double}.
+     * Lê o conteúdo de um valor primitivo {@code float}.
      * @param dis {@code DataInputStream} leitor.
      * @return valor lido.
      * @throws IOException caso ocorra um erro.
      */
-    protected double lerDouble(DataInputStream dis) throws IOException {
-        return dis.readDouble();
+    protected float lerFloat(DataInputStream dis) throws IOException {
+        return dis.readFloat();
     }
 
     protected boolean lerBoolean(DataInputStream dis) throws IOException {
@@ -125,18 +125,18 @@ public abstract class SerialBase {
     }
 
     /**
-     * Lê o conteúdo de um array primitivo {@code double[]}.
+     * Lê o conteúdo de um array primitivo {@code float[]}.
      * @param dis {@code DataInputStream} leitor.
      * @param tam tamanho do array.
      * @return array lido.
      * @throws IOException caso ocorra um erro.
      */
-    protected double[] lerArrDouble(DataInputStream dis) throws IOException {
+    protected float[] lerArrFloat(DataInputStream dis) throws IOException {
         int tam = dis.readInt();// considerando que já escreve o tamanho.
 
-        double[] arr = new double[tam];
+        float[] arr = new float[tam];
         for (int i = 0; i < tam; i++) {
-            arr[i] = dis.readDouble();
+            arr[i] = dis.readFloat();
         }
 
         return arr;

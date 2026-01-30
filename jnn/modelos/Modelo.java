@@ -394,7 +394,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 		final int batch = 32;
 
 		final int n = xs.length;
-		double loss = 0;
+		float loss = 0;
 		for (int i = 0; i < n; i += batch) {
 			int inicio = i;
 			int fim = Math.min(inicio + batch, n);
@@ -403,13 +403,13 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 			
 			Tensor prev = forward(x);
 
-			double lossLote = _perda.forward(prev, y).item();
+			float lossLote = _perda.forward(prev, y).item();
 			int tamLote = fim - inicio;
 			loss += lossLote * tamLote;
 		}
 
 		return new Tensor(
-			new double[] { loss / n }
+			new float[] { loss / n }
 		);
 	}
 
@@ -555,16 +555,16 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * Retorna um array contendo a saída serializada do modelo.
 	 * @return saída do modelo.
 	 */
-	public abstract double[] saidaParaArray();
+	public abstract float[] saidaParaArray();
 
 	/**
 	 * Copia os dados de saída da última camada do modelo para o array.
 	 * @param arr array para cópia.
 	 */
-	public void copiarDaSaida(double[] arr) {
+	public void copiarDaSaida(float[] arr) {
 		JNNutils.validarNaoNulo(arr, "arr == null.");
 		
-		double[] saida = saidaParaArray();
+		float[] saida = saidaParaArray();
 		
 		if (saida.length != arr.length) {
 			throw new IllegalArgumentException(
@@ -617,7 +617,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * @return array contendo o valor de perda durante cada época de treinamento 
 	 * do modelo.
 	 */
-	public double[] hist() {
+	public float[] hist() {
 		return _treinador.hist();
 	}
 

@@ -102,7 +102,7 @@ public final class Funcional {
      */
     public Tensor random(int... shape) {
         Tensor t = new Tensor(shape);
-        t.aplicar(_ -> Math.random()*2-1);
+        t.aplicar(_ -> JNNutils.randFloat() * 2.0f - 1.0f);
 
         return t;
     }
@@ -117,7 +117,7 @@ public final class Funcional {
         RandomGenerator rng = gen == null ? new Random() : gen;
 
         Tensor t = new Tensor(shape);
-        t.aplicar(_ -> rng.nextDouble(-1.0, 1.0));
+        t.aplicar(_ -> rng.nextFloat(-1.0f, 1.0f));
 
         return t;
     }
@@ -210,7 +210,7 @@ public final class Funcional {
      */
     public Tensor pow(Tensor t, Number exp) {
         double e = exp.doubleValue();
-        return new Tensor(t).aplicar(x -> Math.pow(x, e));
+        return new Tensor(t).aplicar(x -> (float) Math.pow(x, e));
     }
 
     /**
@@ -575,7 +575,7 @@ public final class Funcional {
      * @param arr array desejado.
      * @return array de {@code Tensores}
      */
-    public Tensor[] arrayParaTensores(double[] arr) {
+    public Tensor[] arrayParaTensores(float[] arr) {
         return JNNutils.arrayParaTensores(arr);
     }
 
@@ -584,7 +584,7 @@ public final class Funcional {
      * @param arr array desejado.
      * @return array de {@code Tensores}
      */
-    public Tensor[] arrayParaTensores(double[][] arr) {
+    public Tensor[] arrayParaTensores(float[][] arr) {
         return JNNutils.arrayParaTensores(arr);
     }
 
@@ -593,7 +593,7 @@ public final class Funcional {
      * @param arr array desejado.
      * @return array de {@code Tensores}
      */
-    public Tensor[] arrayParaTensores(double[][][] arr) {
+    public Tensor[] arrayParaTensores(float[][][] arr) {
         return JNNutils.arrayParaTensores(arr);
     }
 
@@ -602,7 +602,7 @@ public final class Funcional {
      * @param arr array desejado.
      * @return array de {@code Tensores}
      */
-    public Tensor[] arrayParaTensores(double[][][][] arr) {
+    public Tensor[] arrayParaTensores(float[][][][] arr) {
         return JNNutils.arrayParaTensores(arr);
     }
 
@@ -680,7 +680,7 @@ public final class Funcional {
      * @return {@code DataLoader}.
      * @see {@link DataLoader}
      */
-    public DataLoader dataloader(double[][] arr, int in, int out) {
+    public DataLoader dataloader(float[][] arr, int in, int out) {
         if (in + out > arr[0].length) {
             throw new IllegalArgumentException(
                 "\nA soma de in + out deve ser igual a " + arr[0].length +
@@ -692,8 +692,8 @@ public final class Funcional {
 
         int n = arr.length;
         for (int i = 0; i < n; i++) {
-            double[] x = new double[in];
-            double[] y = new double[out];
+            float[] x = new float[in];
+            float[] y = new float[out];
 
             System.arraycopy(arr[i], 0, x, 0, x.length);
             System.arraycopy(arr[i], x.length, y, 0, y.length);

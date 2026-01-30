@@ -15,13 +15,13 @@ public class SoftPlus extends Ativacao {
 	public SoftPlus() { }
 
 	@Override
-	protected double fx(double x) {
-		return Math.log(1.0 + Math.exp(x));
+	protected float fx(float x) {
+		return (float) Math.log(1.0 + Math.exp(x));
 	}
 
 	@Override
-	protected double dx(double x) {
-		double exp = Math.exp(x);
-		return (exp / (1.0 + exp));
+	protected float dx(float x) {
+		float exp = (float) Math.exp(x);
+		return (exp / (1.0f + exp));
 	}
 }

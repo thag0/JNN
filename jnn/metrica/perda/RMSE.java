@@ -19,27 +19,27 @@ public class RMSE extends Perda {
 		
 		if (prev.numDim() == 1) {
 			int tam = prev.tam();
-			double rmse = f(prev, real, tam);
+			float rmse = f(prev, real, tam);
 			
 			return new Tensor(
-				new double[]{ Math.sqrt(rmse / tam) }
+				new float[]{ (float) Math.sqrt(rmse / tam) }
 			);
 		}
 
         int lotes = prev.tamDim(0);
         int amostras = prev.tamDim(1);
 
-        double somaLote = 0;
+        float somaLote = 0;
         for (int i = 0; i < lotes; i++) {
             Tensor p = prev.subTensor(i);
             Tensor r = real.subTensor(i);
 
-            double soma = f(p, r, amostras) / amostras;
+            float soma = f(p, r, amostras) / amostras;
             somaLote += Math.sqrt(soma);
         }
 
         return new Tensor(
-			new double[]{ somaLote / lotes }
+			new float[]{ somaLote / lotes }
 		);
 	}
 
@@ -50,10 +50,10 @@ public class RMSE extends Perda {
 	 * @param tam quantidade de amostras.
 	 * @return soma do rmse.
 	 */
-	private double f(Tensor prev, Tensor real, int tam) {
-		double rmse = 0.0;
+	private float f(Tensor prev, Tensor real, int tam) {
+		float rmse = 0.0f;
 		for (int i = 0; i < tam; i++) {
-			double d = prev.get(i) - real.get(i);
+			float d = prev.get(i) - real.get(i);
 			rmse += d * d;
 		}
 
@@ -64,7 +64,7 @@ public class RMSE extends Perda {
 	public Tensor backward(Tensor prev, Tensor real) {
 		super.verificarDimensoes(prev, real);
 		final int tam = prev.tam();
-		double rrmse = Math.sqrt(forward(prev, real).item());
+		float rrmse = (float) Math.sqrt(forward(prev, real).item());
 
 		return prev.map(
 			real,

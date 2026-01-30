@@ -38,13 +38,13 @@ public class MainImg {
 		int tamEntrada = 2;
 		int tamSaida = 1;
 		
-		double[][] dados;
+		float[][] dados;
 		if 		(tamSaida == 1) dados = imagemParaDadosTreinoEscalaCinza(imagem);
 		else if (tamSaida == 3) dados = imagemParaDadosTreinoRGB(imagem);
 		else throw new IllegalArgumentException("\nImagem deve ser em Escala de Cinza ou RGB");
 
-		double[][] in  = (double[][]) ged.separarDadosEntrada(dados, tamEntrada);
-		double[][] out = (double[][]) ged.separarDadosSaida(dados, tamSaida);
+		float[][] in  = (float[][]) ged.separarDadosEntrada(dados, tamEntrada);
+		float[][] out = (float[][]) ged.separarDadosSaida(dados, tamSaida);
 
 		Tensor[] x = jnn.arrayParaTensores(in);
 		Tensor[] y = jnn.arrayParaTensores(out);
@@ -169,8 +169,8 @@ public class MainImg {
 	 */
 	static void exportarHistorico(Modelo modelo, String caminho) {
 		System.out.println("Exportando histórico de perda");
-		double[] perdas = modelo.hist();
-		double[][] valores = new double[perdas.length][1];
+		float[] perdas = modelo.hist();
+		float[][] valores = new float[perdas.length][1];
 
 		final int t = Runtime.getRuntime().availableProcessors();
 		try (ForkJoinPool pool = PoolFactory.pool(t)) {
@@ -193,7 +193,7 @@ public class MainImg {
 	 * @param casas quantidade de casas após o ponto flutuante.
 	 * @return
 	 */
-	static String formatarDecimal(double x, int casas) {
+	static String formatarDecimal(float x, int casas) {
 		String formato = "#." + "#".repeat(casas);
 		return new DecimalFormat(formato).format(x);
 	}
@@ -258,13 +258,13 @@ public class MainImg {
 
 				for (int y = inicio; y < fim; y++) {
 					for (int x = 0; x < larguraImagem; x++) {
-						in.set(((double)x / (larguraImagem-1)), 0);
-						in.set(((double)y / (alturaImagem-1)), 1);
-						double[] saida = new double[1];
+						in.set(((float) x / (larguraImagem-1)), 0);
+						in.set(((float) y / (alturaImagem-1)), 1);
+						float[] saida = new float[1];
 					
 						clones[id].forward(in);
 					
-						saida[0] = clones[id].saidaParaArray()[0] * 255;
+						saida[0] = clones[id].saidaParaArray()[0] * 255f;
 
 						synchronized(imagemAmpliada) {
 							imagemAmpliada.set(x, y, (int)saida[0], (int)saida[0], (int)saida[0]);
@@ -337,20 +337,20 @@ public class MainImg {
 
 				for (int y = inicio; y < fim; y++) {
 					for (int x = 0; x < larguraImagem; x++) {
-						double[] entrada = new double[2];
-						in.set(((double)x / (larguraImagem-1)), 0);
-						in.set(((double)y / (alturaImagem-1)), 1);
-						double[] saida = new double[3];
+						float[] entrada = new float[2];
+						in.set(((float) x / (larguraImagem-1)), 0);
+						in.set(((float) y / (alturaImagem-1)), 1);
+						float[] saida = new float[3];
 
-						entrada[0] = (double)x / (larguraImagem-1);
-						entrada[1] = (double)y / (alturaImagem-1);
+						entrada[0] = (float)x / (larguraImagem-1);
+						entrada[1] = (float)y / (alturaImagem-1);
 					
 						redes[id].forward(in);
-						double[] s = redes[id].saidaParaArray();
+						float[] s = redes[id].saidaParaArray();
 					
-						saida[0] = s[0] * 255;
-						saida[1] = s[1] * 255;
-						saida[2] = s[2] * 255;
+						saida[0] = s[0] * 255f;
+						saida[1] = s[1] * 255f;
+						saida[2] = s[2] * 255f;
 
 						synchronized (imagemAmpliada) {
 							imagemAmpliada.set(x, y, (int)saida[0], (int)saida[1], (int)saida[2]);
@@ -379,13 +379,13 @@ public class MainImg {
 	 * @param img imagem base.
 	 * @return dados de treino.
 	 */
-	static double[][] imagemParaDadosTreinoEscalaCinza(BufferedImage imagem) {
+	static float[][] imagemParaDadosTreinoEscalaCinza(BufferedImage imagem) {
 		if (imagem == null) throw new IllegalArgumentException("A imagem fornecida é nula.");
 
 		int larguraImagem = imagem.getWidth();
 		int alturaImagem = imagem.getHeight();
 
-		double[][] dadosImagem = new double[larguraImagem * alturaImagem][3];
+		float[][] dadosImagem = new float[larguraImagem * alturaImagem][3];
 		int[][] vermelho = geim.getR(imagem);
 		int[][] verde = geim.getG(imagem);
 		int[][] azul = geim.getB(imagem);
@@ -398,9 +398,9 @@ public class MainImg {
 				int b = azul[y][x];
 
 				// preenchendo os dados na matriz
-				double xNormalizado = (double) x / (larguraImagem - 1);
-				double yNormalizado = (double) y / (alturaImagem - 1);
-				double escalaCinza = (r + g + b) / 3.0;
+				float xNormalizado = (float) x / (larguraImagem - 1);
+				float yNormalizado = (float) y / (alturaImagem - 1);
+				float escalaCinza = (r + g + b) / 3.0f;
 				
 				dadosImagem[contador][0] = xNormalizado;// x
 				dadosImagem[contador][1] = yNormalizado;// y
@@ -419,12 +419,12 @@ public class MainImg {
 	 * @param img imagem base.
 	 * @return dados de treino.
 	 */
-	static double[][] imagemParaDadosTreinoRGB(BufferedImage imagem) {
+	static float[][] imagemParaDadosTreinoRGB(BufferedImage imagem) {
 		if (imagem == null) throw new IllegalArgumentException("A imagem fornecida é nula.");
 		int larguraImagem = imagem.getWidth();
 		int alturaImagem = imagem.getHeight();
 
-		double[][] dadosImagem = new double[larguraImagem * alturaImagem][5];
+		float[][] dadosImagem = new float[larguraImagem * alturaImagem][5];
 		int[][] vermelho = geim.getR(imagem);
 		int[][] verde = geim.getG(imagem);
 		int[][] azul = geim.getB(imagem);
@@ -438,11 +438,11 @@ public class MainImg {
 				int b = azul[y][x];
 
 				// preenchendo os dados na matriz
-				double xNormalizado = (double) x / (larguraImagem-1);
-				double yNormalizado = (double) y / (alturaImagem-1);  
-				double rNormalizado = (double) r / 255;
-				double gNormalizado = (double) g / 255;
-				double bNormalizado = (double) b / 255;
+				float xNormalizado = (float) x / (larguraImagem-1);
+				float yNormalizado = (float) y / (alturaImagem-1);  
+				float rNormalizado = (float) r / 255f;
+				float gNormalizado = (float) g / 255f;
+				float bNormalizado = (float) b / 255f;
 
 				dadosImagem[contador][0] =  xNormalizado;// x
 				dadosImagem[contador][1] =  yNormalizado;// y

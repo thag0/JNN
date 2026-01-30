@@ -25,58 +25,6 @@ class SerialConv extends SerialBase {
      * @throws IOException caso ocorra um erro.
 	 */
 	public void serializar(Conv2D camada, DataOutputStream dos) throws IOException {
-		// //nome da camada pra facilitar
-		// sb.append(camada.nome()).append("\n");
-
-		// //formato de entrada
-		// int[] entrada = camada.shapeIn();
-		// for (int i = 0; i < entrada.length; i++) {
-		// 	sb.append(entrada[i]).append(" ");
-		// }
-		// sb.append("\n");
-		
-		// //formato de saída
-		// int[] saida = camada.shapeOut();
-		// for (int i = 0; i < saida.length; i++) {
-		// 	sb.append(saida[i]).append(" ");
-		// }
-		// sb.append("\n");
-		
-		// //formato dos filtros
-		// int[] shapeFiltro = camada.formatoFiltro();
-		// for (int i = 0; i < shapeFiltro.length; i++) {
-		// 	sb.append(shapeFiltro[i]).append(" ");
-		// }
-		// sb.append("\n");
-		
-		// //função de ativação
-		// sb.append(camada.ativacao().nome()).append("\n");
-
-		// //bias
-		// sb.append(camada.temBias()).append("\n");
-
-		// //filtros
-		// Tensor filtros = camada.kernel();
-		// int[] shape = filtros.shape();
-		// for (int i = 0; i < shape[0]; i++) {
-		// 	for (int j = 0; j < shape[1]; j++) {
-		// 		for (int k = 0; k < shape[2]; k++) {
-		// 			for (int l = 0; l < shape[3]; l++) {
-		// 				escreverDado(filtros.get(i, j, k, l), tipo, sb);
-		// 				sb.append("\n");
-		// 			}
-		// 		}
-		// 	}
-		// }
-		
-		// if(camada.temBias()){
-		// 	double[] bias = camada.bias().array();
-		// 	for(double valor : bias){
-		// 		escreverDado(valor, tipo, sb);
-		// 		sb.append("\n");               
-		// 	}
-		// }
-	
 		escrever(dos, camada.nome());
 
 		int[] shapeIn = camada.shapeIn();
@@ -92,11 +40,11 @@ class SerialConv extends SerialBase {
 	
 		escrever(dos, camada.temBias());
 
-		double[] kernel = camada.kernel().data().paraArray();
+		float[] kernel = camada.kernel().data().paraArray();
 		escrever(dos, kernel);
 
 		if (camada.temBias()) {
-			double[] bias = camada.bias().data().paraArray();
+			float[] bias = camada.bias().data().paraArray();
 			escrever(dos, bias);
 		}
 	}
@@ -116,9 +64,9 @@ class SerialConv extends SerialBase {
 		boolean temBias = lerBoolean(dis);
 		int numFiltros = shapeOut[0];
 
-		double[] kernel = lerArrDouble(dis);
-		double[] bias = null;
-		if (temBias) bias = lerArrDouble(dis);
+		float[] kernel = lerArrFloat(dis);
+		float[] bias = null;
+		if (temBias) bias = lerArrFloat(dis);
 		
 		Conv2D camada = new Conv2D(numFiltros, filtro);
 		camada.setAtivacao(actStr);

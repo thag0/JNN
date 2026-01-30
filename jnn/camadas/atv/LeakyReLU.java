@@ -12,7 +12,7 @@ public class LeakyReLU extends Camada implements Cloneable {
     Tensor _gradSaida;
 
     private int[] shapeEntrada;
-    double alfa;
+    float alfa;
 
     public LeakyReLU(Number alfa, int... shape) {
         this(alfa);
@@ -20,7 +20,7 @@ public class LeakyReLU extends Camada implements Cloneable {
     }
 
     public LeakyReLU(Number alfa) {
-        this.alfa = alfa.doubleValue();
+        this.alfa = alfa.floatValue();
     }
 
     public LeakyReLU() {
@@ -79,7 +79,7 @@ public class LeakyReLU extends Camada implements Cloneable {
 
         _gradEntrada.aplicar(
             _gradSaida, _entrada,
-            (grad, e) -> grad * ((e > 0.0) ? 1.0 : alfa)
+            (grad, e) -> grad * ((e > 0.0) ? 1.0f : alfa)
         );
 
         return _gradEntrada;

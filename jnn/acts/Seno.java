@@ -15,12 +15,12 @@ public class Seno extends Ativacao {
 	public Seno() { }
 
 	@Override
-	protected double fx(double x) {
-		return Math.sin(x);
+	protected float fx(float x) {
+		return (float) Math.sin(x);
 	}
 
 	@Override
-	public double dx(double x) {
-		return Math.cos(x);
+	public float dx(float x) {
+		return (float) Math.cos(x);
 	}
 }

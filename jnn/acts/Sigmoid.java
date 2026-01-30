@@ -18,27 +18,27 @@ public class Sigmoid extends Ativacao {
 	public Sigmoid() { }
 
 	@Override
-	protected double fx(double x) {
-		return 1.0 / (1.0 + Math.exp(-x));
+	protected float fx(float x) {
+		return 1.0f / (float) (1.0 + Math.exp(-x));
 	}
 
 	@Override
-	protected double dx(double x) {
-		double s = fx(x);
-		return s * (1.0 - s);		
+	protected float dx(float x) {
+		float s = fx(x);
+		return s * (1.0f - s);		
 	}
 
 	@Override
 	public void backward(Densa densa) {
 		//aproveitar os resultados pre calculados
-		double[] s = densa._saida.array();
-		double[] g = densa._gradSaida.array();
-		double[] d = new double[s.length];
+		float[] s = densa._saida.array();
+		float[] g = densa._gradSaida.array();
+		float[] d = new float[s.length];
 
-		double si;
+		float si;
 		for (int i = 0; i < d.length; i++) {
 			si = s[i];
-			d[i] = (si*(1.0 - si)) * g[i];
+			d[i] = (si * (1.0f - si)) * g[i];
 		}
 
 		densa._gradSaida.copiarElementos(d);

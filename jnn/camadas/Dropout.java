@@ -29,7 +29,7 @@ public class Dropout extends Camada implements Cloneable {
 	/**
 	 * Taxa de abandono usada durante o treinamento.
 	 */
-	private double taxa;
+	private float taxa;
 
 	/**
 	 * Formato de entrada da camada.
@@ -97,7 +97,7 @@ public class Dropout extends Camada implements Cloneable {
 	 * taxa de abandono da camada.
 	 */
 	public Dropout(Number taxa) {
-		double t = taxa.doubleValue();
+		float t = taxa.floatValue();
 		
 		if (t < 0 || t >= 1) {
 			throw new IllegalArgumentException(
@@ -228,7 +228,7 @@ public class Dropout extends Camada implements Cloneable {
 	 */
 	private void gerarMascaras() {
 		_mascara.aplicar(
-			_ ->  (JNNutils.randDouble() >= taxa) ? (1.0 / (1.0 - taxa)) : 0.0
+			_ ->  (JNNutils.randFloat() >= taxa) ? (1.0f / (1.0f - taxa)) : 0.0f
 		);
 	}
 
@@ -280,7 +280,7 @@ public class Dropout extends Camada implements Cloneable {
 	 * Retorna a taxa de dropout usada pela camada.
 	 * @return taxa de dropout da camada.
 	 */
-	public double taxa() {
+	public float taxa() {
 		return taxa;
 	}
 

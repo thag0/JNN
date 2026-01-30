@@ -2,8 +2,8 @@
 #include <stdio.h>
 
 void cpu_maxpool2d_forward(const maxpool2d_fwd_params_t* params) {
-    const double* restrict X = params->X;
-    double* Y = params->Y;
+    const float* restrict X = params->X;
+    float* Y = params->Y;
 
     const int alt_x = params->alt_x;
     const int larg_x = params->larg_x;
@@ -36,13 +36,13 @@ void cpu_maxpool2d_forward(const maxpool2d_fwd_params_t* params) {
                 const int base_y_h = off_y_bc + i * larg_y;
 
                 for (int j = 0; j < larg_y; j++) {
-                    double max = MIN_DOUBLE_VAL;
+                    float max = MIN_FLOAT_VAL;
                     const int base_x_w = base_x_h + j * larg_std;
 
                     for (int ph = 0; ph < alt_pool; ph++) {
                         const int lin_x = base_x_w + ph * larg_x;
                         for (int pw = 0; pw < larg_pool; pw++) {
-                            double v = X[lin_x + pw];
+                            float v = X[lin_x + pw];
                             if (v > max) max = v;
                         }
                     }
@@ -55,9 +55,9 @@ void cpu_maxpool2d_forward(const maxpool2d_fwd_params_t* params) {
 }
 
 void cpu_maxpool2d_backward(const maxpool2d_bwd_params_t* params) {
-    const double* restrict X  = params->X;
-    const double* restrict GS = params->GS;
-    double* restrict GE = params->GE;
+    const float* restrict X  = params->X;
+    const float* restrict GS = params->GS;
+    float* restrict GE = params->GE;
 
     const int lotes = params->lotes;
     const int canais = params->canais;
@@ -94,14 +94,14 @@ void cpu_maxpool2d_backward(const maxpool2d_bwd_params_t* params) {
                 const int col_ini = j * larg_std;
                 const int col_fim = (col_ini + larg_pool < larg_x) ? (col_ini + larg_pool) : larg_x;
 
-                double val_max = MIN_DOUBLE_VAL;
+                float val_max = MIN_FLOAT_VAL;
                 int lin_max = lin_ini;
                 int col_max = col_ini;
 
                 for (int y = lin_ini; y < lin_fim; y++) {
                     const int linha = base_x + y * larg_x;
                     for (int x = col_ini; x < col_fim; x++) {
-                        const double v = X[linha + x];
+                        const float v = X[linha + x];
                         if (v > val_max) {
                             val_max = v;
                             lin_max = y;

@@ -3,10 +3,10 @@
 #include <stdbool.h>
 
 typedef struct conv2d_fwd_params_t {
-    const double* restrict X;
-    const double* restrict K;
-    const double* restrict B;
-    double* restrict DST;
+    const float* restrict X;
+    const float* restrict K;
+    const float* restrict B;
+    float* restrict DST;
 
     int lotes;
     int canais;
@@ -21,13 +21,13 @@ typedef struct conv2d_fwd_params_t {
 } conv2d_fwd_params_t;
 
 typedef struct {
-    const double* restrict X;
-    const double* restrict K;
-    const double* restrict GS;
+    const float* restrict X;
+    const float* restrict K;
+    const float* restrict GS;
 
-    double* restrict GK;
-    double* restrict GE;
-    double* restrict GB;
+    float* restrict GK;
+    float* restrict GE;
+    float* restrict GB;
 
     int lotes;
     int canais;

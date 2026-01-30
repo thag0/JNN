@@ -19,27 +19,27 @@ public class MAE extends Perda {
 
 		if (prev.numDim() == 1) {
 			final int tam = prev.tam();
-			double mae = f(prev, real, tam);
+			float mae = f(prev, real, tam);
 			
 			return new Tensor(
-				new double[]{ (mae/tam) }
+				new float[]{ (mae/tam) }
 			);
 		
 		} else {
 			final int lotes = prev.tamDim(0);
 			final int amostras = prev.tamDim(1);
 
-			double somaLote = 0;
+			float somaLote = 0;
 			for (int i = 0; i < lotes; i++) {
 				Tensor p = prev.subTensor(i);
 				Tensor r = real.subTensor(i);
-				double somaAmostras = f(p, r, amostras);
+				float somaAmostras = f(p, r, amostras);
 
 				somaLote += somaAmostras / amostras;
 			}
 
 			return new Tensor(
-				new double[]{somaLote / lotes}
+				new float[]{somaLote / lotes}
 			);
 		}
 	}
@@ -51,8 +51,8 @@ public class MAE extends Perda {
 	 * @param tam quantidade de amostras.
 	 * @return soma do mae.
 	 */
-	private double f(Tensor prev, Tensor real, int tam) {
-		double mae = 0.0;
+	private float f(Tensor prev, Tensor real, int tam) {
+		float mae = 0.0f;
 		for (int i = 0; i < tam; i++) {
 			mae += Math.abs(prev.get(i) - real.get(i));
 		}
@@ -68,8 +68,8 @@ public class MAE extends Perda {
 			final int tam = prev.tamDim(0);
 			return prev.map(real,
 				(p, r) -> {
-					double d = p - r;
-					if (d > 0) return 1 / tam;
+					float d = p - r;
+					if (d > 0) return  1 / tam;
 					if (d < 0) return -1 / tam;
 					return 0;
 				}
@@ -78,13 +78,13 @@ public class MAE extends Perda {
 		} else {
 			int lotes = prev.tamDim(0);
 			int amostras = prev.tamDim(1);
-			double escala = 1.0 / (amostras * lotes);
+			float escala = 1.0f / (amostras * lotes);
 
 			return prev.map(real, (p, r) -> {
-				double d = p - r;
+				float d = p - r;
 				if (d > 0) return  escala;
 				if (d < 0) return -escala;
-				return 0.0;
+				return 0.0f;
 			});
 		}
 	}

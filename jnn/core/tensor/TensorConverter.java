@@ -12,7 +12,7 @@ public class TensorConverter {
     /**
      * Converte um objeto em um {@code Tensor}.
      * @param obj objeto base, deve ser um array de elementos que possa 
-     * ser convertido para o formato {@code double}.
+     * ser convertido para o formato {@code float}.
      * @return um {@code Tensor} representado pelo array.
      */
     public static Tensor tensor(Object obj) {
@@ -29,7 +29,7 @@ public class TensorConverter {
         }
 
         int[] shape = getShape(obj);
-        double[] dados = achatarDados(obj, shape);
+        float[] dados = achatarDados(obj, shape);
 
 		return new Tensor(dados).reshape(shape);
     }
@@ -70,11 +70,11 @@ public class TensorConverter {
      * @param shape formato do array.
      * @return dados achatados, convertidos em {@code double} (usado pelo Tensor).
      */
-    private static double[] achatarDados(Object obj, int[] shape) {
-        List<Double> list = new ArrayList<>();
+    private static float[] achatarDados(Object obj, int[] shape) {
+        List<Float> list = new ArrayList<>();
         achatarRecursivo(obj, list);
         
-        double[] arr = new double[list.size()];
+        float[] arr = new float[list.size()];
         for (int i = 0; i < arr.length; i++) {
             arr[i] = list.get(i);
         }
@@ -87,13 +87,13 @@ public class TensorConverter {
      * @param obj objeto base, deve ser um array.
      * @param list lista de dados dos novos elementos achatados.
      */
-    private static void achatarRecursivo(Object obj, List<Double> list) {
+    private static void achatarRecursivo(Object obj, List<Float> list) {
         if (obj == null) return;
 
         Class<?> cls = obj.getClass();
         if (!cls.isArray()) {
             if (obj instanceof Number) {
-                list.add(((Number) obj).doubleValue());
+                list.add(((Number) obj).floatValue());
             } else {
                 throw new IllegalArgumentException("Valor não numérico: " + obj);
             }

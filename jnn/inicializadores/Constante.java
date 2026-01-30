@@ -10,14 +10,14 @@ public class Constante extends Inicializador {
 	/**
 	 * Valor de preenchimento.
 	 */
-	private final double val;
+	private final float val;
 
 	/**
 	 * Instancia um inicializador de valor constante.
 	 * @param x valor usado de constante na inicialização.
 	 */
 	public Constante(Number x) {
-		val = x.doubleValue();
+		val = x.floatValue();
 	}
 
 	/**
@@ -32,7 +32,7 @@ public class Constante extends Inicializador {
 
 	@Override
 	public void forward(Tensor tensor) {
-		tensor.aplicar(_ -> val);
+		tensor.preencher(val);
 	}
 	
 }

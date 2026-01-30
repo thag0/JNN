@@ -489,8 +489,8 @@ public class DataLoader implements Iterable<Amostra> {
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 2; j++) {
                 loader.add(
-                    new Tensor(new double[]{ i, j }),
-                    new Tensor(new double[]{ i^j })
+                    new Tensor(new float[]{ i, j }),
+                    new Tensor(new float[]{ i^j })
                 );
             }
         }
@@ -508,8 +508,8 @@ public class DataLoader implements Iterable<Amostra> {
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 2; j++) {
                 loader.add(
-                    new Tensor(new double[]{ i,j }),
-                    new Tensor(new double[]{ i&j })
+                    new Tensor(new float[]{ i,j }),
+                    new Tensor(new float[]{ i&j })
                 );
             }
         }

@@ -20,32 +20,32 @@ public class Lion extends Otimizador {
 	/**
 	 * Valor de taxa de aprendizado padrão do otimizador.
 	 */
-	private static final double PADRAO_LR = 0.001;
+	private static final float PADRAO_LR = 0.001f;
 
 	/**
 	 * Valor padrão para o decaimento do momento de primeira ordem.
 	 */
-	private static final double PADRAO_BETA1 = 0.9;
+	private static final float PADRAO_BETA1 = 0.9f;
  
 	/**
 	 * Valor padrão para o decaimento do momento de segunda ordem.
 	 */
-	private static final double PADRAO_BETA2 = 0.99;
+	private static final float PADRAO_BETA2 = 0.99f;
 
 	/**
 	 * Valor de taxa de aprendizado do otimizador.
 	 */
-	private final double lr;
+	private final float lr;
 
 	/**
 	 * Decaimento do momentum.
 	 */
-	private final double beta1;
+	private final float beta1;
 	 
 	/**
 	 * Decaimento do momentum de segunda ordem.
 	 */
-	private final double beta2;
+	private final float beta2;
 
 	/**
 	 * Coeficientes de momentum.
@@ -60,9 +60,9 @@ public class Lion extends Otimizador {
 	 * @param beta2 taxa de decaimento de segunda ordem.
 	 */
     public Lion(Number lr, Number beta1, Number beta2) {
-		double lr_ = lr.doubleValue();
-		double b1_ = beta1.doubleValue();
-		double b2_ = beta2.doubleValue();
+		float lr_ = lr.floatValue();
+		float b1_ = beta1.floatValue();
+		float b2_ = beta2.floatValue();
 
 		if (lr_ <= 0) {
 			throw new IllegalArgumentException(
@@ -126,11 +126,11 @@ public class Lion extends Otimizador {
 			TensorData m_i = m[i].data();
 
 			// p -= tA * signum(β1*m + (1-β1)*g)
-			TensorData temp = m_i.clone().mul(beta1).add(g_i, 1.0 - beta1);
+			TensorData temp = m_i.clone().mul(beta1).add(g_i, 1.0f - beta1);
 			p_i.add(temp.signum().mul(-lr));
 
 			// m = (β2 * m) + ((1-β2) * g)
-			m_i.mul(beta2).add(g_i, 1.0 - beta2);
+			m_i.mul(beta2).add(g_i, 1.0f - beta2);
         }
     }
 

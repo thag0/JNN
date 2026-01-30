@@ -1,10 +1,11 @@
 #pragma once
+#include <float.h>
 
-#define MIN_DOUBLE_VAL -1e300
+#define MIN_FLOAT_VAL (-FLT_MAX)
 
 typedef struct {
-    const double* X;
-    double* Y;
+    const float* restrict X;
+    float* restrict Y;
 
     int lotes;
     int canais;
@@ -19,9 +20,9 @@ typedef struct {
 } maxpool2d_fwd_params_t;
 
 typedef struct {
-    const double* X;
-    const double* GS;
-    double* GE;
+    const float* restrict X;
+    const float* restrict GS;
+    float* restrict GE;
 
     int lotes;
     int canais;

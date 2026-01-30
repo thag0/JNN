@@ -37,11 +37,11 @@ class SerialDensa extends SerialBase {
 	
 		escrever(dos, camada.temBias());
 		
-		double[] kernel = camada.kernel().data().paraArray();
+		float[] kernel = camada.kernel().data().paraArray();
 		escrever(dos, kernel);
 
 		if (camada.temBias()) {
-			double[] bias = camada.bias().data().paraArray();
+			float[] bias = camada.bias().data().paraArray();
 			escrever(dos, bias);
 		}
 	}
@@ -58,9 +58,9 @@ class SerialDensa extends SerialBase {
 		int[] shapeOut = lerArrInt(dis);
 		String actStr = lerString(dis);
 		boolean temBias = lerBoolean(dis);
-		double[] kernel = lerArrDouble(dis);
-		double[] bias = null;
-		if (temBias) bias = lerArrDouble(dis);
+		float[] kernel = lerArrFloat(dis);
+		float[] bias = null;
+		if (temBias) bias = lerArrFloat(dis);
 
 		Densa camada = new Densa(shapeOut[0], actStr);
 		camada.setBias(temBias);

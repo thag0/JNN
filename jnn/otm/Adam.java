@@ -20,22 +20,22 @@ public class Adam extends Otimizador {
 	/**
 	 * Valor de taxa de aprendizado padrão do otimizador.
 	 */
-	static final double PADRAO_LR = 0.001;
+	static final float PADRAO_LR = 0.001f;
 
 	/**
 	 * Valor padrão para o decaimento do momento de primeira ordem.
 	 */
-	static final double PADRAO_BETA1 = 0.9;
+	static final float PADRAO_BETA1 = 0.9f;
  
 	/**
 	 * Valor padrão para o decaimento do momento de segunda ordem.
 	 */
-	static final double PADRAO_BETA2 = 0.999;
+	static final float PADRAO_BETA2 = 0.999f;
 	 
 	/**
 	 * Valor padrão para epsilon.
 	 */
-	static final double PADRAO_EPS = 1e-8;
+	static final float PADRAO_EPS = 1e-7f;
 	 
 	/**
 	 * Valor padrão de correção.
@@ -45,22 +45,22 @@ public class Adam extends Otimizador {
 	/**
 	 * Valor de taxa de aprendizado do otimizador (Learning Rate).
 	 */
-	final double lr;
+	final float lr;
 
 	/**
 	 * Decaimento do momentum.
 	 */
-	final double beta1;
+	final float beta1;
 	 
 	/**
 	 * Decaimento do momentum de segunda ordem.
 	 */
-	final double beta2;
+	final float beta2;
 	 
 	/**
 	 * Usado para evitar divisão por zero.
 	 */
-	final double eps;
+	final float eps;
 
 	/**
 	 * Correção dos valores de velocidade.
@@ -107,10 +107,10 @@ public class Adam extends Otimizador {
 	 * @param amsgrad aplicar correção.
 	 */
 	public Adam(Number lr, Number beta1, Number beta2, Number eps, boolean amsgrad) {
-		double lr_ = lr.doubleValue();
-		double beta1_ = beta1.doubleValue();
-		double beta2_ = beta2.doubleValue();
-		double eps_ = eps.doubleValue();
+		float lr_ = lr.floatValue();
+		float beta1_ = beta1.floatValue();
+		float beta2_ = beta2.floatValue();
+		float eps_ = eps.floatValue();
 
 		if (lr_ <= 0) {
 			throw new IllegalArgumentException(
@@ -218,8 +218,8 @@ public class Adam extends Otimizador {
 		
 		iteracao += 1;
 
-		double corr1 = Math.pow(beta1, iteracao);
-		double corr2 = Math.pow(beta2, iteracao);
+		float corr1 = (float) Math.pow(beta1, iteracao);
+		float corr2 = (float) Math.pow(beta2, iteracao);
 
 		final int n = _params.length;
 		for (int i = 0; i < n; i++) {
@@ -231,16 +231,16 @@ public class Adam extends Otimizador {
 			TensorData vc_i = vc[i].data();
 
 			// m = β1*m + (g * (1 - β1))
-			m_i.mul(beta1).add(g_i, 1.0 - beta1);
+			m_i.mul(beta1).add(g_i, 1.0f - beta1);
 
 			// v = β2*v + (g² * (1 - β2))
-			v_i.mul(beta2).addcmul(g_i, g_i, 1.0 - beta2);
+			v_i.mul(beta2).addcmul(g_i, g_i, 1.0f - beta2);
 
 			// m̂ = m / (1 - β1^t)
-			mc_i.copiar(m_i).div(1.0 - corr1);
+			mc_i.copiar(m_i).div(1.0f - corr1);
 
 			// v̂ = v / (1 - β2^t)
-			vc_i.copiar(v_i).div(1.0 - corr2);
+			vc_i.copiar(v_i).div(1.0f - corr2);
 
 			if (amsgrad) {// vc = max(vc, vams)
 				TensorData vams_i = ams[i].data();

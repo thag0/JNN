@@ -63,19 +63,19 @@ public class OpsConv {
 		int largKernel = shapeK[1];
 		int largEntrada = shapeE[1];
 
-		double[] dataE = x.array();
-		double[] dataK = k.array();
-		double[] dataS = dst.array();
+		float[] dataE = x.array();
+		float[] dataK = k.array();
+		float[] dataS = dst.array();
 
 		int offE = x.offset();
 		int offK = k.offset();
 		int offS = dst.offset();
 
-		double soma;
+		float soma;
 		for (int i = 0; i < altEsp; i++) {
 			for (int j = 0; j < largEsp; j++) {
 
-				soma = 0.0;
+				soma = 0.0f;
 				final int idSaida = offS + (i * largEsp + j);
 				for (int l = 0; l < altKernel; l++) {
 					int idBaseEntrada = offE + ((l + i) * largEntrada);
@@ -93,7 +93,7 @@ public class OpsConv {
 
 	}
 
-	public static void corr2D(double[] dataX, int offX,double[] dataK, int offK,double[] dataDst, int offDst,int W, int H,int kW, int kH) {
+	public static void corr2D(float[] dataX, int offX,float[] dataK, int offK,float[] dataDst, int offDst,int W, int H,int kW, int kH) {
 		final int outH = H - kH + 1;
 		final int outW = W - kW + 1;
 
@@ -102,7 +102,7 @@ public class OpsConv {
 			int baseIn  = offX   + i * W;
 
 			for (int j = 0; j < outW; j++) {
-				double sum = 0.0;
+				float soma = 0.0f;
 
 				int inColBase = baseIn + j;
 
@@ -111,11 +111,11 @@ public class OpsConv {
 					int kRow  = offK + kh * kW;
 
 					for (int kw = 0; kw < kW; kw++) {
-						sum += dataX[inRow + kw] * dataK[kRow + kw];
+						soma += dataX[inRow + kw] * dataK[kRow + kw];
 					}
 				}
 
-				dataDst[baseOut + j] += sum;
+				dataDst[baseOut + j] += soma;
 			}
 		}
 	}
@@ -166,19 +166,19 @@ public class OpsConv {
 		int largKernel = shapeK[1];
 		int largEntrada = shapeE[1];
 
-		double[] dataE = x.array();
-		double[] dataK = k.array();
-		double[] dataS = dst.array();
+		float[] dataE = x.array();
+		float[] dataK = k.array();
+		float[] dataS = dst.array();
 
 		int offE = x.offset();
 		int offK = k.offset();
 		int offS = dst.offset();
 	
-		double soma;
+		float soma;
 		for (int i = 0; i < altEsp; i++) {
 			for (int j = 0; j < largEsp; j++) {
 				
-				soma = 0.0;
+				soma = 0.0f;
 				final int idSaida = offS + (i * largEsp + j);
 				for (int l = 0; l < altKernel; l++) {
 					for (int m = 0; m < largKernel; m++) {
@@ -244,20 +244,20 @@ public class OpsConv {
 		int altKernel = shapeK[0];
 		int largKernel = shapeK[1];
 
-		double[] dataE = x.array();
-		double[] dataK = k.array();
-		double[] dataS = dst.array();
+		float[] dataE = x.array();
+		float[] dataK = k.array();
+		float[] dataS = dst.array();
 
 		// lidar com views de tensores
 		int offE = x.offset();
 		int offK = k.offset();
 		int offS = dst.offset();
 
-		double soma;
+		float soma;
 		for (int i = 0; i < altEsp; i++) {
 			for (int j = 0; j < largEsp; j++) {
 				
-				soma = 0.0;
+				soma = 0.0f;
 				final int idSaida = offS + (i * largEsp + j);
 				for (int m = 0; m < altKernel; m++) {
 					int linEntrada = i - m;
@@ -279,7 +279,7 @@ public class OpsConv {
 
 	}
 
-	public static void conv2DFull(double[] dataX, int offX, double[] dataK, int offK, double[] dataDst, int offDst, int W, int H, int kW, int kH) {
+	public static void conv2DFull(float[] dataX, int offX, float[] dataK, int offK, float[] dataDst, int offDst, int W, int H, int kW, int kH) {
 		final int outH = H + kH - 1;
 		final int outW = W + kW - 1;
 
@@ -287,7 +287,7 @@ public class OpsConv {
 			final int baseOut = offDst + i * outW;
 
 			for (int j = 0; j < outW; j++) {
-				double sum = 0.0;
+				float soma = 0.0f;
 
 				for (int kh = 0; kh < kH; kh++) {
 					int inRow = i - kh;
@@ -300,12 +300,12 @@ public class OpsConv {
 						int inCol = j - kw;
 						if (inCol < 0 || inCol >= W) continue;
 
-						sum += dataK[baseK + kw] *
+						soma += dataK[baseK + kw] *
 							dataX[baseIn + inCol];
 					}
 				}
 
-				dataDst[baseOut + j] += sum;
+				dataDst[baseOut + j] += soma;
 			}
 		}
 	}

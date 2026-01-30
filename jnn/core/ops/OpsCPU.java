@@ -32,7 +32,7 @@ public final class OpsCPU extends Ops {
 	}
 
 	@Override
-	public void corr2D(double[] dataX, int offX, double[] dataK, int offK, double[] dataDst, int offDst, int W, int H, int kW, int kH) {
+	public void corr2D(float[] dataX, int offX, float[] dataK, int offK, float[] dataDst, int offDst, int W, int H, int kW, int kH) {
 		OpsConv.corr2D(dataX, offX, dataK, offK, dataDst, offDst, W, H, kW, kH);
 	}
 
@@ -58,9 +58,9 @@ public final class OpsCPU extends Ops {
 
 	@Override
 	public void conv2DFull(
-		double[] dataX, int offX,
-		double[] dataK, int offK,
-		double[] dataDst, int offDst,
+		float[] dataX, int offX,
+		float[] dataK, int offK,
+		float[] dataDst, int offDst,
 		int W, int H,
 		int kW, int kH
 	) {
@@ -122,8 +122,8 @@ public final class OpsCPU extends Ops {
 		int largOut = (largIn + 2 * largPad - largK) / largStd + 1;
 
 		Tensor col = new Tensor(new int[]{canais * altK * largK, altOut * largOut});
-		double[] dadosX = x.array();
-		double[] dadosC = col.array();
+		float[] dadosX = x.array();
+		float[] dadosC = col.array();
 
 		int canalArea = altK * largK;
 		int colunaCol = altOut * largOut;
@@ -146,7 +146,7 @@ public final class OpsCPU extends Ops {
 							if (inY >= 0 && inY < altIn && inX >= 0 && inX < largIn) {
 								dadosC[linhaBase * colunaCol + outIndex] = dadosX[c * altIn * largIn + inY * largIn + inX];
 							} else {
-								dadosC[linhaBase * colunaCol + outIndex] = 0.0;
+								dadosC[linhaBase * colunaCol + outIndex] = 0.0f;
 							}
 
 							outIndex++;
@@ -193,7 +193,7 @@ public final class OpsCPU extends Ops {
 		
 		bias.ifPresent(b -> {
 			for (int f = 0; f < numFiltros; f++) {
-				double x = b.get(f);
+				float x = b.get(f);
 				saida.subTensor(f).add(x);
 			}
 		});

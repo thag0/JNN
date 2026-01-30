@@ -19,12 +19,12 @@ public class SGD extends Otimizador {
 	/**
 	 * Taxa de aprendizado padrão do otimizador.
 	 */
-	private static final double PADRAO_LR = 0.01;
+	private static final float PADRAO_LR = 0.01f;
 
 	/**
 	 * Taxa de momentum padrão do otimizador.
 	 */
-	private static final double PADRAO_MOMENTUM = 0.9;
+	private static final float PADRAO_MOMENTUM = 0.9f;
 
 	/**
 	 * Uso do acelerador de nesterov padrão.
@@ -34,12 +34,12 @@ public class SGD extends Otimizador {
 	/**
 	 * Valor de taxa de aprendizado do otimizador.
 	 */
-	private final double lr;
+	private final float lr;
 
 	/**
 	 * Valor de taxa de momentum do otimizador.
 	 */
-	private final double momentum;
+	private final float momentum;
 
 	/**
 	 * Usar acelerador de Nesterov.
@@ -59,8 +59,8 @@ public class SGD extends Otimizador {
 	 * @param nesterov usar acelerador de nesterov.
 	 */
 	public SGD(Number lr, Number m, boolean nesterov) {
-		double lr_ = lr.doubleValue();
-		double mm_ = m.doubleValue();
+		float lr_ = lr.floatValue();
+		float mm_ = m.floatValue();
 
 		if (lr_ <= 0) {
 			throw new IllegalArgumentException(

@@ -18,7 +18,7 @@ public class TensorBasics {
         Tensor a = new Tensor(3);
 
         // 2 - A partir de um array primitivo do java
-        double[][] arr = {
+        float[][] arr = {
             {1, 2},
             {3, 4}
         };
@@ -59,6 +59,6 @@ public class TensorBasics {
         // se os shapes deles forem compatíveis para transmissão (broadcast).
         Tensor m = new Tensor(3, 2);
         Tensor n = new Tensor(1, 2);// formato diferente de M, mas compatível para broadcast
-        Tensor o = m.broadcast(n, (valM, valN) -> valM * valM);// Formato final (3, 2)
+        Tensor o = m.broadcast(n, (_m, _n) -> _m * _m);// Formato final (3, 2)
     }
 }

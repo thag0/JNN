@@ -69,7 +69,7 @@ public class ReLU extends Camada implements Cloneable {
 
         _gradEntrada.aplicar(
             _gradSaida, _entrada,
-            (grad, e) -> grad * ((e > 0.0) ? 1.0 : 0.0)
+            (grad, e) -> grad * ((e > 0.0) ? 1.0f : 0.0f)
         );
 
         return _gradEntrada;

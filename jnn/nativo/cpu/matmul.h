@@ -1,9 +1,9 @@
 #pragma once
 
 typedef struct {
-    double* A;
-    double* B;
-    double* DST;
+    float* restrict A;
+    float* restrict B;
+    float* restrict DST;
 
     int off_a, off_b, off_dst;
 

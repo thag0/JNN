@@ -13,7 +13,7 @@ public class LeakyReLU extends Ativacao {
 	/**
 	 * Constante alfa;
 	 */
-	private double alfa = 0.01;
+	private float alfa = 0.01f;
 
 	/**
 	 * Instancia a função de ativação LeakyReLU com seu valor de alfa configurável.
@@ -25,7 +25,7 @@ public class LeakyReLU extends Ativacao {
 	 * @param alfa novo valor alfa.
 	 */
 	public LeakyReLU(Number alfa) {
-		this.alfa = alfa.doubleValue();
+		this.alfa = alfa.floatValue();
 	}
 
 	/**
@@ -44,12 +44,12 @@ public class LeakyReLU extends Ativacao {
 	}
 
 	@Override
-	protected double fx(double x) {
+	protected float fx(float x) {
 		return (x > 0.0) ? x : alfa * x;
 	}
 
 	@Override
-	protected double dx(double x) {
-		return (x > 0.0) ? 1.0 : alfa;
+	protected float dx(float x) {
+		return (x > 0.0) ? 1.0f : alfa;
 	}
 }

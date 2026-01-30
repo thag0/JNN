@@ -28,42 +28,42 @@ JNIEXPORT void JNICALL Java_jnn_nativo_JNNNative_setBackend
 /*
  * Class:     jnn_nativo_JNNNative
  * Method:    matmul
- * Signature: ([DIII[DIII[DIIIIII)V
+ * Signature: ([FIII[FIII[FIIIIII)V
  */
 JNIEXPORT void JNICALL Java_jnn_nativo_JNNNative_matmul
-  (JNIEnv *, jclass, jdoubleArray, jint, jint, jint, jdoubleArray, jint, jint, jint, jdoubleArray, jint, jint, jint, jint, jint, jint);
+  (JNIEnv *, jclass, jfloatArray, jint, jint, jint, jfloatArray, jint, jint, jint, jfloatArray, jint, jint, jint, jint, jint, jint);
 
 /*
  * Class:     jnn_nativo_JNNNative
  * Method:    conv2dForward
- * Signature: ([D[D[DZ[DIIIIIII)V
+ * Signature: ([F[F[FZ[FIIIIIII)V
  */
 JNIEXPORT void JNICALL Java_jnn_nativo_JNNNative_conv2dForward
-  (JNIEnv *, jclass, jdoubleArray, jdoubleArray, jdoubleArray, jboolean, jdoubleArray, jint, jint, jint, jint, jint, jint, jint);
+  (JNIEnv *, jclass, jfloatArray, jfloatArray, jfloatArray, jboolean, jfloatArray, jint, jint, jint, jint, jint, jint, jint);
 
 /*
  * Class:     jnn_nativo_JNNNative
  * Method:    conv2dBackward
- * Signature: ([D[D[D[D[DZ[DIIIIIII)V
+ * Signature: ([F[F[F[F[FZ[FIIIIIII)V
  */
 JNIEXPORT void JNICALL Java_jnn_nativo_JNNNative_conv2dBackward
-  (JNIEnv *, jclass, jdoubleArray, jdoubleArray, jdoubleArray, jdoubleArray, jdoubleArray, jboolean, jdoubleArray, jint, jint, jint, jint, jint, jint, jint);
+  (JNIEnv *, jclass, jfloatArray, jfloatArray, jfloatArray, jfloatArray, jfloatArray, jboolean, jfloatArray, jint, jint, jint, jint, jint, jint, jint);
 
 /*
  * Class:     jnn_nativo_JNNNative
  * Method:    maxPool2dForward
- * Signature: ([D[DIIIIIIII)V
+ * Signature: ([F[FIIIIIIII)V
  */
 JNIEXPORT void JNICALL Java_jnn_nativo_JNNNative_maxPool2dForward
-  (JNIEnv *, jclass, jdoubleArray, jdoubleArray, jint, jint, jint, jint, jint, jint, jint, jint);
+  (JNIEnv *, jclass, jfloatArray, jfloatArray, jint, jint, jint, jint, jint, jint, jint, jint);
 
 /*
  * Class:     jnn_nativo_JNNNative
  * Method:    maxPool2dBackward
- * Signature: ([D[D[DIIIIIIIIII)V
+ * Signature: ([F[F[FIIIIIIIIII)V
  */
 JNIEXPORT void JNICALL Java_jnn_nativo_JNNNative_maxPool2dBackward
-  (JNIEnv *, jclass, jdoubleArray, jdoubleArray, jdoubleArray, jint, jint, jint, jint, jint, jint, jint, jint, jint, jint);
+  (JNIEnv *, jclass, jfloatArray, jfloatArray, jfloatArray, jint, jint, jint, jint, jint, jint, jint, jint, jint, jint);
 
 #ifdef __cplusplus
 }

@@ -11,8 +11,8 @@ package jnn.acts;
  */
 public class GELU extends Ativacao {
 
-	private final double RAIZ_2_POR_PI = Math.sqrt(2 / Math.PI); 
-	private final double ALFA = 0.044715;
+	private final float RAIZ_2_POR_PI = (float) Math.sqrt(2 / Math.PI); 
+	private final float ALFA = 0.044715f;
 
 	/**
 	 * Instancia uma nova função de ativação GELU.
@@ -20,21 +20,21 @@ public class GELU extends Ativacao {
 	public GELU() { }
 
 	@Override
-	protected double fx(double x) {
-		double xCubo = x * x * x;
-		double tanh = tanh(RAIZ_2_POR_PI * (x + ALFA * xCubo));
-		return 0.5 * x * (1.0 + tanh);
+	protected float fx(float x) {
+		float xCubo = x * x * x;
+		float tanh = tanh(RAIZ_2_POR_PI * (x + ALFA * xCubo));
+		return 0.5f * x * (1.0f + tanh);
 	}
 
 	@Override
-	protected double dx(double x) {
-		double xCubo = x * x * x;
-		double tanh = tanh(RAIZ_2_POR_PI * (x + ALFA * xCubo));
-		double exp = Math.exp(-0.5 * x * x) / RAIZ_2_POR_PI;
-		return 0.5 * (1.0 + tanh + x * exp);
+	protected float dx(float x) {
+		float xCubo = x * x * x;
+		float tanh = tanh(RAIZ_2_POR_PI * (x + ALFA * xCubo));
+		float exp = (float) Math.exp(-0.5 * x * x) / RAIZ_2_POR_PI;
+		return 0.5f * (1.0f + tanh + x * exp);
 	}
 
-	final private double tanh(double x) {
-		return (2.0 / (1.0 + Math.exp(-2.0 * x))) - 1.0;
+	final private float tanh(float x) {
+		return (2.0f / (1.0f + (float) Math.exp(-2.0 * x))) - 1.0f;
 	}
 }

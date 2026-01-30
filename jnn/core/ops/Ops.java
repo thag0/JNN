@@ -65,7 +65,7 @@ public abstract class Ops {
 	 * @param kH altura do kernel.
 	 */
 	public abstract void corr2D(
-		double[] dataX, int offX, double[] dataK, int offK, double[] dataDst, int offDst, int W, int H,int kW, int kH
+		float[] dataX, int offX, float[] dataK, int offK, float[] dataDst, int offDst, int W, int H,int kW, int kH
 	);
 
 	/**
@@ -101,9 +101,9 @@ public abstract class Ops {
 	public abstract void conv2DFull(Tensor entrada, Tensor kernel, Tensor saida);
 
 	public abstract void conv2DFull(
-		double[] dataX, int offX,
-		double[] dataK, int offK,
-		double[] dataDst, int offDst,
+		float[] dataX, int offX,
+		float[] dataK, int offK,
+		float[] dataDst, int offDst,
 		int W, int H,
 		int kW, int kH
 	);

@@ -33,7 +33,7 @@ public class UpscaleImg {
 		BufferedImage imagem = geim.lerImagem(caminho);
 
 		// Tratando dados
-		double[][] dados = imagemParaDadosTreinoEscalaCinza(imagem);
+		float[][] dados = imagemParaDadosTreinoEscalaCinza(imagem);
 		int nEntrada = 2;// posição x y do pixel
 		int nSaida = 1;// valor de escala de cinza/brilho do pixel
 		DataLoader img = jnn.dataloader(dados, nEntrada, nSaida);
@@ -55,7 +55,7 @@ public class UpscaleImg {
 		// Avaliando o modelo
 		Tensor[] xs = img.getX();
 		Tensor[] ys = img.getY();
-		double precisao = 1 - modelo.avaliador().mae(xs, ys).item();
+		float precisao = 1 - modelo.avaliador().mae(xs, ys).item();
 		System.out.println("Precisão = " + (precisao * 100));
 		System.out.println("Perda = " + modelo.avaliar(xs, ys).item());
 
@@ -68,10 +68,10 @@ public class UpscaleImg {
 	 * Salva um arquivo csv com o historico de desempenho da rede.
 	 * @param modelo modelo.
 	 */
-	public static void exportarHistoricoPerda(double[] hist) {
+	public static void exportarHistoricoPerda(float[] hist) {
 		System.out.println("Exportando histórico de perda");
 		
-		double[][] perdas = new double[hist.length][1];
+		float[][] perdas = new float[hist.length][1];
 		for (int i = 0; i < perdas.length; i++){
 			perdas[i][0] = hist[i];
 		}
@@ -85,13 +85,13 @@ public class UpscaleImg {
 	 * @param img imagem base.
 	 * @return dados de treino.
 	 */
-	static double[][] imagemParaDadosTreinoEscalaCinza(BufferedImage img) {
+	static float[][] imagemParaDadosTreinoEscalaCinza(BufferedImage img) {
 		if (img == null) throw new IllegalArgumentException("A imagem fornecida é nula.");
 
 		int larguraImagem = img.getWidth();
 		int alturaImagem = img.getHeight();
 
-		double[][] dadosImagem = new double[larguraImagem * alturaImagem][3];
+		float[][] dadosImagem = new float[larguraImagem * alturaImagem][3];
 		int[][] vermelho = geim.getR(img);
 		int[][] verde = geim.getG(img);
 		int[][] azul = geim.getB(img);
@@ -104,9 +104,9 @@ public class UpscaleImg {
 				int b = azul[y][x];
 
 				// preenchendo os dados na matriz
-				double xNormalizado = (double) x / (larguraImagem - 1);
-				double yNormalizado = (double) y / (alturaImagem - 1);
-				double escalaCinza = (r + g + b) / 3.0;
+				float xNormalizado = (float) x / (larguraImagem - 1);
+				float yNormalizado = (float) y / (alturaImagem - 1);
+				float escalaCinza = (r + g + b) / 3.0f;
 				
 				dadosImagem[contador][0] = xNormalizado;// x
 				dadosImagem[contador][1] = yNormalizado;// y
@@ -168,9 +168,9 @@ public class UpscaleImg {
 
 				for (int y = inicio; y < fim; y++) {
 					for (int x = 0; x < larguraImagem; x++) {
-						in.set(((double)x / (larguraImagem-1)), 0);
-						in.set(((double)y / (alturaImagem-1)), 1);
-						double[] saida = new double[1];
+						in.set(((float) x / (larguraImagem-1)), 0);
+						in.set(((float) y / (alturaImagem-1)), 1);
+						float[] saida = new float[1];
 					
 						clones[id].forward(in);
 					

@@ -3,11 +3,11 @@ package jnn.core.tensor;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.function.DoubleUnaryOperator;
 
+import jnn.core.tensor.operadores.FloatBinaryOperator;
+import jnn.core.tensor.operadores.FloatTernaryOperator;
+import jnn.core.tensor.operadores.FloatUnaryOperator;
 import jnn.io.seriais.SerialTensor;
-
-import java.util.function.DoubleBinaryOperator;
 
 /**
  * <h2>
@@ -29,7 +29,7 @@ import java.util.function.DoubleBinaryOperator;
  *   [0.0, 0.0]]
  *]
  * 
- *double[][] mat = { {...}, {...}, ... };
+ *float[][] mat = { {...}, {...}, ... };
  *Tensor tensor = new Tensor(mat);
  * </pre>
  * <h2>
@@ -55,7 +55,7 @@ import java.util.function.DoubleBinaryOperator;
  * @author Thiago Barroso, acadêmico de Engenharia da Computação pela
  * Universidade Federal do Pará, Campus Tucuruí. Maio/2024.
  */
-public class Tensor implements Iterable<Double>, Cloneable {
+public class Tensor implements Iterable<Float>, Cloneable {
     
 	/**
 	 * Dimensões do tensor.
@@ -97,7 +97,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * Inicializa um tensor a partir de um array 5D primitivo.
 	 * @param arr {@code array} base.
 	 */
-	public Tensor(double[][][][][] arr) {
+	public Tensor(float[][][][][] arr) {
 		if (arr == null) {
 			throw new IllegalArgumentException(
 				"\nArray nulo."
@@ -121,7 +121,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * Inicializa um tensor a partir de um array 4D primitivo.
 	 * @param arr {@code array} base.
 	 */
-	public Tensor(double[][][][] arr) {
+	public Tensor(float[][][][] arr) {
 		if (arr == null) {
 			throw new IllegalArgumentException(
 				"\nArray nulo."
@@ -144,7 +144,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * Inicializa um tensor a partir de um array 3D primitivo.
 	 * @param arr {@code array} base.
 	 */
-	public Tensor(double[][][] arr) {
+	public Tensor(float[][][] arr) {
 		if (arr == null) {
 			throw new IllegalArgumentException(
 				"\nArray nulo."
@@ -166,7 +166,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * Inicializa um tensor a partir de um array 2D primitivo.
 	 * @param arr {@code array} base.
 	 */
-	public Tensor(double[][] arr) {
+	public Tensor(float[][] arr) {
 		if (arr == null) {
 			throw new IllegalArgumentException(
 				"\nArray nulo."
@@ -194,7 +194,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @param arr {@code array} base.
 	 * @param shape formato desejado.
 	 */
-	public Tensor(double[] arr) {
+	public Tensor(float[] arr) {
 		int[] shape = {arr.length};
 		int[] s  = initShape(shape);
 		int tam = calcularTamanho(s);
@@ -447,14 +447,14 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	public Tensor bloco(int n) {
 		int[] shapeAntigo = shape();
 		int tamAntigo = tam();
-		double[] dt = dados.data();
+		float[] dt = dados.data();
 
 		int[] shapeNovo = new int[shapeAntigo.length + 1];
 		shapeNovo[0] = n;
 		System.arraycopy(shapeAntigo, 0, shapeNovo, 1, shapeAntigo.length);
 
 		Tensor bloco = new Tensor(shapeNovo);
-		double[] db = bloco.array();
+		float[] db = bloco.array();
 
 		for (int i = 0; i < n; i++) {
 			int offset = i * tamAntigo;
@@ -495,7 +495,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @param ids índices desejados para busca.
 	 * @return valor de acordo com os índices.
 	 */
-    public double get(int... ids) {
+    public float get(int... ids) {
         return dados.get(indice(ids));
     }
 
@@ -565,7 +565,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @param arr {@code array} base.
 	 * @return {@code Tensor} local alterado.
 	 */
-    public Tensor copiar(double[][][][][] arr) {
+    public Tensor copiar(float[][][][][] arr) {
         if (numDim() != 5) {
             throw new IllegalArgumentException(
                 "\nTensor tem " + numDim() + " dimensões, mas deve" +
@@ -596,7 +596,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		}
 
 		int cont = 0;
-		double[] d = array();
+		float[] d = array();
 		for (int i = 0; i < d1; i++) {
 			for (int j = 0; j < d2; j++) {
 				for (int k = 0; k < d3; k++) {
@@ -617,7 +617,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @param arr {@code array} base.
 	 * @return {@code Tensor} local alterado.
 	 */
-    public Tensor copiar(double[][][][] arr) {
+    public Tensor copiar(float[][][][] arr) {
         if (numDim() != 4) {
             throw new IllegalArgumentException(
                 "\nTensor tem " + numDim() + " dimensões, mas deve" +
@@ -643,7 +643,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		}
 
 		int cont = 0;
-		double[] d = array();
+		float[] d = array();
 		for (int i = 0; i < d1; i++) {
 			for (int j = 0; j < d2; j++) {
 				for (int k = 0; k < d3; k++) {
@@ -662,7 +662,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @param arr {@code array} base.
 	 * @return {@code Tensor} local alterado.
 	 */
-    public Tensor copiar(double[][][] arr) {
+    public Tensor copiar(float[][][] arr) {
         if (numDim() != 3) {
             throw new IllegalArgumentException(
                 "\nTensor tem " + numDim() + " dimensões, mas deve" +
@@ -685,7 +685,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		}
 
 		int cont = 0;
-		double[] d = array();
+		float[] d = array();
 		for (int i = 0; i < d1; i++) {
 			for (int j = 0; j < d2; j++) {
 				for (int k = 0; k < d3; k++) {
@@ -702,7 +702,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @param arr {@code array} base.
 	 * @return {@code Tensor} local alterado.
 	 */
-    public Tensor copiar(double[][] arr) {
+    public Tensor copiar(float[][] arr) {
         if (numDim() != 2) {
             throw new IllegalArgumentException(
                 "\nTensor tem " + numDim() + " dimensões, mas deve" +
@@ -723,7 +723,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		}
 
 		int id = 0;
-		double[] d = array();
+		float[] d = array();
 		for (int i = 0; i < lin; i++) {
 			for (int j = 0; j < col; j++) {
 				d[id++] = arr[i][j];
@@ -738,7 +738,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @param arr {@code array} base.
 	 * @return {@code Tensor} local alterado.
 	 */
-    public Tensor copiar(double[] arr) {
+    public Tensor copiar(float[] arr) {
         if (numDim() != 1) {
             throw new IllegalArgumentException(
                 "\nTensor tem " + numDim() + " dimensões, mas deve" +
@@ -791,7 +791,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @param arr {@code array} base.
 	 * @return {@code Tensor} local alterado.
 	 */
-	public Tensor copiarElementos(double[] arr) {
+	public Tensor copiarElementos(float[] arr) {
 		if (arr.length != tam()) {
 			throw new IllegalArgumentException(
 				"\nTamanho do array fornecido (" + arr.length + ") inconpatível" +
@@ -810,7 +810,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
 	public Tensor add(Number x) {
-		final double val = x.doubleValue();
+		final float val = x.floatValue();
 		dados.add(val);
 		return this;
 	}
@@ -926,7 +926,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
 	public Tensor add(Number x, int... ids) {
-		final double val = x.doubleValue();
+		final float val = x.floatValue();
 		dados.add(val, indice(ids));
 		return this;
 	}
@@ -937,7 +937,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
 	public Tensor sub(Number x) {
-		final double val = x.doubleValue();
+		final float val = x.floatValue();
 		dados.add(-val);
 		return this;
 	}
@@ -1053,7 +1053,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
 	public Tensor sub(Number x, int... ids) {
-		final double val = x.doubleValue();
+		final float val = x.floatValue();
 		dados.sub(val, indice(ids));
 		return this;
 	}
@@ -1064,7 +1064,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
 	public Tensor mul(Number x) {
-		final double val = x.doubleValue();
+		final float val = x.floatValue();
 		dados.mul(val);
 		return this;
 	}
@@ -1180,7 +1180,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
 	public Tensor mul(Number x, int... ids) {
-		final double val = x.doubleValue();
+		final float val = x.floatValue();
 		dados.mul(val, indice(ids));
 		return this;
 	}
@@ -1191,7 +1191,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
 	public Tensor div(Number x) {
-		final double val = x.doubleValue();
+		final float val = x.floatValue();
 		dados.div(val);
 		return this;
 	}
@@ -1306,7 +1306,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
 	public Tensor div(Number x, int... ids) {
-		final double val = x.doubleValue();
+		final float val = x.floatValue();
 		dados.div(val, indice(ids));
 		return this;
 	}
@@ -1414,7 +1414,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
      * @param alfa {@code valor} escalar multiplicativo.
 	 * @return {@code Tensor} local alterado.
      */
-	public Tensor addcmul(Tensor a, Tensor b, double alfa) {
+	public Tensor addcmul(Tensor a, Tensor b, float alfa) {
 		dados.addcmul(a.dados, b.dados, alfa);
 		return this;
 	}
@@ -1436,7 +1436,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
      * @param alfa {@code valor} escalar multiplicativo.
 	 * @return {@code Tensor} local alterado.
      */
-	public Tensor addcdiv(Tensor a, Tensor b, double alfa) {
+	public Tensor addcdiv(Tensor a, Tensor b, float alfa) {
 		dados.addcdiv(a.dados, b.dados, alfa);
 		return this;
 	}
@@ -1454,7 +1454,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @param fun função desejada.
 	 * @return {@code Tensor} local alterado.
 	 */
-    public Tensor aplicar(DoubleUnaryOperator fun) {
+    public Tensor aplicar(FloatUnaryOperator fun) {
 		dados.aplicar(fun);
 		return this;
 	}
@@ -1472,7 +1472,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @param fun função para aplicar no tensor base.
 	 * @return {@code Tensor} local alterado.
 	 */
-    public Tensor aplicar(Tensor t, DoubleUnaryOperator fun) {
+    public Tensor aplicar(Tensor t, FloatUnaryOperator fun) {
 		if (!compShape(t)) {
 			throw new IllegalArgumentException(
 				"\nAs dimensões do tensor fornecido " + t.shapeStr() +
@@ -1507,7 +1507,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @param fun função para aplicar no tensor local.
 	 * @return {@code Tensor} local alterado.
 	 */
-    public Tensor aplicar(Tensor a, Tensor b, DoubleBinaryOperator fun) {
+    public Tensor aplicar(Tensor a, Tensor b, FloatBinaryOperator fun) {
 		if (!compShape(a) || !compShape(b)) {
 			throw new IllegalArgumentException(
 				"\nAs dimensões dos tensores A " + a.shapeStr() +
@@ -1517,12 +1517,12 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		}
 		
 		final int n = tam();
-		double[] td = array();
-		double[] da = a.array();
-		double[] db = b.array();
+		float[] td = array();
+		float[] da = a.array();
+		float[] db = b.array();
 
 		for (int i = 0; i < n; i++) {
-			td[i] = fun.applyAsDouble(da[i], db[i]);
+			td[i] = fun.apply(da[i], db[i]);
 		}
 
 		return this;
@@ -1554,7 +1554,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @param fun função para aplicar no tensor local.
 	 * @return {@code Tensor} local alterado.
 	 */
-	public Tensor aplicar(Tensor a, Tensor b, Tensor c, DoubleTernaryOperator fun) {
+	public Tensor aplicar(Tensor a, Tensor b, Tensor c, FloatTernaryOperator fun) {
 		if (!compShape(a) || !compShape(b) || !compShape(c)) {
 			throw new IllegalArgumentException(
 				"\nAs dimensões dos tensores A " + a.shapeStr() +
@@ -1565,13 +1565,13 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		}
 
 		final int n = tam();
-		double[] td = array();
-		double[] da = a.array();
-		double[] db = b.array();
-		double[] dc = c.array();
+		float[] td = array();
+		float[] da = a.array();
+		float[] db = b.array();
+		float[] dc = c.array();
 
 		for (int i = 0; i < n; i++) {
-			td[i] = fun.applyAsDouble(da[i], db[i], dc[i]);
+			td[i] = fun.apply(da[i], db[i], dc[i]);
 		}
 		
 		return this;
@@ -1581,7 +1581,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * Retorna o valor contido no tensor, caso ele possua apenas um elemento.
 	 * @return valor contido no tensor.
 	 */
-	public double item() {
+	public float item() {
 		if (tam() != 1) {
 			throw new IllegalArgumentException(
 				"\nO tensor deve conter apenas um elemento."
@@ -1603,7 +1603,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @param fun função desejada.
 	 * @return novo {@code Tensor} contendo o resultado.
 	 */
-	public Tensor map(DoubleUnaryOperator fun) {
+	public Tensor map(FloatUnaryOperator fun) {
 		Tensor t = clone();		
 		return t.aplicar(this, fun);
 	}
@@ -1627,7 +1627,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @param fun função desejada.
 	 * @return novo {@code Tensor} contendo o resultado.
 	 */
-	public Tensor map(Tensor t, DoubleBinaryOperator fun) {
+	public Tensor map(Tensor t, FloatBinaryOperator fun) {
 		if (!compShape(t)) {
 			throw new IllegalArgumentException(
 				"\nTensor " + t.shapeStr() + " deve conter mesmo formato do " +
@@ -1654,16 +1654,16 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @param fun função desejada.
 	 * @return novo {@code Tensor} contendo o resultado.
 	 */
-	public Tensor reduce(Number in, DoubleBinaryOperator fun) {
-		double res = in.doubleValue();
+	public Tensor reduce(Number in, FloatBinaryOperator fun) {
+		float res = in.floatValue();
 
-		double[] d = array();
-		for (double val : d) {
-			res = fun.applyAsDouble(res, val);
+		float[] d = array();
+		for (float val : d) {
+			res = fun.apply(res, val);
 		}
 
 		return new Tensor(
-			new double[]{ res }
+			new float[]{ res }
 		);
 	}
 
@@ -1673,9 +1673,9 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return novo {@code Tensor} contendo o resultado.
 	 */
     public Tensor soma() {
-		double soma = dados.soma();
+		float soma = dados.soma();
 		return new Tensor(
-			new double[]{ soma }
+			new float[]{ soma }
 		);
     }
 
@@ -1685,9 +1685,9 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return novo {@code Tensor} contendo o resultado.
 	 */
 	public Tensor media() {
-		double med = dados.media();
+		float med = dados.media();
 		return new Tensor(
-			new double[]{ med }
+			new float[]{ med }
 		);
     }
 
@@ -1697,9 +1697,9 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return novo {@code Tensor} contendo o resultado.
 	 */
 	public Tensor max() {
-		double max = dados.max();
+		float max = dados.max();
 		return new Tensor(
-			new double[]{ max }
+			new float[]{ max }
 		);
 	}
 
@@ -1709,9 +1709,9 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return novo {@code Tensor} contendo o resultado.
 	 */
 	public Tensor min() {
-		double min = dados.min();
+		float min = dados.min();
 		return new Tensor(
-			new double[]{ min }
+			new float[]{ min }
 		);
 	}
 
@@ -1721,9 +1721,9 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return novo {@code Tensor} contendo o resultado.
      */
 	public Tensor desvp() {
-		double desvp = dados.desvp();
+		float desvp = dados.desvp();
 		return new Tensor(
-			new double[]{ desvp }
+			new float[] { desvp }
 		);
 	}
 
@@ -1734,7 +1734,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @param max valor máximo.
 	 * @return {@code Tensor} local alterado.
 	 */
-	public Tensor clamp(double min, double max) {
+	public Tensor clamp(float min, float max) {
 		dados.clamp(min, max);
 		return this;
 	}
@@ -1746,14 +1746,14 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
 	public Tensor norm(Number min, Number max) {
-		double valMin = min().item();
-		double valMax = max().item();
+		float valMin = min().item();
+		float valMax = max().item();
 
-		double intOrig = valMax - valMin;
-		double intNovo = max.doubleValue() - min.doubleValue();
+		float intOrig = valMax - valMin;
+		float intNovo = max.floatValue() - min.floatValue();
 
 		return aplicar(
-			x -> ((x - valMin) / intOrig) * intNovo + min.doubleValue()
+			x -> ((x - valMin) / intOrig) * intNovo + min.floatValue()
 		);
 	}
 
@@ -1763,7 +1763,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
 	public Tensor relu() {
-		return aplicar(x -> x > 0.0 ? x : 0.0);
+		return aplicar(x -> x > 0.0f ? x : 0.0f);
 	}
 
 	/**
@@ -1772,7 +1772,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
 	public Tensor sigmoid() {
-		return aplicar(x -> 1.0 / (1.0 + Math.exp(-x)));
+		return aplicar(x -> 1.0f / (float) (1.0 + Math.exp(-x)));
 	}
 
 	/**
@@ -1781,7 +1781,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
 	public Tensor tanh() {
-		return aplicar(x -> 2.0 / (1.0 + Math.exp(-2 * x)) - 1.0);
+		return aplicar(x -> 2.0f / (float) (1.0 + Math.exp(-2 * x)) - 1.0f);
 	}
 
 	/**
@@ -1790,7 +1790,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
 	public Tensor atan() {
-		return aplicar(x -> Math.atan(x));
+		return aplicar(x -> (float) Math.atan(x));
 	}
 
 	/**
@@ -1798,7 +1798,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
 	public Tensor sin() {
-		return aplicar(x -> Math.sin(x));
+		return aplicar(x -> (float) Math.sin(x));
 	}
 
 	/**
@@ -1806,7 +1806,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
 	public Tensor cos() {
-		return aplicar(x -> Math.cos(x));
+		return aplicar(x -> (float) Math.cos(x));
 	}
 
 	/**
@@ -1814,7 +1814,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
 	public Tensor tan() {
-		return aplicar(x -> Math.tan(x));
+		return aplicar(x -> (float) Math.tan(x));
 	}
 
 	/**
@@ -1830,7 +1830,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
 	public Tensor exp() {
-		return aplicar(x -> Math.exp(x));
+		return aplicar(x -> (float) Math.exp(x));
 	}
 
 	/**
@@ -1838,7 +1838,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
 	public Tensor log() {
-		return aplicar(x -> Math.log(x));
+		return aplicar(x -> (float) Math.log(x));
 	}
 
 	/**
@@ -1946,14 +1946,14 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * 		Para comparações com tolerância, use:
 	 * </p>
 	 * <pre>
-	 *double eps = ... //tolerância
+	 *float eps = ... //tolerância
 	 *t.comp(t2, eps)
 	 * </pre>
 	 * @param t {@code Tensor} base.
 	 * @return {@code true} caso sejam iguais, {@code false} caso contrário.
 	 */
 	public boolean comp(Tensor t) {
-		return comp(t, 0);
+		return comp(t, 0f);
 	}
 
 	/**
@@ -1967,19 +1967,19 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @param eps valor de tolerância.
 	 * @return {@code true} caso sejam iguais, {@code false} caso contrário.
 	 */
-	public boolean comp(Tensor t, double eps) {
+	public boolean comp(Tensor t, float eps) {
 		if (!compShape(t)) return false;
 
 		final int n = tam();
-		double[] d = dados.data();
-		double[] td = t.dados.data();
+		float[] d = dados.data();
+		float[] td = t.dados.data();
 
 		final int off1 = offset();
 		final int off2 = t.offset(); 
 		
 		for (int i = 0; i < n; i++) {
-			double a =  d[off1 + i];
-			double b = td[off2 + i];
+			float a =  d[off1 + i];
+			float b = td[off2 + i];
 			if (Math.abs(a - b) > eps) return false;
 		}
 
@@ -2049,7 +2049,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * </p>
 	 * @return conteúdo do tensor.
 	 */
-	public double[] array() {
+	public float[] array() {
 		return dados.data();
 	}
 
@@ -2095,14 +2095,14 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		final String identacao = " ".repeat(4);
 
 		int maxCasasDecimais = 0;
-		for (double valor : array()) {
-			String valorStr = Double.toString(valor);
+		for (float valor : array()) {
+			String valorStr = Float.toString(valor);
 			int decimais = valorStr.length() - valorStr.indexOf('.') - 1;
 			if (decimais > maxCasasDecimais) maxCasasDecimais = decimais;
 		}
 
 		int tamMaximo = -1;
-        for (double valor : array()) {
+        for (float valor : array()) {
             String valorStr = valorStr(valor, maxCasasDecimais);
 			int tamValor = valorStr.length();
             if (tamValor > tamMaximo) tamMaximo = tamValor;
@@ -2181,7 +2181,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @param casas quantidade de casas decimais desejada.
 	 * @return valor formatado.
 	 */
-	private String valorStr(double x, int casas) {
+	private String valorStr(float x, int casas) {
 		return String.format("%.0" + casas + "f", x).replace(',', '.');
 	}
 
@@ -2212,7 +2212,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	}
 
 	@Override
-	public Iterator<Double> iterator() {
+	public Iterator<Float> iterator() {
 		return new TensorIterator();
 	}
 
@@ -2220,7 +2220,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * Iterador para usar com o tensor, usando para percorrer
 	 * seuss elementos sequencialmente.
 	 */
-	class TensorIterator implements Iterator<Double> {
+	class TensorIterator implements Iterator<Float> {
 		private int linear = 0;
 		private int total = tam();
 		private int numDim = numDim();
@@ -2232,7 +2232,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		}
 
 		@Override
-		public Double next() {
+		public Float next() {
 			if (!hasNext()) throw new NoSuchElementException(
 				"\nSem elementos para iterar."
 			);
@@ -2315,7 +2315,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 
 		// escalar
 		if (numDim() == 1) {
-			return new Tensor(new double[] { dados.get(dim) });
+			return new Tensor(new float[] { dados.get(dim) });
 		}
 
 		int[] novoShape = Arrays.copyOfRange(shape, 1, shape.length);
@@ -2350,7 +2350,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	 * @param op tipo de operação entre os tensores.
 	 * @return {@code Tensor} contendo o resultado.
 	 */
-	public Tensor broadcast(Tensor t, DoubleBinaryOperator op) {
+	public Tensor broadcast(Tensor t, FloatBinaryOperator op) {
 		int[] outShape = broadcastShape(this.shape, t.shape);
 		Tensor out = new Tensor(outShape);
 
@@ -2362,9 +2362,9 @@ public class Tensor implements Iterable<Double>, Cloneable {
 		int desvioA = this.shape.length < outShape.length ? outShape.length - this.shape.length : 0;
 		int desvioB = t.shape.length < outShape.length ? outShape.length - t.shape.length : 0;
 
-		double[] data = array();
-		double[] td = t.array();
-		double[] bd = out.array();
+		float[] data = array();
+		float[] td = t.array();
+		float[] bd = out.array();
 
 		for (int ids = 0; ids < n; ids++) {
 			int temp = ids;
@@ -2389,7 +2389,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 				}
 			}
 
-			bd[ids] = op.applyAsDouble(data[idA], td[idB]);
+			bd[ids] = op.apply(data[idA], td[idB]);
 		}
 
 		return out;
@@ -2452,11 +2452,11 @@ public class Tensor implements Iterable<Double>, Cloneable {
 	public Tensor contiguous() {
 		if (isContiguous()) return this;
 		
-		final double[] dados = array();
+		final float[] dados = array();
 		final int offset = offset();
 
 		Tensor contg = new Tensor(shape);
-		double[] dst = contg.array();
+		float[] dst = contg.array();
 
 		int ndim = shape.length;
 		int tam = contg.tam();
@@ -2501,7 +2501,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 
 		int[] idIn  = new int[shape.length];
 		int[] idRes = new int[resShape.length];
-		double[] rd = res.array();
+		float[] rd = res.array();
 
 		for (int i = 0; i < res.tam(); i++) {
 			indiceLinear(i, resShape, idRes);
@@ -2511,7 +2511,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 				idIn[j] = idRes[k++];
 			}
 
-			double soma = 0.0;
+			float soma = 0.0f;
 			for (int a = 0; a < shape[eixo]; a++) {
 				idIn[eixo] = a;
 				soma += get(idIn);
@@ -2556,9 +2556,9 @@ public class Tensor implements Iterable<Double>, Cloneable {
 
 		if (shape.length == 1) {
 			int arg = 0;
-			double maxVal = Double.NEGATIVE_INFINITY;
+			float maxVal = Float.NEGATIVE_INFINITY;
 			for (int i = 0; i < shape[0]; i++) {
-				double v = dados.get(i);
+				float v = dados.get(i);
 				if (v > maxVal) {
 					maxVal = v;
 					arg = i;
@@ -2579,7 +2579,7 @@ public class Tensor implements Iterable<Double>, Cloneable {
 
 		int[] idIn  = new int[shape.length];
 		int[] idRes = new int[shapeRes.length];
-		double[] rd = res.array();
+		float[] rd = res.array();
 
 		for (int i = 0; i < res.tam(); i++) {
 			indiceLinear(i, shapeRes, idRes);
@@ -2589,12 +2589,12 @@ public class Tensor implements Iterable<Double>, Cloneable {
 				idIn[j] = idRes[k++];
 			}
 
-			double maxVal = Double.NEGATIVE_INFINITY;
+			float maxVal = Float.NEGATIVE_INFINITY;
 			int maxIdx = 0;
 
 			for (int a = 0; a < shape[eixo]; a++) {
 				idIn[eixo] = a;
-				double v = get(idIn);
+				float v = get(idIn);
 
 				if (v > maxVal) {
 					maxVal = v;

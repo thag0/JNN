@@ -57,9 +57,6 @@ public class MainConv {
 		long segundos = segundosTotais % 60;
 
 		System.out.println("\nTempo de treino: " + horas + "h " + minutos + "min " + segundos + "s");
-		
-		// System.out.print("Treino -> perda: " + modelo.avaliar(dlTreino).item() + " - ");
-		// System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(dlTreino).item() * 100), 4) + "%");
 
 		System.out.println("\nCarregando dados de teste.");
 		DataLoader dlTeste = CIFAR10.teste();
@@ -130,7 +127,7 @@ public class MainConv {
 	 * @param casas quantidade de casas após o ponto flutuante.
 	 * @return
 	 */
-	static String formatarDecimal(double valor, int casas) {
+	static String formatarDecimal(float valor, int casas) {
 		String formato = "#.";
 		for (int i = 0; i < casas; i++) formato += "#";
 
@@ -147,8 +144,8 @@ public class MainConv {
 	static void exportarHistorico(Modelo modelo, String caminho) {
 		System.out.println("Exportando histórico de perda");
 
-		double[] perdas = modelo.hist();
-		double[][] dadosPerdas = new double[perdas.length][1];
+		float[] perdas = modelo.hist();
+		float[][] dadosPerdas = new float[perdas.length][1];
 
 		for (int i = 0; i < dadosPerdas.length; i++) {
 			dadosPerdas[i][0] = perdas[i];

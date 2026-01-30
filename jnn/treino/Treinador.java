@@ -26,7 +26,7 @@ public class Treinador implements Cloneable {
 	/**
 	 * Histórico de perda do modelo durante o treinamento.
 	 */
-	protected LinkedList<Double> historico = new LinkedList<>();
+	protected LinkedList<Float> historico = new LinkedList<>();
 
 	/**
 	 * Número de threads para execução em paralelo.
@@ -115,7 +115,6 @@ public class Treinador implements Cloneable {
 		else setMetodo(new TreinoLote(modelo, tamLote));
 
 		metodo.calcHist = calcHist;
-		metodo._threads = _numThreads;
 		
 		// só mexer na seed se for mudada
 		if (seed != 0) metodo.random.setSeed(seed);
@@ -200,9 +199,9 @@ public class Treinador implements Cloneable {
 	 * Retorna um array contendo os valores de perda por época de treinamento.
 	 * @return lista de perdas do modelo.
 	 */
-	public double[] hist() {
-		Double[] hist = metodo.hist();
-		double[] h = new double[hist.length];
+	public float[] hist() {
+		Float[] hist = metodo.hist();
+		float[] h = new float[hist.length];
 
 		final int t = Runtime.getRuntime().availableProcessors();
 		try (ForkJoinPool pool = PoolFactory.pool(t)) {

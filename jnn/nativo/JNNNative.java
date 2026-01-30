@@ -98,9 +98,9 @@ public final class JNNNative {
      * @param colB colunas de B.
      */
     public static native void matmul(
-        double[] A, int offA, int s0A, int s1A,
-        double[] B, int offB, int s0B, int s1B,
-        double[] C, int offC, int s0C, int s1C,
+        float[] A, int offA, int s0A, int s1A,
+        float[] B, int offB, int s0B, int s1B,
+        float[] C, int offC, int s0C, int s1C,
         int linA, int colA, int colB
     );
 
@@ -120,11 +120,11 @@ public final class JNNNative {
      * @param largK largura do kernel.
      */
     public static native void conv2dForward(
-        double[] X,
-        double[] K,
-        double[] B,
+        float[] X,
+        float[] K,
+        float[] B,
         boolean hasBias,
-        double[] Y,
+        float[] Y,
         int lotes, 
         int canais, 
         int filtros,
@@ -152,13 +152,13 @@ public final class JNNNative {
      * @param largK largura do kernel.
      */
     public static native void conv2dBackward(
-        double[] X,
-        double[] K,
-        double[] GS,
-        double[] GK,
-        double[] GB,
+        float[] X,
+        float[] K,
+        float[] GS,
+        float[] GK,
+        float[] GB,
         boolean temBias,
-        double[] GE,
+        float[] GE,
         int lotes,
         int canais,
         int filtros,
@@ -183,8 +183,8 @@ public final class JNNNative {
      * @param largStride largura do stride de pooling.
      */
     public static native void maxPool2dForward(
-        double[] X,
-        double[] Y,
+        float[] X,
+        float[] Y,
         int lotes,
         int canais,
         int altX,
@@ -213,9 +213,9 @@ public final class JNNNative {
      * @param largStride largura do stride de pooling.
      */
     public static native void maxPool2dBackward(
-        double[] X,
-        double[] G,
-        double[] GE,
+        float[] X,
+        float[] G,
+        float[] GE,
         int lotes,
         int canais,
         int altX,

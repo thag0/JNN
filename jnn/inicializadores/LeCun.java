@@ -17,9 +17,9 @@ public class LeCun extends Inicializador {
 	@Override
 	public void forward(Tensor tensor) {
         int fanIn = calcularFans(tensor)[0];
-        double var = 1.0 / fanIn;
+        float var = 1.0f / fanIn;
 
-		tensor.aplicar(_ -> JNNutils.randGaussian() * Math.sqrt(var));
+		tensor.aplicar(_ -> JNNutils.randGaussianf() * (float) Math.sqrt(var));
 	}
 
 }

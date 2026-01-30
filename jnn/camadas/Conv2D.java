@@ -690,7 +690,7 @@ public class Conv2D extends Camada implements Cloneable {
 	}
 
 	@Override
-	public double[] saidaParaArray() {
+	public float[] saidaParaArray() {
 		return saida().array();
 	}
 

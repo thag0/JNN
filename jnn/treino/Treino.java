@@ -30,7 +30,7 @@ public class Treino extends MetodoTreino {
 		for (int e = 1; e <= epochs; e++) {
 			if (logs) tempo = System.nanoTime();
 
-			double perdaEpoca = 0;
+			float perdaEpoca = 0.0f;
 			embaralhar(x, y);
 			
 			for (int i = 0; i < amostras; i++) {
@@ -46,7 +46,7 @@ public class Treino extends MetodoTreino {
 			if (logs) {
 				tempo = System.nanoTime() - tempo;
 				limparLinha();
-				String log = "Época " +  e + "/" + epochs + " -> perda: " + (float)(perdaEpoca/amostras);
+				String log = "Época " +  e + "/" + epochs + " -> perda: " + (perdaEpoca/amostras);
 
 				long segundos = (long) tempo / 1_000_000_000;
 				long min = (segundos / 60);

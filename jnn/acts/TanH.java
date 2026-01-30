@@ -18,27 +18,27 @@ public class TanH extends Ativacao {
 	public TanH() {	}
 
 	@Override
-	protected double fx(double x) {
-		return 2.0 / (1.0 + Math.exp(-2.0 * x)) - 1.0;
+	protected float fx(float x) {
+		return 2.0f / (float) (1.0 + Math.exp(-2.0 * x)) - 1.0f;
 	}
 
 	@Override
-	protected double dx(double x) {
-		double t = fx(x);
-		return 1.0 - (t * t);		
+	protected float dx(float x) {
+		float t = fx(x);
+		return 1.0f - (t * t);		
 	}
 
 	@Override
 	public void backward(Densa densa) {
 		//aproveitar os resultados pre calculados
-		double[] t = densa._saida.array();
-		double[] g = densa._gradSaida.array();
-		double[] d = new double[t.length];
+		float[] t = densa._saida.array();
+		float[] g = densa._gradSaida.array();
+		float[] d = new float[t.length];
 
-		double ti;
+		float ti;
 		for (int i = 0; i < d.length; i++) {
 			ti = t[i];
-			d[i] = (1.0 - (ti*ti)) * g[i];
+			d[i] = (1.0f - (ti * ti)) * g[i];
 		}
 
 		densa._gradSaida.copiarElementos(d);

@@ -29,6 +29,18 @@ public final class JNNutils {
 		rng.setSeed(seed);
 	}
 
+	public static float randGaussianf() {
+		return (float) rng.nextGaussian();
+	}
+
+	public static float randFloat() {
+		return rng.nextFloat();
+	}
+
+	public static float randFloat(float min, float max) {
+		return rng.nextFloat(min, max);
+	}
+
 	/**
 	 * Retorna um número normalmente distribuído com média = 0 
 	 * e desvio padrão = 1.
@@ -132,12 +144,12 @@ public final class JNNutils {
 	 * @param array array desejado.
 	 * @return array de {@code Tensores}.
 	 */
-	public static Tensor[] arrayParaTensores(double[] array) {
+	public static Tensor[] arrayParaTensores(float[] array) {
 		int n = array.length;
 
 		Tensor[] arr = new Tensor[n];
 		for (int i = 0; i < n; i++) {
-			arr[i] = new Tensor(new double[]{ array[i] });
+			arr[i] = new Tensor(new float[]{ array[i] });
 			arr[i].nome("amostra " + i);// ajudar no debug
 		}
 
@@ -150,7 +162,7 @@ public final class JNNutils {
 	 * @param array array desejado.
 	 * @return array de {@code Tensores}.
 	 */
-	public static Tensor[] arrayParaTensores(double[][] array) {
+	public static Tensor[] arrayParaTensores(float[][] array) {
 		int lin = array.length;
 		int col = array[0].length;
 
@@ -170,7 +182,7 @@ public final class JNNutils {
 	 * @param array array desejado.
 	 * @return array de {@code Tensores}.
 	 */
-	public static Tensor[] arrayParaTensores(double[][][] array) {
+	public static Tensor[] arrayParaTensores(float[][][] array) {
 		Tensor[] arr = new Tensor[array.length];
 
 		int n = array.length;
@@ -188,7 +200,7 @@ public final class JNNutils {
 	 * @param array array desejado.
 	 * @return array de {@code Tensores}.
 	 */
-	public static Tensor[] arrayParaTensores(double[][][][] array) {
+	public static Tensor[] arrayParaTensores(float[][][][] array) {
 		Tensor[] arr = new Tensor[array.length];
 
 		int n = array.length;

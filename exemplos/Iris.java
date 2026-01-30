@@ -45,7 +45,7 @@ public class Iris {
 		// Separando os dados em treino e teste.
 		int numEntradas = 4;// dados de entrada (features)
 		int numSaidas = 3;// rótulos (classes)
-		double[][] dados = ged.dadosParaDouble(iris);
+		float[][] dados = ged.dadosParaFloat(iris);
 
 		// Gerando o dataset
 		DataLoader loader = jnn.dataloader(dados, numEntradas, numSaidas);
@@ -74,7 +74,7 @@ public class Iris {
 		// Avaliando o modelo
 		DataLoader teste  = ds[1];
 		System.out.println("Perda = " + modelo.avaliar(teste).item());
-		double acc = modelo.avaliador().acuracia(teste).item();
+		float acc = modelo.avaliador().acuracia(teste).item();
 		System.out.println("Acurácia = " + formatarDecimal(acc*100, 4) + "%");
 
 		// Matriz de confusão
@@ -100,7 +100,7 @@ public class Iris {
 	 * @param casas casas decimais.
 	 * @return {@code String} com valor formatado
 	 */
-	public static String formatarDecimal(double valor, int casas) {
+	public static String formatarDecimal(float valor, int casas) {
 		String formato = "#." + "#".repeat(casas);
 		String valStr = new DecimalFormat(formato).format(valor);
 		return valStr;
@@ -111,9 +111,9 @@ public class Iris {
 	 * @param modelo modelo.
 	 * @param caminho caminho onde será salvo o arquivo.
 	 */
-	static void exportarHistorico(double[] hist, String caminho){
+	static void exportarHistorico(float[] hist, String caminho) {
 		System.out.println("Exportando histórico de perda");
-		double[][] dadosPerdas = new double[hist.length][1];
+		float[][] dadosPerdas = new float[hist.length][1];
 
 		for(int i = 0; i < dadosPerdas.length; i++){
 			dadosPerdas[i][0] = hist[i];
@@ -127,7 +127,7 @@ public class Iris {
 	 * Experimental
 	 * @param comando comando para executar no prompt.
 	 */
-	static void executarComando(String comando){
+	static void executarComando(String comando) {
 		try{
 			new ProcessBuilder("cmd", "/c", comando).inheritIO().start().waitFor();
 		}catch(Exception e){

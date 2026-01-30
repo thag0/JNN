@@ -27,7 +27,7 @@ public class Xor{
 		// Criando de treinando o modelo
 		Sequencial modelo = new Sequencial(
 			new Entrada(in),
-			new Densa(2, "sigmoid"),
+			new Densa(3, "sigmoid"),
 			new Densa(out, "sigmoid")
 		);
 		modelo.compilar(new SGD(0.001, 0.999), "mse");
@@ -51,9 +51,9 @@ public class Xor{
 		System.out.println("\n-- Tabela verdade --");
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < 2; j++) {
-				Tensor x = new Tensor(new double[]{ i, j });
+				Tensor x = new Tensor(new float[]{ i, j });
 				Tensor y = modelo.forward(x);
-				System.out.println(i + " ^ " + j + " = " + formatarDecimal(y.item(), 10));
+				System.out.println(i + " ^ " + j + " = " + formatarDecimal(y.item(), 8));
 			}
 		}
 	}
@@ -64,7 +64,7 @@ public class Xor{
 	 * @param casas casas decimais.
 	 * @return {@code String} com valor formatado
 	 */
-	static String formatarDecimal(double valor, int casas) {
+	static String formatarDecimal(float valor, int casas) {
 		String formato = "#." + "#".repeat(casas);
 		String valStr = new DecimalFormat(formato).format(valor);
 		return valStr.replaceAll(",", ".");
