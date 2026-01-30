@@ -25,11 +25,10 @@ void cpu_conv2d_forward(const conv2d_fwd_params_t* params) {
     const int area_s = alt_s * larg_s;
 
     #pragma omp parallel for collapse(2) schedule(static)
-    for (int b = 0; b < lotes; b++) {
+    for (int l = 0; l < lotes; l++) {
         for (int f = 0; f < filtros; f++) {
-
-            const int off_x_b = b * canais * area_x;
-            const int off_y   = (b * filtros + f) * area_s;
+            const int off_x_b = l * canais * area_x;
+            const int off_y   = (l * filtros + f) * area_s;
             const int off_k_f = f * canais * area_k;
 
             if (temBias) {

@@ -78,39 +78,39 @@ void cpu_maxpool2d_backward(const maxpool2d_bwd_params_t* params) {
     const int bloco_e  = canais * area_x;
     const int bloco_gs = canais * area_gs;
 
-    #pragma omp parallel for schedule(static)
-    for (int bc = 0; bc < lotes * canais; bc++) {
-        const int b = bc / canais;
-        const int c = bc % canais;
-        const int base_x  = b * bloco_e  + c * area_x;
-        const int base_gs = b * bloco_gs + c * area_gs;
-        const int base_ge = b * bloco_e  + c * area_x;
-
-        for (int i = 0; i < alt_gs; i++) {
-            const int lin_ini = i * alt_std;
-            const int lin_fim = (lin_ini + alt_pool < alt_x) ? (lin_ini + alt_pool) : alt_x;
-
-            for (int j = 0; j < larg_gs; j++) {
-                const int col_ini = j * larg_std;
-                const int col_fim = (col_ini + larg_pool < larg_x) ? (col_ini + larg_pool) : larg_x;
-
-                float val_max = MIN_FLOAT_VAL;
-                int lin_max = lin_ini;
-                int col_max = col_ini;
-
-                for (int y = lin_ini; y < lin_fim; y++) {
-                    const int linha = base_x + y * larg_x;
-                    for (int x = col_ini; x < col_fim; x++) {
-                        const float v = X[linha + x];
-                        if (v > val_max) {
-                            val_max = v;
-                            lin_max = y;
-                            col_max = x;
+    #pragma omp parallel for collapse(2) schedule(static)
+    for (int l = 0; l < lotes; l++) {
+        for (int c = 0; c < canais; c++) {
+            const int base_x  = l * bloco_e  + c * area_x;
+            const int base_gs = l * bloco_gs + c * area_gs;
+            const int base_ge = l * bloco_e  + c * area_x;
+    
+            for (int i = 0; i < alt_gs; i++) {
+                const int lin_ini = i * alt_std;
+                const int lin_fim = (lin_ini + alt_pool < alt_x) ? (lin_ini + alt_pool) : alt_x;
+    
+                for (int j = 0; j < larg_gs; j++) {
+                    const int col_ini = j * larg_std;
+                    const int col_fim = (col_ini + larg_pool < larg_x) ? (col_ini + larg_pool) : larg_x;
+    
+                    float val_max = MIN_FLOAT_VAL;
+                    int lin_max = lin_ini;
+                    int col_max = col_ini;
+    
+                    for (int y = lin_ini; y < lin_fim; y++) {
+                        const int linha = base_x + y * larg_x;
+                        for (int x = col_ini; x < col_fim; x++) {
+                            const float v = X[linha + x];
+                            if (v > val_max) {
+                                val_max = v;
+                                lin_max = y;
+                                col_max = x;
+                            }
                         }
                     }
+    
+                    GE[base_ge + lin_max * larg_x + col_max] += GS[base_gs + i * larg_gs + j];
                 }
-
-                GE[base_ge + lin_max * larg_x + col_max] += GS[base_gs + i * larg_gs + j];
             }
         }
     }

@@ -101,7 +101,6 @@ public class MainConv {
 			new MaxPool2D(new int[]{2, 2}),
 			new Conv2D(128, new int[]{3, 3}, "relu"),
 			new Flatten(),
-			new Densa(256, "relu"),
 			new Densa(128, "relu"),
 			new Densa(10, "softmax")
 		);
