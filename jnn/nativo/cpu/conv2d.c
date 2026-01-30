@@ -46,7 +46,7 @@ void cpu_conv2d_forward(const conv2d_fwd_params_t* params) {
                     float* restrict dst = DST + off_y + i * larg_s;
                     #pragma omp simd
                     for (int j = 0; j < larg_s; j++) {
-                        dst[j] = 0.0;
+                        dst[j] = 0.0f;
                     }
                 }
             }
@@ -108,7 +108,7 @@ void cpu_conv2d_backward(const conv2d_bwd_params_t* params) {
     if (temBias) {
         #pragma omp parallel for schedule(static)
         for (int f = 0; f < filtros; f++) {
-            float soma_bias = 0.0;
+            float soma_bias = 0.0f;
 
             const int f_offset = f * area_gs;
 
@@ -135,7 +135,7 @@ void cpu_conv2d_backward(const conv2d_bwd_params_t* params) {
 
             for (int kh = 0; kh < alt_k; kh++) {
                 for (int kw = 0; kw < larg_k; kw++) {
-                    float soma = 0.0;
+                    float soma = 0.0f;
 
                     for (int l = 0; l < lotes; l++) {
                         const float* ptr_gs = GS + l * filtros * area_gs + f_gs_offset;

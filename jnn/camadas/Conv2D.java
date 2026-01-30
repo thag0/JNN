@@ -840,4 +840,39 @@ public class Conv2D extends Camada implements Cloneable {
 		return _gradEntrada; 
 	}
 
+	@Override
+	public long tamBytes() {
+		String jvmBits = System.getProperty("sun.arch.data.model");
+        long bits = Long.valueOf(jvmBits);
+
+        long tamObj;
+		// overhead da jvm
+        if (bits == 32) tamObj = 8;
+        else if (bits == 64) tamObj = 16;
+        else throw new IllegalStateException(
+            "\nSem suporte para plataforma de " + bits + " bits."
+        );
+
+		long tamVars = super.tamBytes(); //base camada
+		tamVars += 4 * shapeIn.length; 
+		tamVars += 4 * shapeOut.length; 
+		tamVars += 4 * shapeFiltro.length; 
+
+		long tamTensores =
+		_kernel.tamBytes() + 
+		_entrada.tamBytes() +
+		_buffer.tamBytes() +
+		_saida.tamBytes() +
+		_gradEntrada.tamBytes() +
+		_gradSaida.tamBytes() + 
+		_gradKernel.tamBytes();
+
+		if (temBias()) {
+			tamTensores += _bias.get().tamBytes();
+			tamTensores += _gradBias.get().tamBytes();
+		}
+
+		return tamObj + tamVars + tamTensores;
+	}
+
 }

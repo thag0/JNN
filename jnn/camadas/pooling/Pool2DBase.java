@@ -19,12 +19,12 @@ public abstract class Pool2DBase extends Camada {
     /**
      * Formato de entrada da camada em {@code (canais, altura, largura)}
      */
-    protected int[] shapeEntrada = {1, 1, 1};
+    protected int[] shapeIn = {1, 1, 1};
 
     /**
      * Formato de saída da camada em {@code (canais, altura, largura)}
      */
-    protected int[] shapeSaida = {1, 1, 1};
+    protected int[] shapeOut = {1, 1, 1};
 
 	/**
 	 * Auxilar no controle de treinamento em lotes.
@@ -137,26 +137,26 @@ public abstract class Pool2DBase extends Camada {
 			);
 		}
 
-		shapeEntrada[0] = shape[0];// canais
-		shapeEntrada[1] = shape[1];// altura
-		shapeEntrada[2] = shape[2];// largura
+		shapeIn[0] = shape[0];// canais
+		shapeIn[1] = shape[1];// altura
+		shapeIn[2] = shape[2];// largura
 
-		shapeSaida[0] = shapeEntrada[0];
-		shapeSaida[1] = (int) Math.floor((float)(shapeEntrada[1] - _filtro[0]) / _stride[0]) + 1;
-		shapeSaida[2] = (int) Math.floor((float)(shapeEntrada[2] - _filtro[1]) / _stride[1]) + 1;
+		shapeOut[0] = shapeIn[0];
+		shapeOut[1] = (int) Math.floor((float)(shapeIn[1] - _filtro[0]) / _stride[0]) + 1;
+		shapeOut[2] = (int) Math.floor((float)(shapeIn[2] - _filtro[1]) / _stride[1]) + 1;
 		
-		if (shapeSaida[1] < 1 || shapeSaida[2] < 1) {
+		if (shapeOut[1] < 1 || shapeOut[2] < 1) {
 			throw new IllegalArgumentException(
 				"\nCamada não pode ser construida:" +
 				"\nFormato de entrada " + JNNutils.arrayStr(shape) +
 				" e formato dos filtros " + JNNutils.arrayStr(_filtro) +
-				" resultam num formato de saída inválido " + JNNutils.arrayStr(shapeSaida)
+				" resultam num formato de saída inválido " + JNNutils.arrayStr(shapeOut)
 			);
 		}
 		
-		_entrada 	 = addParam("Entrada", shapeEntrada);
+		_entrada 	 = addParam("Entrada", shapeIn);
 		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
-		_saida 		 = addParam("Saida", shapeSaida);
+		_saida 		 = addParam("Saida", shapeOut);
 
 		_construida = true;// camada pode ser usada
     }
@@ -166,16 +166,16 @@ public abstract class Pool2DBase extends Camada {
 
 	@Override
 	public void ajustarParaLote(int tamLote) {
-		final int canais = shapeEntrada[0];
-		final int altIn = shapeEntrada[1];
-		final int largIn = shapeEntrada[2];
+		final int canais = shapeIn[0];
+		final int altIn = shapeIn[1];
+		final int largIn = shapeIn[2];
 		
-		final int altOut = shapeSaida[1];
-		final int largOut = shapeSaida[2];
+		final int altOut = shapeOut[1];
+		final int largOut = shapeOut[2];
 
 		if (tamLote == 0) {
-			_entrada = addParam("Entrada", shapeEntrada);
-			_saida = addParam("Saida", shapeSaida);
+			_entrada = addParam("Entrada", shapeIn);
+			_saida = addParam("Saida", shapeOut);
 			
 		} else {
 			_entrada = addParam("Entrada", tamLote, canais, altIn, largIn);
@@ -204,8 +204,8 @@ public abstract class Pool2DBase extends Camada {
 		
 		} else {
 			throw new UnsupportedOperationException(
-				"Esperado tensor com " + shapeEntrada.length +
-				" ou " + (shapeEntrada.length + 1) +
+				"Esperado tensor com " + shapeIn.length +
+				" ou " + (shapeIn.length + 1) +
 				" dimensões. Recebido: " + x.numDim()
 			);
 		}
@@ -264,13 +264,13 @@ public abstract class Pool2DBase extends Camada {
     @Override
     public int[] shapeIn() {
 		verificarConstrucao();
-		return shapeEntrada;
+		return shapeIn;
     }
 
     @Override
     public int[] shapeOut() {
         verificarConstrucao();
-		return shapeSaida;
+		return shapeOut;
     }
 
     @Override
@@ -311,7 +311,7 @@ public abstract class Pool2DBase extends Camada {
 		
 		sb.append(nome() + " (id " + this.id + ") = [\n");
 
-		sb.append(pad).append("Entrada: " + JNNutils.arrayStr(shapeEntrada) + "\n");
+		sb.append(pad).append("Entrada: " + JNNutils.arrayStr(shapeIn) + "\n");
 		sb.append(pad).append("Filtro: " + JNNutils.arrayStr(_filtro) + "\n");
 		sb.append(pad).append("Strides: " + JNNutils.arrayStr(_stride) + "\n");
 		sb.append(pad).append("Saída: " + JNNutils.arrayStr(shapeOut()) + "\n");
@@ -344,9 +344,9 @@ public abstract class Pool2DBase extends Camada {
 		clone.treinando = this.treinando;
 		clone._construida = this._construida;
 
-		clone.shapeEntrada = this.shapeEntrada.clone();
+		clone.shapeIn = this.shapeIn.clone();
 		clone._filtro = this._filtro.clone();
-		clone.shapeSaida = this.shapeSaida.clone();
+		clone.shapeOut = this.shapeOut.clone();
 		clone._stride = this._stride.clone();
 		
 		clone._entrada = this._entrada.clone();
@@ -356,4 +356,30 @@ public abstract class Pool2DBase extends Camada {
 		return clone;
 	}
     
+	@Override
+	public long tamBytes() {
+		String jvmBits = System.getProperty("sun.arch.data.model");
+        long bits = Long.valueOf(jvmBits);
+
+        long tamObj;
+		// overhead da jvm
+        if (bits == 32) tamObj = 8;
+        else if (bits == 64) tamObj = 16;
+        else throw new IllegalStateException(
+            "\nSem suporte para plataforma de " + bits + " bits."
+        );
+
+		long tamVars = super.tamBytes(); //base camada
+		tamVars += 4 * shapeIn.length; 
+		tamVars += 4 * shapeOut.length; 
+		tamVars += 4; //tamLote; 
+
+		long tamTensores =
+		_entrada.tamBytes() +
+		_saida.tamBytes() +
+		_gradEntrada.tamBytes();
+
+		return tamObj + tamVars + tamTensores;
+	}
+
 }

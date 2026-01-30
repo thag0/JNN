@@ -652,4 +652,6 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 			throw new RuntimeException(e);
 		}
 	}
+
+	public abstract long tamBytes();
 }

@@ -356,4 +356,19 @@ public final class JNNutils {
 		return TensorConverter.tensor(obj);
 	}
 
+    /**
+     * Formata um valor de tamanho em bytes para um formato mas fácil de ler.
+     * @param bytes quantidade total em bytes.
+     * @return valor formatado.
+     */
+    public static String formatarTamanho(long bytes) {
+        if (bytes < 1024) return bytes + " B";
+        int exp = (int) (Math.log(bytes) / Math.log(1024));
+        char prefixo = "KMGTPE".charAt(exp - 1); // K, M, G, T, P, E
+        
+        return String
+        .format("%.2f %sB", bytes / Math.pow(1024, exp), prefixo)
+        .replaceAll(",", ".");
+    }
+
 }

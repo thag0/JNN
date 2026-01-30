@@ -45,18 +45,18 @@ public class Densa extends Camada implements Cloneable {
 	/**
 	 * Variável controlador para o tamanho de entrada da camada densa.
 	 */
-	private int tamEntrada;
+	private int _tamEntrada;
 	 
 	/**
 	 * Variável controlador para a quantidade de neurônios (unidades) 
 	 * da camada densa.
 	 */
-	private int numNeuronios;
+	private int _numNeuronios;
 
 	/**
 	 * Auxilar no controle de treinamento em lotes.
 	 */
-	private int tamLote;
+	private int _tamLote;
 
 	/**
 	 * Tensor contendo os valores dos pesos de cada conexão da
@@ -245,7 +245,7 @@ public class Densa extends Camada implements Cloneable {
 			);
 		}
 
-		numNeuronios = n;
+		_numNeuronios = n;
 
 		//usar os valores padrão se necessário
 		Dicionario dic = new Dicionario();
@@ -309,23 +309,23 @@ public class Densa extends Camada implements Cloneable {
 			);
 		}
 
-		tamEntrada = shape[0];
+		_tamEntrada = shape[0];
 
-		if (tamEntrada < 1) {
+		if (_tamEntrada < 1) {
 			throw new IllegalArgumentException(
 				"\nTamanho de entrada deve ser maior que zero."
 			);
 		}
 
-		if (numNeuronios < 1) {
+		if (_numNeuronios < 1) {
 			throw new IllegalArgumentException(
 				"\nNúmero de neurônios para a camada Densa não foi definido."
 			);
 		}
 
-		_entrada  	= addParam("Entrada", tamEntrada);
-		_saida  	= addParam("Saida", numNeuronios);
-		_kernel 	= addParam("Kernel", tamEntrada, numNeuronios);
+		_entrada  	= addParam("Entrada", _tamEntrada);
+		_saida  	= addParam("Saida", _numNeuronios);
+		_kernel 	= addParam("Kernel", _tamEntrada, _numNeuronios);
 		_gradKernel = addParam("Grad Kernel", _kernel.shape());
 
 		if (usarBias) {
@@ -362,19 +362,19 @@ public class Densa extends Camada implements Cloneable {
 	@Override
 	public void ajustarParaLote(int tamLote) {
 		if (tamLote == 0) {// remover dimensão de lote
-			_entrada = addParam("Entrada", tamEntrada);
-			_saida = addParam("Saida", numNeuronios);
+			_entrada = addParam("Entrada", _tamEntrada);
+			_saida = addParam("Saida", _numNeuronios);
 		
 		} else {
-			_entrada = addParam("Entrada", tamLote,  tamEntrada);
-			_saida = addParam("Saida", tamLote,  numNeuronios);
+			_entrada = addParam("Entrada", tamLote,  _tamEntrada);
+			_saida = addParam("Saida", tamLote,  _numNeuronios);
 		}
 
 		_buffer 	 = addParam("Buffer", _saida.shape());
 		_gradSaida 	 = addParam("Grad Saida", _saida.shape());
 		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
 		
-		this.tamLote = tamLote;
+		this._tamLote = tamLote;
 	}
 
 	/**
@@ -407,7 +407,7 @@ public class Densa extends Camada implements Cloneable {
 		// isso aqui vai ser melhorado
 		if (x.numDim() == 2) {
 			int lotes = x.tamDim(0);
-			if (tamLote != lotes) {
+			if (_tamLote != lotes) {
 				ajustarParaLote(lotes);
 			}
 
@@ -507,7 +507,7 @@ public class Densa extends Camada implements Cloneable {
 	 */
 	public int tamSaida() {
 		verificarConstrucao();
-		return numNeuronios;
+		return _numNeuronios;
 	}
 
 	@Override
@@ -659,6 +659,42 @@ public class Densa extends Camada implements Cloneable {
 	public Tensor gradEntrada() {
 		verificarConstrucao();
 		return _gradEntrada;
+	}
+
+	@Override
+	public long tamBytes() {
+		String jvmBits = System.getProperty("sun.arch.data.model");
+        long bits = Long.valueOf(jvmBits);
+
+        long tamObj;
+		// overhead da jvm
+        if (bits == 32) tamObj = 8;
+        else if (bits == 64) tamObj = 16;
+        else throw new IllegalStateException(
+            "\nSem suporte para plataforma de " + bits + " bits."
+        );
+
+		long tamVars = super.tamBytes(); //base camada
+		tamVars += 4; //tamEntrada
+		tamVars += 4; //numNeuronios
+		tamVars += 4; //tamLote
+		tamVars += 1; //usarBias
+
+		long tamTensores =
+		_kernel.tamBytes() + 
+		_entrada.tamBytes() +
+		_buffer.tamBytes() +
+		_saida.tamBytes() +
+		_gradEntrada.tamBytes() +
+		_gradSaida.tamBytes() + 
+		_gradKernel.tamBytes();
+
+		if (temBias()) {
+			tamTensores += _bias.get().tamBytes();
+			tamTensores += _gradBias.get().tamBytes();
+		}
+
+		return tamObj + tamVars + tamTensores;
 	}
 
 }

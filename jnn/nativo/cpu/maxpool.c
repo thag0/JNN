@@ -78,7 +78,7 @@ void cpu_maxpool2d_backward(const maxpool2d_bwd_params_t* params) {
     const int bloco_e  = canais * area_x;
     const int bloco_gs = canais * area_gs;
 
-   #pragma omp parallel for schedule(static)
+    #pragma omp parallel for schedule(static)
     for (int bc = 0; bc < lotes * canais; bc++) {
         const int b = bc / canais;
         const int c = bc % canais;
@@ -110,8 +110,7 @@ void cpu_maxpool2d_backward(const maxpool2d_bwd_params_t* params) {
                     }
                 }
 
-                GE[base_ge + lin_max * larg_x + col_max] +=
-                    GS[base_gs + i * larg_gs + j];
+                GE[base_ge + lin_max * larg_x + col_max] += GS[base_gs + i * larg_gs + j];
             }
         }
     }

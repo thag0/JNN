@@ -377,4 +377,12 @@ public abstract class Camada {
 			"\nCamada " + nome() + " não possui exibição de informações."
 		);
 	}
+
+	public long tamBytes() {
+		return 
+		1 + //treinavel 
+		1 + //construida
+		1 + //treinando
+		4; //id
+	}
 }

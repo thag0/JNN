@@ -50,7 +50,6 @@ gcc ^
  -shared ^
  -march=x86-64 ^
  -ffast-math ^
- -mtune=generic ^
  -mfma ^
  -fopenmp ^
  -I"%JAVA_HOME%\include" ^
@@ -67,8 +66,8 @@ if errorlevel 1 (
   exit /b 1
 )
 
-copy C:\mingw64\bin\libgomp-1.dll "%OUT_DIR%" >nul
-copy C:\mingw64\bin\libgcc_s_seh-1.dll "%OUT_DIR%" >nul
-copy C:\mingw64\bin\libwinpthread-1.dll "%OUT_DIR%" >nul
+copy C:\mingw64\bin\libgomp-1.dll "%OUT_DIR%" > nul
+copy C:\mingw64\bin\libgcc_s_seh-1.dll "%OUT_DIR%" > nul
+copy C:\mingw64\bin\libwinpthread-1.dll "%OUT_DIR%" > nul
 
 echo Build nativo OK

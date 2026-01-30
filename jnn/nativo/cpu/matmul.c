@@ -1,8 +1,8 @@
 #include "matmul.h"
 
 // tilling
-#define BLOCO_COL_A 64
-#define BLOCO_COL_B 64
+#define BLOCO_COL_A 32
+#define BLOCO_COL_B 32
 
 void _matmul_fastpath(
     const float* restrict A, 

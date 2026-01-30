@@ -405,7 +405,8 @@ public class Sequencial extends Modelo {
 
 		String params = String.format("%,d", numParams());
 		sb.append("\n");
-		sb.append(pad).append("Parâmetros: " + params);
+		sb.append(pad).append("Parâmetros: ").append(params).append("\n");
+		sb.append(pad).append("Tamanho: ").append(JNNutils.formatarTamanho(tamBytes()));
 		sb.append("\n").append("]");
 
 		return sb.toString();
@@ -444,6 +445,17 @@ public class Sequencial extends Modelo {
 	@Override
 	public Iterator<Camada> iterator() {
 		return new ModelIterator(_camadas);
+	}
+
+	@Override
+	public long tamBytes() {
+		long tam = 0;
+
+		for (Camada c : this) {
+			tam += c.tamBytes();
+		}
+
+		return tam;
 	}
 
 }

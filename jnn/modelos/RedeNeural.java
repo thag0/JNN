@@ -558,9 +558,10 @@ public class RedeNeural extends Modelo {
 		//perda
 		sb.append(pad).append("Perda: ").append(_perda.nome()).append("\n");
 
-		sb.append(pad).append("Parâmetros: ").append(numParams());
+		sb.append(pad).append("Parâmetros: ").append(numParams()).append("\n");
+		sb.append(pad).append("Tamanho: ").append(JNNutils.formatarTamanho(tamBytes())).append("\n");
 
-		sb.append("\n]");
+		sb.append("]");
 		
 		return sb.toString();
 	}
@@ -619,6 +620,17 @@ public class RedeNeural extends Modelo {
 	@Override
 	public Iterator<Camada> iterator() {
 		return new ModelIterator(_camadas);
+	}
+
+	@Override
+	public long tamBytes() {
+		long tam = 0;
+
+		for (Camada c : this) {
+			tam += c.tamBytes();
+		}
+
+		return tam;
 	}
 
 }
