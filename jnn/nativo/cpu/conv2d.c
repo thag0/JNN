@@ -31,39 +31,28 @@ void cpu_conv2d_forward(const conv2d_fwd_params_t* params) {
             const int off_y   = (l * filtros + f) * area_s;
             const int off_k_f = f * canais * area_k;
 
-            if (temBias) {
-                const float bias = B[f];
-                for (int i = 0; i < alt_s; i++) {
-                    float* restrict dst = DST + off_y + i * larg_s;
-                    #pragma omp simd
-                    for (int j = 0; j < larg_s; j++) {
-                        dst[j] = bias;
-                    }
-                }
-            } else {
-                for (int i = 0; i < alt_s; i++) {
-                    float* restrict dst = DST + off_y + i * larg_s;
-                    #pragma omp simd
-                    for (int j = 0; j < larg_s; j++) {
-                        dst[j] = 0.0f;
-                    }
+            const float saida = temBias ? B[f] : 0.0f;
+            for (int i = 0; i < alt_s; i++) {
+                float* restrict dst = DST + off_y + i * larg_s;
+                #pragma omp simd
+                for (int j = 0; j < larg_s; j++) {
+                    dst[j] = saida;
                 }
             }
 
             for (int c = 0; c < canais; c++) {
-                const int off_x_c = off_x_b + c * area_x;
-                const int off_k_c = off_k_f + c * area_k;
+                const float* restrict Xc = X + off_x_b + c * area_x;
+                const float* restrict Kc = K + off_k_f + c * area_k;
 
                 for (int kh = 0; kh < alt_k; kh++) {
-                    const int lin_k = off_k_c + kh * larg_k;
+                    const float* restrict Krow = Kc + kh * larg_k;
 
-                    for (int i = 0; i < alt_s; i++) {
-                        float* restrict dst = DST + off_y + i * larg_s;
-                        const float* restrict lin_X = X + off_x_c + (i + kh) * larg_x;
+                    for (int kw = 0; kw < larg_k; kw++) {
+                        const float val_k = Krow[kw];
 
-                        for (int kw = 0; kw < larg_k; kw++) {
-                            const float val_k = K[lin_k + kw];
-                            const float* restrict x = lin_X + kw;
+                        for (int i = 0; i < alt_s; i++) {
+                            float* restrict dst = DST + off_y + i * larg_s;
+                            const float* restrict x = Xc + (i + kh) * larg_x + kw;
 
                             #pragma omp simd
                             for (int j = 0; j < larg_s; j++) {
@@ -73,6 +62,7 @@ void cpu_conv2d_forward(const conv2d_fwd_params_t* params) {
                     }
                 }
             }
+
         }
     }
     

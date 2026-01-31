@@ -39,9 +39,7 @@ set DLL=jnn_native.dll
 set SRC=^
  jnn\nativo\jni\jnn_jni.c ^
  jnn\nativo\dispatch\dispatcher.c ^
- jnn\nativo\cpu\matmul.c ^
- jnn\nativo\cpu\conv2d.c ^
- jnn\nativo\cpu\maxpool.c
+ jnn\nativo\cpu\*.c
 
 if not exist "%OUT_DIR%" mkdir "%OUT_DIR%"
 
@@ -51,6 +49,7 @@ gcc ^
  -march=x86-64 ^
  -ffast-math ^
  -mfma ^
+ -mavx2 ^
  -fopenmp ^
  -I"%JAVA_HOME%\include" ^
  -I"%JAVA_HOME%\include\win32" ^

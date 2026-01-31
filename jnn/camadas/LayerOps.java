@@ -200,6 +200,8 @@ public class LayerOps {
 			return;
 		}
 
+		saida.zero();
+
 		final int altS = altX - altK + 1;
 		final int largS = largX - largK + 1;
 

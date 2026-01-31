@@ -8,10 +8,12 @@ rem deixar esse jar da jnn sempre primeiro
 set CP_JNN_GED=bin\jnn.jar;lib\ged.jar;testes\bin
 set CP_JNN_GED_GEIM=bin\jnn.jar;lib\ged.jar;lib\geim.jar;testes\bin
 
-java %ENABLE_NATIVE% -cp "%CP_JNN_GED%" MainConv
+@REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED%" TesteTempos
+
+@REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED%" MainConv
 @REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED_GEIM%" Conv
 @REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED%" Benchmark
-@REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED%" TesteConv 1
+java %ENABLE_NATIVE% -cp "%CP_JNN_GED%" TesteConv 1
 @REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED_GEIM%" TesteJNI
 @REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED" Playground
 
