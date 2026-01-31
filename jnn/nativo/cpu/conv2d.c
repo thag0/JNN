@@ -114,35 +114,25 @@ void cpu_conv2d_backward(const conv2d_bwd_params_t* params) {
         }
     }
 
-    #pragma omp parallel for schedule(static)
+    #pragma omp parallel for collapse(3) schedule(static)
     for (int f = 0; f < filtros; f++) {
-        const int f_gs_offset = f * area_gs;
-        const int f_k_offset  = f * canais * area_k;
-
         for (int c = 0; c < canais; c++) {
-            float* base_ptr_gk = GK + f_k_offset + c * area_k;
-
             for (int kh = 0; kh < alt_k; kh++) {
                 for (int kw = 0; kw < larg_k; kw++) {
                     float soma = 0.0f;
-
                     for (int l = 0; l < lotes; l++) {
-                        const float* ptr_gs = GS + l * filtros * area_gs + f_gs_offset;
-                        const float* ptr_x = X  + l * canais  * area_x  + c * area_x;
+                        const float* ptr_gs = GS + (l * filtros + f) * area_gs;
+                        const float* ptr_x  = X  + (l * canais + c) * area_x;
                         const float* janela_x = ptr_x + kh * larg_x + kw;
-
                         for (int i = 0; i < alt_s; i++) {
                             const float* lin_gs = ptr_gs   + i * larg_s;
                             const float* lin_x  = janela_x + i * larg_x;
-
-                            #pragma omp simd reduction(+:soma)
                             for (int j = 0; j < larg_s; j++) {
                                 soma += lin_gs[j] * lin_x[j];
                             }
                         }
                     }
-
-                    base_ptr_gk[kh * larg_k + kw] += soma;
+                    GK[((f * canais + c) * alt_k + kh) * larg_k + kw] += soma;
                 }
             }
         }
