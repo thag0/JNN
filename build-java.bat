@@ -22,6 +22,7 @@ for /R "%SRC_DIR%" %%f in (*.java) do (
 )
 
 javac ^
+ -Xdiags:verbose ^
  -g ^
  -parameters ^
  -h "%JNI_HEADERS%" ^

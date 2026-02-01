@@ -506,7 +506,7 @@ public class Tensor implements Iterable<Float>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
     public Tensor set(Number x, int... ids) {
-        dados.set(x, indice(ids));
+        dados.set(x.floatValue(), indice(ids));
 		return this;
 	}
 
@@ -516,7 +516,7 @@ public class Tensor implements Iterable<Float>, Cloneable {
 	 * @return {@code Tensor} local alterado.
 	 */
 	public Tensor preencher(Number x) {
-		dados.preencher(x);
+		dados.preencher(x.floatValue());
 		return this;
 	}
 
