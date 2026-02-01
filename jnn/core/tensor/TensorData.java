@@ -943,8 +943,10 @@ public class TensorData {
 
     @Override
     public TensorData clone() {
-        float[] novo = Arrays.copyOfRange(this.dados, this.offset, this.offset + this.tam);
-        return new TensorData(novo, 0, novo.length);
+        float[] novo = new float[tam];
+        System.arraycopy(dados, offset, novo, 0, tam);
+        
+        return new TensorData(novo);
     }
 
     /**
