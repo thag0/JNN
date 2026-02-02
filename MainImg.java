@@ -19,6 +19,12 @@ import jnn.modelos.Sequencial;
 import jnn.otm.*;
 import render.JanelaTreino;
 
+// Por enquanto esse script não está rodando devido a problemas com a 
+// parte nativa da biblioteca além do forte acoplamento junto da parte
+// de desenho.
+
+// futuramente vou resolver esses problemas.
+
 public class MainImg {
 	static Ged ged = new Ged();
 	static Geim geim = new Geim();
