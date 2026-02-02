@@ -7,7 +7,7 @@ setlocal enabledelayedexpansion
 
 set SRC_DIR=jnn
 set BIN_DIR=bin\classes
-set JNI_HEADERS=jnn/nativo
+set JNI_HEADERS=jnn/nativo/include/jni
 set TMP_FILE=%TEMP%\java_sources.txt
 
 if exist bin rmdir /S /Q bin

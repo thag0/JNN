@@ -6,10 +6,10 @@ import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 
+import jnn.core.JNNnative;
 import jnn.core.ops.Ops;
 import jnn.core.parallel.PoolFactory;
 import jnn.core.tensor.Tensor;
-import jnn.nativo.JNNNative;
 
 /**
  * Utilitário para operações de forward e backward de camadas.
@@ -185,8 +185,8 @@ public class LayerOps {
 		final int altK = shapeK[2];
 		final int largK = shapeK[3];
 
-		if (JNNNative.jni) {
-			JNNNative.conv2dForward(
+		if (JNNnative.jni) {
+			JNNnative.conv2dForward(
 				entrada.array(),
 				kernel.array(),
 				bias.isPresent() ? bias.get().array() : null,
@@ -417,8 +417,8 @@ public class LayerOps {
 		final int altK = shapeK[2];
 		final int largK = shapeK[3];
 	
-		if (JNNNative.jni) {
-			JNNNative.conv2dBackward(
+		if (JNNnative.jni) {
+			JNNnative.conv2dBackward(
 				entrada.array(),
 				kernel.array(),
 				gradS.array(),
@@ -584,12 +584,12 @@ public class LayerOps {
 	private void forwardMaxPool2DNormal(Tensor entrada, Tensor saida, int[] filtro, int[] stride) {
 		final int canais = entrada.tamDim(0);
 		
-		if (JNNNative.jni) {
+		if (JNNnative.jni) {
 			final int lotes = 1;
 			final int altX = entrada.tamDim(1);
 			final int largX = entrada.tamDim(2);
 			
-			JNNNative.maxPool2dForward(
+			JNNnative.maxPool2dForward(
 				entrada.array(),
 				saida.array(),
 				lotes,
@@ -622,12 +622,12 @@ public class LayerOps {
 	private void forwardMaxPool2DLotes(Tensor entrada, Tensor saida, int[] filtro, int[] stride) {
 		final int lotes = entrada.tamDim(0);
 		
-		if (JNNNative.jni) {
+		if (JNNnative.jni) {
 			final int canais = entrada.tamDim(1);
 			final int altX = entrada.tamDim(2);
 			final int largX = entrada.tamDim(3);
 
-			JNNNative.maxPool2dForward(
+			JNNnative.maxPool2dForward(
 				entrada.array(),
 				saida.array(),
 				lotes,
@@ -683,10 +683,10 @@ public class LayerOps {
 		final int altG = grad.tamDim(1);
 		final int largG = grad.tamDim(2);
 
-		if (JNNNative.jni) {
+		if (JNNnative.jni) {
 			final int lotes = 1;
 
-			JNNNative.maxPool2dBackward(
+			JNNnative.maxPool2dBackward(
 				entrada.array(),
 				grad.array(),
 				gradE.array(),
@@ -757,14 +757,14 @@ public class LayerOps {
 	private void backwardMaxPool2DLotes(Tensor entrada, Tensor grad, Tensor gradE, int[] filtro, int[] stride) {
 		final int lotes = entrada.tamDim(0);
 		
-		if (JNNNative.jni) {
+		if (JNNnative.jni) {
 			final int canais = entrada.tamDim(1);
 			final int altX = entrada.tamDim(2);
 			final int largX = entrada.tamDim(3);
 			final int altG = grad.tamDim(2);
 			final int largG = grad.tamDim(3);
 
-			JNNNative.maxPool2dBackward(
+			JNNnative.maxPool2dBackward(
 				entrada.array(),
 				grad.array(),
 				gradE.array(),

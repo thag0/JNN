@@ -2,8 +2,8 @@ package jnn.core.ops;
 
 import java.util.Optional;
 
+import jnn.core.JNNnative;
 import jnn.core.tensor.Tensor;
-import jnn.nativo.JNNNative;
 
 /**
  * Implementações java em cpu das operações internas da biblioteca.
@@ -17,7 +17,7 @@ public final class OpsCPU extends Ops {
 
     @Override
 	public void matmul(Tensor a, Tensor b, Tensor dst) {
-		if (JNNNative.jni) OpsLinear.matmul_jni(a, b, dst);
+		if (JNNnative.jni) OpsLinear.matmul_jni(a, b, dst);
 		else OpsLinear.matmul(a, b, dst);
 	}
 

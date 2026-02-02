@@ -21,7 +21,7 @@ JNI_OnLoad(JavaVM* vm, void* reserved) {
 }
 
 JNIEXPORT void JNICALL
-Java_jnn_nativo_JNNNative_setThreads(JNIEnv* env, jclass cls, jint n) {
+Java_jnn_core_JNNnative_setThreads(JNIEnv* env, jclass cls, jint n) {
     (void) env;
     (void) cls;
 
@@ -30,7 +30,7 @@ Java_jnn_nativo_JNNNative_setThreads(JNIEnv* env, jclass cls, jint n) {
 }
 
 JNIEXPORT void JNICALL 
-Java_jnn_nativo_JNNNative_setBackend(JNIEnv * env, jclass cls, jint backend) {
+Java_jnn_core_JNNnative_setBackend(JNIEnv * env, jclass cls, jint backend) {
     (void) env;
     (void) cls;
 
@@ -38,7 +38,7 @@ Java_jnn_nativo_JNNNative_setBackend(JNIEnv * env, jclass cls, jint backend) {
 }
 
 JNIEXPORT void JNICALL
-Java_jnn_nativo_JNNNative_matmul(
+Java_jnn_core_JNNnative_matmul(
     JNIEnv* env, jclass cls,
     jfloatArray A_arr, jint off_a, jint std_a_0, jint std_a_1,
     jfloatArray B_arr, jint off_b, jint std_b_0, jint std_b_1,
@@ -77,7 +77,7 @@ Java_jnn_nativo_JNNNative_matmul(
 }
 
 JNIEXPORT void JNICALL
-Java_jnn_nativo_JNNNative_conv2dForward(
+Java_jnn_core_JNNnative_conv2dForward(
     JNIEnv* env, jclass cls,
     jfloatArray X_arr,
     jfloatArray K_arr,
@@ -129,7 +129,7 @@ Java_jnn_nativo_JNNNative_conv2dForward(
 }
 
 JNIEXPORT void JNICALL
-Java_jnn_nativo_JNNNative_conv2dBackward(
+Java_jnn_core_JNNnative_conv2dBackward(
     JNIEnv* env, jclass cls,
     jfloatArray X_arr,
     jfloatArray K_arr,
@@ -189,7 +189,7 @@ Java_jnn_nativo_JNNNative_conv2dBackward(
 }
 
 JNIEXPORT void JNICALL
-Java_jnn_nativo_JNNNative_maxPool2dForward(
+Java_jnn_core_JNNnative_maxPool2dForward(
     JNIEnv* env, jclass cls,
     jfloatArray x_arr,
     jfloatArray y_arr,
@@ -227,7 +227,7 @@ Java_jnn_nativo_JNNNative_maxPool2dForward(
 }
 
 JNIEXPORT void JNICALL
-Java_jnn_nativo_JNNNative_maxPool2dBackward(
+Java_jnn_core_JNNnative_maxPool2dBackward(
     JNIEnv* env, jclass cls,
     jfloatArray x_arr,
     jfloatArray gs_arr,

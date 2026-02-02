@@ -1,4 +1,4 @@
-package jnn.nativo;
+package jnn.core;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.nio.file.StandardCopyOption;
 /**
  * Interface para implementação nativa em C.
  */
-public final class JNNNative {
+public final class JNNnative {
 
     /**
      * Nome da biblioteca dinâmica (windows).
@@ -46,7 +46,7 @@ public final class JNNNative {
      * @throws IOException caso ocora algum erro.
      */
     private static void carregarDoJar() throws IOException {
-        InputStream is = JNNNative.class.getResourceAsStream(caminhoDLL + nomeDLL);
+        InputStream is = JNNnative.class.getResourceAsStream(caminhoDLL + nomeDLL);
 
         if (is == null) {
             throw new FileNotFoundException("\nDLL não encontrada: " + nomeDLL);
@@ -62,7 +62,7 @@ public final class JNNNative {
         System.load(dll.toAbsolutePath().toString());
     }
 
-    private JNNNative() {}
+    private JNNnative() {}
 
     /**
      * Altera a quantidade de threads usadas pelo código nativo.

@@ -1,7 +1,7 @@
 package jnn.core.ops;
 
+import jnn.core.JNNnative;
 import jnn.core.tensor.Tensor;
-import jnn.nativo.JNNNative;
 
 /**
  * 
@@ -254,7 +254,7 @@ public class OpsLinear {
 		final int s0C = stridesD.length == 1 ? 1 : stridesD[0];
 		final int s1C = stridesD.length == 1 ? 1 : stridesD[1];
 
-		JNNNative.matmul(
+		JNNnative.matmul(
 			a.array(), a.offset(), s0A, s1A,
 			b.array(), b.offset(), s0B, s1B,
 			dst.array(), dst.offset(), s0C, s1C,
