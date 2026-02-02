@@ -797,7 +797,7 @@ public class TensorData {
         float max = get(0);
         final float[] d = dados;
         final int inicio = offset + 1;
-        final int fim = inicio + tam();
+        final int fim = offset + tam();
         
         for (int i = inicio; i < fim; i++) {
             if (d[i] > max) max = d[i];
@@ -814,7 +814,7 @@ public class TensorData {
         float min = get(0);
         final float[] d = dados;
         final int inicio = offset + 1;
-        final int fim = inicio + tam();
+        final int fim = offset + tam();
         
         for (int i = inicio; i < fim; i++) {
             if (d[i] < min) min = d[i];
