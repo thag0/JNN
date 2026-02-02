@@ -127,12 +127,11 @@ public class Dropout extends Camada implements Cloneable {
 
 		shapeIn = shape.clone();
 
-		_entrada 	 = addParam("Entrada", shapeIn);
-		_mascara 	 = addParam("Mascara", _entrada.shape());
-		_saida 		 = addParam("Saida", _entrada.shape());
-		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
+		_gradEntrada = addParam("Grad Entrada", shapeIn);
+		_mascara 	 = addParam("Mascara", shapeIn);
+		_saida 		 = addParam("Saida", shapeIn);
 
-		dimBase = _entrada.numDim();
+		dimBase = _gradEntrada.numDim();
 		
 		_construida = true;// camada pode ser usada
 	}
@@ -143,19 +142,20 @@ public class Dropout extends Camada implements Cloneable {
 	@Override
 	public void ajustarParaLote(int tamLote) {
 		if (tamLote == 0) {
-			_entrada = addParam("Entrada", shapeIn);
+			_gradEntrada = addParam("Grad Entrada", shapeIn);
 			
 		} else {
 			int[] shape = new int[shapeIn.length + 1];
 			shape[0] = tamLote;
-			System.arraycopy(shapeIn, 0, shape, 1, shapeIn.length);
+			for (int i = 0; i < shapeIn.length; i++) {
+				shape[i+1] = shapeIn[i];
+			}
 
-			_entrada = addParam("Entrada", shape);
+			_gradEntrada = addParam("Grad Entrada", shape);
 		}
 		
-		_saida = addParam("Saida", _entrada.shape());
-		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
-		_mascara = addParam("Mascara", _entrada.shape());
+		_saida = addParam("Saida", _gradEntrada.shape());
+		_mascara = addParam("Mascara", _gradEntrada.shape());
 
 		this.tamLote = tamLote;
 	}
@@ -198,7 +198,7 @@ public class Dropout extends Camada implements Cloneable {
 			);
 		}
 
-		_entrada.copiar(x);
+		_entrada = x.contiguous();
 
 		_saida.copiar(_entrada);
 
@@ -292,7 +292,6 @@ public class Dropout extends Camada implements Cloneable {
 		clone.shapeIn = this.shapeIn.clone();
 		clone.taxa = this.taxa;
 
-		clone._entrada = this._entrada.clone();
 		clone._mascara = this._mascara.clone();
 		clone._saida = this._saida.clone();
 		clone._gradEntrada = this._gradEntrada.clone();

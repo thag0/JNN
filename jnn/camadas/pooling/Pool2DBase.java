@@ -154,8 +154,7 @@ public abstract class Pool2DBase extends Camada {
 			);
 		}
 		
-		_entrada 	 = addParam("Entrada", shapeIn);
-		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
+		_gradEntrada = addParam("Grad Entrada", shapeIn);
 		_saida 		 = addParam("Saida", shapeOut);
 
 		_construida = true;// camada pode ser usada
@@ -166,23 +165,21 @@ public abstract class Pool2DBase extends Camada {
 
 	@Override
 	public void ajustarParaLote(int tamLote) {
-		final int canais = shapeIn[0];
-		final int altIn = shapeIn[1];
-		final int largIn = shapeIn[2];
-		
-		final int altOut = shapeOut[1];
-		final int largOut = shapeOut[2];
-
 		if (tamLote == 0) {
-			_entrada = addParam("Entrada", shapeIn);
+			_gradEntrada = addParam("Grad Entrada", shapeIn);
 			_saida = addParam("Saida", shapeOut);
 			
 		} else {
-			_entrada = addParam("Entrada", tamLote, canais, altIn, largIn);
+			final int canais = shapeIn[0];
+			final int altIn = shapeIn[1];
+			final int largIn = shapeIn[2];
+			final int altOut = shapeOut[1];
+			final int largOut = shapeOut[2];
+			
+			_gradEntrada = addParam("Grad Entrada", tamLote, canais, altIn, largIn);
 			_saida = addParam("Saida", tamLote, canais, altOut, largOut);
 		}
 
-		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
 
 		this.tamLote = tamLote;
 	}
@@ -210,7 +207,7 @@ public abstract class Pool2DBase extends Camada {
 			);
 		}
 
-		_entrada.copiar(x);
+		_entrada = x.contiguous();
 
         if (modo.equals("avg")) {
             lops.forwardAvgPool2D(_entrada, _saida, _filtro, _stride);
@@ -231,9 +228,9 @@ public abstract class Pool2DBase extends Camada {
     public Tensor backward(Tensor g) {
 		verificarConstrucao();
 
-		if (g.numDim() != _entrada.numDim()) {
+		if (g.numDim() != _gradEntrada.numDim()) {
 			throw new IllegalStateException(
-				"\nEsperado gradiente " + _entrada.numDim() + "D, " +
+				"\nEsperado gradiente " + _gradEntrada.numDim() + "D, " +
 				" mas recebido " + g.numDim() + "D."
 			);
 		}
@@ -311,7 +308,7 @@ public abstract class Pool2DBase extends Camada {
 		
 		sb.append(nome() + " (id " + this.id + ") = [\n");
 
-		sb.append(pad).append("Entrada: " + JNNutils.arrayStr(shapeIn) + "\n");
+		sb.append(pad).append("Entrada: " + JNNutils.arrayStr(shapeIn()) + "\n");
 		sb.append(pad).append("Filtro: " + JNNutils.arrayStr(_filtro) + "\n");
 		sb.append(pad).append("Strides: " + JNNutils.arrayStr(_stride) + "\n");
 		sb.append(pad).append("Saída: " + JNNutils.arrayStr(shapeOut()) + "\n");
@@ -349,7 +346,6 @@ public abstract class Pool2DBase extends Camada {
 		clone.shapeOut = this.shapeOut.clone();
 		clone._stride = this._stride.clone();
 		
-		clone._entrada = this._entrada.clone();
 		clone._saida = this._saida.clone();
 		clone._gradEntrada = this._gradEntrada.clone();
 
@@ -375,7 +371,6 @@ public abstract class Pool2DBase extends Camada {
 		tamVars += 4; //tamLote; 
 
 		long tamTensores =
-		_entrada.tamBytes() +
 		_saida.tamBytes() +
 		_gradEntrada.tamBytes();
 

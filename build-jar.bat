@@ -13,4 +13,4 @@ if errorlevel 1 (
     exit /b 1
 )
 
-echo JAR gerado: %OUT_JAR%
+echo Build jar OK

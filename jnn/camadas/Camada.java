@@ -196,7 +196,7 @@ public abstract class Camada {
 
 	/**
 	 * Retropropaga os gradientes recebidos para as camadas anteriores.
-	 * @param grad gradiente em relação a saída da camada.
+	 * @param g gradiente em relação a saída da camada.
 	 * @return {@code Tensor} contendo os gradientes em relação a entrada da camada.
 	 */
 	public abstract Tensor backward(Tensor g);

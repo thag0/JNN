@@ -130,8 +130,7 @@ public class Flatten extends Camada implements Cloneable {
 
 		shapeOut = new int[]{ totalFlatten };
 
-		_entrada 	 = addParam("Entrada", shapeIn);
-		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
+		_gradEntrada = addParam("Grad Entrada", shapeIn);
 		_saida 		 = addParam("Saida", shapeOut);
 
 		_construida = true;// camada pode ser usada.
@@ -143,19 +142,20 @@ public class Flatten extends Camada implements Cloneable {
 	@Override
 	public void ajustarParaLote(int tamLote) {
 		if (tamLote == 0) {
-			_entrada 	= addParam("Entrada", shapeIn);
+			_gradEntrada = addParam("Grad Entrada", shapeIn);
 			_saida 		= addParam("Saida", tamSaida());
 		
 		} else {
 			int[] shape = new int[shapeIn.length + 1];
 			shape[0] = tamLote;
-			System.arraycopy(shapeIn, 0, shape, 1, shapeIn.length);
+			for (int i = 0; i < shapeIn.length; i++) {
+				shape[i+1] = shapeIn[i];
+			}
 
-			_entrada	= addParam("Entrada", shape);
+			_gradEntrada = addParam("Grad Entrada", shape);
 			_saida		= addParam("Saida", tamLote, totalFlatten);
 		}
 
-		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
 		
 		this.tamLote = tamLote;
 	}
@@ -186,7 +186,7 @@ public class Flatten extends Camada implements Cloneable {
 			);
 		}
 
-		_entrada.copiar(x);
+		_entrada = x.contiguous();
 		_saida.copiarElementos(_entrada);
 
 		return _saida;
@@ -305,7 +305,6 @@ public class Flatten extends Camada implements Cloneable {
 		clone.shapeIn = shapeIn.clone();
 		clone.shapeOut = shapeOut.clone();
 
-		clone._entrada = _entrada.clone();
 		clone._gradEntrada = _gradEntrada.clone();
 		clone._saida = _saida.clone();
 
@@ -332,7 +331,6 @@ public class Flatten extends Camada implements Cloneable {
 		tamVars += 4; //tamLote
 
 		long tamTensores =
-		_entrada.tamBytes() +
 		_saida.tamBytes() +
 		_gradEntrada.tamBytes();
 

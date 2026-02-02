@@ -165,7 +165,7 @@ public class Densa extends Camada implements Cloneable {
 	/**
 	 * Função de ativação da camada
 	 */
-	private Ativacao ativacao = new Linear();
+	private Ativacao act = new Linear();
 
 	/**
 	 * Inicializador para os pesos da camada.
@@ -249,7 +249,7 @@ public class Densa extends Camada implements Cloneable {
 
 		//usar os valores padrão se necessário
 		Dicionario dic = new Dicionario();
-		if (act != null) this.ativacao = dic.getAtivacao(act);
+		if (act != null) this.act = dic.getAtivacao(act);
 		if (iniKernel != null) this.iniKernel = dic.getInicializador(iniKernel);
 		if (iniBias != null)  this.iniBias = dic.getInicializador(iniBias);
 	}
@@ -323,7 +323,6 @@ public class Densa extends Camada implements Cloneable {
 			);
 		}
 
-		_entrada  	= addParam("Entrada", _tamEntrada);
 		_saida  	= addParam("Saida", _numNeuronios);
 		_kernel 	= addParam("Kernel", _tamEntrada, _numNeuronios);
 		_gradKernel = addParam("Grad Kernel", _kernel.shape());
@@ -335,7 +334,7 @@ public class Densa extends Camada implements Cloneable {
 
 		_buffer 	 = addParam("Buffer", _saida.shape());
 		_gradSaida 	 = addParam("Grad Saida", _saida.shape());
-		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
+		_gradEntrada = addParam("Grad Entrada", _tamEntrada);
 		
 		_treinavel = true;// camada pode ser treinada.
 		_construida = true;// camada pode ser usada.
@@ -351,7 +350,7 @@ public class Densa extends Camada implements Cloneable {
 
 	@Override
 	public void setAtivacao(Object act) {
-		this.ativacao = new Dicionario().getAtivacao(act);
+		this.act = new Dicionario().getAtivacao(act);
 	}
 
 	@Override
@@ -361,18 +360,17 @@ public class Densa extends Camada implements Cloneable {
 
 	@Override
 	public void ajustarParaLote(int tamLote) {
-		if (tamLote == 0) {// remover dimensão de lote
-			_entrada = addParam("Entrada", _tamEntrada);
+		if (tamLote == 0) {
+			_gradEntrada = addParam("Grad Entrada", _tamEntrada);
 			_saida = addParam("Saida", _numNeuronios);
 		
 		} else {
-			_entrada = addParam("Entrada", tamLote,  _tamEntrada);
+			_gradEntrada = addParam("Grad Entrada", tamLote,  _tamEntrada);
 			_saida = addParam("Saida", tamLote,  _numNeuronios);
 		}
-
+		
 		_buffer 	 = addParam("Buffer", _saida.shape());
 		_gradSaida 	 = addParam("Grad Saida", _saida.shape());
-		_gradEntrada = addParam("Grad Entrada", _entrada.shape());
 		
 		this._tamLote = tamLote;
 	}
@@ -404,7 +402,6 @@ public class Densa extends Camada implements Cloneable {
 	public Tensor forward(Tensor x) {
 		verificarConstrucao();
 
-		// isso aqui vai ser melhorado
 		if (x.numDim() == 2) {
 			int lotes = x.tamDim(0);
 			if (_tamLote != lotes) {
@@ -420,11 +417,11 @@ public class Densa extends Camada implements Cloneable {
 			);
 		}
 
-		_entrada.copiar(x);
+		_entrada = x.contiguous();
 
 		lops.forwardDensa(_entrada, _kernel, _bias, _buffer);
 
-		ativacao.forward(_buffer, _saida);
+		act.forward(_buffer, _saida);
 
 		return _saida;
 	}
@@ -449,7 +446,7 @@ public class Densa extends Camada implements Cloneable {
 
 		_gradSaida.copiar(g);
 		
-		ativacao.backward(this);
+		act.backward(this);
 		
 		_gradEntrada.zero();
 		lops.backwardDensa(
@@ -489,7 +486,7 @@ public class Densa extends Camada implements Cloneable {
 
 	@Override
 	public Ativacao ativacao() {
-		return ativacao;
+		return act;
 	}
 
 	/**
@@ -498,7 +495,7 @@ public class Densa extends Camada implements Cloneable {
 	 */
 	public int tamEntrada() {
 		verificarConstrucao();
-		return _entrada.tam();
+		return _tamEntrada;
 	}
 
 	/**
@@ -534,7 +531,7 @@ public class Densa extends Camada implements Cloneable {
 		
 		sb.append(nome() + " (id " + id + ") = [\n");
 
-		sb.append(pad).append("Ativação: " + ativacao.nome() + "\n");
+		sb.append(pad).append("Ativação: " + act.nome() + "\n");
 		sb.append(pad).append("Entrada: " + tamEntrada() + "\n");
 		sb.append(pad).append("Neurônios: " + numNeuronios() + "\n");
 		sb.append(pad).append("Saida: " + tamSaida() + "\n");
@@ -574,7 +571,7 @@ public class Densa extends Camada implements Cloneable {
 		Densa clone = (Densa) super.clone();
 
 		clone.lops = new LayerOps();
-		clone.ativacao = new Dicionario().getAtivacao(this.ativacao.nome());
+		clone.act = new Dicionario().getAtivacao(this.act.nome());
 		clone._treinavel = this._treinavel;
 
 		clone.usarBias = this.usarBias;
@@ -583,7 +580,6 @@ public class Densa extends Camada implements Cloneable {
 			clone._gradBias = Optional.of(gradBias());
 		}
 
-		clone._entrada = this._entrada.clone();
 		clone._kernel = this._kernel.clone();
 		clone._buffer = this._buffer.clone();
 		clone._saida = this._saida.clone();
@@ -604,7 +600,7 @@ public class Densa extends Camada implements Cloneable {
 	@Override
 	public int[] shapeIn() {
 		verificarConstrucao();
-		return _entrada.shape();
+		return _gradEntrada.shape();
 	}
 
 	/**
@@ -682,7 +678,6 @@ public class Densa extends Camada implements Cloneable {
 
 		long tamTensores =
 		_kernel.tamBytes() + 
-		_entrada.tamBytes() +
 		_buffer.tamBytes() +
 		_saida.tamBytes() +
 		_gradEntrada.tamBytes() +
