@@ -56,7 +56,8 @@ Sequencial modelo = new Sequencial(
 );
 ```
 
-<img src="https://github.com/user-attachments/assets/347ab287-eb99-4b6c-9fa1-55dd18756a0f"/>
+<img width="1149" height="891" alt="Image" src="https://github.com/user-attachments/assets/6356805a-36d3-4f2e-9900-9fe6b94735da" />
+
 *Exemplo de treino com o modelo sequencial, usando o otimizador sgd (Stochastic Gradient Descent) e função de perda mse (Mean Squared Error)*
 
 # **Interface com código nativo**
