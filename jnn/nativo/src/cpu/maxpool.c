@@ -1,4 +1,5 @@
 #include "maxpool.h"
+
 #include <stdio.h>
 
 void cpu_maxpool2d_forward(const maxpool2d_fwd_params_t* params) {

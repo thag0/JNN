@@ -37,13 +37,14 @@ set OUT_DIR=bin\nativo\cpu\win64
 set DLL=jnn_native.dll
 
 set SRC=^
- jnn\nativo\jni\jnn_jni.c ^
- jnn\nativo\dispatch\dispatcher.c ^
- jnn\nativo\cpu\*.c
+ jnn\nativo\src\jni\jnn_jni.c ^
+ jnn\nativo\src\dispatch\dispatcher.c ^
+ jnn\nativo\src\cpu\*.c
 
 if not exist "%OUT_DIR%" mkdir "%OUT_DIR%"
 
 gcc ^
+ -Wall -Wextra ^
  -O3 ^
  -shared ^
  -march=x86-64 ^
@@ -53,10 +54,9 @@ gcc ^
  -fopenmp ^
  -I"%JAVA_HOME%\include" ^
  -I"%JAVA_HOME%\include\win32" ^
- -I"jnn\nativo" ^
- -I"jnn\nativo\cpu" ^
- -I"jnn\nativo\dispatch" ^
- -I"jnn\nativo\jni" ^
+ -I"jnn\nativo\include\cpu" ^
+ -I"jnn\nativo\include\dispatch" ^
+ -I"jnn\nativo\include\jni" ^
  %SRC% ^
  -o "%OUT_DIR%\%DLL%"
 

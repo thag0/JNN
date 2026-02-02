@@ -31,6 +31,9 @@ Java_jnn_nativo_JNNNative_setThreads(JNIEnv* env, jclass cls, jint n) {
 
 JNIEXPORT void JNICALL 
 Java_jnn_nativo_JNNNative_setBackend(JNIEnv * env, jclass cls, jint backend) {
+    (void) env;
+    (void) cls;
+
     jnn_set_backend(backend);
 }
 
@@ -240,6 +243,8 @@ Java_jnn_nativo_JNNNative_maxPool2dBackward(
     jint alt_std, 
     jint larg_std
 ) {
+    (void) cls;
+
     float* X = (*env)->GetPrimitiveArrayCritical(env, x_arr, NULL);
     float* GS = (*env)->GetPrimitiveArrayCritical(env, gs_arr, NULL);
     float* GE = (*env)->GetPrimitiveArrayCritical(env, ge_arr, NULL);
@@ -252,6 +257,8 @@ Java_jnn_nativo_JNNNative_maxPool2dBackward(
         .canais = canais,
         .alt_x = alt_x,
         .larg_x = larg_x,
+        .alt_gs = alt_gs,
+        .larg_gs = larg_gs,
         .alt_pool = alt_pool,
         .larg_pool = larg_pool,
         .alt_std = alt_std,
