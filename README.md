@@ -56,9 +56,9 @@ Sequencial modelo = new Sequencial(
 );
 ```
 
-<img width="1149" height="891" alt="Image" src="https://github.com/user-attachments/assets/6356805a-36d3-4f2e-9900-9fe6b94735da" />
+<img width="1097" height="892" alt="Image" src="https://github.com/user-attachments/assets/c0bd172b-6ec9-456a-ac7c-2dbe3230d1d9" />
 
-*Exemplo de treino com o modelo sequencial, usando o otimizador sgd (Stochastic Gradient Descent) e função de perda mse (Mean Squared Error)*
+*Exemplo de treino com o modelo sequencial, usando o otimizador sgd (Stochastic Gradient Descent) e função de perda mse (Mean Squared Error) usando dataset Iris*
 
 # **Interface com código nativo**
 Para acelerar processos críticos que demandam muito tempo em java, implementei a aceleração usando código nativo em C, por enquanto essas funcionalidades estão beneficiando apenas as camadas Densa e Conv2D (que são as mais pesadas), mas tenho interesse em expandir esse cenário de aceleração e quem sabe futuramente implementar cuda.
