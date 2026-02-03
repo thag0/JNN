@@ -7,7 +7,6 @@ import jnn.camadas.Camada;
 import jnn.camadas.Entrada;
 import jnn.core.Dicionario;
 import jnn.core.JNNutils;
-import jnn.core.tensor.Tensor;
 import jnn.metrica.Avaliador;
 import jnn.treino.Treinador;
 
@@ -297,19 +296,6 @@ public class Sequencial extends Modelo {
 		_otimizador.construir(params(), grads());
 		
 		_compilado = true;// modelo pode ser usado.
-	}
-
-	@Override
-	public Tensor backward(Tensor g) {
-		validarCompilacao();
-		
-		// talvez melhorar isso aqui criando um Iterator reverso
-		final int n = numCamadas();
-		for (int i = n-1; i >= 0; i--) {
-			g = camada(i).backward(g);
-		}
-
-		return g;
 	}
 
 	@Override

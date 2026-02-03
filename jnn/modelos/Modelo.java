@@ -254,7 +254,26 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * @param g {@code Tensor} contendo o gradiente da perda em relação a saída do modelo.
 	 * @return {@code Tensor} contendo o gradiente da perda em relação a entrada do modelo.
 	 */
-	public abstract Tensor backward(Tensor g);
+	public Tensor backward(Tensor g) {
+		validarCompilacao();
+		
+		try {
+			final int n = numCamadas() - 1;
+			for (int i = n; i >= 0; i--) {
+				g = camada(i).backward(g);
+			}
+		
+		} catch (NullPointerException npe) {
+			// Pode disparar um nullpointer caso não tenha rodado
+			// nenhum forward anteriormente, aí as entradas das
+			// camadas ainda não apontam para lugar nenhum.
+			throw new IllegalStateException(
+				"\nNecessário realizar um forward prévio antes de chamar backward()."
+			);
+		}
+
+		return g;
+	}
 
 	/**
 	 * Zera os gradientes acumulados do modelo.
@@ -653,5 +672,26 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 		}
 	}
 
+	/**
+	 * Retorna o tamanho em bytes na memória que o modelo possui alocado.
+	 * @return tamanho calculado em bytes.
+	 */
 	public abstract long tamBytes();
+
+	/**
+	 * Retorna o formato de entrada da primeira camada do modelo.
+	 * @return array contendo formato de entrada do modelo.
+	 */
+	public int[] shapeIn() {
+		return camada(0).shapeIn();
+	}
+	
+	/**
+	 * Retorna o formato de saída da última camada do modelo.
+	 * @return array contendo formato de saída do modelo.
+	 */
+	public int[] shapeOut() {
+		return camadaSaida().shapeOut();
+	}
+
 }

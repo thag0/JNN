@@ -7,7 +7,6 @@ import jnn.camadas.Camada;
 import jnn.camadas.Densa;
 import jnn.core.Dicionario;
 import jnn.core.JNNutils;
-import jnn.core.tensor.Tensor;
 import jnn.metrica.Avaliador;
 import jnn.metrica.perda.MSE;
 import jnn.metrica.perda.Perda;
@@ -384,19 +383,6 @@ public class RedeNeural extends Modelo {
 		_otimizador.construir(params(), grads());
 
 		_compilado = true;
-	}
-
-	@Override
-	public Tensor backward(Tensor g) {
-		validarCompilacao();
-		
-		// talvez melhorar isso aqui criando um Iterator reverso
-		final int n = numCamadas();
-		for (int i = n-1; i >= 0; i--) {
-			g = camada(i).backward(g);
-		}
-
-		return g;
 	}
 
 	/**

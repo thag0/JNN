@@ -483,7 +483,6 @@ public class Conv2D extends Camada implements Cloneable {
 		_gradKernel   = addParam("Grad Kernel", _kernel.shape());
 		_saida        = addParam("Saida", shapeOut);
 		_buffer 	  = addParam("Buffer", _saida.shape());
-		_gradSaida    = addParam("Grad Saida", _saida.shape());
 
 		if (usarBias) {
 			_bias      = Optional.of(addParam("Bias", shapeOut[0]));
@@ -522,7 +521,7 @@ public class Conv2D extends Camada implements Cloneable {
 			final int canais = shapeIn[0];
 			final int altIn = shapeIn[1];
 			final int largIn = shapeIn[2];
-	
+
 			final int filtros = shapeOut[0];
 			final int altOut = shapeOut[1];
 			final int largOut = shapeOut[2];
@@ -531,8 +530,7 @@ public class Conv2D extends Camada implements Cloneable {
 			_saida = addParam("Saida", tamLote, filtros, altOut, largOut);
 		}
 
-		_buffer 	 = addParam("Buffer", _saida.shape());
-		_gradSaida 	 = addParam("Grad Saida", _saida.shape());
+		_buffer = addParam("Buffer", _saida.shape());
 
 		this.tamLote = tamLote;
 	}
@@ -608,11 +606,12 @@ public class Conv2D extends Camada implements Cloneable {
 	public Tensor backward(Tensor g) {
 		verificarConstrucao();
 
-		_gradSaida.copiar(g);
+		_gradSaida = g.contiguous();
 
-		act.backward(this);
+		act.backward(this, g);
 
 		_gradEntrada.zero();// zerar acumulações anteriores
+
 		lops.backwardConv2D(
 			_entrada,
 			_kernel,
@@ -687,10 +686,10 @@ public class Conv2D extends Camada implements Cloneable {
 		
 		sb.append(nome() + " (id " + id + ") = [\n");
 
-		sb.append(pad).append("Ativação: " + act.nome() + "\n");
 		sb.append(pad).append("Entrada: " + JNNutils.arrayStr(shapeIn) + "\n");
 		sb.append(pad).append("Filtros: " + numFiltros() + "\n");
 		sb.append(pad).append("Saida: " + JNNutils.arrayStr(shapeOut) + "\n");
+		sb.append(pad).append("Ativação: " + act.nome() + "\n");
 		sb.append("\n");
 
 		sb.append(pad + "Kernel: " + _kernel.shapeStr() + "\n");
@@ -740,7 +739,6 @@ public class Conv2D extends Camada implements Cloneable {
 
 		clone._buffer = this._buffer.clone();
 		clone._saida = this._saida.clone();
-		clone._gradSaida = this._gradSaida.clone();
 
 		return clone;
 	}
@@ -841,7 +839,6 @@ public class Conv2D extends Camada implements Cloneable {
 		_buffer.tamBytes() +
 		_saida.tamBytes() +
 		_gradEntrada.tamBytes() +
-		_gradSaida.tamBytes() + 
 		_gradKernel.tamBytes();
 
 		if (temBias()) {

@@ -34,12 +34,26 @@ import jnn.core.tensor.Tensor;
  */
 public abstract class Ativacao {
 
+	/**
+	 * Função usada para o forward pass.
+	 * @param x valor de entrada.
+	 * @return valor calculado pela ativação.
+	 */
 	protected float fx(float x) {
-		throw new UnsupportedOperationException("\nNão implementado.");
+		throw new UnsupportedOperationException(
+			"\nNão fx implementado para " + nome() + "."
+		);
 	}
 
+	/**
+	 * Função usada para o backward pass.
+	 * @param x valor de entrada.
+	 * @return valor calculado pela ativação.
+	 */
 	protected float dx(float x) {
-		throw new UnsupportedOperationException("\nNão implementado.");
+		throw new UnsupportedOperationException(
+			"\nNão dx implementado para " + nome() + "."
+		);
 	}
 
 	/**
@@ -115,9 +129,9 @@ public abstract class Ativacao {
 	 * </p>
 	 * @param camada camada densa.
 	 */
-	public void backward(Densa camada) {
+	public void backward(Densa camada, Tensor g) {
 		//por padrão chamar o método da própria ativação
-		backward(camada._buffer, camada._gradSaida, camada._gradSaida);
+		backward(camada._buffer, g, camada._gradSaida);
 	}
 
 	/**
@@ -127,9 +141,9 @@ public abstract class Ativacao {
 	 * </p>
 	 * @param camada camada convolucional.
 	 */
-	public void backward(Conv2D camada) {
+	public void backward(Conv2D camada, Tensor g) {
 		//por padrão chamar o método da própria ativação
-		backward(camada._buffer, camada._gradSaida, camada._gradSaida);
+		backward(camada._buffer, g, camada._gradSaida);
 	}
 
 	/**

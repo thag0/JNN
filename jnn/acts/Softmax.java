@@ -87,18 +87,18 @@ public class Softmax extends Ativacao {
 	}
 
 	@Override
-	public void backward(Densa camada) {
+	public void backward(Densa camada, Tensor g) {
 		final int numDim = camada._saida.numDim();
 		
 		if (numDim == 1) {
-			backward1D(camada._saida, camada._gradSaida);
+			backward1D(camada._saida, g);
 			
 		} else if (numDim == 2) {
 			final int lin = camada._saida.tamDim(0);
 			for (int i = 0; i < lin; i++) {
 				backward1D(
 					camada._saida.subTensor(i),
-					camada._gradSaida.subTensor(i)
+					g.subTensor(i)
 				);
 			}
 		
@@ -130,7 +130,7 @@ public class Softmax extends Ativacao {
 	}
 
 	@Override
-	public void backward(Conv2D camada) {
+	public void backward(Conv2D camada, Tensor g) {
 		throw new UnsupportedOperationException(
 			"\nSem suporte para Conv2D."
 		);

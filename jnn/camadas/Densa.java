@@ -333,7 +333,6 @@ public class Densa extends Camada implements Cloneable {
 		}
 
 		_buffer 	 = addParam("Buffer", _saida.shape());
-		_gradSaida 	 = addParam("Grad Saida", _saida.shape());
 		_gradEntrada = addParam("Grad Entrada", _tamEntrada);
 		
 		_treinavel = true;// camada pode ser treinada.
@@ -369,8 +368,7 @@ public class Densa extends Camada implements Cloneable {
 			_saida = addParam("Saida", tamLote,  _numNeuronios);
 		}
 		
-		_buffer 	 = addParam("Buffer", _saida.shape());
-		_gradSaida 	 = addParam("Grad Saida", _saida.shape());
+		_buffer = addParam("Buffer", _saida.shape());
 		
 		this._tamLote = tamLote;
 	}
@@ -402,14 +400,14 @@ public class Densa extends Camada implements Cloneable {
 	public Tensor forward(Tensor x) {
 		verificarConstrucao();
 
-		if (x.numDim() == 2) {
+		if (x.numDim() == 1) {
+			ajustarParaLote(0);
+			
+		} else if (x.numDim() == 2) {
 			int lotes = x.tamDim(0);
 			if (_tamLote != lotes) {
 				ajustarParaLote(lotes);
 			}
-
-		} else if (x.numDim() == 1) {
-			ajustarParaLote(0);
 			
 		} else {
 			throw new UnsupportedOperationException(
@@ -443,12 +441,13 @@ public class Densa extends Camada implements Cloneable {
 	@Override
 	public Tensor backward(Tensor g) {
 		verificarConstrucao();
-
-		_gradSaida.copiar(g);
 		
-		act.backward(this);
+		_gradSaida = g.contiguous();
+
+		act.backward(this, g);
 		
 		_gradEntrada.zero();
+
 		lops.backwardDensa(
 			_entrada,
 			_kernel,
@@ -583,7 +582,6 @@ public class Densa extends Camada implements Cloneable {
 		clone._kernel = this._kernel.clone();
 		clone._buffer = this._buffer.clone();
 		clone._saida = this._saida.clone();
-		clone._gradSaida = this._gradSaida.clone();
 		clone._gradKernel = this._gradKernel.clone();
 
 		return clone;
@@ -681,7 +679,6 @@ public class Densa extends Camada implements Cloneable {
 		_buffer.tamBytes() +
 		_saida.tamBytes() +
 		_gradEntrada.tamBytes() +
-		_gradSaida.tamBytes() + 
 		_gradKernel.tamBytes();
 
 		if (temBias()) {

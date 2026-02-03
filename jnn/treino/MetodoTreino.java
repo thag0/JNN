@@ -66,10 +66,7 @@ public abstract class MetodoTreino {
 	 * pelo modelo.
 	 */
 	protected void backpropagation(Tensor g) {
-		final int n = modelo.numCamadas();
-		for (int i = n-1; i >= 0; i--) {
-			g = modelo.camada(i).backward(g);
-		}
+		modelo.backward(g);// implementação com checks
 	}
 
 	/**
