@@ -12,9 +12,9 @@ if not exist %OUT_DIR% mkdir %OUT_DIR%
 
 @REM javac -cp "%CP_JNN_GED%" -d %OUT_DIR% MainConv.java
 @REM javac -cp "%CP_JNN_GED%" -d %OUT_DIR% Benchmark.java
-@REM javac -cp "%CP_JNN_GED_GEIM%" -d %OUT_DIR% Conv.java
+javac -cp "%CP_JNN_GED_GEIM%" -d %OUT_DIR% Conv.java
 @REM javac -cp "%CP_JNN_GED%" -d %OUT_DIR% Playground.java
-javac -cp "%CP_JNN_GED%" -d %OUT_DIR% TesteConv.java
+@REM javac -cp "%CP_JNN_GED%" -d %OUT_DIR% TesteConv.java
 @REM javac -cp "%CP_JNN_GED_GEIM%" -d %OUT_DIR% TesteJNI.java
 @REM javac -cp "%CP_JNN_GED%" -d %OUT_DIR% TesteTempos.java
 
