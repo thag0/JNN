@@ -348,7 +348,7 @@ public class Densa extends Camada implements Cloneable {
 	}
 
 	@Override
-	public void setAtivacao(Object act) {
+	public void setAct(Object act) {
 		this.act = new Dicionario().getAtivacao(act);
 	}
 
@@ -484,7 +484,7 @@ public class Densa extends Camada implements Cloneable {
 	}
 
 	@Override
-	public Ativacao ativacao() {
+	public Ativacao act() {
 		return act;
 	}
 

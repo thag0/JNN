@@ -151,7 +151,7 @@ public class Serializador extends SerialBase {
 				rede.camada(i).kernel().copiar(camadas[i].kernel());
 				if (temBias) rede.camada(i).bias().copiar(camadas[i].bias());
 
-				rede.camada(i).setAtivacao(camadas[i].ativacao().nome());
+				rede.camada(i).setAct(camadas[i].act().nome());
 			}
 
 		} catch (IOException e) {

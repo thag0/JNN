@@ -502,7 +502,7 @@ public class Conv2D extends Camada implements Cloneable {
 	}
 
 	@Override
-	public void setAtivacao(Object act) {
+	public void setAct(Object act) {
 		this.act = new Dicionario().getAtivacao(act);
 	}
 
@@ -642,7 +642,7 @@ public class Conv2D extends Camada implements Cloneable {
 	}
 
 	@Override
-	public Ativacao ativacao() {
+	public Ativacao act() {
 		return act;
 	}
 

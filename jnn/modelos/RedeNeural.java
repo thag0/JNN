@@ -186,7 +186,7 @@ public class RedeNeural extends Modelo {
 		validarCompilacao();
 		
 		for (Camada camada : _camadas) {
-			camada.setAtivacao(ativacao);
+			camada.setAct(ativacao);
 		}
 	}
 
@@ -224,7 +224,7 @@ public class RedeNeural extends Modelo {
 		validarCompilacao();
 		
 		for (Camada camada : _camadas) {
-			camada.setAtivacao(ativacao);
+			camada.setAct(ativacao);
 		}
 	}
 
@@ -243,7 +243,7 @@ public class RedeNeural extends Modelo {
 	 */
 	public void configurarAtivacao(Densa camada, Ativacao act) {
 		JNNutils.validarNaoNulo(camada, "camada == null");
-		camada.setAtivacao(act);
+		camada.setAct(act);
 	}
 
 	/**
@@ -261,7 +261,7 @@ public class RedeNeural extends Modelo {
 	 */
 	public void configurarAtivacao(Densa camada, String act) {
 		JNNutils.validarNaoNulo(camada, "camada == null.");
-		camada.setAtivacao(act);
+		camada.setAct(act);
 	}
 
 	/**
@@ -527,7 +527,7 @@ public class RedeNeural extends Modelo {
 		//ativações
 		for (int i = 0; i < _camadas.length; i++) {
 			sb.append(pad).append("Ativação camada ").append(i).append(": ")
-			.append(_camadas[i].ativacao().nome()).append("\n");
+			.append(_camadas[i].act().nome()).append("\n");
 		}
 
 		//arquitetura

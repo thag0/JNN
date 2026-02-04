@@ -33,7 +33,7 @@ class SerialDensa extends SerialBase {
         int[] shapeOut = camada.shapeOut();
 		escrever(dos, shapeOut);
 	
-		escrever(dos, camada.ativacao().nome());
+		escrever(dos, camada.act().nome());
 	
 		escrever(dos, camada.temBias());
 		

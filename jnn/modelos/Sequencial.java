@@ -370,7 +370,7 @@ public class Sequencial extends Modelo {
 			//função de ativação
 			String ativacao;
 			try {
-				ativacao = camada.ativacao().nome();
+				ativacao = camada.act().nome();
 			} catch (Exception e) {
 				ativacao = "-";
 			}

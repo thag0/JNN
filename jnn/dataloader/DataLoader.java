@@ -28,7 +28,7 @@ public class DataLoader implements Iterable<Amostra> {
     /**
      * Conjunto de elementos.
      */
-    Amostra[] dados = {};
+    private Amostra[] dados = {};
 
     /**
      * Inicializa um DataLoader vazio.

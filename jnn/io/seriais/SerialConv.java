@@ -36,7 +36,7 @@ class SerialConv extends SerialBase {
 		int[] filtro = camada.formatoFiltro();
 		escrever(dos, filtro);
 
-		escrever(dos, camada.ativacao().nome());
+		escrever(dos, camada.act().nome());
 	
 		escrever(dos, camada.temBias());
 
@@ -69,7 +69,7 @@ class SerialConv extends SerialBase {
 		if (temBias) bias = lerArrFloat(dis);
 		
 		Conv2D camada = new Conv2D(numFiltros, filtro);
-		camada.setAtivacao(actStr);
+		camada.setAct(actStr);
 		camada.setBias(temBias);
 		camada.construir(shapeIn);
 

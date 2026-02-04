@@ -47,8 +47,8 @@ import jnn.core.tensor.Tensor;
  *    </li>
  *    <li>
  *       Segundo, que as funções de ativação não são camadas independentes e sim 
- *       funções que atuam sobre os elementos das camadas, especialmente nos elementos 
- *       chamados "somatório" e guardam os resultados na saída da camada.
+ *       funções que atuam sobre os elementos das camadas, e guardam os resultados 
+ * 		 na saída da camada.
  *    </li>
  * </ul>
  */
@@ -113,15 +113,15 @@ public abstract class Camada {
 
 	/**
 	 * Configura a função de ativação da camada através de uma instância 
-	 * de {@code Ativacao} que será usada para ativar seus neurônios.
+	 * de {@code Ativacao} que será usada para ativar sua saída.
 	 * <p>
 	 *    Configurando a ativação da camada usando uma instância de função 
 	 *    de ativação aumenta a liberdade de personalização dos hiperparâmetros
-	 *    que algumas funções podem ter.
+	 *    que algumas funções proporcionam.
 	 * </p>
 	 * @param act nova função de ativação.
 	 */
-	public void setAtivacao(Object act) {
+	public void setAct(Object act) {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui configuração de função de ativação."
 		);    
@@ -211,7 +211,7 @@ public abstract class Camada {
 	 * Retorna a função de ativação configurada pela camada.
 	 * @return função de ativação da camada.
 	 */
-	public Ativacao ativacao() {
+	public Ativacao act() {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui função de ativação."
 		);  

@@ -11,47 +11,20 @@ import jnn.io.seriais.SerialTensor;
 
 /**
  * <h2>
- *		Tensor multidimensional
+ *		Tensor Multidimensional
  * </h2>
  *		Um {@code Tensor} representa um vetor que pode conter diversas dimensões,
  *		cada uma contendo um tamanho fixo de elementos.
  * <p>
- * 		O tensor possui algumas funções próprias com intuito de aproveitar a
- * 		velocidade de processamento usando um único array contendo seus dados.
+ *		Esta implementação de tensor considera o formato {@code row-major} para
+ *		armazenamento em memória e manipulação.
  * </p>
- * <h2>
- *		Criação:
- * </h2>
- * <pre>
- *Tensor tensor = new Tensor(2, 2);
- *tensor = [
- *  [[0.0, 0.0],
- *   [0.0, 0.0]]
- *]
- * 
- *float[][] mat = { {...}, {...}, ... };
- *Tensor tensor = new Tensor(mat);
- * </pre>
- * <h2>
- *		Operações
- * </h2>
- *		Quase todas as operações realizadas acontecem localmente,
- *		alterando o conteúdo da instância que realizou o procedimento.
- * <pre>
- *Tensor a = [
- *	[1, 2, 3]
- *]
- *Tensor b = [
- *	[1, 2, 3]
- *]
- *a.add(b);// resultado em A
- * </pre>
- * <h2>
- *		Nota
- * </h2>
- * Algumas operação retornam visualizações do tensor, como: {@code view()},
- * {@code reshape()}, {@code transpor()}, {@code permutar()}, {@code squeeze()},
- * {@code unsqueeze()}, {@code flatten()}, {@code subTensor()}
+ * <p>
+ *		A maioria das implementações considera alterações {@code in-place} sendo
+ *		evitado ao máximo alocação de memória para reduzir pressão no Garbage Collector.
+ * </p>
+ * <p>
+ * </p>
  * @author Thiago Barroso, acadêmico de Engenharia da Computação pela
  * Universidade Federal do Pará, Campus Tucuruí. Maio/2024.
  */
