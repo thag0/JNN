@@ -12,7 +12,7 @@ O Tensor pode ser criado a partir de arrays primitivos oferecidos pelo prórpio 
 
 # *Exemplo de criação*
 ```
-double[][] arr = {
+float[][] arr = {
     {1, 2},
     {3, 4}
 };
@@ -81,6 +81,14 @@ java --enable-native-access=ALL-UNNAMED -cp "jnn.jar" NomeDoPrograma
 ```
 
 Importante reforçar que o jni por enquanto suporta apenas windows_x64 e que o usuário deve ter instalado o OpenMP na máquina.
+
+# **Callbacks de treino**
+
+É possível adicionar callbacks ao final de cada época de trieno para poder aproveitar os dados em processamentos para fazer análises especiais.
+
+<img width="1406" height="600" alt="Image" src="https://github.com/user-attachments/assets/886fcf8a-acf4-4bda-86f1-02f1fb4f7e71" />
+
+*Utilizando callback para capturar acurácia do modelo durante o treino*
 
 # **Adicionais**
 Caso queira ajustar a quantidade de threads alocadas para a biblioteca, chame antes do inicio das inicializações:

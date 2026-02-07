@@ -2,6 +2,9 @@ package jnn.core.parallel;
 
 import java.util.concurrent.ForkJoinPool;
 
+import jnn.core.JNNlog;
+import jnn.core.JNNlog.TipoLog;
+
 /**
  * Molde de criação para multiprocessamento.
  */
@@ -43,6 +46,14 @@ public class PoolFactory {
         if (t < 1) {
             throw new IllegalArgumentException(
                 "\nValor de threads " + t + " inválido."
+            );
+        }
+
+        if (t > MAX_DISPONIVEL) {
+            JNNlog.log(
+                TipoLog.PARALLEL,
+                "Threads configuradas " + t + " é maior que o valor disponível " + MAX_DISPONIVEL
+                + ", podendo afetar o desempenho."
             );
         }
 

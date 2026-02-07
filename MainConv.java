@@ -1,4 +1,5 @@
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import ged.Dados;
@@ -33,18 +34,26 @@ public class MainConv {
 	// caminhos de arquivos externos
 	static final String CAMINHO_SAIDA_MODELO = "./dados/modelos/modelo-treinado.nn";
 	static final String CAMINHO_HISTORICO = "historico-perda.csv";
-
+	
 	public static void main(String[] args) {
 		ged.limparConsole();
-
+		
 		DataLoader dlTreino = CIFAR10.treino();
 		dlTreino.print();
-
+		
 		JNNnative.jni = true;
 
 		Sequencial modelo = cnn();
 		modelo.setHistorico(true);
 		modelo.print();
+
+		DataLoader dlTeste = CIFAR10.teste();
+	
+		ArrayList<Float> accs = new ArrayList<>();
+		modelo.treinador().setCallback(info -> {
+			float ac = modelo.avaliador().acuracia(dlTeste).item();
+			accs.add(ac);
+		});
 
 		System.out.println("Treinando.");
 		long tempo = System.nanoTime();
@@ -58,14 +67,12 @@ public class MainConv {
 
 		System.out.println("\nTempo de treino: " + horas + "h " + minutos + "min " + segundos + "s");
 
-		System.out.println("\nCarregando dados de teste.");
-		DataLoader dlTeste = CIFAR10.teste();
 		System.out.print("Teste -> perda: " + modelo.avaliar(dlTeste).item() + " - ");
 		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(dlTeste).item() * 100), 4) + "%");
 
 		salvarModelo(modelo, CAMINHO_SAIDA_MODELO);
 
-		exportarHistorico(modelo, CAMINHO_HISTORICO);
+		exportarHistorico(modelo, CAMINHO_HISTORICO, accs.toArray(new Float[]{}));
 		executarComando("python grafico.py " + CAMINHO_HISTORICO);
 	}
 
@@ -95,7 +102,7 @@ public class MainConv {
 	static Sequencial cnn() {
 		Sequencial modelo = new Sequencial(
 			new Entrada(3, 32, 32),
-			new Conv2D(32, new int[]{4, 4}, "relu"),
+			new Conv2D(32, new int[]{5, 5}, "relu"),
 			new MaxPool2D(new int[]{2, 2}),
 			new Conv2D(64, new int[]{3, 3}, "relu"),
 			new Conv2D(64, new int[]{3, 3}, "relu"),
@@ -142,17 +149,33 @@ public class MainConv {
 	 * @param modelo modelo.
 	 * @param caminho caminho onde será salvo o arquivo.
 	 */
-	static void exportarHistorico(Modelo modelo, String caminho) {
+	static void exportarHistorico(Modelo modelo, String caminho, Float[] accs) {
 		System.out.println("Exportando histórico de perda");
 
-		float[] perdas = modelo.hist();
-		float[][] dadosPerdas = new float[perdas.length][1];
+		Dados dados = null;
 
-		for (int i = 0; i < dadosPerdas.length; i++) {
-			dadosPerdas[i][0] = perdas[i];
+		if (accs != null) {
+			float[] perdas = modelo.hist();
+			float[][] dadosPerdas = new float[perdas.length][2];
+			
+			for (int i = 0; i < dadosPerdas.length; i++) {
+				dadosPerdas[i][0] = perdas[i];
+				dadosPerdas[i][1] = accs[i];
+			}
+			
+			dados = new Dados(dadosPerdas);	
+
+		} else {
+			float[] perdas = modelo.hist();
+			float[][] dadosPerdas = new float[perdas.length][1];
+			
+			for (int i = 0; i < dadosPerdas.length; i++) {
+				dadosPerdas[i][0] = perdas[i];
+			}
+			
+			dados = new Dados(dadosPerdas);
 		}
-
-		Dados dados = new Dados(dadosPerdas);
+		
 		ged.exportarCsv(dados, caminho);
 	}
 

@@ -4,6 +4,7 @@ import jnn.core.tensor.Tensor;
 import jnn.metrica.perda.Perda;
 import jnn.modelos.Modelo;
 import jnn.otm.Otimizador;
+import jnn.treino.callback.InfoEpoca;
 
 /**
   * Implementação de treino dos modelos.
@@ -27,7 +28,7 @@ public class Treino extends MetodoTreino {
 		if (logs) esconderCursor();
 		long tempo = 0;
 
-		for (int e = 1; e <= epochs; e++) {
+		for (int e = 0; e < epochs; e++) {
 			if (logs) tempo = System.nanoTime();
 
 			float perdaEpoca = 0.0f;
@@ -46,14 +47,15 @@ public class Treino extends MetodoTreino {
 			if (logs) {
 				tempo = System.nanoTime() - tempo;
 				limparLinha();
-				String log = "Época " +  e + "/" + epochs + " -> perda: " + (perdaEpoca/amostras);
+				String log = "Época " + (e+1) + "/" + epochs + " -> perda: " + (perdaEpoca/amostras);
 
 				long segundos = (long) tempo / 1_000_000_000;
-				long min = (segundos / 60);
-				long seg = segundos % 60;
 				if (segundos < 60) {
 					log += String.format(" (%ds)", segundos);
+				
 				} else {
+					long min = (segundos / 60);
+					long seg = segundos % 60;
 					log += String.format(" (%dmin %ds)", min, seg);
 				}
 
@@ -61,6 +63,10 @@ public class Treino extends MetodoTreino {
 			}
 
 			if (calcHist) historico.add(perdaEpoca/amostras);
+
+			if (callback != null) {
+				callback.run(new InfoEpoca(e, perdaEpoca));
+			}
 		}
 
 		if (logs) {

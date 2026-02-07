@@ -3,11 +3,13 @@ package jnn.treino;
 import java.util.LinkedList;
 import java.util.Random;
 
+import jnn.core.JNNlog;
 import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 import jnn.metrica.perda.Perda;
 import jnn.modelos.Modelo;
 import jnn.otm.Otimizador;
+import jnn.treino.callback.CallbackFimEpoca;
 
 public abstract class MetodoTreino {
 
@@ -20,7 +22,7 @@ public abstract class MetodoTreino {
 	 * Histórico de perda do modelo durante o treinamento.
 	 */
 	protected LinkedList<Float> historico;
-    
+
 	/**
 	 * Gerador de números pseudo-aleatórios.
 	 */
@@ -30,6 +32,11 @@ public abstract class MetodoTreino {
 	 * Variável de controle para armazenagem do histórico de treino.
 	 */
 	protected boolean calcHist;
+	
+	/**
+	 * 
+	 */
+	CallbackFimEpoca callback;
 
 	/**
 	 * Construtor interno.
@@ -50,14 +57,20 @@ public abstract class MetodoTreino {
 	}
 
 	/**
+	 * Configura um callback para ser chamado a cada final de época.
+	 * @param callback novo callback.
+	 */
+	public void setCallback(CallbackFimEpoca callback) {
+		if (callback != null) this.callback = callback;
+	}
+
+	/**
 	 * Configura uma seed manual para o método de treino, útil para replicar
 	 * e comparar resultados.
 	 * @param seed nova seed.
 	 */
 	public void setSeed(Number seed) {
-		if (seed != null) {
-			random.setSeed(seed.longValue());
-		}
+		if (seed != null) random.setSeed(seed.longValue());
 	}
 
 	/**
@@ -110,8 +123,10 @@ public abstract class MetodoTreino {
 	 * @param log informações desejadas.
 	 */
 	protected void exibirLogTreino(String log) {
-		System.out.println(log);
-		System.out.print("\033[1A"); // mover pra a linha anterior
+		limparLinha();
+
+		// JNNlog.log(info, LOG_LEVEL.TREINO);
+		JNNlog.logTreino(log);
 	}
 
 	/**

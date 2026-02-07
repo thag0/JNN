@@ -7,6 +7,7 @@ import jnn.core.parallel.PoolFactory;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;
+import jnn.treino.callback.CallbackFimEpoca;
 
 /**
  * Interface para treino de modelos da biblioteca.
@@ -43,6 +44,8 @@ public class Treinador implements Cloneable {
 	 */
 	protected long seed = 0L;// seed padrão
 
+	private CallbackFimEpoca callback;
+
 	/**
 	 * 
 	 */
@@ -59,11 +62,23 @@ public class Treinador implements Cloneable {
 		this(modelo, false, 1);
 	}
 
+	/**
+	 * Configura um novo método de treino.
+	 * @param metodo novo método de treino.
+	 */
 	public void setMetodo(MetodoTreino metodo) {
 		if (metodo != null) {
 			this.metodo = metodo;
 			this.metodo.historico = historico;
 		}
+	}
+
+	/**
+	 * Configura um callback para ser chamado a cada final de época.
+	 * @param callback novo callback.
+	 */
+	public void setCallback(CallbackFimEpoca callback) {
+		this.callback = callback;
 	}
 
 	/**
@@ -80,20 +95,6 @@ public class Treinador implements Cloneable {
 	 */
 	public void setHistorico(boolean calcular) {
 		this.calcHist = calcular;
-	}
-
-	/**
-	 * Ajusta a quantidade de threads para utilizar durante o treino.
-	 * @param n threads desejadas.
-	 */
-	public void setThreads(int n) {
-		if (n < 1) {
-			throw new IllegalArgumentException(
-				"\nNúmero de threads " + n + " inválido."
-			);
-		}
-
-		_numThreads = n;
 	}
 
 	/**
@@ -114,9 +115,11 @@ public class Treinador implements Cloneable {
 		if (tamLote < 2) setMetodo(new Treino(modelo));
 		else setMetodo(new TreinoLote(modelo, tamLote));
 
+		metodo.setCallback(callback);
+
 		metodo.calcHist = calcHist;
 		
-		// só mexer na seed se for mudada
+		// só mexer na seed se for mudado o valor padrão.
 		if (seed != 0) metodo.random.setSeed(seed);
 		
 		modelo.treino(true);	
