@@ -161,8 +161,7 @@ public class Tensor implements Iterable<Float>, Cloneable {
 	}
 
 	/**
-	 * Inicializar um tensor a partir de um conjunto de dados e formato
-	 * pré-definidos.
+	 * Inicializa um tensor a partir de um array primitivo.
 	 * @param arr {@code array} base.
 	 */
 	public Tensor(float[] arr) {
