@@ -54,7 +54,7 @@ public class PoolFactory {
         }
 
         if (t > MAX_DISPONIVEL) {
-            JNNlog.log(
+            JNNlog.logln(
                 TipoLog.PARALLEL,
                 "Threads configuradas " + t + " é maior que o valor disponível " + MAX_DISPONIVEL
                 + ", podendo afetar o desempenho."
