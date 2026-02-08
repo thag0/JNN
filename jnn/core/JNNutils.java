@@ -29,14 +29,30 @@ public final class JNNutils {
 		rng.setSeed(seed);
 	}
 
+	/**
+	 * Retorna um número normalmente distribuído com média = 0 
+	 * e desvio padrão = 1.
+	 * @return valor gerado.
+	 */
 	public static float randGaussianf() {
 		return (float) rng.nextGaussian();
 	}
 
+	/**
+	 * Retorna um número aleatório uniformemente distribuído com 
+	 * média = 0 e desvio padrão = 1.
+	 * @return valor gerado.
+	 */
 	public static float randFloat() {
 		return rng.nextFloat();
 	}
 
+	/**
+	 * Retorna um número aleatório de acordo com o intervalo especificado.
+	 * @param min valor mínimo (inclusivo).
+	 * @param max valor valor máximo (exclusivo).
+	 * @return valor gerado.
+	 */
 	public static float randFloat(float min, float max) {
 		return rng.nextFloat(min, max);
 	}

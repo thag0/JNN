@@ -4,9 +4,7 @@ import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 
 /**
- * <h3>
- *		Otimizador base
- * </h3>
+ * <p>Otimizador base</p>
  * <p>
  *		Novos otimizadores devem implementar os métodos {@code construir()} 
  *		e {@code atualizar()} que são chamados obrigatoriamente no momento da 
@@ -39,6 +37,11 @@ public abstract class Otimizador {
 	 * Auxiliar para o controle de inicialização do otimizador.
 	 */
 	protected boolean _construido = false;
+
+	/**
+	 * Construtor privado.
+	 */
+	protected Otimizador() {}
 
 	/**
 	 * Verifica se o otimizador pode ser utilizado.

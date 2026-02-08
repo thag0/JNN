@@ -20,13 +20,21 @@ public class TreinoLote extends MetodoTreino {
 	/**
 	 * Treinador em lotes, atualiza os parâmetros a subamostra
 	 * do dataset fornecido.
-	 * @param historico modelo para treino.
+	 * @param modelo modelo base.
+	 * @param hist calcular histórico de perda.
+	 * @param tamLote tamanho do lote de treino.
 	 */
 	public TreinoLote(Modelo modelo, boolean hist, int tamLote) {
 		super(modelo, hist);
 		this.tamLote = tamLote;
 	}
 
+	/**
+	 * Treinador em lotes, atualiza os parâmetros a subamostra
+	 * do dataset fornecido.
+	 * @param modelo modelo base.
+	 * @param tamLote tamanho do lote de treino.
+	 */
 	public TreinoLote(Modelo modelo, int tamLote) {
 		this(modelo, false, tamLote);
 	}

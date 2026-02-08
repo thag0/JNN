@@ -623,7 +623,7 @@ public final class Funcional {
     /**
      * Inicializa um {@code DataLoader} vazio.
      * @return {@code DataLoader}.
-     * @see {@link DataLoader}
+     * @see jnn.dataloader.DataLoader DataLoader
      */
     public DataLoader dataloader() {
         return new DataLoader();
@@ -632,10 +632,10 @@ public final class Funcional {
     /**
      * Inicializa um {@code DataLoader} a partir de um conjunto de amostras
      * de entrada (X) e de saída (Y).
-     * @param X {@code array} de {@code Tensor} com dados de entrada.
-     * @param Y {@code array} de {@code Tensor} com dados de saída.
+     * @param x {@code array} de {@code Tensor} com dados de entrada.
+     * @param y {@code array} de {@code Tensor} com dados de saída.
      * @return {@code DataLoader}.
-     * @see {@link DataLoader}
+     * @see jnn.dataloader.DataLoader DataLoader
      */
     public DataLoader dataloader(Tensor[] x, Tensor[] y) {
         return new DataLoader(x, y);
@@ -645,7 +645,7 @@ public final class Funcional {
      * Inicializa um {@code DataLoader} a partir de um conjunto de amostras.
      * @param as {@code array} de {@code Amostra}.
      * @return {@code DataLoader}.
-     * @see {@link DataLoader}
+     * @see jnn.dataloader.DataLoader DataLoader
      */
     public DataLoader dataloader(Amostra[] as) {
         return new DataLoader(as);
@@ -655,7 +655,7 @@ public final class Funcional {
      * Inicializa um {@code DataLoader} a partir de uma amostra inicial.
      * @param a {@code Amostra} base.
      * @return {@code DataLoader}.
-     * @see {@link DataLoader}
+     * @see jnn.dataloader.DataLoader DataLoader
      */
     public DataLoader dataloader(Amostra a) {
         return new DataLoader(a);
@@ -663,9 +663,9 @@ public final class Funcional {
     
     /**
      * Inicializa um {@code DataLoader} a partir de um array de dados.
-     * <h3>
-     *      Nota
-     * </h3>
+     * <p>
+     *      <strong> Nota </strong>
+     * </p>
      * <p>
      *      Esse tipo de abordagem leva em consideração que as amostras serão
      *      todas no formato de {@code arrays}, tanto em X como em Y. 
@@ -678,7 +678,7 @@ public final class Funcional {
      * @param in quantidade de dados de entrada (X).
      * @param out quantidade de dados de saída (Y).
      * @return {@code DataLoader}.
-     * @see {@link DataLoader}
+     * @see jnn.dataloader.DataLoader DataLoader
      */
     public DataLoader dataloader(float[][] arr, int in, int out) {
         if (in + out > arr[0].length) {

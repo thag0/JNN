@@ -1,9 +1,9 @@
 package jnn.camadas.pooling;
 
 /**
- * <h1>
+ * <p>
  *    Camada de agrupamento médio
- * </h1>
+ * </p>
  * <p>
  *    A camada de agrupamento médio é um componente utilizado para reduzir a 
  *    dimensionalidade espacial dos dados, preservando as características mais 

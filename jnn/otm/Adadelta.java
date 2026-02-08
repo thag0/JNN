@@ -14,7 +14,7 @@ import jnn.core.tensor.TensorData;
  *		acumulando a média móvel dos quadrados dos gradientes e dos incrementos dos 
  *		parâmetros, eliminando a necessidade de uma taxa de aprendizado fixa.
  * </p>
- * {@link {@code Paper}: http://arxiv.org/abs/1212.5701}
+ * @see <a href="http://arxiv.org/abs/1212.5701"> Paper AdaDelta </a>
  */
 public class Adadelta extends Otimizador {
 
@@ -83,7 +83,6 @@ public class Adadelta extends Otimizador {
 	 * Inicializa uma nova instância de otimizador <strong> Adadelta </strong> 
 	 * usando os valores de hiperparâmetros fornecidos.
 	 * @param rho valor de decaimento do otimizador.
-	 * @param eps usado para evitar a divisão por zero.
 	 */
 	public Adadelta(Number rho) {
 		this(rho, PADRAO_EPS);

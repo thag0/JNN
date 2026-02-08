@@ -20,6 +20,11 @@ import jnn.core.tensor.Tensor;
 public abstract class Ativacao {
 
 	/**
+	 * Construtor privado.
+	 */
+	protected Ativacao() {}
+
+	/**
 	 * Função usada para o forward pass.
 	 * @param x valor de entrada.
 	 * @return valor calculado pela ativação.
@@ -112,7 +117,8 @@ public abstract class Ativacao {
 	 * <p>
 	 *    Criada para dar suporte a ativações especiais.
 	 * </p>
-	 * @param camada camada densa.
+	 * @param camada camada convolucional.
+	 * @param g {@code Tensor} contendo gradiente de saída da camada.
 	 */
 	public void backward(Densa camada, Tensor g) {
 		//por padrão chamar o método da própria ativação
@@ -125,6 +131,7 @@ public abstract class Ativacao {
 	 *    Criada para dar suporte a ativações especiais.
 	 * </p>
 	 * @param camada camada convolucional.
+	 * @param g {@code Tensor} contendo gradiente de saída da camada.
 	 */
 	public void backward(Conv2D camada, Tensor g) {
 		//por padrão chamar o método da própria ativação

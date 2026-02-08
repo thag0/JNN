@@ -37,7 +37,7 @@ public class LayerOps {
 	 * @param kernel {@code Tensor} contendos o kernel/pesos da camada.
 	 * @param bias {@code Tensor} contendo o bias da camada {@code (podendo ser nulo)}.
 	 * @param saida {@code Tensor} de destino do resultado.
-	 * @see {@link jnn.camadas.Densa}
+	 * @see jnn.camadas.Densa Densa
 	 */
 	public void forwardDensa(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
 		saida.zero();// zerar acumulos anteriores
@@ -64,7 +64,7 @@ public class LayerOps {
 	 * @param gradK {@code Tensor} contendo o gradiente em relação ao kernel/pesos da camada.
 	 * @param gradB {@code Tensor} contendo o gradiente em relação ao bias da camada {@code (podendo ser nulo)}.
 	 * @param gradE {@code Tensor} contendo o gradiente em relação à entrada da camada.
-	 * @see {@link jnn.camadas.Densa}
+	 * @see jnn.camadas.Densa Densa
 	 */
 	public void backwardDensa(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
 		ops.matmul(gradS, kernel.transpor(), gradE);
@@ -92,7 +92,7 @@ public class LayerOps {
 	 * @param kernel {@code Tensor} contendos o kernel/filtros da camada.
 	 * @param bias {@code Tensor} contendo o bias da camada {@code (podendo ser nulo)}.
 	 * @param saida {@code Tensor} de destino do resultado.
-	 * @see {@link jnn.camadas.Conv2D}
+	 * @see jnn.camadas.Conv2D Conv2D
 	 */
 	public void forwardConv2D(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
 		if (entrada.numDim() == 3) {
@@ -276,7 +276,7 @@ public class LayerOps {
 	 * @param gradK {@code Tensor} contendo o gradiente em relação ao kernel/filtros da camada.
 	 * @param gradB {@code Tensor} contendo o gradiente em relação ao bias da camada {@code (podendo ser nulo)}.
 	 * @param gradE {@code Tensor} contendo o gradiente em relação à entrada da camada.
-	 * @see {@link jnn.camadas.Conv2D}
+	 * @see jnn.camadas.Conv2D Conv2D
 	 */
 	public void backwardConv2D(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
 		if (entrada.numDim() == 3) {

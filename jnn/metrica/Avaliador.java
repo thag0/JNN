@@ -230,8 +230,8 @@ public class Avaliador {
 	 * 		classificadas de forma ccorreta ou não em cada classe. As linhas 
 	 *		representam as classes reais e as colunas as classes previstas.
 	 * </p>
-	 * @param prev {@code Tensores} com dados de entrada para o modelo.
-	 * @param real {@code Tensores} com dados reais.
+	 * @param xs {@code Tensores} com dados de entrada para o modelo.
+	 * @param ys {@code Tensores} com dados reais.
 	 * @return {@code Tensor} resultado.
 	 */
 	public Tensor matrizConfusao(Tensor[] xs, Tensor[] ys) {

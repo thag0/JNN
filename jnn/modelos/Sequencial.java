@@ -11,9 +11,9 @@ import jnn.metrica.Avaliador;
 import jnn.treino.Treinador;
 
 /**
- * <h1>
+ * <p>
  *    Modelo sequencial de camadas
- * </h1>
+ * </p>
  * <p>
  *    Uma interface simples para criação de modelos de redes neurais,
  *    empilhando camadas em sequência que podem ser customizáveis.

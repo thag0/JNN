@@ -27,6 +27,11 @@ import jnn.dataloader.DataLoader;
 public class MNIST {
 
     /**
+     * Construtor privado.
+     */
+    private MNIST() {}
+
+    /**
      * Fonte dos dados.
      */
     static private final String BASE = "https://storage.googleapis.com/cvdf-datasets/mnist/";

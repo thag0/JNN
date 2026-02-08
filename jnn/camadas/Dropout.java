@@ -4,9 +4,9 @@ import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 
 /**
- * <h1>
+ * <p>
  *    Camada de Abandono
- * </h1>
+ * </p>
  * <p>
  *    O dropout (abandono) é uma técnica regularizadora usada para evitar
  *    overfitting para modelos muito grandes, melhorando sua capacidade de 
@@ -83,7 +83,6 @@ public class Dropout extends Camada implements Cloneable {
 	 * @param entrada formato de entrada da camada.
 	 * @param taxa taxa de dropout, um valor entre 0 e 1 representando a
 	 * taxa de abandono da camada.
-	 * @param seed seed usada para o gerador de números aleatórios da camada.
 	 */
 	public Dropout(int[] entrada, Number taxa) {
 		this(taxa);
@@ -160,21 +159,6 @@ public class Dropout extends Camada implements Cloneable {
 		this.tamLote = tamLote;
 	}
 
-	/**
-	 * <h2>
-	 *    Propagação direta através da camada Dropout
-	 * </h2>
-	 * <p>
-	 *    A máscara de dropout é gerada e utilizada apenas durante o processo
-	 *    de treinamento, durante isso, cada predição irá gerar uma máscara diferente,
-	 *    a máscara será usada como filtro para os dados de entrada e os valores de 
-	 *    unidades desativadas serão propagados como "0".
-	 * </p>
-	 * <p>
-	 *    Caso a camada não esteja {@code treinando}, por padrão a entrada é apenas
-	 *    repassada para a saída da camada.
-	 * </p>
-	 */
 	@Override
 	public Tensor forward(Tensor x) {
 		verificarConstrucao();
@@ -232,17 +216,6 @@ public class Dropout extends Camada implements Cloneable {
 		);
 	}
 
-	/**
-	 * <h2>
-	 *    Propagação reversa através da camada Dropout
-	 * </h2>
-	 * Retropropaga os gradientes da camada suguinte, aplicando a máscara usada
-	 * no cálculo da saída.
-	 * <p>
-	 *    Caso a camada não esteja {@code treinando}, por padrão os gradientes são 
-	 *    apenas repassados para o gradiente de entrada da camada.
-	 * </p>
-	 */
 	@Override
 	public Tensor backward(Tensor g) {
 		verificarConstrucao();

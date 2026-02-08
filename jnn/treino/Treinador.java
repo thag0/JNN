@@ -30,11 +30,6 @@ public class Treinador implements Cloneable {
 	protected LinkedList<Float> historico = new LinkedList<>();
 
 	/**
-	 * Número de threads para execução em paralelo.
-	 */
-	protected int _numThreads;
-
-	/**
 	 * Armazenar histórico de perda durante o treino.
 	 */
 	protected boolean calcHist;
@@ -44,22 +39,27 @@ public class Treinador implements Cloneable {
 	 */
 	protected long seed = 0L;// seed padrão
 
+	/**
+	 * Callback de fim de época.
+	 */
 	private CallbackFimEpoca callback;
 
 	/**
-	 * 
+	 * Inicializa um novo treinador.
+	 * @param modelo modelo base
+	 * @param hist calcular histórico de perda.
 	 */
-	public Treinador(Modelo modelo, boolean hist, int numThreads) {
+	public Treinador(Modelo modelo, boolean hist) {
 		this.modelo = modelo;
-		this._numThreads = numThreads;
 		this.calcHist = hist;
 	}
 
 	/**
-	 * 
+	 * Iniciliza um novo treinador.
+	 * @param modelo modelo base.
 	 */
 	public Treinador(Modelo modelo) {
-		this(modelo, false, 1);
+		this(modelo, false);
 	}
 
 	/**
@@ -140,7 +140,7 @@ public class Treinador implements Cloneable {
 	 * @param loader {@code DataLoader} com conjunto de amostras.
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param logs logs para perda durante as épocas de treinamento.
-	 * @see {@link jnn.dataloader.DataLoader}
+	 * @see jnn.dataloader.DataLoader
 	 */
 	public void executar(DataLoader loader, int epochs, boolean logs) {
 		executar(loader, epochs, 1, logs);
@@ -152,7 +152,7 @@ public class Treinador implements Cloneable {
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param tamLote tamanho do lote de amostras.
 	 * @param logs logs para perda durante as épocas de treinamento.
-	 * @see {@link jnn.dataloader.DataLoader}
+	 * @see jnn.dataloader.DataLoader
 	 */
 	public void executar(DataLoader loader, int epochs, int tamLote, boolean logs) {
 		executar(loader.getX(), loader.getY(), epochs, tamLote, logs);
@@ -181,8 +181,7 @@ public class Treinador implements Cloneable {
 
 	/**
 	 * Executa a regra de treino durante um determinado número de épocas.
-	 * @param xs {@code Tensores} contendos os dados de entrada.
-	 * @param ys {@code Tensores} contendos os dados de saída (rótulos).
+	 * @param loader conjunto de dados.
 	 * @param epochs quantidade de épocas de treinamento.
 	 */
 	public void executar(DataLoader loader, int epochs) {

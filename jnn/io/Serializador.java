@@ -41,13 +41,12 @@ public class Serializador extends SerialBase {
 	/**
 	 * Serializador e desserializador de modelos.
 	 */
-	public Serializador() {}
+	private Serializador() {}
 
 	/**
 	 * Salva um modelo {@code RedeNeural} em um arquivo externo.
 	 * @param modelo instância de uma {@code Rede Neural}.
 	 * @param caminho caminho com nome e extensão do arquivo {@code .nn}.
-	 * @param tipo tipo de valor usado na serialização, exemplo: {@code float} ou {@code double}.
 	 */
 	public void salvar(RedeNeural modelo, String caminho) {
 		File arquivo = new File(caminho);
@@ -78,7 +77,6 @@ public class Serializador extends SerialBase {
 	 * Salva um modelo Sequencial em um arquivo externo.
 	 * @param modelo modelo {@code Sequencial}.
 	 * @param caminho caminho com nome e extensão do arquivo {@code .nn}.
-	 * @param tipo tipo de valor usado na serialização, exemplo: {@code float} ou {@code double}.
 	 */
 	public void salvar(Sequencial modelo, String caminho) {
 		File arquivo = new File(caminho);

@@ -20,6 +20,10 @@ public class PoolFactory {
      */
     static int numThreads = MAX_DISPONIVEL / 2;// normalmente threads físicas.
 
+    /**
+     * Construtor privado.
+     */
+    private PoolFactory() {}
 
     /**
      * Cria uma nova pool de threads utilizando o valor padrão.

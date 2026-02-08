@@ -15,6 +15,11 @@ import jnn.core.tensor.Tensor;
 public abstract class Perda {
 
 	/**
+	 * Construtor privado.
+	 */
+	protected Perda() {}
+
+	/**
 	 * Calcula a função de perda configurada.
 	 * @param prev {@code Tensor} com dados previstos.
 	 * @param real {@code Tensor} com dados reais.

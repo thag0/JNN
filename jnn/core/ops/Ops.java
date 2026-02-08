@@ -3,13 +3,18 @@ package jnn.core.ops;
 import jnn.core.tensor.Tensor;
 
 /**
- * <h2>
+ * <p>
  * 	Operador interno.
- * </h2>
+ * </p>
  *		Utilitário auxliar em operações utilizando {@code Tensor}
- * @see {@link jnn.core.tensor.Tensor}
+ * @see jnn.core.tensor.Tensor Tensor
  */
 public abstract class Ops {
+
+	/**
+	 * Construtor privado.
+	 */
+	protected Ops() {}
 
 	/**
 	 * Retorna as implementações em {@code CPU} da biblioteca.
@@ -47,7 +52,7 @@ public abstract class Ops {
 	 * Realiza a operação de correlação cruzada entre o tensor de entrada e o kernel.
 	 * @param x {@code Tensor} de entrada.
 	 * @param k {@code Tensor} utilizado para filtro.
-	 * @return {@code Tensor} resultado.
+	 * @param dst {@code Tensor} resultado.
 	 */
 	public abstract void corr2D(Tensor x, Tensor k, Tensor dst);
 
@@ -65,7 +70,11 @@ public abstract class Ops {
 	 * @param kH altura do kernel.
 	 */
 	public abstract void corr2D(
-		float[] dataX, int offX, float[] dataK, int offK, float[] dataDst, int offDst, int W, int H,int kW, int kH
+		float[] dataX, int offX, 
+		float[] dataK, int offK, 
+		float[] dataDst, int offDst, 
+		int W, int H, 
+		int kW, int kH
 	);
 
 	/**
@@ -80,7 +89,7 @@ public abstract class Ops {
 	 * Realiza a operação de convolução entre o tensor de entrada e o kernel.
 	 * @param x {@code Tensor} de entrada.
 	 * @param k {@code Tensor} utilizado para filtro.
-	 * @return {@code Tensor} resultado.
+	 * @param dst {@code Tensor} resultado.
 	 */
 	public abstract void conv2D(Tensor x, Tensor k, Tensor dst);
 
@@ -100,6 +109,20 @@ public abstract class Ops {
 	 */
 	public abstract void conv2DFull(Tensor entrada, Tensor kernel, Tensor saida);
 
+	/**
+	 * Realiza a operação de convolução da entrada {@code X} utilizando o 
+	 * kernel {@code K}, no modo "full".
+	 * @param dataX {@code array} contendo os dados de entrada.
+	 * @param offX offset do array dos dados de entrada.
+	 * @param dataK {@code array} contendo os dados do kernel.
+	 * @param offK offset do array dos dados do kernel.
+	 * @param dataDst {@code array} contendo os dados de destino.
+	 * @param offDst offset do array dos dados de destino.
+	 * @param W largura da entrada.
+	 * @param H altura da entrada.
+	 * @param kW largura do kernel.
+	 * @param kH altura do kernel.
+	 */
 	public abstract void conv2DFull(
 		float[] dataX, int offX,
 		float[] dataK, int offK,
@@ -140,7 +163,7 @@ public abstract class Ops {
 	 * @param filtro formato do filtro (altura, largura)
 	 * @return {@code Tensor} resultado.
 	 */
-	public abstract Tensor avgPool2D(Tensor x, int[] stride);
+	public abstract Tensor avgPool2D(Tensor x, int[] filtro);
 
 	/**
 	 * Realiza a operação de agrupamento médio.

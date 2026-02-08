@@ -102,6 +102,12 @@ public abstract class SerialBase {
         return dis.readFloat();
     }
 
+    /**
+     * Lê o conteúdo de um valor primitivo {@code boolean}.
+     * @param dis {@code DataInputStream} leitor.
+     * @return valor lido.
+     * @throws IOException caso ocorra um erro.
+     */
     protected boolean lerBoolean(DataInputStream dis) throws IOException {
         return dis.readBoolean();
     }
@@ -109,7 +115,6 @@ public abstract class SerialBase {
     /**
      * Lê o conteúdo de um array primitivo {@code int[]}.
      * @param dis {@code DataInputStream} leitor.
-     * @param tam tamanho do array.
      * @return array lido.
      * @throws IOException caso ocorra um erro.
      */
@@ -127,7 +132,6 @@ public abstract class SerialBase {
     /**
      * Lê o conteúdo de um array primitivo {@code float[]}.
      * @param dis {@code DataInputStream} leitor.
-     * @param tam tamanho do array.
      * @return array lido.
      * @throws IOException caso ocorra um erro.
      */
@@ -142,10 +146,17 @@ public abstract class SerialBase {
         return arr;
     }
     
-    protected String lerString(DataInputStream in) throws IOException {
-        int tam = in.readInt();
+    /**
+     * Lê o conteúdo de um array primitivo {@code byte[]} e 
+     * converte em uma String.
+     * @param dis {@code DataInputStream} leitor.
+     * @return String lida
+     * @throws IOException caso ocorra algum erro.
+     */
+    protected String lerString(DataInputStream dis) throws IOException {
+        int tam = dis.readInt();
         byte[] bytes = new byte[tam];
-        in.readFully(bytes);
+        dis.readFully(bytes);
         return new String(bytes, "UTF-8");
     }
 

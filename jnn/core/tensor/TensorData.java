@@ -11,7 +11,7 @@ import jnn.core.tensor.operadores.FloatUnaryOperator;
  * O TensorData é um conteiner para um array de elementos contíguo em 
  * memória com a promessa de otimizar o desempenho de operações com
  * Tensores.
- * @see {@link jnn.core.tensor.Tensor}
+ * @see jnn.core.tensor.Tensor Tensor
  */
 public class TensorData {
 
@@ -90,7 +90,7 @@ public class TensorData {
      * <p>
      *      O conteúdo estará zerado.
      * </p>
-     * @param arr {@code array} base.
+     * @param tam tamanho desejado.
      */
     public TensorData(int tam) {
         if (tam < 1) {
@@ -228,7 +228,9 @@ public class TensorData {
     /**
      * Calcula o produto interno entre a instância local e o TensorData
      * fornecido.
-     * Equivalente ao {@code ddot} do BLAS {@link https://www.netlib.org/lapack/explore-html/d0/d8c/group__dot.html}
+     * Equivalente ao {@code ddot} do BLAS
+     * @see <a href="https://www.netlib.org/lapack/explore-html/d1/dcc/group__dot_ga2a42ecc597403b22ad786715c739196b.html">
+     *      LAPACK ddot</a>
      * @param td {@code TensorData} base.
      * @return valor resultante do produto interno.
      */
@@ -261,8 +263,11 @@ public class TensorData {
      *B = Outro TensorData
      *Alfa = multiplicador para os elementos de B
      * </pre>
-     * Equivalente ao {@code axpy} do BLAS {@link https://www.netlib.org/lapack/explore-html/d5/d4b/group__axpy.html}
+     * Equivalente ao {@code axpy} do BLAS:
+     * @see <a href="https://www.netlib.org/lapack/explore-html/d5/d4b/group__axpy.html">
+     *      LAPACK axpy</a>
      * @param td {@code TensorData} base.
+     * @param alfa escalar multiplicativo.
      * @return TensorData local alterado.
      */
     public TensorData add(TensorData td, float alfa) {
@@ -652,7 +657,8 @@ public class TensorData {
      * this += alfa * (A * B)
      * </pre>
      * Essa função foi inspirada no {@code PyTorch}:
-     * {@link https://docs.pytorch.org/docs/stable/generated/torch.addcmul.html}
+     * @see <a href="https://docs.pytorch.org/docs/stable/generated/torch.addcmul.html">
+     *      torch.addcdiv (PyTorch) </a>
      * @param a {@code TensorData} A.
      * @param b {@code TensorData} B.
      * @param alfa {@code valor} escalar multiplicativo.
@@ -690,7 +696,9 @@ public class TensorData {
      * this += alfa * (A / B)
      * </pre>
      * Essa função foi inspirada no {@code PyTorch}:
-     * {@link https://docs.pytorch.org/docs/stable/generated/torch.addcdiv.html}
+     * @see <a href="https://docs.pytorch.org/docs/stable/generated/torch.addcdiv.html">
+     *      torch.addcdiv (PyTorch)
+     *      </a>
      * @param a {@code TensorData} numerador.
      * @param b {@code TensorData} denominador.
      * @param alfa {@code valor} escalar multiplicativo.

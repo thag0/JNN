@@ -286,7 +286,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
 	 * <p>
 	 *    O valor de uso do bias será usado como {@code true} por padrão.
-	 * <p>
+	 * </p>
 	 * @param entrada formato de entrada da camada.
 	 * @param filtros quantidade de filtros.
 	 * @param filtro formato dos filtros da camada (altura, largura).
@@ -535,25 +535,6 @@ public class Conv2D extends Camada implements Cloneable {
 		this.tamLote = tamLote;
 	}
 
-	/**
-	 * <h2>
-	 *    Propagação direta através da camada Convolucional
-	 * </h2>
-	 * <p>
-	 *    Realiza a correlação cruzada entre os dados de entrada e os filtros da 
-	 *    camada, somando os resultados ponderados. Caso a camada tenha configurado 
-	 *    o uso do bias, ele é adicionado após a operação. Por fim é aplicada a função 
-	 *    de ativação aos resultados que serão salvos da saída da camada.
-	 * </p>
-	 * <h3>
-	 *    A expressão que define a saída da camada é dada por:
-	 * </h3>
-	 * <pre>
-	 *buffer = corr2D(entrada, kernel);
-	 *buffer.add(bias);
-	 *saida = ativacao(buffer);
-	 * </pre>
-	 */
 	@Override
 	public Tensor forward(Tensor x) {
 		verificarConstrucao();
@@ -586,22 +567,6 @@ public class Conv2D extends Camada implements Cloneable {
 		return _saida;
 	}
 
-	/**
-	 * <h2>
-	 *    Propagação reversa através da camada Convolucional
-	 * </h2>
-	 * <p>
-	 *    Calcula os gradientes da camada para os filtros e bias baseado nos
-	 *    gradientes fornecidos.
-	 * </p>
-	 * <p>
-	 *    Após calculdos, os gradientes em relação a entrada da camada são
-	 *    calculados e salvos em {@code gradEntrada} para serem retropropagados 
-	 *    para as camadas anteriores do modelo em que a camada estiver.
-	 * </p>
-	 * Resultados calculados ficam salvos nas prorpiedades {@code camada.gradFiltros} e
-	 * {@code camada.gradBias}.
-	 */
 	@Override
 	public Tensor backward(Tensor g) {
 		verificarConstrucao();

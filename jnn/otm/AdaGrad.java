@@ -16,7 +16,7 @@ import jnn.core.tensor.TensorData;
  *    Devido a natureza do otimizador, pode ser mais vantajoso (para este caso específico)
  *    usar valores de taxa de aprendizagem mais altos.
  * </p>
- * {@link {@code Paper}: http://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf}
+ * @see <a href="http://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf"> Paper AdaGrad </a>
  */
 public class AdaGrad extends Otimizador {
 

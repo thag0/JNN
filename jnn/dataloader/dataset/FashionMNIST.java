@@ -25,6 +25,11 @@ import jnn.dataloader.DataLoader;
  * Conjunto de dados do dataset {@code Fashion MNIST}
  */
 public class FashionMNIST {
+
+    /**
+     * Construtor privado.
+     */
+    private FashionMNIST() {}
     
     /**
      * Fonte dos dados.

@@ -50,7 +50,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = V + X</pre>
+     * {@code V = V + X}
      * @param x valor base.
 	 * @return {@code Variavel} local alterada.
      */
@@ -61,7 +61,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = V + X</pre>
+     * {@code V = V + X}
      * @param x {@code Variavel} base.
 	 * @return {@code Variavel} local alterada.
      */
@@ -72,7 +72,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = V - X</pre>
+     * {@code V = V - X}
      * @param x valor base.
 	 * @return {@code Variavel} local alterada.
      */
@@ -83,7 +83,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = V - X</pre>
+     * {@code V = V - X}
      * @param x {@code Variavel} base.
 	 * @return {@code Variavel} local alterada.
      */
@@ -94,7 +94,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = V * X</pre>
+     * {@code V = V * X}
      * @param x valor base.
 	 * @return {@code Variavel} local alterada.
      */
@@ -105,7 +105,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = V * X</pre>
+     * {@code V = V * X}
      * @param x {@code Variavel} base.
 	 * @return {@code Variavel} local alterada.
      */
@@ -116,7 +116,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = V / X</pre>
+     * {@code V = V / X}
      * @param x valor base.
 	 * @return {@code Variavel} local alterada.
      */
@@ -127,7 +127,7 @@ public class Variavel implements Cloneable {
    
     /**
      * Realiza a operação
-     * <pre>V = V / X</pre>
+     * {@code V = V / X}
      * @param x {@code Variavel} base.
 	 * @return {@code Variavel} local alterada.
      */
@@ -138,7 +138,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = X</pre>
+     * {@code V = X}
      * @param x valor base.
 	 * @return {@code Variavel} local alterada.
      */
@@ -149,7 +149,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = X</pre>
+     * {@code V = X}
      * @param x {@code Variavel} base.
 	 * @return {@code Variavel} local alterada.
      */
@@ -168,7 +168,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = 0</pre>
+     * {@code V = 0}
 	 * @return {@code Variavel} local alterada.
      */
     public Variavel zero() {
@@ -180,7 +180,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = V + (X + Y)</pre>
+     * {@code V = V + (X + Y)}
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
 	 * @return {@code Variavel} local alterada.
@@ -192,7 +192,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = V + (X - Y)</pre>
+     * {@code V = V + (X - Y)}
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
 	 * @return {@code Variavel} local alterada.
@@ -204,7 +204,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = V + (X * Y)</pre>
+     * {@code V = V + (X * Y)}
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
 	 * @return {@code Variavel} local alterada.
@@ -216,7 +216,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = V + (X / Y)</pre>
+     * {@code V = V + (X / Y)}
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
 	 * @return {@code Variavel} local alterada.
@@ -228,7 +228,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = V - (X + Y)</pre>
+     * {@code V = V - (X + Y)}
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
 	 * @return {@code Variavel} local alterada.
@@ -240,7 +240,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = V - (X - Y)</pre>
+     * {@code V = V - (X - Y)}
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
 	 * @return {@code Variavel} local alterada.
@@ -252,7 +252,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = V - (X * Y)</pre>
+     * {@code V = V - (X * Y)}
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
 	 * @return {@code Variavel} local alterada.
@@ -264,7 +264,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = V - (X / Y)</pre>
+     * {@code V = V - (X / Y)}
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
 	 * @return {@code Variavel} local alterada.
@@ -276,7 +276,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = V * (X + Y)</pre>
+     * {@code V = V * (X + Y)}
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
 	 * @return {@code Variavel} local alterada.
@@ -288,7 +288,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = V * (X - Y)</pre>
+     * {@code V = V * (X - Y)}
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
 	 * @return {@code Variavel} local alterada.
@@ -300,7 +300,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = V * (X * Y)</pre>
+     * {@code V = V * (X * Y)}
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
 	 * @return {@code Variavel} local alterada.
@@ -312,7 +312,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = V * (X / Y)</pre>
+     * {@code V = V * (X / Y)}
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
 	 * @return {@code Variavel} local alterada.
@@ -324,7 +324,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = V / (X + Y)</pre>
+     * {@code V = V  (X + Y)}
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
 	 * @return {@code Variavel} local alterada.
@@ -336,7 +336,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = V / (X - Y)</pre>
+     * {@code V = V  (X - Y)}
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
 	 * @return {@code Variavel} local alterada.
@@ -348,7 +348,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = V / (X * Y)</pre>
+     * {@code V = V  (X * Y)}
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
 	 * @return {@code Variavel} local alterada.
@@ -360,7 +360,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V = V / (X / Y)</pre>
+     * {@code V = V  (X / Y)}
      * @param x {@code Variavel} 1
      * @param y {@code Variavel} 2
 	 * @return {@code Variavel} local alterada.
@@ -372,7 +372,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V > X</pre>
+     * {@code V > X}
      * @param x {@code Variavel} desejada.
      * @return resultado da verificação.
      */
@@ -382,7 +382,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V > X</pre>
+     * {@code V > X}
      * @param x {@code Variavel} desejada.
      * @return resultado da verificação.
      */
@@ -392,7 +392,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V < X</pre>
+     * {@code V < X}
      * @param x {@code Variavel} desejada.
      * @return resultado da verificação.
      */
@@ -402,7 +402,7 @@ public class Variavel implements Cloneable {
 
     /**
      * Realiza a operação
-     * <pre>V < X</pre>
+     * {@code V < X}
      * @param x {@code Variavel} desejada.
      * @return resultado da verificação.
      */

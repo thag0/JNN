@@ -15,9 +15,9 @@ import jnn.otm.SGD;
 import jnn.treino.Treinador;
 
 /**
- * <h3>
- *    Modelo de Rede Neural {@code Multilayer Perceptron} criado do zero
- * </h3>
+ * <p>
+ *    Modelo de Rede Neural {@code Multilayer Perceptron}
+ * </p>
  *  Possui um conjunto de camadas densas sequenciais que propagam os dados de entrada.
  * <p>
  *    O modelo pode ser usado tanto para problemas de {@code regressão e classificação}, contando com 
@@ -552,25 +552,6 @@ public class RedeNeural extends Modelo {
 		return sb.toString();
 	}
 
-	/**
-	 * Exibe algumas informações importantes sobre a Rede Neural, como:
-	 * <ul>
-	 *    <li>
-	 *       Otimizador atual e suas informações específicas.
-	 *    </li>
-	 *    <li>
-	 *       Contém bias adicionado nas camadas.
-	 *    </li>
-	 *    <li>
-	 *       Função de ativação de todas as camadas.
-	 *    </li>
-	 *    <li>
-	 *       Arquitetura da rede.
-	 *    </li>
-	 * </ul>
-	 * @return buffer formatado contendo as informações.
-	 * @throws IllegalArgumentException se o modelo não foi compilado previamente.
-	 */
 	@Override
 	public void print() {
 		validarCompilacao();

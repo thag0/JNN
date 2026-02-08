@@ -2,7 +2,15 @@ package jnn.core.ops;
 
 import jnn.core.tensor.Tensor;
 
+/**
+ * Implementações internas de operações de pooling.
+ */
 public class OpsPooling {
+
+	/**
+	 * Construtor privado.
+	 */
+	private OpsPooling() {}
     
 	private static int[] calcShapeConv(int[] entrada, int[] filtro, int[] stride) {
 		if (entrada.length != 2 || filtro.length != 2 || stride.length != 2) {
@@ -17,10 +25,23 @@ public class OpsPooling {
 		};
 	}
 
+	/**
+	 * Operação interna de max pooling 2D.
+	 * @param x {@code Tensor} de entrada.
+	 * @param filtro formato do filtro (altura, largura).
+	 * @return {@code Tensor} resultado.
+	 */
 	public static Tensor maxPool2D(Tensor x, int[] filtro) {
 		return maxPool2D(x, filtro, filtro);// stride = filtro
 	}
 
+	/**
+	 * Operação interna de max pooling 2D.
+	 * @param x {@code Tensor} de entrada.
+	 * @param filtro formato do filtro (altura, largura).
+	 * @param stride formato dos strides (altura, largura).
+	 * @return {@code Tensor} resultado.
+	 */
 	public static Tensor maxPool2D(Tensor x, int[] filtro, int[] stride) {
 		if (x.numDim() != 2) {
 			throw new IllegalArgumentException(
@@ -56,6 +77,13 @@ public class OpsPooling {
 		return pool;
 	}
 
+	/**
+	 * Operação interna de max pooling 2D.
+	 * @param x {@code Tensor} de entrada.
+	 * @param dst {@code Tensor} de destino.
+	 * @param filtro formato do filtro (altura, largura).
+	 * @param stride formato dos strides (altura, largura).
+	 */
 	public static void maxPool2D(Tensor x, Tensor dst, int[] filtro, int[] stride) {
 		if (x.numDim() != 2 || dst.numDim() != 2) {
 			throw new IllegalArgumentException(
@@ -126,10 +154,23 @@ public class OpsPooling {
 		}
 	}
 
-	public static Tensor avgPool2D(Tensor x, int[] stride) {
-		return avgPool2D(x, stride, stride);// stride = filtro
+	/**
+	 * Operação interna de avg pooling 2D.
+	 * @param x {@code Tensor} de entrada.
+	 * @param filtro formato do filtro (altura, largura).
+	 * @return {@code Tensor} resultado.
+	 */
+	public static Tensor avgPool2D(Tensor x, int[] filtro) {
+		return avgPool2D(x, filtro, filtro);// stride = filtro
 	}
 
+	/**
+	 * Operação interna de avg pooling 2D.
+	 * @param x {@code Tensor} de entrada.
+	 * @param filtro formato do filtro (altura, largura).
+	 * @param stride formato dos strides (altura, largura).
+	 * @return {@code Tensor} resultado.
+	 */
 	public static Tensor avgPool2D(Tensor x, int[] filtro, int[] stride) {
 		if (x.numDim() != 2) {
 			throw new IllegalArgumentException(
@@ -165,6 +206,13 @@ public class OpsPooling {
 		return pool;		
 	}
 
+	/**
+	 * Operação interna de avg pooling 2D.
+	 * @param x {@code Tensor} de entrada.
+	 * @param dst {@code Tensor} de destino.
+	 * @param filtro formato do filtro (altura, largura).
+	 * @param stride formato dos strides (altura, largura).
+	 */
 	public static void avgPool2D(Tensor x, Tensor dst, int[] filtro, int[] stride) {
 		if (x.numDim() != 2 || dst.numDim() != 2) {
 			throw new UnsupportedOperationException(

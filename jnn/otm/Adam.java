@@ -13,7 +13,7 @@ import jnn.core.tensor.TensorData;
  *    O algoritmo ajusta os parâmetros do modelo usando o gradiente descendente 
  *    com momento e estimativas adaptativas para momentos de primeira e segunda ordem.
  * </p>
- * {@link {@code Paper}: https://arxiv.org/pdf/1412.6980}
+ * @see <a href="https://arxiv.org/pdf/1412.6980"> Paper Adam </a>
  */
 public class Adam extends Otimizador {
 

@@ -23,10 +23,9 @@ import jnn.io.seriais.SerialTensor;
  *		A maioria das implementações considera alterações {@code in-place} sendo
  *		evitado ao máximo alocação de memória para reduzir pressão no Garbage Collector.
  * </p>
- * <p>
- * </p>
  * @author Thiago Barroso, acadêmico de Engenharia da Computação pela
  * Universidade Federal do Pará, Campus Tucuruí. Maio/2024.
+ * @see <a href="https://github.com/thag0"> Github </a>
  */
 public class Tensor implements Iterable<Float>, Cloneable {
     
@@ -165,7 +164,6 @@ public class Tensor implements Iterable<Float>, Cloneable {
 	 * Inicializar um tensor a partir de um conjunto de dados e formato
 	 * pré-definidos.
 	 * @param arr {@code array} base.
-	 * @param shape formato desejado.
 	 */
 	public Tensor(float[] arr) {
 		int[] shape = {arr.length};
@@ -305,7 +303,7 @@ public class Tensor implements Iterable<Float>, Cloneable {
 	 *    [1, 2, 3, 4]
 	 *]
 	 * </pre>
-	 * @param dim array contendo as novas dimensões.
+	 * @param shape array contendo as novas dimensões.
 	 * @return {@code view} do {@code Tensor}.
 	 */
 	public Tensor reshape(int... shape) {
@@ -516,7 +514,6 @@ public class Tensor implements Iterable<Float>, Cloneable {
 
 	/**
 	 * Copia todo o conteúdo do tensor na instância local.
-	 * @param t {@code Tensor} desejado.
 	 * @param t {@code Tensor} desejado.
 	 * @return {@code Tensor} local alterado.
 	 */
@@ -1381,7 +1378,8 @@ public class Tensor implements Iterable<Float>, Cloneable {
      * this += alfa * (A * B)
      * </pre>
      * Essa função foi inspirada no {@code PyTorch}:
-     * {@link https://docs.pytorch.org/docs/stable/generated/torch.addcmul.html}
+     * @see <a href="https://docs.pytorch.org/docs/stable/generated/torch.addcmul.html">
+     *      torch.addcdiv (PyTorch) </a>
      * @param a {@code Tensor} A.
      * @param b {@code Tensor} B.
      * @param alfa {@code valor} escalar multiplicativo.
@@ -1403,7 +1401,9 @@ public class Tensor implements Iterable<Float>, Cloneable {
      * this += alfa * (A / B)
      * </pre>
      * Essa função foi inspirada no {@code PyTorch}:
-     * {@link https://docs.pytorch.org/docs/stable/generated/torch.addcdiv.html}
+     * @see <a href="https://docs.pytorch.org/docs/stable/generated/torch.addcdiv.html">
+     *      torch.addcdiv (PyTorch)
+     *      </a>
      * @param a {@code Tensor} numerador.
      * @param b {@code Tensor} denominador.
      * @param alfa {@code valor} escalar multiplicativo.
@@ -2228,9 +2228,9 @@ public class Tensor implements Iterable<Float>, Cloneable {
 
 	/**
 	 * Exporta os dados do tensor em um arquivo externo.
-	 * <h3>
+	 * <h4>
 	 *		Observação
-	 * </h3>
+	 * </h4>
 	 * Para ler o tensor de um arquivo externo é necessário usar um
 	 * {@code SerialTensor}, interface responsável pelo io de tensores.
 	 * <p>

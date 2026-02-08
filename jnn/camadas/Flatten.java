@@ -160,12 +160,6 @@ public class Flatten extends Camada implements Cloneable {
 		this.tamLote = tamLote;
 	}
 
-	/**
-	 * <h2>
-	 *    Propagação direta através da camada Flatten
-	 * </h2>
-	 * Achata os dados de entrada num formato sequencial.
-	 */
 	@Override
 	public Tensor forward(Tensor x) {
 		verificarConstrucao();
@@ -192,12 +186,6 @@ public class Flatten extends Camada implements Cloneable {
 		return _saida;
 	}
 
-	/**
-	 * <h2>
-	 *    Propagação reversa através da camada Flatten
-	 * </h2>
-	 * Desserializa os gradientes recebedos de volta para o mesmo formato de entrada.
-	 */
 	@Override
 	public Tensor backward(Tensor g) {
 		verificarConstrucao();

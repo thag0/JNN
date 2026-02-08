@@ -184,7 +184,6 @@ public class Densa extends Camada implements Cloneable {
 	 * @param e quantidade de conexões de entrada.
 	 * @param n quantidade de neurônios (unidades).
 	 * @param act função de ativação que será usada pela camada.
-	 * @param usarBias uso de viés na camada.
 	 * @param iniKernel inicializador para os pesos da camada.
 	 * @param iniBias inicializador para os bias da camada.
 	 */
@@ -373,29 +372,6 @@ public class Densa extends Camada implements Cloneable {
 		this._tamLote = tamLote;
 	}
 
-	/**
-	 * <h2>
-	 *		Propagação direta através da camada Densa
-	 * </h2>
-	 * <p>
-	 *		Alimenta os dados de entrada para a saída da camada por meio da 
-	 *		multiplicação matricial entre a entrada recebida e os pesos da 
-	 *		camada, em seguida é adicionado o bias caso ele seja configurado 
-	 *		no momento da inicialização.
-	 * </p>
-	 * <p>
-	 *		Após a propagação dos dados, a função de ativação da camada é aplicada
-	 *		ao resultado, que então é salvo da saída da camada.
-	 * </p>
-	 * <p>
-	 *    A expressão que define a saída é dada por:
-	 * </p>
-	 * <pre>
-	 *buffer = matMult(entrada, pesos);
-	 *buffer.add(bias);
-	 *saida = ativacao(buffer);
-	 * </pre>
-	 */
 	@Override
 	public Tensor forward(Tensor x) {
 		verificarConstrucao();
@@ -424,20 +400,6 @@ public class Densa extends Camada implements Cloneable {
 		return _saida;
 	}
 
-	/**
-	 * <h2>
-	 *		Propagação reversa através da camada Densa
-	 * </h2>
-	 * <p>
-	 *		Calcula os gradientes da camada para os pesos e bias baseado nos
-	 *		gradientes fornecidos.
-	 * </p>
-	 * <p>
-	 *		Após calculdos, os gradientes em relação a entrada da camada são
-	 *		calculados e salvos em {@code gradEntrada} para serem retropropagados 
-	 *		para as camadas anteriores do modelo em que a camada estiver.
-	 * </p>
-	 */
 	@Override
 	public Tensor backward(Tensor g) {
 		verificarConstrucao();

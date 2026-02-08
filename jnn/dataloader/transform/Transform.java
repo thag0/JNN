@@ -5,8 +5,8 @@ import jnn.core.tensor.Tensor;
 /**
  * Inferface para aplicar transformações em {@code Tensor} dentro
  * do {@code DataLoader}
- * @see {@code Tensor} {@link jnn.core.tensor.Tensor}
- * @see {@code DataLoader} {@link jnn.dataloader.DataLoader}
+ * @see jnn.core.tensor.Tensor Tensor
+ * @see jnn.dataloader.DataLoader DataLoader
  */
 public interface Transform {
     

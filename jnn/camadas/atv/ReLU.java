@@ -4,6 +4,9 @@ import jnn.camadas.Camada;
 import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 
+/**
+ * Camada de ativação ReLU.
+ */
 public class ReLU extends Camada implements Cloneable {
 
     Tensor _entrada;
@@ -13,8 +16,15 @@ public class ReLU extends Camada implements Cloneable {
 
     private int[] shapeEntrada;
 
+    /**
+     * Inicializa uma camada de ativação ReLU.
+     */
     public ReLU() {}
 
+    /**
+     * Inicializa uma camada de ativação ReLU.
+     * @param shape formato de entrada para a camada.
+     */
     public ReLU(int... shape) {
         construir(shape);
     }

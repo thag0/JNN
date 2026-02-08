@@ -2,7 +2,15 @@ package jnn.core.ops;
 
 import jnn.core.tensor.Tensor;
 
+/**
+ * Implementações internas de operações de convolução.
+ */
 public class OpsConv {
+
+	/**
+	 * Construtor privado.
+	 */
+	private OpsConv() {}
     
 	private static int[] calcShapeConv(int[] entrada, int[] filtro, int[] stride) {
 		if (entrada.length != 2 || filtro.length != 2 || stride.length != 2) {
@@ -17,6 +25,13 @@ public class OpsConv {
 		};
 	}
 
+	/**
+	 * Realiza a operação de correlaão cruzada da entrada {@code X} 
+	 * utilizando o kernel {@code K}.
+	 * @param x {@code Tensor} de entrada.
+	 * @param k {@code Tensor} contendo kernel.
+	 * @return {@code Tensor} resultado.
+	 */
 	public static Tensor corr2D(Tensor x, Tensor k) {
 		if (x.numDim() != 2 || k.numDim() != 2) {
 			throw new IllegalArgumentException(
@@ -35,6 +50,13 @@ public class OpsConv {
 		return corr;
 	}
 
+	/**
+	 * Realiza a operação de correlaão cruzada da entrada {@code X} 
+	 * utilizando o kernel {@code K}.
+	 * @param x {@code Tensor} de entrada.
+	 * @param k {@code Tensor} contendo kernel.
+	 * @param dst {@code Tensor} resultado.
+	 */
 	public static void corr2D(Tensor x, Tensor k, Tensor dst) {
 		int[] shapeE = x.shape();
 		int[] shapeK = k.shape();
@@ -93,7 +115,32 @@ public class OpsConv {
 
 	}
 
-	public static void corr2D(float[] dataX, int offX,float[] dataK, int offK,float[] dataDst, int offDst,int W, int H,int kW, int kH) {
+	/**
+	 * Realiza a operação de correlaão cruzada da entrada {@code X} 
+	 * utilizando o kernel {@code K}.
+	 * @param dataX {@code array} contendo os dados de entrada.
+	 * @param offX offset do array dos dados de entrada.
+	 * @param dataK {@code array} contendo os dados do kernel.
+	 * @param offK offset do array dos dados do kernel.
+	 * @param dataDst {@code array} contendo os dados de destino.
+	 * @param offDst offset do array dos dados de destino.
+	 * @param W largura da entrada.
+	 * @param H altura da entrada.
+	 * @param kW largura do kernel.
+	 * @param kH altura do kernel.
+	 */
+	public static void corr2D(
+		float[] dataX, 
+		int offX,
+		float[] dataK, 
+		int offK,
+		float[] dataDst, 
+		int offDst,
+		int W, 
+		int H,
+		int kW, 
+		int kH
+	) {
 		final int outH = H - kH + 1;
 		final int outW = W - kW + 1;
 
@@ -120,6 +167,13 @@ public class OpsConv {
 		}
 	}
 
+	/**
+	 * Realiza a operação de convolução da entrada {@code X} utilizando o 
+	 * kernel {@code K}.
+	 * @param x {@code Tensor} de entrada.
+	 * @param k {@code Tensor} contendo kernel.
+	 * @return {@code Tensor} resultado.
+	 */
 	public static Tensor conv2D(Tensor x, Tensor k) {
 		if (x.numDim() != 2 || k.numDim() != 2) {
 			throw new IllegalArgumentException(
@@ -138,6 +192,13 @@ public class OpsConv {
 		return conv;
 	}
 
+	/**
+	 * Realiza a operação de convolução da entrada {@code X} utilizando o 
+	 * kernel {@code K}.
+	 * @param x {@code Tensor} de entrada.
+	 * @param k {@code Tensor} contendo kernel.
+	 * @param dst {@code Tensor} resultado.
+	 */
 	public static void conv2D(Tensor x, Tensor k, Tensor dst) {
 		int[] shapeE = x.shape();
 		int[] shapeK = k.shape();
@@ -194,6 +255,13 @@ public class OpsConv {
 		
 	}
 
+	/**
+	 * Realiza a operação de convolução da entrada {@code X} utilizando o 
+	 * kernel {@code K}, no modo "full".
+	 * @param x {@code Tensor} de entrada.
+	 * @param k {@code Tensor} contendo kernel.
+	 * @return {@code Tensor} resultado.
+	 */
 	public static Tensor conv2DFull(Tensor x, Tensor k) {
 		if (x.numDim() != 2 || k.numDim() != 2) {
 			throw new IllegalArgumentException(
@@ -215,6 +283,13 @@ public class OpsConv {
 		return conv;
 	}
 
+	/**
+	 * Realiza a operação de convolução da entrada {@code X} utilizando o 
+	 * kernel {@code K}, no modo "full".
+	 * @param x {@code Tensor} de entrada.
+	 * @param k {@code Tensor} contendo kernel.
+	 * @param dst {@code Tensor} resultado.
+	 */
 	public static void conv2DFull(Tensor x, Tensor k, Tensor dst) {
 		int[] shapeE = x.shape();
 		int[] shapeK = k.shape();
@@ -279,6 +354,20 @@ public class OpsConv {
 
 	}
 
+	/**
+	 * Realiza a operação de convolução da entrada {@code X} utilizando o 
+	 * kernel {@code K}, no modo "full".
+	 * @param dataX {@code array} contendo os dados de entrada.
+	 * @param offX offset do array dos dados de entrada.
+	 * @param dataK {@code array} contendo os dados do kernel.
+	 * @param offK offset do array dos dados do kernel.
+	 * @param dataDst {@code array} contendo os dados de destino.
+	 * @param offDst offset do array dos dados de destino.
+	 * @param W largura da entrada.
+	 * @param H altura da entrada.
+	 * @param kW largura do kernel.
+	 * @param kH altura do kernel.
+	 */
 	public static void conv2DFull(float[] dataX, int offX, float[] dataK, int offK, float[] dataDst, int offDst, int W, int H, int kW, int kH) {
 		final int outH = H + kH - 1;
 		final int outW = W + kW - 1;

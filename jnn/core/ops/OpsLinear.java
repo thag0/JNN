@@ -4,10 +4,21 @@ import jnn.core.JNNnative;
 import jnn.core.tensor.Tensor;
 
 /**
- * 
+ * Implementações internas de operações lineares.
  */
 public class OpsLinear {
+
+	/**
+	 * Construtor privado.
+	 */
+	private OpsLinear() {}
     
+	/**
+	 * Realiza a operação {@code A + B} elemento a elemento.
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @return {@code Tensor} resultado.
+	 */
     public static Tensor matadd(Tensor a, Tensor b) {
 		if (!a.compShape(b)) {
 			throw new IllegalArgumentException(
@@ -19,6 +30,12 @@ public class OpsLinear {
 		return a.map(b, (x, y) -> x + y);
     }
 
+	/**
+	 * Realiza a operação {@code A - B} elemento a elemento.
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @return {@code Tensor} resultado.
+	 */
 	public static Tensor matsub(Tensor a, Tensor b) {
 		if (!a.compShape(b)) {
 			throw new IllegalArgumentException(
@@ -30,6 +47,12 @@ public class OpsLinear {
 		return a.map(b, (x, y) -> x - y);
 	}
 
+	/**
+	 * Realiza a operação {@code A * B} elemento a elemento.
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @return {@code Tensor} resultado.
+	 */
 	public static Tensor mathad(Tensor a, Tensor b) {
 		if (!a.compShape(b)) {
 			throw new IllegalArgumentException(
@@ -41,6 +64,12 @@ public class OpsLinear {
 		return a.map(b, (x, y) -> x * y);
 	}
 
+	/**
+	 * Realiza a operação {@code A / B} elemento a elemento.
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @return {@code Tensor} resultado.
+	 */
 	public static Tensor matdiv(Tensor a, Tensor b) {
 		if (!a.compShape(b)) {
 			throw new IllegalArgumentException(
@@ -51,6 +80,12 @@ public class OpsLinear {
 		return a.map(b, (x, y) -> x / y);
 	}
 
+	/**
+	 * Realiza a operação {@code A @ B} (multiplicação matricial).
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @return {@code Tensor} resultado.
+	 */
 	public static Tensor matmul(Tensor a, Tensor b) {
 		if (a.numDim() > 2 || b.numDim() > 2) {
 			throw new IllegalArgumentException(
@@ -81,6 +116,12 @@ public class OpsLinear {
 		return res;
 	}
 
+	/**
+	 * Realiza a operação {@code DST = A @ B} (multiplicação matricial).
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @param dst {@code Tensor} de destino.
+	 */
 	public static void matmul(Tensor a, Tensor b, Tensor dst) {
 		if (a.numDim() > 2 || b.numDim() > 2 || dst.numDim() > 2) {
 			throw new IllegalArgumentException(
@@ -211,7 +252,14 @@ public class OpsLinear {
 		}
 	}
 
-	public static void matmul_jni(Tensor a, Tensor b, Tensor dst) {
+	/**
+	 * Realiza a operação {@code DST = A @ B} (multiplicação matricial)
+	 * utilizando a interface nativa.
+	 * @param a {@code Tensor} A.
+	 * @param b {@code Tensor} B.
+	 * @param dst {@code Tensor} de destino.
+	 */
+	public static void matmulJNI(Tensor a, Tensor b, Tensor dst) {
 		if (a.numDim() > 2 || b.numDim() > 2 || dst.numDim() > 2)
 			throw new IllegalArgumentException(
 				"\nOs tensores devem conter até duas dimensões, mas contêm " +
@@ -261,6 +309,5 @@ public class OpsLinear {
 			linA, colA, colB
 		);
 	}
-
 
 }

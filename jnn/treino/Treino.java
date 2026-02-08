@@ -14,11 +14,16 @@ public class Treino extends MetodoTreino {
 	/**
 	 * Treinador sequencial, atualiza os parâmetros a cada amostra de dados.
 	 * @param modelo modelo para treino.
+	 * @param hist calcular histórico de perda.
 	 */
 	public Treino(Modelo modelo, boolean hist) {
 		super(modelo, hist);
 	}
 
+	/**
+	 * Treinador sequencial, atualiza os parâmetros a cada amostra de dados.
+	 * @param modelo modelo para treino.
+	 */
 	public Treino(Modelo modelo) {
 		this(modelo, false);
 	}

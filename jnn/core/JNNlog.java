@@ -1,12 +1,23 @@
 package jnn.core;
 
+/**
+ * Serviço simples de loggin da biblioteca.
+ */
 public class JNNlog {
 
     /**
      * Tipos de logs disponíveis.
      */
     public enum TipoLog {
+
+        /**
+         * Tipo específico para logs relacionados ao treino.
+         */
         TREINO,
+        
+        /**
+         * Tipo específico para logs relacionados à paralelismo.
+         */
         PARALLEL
     };
     
@@ -31,8 +42,8 @@ public class JNNlog {
      * @param tipo tipo de informação.
      * @param info infomação para log.
      */
-    public static void logln(TipoLog level, String info) {
-        log(level, info);
+    public static void logln(TipoLog tipo, String info) {
+        log(tipo, info);
         System.out.printf("\n");
     }
 

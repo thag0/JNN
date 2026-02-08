@@ -14,7 +14,7 @@ import jnn.core.tensor.TensorData;
  *		com momento e a estimativa adaptativa de momentos de primeira e segunda ordem
  *		tendo como adicionar o acelerador de nesterov para correção.
  * </p>
- * {@link {@code Paper} https://cs229.stanford.edu/proj2015/054_report.pdf}
+ * @see <a href="https://cs229.stanford.edu/proj2015/054_report.pdf"> Paper Nadam </a>
  */
 public class Nadam extends Otimizador {
 

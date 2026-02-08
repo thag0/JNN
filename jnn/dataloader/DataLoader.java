@@ -20,8 +20,8 @@ import jnn.dataloader.transform.Transform;
  *      de um conjunto de dados, cada amostra possuindo um {@code Tensor}
  *      para dados de entrada (X) e outro {@code Tensor} para dados de 
  *      saída (Y).
- * @see {@code Tensor} {@link jnn.core.tensor.Tensor}
- * @see {@code Amostra} {@link jnn.dataloader.Amostra}
+ * @see jnn.core.tensor.Tensor Tensor
+ * @see jnn.dataloader.Amostra Amostra
  */
 public class DataLoader implements Iterable<Amostra> {
 
@@ -38,7 +38,7 @@ public class DataLoader implements Iterable<Amostra> {
     /**
      * Inicializa um DataLoader com uma amostra inicial.
      * @param a {@code Amostra} desejada.
-     * @see {@link jnn.dataloader.Amostra}
+     * @see jnn.dataloader.Amostra Amostra
      */
     public DataLoader(Amostra a) {
         add(a);
@@ -46,8 +46,8 @@ public class DataLoader implements Iterable<Amostra> {
 
     /**
      * Inicializa um DataLoader com uma amostra inicial.
-     * @param a {@code Amostra} desejada.
-     * @see {@link jnn.dataloader.Amostra}
+     * @param as {@code Amostra} desejada.
+     * @see jnn.dataloader.Amostra Amostra
      */
     public DataLoader(Amostra[] as) {
         add(as);
@@ -76,7 +76,7 @@ public class DataLoader implements Iterable<Amostra> {
     /**
      * Adiciona um conjunto de amostras.
      * @param as conjunto de {@code Amostra} desejada.
-     * @see {@link jnn.dataloader.Amostra}
+     * @see jnn.dataloader.Amostra Amostra
      */
     public void add(Amostra[] as) {
        for (Amostra a : as) {
@@ -87,7 +87,7 @@ public class DataLoader implements Iterable<Amostra> {
     /**
      * Adiciona uma nova amostra.
      * @param a {@code Amostra} desejada.
-     * @see {@link jnn.dataloader.Amostra}
+     * @see jnn.dataloader.Amostra Amostra
      */
     public void add(Amostra a) {
         if (tam() > 1) {
@@ -117,7 +117,7 @@ public class DataLoader implements Iterable<Amostra> {
      * Adiciona uma nova amostra a partir de um conjunto de entrada e saída.
      * @param x {@code Tensor} contendo dados de entrada.
      * @param y {@code Tensor} contendo dados de saída.
-     * @see {@link jnn.core.tensor.Tensor}
+     * @see jnn.core.tensor.Tensor Tensor
      */
     public void add(Tensor x, Tensor y) {
         add(new Amostra(x, y));
@@ -125,7 +125,7 @@ public class DataLoader implements Iterable<Amostra> {
 
     /**
      * Embaralha os dados do DataLoader usando o algoritmo Fisher-Yates
-     * @see {@link jnn.core.JNNutils} 
+     * @see jnn.core.JNNutils JNNutils. 
      */
     public void embaralhar() {
         JNNutils.embaralhar(dados, null);
@@ -134,7 +134,7 @@ public class DataLoader implements Iterable<Amostra> {
     /**
      * Embaralha os dados do DataLoader usando o algoritmo Fisher-Yates.
      * @param rng gerador de números aleatórios desejado.
-     * @see {@link jnn.core.JNNutils} 
+     * @see jnn.core.JNNutils JNNutils. 
      */
     public void embaralhar(Random rng) {
         JNNutils.embaralhar(dados, rng);

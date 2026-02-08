@@ -11,6 +11,9 @@ import jnn.modelos.Modelo;
 import jnn.otm.Otimizador;
 import jnn.treino.callback.CallbackFimEpoca;
 
+/**
+ * Método base de treino de modelo.
+ */
 public abstract class MetodoTreino {
 
 	/**
@@ -34,7 +37,7 @@ public abstract class MetodoTreino {
 	protected boolean calcHist;
 	
 	/**
-	 * 
+	 * Callback usada a cada final de época.
 	 */
 	CallbackFimEpoca callback;
 
@@ -124,8 +127,6 @@ public abstract class MetodoTreino {
 	 */
 	protected void exibirLogTreino(String log) {
 		limparLinha();
-
-		// JNNlog.log(info, LOG_LEVEL.TREINO);
 		JNNlog.logTreino(log);
 	}
 
@@ -138,7 +139,7 @@ public abstract class MetodoTreino {
 
 	/**
 	 * Retorna os valores do histórico de perdas do modelo durante o treino.
-	 * @return
+	 * @return histórico convertido em array de {@code Float}.
 	 */
 	public Float[] hist() {
 		return historico.toArray(new Float[]{});

@@ -4,6 +4,9 @@ import jnn.camadas.Camada;
 import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 
+/**
+ * Camada de ativação Leaky ReLU.
+ */
 public class LeakyReLU extends Camada implements Cloneable {
 
     Tensor _entrada;
@@ -13,16 +16,28 @@ public class LeakyReLU extends Camada implements Cloneable {
 
     private int[] shapeEntrada;
     float alfa;
-
+    
+    /**
+     * Inicializa uma camada de ativação Leaky ReLU.
+     * @param alfa constante da ativação.
+     * @param shape formato de entrada para a camada.
+     */
     public LeakyReLU(Number alfa, int... shape) {
         this(alfa);
         construir(shape);
     }
 
+    /**
+     * Inicializa uma camada de ativação Leaky ReLU.
+     * @param alfa constante da ativação.
+     */
     public LeakyReLU(Number alfa) {
         this.alfa = alfa.floatValue();
     }
 
+    /**
+     * Inicializa uma camada de ativação Leaky ReLU.
+     */
     public LeakyReLU() {
         this(0.01);
     }

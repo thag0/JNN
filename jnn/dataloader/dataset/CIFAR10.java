@@ -25,6 +25,11 @@ import jnn.dataloader.DataLoader;
 public class CIFAR10 {
 
     /**
+     * Construtor privado.
+     */
+    private CIFAR10() {}
+
+    /**
      * Fonte dos dados.
      */
     static private final String BASE = "https://www.cs.toronto.edu/~kriz/";

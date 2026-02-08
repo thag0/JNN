@@ -8,6 +8,11 @@ import java.util.List;
  * @see jnn.core.tensor.Tensor
  */
 public class TensorConverter {
+
+    /**
+     * Construtor privado.
+     */
+    private TensorConverter() {}
     
     /**
      * Converte um objeto em um {@code Tensor}.

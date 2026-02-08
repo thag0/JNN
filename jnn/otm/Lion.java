@@ -13,7 +13,7 @@ import jnn.core.tensor.TensorData;
  *		memória que utiliza apenas o sinal de operação para controlar
  *		a magnitude das suas atualizações.
  * </p>
- * {@link {@code Paper} http://arxiv.org/abs/2302.06675}
+ * @see <a href="http://arxiv.org/abs/2302.06675"> Paper Lion </a>
  */
 public class Lion extends Otimizador {
 

@@ -36,7 +36,6 @@ public class Entrada extends Camada {
 
 	/**
 	 * Inicializa um camada de entrada de acordo com o formato especificado.
-	 * </pre>
 	 * @param shape formato de entrada usado para o modelo em que a camada estiver.
 	 */
 	public Entrada(int... shape) {

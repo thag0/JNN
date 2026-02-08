@@ -14,7 +14,7 @@ import jnn.core.tensor.TensorData;
  *    oscilação do gradiente, permitindo que a taxa de aprendizado seja adaptada para cada 
  *    parâmetro individualmente.
  * </p>
- * {@link {@code Paper}: http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf}
+ * @see <a href="http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf"> Doc RMSProp </a>
  */
 public class RMSProp extends Otimizador {
 

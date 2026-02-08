@@ -23,10 +23,12 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	protected String nome = getClass().getSimpleName();
 
 	/**
-	 * <h3> Não alterar </h3>
-	 * Auxiliar no controle da compilação do modelo, ajuda a evitar uso 
-	 * indevido caso ainda não tenha suas variáveis e dependências inicializadas 
-	 * previamente.
+	 * <strong> Não alterar </strong>
+	 * <p>
+	 *		Auxiliar no controle da compilação do modelo, ajuda a 
+	 *		evitar uso indevido caso ainda não tenha suas variáveis 
+	 *		e dependências inicializadas previamente.
+	 * </p>
 	 */
 	public boolean _compilado;
 
@@ -192,10 +194,10 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 *    Para treinar o modelo deve-se fazer uso da função função {@code treinar()} 
 	 *    informando os dados necessários para treino.
 	 * </p>
-	 * @param otimizador otimizador usando para ajustar os parâmetros treinavéis do 
+	 * @param otm otimizador usando para ajustar os parâmetros treinavéis do 
 	 * modelo, pode ser uma {@code String} referente ao nome ou uma {@code instância} 
 	 * já inicializada.
-	 * @param perda função de perda usada para avaliar o erro do modelo durante o 
+	 * @param loss função de perda usada para avaliar o erro do modelo durante o 
 	 * treino, pode ser uma {@code String} referente ao nome ou uma {@code instância} 
 	 * já inicializada.
 	 */

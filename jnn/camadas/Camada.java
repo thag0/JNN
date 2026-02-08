@@ -378,6 +378,10 @@ public abstract class Camada {
 		);
 	}
 
+	/**
+	 * Retorna o tamanho em bytes na memória ocupado pela camada.
+	 * @return tamanho aproximado em bytes.
+	 */
 	public long tamBytes() {
 		return 
 		1 + //treinavel 

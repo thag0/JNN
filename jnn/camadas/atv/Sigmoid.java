@@ -4,6 +4,9 @@ import jnn.camadas.Camada;
 import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 
+/**
+ * Camada de ativação Sigmoid.
+ */
 public class Sigmoid extends Camada implements Cloneable {
 
     Tensor _entrada;
@@ -13,8 +16,15 @@ public class Sigmoid extends Camada implements Cloneable {
 
     private int[] shapeEntrada;
 
+    /**
+     * Inicializa uma camada de ativação Sigmoid.
+     */
     public Sigmoid() {}
-
+    
+    /**
+     * Inicializa uma camada de ativação Sigmoid.
+     * @param shape formato de entrada para a camada.
+     */
     public Sigmoid(int... shape) {
         construir(shape);
     }
