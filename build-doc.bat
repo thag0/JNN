@@ -6,7 +6,7 @@ chcp 65001 > nul
 setlocal enabledelayedexpansion
 
 set SRC_DIR=jnn
-set DOC_DIR=bin\javadoc
+set DOC_DIR=bin\doc
 set TMP_FILE=%TEMP%\java_sources.txt
 
 if exist "%DOC_DIR%" rmdir /S /Q "%DOC_DIR%"
@@ -27,10 +27,10 @@ javadoc ^
  -d "%DOC_DIR%" ^
  -windowtitle "JNN - Java Neural Network Library" ^
  -doctitle "JNN<br>Java Neural Network Library" ^
- -bottom "2026 Thiago Barroso" ^
+ -bottom "Thiago Barroso" ^
  -sourcepath "%SRC_DIR%" ^
  @"%TMP_FILE%"
 
 del "%TMP_FILE%"
 
-echo Javadoc gerado com sucesso em %DOC_DIR%
+echo Javadoc gerado em %DOC_DIR%
