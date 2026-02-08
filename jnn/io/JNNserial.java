@@ -26,29 +26,29 @@ import jnn.otm.Otimizador;
  * Classe responsável por tratar da gravação/leitura de modelos
  * de {@code RedeNeural} e {@code Sequencial}.
  */
-public class Serializador extends SerialBase {
+public class JNNserial extends SerialBase {
 
 	/**
 	 * Formato suportado de leitura e escrita dos modelos.
 	 */
-	private final String formatoModelo = ".nn";
+	static private final String formatoModelo = ".nn";
 
 	/**
 	 * Operador de leitura/gravação.
 	 */
-	private SerialCamada serialCamada = new SerialCamada();
+	static private SerialCamada serialCamada = new SerialCamada();
 
 	/**
 	 * Serializador e desserializador de modelos.
 	 */
-	private Serializador() {}
+	private JNNserial() {}
 
 	/**
 	 * Salva um modelo {@code RedeNeural} em um arquivo externo.
 	 * @param modelo instância de uma {@code Rede Neural}.
 	 * @param caminho caminho com nome e extensão do arquivo {@code .nn}.
 	 */
-	public void salvar(RedeNeural modelo, String caminho) {
+	static public void salvar(RedeNeural modelo, String caminho) {
 		File arquivo = new File(caminho);
 		if (!arquivo.getName().toLowerCase().endsWith(formatoModelo)) {
 			throw new IllegalArgumentException(
@@ -78,7 +78,7 @@ public class Serializador extends SerialBase {
 	 * @param modelo modelo {@code Sequencial}.
 	 * @param caminho caminho com nome e extensão do arquivo {@code .nn}.
 	 */
-	public void salvar(Sequencial modelo, String caminho) {
+	static public void salvar(Sequencial modelo, String caminho) {
 		File arquivo = new File(caminho);
 		if (!arquivo.getName().toLowerCase().endsWith(formatoModelo)) {
 			throw new IllegalArgumentException(
@@ -115,7 +115,7 @@ public class Serializador extends SerialBase {
 	 * @param caminho caminho onde está salvo o arquivo {@code .nn} do modelo.
 	 * @return modelo {@code RedeNeural} baseado no arquivo lido.
 	 */
-	public RedeNeural lerRedeNeural(String caminho) {
+	static public RedeNeural lerRedeNeural(String caminho) {
 		RedeNeural rede = null;
 		Dicionario dicio = new Dicionario();
 
@@ -166,7 +166,7 @@ public class Serializador extends SerialBase {
 	 * @param caminho caminho onde está saldo o arquivo {@code .nn} do modelo;
 	 * @return modelo {@code Sequencial} lido a partir do arquivo.
 	 */
-	public Sequencial lerSequencial(String caminho) {
+	static public Sequencial lerSequencial(String caminho) {
 		Sequencial modelo = new Sequencial();
 		Dicionario dicio = new Dicionario();
 

@@ -10,7 +10,7 @@ import jnn.camadas.pooling.MaxPool2D;
 import jnn.core.JNNnative;
 import jnn.dataloader.DataLoader;
 import jnn.dataloader.dataset.CIFAR10;
-import jnn.io.Serializador;
+import jnn.io.JNNserial;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
 
@@ -70,7 +70,7 @@ public class MainConv {
 		System.out.print("Teste -> perda: " + modelo.avaliar(dlTeste).item() + " - ");
 		System.out.println("acurácia: " + formatarDecimal((modelo.avaliador().acuracia(dlTeste).item() * 100), 4) + "%");
 
-		salvarModelo(modelo, CAMINHO_SAIDA_MODELO);
+		JNNserial.salvar(modelo, CAMINHO_SAIDA_MODELO);
 
 		exportarHistorico(modelo, CAMINHO_HISTORICO, accs.toArray(new Float[]{}));
 		executarComando("python grafico.py " + CAMINHO_HISTORICO);
@@ -117,15 +117,6 @@ public class MainConv {
 		modelo.compilar("adam", "entropia-cruzada");
 		
 		return modelo;		
-	}
-
-	/**
-	 * Salva o modelo num arquivo externo.
-	 * @param modelo instância de um modelo sequencial.
-	 * @param caminho caminho de destino.
-	 */
-	static void salvarModelo(Sequencial modelo, String caminho) {
-		new Serializador().salvar(modelo, caminho);
 	}
 
 	/**

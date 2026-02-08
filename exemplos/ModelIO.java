@@ -2,7 +2,7 @@ package exemplos;
 
 import ged.Ged;
 import jnn.camadas.Densa;
-import jnn.io.Serializador;
+import jnn.io.JNNserial;
 import jnn.modelos.Sequencial;
 
 /**
@@ -28,8 +28,7 @@ public class ModelIO {
 		modelo.print();
 
 		// Ferramenta para exportação
-		Serializador serial = new Serializador();
-		serial.salvar(modelo, caminho);
+		JNNserial.salvar(modelo, caminho);
 	}
 
 }
