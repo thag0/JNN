@@ -2064,87 +2064,76 @@ public class Tensor implements Iterable<Float>, Cloneable {
 	 * @return string formatada.
 	 */
     private String construirPrint() {
-		final String identacao = " ".repeat(4);
-
+		// desse jeito aqui o array usado vai conter
+		// só os dados que o tensor aponta, se for uma view
+		// vai usar apenas o subconjunto dessa view
+		float arr[] = dados.paraArray();
+		
 		int maxCasasDecimais = 0;
-		for (float valor : array()) {
+		for (float valor : arr) {
 			String valorStr = Float.toString(valor);
-			int decimais = valorStr.length() - valorStr.indexOf('.') - 1;
+			int pontoIndex = valorStr.indexOf('.');
+			int decimais = (pontoIndex >= 0) ? valorStr.length() - pontoIndex - 1 : 0;
 			if (decimais > maxCasasDecimais) maxCasasDecimais = decimais;
 		}
 
 		int tamMaximo = -1;
-        for (float valor : array()) {
-            String valorStr = valorStr(valor, maxCasasDecimais);
+		for (float valor : arr) {
+			String valorStr = valorStr(valor, maxCasasDecimais);
 			int tamValor = valorStr.length();
-            if (tamValor > tamMaximo) tamMaximo = tamValor;
+			if (tamValor > tamMaximo) tamMaximo = tamValor;
 		}
 
-        StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder();
+		
+		String cabecalho = nome() + " (";
+		sb.append(cabecalho);
 
-        int[] indices = new int[shape.length];
-        boolean[] parentesisAbertos = new boolean[shape.length];
+		int[] indices = new int[shape.length];
+		
+		construirPrintRec(sb, indices, 0, tamMaximo, maxCasasDecimais, cabecalho.length());
 
-		sb.append(nome()).append(" ").append(shapeStr()).append(" = [").append("\n");
+		sb.append(")");
+		return sb.toString();
+	}
 
-        sb.append(identacao);
-        for (int n = 0; n < tam(); n++) {
-            for (int i = 0; i < indices.length; i++) {
-                if (!parentesisAbertos[i]) {
-                    sb.append("[");
-                    parentesisAbertos[i] = true;
-                }
-            }
+	/**
+	 * Monta as informações do tensor.
+	 * @param sb buffer.
+	 * @param indices índices dos dados.
+	 * @param dim dimensão atual.
+	 * @param maxTam tamanho máximo.
+	 * @param maxDecimal tamanho máximo de casas decimais.
+	 * @param padBase espaçamento base (padding).
+	 */
+	private void construirPrintRec(StringBuilder sb, int[] indices, int dim, int maxTam, int maxDecimal, int padBase) {
+		sb.append("[");
+		
+		int tamDim = shape[dim];
+		boolean ultimaDim = (dim == shape.length - 1);
 
-            final String valorStr = valorStr(get(indices), maxCasasDecimais);
-            sb.append(" ".repeat(tamMaximo - valorStr.length()))
-				.append(valorStr);
+		for (int i = 0; i < tamDim; i++) {
+			indices[dim] = i;
 
-            final int idUltimaDim = shape.length - 1;
-            if (indices[idUltimaDim] < shape[idUltimaDim] - 1) {
-                sb.append(", ");
-            }
+			if (ultimaDim) {
+				if (i > 0) sb.append(", ");
+				String valorStr = valorStr(get(indices), maxDecimal);
+				sb.append(" ".repeat(maxTam - valorStr.length())).append(valorStr);
+				
+			} else {
+				
+				if (i > 0) {
+					sb.append(",");
+					int quebraLinha = shape.length - dim - 1;
+					sb.append("\n".repeat(quebraLinha));
+					sb.append(" ".repeat(padBase + dim + 1));
+				}
+				
+				construirPrintRec(sb, indices, dim + 1, maxTam, maxDecimal, padBase);
+			}
+		}
 
-            boolean qualquerParentesisAberto = false;
-            int numParentesisFechados = 0;
-
-            for (int i = indices.length - 1; i >= 0; i--) {
-                indices[i] += 1;
-                if (indices[i] >= shape[i]) {
-                    indices[i] = 0;
-
-                    sb.append("]");
-                    if (i > 0 && indices[i - 1] < shape[i - 1] - 1) {
-                        sb.append(",");
-                    }
-
-                    parentesisAbertos[i] = false;
-                    qualquerParentesisAberto = true;
-                    numParentesisFechados++;
-                } else {
-                    break;
-                }
-            }
-
-            if (qualquerParentesisAberto) {
-                if (numParentesisFechados > 1) {
-                    sb.append("\n");
-                }
-                sb.append("\n").append(identacao);
-                sb.append(" ".repeat(shape.length - numParentesisFechados));
-            }
-        }
-
-		// arrumar ultima linha antes do fim do print
-		int n = identacao.length();
-		if (numDim() > 1) n += 1;
-        for (int i = 0; i < n; i++) {
-            sb.deleteCharAt(sb.length()-1);
-        }
-
-		sb.append("]").append("\n");
-
-        return sb.toString().trim();
+		sb.append("]");
 	}
 
 	/**
@@ -2167,6 +2156,7 @@ public class Tensor implements Iterable<Float>, Cloneable {
 			Tensor clone = (Tensor) super.clone();
 
 			clone.shape = shape.clone();
+			clone.strides = strides.clone();
 			
 			int n = tam();
 			clone.dados = new TensorData(n);
