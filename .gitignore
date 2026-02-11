@@ -1,9 +1,8 @@
 .vscode
 /testes/bin
 
-/bin/classes
-/bin/doc
-/bin/nativo
+/bin/*
+!/bin/jnn.jar
 
 historico-perda.csv
 Renomear.java
