@@ -4,7 +4,6 @@ import java.util.concurrent.TimeUnit;
 
 import ged.Dados;
 import ged.Ged;
-import jnn.Funcional;
 import jnn.camadas.*;
 import jnn.camadas.acts.ReLU;
 import jnn.camadas.acts.Softmax;
@@ -23,11 +22,6 @@ public class MainConv {
 	 * Gerenciador de dados.
 	 */
 	static Ged ged = new Ged();
-
-	/**
-	 * Interface da biblioteca.
-	 */
-	static Funcional jnn = new Funcional();
 
 	// controle de treino
 	static final int TREINO_EPOCAS = 7;

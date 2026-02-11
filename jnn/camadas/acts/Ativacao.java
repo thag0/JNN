@@ -7,7 +7,7 @@ import jnn.core.tensor.Tensor;
 /**
  * Camada de ativação base.
  */
-public abstract class Ativacao extends Camada {
+public abstract class Ativacao extends Camada implements Cloneable {
     
     /**
      * Tensor contendo os dados de entrada da camada.

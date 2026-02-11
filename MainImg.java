@@ -7,7 +7,7 @@ import ged.Dados;
 import ged.Ged;
 import geim.Geim;
 import geim.imagem.Imagem;
-import jnn.Funcional;
+import jnn.JNN;
 import jnn.camadas.Densa;
 import jnn.camadas.Entrada;
 import jnn.core.parallel.PoolFactory;
@@ -26,7 +26,6 @@ import render.JanelaTreino;
 public class MainImg {
 	static Ged ged = new Ged();
 	static Geim geim = new Geim();
-	static Funcional jnn = new Funcional();
 
 	static final int EPOCAS = 10 * 1000;
 	static final double ESCALA_RENDER = 10;
@@ -50,8 +49,8 @@ public class MainImg {
 		float[][] in  = (float[][]) ged.separarDadosEntrada(dados, tamEntrada);
 		float[][] out = (float[][]) ged.separarDadosSaida(dados, tamSaida);
 
-		Tensor[] x = jnn.arrayParaTensores(in);
-		Tensor[] y = jnn.arrayParaTensores(out);
+		Tensor[] x = JNN.arrayParaTensores(in);
+		Tensor[] y = JNN.arrayParaTensores(out);
 		DataLoader dl = new DataLoader(x, y);
 		dl.transformY(t -> t.div(255));// normalizar saída de 0-255 para 0-1
 		dl.print();

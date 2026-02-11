@@ -34,6 +34,7 @@ public class TensorConverter {
         }
 
         int[] shape = getShape(obj);
+        validarShape(obj, shape, 0);
         float[] dados = achatarDados(obj, shape);
 
 		return new Tensor(dados).reshape(shape);
@@ -68,6 +69,39 @@ public class TensorConverter {
 
         return shape;
     }
+    
+    /**
+     * Verifica se o shape é válido para usar em um tensor.
+     * @param obj objeto base.
+     * @param shape shape previamente calculado.
+     * @param dim dimensão de checagem.
+     */
+    private static void validarShape(Object obj, int[] shape, int dim) {
+        if (dim == shape.length) {
+            if (obj instanceof Number) return;
+            throw new IllegalArgumentException("\nProfundidade inconsistente no array.");
+        }
+
+        if (obj == null || !obj.getClass().isArray()) {
+            throw new IllegalArgumentException("\nEstrutura irregular no nível " + dim);
+        }
+
+        int len = java.lang.reflect.Array.getLength(obj);
+
+        if (len != shape[dim]) {
+            throw new IllegalArgumentException(
+                "\nArray irregular na dimensão " + dim +
+                ". Esperado: " + shape[dim] +
+                ", encontrado: " + len
+            );
+        }
+
+        for (int i = 0; i < len; i++) {
+            Object elem = java.lang.reflect.Array.get(obj, i);
+            validarShape(elem, shape, dim + 1);
+        }
+    }
+
 
     /**
      * Transforma os dados do objeto em um array linear.

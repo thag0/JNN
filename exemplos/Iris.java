@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import ged.Ged;
 import ged.Dados;
-import jnn.Funcional;
+import jnn.JNN;
 import jnn.camadas.Densa;
 import jnn.camadas.Dropout;
 import jnn.camadas.Entrada;
@@ -27,11 +27,6 @@ public class Iris {
 	 */
 	static Ged ged = new Ged();
 	
-	/**
-	 * Interface funcional.
-	 */
-	static Funcional jnn = new Funcional();
-	
 	static {
 		ged.limparConsole();
 	}
@@ -50,7 +45,7 @@ public class Iris {
 		float[][] dados = ged.dadosParaFloat(iris);
 
 		// Gerando o dataset
-		DataLoader loader = jnn.dataloader(dados, numEntradas, numSaidas);
+		DataLoader loader = JNN.dataloader(dados, numEntradas, numSaidas);
 		loader.embaralhar();
 		DataLoader[] ds = loader.separar(0.75, 0.25);// separando 75% treino, 25% teste
 		DataLoader treino = ds[0];

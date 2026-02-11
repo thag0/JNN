@@ -3,7 +3,6 @@ package exemplos;
 import java.text.DecimalFormat;
 
 import ged.Ged;
-import jnn.Funcional;
 import jnn.camadas.*;
 import jnn.camadas.acts.Sigmoid;
 import jnn.core.tensor.Tensor;
@@ -13,7 +12,6 @@ import jnn.otm.SGD;
 
 public class Xor{
 	static Ged ged = new Ged();
-	static Funcional jnn = new Funcional();
 
 	static {
 		ged.limparConsole();
@@ -25,12 +23,6 @@ public class Xor{
 		final int in  = 2;// Entradas X
 		final int out = 1;// Saídas Y
 
-		// Criando de treinando o modelo
-		// Sequencial modelo = new Sequencial(
-		// 	new Entrada(in),
-		// 	new Densa(3, "sigmoid"),
-		// 	new Densa(out, "sigmoid")
-		// );
 		Sequencial modelo = new Sequencial(
 			new Entrada(in),
 			new Densa(3),
@@ -38,14 +30,13 @@ public class Xor{
 			new Densa(out),
 			new Sigmoid()
 		);
+
 		modelo.compilar(new SGD(0.001, 0.999), "mse");
 		modelo.print();
 		modelo.treinar(xor, 5_000, false);
 		
 		// Avaliando
-		Tensor[] xs = xor.getX();
-		Tensor[] ys = xor.getY();
-		Tensor perda = modelo.avaliar(xs, ys);
+		Tensor perda = modelo.avaliar(xor);
 		System.out.println("Perda: " + perda.item());
 
 		// Criando uma tabela verdade para verificação

@@ -6,8 +6,9 @@ import ged.Ged;
 import geim.imagem.Imagem;
 import ged.Dados;
 import geim.Geim;
-import jnn.Funcional;
+import jnn.JNN;
 import jnn.camadas.*;
+import jnn.camadas.acts.Sigmoid;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;
@@ -22,30 +23,31 @@ import jnn.otm.SGD;
 public class UpscaleImg {
 	static Ged ged = new Ged();
 	static Geim geim = new Geim();
-	static Funcional jnn = new Funcional();
 
 	public static void main(String[] args) {
-
 		ged.limparConsole();
 
 		// Carregando imagem
-		String caminho = "./dados/mnist/treino/8/img_0.jpg";
+		String caminho = "./dados/mnist/img_0.png";
 		BufferedImage imagem = geim.lerImagem(caminho);
 
 		// Tratando dados
 		float[][] dados = imagemParaDadosTreinoEscalaCinza(imagem);
 		int nEntrada = 2;// posição x y do pixel
 		int nSaida = 1;// valor de escala de cinza/brilho do pixel
-		DataLoader img = jnn.dataloader(dados, nEntrada, nSaida);
+		DataLoader img = JNN.dataloader(dados, nEntrada, nSaida);
 		img.transformY(a -> a.div(255));// normalizar entre 0 e 1
 
 		// Criando modelo
 		// -Neste exemplo queremos que o modelo tenha overfitting
 		Sequencial modelo = new Sequencial(
 			new Entrada(nEntrada),
-			new Densa(12, "sigmoid"),
-			new Densa(12, "sigmoid"),
-			new Densa(nSaida, "sigmoid")
+			new Densa(12),
+			new Sigmoid(),
+			new Densa(12),
+			new Sigmoid(),
+			new Densa(nSaida),
+			new Sigmoid()
 		);
 
 		modelo.setHistorico(true);
@@ -55,8 +57,6 @@ public class UpscaleImg {
 		// Avaliando o modelo
 		Tensor[] xs = img.getX();
 		Tensor[] ys = img.getY();
-		float precisao = 1 - modelo.avaliador().mae(xs, ys).item();
-		System.out.println("Precisão = " + (precisao * 100));
 		System.out.println("Perda = " + modelo.avaliar(xs, ys).item());
 
 		// Salvando dados
@@ -77,7 +77,7 @@ public class UpscaleImg {
 		}
 
 		Dados dados = new Dados(perdas);
-		ged.exportarCsv(dados, "historico-perda");
+		ged.exportarCsv(dados, "historico-perda.csv");
 	}
 
 	/**
@@ -129,6 +129,8 @@ public class UpscaleImg {
 	 * @param caminho caminho para o arquivo.
 	 */
 	static void exportarImagemEscalaCinza(Modelo modelo, int altBase, int largBase, double escala, String caminho) {
+		modelo.loteZero();//remover dimensão de lote 
+
 		if (escala <= 0) throw new IllegalArgumentException("O valor de escala não pode ser menor que 1.");
 		if (modelo.camadaSaida().tamSaida() != 1) {
 			throw new IllegalArgumentException(

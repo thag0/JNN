@@ -18,5 +18,8 @@ javac -cp "%CP_JNN_GED%" -d %OUT_DIR% MainConv.java
 @REM javac -cp "%CP_JNN_GED_GEIM%" -d %OUT_DIR% TesteJNI.java
 @REM javac -cp "%CP_JNN_GED%" -d %OUT_DIR% TesteTempos.java
 
+@rem Exemplos
 @REM javac -cp "%CP_JNN_GED%" -d %OUT_DIR% exemplos\Iris.java
+@REM javac -cp "%CP_JNN_GED%" -d %OUT_DIR% exemplos\ModelIO.java
+javac -cp "%CP_JNN_GED_GEIM%" -d %OUT_DIR% exemplos\UpscaleImg.java
 @REM javac -cp "%CP_JNN_GED%" -d %OUT_DIR% exemplos\Xor.java
