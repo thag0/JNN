@@ -1,6 +1,7 @@
 package exemplos;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 import ged.Ged;
 import ged.Dados;
@@ -8,7 +9,8 @@ import jnn.Funcional;
 import jnn.camadas.Densa;
 import jnn.camadas.Dropout;
 import jnn.camadas.Entrada;
-
+import jnn.camadas.acts.Softmax;
+import jnn.camadas.acts.Tanh;
 import jnn.dataloader.DataLoader;
 
 import jnn.modelos.Sequencial;
@@ -56,11 +58,14 @@ public class Iris {
 		// Criando um modelo
 		Sequencial modelo = new Sequencial(
 			new Entrada(numEntradas),
-			new Densa(10, "tanh"),
+			new Densa(10),
+			new Tanh(),
 			new Dropout(0.25),
-			new Densa(10, "tanh"),
+			new Densa(10),
+			new Tanh(),
 			new Dropout(0.25),
-			new Densa(numSaidas, "softmax")
+			new Densa(numSaidas),
+			new Softmax()
 		);
 			
 		modelo.compilar("adam", "entropia-cruzada");
@@ -69,10 +74,17 @@ public class Iris {
 		treino.print();
 		modelo.print();
 
-		modelo.treinar(treino, 500, 12, true);
+		// callback para capturar a acurácia ao longo do treino
+		DataLoader teste  = ds[1];
+		ArrayList<Float> accs = new ArrayList<>();
+		modelo.treinador().setCallback(info -> {
+			float acuracia = modelo.avaliador().acuracia(teste).item();
+			accs.add(acuracia);
+		});
+
+		modelo.treinar(treino, 250, 12, true);
 		
 		// Avaliando o modelo
-		DataLoader teste  = ds[1];
 		System.out.println("Perda = " + modelo.avaliar(teste).item());
 		float acc = modelo.avaliador().acuracia(teste).item();
 		System.out.println("Acurácia = " + formatarDecimal(acc*100, 4) + "%");
@@ -85,7 +97,7 @@ public class Iris {
 		.print();
 
 		String nomeArquivo = "historico-perda.csv";
-		exportarHistorico(modelo.hist(), nomeArquivo);
+		exportarHistorico(modelo.hist(), nomeArquivo, accs.toArray(new Float[]{}));
 
 		try {
 			executarComando("python grafico.py " + nomeArquivo);
@@ -111,15 +123,29 @@ public class Iris {
 	 * @param modelo modelo.
 	 * @param caminho caminho onde será salvo o arquivo.
 	 */
-	static void exportarHistorico(float[] hist, String caminho) {
-		System.out.println("Exportando histórico de perda");
-		float[][] dadosPerdas = new float[hist.length][1];
+	static void exportarHistorico(float[] hist, String caminho, Float[] accs) {
+		Dados dados = null;
 
-		for(int i = 0; i < dadosPerdas.length; i++){
-			dadosPerdas[i][0] = hist[i];
+		if (accs != null) {
+			float[][] dadosPerdas = new float[hist.length][2];
+			
+			for (int i = 0; i < dadosPerdas.length; i++) {
+				dadosPerdas[i][0] = hist[i];
+				dadosPerdas[i][1] = accs[i];
+			}
+			
+			dados = new Dados(dadosPerdas);	
+
+		} else {
+			float[][] dadosPerdas = new float[hist.length][1];
+			
+			for (int i = 0; i < dadosPerdas.length; i++) {
+				dadosPerdas[i][0] = hist[i];
+			}
+			
+			dados = new Dados(dadosPerdas);
 		}
-
-		Dados dados = new Dados(dadosPerdas);
+		
 		ged.exportarCsv(dados, caminho);
 	}
 

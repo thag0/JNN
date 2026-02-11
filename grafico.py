@@ -25,7 +25,6 @@ if __name__ == '__main__':
 
 		fig, axes = plt.subplots(num="Treino")
 		plt.plot(eixo_x, eixo_y, color='orange')
-		plt.scatter(eixo_x, eixo_y, color='orange')
 		plt.title(f'Perda por época (min = {min_y:.6f})')
 		plt.xlabel('Épocas')
 		plt.ylabel('Perda')
@@ -40,7 +39,6 @@ if __name__ == '__main__':
 		fig, (ax_loss, ax_acc) = plt.subplots(1, 2, num="Treino", figsize=(10, 4))
 
 		ax_loss.plot(eixo_x, eixo_y_loss, color='orange')
-		ax_loss.scatter(eixo_x, eixo_y_loss, color='orange')
 		ax_loss.set_title('Perda por época')
 		ax_loss.set_xlabel('Épocas')
 		ax_loss.set_ylabel('Perda')
@@ -48,7 +46,6 @@ if __name__ == '__main__':
 		ax_loss.grid()
 
 		ax_acc.plot(eixo_x, eixo_y_acc, color='blue')
-		ax_acc.scatter(eixo_x, eixo_y_acc, color='blue')
 		ax_acc.set_title('Acurácia por época')
 		ax_acc.set_xlabel('Épocas')
 		ax_acc.set_ylabel('Acurácia')

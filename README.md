@@ -23,40 +23,35 @@ t.print();
 
 # *Saída*
 ```
-Tensor (2, 2) = [
-    [[1.0, 2.0],
-     [3.0, 4.0]]
-]
+Tensor ([[1.0, 2.0],
+         [3.0, 4.0]])
 ```
+
+*Internamente todos os tensores trabalham com dados do tipo float32.*
 
 # **Modelos**
 
-A biblioteca atualmente possui duas APIs para criação de modelos, sendo eles: RedeNeural e Sequencial.
-
-# *RedeNeural*
-O modelo RedeNeural foi a base da construção de todo esse ambiente, nele que comecei a incorporar os moldes para a biblioteca.
-- Ele é uma implementação focada em Multilayer Perceptrons (MLPs), onde conta com apenas camadas densas na sua estrutura, o que acaba sendo um pouco limitado dependendo do tipo de problema, pois não traz flexibilidade nas configurações específicas de suas camadas;
-- Contudo o modelo tem um ótimo desemepenho nas suas tarefas esperadas, como classificação e regressão, podendo ser uma escolha mais leve e simples dependendo da necessidade.
-
-# *Sequencial*
-
-O modelo Sequencial foi pensado para criar estruturas mais complexas que envolvam camadas mais diversificadas, podendo empilhas uma lista de camadas em sua estrutura.
+A biblioteca conta uma API para criação de modelos sequenciais de camadas.
 
 # *Exemplo de criação*
 ```
 Sequencial modelo = new Sequencial(
     new Entrada(1, 28, 28),
-    new Conv2D(24, new int[]{3, 3}, "relu"),
+    new Conv2D(24, new int[]{3, 3}),
+    new ReLU(),
     new MaxPool2D(new int[]{2, 2}),
-    new Conv2D(30, new int[]{3, 3}, "relu"),
+    new Conv2D(30, new int[]{3, 3}),
+    new ReLU(),
     new MaxPool2D(new int[]{2, 2}),
     new Flatten(),
-    new Densa(100, "tanh"),
-    new Densa(NUM_DIGITOS_TREINO, "softmax")
+    new Densa(100),
+    new Tanh(),
+    new Densa(10),
+    new Softmax()
 );
 ```
 
-<img width="1097" height="892" alt="Image" src="https://github.com/user-attachments/assets/c0bd172b-6ec9-456a-ac7c-2dbe3230d1d9" />
+<img width="1701" height="647" alt="Image" src="https://github.com/user-attachments/assets/78ba9bcb-8eae-4931-82d7-9c8a5b25c805" />
 
 *Exemplo de treino com o modelo sequencial, usando o otimizador sgd (Stochastic Gradient Descent) e função de perda mse (Mean Squared Error) usando dataset Iris*
 

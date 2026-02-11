@@ -352,7 +352,7 @@ public class Sequencial extends Modelo {
 		//camadas
 		sb.append(
 			pad + String.format(
-			"%-23s%-23s%-23s%-23s%-23s\n", "Camada", "Entrada", "Saída", "Ativação", "Parâmetros"
+			"%-23s%-23s%-23s%-23s\n", "Camada", "Entrada", "Saída", "Parâmetros"
 			)
 		);
 
@@ -366,20 +366,12 @@ public class Sequencial extends Modelo {
 			
 			//formato de saída
 			String formSaida = JNNutils.arrayStr(camada.shapeOut());
-
-			//função de ativação
-			String ativacao;
-			try {
-				ativacao = camada.act().nome();
-			} catch (Exception e) {
-				ativacao = "-";
-			}
 			
 			String parametros = new DecimalFormat("#,###").format(camada.numParams());
 
 			sb.append(
 				pad + String.format(
-					"%-23s%-23s%-23s%-23s%-23s\n", nomeCamada, formEntrada, formSaida, ativacao, parametros
+					"%-23s%-23s%-23s%-23s\n", nomeCamada, formEntrada, formSaida, parametros
 				)
 			);
 		}

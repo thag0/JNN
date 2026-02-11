@@ -1,8 +1,5 @@
 package jnn;
 
-import jnn.acts.Argmax;
-import jnn.acts.Ativacao;
-import jnn.acts.Softmax;
 import jnn.core.Dicionario;
 import jnn.core.JNNutils;
 import jnn.core.ops.Ops;
@@ -363,28 +360,6 @@ public final class Funcional {
         return new Tensor(t).log();
     }
 
-    /**
-     * Calcula a ativação softmax aos elementos do tensor.
-     * @param t {@code Tensor} desejado.
-     * @return {@code Tensor} com resultado aplicado.
-     */
-    public Tensor softmax(Tensor t) {
-        Tensor soft = new Tensor(t);
-        new Softmax().forward(t, soft);
-        return soft;
-    }
-
-    /**
-     * Calcula a ativação argmax aos elementos do tensor.
-     * @param t {@code Tensor} desejado.
-     * @return {@code Tensor} com resultado aplicado.
-     */
-    public Tensor argmax(Tensor t) {
-        Tensor arg = new Tensor(t);
-        new Argmax().forward(t, arg);
-        return arg;
-    }
-
     // perdas
 
     /**
@@ -531,15 +506,6 @@ public final class Funcional {
     }
 
     // dicionario
-
-    /**
-     * Retorna uma ativação com base no nome informado.
-     * @param act nome da ativação desejada.
-     * @return {@code Ativacao} buscada.
-     */
-    public Ativacao getAtivacao(String act) {
-        return dicionario.getAtivacao(act);
-    }
 
     /**
      * Retorna um otimizador com base no nome informado.

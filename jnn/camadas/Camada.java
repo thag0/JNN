@@ -1,6 +1,5 @@
 package jnn.camadas;
 
-import jnn.acts.Ativacao;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -112,22 +111,6 @@ public abstract class Camada {
 	public abstract void inicializar();
 
 	/**
-	 * Configura a função de ativação da camada através de uma instância 
-	 * de {@code Ativacao} que será usada para ativar sua saída.
-	 * <p>
-	 *    Configurando a ativação da camada usando uma instância de função 
-	 *    de ativação aumenta a liberdade de personalização dos hiperparâmetros
-	 *    que algumas funções proporcionam.
-	 * </p>
-	 * @param act nova função de ativação.
-	 */
-	public void setAct(Object act) {
-		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui configuração de função de ativação."
-		);    
-	}
-
-	/**
 	 * Configura o id da camada. O id deve indicar dentro de um modelo, em 
 	 * qual posição a camada está localizada.
 	 * @param id id da camada.
@@ -206,16 +189,6 @@ public abstract class Camada {
 	 * @return saída da camada.
 	 */
 	public abstract Tensor saida();
-
-	/**
-	 * Retorna a função de ativação configurada pela camada.
-	 * @return função de ativação da camada.
-	 */
-	public Ativacao act() {
-		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui função de ativação."
-		);  
-	}
 	
 	/**
 	 * Retorna o formado dos dados de entrada suportados pela camada.
@@ -383,10 +356,21 @@ public abstract class Camada {
 	 * @return tamanho aproximado em bytes.
 	 */
 	public long tamBytes() {
-		return 
-		1 + //treinavel 
-		1 + //construida
-		1 + //treinando
-		4; //id
+		String jvmBits = System.getProperty("sun.arch.data.model");
+        long bits = Long.valueOf(jvmBits);
+
+        long tamObj;
+		// overhead da jvm
+        if (bits == 32) tamObj = 8;
+        else if (bits == 64) tamObj = 16;
+        else throw new IllegalStateException(
+            "\nSem suporte para plataforma de " + bits + " bits."
+        );
+
+		return tamObj +
+			1 + //treinavel 
+			1 + //construida
+			1 + //treinando
+			4; //id
 	}
 }

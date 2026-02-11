@@ -308,4 +308,20 @@ public class Dropout extends Camada implements Cloneable {
 		verificarConstrucao();
 		return _gradEntrada;
 	}
+
+	@Override
+	public long tamBytes() {
+		long tamVars = super.tamBytes(); //base camada
+		tamVars += 4; //taxa 
+		tamVars += 4 * shapeIn.length; 
+		tamVars += 4; //dimbase
+		tamVars += 4; //tamLote
+
+		long tamTensores = 
+		_gradEntrada.tamBytes() +
+		_mascara.tamBytes() +
+		_saida.tamBytes();
+
+		return tamVars + tamTensores;
+	}
 }

@@ -6,10 +6,13 @@ import ged.Dados;
 import ged.Ged;
 import jnn.Funcional;
 import jnn.camadas.*;
+import jnn.camadas.acts.ReLU;
+import jnn.camadas.acts.Softmax;
+import jnn.camadas.acts.Tanh;
 import jnn.camadas.pooling.MaxPool2D;
 import jnn.core.JNNnative;
 import jnn.dataloader.DataLoader;
-import jnn.dataloader.dataset.CIFAR10;
+import jnn.dataloader.dataset.MNIST;
 import jnn.io.JNNserial;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
@@ -27,7 +30,7 @@ public class MainConv {
 	static Funcional jnn = new Funcional();
 
 	// controle de treino
-	static final int TREINO_EPOCAS = 25;
+	static final int TREINO_EPOCAS = 5;
 	static final int TREINO_LOTE = 32;
 	static final boolean TREINO_LOGS = true;
 
@@ -38,7 +41,7 @@ public class MainConv {
 	public static void main(String[] args) {
 		ged.limparConsole();
 		
-		DataLoader dlTreino = CIFAR10.treino();
+		DataLoader dlTreino = MNIST.treino();
 		dlTreino.print();
 		
 		JNNnative.jni = true;
@@ -47,7 +50,7 @@ public class MainConv {
 		modelo.setHistorico(true);
 		modelo.print();
 
-		DataLoader dlTeste = CIFAR10.teste();
+		DataLoader dlTeste = MNIST.teste();
 	
 		ArrayList<Float> accs = new ArrayList<>();
 		modelo.treinador().setCallback(info -> {
@@ -84,10 +87,14 @@ public class MainConv {
 		Sequencial modelo = new Sequencial(
 			new Entrada(1, 28, 28),
 			new Flatten(),
-			new Densa(40, "tanh"),
-			new Densa(40, "tanh"),
-			new Densa(40, "tanh"),
-			new Densa(10, "sigmoid")
+			new Densa(40),
+			new Tanh(),
+			new Densa(40),
+			new Tanh(),
+			new Densa(40),
+			new Tanh(),
+			new Densa(10),
+			new Softmax()
 		);
 
 		modelo.compilar("adam", "entropia-cruzada");
@@ -100,18 +107,35 @@ public class MainConv {
 	 * @return {@code Sequencial}.
 	 */
 	static Sequencial cnn() {
+		// Sequencial modelo = new Sequencial(
+		// 	new Entrada(3, 32, 32),
+		// 	new Conv2D(32, new int[]{5, 5}, "relu"),
+		// 	new MaxPool2D(new int[]{2, 2}),
+		// 	new Conv2D(64, new int[]{3, 3}, "relu"),
+		// 	new Conv2D(64, new int[]{3, 3}, "relu"),
+		// 	new MaxPool2D(new int[]{2, 2}),
+		// 	new Conv2D(128, new int[]{3, 3}, "relu"),
+		// 	new Flatten(),
+		// 	new Dropout(0.25),
+		// 	new Densa(128, "relu"),
+		// 	new Densa(10, "softmax")
+		// );
+
 		Sequencial modelo = new Sequencial(
-			new Entrada(3, 32, 32),
-			new Conv2D(32, new int[]{5, 5}, "relu"),
+			new Entrada(1, 28, 28),
+			new Conv2D(32, new int[]{5, 5}),
+			new ReLU(),
+			
 			new MaxPool2D(new int[]{2, 2}),
-			new Conv2D(64, new int[]{3, 3}, "relu"),
-			new Conv2D(64, new int[]{3, 3}, "relu"),
-			new MaxPool2D(new int[]{2, 2}),
-			new Conv2D(128, new int[]{3, 3}, "relu"),
+			new Conv2D(24, new int[]{3, 3}),
+			new ReLU(),
+
 			new Flatten(),
-			new Dropout(0.25),
-			new Densa(128, "relu"),
-			new Densa(10, "softmax")
+			new Densa(50),
+			new ReLU(),
+			
+			new Densa(10),
+			new Softmax()
 		);
 
 		modelo.compilar("adam", "entropia-cruzada");

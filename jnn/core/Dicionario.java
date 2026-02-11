@@ -1,20 +1,5 @@
 package jnn.core;
 
-import jnn.acts.Argmax;
-import jnn.acts.Atan;
-import jnn.acts.Ativacao;
-import jnn.acts.ELU;
-import jnn.acts.GELU;
-import jnn.acts.LeakyReLU;
-import jnn.acts.Linear;
-import jnn.acts.ReLU;
-import jnn.acts.SELU;
-import jnn.acts.Seno;
-import jnn.acts.Sigmoid;
-import jnn.acts.SoftPlus;
-import jnn.acts.Softmax;
-import jnn.acts.Swish;
-import jnn.acts.TanH;
 import jnn.inicializadores.Aleatorio;
 import jnn.inicializadores.AleatorioPositivo;
 import jnn.inicializadores.Constante;
@@ -66,48 +51,6 @@ public class Dicionario {
 		nome = nome.replace(".", "");
 
 		return nome.toLowerCase();
-	}
-
-    /**
-     * Converte a ativação lida em uma instância de função
-     * de ativação correspondente.
-     * @param act tipo função de ativação.
-     * @return instância da função de ativação lida.
-     */
-	public Ativacao getAtivacao(Object act) {
-		JNNutils.validarNaoNulo(act, "act == null.");
-		
-		if (act instanceof Ativacao) {
-			return (Ativacao) act;
-		
-		} else if (act instanceof String) {
-			String nome = (String) act;
-			switch (tratarNome(nome)) {
-				case "argmax"     : return new Argmax();
-				case "elu"        : return new ELU();
-				case "gelu"       : return new GELU();
-				case "leakyrelu"  : return new LeakyReLU();
-				case "linear"     : return new Linear();
-				case "relu"       : return new ReLU();
-				case "seno"       : return new Seno();
-				case "sigmoid"    : return new Sigmoid();
-				case "softmax"    : return new Softmax();
-				case "softplus"   : return new SoftPlus();
-				case "swish"      : return new Swish();
-				case "tanh"       : return new TanH();
-				case "atan"       : return new Atan();
-				case "selu"       : return new SELU();
-	
-				default: throw new IllegalArgumentException(
-					"\nAtivação \"" + nome + "\" não encontada."
-				);
-			}
-
-		} else {
-			throw new IllegalArgumentException(
-				"\nTipo de dado \"" + act.getClass().getTypeName() + "\" não suportado."
-			);
-		}
 	}
 
     /**

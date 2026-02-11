@@ -301,17 +301,6 @@ public class Flatten extends Camada implements Cloneable {
 
 	@Override
 	public long tamBytes() {
-		String jvmBits = System.getProperty("sun.arch.data.model");
-        long bits = Long.valueOf(jvmBits);
-
-        long tamObj;
-		// overhead da jvm
-        if (bits == 32) tamObj = 8;
-        else if (bits == 64) tamObj = 16;
-        else throw new IllegalStateException(
-            "\nSem suporte para plataforma de " + bits + " bits."
-        );
-
 		long tamVars = super.tamBytes(); //base camada
 		tamVars += 4 * shapeIn.length; 
 		tamVars += 4 * shapeOut.length; 
@@ -322,7 +311,7 @@ public class Flatten extends Camada implements Cloneable {
 		_saida.tamBytes() +
 		_gradEntrada.tamBytes();
 
-		return tamObj + tamVars + tamTensores;
+		return tamVars + tamTensores;
 	}
 
 }

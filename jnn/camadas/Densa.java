@@ -2,8 +2,6 @@ package jnn.camadas;
 
 import java.util.Optional;
 
-import jnn.acts.Ativacao;
-import jnn.acts.Linear;
 import jnn.core.Dicionario;
 import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
@@ -22,18 +20,8 @@ import jnn.inicializadores.Zeros;
  * </p>
  * <p>
  *    Ela funciona realizando a operação de produto entre a {@code entrada} e 
- *    seus {@code pesos}, adicionando os bias caso sejam configurados, de acordo 
- *    com a expressão:
+ *    seus {@code pesos}, adicionando os bias caso sejam configurados.
  * </p>
- * <pre>
- *buffer = matmul(entrada, kernel);
- *buffer.add(bias);
- * </pre>
- * Após a propagação dos dados, a função de ativação da camada é aplicada ao 
- * resultado do buffer, que por fim é salvo na saída da camada.
- * <pre>
- *    saida = ativacao(buffer);
- * </pre>
  */
 public class Densa extends Camada implements Cloneable {
 
@@ -102,15 +90,6 @@ public class Densa extends Camada implements Cloneable {
 	public Tensor _entrada;
 
 	/**
-	 * Tensor contendo os valores de resultados intermediários 
-	 * do processamento da camada.
-	 * <pre>
-	 *    buffer = (neuronios)
-	 * </pre>
-	 */
-	public Tensor _buffer;
-
-	/**
 	 * Tensor contendo os valores de resultado da soma entre os valores 
 	 * da matriz de somatório com os valores da matriz de bias da camada, seu 
 	 * formato se dá por:
@@ -163,11 +142,6 @@ public class Densa extends Camada implements Cloneable {
 	public Optional<Tensor> _gradBias;
 
 	/**
-	 * Função de ativação da camada
-	 */
-	private Ativacao act = new Linear();
-
-	/**
 	 * Inicializador para os pesos da camada.
 	 */
 	private Inicializador iniKernel = new GlorotUniforme();
@@ -183,12 +157,11 @@ public class Densa extends Camada implements Cloneable {
 	 * inicializados com o método {@code inicializar()}.
 	 * @param e quantidade de conexões de entrada.
 	 * @param n quantidade de neurônios (unidades).
-	 * @param act função de ativação que será usada pela camada.
 	 * @param iniKernel inicializador para os pesos da camada.
 	 * @param iniBias inicializador para os bias da camada.
 	 */
-	public Densa(int e, int n, Object act, Object iniKernel, Object iniBias) {
-		this(n, act, iniKernel, iniBias);
+	public Densa(int e, int n, Object iniKernel, Object iniBias) {
+		this(n, iniKernel, iniBias);
 		construir(new int[]{ e });// construir automaticamente
 	}
 
@@ -198,23 +171,10 @@ public class Densa extends Camada implements Cloneable {
 	 * inicializados com o método {@code inicializar()}.
 	 * @param e quantidade de conexões de entrada.
 	 * @param n quantidade de neurônios (unidades).
-	 * @param act função de ativação que será usada pela camada.
 	 * @param iniKernel inicializador para os pesos da camada.
 	 */
-	public Densa(int e, int n, Object act, Object iniKernel) {
-		this(e, n, act, iniKernel, null);
-	}
-
-	/**
-	 * Instancia uma nova camada densa de neurônios de acordo com os dados fornecidos.
-	 * Após a inicialização os pesos e bias da Camada estarão zerados e devem ser 
-	 * inicializados com o método {@code inicializar()}.
-	 * @param e quantidade de conexões de entrada.
-	 * @param n quantidade de neurônios (unidades).
-	 * @param act função de ativação que será usada pela camada.
-	 */
-	public Densa(int e, int n, Object act) {
-		this(e, n, act, null, null);
+	public Densa(int e, int n, Object iniKernel) {
+		this(e, n, iniKernel, null);
 	}
 
 	/**
@@ -225,7 +185,7 @@ public class Densa extends Camada implements Cloneable {
 	 * @param n quantidade de neurônios (unidades).
 	 */
 	public Densa(int e, int n) {
-		this(e, n, null, null, null);
+		this(e, n, null, null);
 	}
 
 	/**
@@ -233,11 +193,10 @@ public class Densa extends Camada implements Cloneable {
 	 * Após a inicialização os pesos e bias da Camada estarão zerados e devem ser 
 	 * inicializados com o método {@code inicializar()}.
 	 * @param n quantidade de neurônios (unidades).
-	 * @param act função de ativação que será usada pela camada.
 	 * @param iniKernel inicializador para os pesos da camada.
 	 * @param iniBias inicializador para os bias da camada.
 	 */
-	public Densa(int n, Object act, Object iniKernel, Object iniBias) {
+	public Densa(int n, Object iniKernel, Object iniBias) {
 		if (n < 1) {
 			throw new IllegalArgumentException(
 				"\nA camada deve conter ao menos um neurônio."
@@ -248,7 +207,6 @@ public class Densa extends Camada implements Cloneable {
 
 		//usar os valores padrão se necessário
 		Dicionario dic = new Dicionario();
-		if (act != null) this.act = dic.getAtivacao(act);
 		if (iniKernel != null) this.iniKernel = dic.getInicializador(iniKernel);
 		if (iniBias != null)  this.iniBias = dic.getInicializador(iniBias);
 	}
@@ -258,22 +216,10 @@ public class Densa extends Camada implements Cloneable {
 	 * Após a inicialização os pesos e bias da Camada estarão zerados e devem ser 
 	 * inicializados com o método {@code inicializar()}.
 	 * @param n quantidade de neurônios (unidades).
-	 * @param act função de ativação que será usada pela camada.
 	 * @param iniKernel inicializador para os pesos da camada.
 	 */
-	public Densa(int n, Object act, Object iniKernel) {
-		this(n, act, iniKernel, null);
-	}
-
-	/**
-	 * Instancia uma nova camada densa de neurônios de acordo com os dados fornecidos.
-	 * Após a inicialização os pesos e bias da Camada estarão zerados e devem ser 
-	 * inicializados com o método {@code inicializar()}.
-	 * @param n quantidade de neurônios (unidades).
-	 * @param act função de ativação que será usada pela camada.
-	 */
-	public Densa(int n, Object act) {
-		this(n, act, null, null);
+	public Densa(int n, Object iniKernel) {
+		this(n, iniKernel, null);
 	}
 
 	/**
@@ -283,7 +229,7 @@ public class Densa extends Camada implements Cloneable {
 	 * @param n quantidade de neurônios (unidades).
 	 */
 	public Densa(int n) {
-		this(n, null, null, null);
+		this(n, null, null);
 	}
 
 	/**
@@ -331,7 +277,6 @@ public class Densa extends Camada implements Cloneable {
 			_gradBias = Optional.of(addParam("Grad Bias", _saida.shape()));
 		}
 
-		_buffer 	 = addParam("Buffer", _saida.shape());
 		_gradEntrada = addParam("Grad Entrada", _tamEntrada);
 		
 		_treinavel = true;// camada pode ser treinada.
@@ -344,11 +289,6 @@ public class Densa extends Camada implements Cloneable {
 
 		iniKernel.forward(_kernel);
 		_bias.ifPresent(b -> iniBias.forward(b));
-	}
-
-	@Override
-	public void setAct(Object act) {
-		this.act = new Dicionario().getAtivacao(act);
 	}
 
 	@Override
@@ -366,8 +306,6 @@ public class Densa extends Camada implements Cloneable {
 			_gradEntrada = addParam("Grad Entrada", tamLote,  _tamEntrada);
 			_saida = addParam("Saida", tamLote,  _numNeuronios);
 		}
-		
-		_buffer = addParam("Buffer", _saida.shape());
 		
 		this._tamLote = tamLote;
 	}
@@ -393,9 +331,7 @@ public class Densa extends Camada implements Cloneable {
 
 		_entrada = x.contiguous();
 
-		lops.forwardDensa(_entrada, _kernel, _bias, _buffer);
-
-		act.forward(_buffer, _saida);
+		lops.forwardDensa(_entrada, _kernel, _bias, _saida);
 
 		return _saida;
 	}
@@ -406,7 +342,7 @@ public class Densa extends Camada implements Cloneable {
 		
 		_gradSaida = g.contiguous();
 
-		act.backward(this, g);
+		// act.backward(this, g);
 		
 		_gradEntrada.zero();
 
@@ -443,11 +379,6 @@ public class Densa extends Camada implements Cloneable {
 	public int numNeuronios() {
 		verificarConstrucao();
 		return _kernel.tamDim(1);
-	}
-
-	@Override
-	public Ativacao act() {
-		return act;
 	}
 
 	/**
@@ -492,7 +423,6 @@ public class Densa extends Camada implements Cloneable {
 		
 		sb.append(nome() + " (id " + id + ") = [\n");
 
-		sb.append(pad).append("Ativação: " + act.nome() + "\n");
 		sb.append(pad).append("Entrada: " + tamEntrada() + "\n");
 		sb.append(pad).append("Neurônios: " + numNeuronios() + "\n");
 		sb.append(pad).append("Saida: " + tamSaida() + "\n");
@@ -532,7 +462,6 @@ public class Densa extends Camada implements Cloneable {
 		Densa clone = (Densa) super.clone();
 
 		clone.lops = new LayerOps();
-		clone.act = new Dicionario().getAtivacao(this.act.nome());
 		clone._treinavel = this._treinavel;
 
 		clone.usarBias = this.usarBias;
@@ -542,7 +471,6 @@ public class Densa extends Camada implements Cloneable {
 		}
 
 		clone._kernel = this._kernel.clone();
-		clone._buffer = this._buffer.clone();
 		clone._saida = this._saida.clone();
 		clone._gradKernel = this._gradKernel.clone();
 
@@ -619,17 +547,6 @@ public class Densa extends Camada implements Cloneable {
 
 	@Override
 	public long tamBytes() {
-		String jvmBits = System.getProperty("sun.arch.data.model");
-        long bits = Long.valueOf(jvmBits);
-
-        long tamObj;
-		// overhead da jvm
-        if (bits == 32) tamObj = 8;
-        else if (bits == 64) tamObj = 16;
-        else throw new IllegalStateException(
-            "\nSem suporte para plataforma de " + bits + " bits."
-        );
-
 		long tamVars = super.tamBytes(); //base camada
 		tamVars += 4; //tamEntrada
 		tamVars += 4; //numNeuronios
@@ -637,8 +554,7 @@ public class Densa extends Camada implements Cloneable {
 		tamVars += 1; //usarBias
 
 		long tamTensores =
-		_kernel.tamBytes() + 
-		_buffer.tamBytes() +
+		_kernel.tamBytes() +
 		_saida.tamBytes() +
 		_gradEntrada.tamBytes() +
 		_gradKernel.tamBytes();
@@ -648,7 +564,7 @@ public class Densa extends Camada implements Cloneable {
 			tamTensores += _gradBias.get().tamBytes();
 		}
 
-		return tamObj + tamVars + tamTensores;
+		return tamVars + tamTensores;
 	}
 
 }

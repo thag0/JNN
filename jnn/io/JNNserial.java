@@ -12,13 +12,22 @@ import jnn.camadas.Conv2D;
 import jnn.camadas.Densa;
 import jnn.camadas.Dropout;
 import jnn.camadas.Flatten;
+import jnn.camadas.acts.ELU;
+import jnn.camadas.acts.GELU;
+import jnn.camadas.acts.LeakyReLU;
+import jnn.camadas.acts.ReLU;
+import jnn.camadas.acts.SELU;
+import jnn.camadas.acts.Sigmoid;
+import jnn.camadas.acts.Softmax;
+import jnn.camadas.acts.Softplus;
+import jnn.camadas.acts.Swish;
+import jnn.camadas.acts.Tanh;
 import jnn.camadas.pooling.AvgPool2D;
 import jnn.camadas.pooling.MaxPool2D;
 import jnn.core.Dicionario;
 import jnn.io.seriais.SerialBase;
-import jnn.io.seriais.SerialCamada;
+import jnn.io.seriais.camadas.SerialCamada;
 import jnn.metrica.perda.Perda;
-import jnn.modelos.RedeNeural;
 import jnn.modelos.Sequencial;
 import jnn.otm.Otimizador;
 
@@ -42,36 +51,6 @@ public class JNNserial extends SerialBase {
 	 * Serializador e desserializador de modelos.
 	 */
 	private JNNserial() {}
-
-	/**
-	 * Salva um modelo {@code RedeNeural} em um arquivo externo.
-	 * @param modelo instância de uma {@code Rede Neural}.
-	 * @param caminho caminho com nome e extensão do arquivo {@code .nn}.
-	 */
-	static public void salvar(RedeNeural modelo, String caminho) {
-		File arquivo = new File(caminho);
-		if (!arquivo.getName().toLowerCase().endsWith(formatoModelo)) {
-			throw new IllegalArgumentException(
-				"\nO caminho especificado não é um arquivo de modelo válido."
-			);
-		}
-
-		try (DataOutputStream out = new DataOutputStream(new FileOutputStream(arquivo))) {
-			int[] arq = modelo.obterArquitetura();
-			escrever(out, arq);
-			escrever(out, modelo.temBias());
-			escrever(out, modelo.otm().nome());
-			escrever(out, modelo.loss().nome());
-
-			for (Densa camada : modelo.camadas()) {
-				serialCamada.serializar(camada, out);
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-	}
 
 	/**
 	 * Salva um modelo Sequencial em um arquivo externo.
@@ -107,57 +86,6 @@ public class JNNserial extends SerialBase {
 			e.printStackTrace();
 			System.exit(1);
 		}
-	}
-
-	/**
-	 * Lê o arquivo de uma {@code Rede Neural} serializada e converte numa
-	 * instância pré configurada.
-	 * @param caminho caminho onde está salvo o arquivo {@code .nn} do modelo.
-	 * @return modelo {@code RedeNeural} baseado no arquivo lido.
-	 */
-	static public RedeNeural lerRedeNeural(String caminho) {
-		RedeNeural rede = null;
-		Dicionario dicio = new Dicionario();
-
-        File arquivo = new File(caminho);
-        if (!arquivo.getName().toLowerCase().endsWith(formatoModelo)) {
-            throw new IllegalArgumentException("O caminho deve conter a extensão " + formatoModelo);
-        }
-
-		try (DataInputStream in = new DataInputStream(new FileInputStream(arquivo))) {
-			int[] arq = lerArrInt(in);
-			boolean temBias = lerBoolean(in);
-			Otimizador otm = dicio.getOtimizador(lerString(in));
-			Perda loss = dicio.getPerda(lerString(in));
-
-			rede = new RedeNeural(arq);
-			rede.configurarBias(temBias);
-			rede.compilar(otm, loss);
-
-			int numCamadas = rede.numCamadas();
-			Densa[] camadas = new Densa[numCamadas];
-
-			for (int i = 0; i < numCamadas; i++) {
-				// ler o nome da camada porque a api que escreve
-				// a densa faz isso no começo.
-				// mesmo sabendo que só tem densa na mlp, não da pra ignorar
-				String nome = lerString(in);
-				camadas[i] = (Densa) serialCamada.ler(in, nome);
-			}
-
-			for (int i = 0; i < numCamadas; i++) {
-				rede.camada(i).kernel().copiar(camadas[i].kernel());
-				if (temBias) rede.camada(i).bias().copiar(camadas[i].bias());
-
-				rede.camada(i).setAct(camadas[i].act().nome());
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-
-		return rede;
 	}
 
 	/**
@@ -212,6 +140,56 @@ public class JNNserial extends SerialBase {
 					case "dropout":
 						Dropout dropout = (Dropout) serialCamada.ler(in, nomeCamada);
 						modelo.add(dropout);
+					break;
+
+					case "elu":
+						ELU elu = (ELU) serialCamada.ler(in, nomeCamada);
+						modelo.add(elu);
+					break;
+					
+					case "gelu":
+						GELU gelu = (GELU) serialCamada.ler(in, nomeCamada);
+						modelo.add(gelu);
+					break;
+
+					case "leakyrelu":
+						LeakyReLU leakyrelu = (LeakyReLU) serialCamada.ler(in, nomeCamada);
+						modelo.add(leakyrelu);
+					break;
+
+					case "relu":
+						ReLU relu = (ReLU) serialCamada.ler(in, nomeCamada);
+						modelo.add(relu);
+					break;
+
+					case "selu":
+						SELU selu = (SELU) serialCamada.ler(in, nomeCamada);
+						modelo.add(selu);
+					break;
+
+					case "sigmoid":
+						Sigmoid sigmoid = (Sigmoid) serialCamada.ler(in, nomeCamada);
+						modelo.add(sigmoid);
+					break;
+
+					case "softmax":
+						Softmax softmax = (Softmax) serialCamada.ler(in, nomeCamada);
+						modelo.add(softmax);
+					break;
+
+					case "softplus":
+						Softplus softplus = (Softplus) serialCamada.ler(in, nomeCamada);
+						modelo.add(softplus);
+					break;
+
+					case "swish":
+						Swish swish = (Swish) serialCamada.ler(in, nomeCamada);
+						modelo.add(swish);
+					break;
+
+					case "tanh":
+						Tanh tanh = (Tanh) serialCamada.ler(in, nomeCamada);
+						modelo.add(tanh);
 					break;
 				
 					default:

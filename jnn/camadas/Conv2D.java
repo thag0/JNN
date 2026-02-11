@@ -2,8 +2,6 @@ package jnn.camadas;
 
 import java.util.Optional;
 
-import jnn.acts.Ativacao;
-import jnn.acts.Linear;
 import jnn.core.Dicionario;
 import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
@@ -17,18 +15,8 @@ import jnn.inicializadores.Zeros;
  * </h2>
  * <p>
  *    A camada convolucional realiza operações de convolução sobre a entrada
- *    utilizando filtros (kernels) para extrair características locais, dada 
- *    pela expressão:
+ *    utilizando filtros (kernels) para extrair características locais.
  * </p>
- * <pre>
- *buffer = conv2D(entrada, filtros);
- *buffer.add(bias);
- * </pre>
- * Após a propagação dos dados, a função de ativação da camada é aplicada ao 
- * resultado do somatório, que por fim é salvo na saída da camada.
- * <pre>
- *    saida = ativacao(buffer);
- * </pre>
  * <h3>
  *    Detalhe adicional:
  * </h3>
@@ -106,16 +94,6 @@ public class Conv2D extends Camada implements Cloneable {
 	 * Auxilar no controle de treinamento em lotes.
 	 */
 	private int tamLote;
-
-	/**
-	 * Tensor contendo os valores de resultados intermediários 
-	 * do processamento da camada.
-	 * <p>
-	 *    O formato buffer é dado por:
-	 * </p>
-	 * <pre>buffer = (filtros, altSaida, largSaida) </pre>
-	 */
-	public Tensor _buffer;
 	
 	/**
 	 * Tensor contendo os valores de saídas da camada.
@@ -167,11 +145,6 @@ public class Conv2D extends Camada implements Cloneable {
 	public Optional<Tensor> _gradBias;
 
 	/**
-	 * Função de ativação da camada.
-	 */
-	private Ativacao act = new Linear();
-
-	/**
 	 * Inicializador para os filtros da camada.
 	 */
 	private Inicializador iniKernel = new GlorotUniforme();
@@ -202,12 +175,11 @@ public class Conv2D extends Camada implements Cloneable {
 	 * @param entrada formato de entrada da camada.
 	 * @param filtros quantidade de filtros.
 	 * @param filtro formato dos filtros da camada (altura, largura).
-	 * @param act função de ativação.
 	 * @param iniKernel inicializador para os filtros.
 	 * @param iniBias inicializador para os bias.
 	 */
-	public Conv2D(int[] entrada, int filtros, int[] filtro, Object act, Object iniKernel, Object iniBias) {
-		this(filtros, filtro, act, iniKernel, iniBias);
+	public Conv2D(int[] entrada, int filtros, int[] filtro, Object iniKernel, Object iniBias) {
+		this(filtros, filtro, iniKernel, iniBias);
 		construir(entrada);
 	}
 
@@ -232,11 +204,10 @@ public class Conv2D extends Camada implements Cloneable {
 	 * @param entrada formato de entrada da camada.
 	 * @param filtros quantidade de filtros.
 	 * @param filtro formato dos filtros da camada (altura, largura).
-	 * @param act função de ativação.
 	 * @param iniKernel inicializador para os filtros.
 	 */
-	public Conv2D(int[] entrada, int filtros, int[] filtro, Object act, Object iniKernel) {
-		this(entrada, filtros, filtro, act, iniKernel, null);
+	public Conv2D(int[] entrada, int filtros, int[] filtro, Object iniKernel) {
+		this(entrada, filtros, filtro, iniKernel, null);
 	}
 
 	/**
@@ -257,42 +228,12 @@ public class Conv2D extends Camada implements Cloneable {
 	 *    formFiltro = (altura, largura)
 	 * </pre>
 	 * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-	 * @param entrada formato de entrada da camada.
-	 * @param filtros quantidade de filtros.
-	 * @param filtro formato dos filtros da camada (altura, largura).
-	 * @param act função de ativação.
-	 */
-	public Conv2D(int[] entrada, int filtros, int[] filtro, Object act) {
-		this(entrada, filtros, filtro, act, null, null);
-	}
-
-	/**
-	 * Instancia uma camada convolucional de acordo com os formatos fornecidos.
-	 * <p>
-	 *    A disposição do formato de entrada deve ser da seguinte forma:
-	 * </p>
-	 * <pre>
-	 *    formEntrada = (canais, altura, largura)
-	 * </pre>
-	 * Onde largura e altura devem corresponder as dimensões dos dados de entrada
-	 * que serão processados pela camada e a profundidade diz respeito a quantidade
-	 * de entradas que a camada deve processar.
-	 * <p>
-	 *    A disposição do formato do filtro deve ser da seguinte forma:
-	 * </p>
-	 * <pre>
-	 *    formFiltro = (altura, largura)
-	 * </pre>
-	 * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-	 * <p>
-	 *    O valor de uso do bias será usado como {@code true} por padrão.
-	 * </p>
 	 * @param entrada formato de entrada da camada.
 	 * @param filtros quantidade de filtros.
 	 * @param filtro formato dos filtros da camada (altura, largura).
 	 */
 	public Conv2D(int[] entrada, int filtros, int[] filtro) {
-		this(entrada, filtros, filtro, null, null, null);
+		this(entrada, filtros, filtro, null, null);
 	}
 
 	/**
@@ -315,11 +256,10 @@ public class Conv2D extends Camada implements Cloneable {
 	 * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
 	 * @param filtro formato dos filtros da camada.
 	 * @param filtros quantidade de filtros.
-	 * @param act função de ativação.
 	 * @param iniKernel inicializador para os filtros.
 	 * @param iniBias inicializador para os bias.
 	 */
-	public Conv2D(int filtros, int[] filtro, Object act, Object iniKernel, Object iniBias) {
+	public Conv2D(int filtros, int[] filtro, Object iniKernel, Object iniBias) {
 		JNNutils.validarNaoNulo(filtro, "filtro == null.");
 
 		//formado dos filtros
@@ -348,7 +288,6 @@ public class Conv2D extends Camada implements Cloneable {
 		shapeOut[0] = filtros;
 		
 		Dicionario dicio = new Dicionario();
-		if (act != null) this.act = dicio.getAtivacao(act);
 		if (iniKernel != null) this.iniKernel = dicio.getInicializador(iniKernel);
 		if (iniBias != null) this.iniBias = dicio.getInicializador(iniBias);
 	}
@@ -373,37 +312,10 @@ public class Conv2D extends Camada implements Cloneable {
 	 * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
 	 * @param filtro formato dos filtros da camada.
 	 * @param filtros quantidade de filtros.
-	 * @param act função de ativação.
 	 * @param iniKernel inicializador para os filtros.
 	 */
-	public Conv2D(int filtros, int[] filtro, Object act, Object iniKernel) {
-		this(filtros, filtro, act, iniKernel, null);
-	}
-
-	/**
-	 * Instancia uma camada convolucional de acordo com os formatos fornecidos.
-	 * <p>
-	 *    A disposição do formato de entrada deve ser da seguinte forma:
-	 * </p>
-	 * <pre>
-	 *    formEntrada = (canais, altura, largura)
-	 * </pre>
-	 * Onde largura e altura devem corresponder as dimensões dos dados de entrada
-	 * que serão processados pela camada e a profundidade diz respeito a quantidade
-	 * de entradas que a camada deve processar.
-	 * <p>
-	 *    A disposição do formato do filtro deve ser da seguinte forma:
-	 * </p>
-	 * <pre>
-	 *    formFiltro = (altura, largura)
-	 * </pre>
-	 * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-	 * @param filtro formato dos filtros da camada.
-	 * @param filtros quantidade de filtros.
-	 * @param act função de ativação.
-	 */
-	public Conv2D(int filtros, int[] filtro, Object act) {
-		this(filtros, filtro, act, null, null);
+	public Conv2D(int filtros, int[] filtro, Object iniKernel) {
+		this(filtros, filtro, iniKernel, null);
 	}
 
 	/**
@@ -428,7 +340,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 * @param filtros quantidade de filtros.
 	 */
 	public Conv2D(int filtros, int[] filtro) {
-		this(filtros, filtro, null, null, null);
+		this(filtros, filtro, null, null);
 	}
 	
 	/**
@@ -482,7 +394,6 @@ public class Conv2D extends Camada implements Cloneable {
 		_kernel       = addParam("Kernel", shapeOut[0], shapeIn[0], shapeFiltro[0], shapeFiltro[1]);
 		_gradKernel   = addParam("Grad Kernel", _kernel.shape());
 		_saida        = addParam("Saida", shapeOut);
-		_buffer 	  = addParam("Buffer", _saida.shape());
 
 		if (usarBias) {
 			_bias      = Optional.of(addParam("Bias", shapeOut[0]));
@@ -499,11 +410,6 @@ public class Conv2D extends Camada implements Cloneable {
 		
 		iniKernel.forward(_kernel);
 		_bias.ifPresent(b -> iniBias.forward(b));
-	}
-
-	@Override
-	public void setAct(Object act) {
-		this.act = new Dicionario().getAtivacao(act);
 	}
 
 	@Override
@@ -529,8 +435,6 @@ public class Conv2D extends Camada implements Cloneable {
 			_gradEntrada = addParam("Grad Entrada", tamLote, canais, altIn, largIn);
 			_saida = addParam("Saida", tamLote, filtros, altOut, largOut);
 		}
-
-		_buffer = addParam("Buffer", _saida.shape());
 
 		this.tamLote = tamLote;
 	}
@@ -560,9 +464,7 @@ public class Conv2D extends Camada implements Cloneable {
 		
 		_entrada = x.contiguous();
 
-		lops.forwardConv2D(_entrada, _kernel, _bias, _buffer);
-
-		act.forward(_buffer, _saida);
+		lops.forwardConv2D(_entrada, _kernel, _bias, _saida);
 
 		return _saida;
 	}
@@ -572,8 +474,6 @@ public class Conv2D extends Camada implements Cloneable {
 		verificarConstrucao();
 
 		_gradSaida = g.contiguous();
-
-		act.backward(this, g);
 
 		_gradEntrada.zero();// zerar acumulações anteriores
 
@@ -604,11 +504,6 @@ public class Conv2D extends Camada implements Cloneable {
 	public int numFiltros() {
 		verificarConstrucao();
 		return _kernel.tamDim(0);
-	}
-
-	@Override
-	public Ativacao act() {
-		return act;
 	}
 
 	@Override
@@ -654,7 +549,6 @@ public class Conv2D extends Camada implements Cloneable {
 		sb.append(pad).append("Entrada: " + JNNutils.arrayStr(shapeIn) + "\n");
 		sb.append(pad).append("Filtros: " + numFiltros() + "\n");
 		sb.append(pad).append("Saida: " + JNNutils.arrayStr(shapeOut) + "\n");
-		sb.append(pad).append("Ativação: " + act.nome() + "\n");
 		sb.append("\n");
 
 		sb.append(pad + "Kernel: " + _kernel.shapeStr() + "\n");
@@ -689,7 +583,6 @@ public class Conv2D extends Camada implements Cloneable {
 		verificarConstrucao();
 
 		Conv2D clone = (Conv2D) super.clone();
-		clone.act = this.act;
 		clone.usarBias = this.usarBias;
 		clone._treinavel = this._treinavel;
 
@@ -702,7 +595,6 @@ public class Conv2D extends Camada implements Cloneable {
 			clone._gradBias = Optional.of(gradBias());
 		}
 
-		clone._buffer = this._buffer.clone();
 		clone._saida = this._saida.clone();
 
 		return clone;
@@ -783,25 +675,13 @@ public class Conv2D extends Camada implements Cloneable {
 
 	@Override
 	public long tamBytes() {
-		String jvmBits = System.getProperty("sun.arch.data.model");
-        long bits = Long.valueOf(jvmBits);
-
-        long tamObj;
-		// overhead da jvm
-        if (bits == 32) tamObj = 8;
-        else if (bits == 64) tamObj = 16;
-        else throw new IllegalStateException(
-            "\nSem suporte para plataforma de " + bits + " bits."
-        );
-
 		long tamVars = super.tamBytes(); //base camada
 		tamVars += 4 * shapeIn.length; 
 		tamVars += 4 * shapeOut.length; 
 		tamVars += 4 * shapeFiltro.length; 
 
 		long tamTensores =
-		_kernel.tamBytes() + 
-		_buffer.tamBytes() +
+		_kernel.tamBytes() +
 		_saida.tamBytes() +
 		_gradEntrada.tamBytes() +
 		_gradKernel.tamBytes();
@@ -811,7 +691,7 @@ public class Conv2D extends Camada implements Cloneable {
 			tamTensores += _gradBias.get().tamBytes();
 		}
 
-		return tamObj + tamVars + tamTensores;
+		return tamVars + tamTensores;
 	}
 
 }

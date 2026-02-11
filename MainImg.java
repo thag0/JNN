@@ -14,9 +14,7 @@ import jnn.core.parallel.PoolFactory;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;
-import jnn.modelos.RedeNeural;
 import jnn.modelos.Sequencial;
-import jnn.otm.*;
 import render.JanelaTreino;
 
 // Por enquanto esse script não está rodando devido a problemas com a 
@@ -58,7 +56,7 @@ public class MainImg {
 		dl.transformY(t -> t.div(255));// normalizar saída de 0-255 para 0-1
 		dl.print();
 
-		Modelo modelo = criarSequencial(tamEntrada, tamSaida);
+		Modelo modelo = modelo(tamEntrada, tamSaida);
 		modelo.print();
 
 		System.out.println("Treinando.");
@@ -77,32 +75,12 @@ public class MainImg {
 	}
 
 	/**
-	 * Cria um modelo MLP.
-	 * @param in quantidade de dados de entrada.
-	 * @param out quantidade de dados de saída.
-	 * @return {@code Modelo} criado.
-	 */
-	static Modelo criarRna(int in, int out) {
-		RedeNeural modelo = new RedeNeural(in, 8, 8, out);
-		
-		Object otm = new SGD(0.001, 0.99);
-		Object loss = "mse";
-		modelo.compilar(otm, loss);
-
-		modelo.configurarAtivacao("sigmoid");
-		modelo.configurarAtivacao(modelo.camadaSaida(), "sigmoid");
-		modelo.setHistorico(historico);
-		
-		return modelo;
-	}
-
-	/**
 	 * Cria um modelo Sequencial.
 	 * @param in quantidade de dados de entrada.
 	 * @param out quantidade de dados de saída.
 	 * @return {@code Modelo} criado.
 	 */
-	static Modelo criarSequencial(int in, int out) {
+	static Modelo modelo(int in, int out) {
 		Sequencial modelo = new Sequencial(
 			new Entrada(in),
 			new Densa(14, "tanh"),
