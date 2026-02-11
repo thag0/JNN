@@ -30,8 +30,8 @@ public class MainConv {
 	static Funcional jnn = new Funcional();
 
 	// controle de treino
-	static final int TREINO_EPOCAS = 5;
-	static final int TREINO_LOTE = 32;
+	static final int TREINO_EPOCAS = 7;
+	static final int TREINO_LOTE = 64;
 	static final boolean TREINO_LOGS = true;
 
 	// caminhos de arquivos externos
@@ -123,7 +123,7 @@ public class MainConv {
 
 		Sequencial modelo = new Sequencial(
 			new Entrada(1, 28, 28),
-			new Conv2D(32, new int[]{5, 5}),
+			new Conv2D(18, new int[]{5, 5}),
 			new ReLU(),
 			
 			new MaxPool2D(new int[]{2, 2}),
@@ -131,7 +131,7 @@ public class MainConv {
 			new ReLU(),
 
 			new Flatten(),
-			new Densa(50),
+			new Densa(100),
 			new ReLU(),
 			
 			new Densa(10),
