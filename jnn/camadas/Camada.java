@@ -53,6 +53,8 @@ import jnn.core.tensor.Tensor;
  */
 public abstract class Camada {
 
+	// TODO fazer validação dos shapes dos tensores recebidos no forward e backward, pra ontem
+
 	/**
 	 * Controlador para uso dentro dos algoritmos de treino.
 	 */

@@ -118,6 +118,8 @@ public final class JNNnative {
      * @param largX largura da entrada.
      * @param altK altura do kernel.
      * @param largK largura do kernel.
+     * @param altPad altura do padding.
+     * @param largPad largura do padding.
      */
     public static native void conv2dForward(
         float[] X,
@@ -128,10 +130,9 @@ public final class JNNnative {
         int lotes, 
         int canais, 
         int filtros,
-        int altX,
-        int largX,
-        int altK,
-        int largK
+        int altX, int largX,
+        int altK, int largK,
+        int altPad, int largPad
     );
 
     /**
@@ -150,6 +151,8 @@ public final class JNNnative {
      * @param largX largura da entrada.
      * @param altK altura do kernel.
      * @param largK largura do kernel.
+     * @param altPad altura do padding.
+     * @param largPad largura do padding.
      */
     public static native void conv2dBackward(
         float[] X,
@@ -162,10 +165,9 @@ public final class JNNnative {
         int lotes,
         int canais,
         int filtros,
-        int altX,
-        int largX,
-        int altK,
-        int largK  
+        int altX, int largX,
+        int altK, int largK,
+        int altPad, int largPad
     );
 
     /**

@@ -11,7 +11,7 @@ import jnn.camadas.acts.Tanh;
 import jnn.camadas.pooling.MaxPool2D;
 import jnn.core.JNNnative;
 import jnn.dataloader.DataLoader;
-import jnn.dataloader.dataset.MNIST;
+import jnn.dataloader.dataset.CIFAR10;
 import jnn.io.JNNserial;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
@@ -24,8 +24,8 @@ public class MainConv {
 	static Ged ged = new Ged();
 
 	// controle de treino
-	static final int TREINO_EPOCAS = 7;
-	static final int TREINO_LOTE = 64;
+	static final int TREINO_EPOCAS = 15;
+	static final int TREINO_LOTE = 32;
 	static final boolean TREINO_LOGS = true;
 
 	// caminhos de arquivos externos
@@ -35,7 +35,7 @@ public class MainConv {
 	public static void main(String[] args) {
 		ged.limparConsole();
 		
-		DataLoader dlTreino = MNIST.treino();
+		DataLoader dlTreino = CIFAR10.treino();
 		dlTreino.print();
 		
 		JNNnative.jni = true;
@@ -44,7 +44,7 @@ public class MainConv {
 		modelo.setHistorico(true);
 		modelo.print();
 
-		DataLoader dlTeste = MNIST.teste();
+		DataLoader dlTeste = CIFAR10.teste();
 	
 		ArrayList<Float> accs = new ArrayList<>();
 		modelo.treinador().setCallback(info -> {
@@ -101,33 +101,22 @@ public class MainConv {
 	 * @return {@code Sequencial}.
 	 */
 	static Sequencial cnn() {
-		// Sequencial modelo = new Sequencial(
-		// 	new Entrada(3, 32, 32),
-		// 	new Conv2D(32, new int[]{5, 5}, "relu"),
-		// 	new MaxPool2D(new int[]{2, 2}),
-		// 	new Conv2D(64, new int[]{3, 3}, "relu"),
-		// 	new Conv2D(64, new int[]{3, 3}, "relu"),
-		// 	new MaxPool2D(new int[]{2, 2}),
-		// 	new Conv2D(128, new int[]{3, 3}, "relu"),
-		// 	new Flatten(),
-		// 	new Dropout(0.25),
-		// 	new Densa(128, "relu"),
-		// 	new Densa(10, "softmax")
-		// );
-
 		Sequencial modelo = new Sequencial(
 			new Entrada(1, 28, 28),
-			new Conv2D(18, new int[]{5, 5}),
+
+			new Conv2D(32, new int[]{3, 3}),
 			new ReLU(),
-			
 			new MaxPool2D(new int[]{2, 2}),
+
 			new Conv2D(24, new int[]{3, 3}),
 			new ReLU(),
+			new MaxPool2D(new int[]{2, 2}),
 
 			new Flatten(),
-			new Densa(100),
+
+			new Densa(50),
 			new ReLU(),
-			
+
 			new Densa(10),
 			new Softmax()
 		);

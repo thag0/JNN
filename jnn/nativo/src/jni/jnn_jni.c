@@ -90,7 +90,9 @@ Java_jnn_core_JNNnative_conv2dForward(
     jint alt_x, 
     jint larg_x,
     jint alt_k, 
-    jint larg_k
+    jint larg_k,
+    jint alt_pad,
+    jint larg_pad
 ) {
     (void) cls;
 
@@ -113,6 +115,8 @@ Java_jnn_core_JNNnative_conv2dForward(
         .larg_x = larg_x,
         .alt_k  = alt_k,
         .larg_k = larg_k,
+        .alt_pad = alt_pad,
+        .larg_pad = larg_pad,
 
         .temBias = temBias
     };
@@ -144,7 +148,9 @@ Java_jnn_core_JNNnative_conv2dBackward(
     jint alt_x, 
     jint larg_x,
     jint alt_k, 
-    jint larg_k
+    jint larg_k,
+    jint alt_pad,
+    jint larg_pad
 ) {
     (void) cls;
 
@@ -171,6 +177,8 @@ Java_jnn_core_JNNnative_conv2dBackward(
         .larg_x = larg_x,
         .alt_k  = alt_k,
         .larg_k = larg_k,
+        .alt_pad = alt_pad,
+        .larg_pad = larg_pad,
 
         .temBias = temBias
     };

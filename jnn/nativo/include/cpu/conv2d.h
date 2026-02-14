@@ -16,6 +16,8 @@ typedef struct conv2d_fwd_params_t {
     int larg_x;
     int alt_k;
     int larg_k;
+    int alt_pad;
+    int larg_pad;
 
     bool temBias;
 } conv2d_fwd_params_t;
@@ -37,6 +39,8 @@ typedef struct {
     int larg_x;
     int alt_k;
     int larg_k;
+    int alt_pad;
+    int larg_pad;
 
     bool temBias;
 } conv2d_bwd_params_t;

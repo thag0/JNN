@@ -92,14 +92,21 @@ public class LayerOps {
 	 * @param kernel {@code Tensor} contendos o kernel/filtros da camada.
 	 * @param bias {@code Tensor} contendo o bias da camada {@code (podendo ser nulo)}.
 	 * @param saida {@code Tensor} de destino do resultado.
+	 * @param padding {@code array} contendo o formato de padding (altura, largura)
 	 * @see jnn.camadas.Conv2D Conv2D
 	 */
-	public void forwardConv2D(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
+	public void forwardConv2D(
+		Tensor entrada,
+		Tensor kernel,
+		Optional<Tensor> bias,
+		Tensor saida,
+		int[] padding) {
+		
 		if (entrada.numDim() == 3) {
-			forwardConv2DNormal(entrada, kernel, bias, saida);	
+			forwardConv2DNormal(entrada, kernel, bias, saida, padding);	
 		
 		} else if (entrada.numDim() == 4) {
-			forwardConv2DLotes(entrada, kernel, bias, saida);
+			forwardConv2DLotes(entrada, kernel, bias, saida, padding);
 		
 		} else {
 			throw new IllegalArgumentException(
@@ -114,24 +121,38 @@ public class LayerOps {
 	 * @param kernel kernel.
 	 * @param bias bias.
 	 * @param saida saída.
+	 * @param padding padding.
 	 */
-	private void forwardConv2DNormal(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
-		saida.zero();// zerar acumulos anteriores
+	private void forwardConv2DNormal(
+		Tensor entrada,
+		Tensor kernel,
+		Optional<Tensor> bias,
+		Tensor saida,
+		int[] padding) {
+
+		saida.zero();//zerar acumulações anteriores
 
 		final int[] shapeK = kernel.shape();
 		final int[] shapeX = entrada.shape();
 
-		final int canais = shapeK[1];
 		final int filtros = shapeK[0];
+		final int canais  = shapeK[1];
 
-		final int altX = shapeX[1];
+		final int altX  = shapeX[1];
 		final int largX = shapeX[2];
-		final int altK = shapeK[2];
+
+		final int altK  = shapeK[2];
 		final int largK = shapeK[3];
+
+		final int altPad  = padding[0];
+		final int largPad = padding[1];
+
+		final int altS  = (altX  + 2 * altPad  - altK ) + 1;
+		final int largS = (largX + 2 * largPad - largK) + 1;
 
 		final int areaX = altX * largX;
 		final int areaK = altK * largK;
-		final int areaS = (altX - altK + 1) * (largX - largK + 1);
+		final int areaS = altS * largS;
 
 		final float[] dataX = entrada.array();
 		final float[] dataK = kernel.array();
@@ -146,22 +167,40 @@ public class LayerOps {
 
 			for (int c = 0; c < canais; c++) {
 				int offX = offXBase + c * areaX;
-				int offK  = offKBase + (f * canais + c) * areaK;
+				int offK = offKBase + (f * canais + c) * areaK;
 
-				ops.corr2D(
-					dataX, offX,
-					dataK, offK,
-					dataS, offS,
-					largX, altX,
-					largK, altK
-				);
+				for (int kh = 0; kh < altK; kh++) {
+					for (int kw = 0; kw < largK; kw++) {
+						float valK = dataK[offK + kh * largK + kw];
+
+						for (int i = 0; i < altS; i++) {
+							int inY = i + kh - altPad;
+							if (inY < 0 || inY >= altX) continue;//depois tirar isso
+							int rowS = offS + i * largS;
+
+							for (int j = 0; j < largS; j++) {
+								int inX = j + kw - largPad;
+								if (inX < 0 || inX >= largX) continue;//depois tirar isso
+
+								dataS[rowS + j] += dataX[offX + inY * largX + inX] * valK;
+							}
+						}
+					}
+				}
 			}
 		}
-				
+
 		if (bias.isPresent()) {
 			Tensor b = bias.get();
-			for (int i = 0; i < filtros; i++) {
-				saida.subTensor(i).add(b.get(i));
+			float[] dataB = b.array();
+			int offB = b.offset();
+			for (int f = 0; f < filtros; f++) {
+				float valB = dataB[offB + f];
+				int offS = offSBase + f * areaS;
+				
+				for (int i = 0; i < areaS; i++) {
+					dataS[offS + i] += valB;
+				}
 			}
 		}
 	}
@@ -172,8 +211,15 @@ public class LayerOps {
 	 * @param kernel kernel.
 	 * @param bias bias.
 	 * @param saida saída.
+	 * @param padding padding.
 	 */
-	private void forwardConv2DLotes(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
+	private void forwardConv2DLotes(
+		Tensor entrada,
+		Tensor kernel,
+		Optional<Tensor> bias,
+		Tensor saida,
+		int[] padding) {
+		
 		final int[] shapeX = entrada.shape();
 		final int[] shapeK = kernel.shape();
 		final int lotes = shapeX[0];
@@ -185,6 +231,9 @@ public class LayerOps {
 		final int altK = shapeK[2];
 		final int largK = shapeK[3];
 
+		final int altPad = padding[0];
+		final int largPad = padding[1];
+
 		if (JNNnative.jni) {
 			JNNnative.conv2dForward(
 				entrada.array(),
@@ -194,7 +243,8 @@ public class LayerOps {
 				saida.array(),
 				lotes, canais, filtros,
 				altX, largX,
-				altK, largK
+				altK, largK,
+				altPad, largPad
 			);
 
 			return;
@@ -202,8 +252,8 @@ public class LayerOps {
 
 		saida.zero();
 
-		final int altS = altX - altK + 1;
-		final int largS = largX - largK + 1;
+		final int altS  = altX - altK + 1 + 2 * altPad;
+		final int largS = largX - largK + 1 + 2 * largPad;
 
 		final int areaX = altX * largX;
 		final int areaK = altK * largK;
@@ -222,39 +272,42 @@ public class LayerOps {
 		
 		for (int f = 0; f < filtros; f++) {
 			final int filtro = f;
-			
+
 			tarefas.add(pool.submit(() -> {
 				final int offKf = offKBase + filtro * canais * areaK;
 				final float biasF = (dataB != null) ? dataB[filtro] : 0.0f;
-				
+
 				for (int l = 0; l < lotes; l++) {
 					final int offY = offYBase + (l * filtros + filtro) * areaS;
-					final int offX_l = offXBase + (l * canais) * areaX;
+					final int offXL = offXBase + (l * canais) * areaX;
 
 					for (int i = 0; i < areaS; i++) {
 						dataS[offY + i] = biasF;
 					}
 
 					for (int c = 0; c < canais; c++) {
-						final int offX_lc = offX_l + c * areaX;
-						final int offK_fc = offKf + c * areaK;
+						final int offXLc = offXL + c * areaX;
+						final int offKFc = offKf + c * areaK;
 
-						for (int kh = 0; kh < altK; kh++) {
-							final int off_k_lin = offK_fc + kh * largK;
-							final int x_base_h = offX_lc + kh * largX;
+						for (int hOut = 0; hOut < altS; hOut++) {
+							for (int wOut = 0; wOut < largS; wOut++) {
+								float soma = dataS[offY + hOut * largS + wOut];
 
-							for (int kw = 0; kw < largK; kw++) {
-								final float valK = dataK[off_k_lin + kw];
-								final int x_base_w = x_base_h + kw;
+								for (int kh = 0; kh < altK; kh++) {
+									final int inH = hOut + kh - altPad;
+									if (inH < 0 || inH >= altX) continue;//depois tirar isso
 
-								for (int i = 0; i < altS; i++) {
-									final int out_idx = offY + i * largS;
-									final int in_idx = x_base_w + i * largX;
+									for (int kw = 0; kw < largK; kw++) {
+										final int inW = wOut + kw - largPad;
+										if (inW < 0 || inW >= largX) continue;//depois tirar isso
 
-									for (int j = 0; j < largS; j++) {
-										dataS[out_idx + j] += dataX[in_idx + j] * valK;
+										final int idxX = offXLc + inH * largX + inW;
+										final int idxK = offKFc + kh * largK + kw;
+										soma += dataX[idxX] * dataK[idxK];
 									}
 								}
+
+								dataS[offY + hOut * largS + wOut] = soma;
 							}
 						}
 					}
@@ -276,14 +329,23 @@ public class LayerOps {
 	 * @param gradK {@code Tensor} contendo o gradiente em relação ao kernel/filtros da camada.
 	 * @param gradB {@code Tensor} contendo o gradiente em relação ao bias da camada {@code (podendo ser nulo)}.
 	 * @param gradE {@code Tensor} contendo o gradiente em relação à entrada da camada.
+	 * @param padding {@code array} contendo o formato de padding (altura, largura)
 	 * @see jnn.camadas.Conv2D Conv2D
 	 */
-	public void backwardConv2D(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
+	public void backwardConv2D(
+		Tensor entrada, 
+		Tensor kernel, 
+		Tensor gradS, 
+		Tensor gradK, 
+		Optional<Tensor> gradB, 
+		Tensor gradE, 
+		int[] padding) {
+		
 		if (entrada.numDim() == 3) {
-			backwardConv2DNormal(entrada, kernel, gradS, gradK, gradB, gradE);
+			backwardConv2DNormal(entrada, kernel, gradS, gradK, gradB, gradE, padding);
 		
 		} else if (entrada.numDim() == 4) {
-			backwardConv2DLotes(entrada, kernel, gradS, gradK, gradB, gradE);
+			backwardConv2DLotes(entrada, kernel, gradS, gradK, gradB, gradE, padding);
 		
 		} else {
 			throw new IllegalArgumentException(
@@ -300,8 +362,17 @@ public class LayerOps {
 	 * @param gradK gradK
 	 * @param gradB gradB
 	 * @param gradE gradE
+	 * @param padding padding
 	 */
-	private void backwardConv2DNormal(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
+	private void backwardConv2DNormal(
+		Tensor entrada,
+		Tensor kernel,
+		Tensor gradS,
+		Tensor gradK,
+		Optional<Tensor> gradB,
+		Tensor gradE,
+		int[] padding) {
+		
 		final int[] shapeX = entrada.shape();
 		final int[] shapeK = kernel.shape();
 		final int[] shapeGS = gradS.shape();
@@ -322,6 +393,9 @@ public class LayerOps {
 		final int areaK  = altK * largK;
 		final int areaGS = altS * largS;
 
+		final int altPad = padding[0];
+		final int largPad = padding[1];
+
 		final float[] dataX  = entrada.array();
 		final float[] dataK  = kernel.array();
 		final float[] dataGS = gradS.array();
@@ -336,59 +410,70 @@ public class LayerOps {
 
 		for (int f = 0; f < filtros; f++) {
 			final int offGS = offGSBase + f * areaGS;
+			float somaBias = 0f;
+			for (int hOut = 0; hOut < altS; hOut++) {
+				for (int outW = 0; outW < largS; outW++) {
+					somaBias += dataGS[offGS + hOut * largS + outW];
+				}
+			}
+
+			if (gradB.isPresent()) {
+				gradB.get().add(somaBias, f);
+			}
+
+			for (int c = 0; c < canais; c++) {
+				final int offX  = offXBase  + c * areaX;
+				final int offGK = offGKBase + (f * canais + c) * areaK;
+
+				for (int kh = 0; kh < altK; kh++) {
+					for (int kw = 0; kw < largK; kw++) {
+						float soma = 0f;
+
+						for (int hOut = 0; hOut < altS; hOut++) {
+							int hIn = hOut + kh - altPad;
+							if (hIn < 0 || hIn >= altX) continue;//depois tirar isso
+
+							for (int wOut = 0; wOut < largS; wOut++) {
+								int wIn = wOut + kw - largPad;
+								if (wIn < 0 || wIn >= largX) continue;//depois tirar isso
+								float valX  = dataX[offX + hIn * largX + wIn];
+								float valGS = dataGS[offGS + hOut * largS + wOut];
+								soma += valX * valGS;
+							}
+						}
+
+						dataGK[offGK + kh * largK + kw] += soma;
+					}
+				}
+			}
+		}
+
+		for (int f = 0; f < filtros; f++) {
+			final int offGS = offGSBase + f * areaGS;
+
 			for (int c = 0; c < canais; c++) {
 				final int offK  = offKBase  + (f * canais + c) * areaK;
 				final int offGE = offGEBase + c * areaX;
 
-				ops.conv2DFull(
-					dataGS, offGS,
-					dataK,  offK,
-					dataGE, offGE,
-					largS, altS,
-					largK, altK
-				);
-			}
-		}
+				for (int outH = 0; outH < altS; outH++) {
+					for (int outW = 0; outW < largS; outW++) {
+						float gradVal = dataGS[offGS + outH * largS + outW];
 
-		if (gradB.isPresent()) {
-			Tensor gb = gradB.get();
+						for (int kh = 0; kh < altK; kh++) {
+							int inH = outH + kh - altPad;
+							if (inH < 0 || inH >= altX) continue;
 
-			for (int f = 0; f < filtros; f++) {
-				final int offGS = offGSBase + f * areaGS;
-				for (int c = 0; c < canais; c++) {
-					final int offX  = offXBase  + c * areaX;
-					final int offGK = offGKBase + (f * canais + c) * areaK;
-	
-					ops.corr2D(
-						dataX,  offX,
-						dataGS, offGS,
-						dataGK, offGK,
-						largX, altX,
-						largS, altS
-					);
-				}
+							for (int kw = 0; kw < largK; kw++) {
+								int inW = outW + kw - largPad;
+								if (inW < 0 || inW >= largX) continue;
 
-				float somaBias = 0.0f;
-				for (int i = 0; i < areaGS; i++) {
-					somaBias += dataGS[offGS + i];
-				}
-				gb.add(somaBias, f);
-			}
-			
-		} else {
-			for (int f = 0; f < filtros; f++) {
-				final int offGS = offGSBase + f * areaGS;
-				for (int c = 0; c < canais; c++) {
-					final int offX  = offXBase  + c * areaX;
-					final int offGK = offGKBase + (f * canais + c) * areaK;
-	
-					ops.corr2D(
-						dataX,  offX,
-						dataGS, offGS,
-						dataGK, offGK,
-						largX, altX,
-						largS, altS
-					);
+								int idxGE = offGE + inH * largX + inW;
+								int idxK  = offK  + kh * largK + kw;
+
+								dataGE[idxGE] += gradVal * dataK[idxK];
+							}
+						}
+					}
 				}
 			}
 		}
@@ -403,8 +488,17 @@ public class LayerOps {
 	 * @param gradK gradK
 	 * @param gradB gradB
 	 * @param gradE gradE
+	 * @param padding padding
 	 */
-	private void backwardConv2DLotes(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
+	private void backwardConv2DLotes(
+		Tensor entrada,
+		Tensor kernel,
+		Tensor gradS,
+		Tensor gradK,
+		Optional<Tensor> gradB,
+		Tensor gradE,
+		int[] padding) {
+
 		final int[] shapeX = entrada.shape();
 		final int[] shapeK = kernel.shape();
 
@@ -416,6 +510,9 @@ public class LayerOps {
 		final int filtros  = shapeK[0];
 		final int altK = shapeK[2];
 		final int largK = shapeK[3];
+
+		final int altPad = padding[0];
+		final int largPad = padding[1];
 	
 		if (JNNnative.jni) {
 			JNNnative.conv2dBackward(
@@ -428,14 +525,16 @@ public class LayerOps {
 				gradE.array(),
 				lotes, canais, filtros, 
 				altX, largX, 
-				altK, largK
+				altK, largK,
+				altPad, largPad
 			);
 
 			return;
 		}
 
-		final int altS = altX - altK + 1;
-		final int largS = largX - largK + 1;
+		final int[] shapeGS = gradS.shape();
+		final int altS = shapeGS[2]; 
+    	final int largS = shapeGS[3];
 
 		final int areaX = altX * largX;
 		final int areaK = altK * largK;
@@ -461,55 +560,56 @@ public class LayerOps {
 
 		for (int f = 0; f < filtros; f++) {
 			final int filtro = f;
-			
 			tarefas1.add(pool.submit(() -> {
-				final int offGKf = offGKBase + filtro * canais * areaK;
-				float somaBiasLocal = 0.0f;
-
-				for (int l = 0; l < lotes; l++) {
-					final int offGSlf = offGSBase + (l * filtros + filtro) * areaGS;
-					final int offXl = offXBase + l * canais * areaX;
-
-					if (temBias) {
+		
+				if (temBias) {
+					float soma = 0f;
+					for (int l = 0; l < lotes; l++) {
+						final int offGSlf = offGSBase + (l * filtros + filtro) * areaGS;
 						for (int i = 0; i < areaGS; i++) {
-							somaBiasLocal += dataGS[offGSlf + i];
+							soma += dataGS[offGSlf + i];
 						}
 					}
+					dataGB[offGBBase + filtro] += soma;
+				}
 
-					for (int c = 0; c < canais; c++) {
-						final int offXc = offXl + c * areaX;
-						final int offGKc = offGKf + c * areaK;
+				for (int c = 0; c < canais; c++) {
+					final int offGK_fc = offGKBase + (filtro * canais + c) * areaK;
 
-						for (int kh = 0; kh < altK; kh++) {
-							final int offGKlin = offGKc + kh * largK;
-							final int offXh = offXc + kh * largX;
+					for (int kh = 0; kh < altK; kh++) {
+						for (int kw = 0; kw < largK; kw++) {
+							int iMin = Math.max(0, altPad - kh);
+							int iMax = Math.min(altS, altX + altPad - kh);
+							int jMin = Math.max(0, largPad - kw);
+							int jMax = Math.min(largS, largX + largPad - kw);
+							float soma = 0f;
 
-							for (int kw = 0; kw < largK; kw++) {
-								final int offXw = offXh + kw;
-								float valGrad = 0.0f;
-								
-								for (int i = 0; i < altS; i++) {
-									final int idGS = offGSlf + i * largS;
-									final int idX = offXw + i * largX;
+							for (int l = 0; l < lotes; l++) {
+								final int offGS_loteFilter = offGSBase + (l * filtros + filtro) * areaGS;
+								final int offX_loteCanal   = offXBase + (l * canais + c) * areaX;
+
+								for (int hOut = iMin; hOut < iMax; hOut++) {
+									int inH = hOut + kh - altPad;
 									
-									for (int j = 0; j < largS; j++) {
-										valGrad += dataX[idX + j] * dataGS[idGS + j];
+									final int idxGS_Line = offGS_loteFilter + hOut * largS;
+									final int idxX_Line  = offX_loteCanal   + inH * largX;
+									
+									int inW_Offset = kw - largPad;
+
+									for (int wOut = jMin; wOut < jMax; wOut++) {
+										float valGS = dataGS[idxGS_Line + wOut];
+										float valX  = dataX[idxX_Line + (wOut + inW_Offset)];
+										soma += valX * valGS;
 									}
 								}
-								
-								dataGK[offGKlin + kw] += valGrad;
 							}
+							dataGK[offGK_fc + kh * largK + kw] += soma;
 						}
 					}
 				}
-				
-				if (temBias) {
-					dataGB[offGBBase + filtro] += somaBiasLocal; 
-				}
-				
 			}));
 		}
-
+		
 		for (ForkJoinTask<?> t : tarefas1) {
 			t.join();
 		}
@@ -517,33 +617,35 @@ public class LayerOps {
 		List<ForkJoinTask<?>> tarefas2 = new ArrayList<>(lotes);
 
 		for (int l = 0; l < lotes; l++) {
-			
 			final int lote = l;
+
 			tarefas2.add(pool.submit(() -> {
-				final int offGEl = offGEBase + lote * canais * areaX;
-				final int offGSl = offGSBase + lote * filtros * areaGS;
+				final int offGE_lote = offGEBase + lote * canais * areaX;
+				final int offGS_lote = offGSBase + lote * filtros * areaGS;
 
 				for (int c = 0; c < canais; c++) {
-					final int offGEc = offGEl + c * areaX;
-					
+					final int offGE_loteCanal = offGE_lote + c * areaX;
+
 					for (int f = 0; f < filtros; f++) {
-						final int offGSf = offGSl + f * areaGS;
-						final int offKfc = offKBase + (f * canais + c) * areaK;
+						final int offGS_loteFilter = offGS_lote + f * areaGS;
+						final int offK_filterCanal = offKBase + (f * canais + c) * areaK;
 
 						for (int kh = 0; kh < altK; kh++) {
-							final int offKlin = offKfc + kh * largK;
-							final int offGEh = offGEc + kh * largX;
-
 							for (int kw = 0; kw < largK; kw++) {
-								final float valK = dataK[offKlin + kw];
-								final int offGEw = offGEh + kw;
+								float valK = dataK[offK_filterCanal + kh * largK + kw];
+								int iStart = Math.max(0, altPad - kh);
+								int iEnd   = Math.min(altS, altX + altPad - kh);
+								int jStart = Math.max(0, largPad - kw);
+								int jEnd   = Math.min(largS, largX + largPad - kw);
+								int inW_Offset = kw - largPad;
 
-								for (int i = 0; i < altS; i++) {
-									final int idGE = offGEw + i * largX;
-									final int idGS = offGSf + i * largS;
+								for (int outH = iStart; outH < iEnd; outH++) {
+									int inH = outH + kh - altPad;
+									int idxGE_Line = offGE_loteCanal + inH * largX;
+									int idxGS_Line = offGS_loteFilter + outH * largS;
 
-									for (int j = 0; j < largS; j++) {
-										dataGE[idGE + j] += dataGS[idGS + j] * valK;
+									for (int outW = jStart; outW < jEnd; outW++) {
+										dataGE[idxGE_Line + (outW + inW_Offset)] += dataGS[idxGS_Line + outW] * valK;
 									}
 								}
 							}

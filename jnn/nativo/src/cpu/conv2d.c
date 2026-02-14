@@ -1,5 +1,8 @@
 #include "conv2d.h"
 
+#define MAX_ENTRE(a, b) ((a) > (b) ? (a) : (b))
+#define MIN_ENTRE(a, b) ((a) < (b) ? (a) : (b))
+
 void cpu_conv2d_forward(const conv2d_fwd_params_t* params) {
     const float* restrict X = params->X;
     const float* restrict K = params->K;
@@ -10,15 +13,17 @@ void cpu_conv2d_forward(const conv2d_fwd_params_t* params) {
     const int larg_x = params->larg_x;
     const int alt_k = params->alt_k;
     const int larg_k = params->larg_k;
+    const int alt_pad = params->alt_pad;
+    const int larg_pad = params->larg_pad;
     
     const int lotes = params->lotes;
     const int filtros = params->filtros;
     const int canais = params->canais;
 
-    bool temBias = params->temBias;
+    const bool temBias = params->temBias;
 
-    const int alt_s  = alt_x  - alt_k  + 1;
-    const int larg_s = larg_x - larg_k + 1;
+    const int alt_s  = (alt_x  + 2 * alt_pad  - alt_k ) + 1;
+    const int larg_s = (larg_x + 2 * larg_pad - larg_k) + 1;
 
     const int area_x = alt_x * larg_x;
     const int area_k = alt_k * larg_k;
@@ -27,42 +32,35 @@ void cpu_conv2d_forward(const conv2d_fwd_params_t* params) {
     #pragma omp parallel for collapse(2) schedule(static)
     for (int l = 0; l < lotes; l++) {
         for (int f = 0; f < filtros; f++) {
-            const int off_x_b = l * canais * area_x;
-            const int off_y   = (l * filtros + f) * area_s;
-            const int off_k_f = f * canais * area_k;
-
-            const float saida = temBias ? B[f] : 0.0f;
-            for (int i = 0; i < alt_s; i++) {
-                float* restrict dst = DST + off_y + i * larg_s;
-                #pragma omp simd
-                for (int j = 0; j < larg_s; j++) {
-                    dst[j] = saida;
-                }
-            }
+            float* restrict dst_base = DST + (l * filtros + f) * area_s;
+            for (int i = 0; i < area_s; i++) dst_base[i] = temBias ? B[f] : 0.0f;
 
             for (int c = 0; c < canais; c++) {
-                const float* restrict Xc = X + off_x_b + c * area_x;
-                const float* restrict Kc = K + off_k_f + c * area_k;
+                const float* restrict Xc = X + (l * canais + c) * area_x;
+                const float* restrict Kc = K + (f * canais + c) * area_k;
 
                 for (int kh = 0; kh < alt_k; kh++) {
-                    const float* restrict Krow = Kc + kh * larg_k;
-
                     for (int kw = 0; kw < larg_k; kw++) {
-                        const float val_k = Krow[kw];
+                        const float val_k = Kc[kh * larg_k + kw];
+                        const int j_max = MIN_ENTRE(larg_x + larg_pad - kw, larg_s);
+                        const int j_min = MAX_ENTRE(larg_pad - kw, 0);
+                        const int i_max = MIN_ENTRE(alt_x + alt_pad - kh, alt_s);
+                        const int i_min = MAX_ENTRE(alt_pad - kh, 0);
 
-                        for (int i = 0; i < alt_s; i++) {
-                            float* restrict dst = DST + off_y + i * larg_s;
-                            const float* restrict x = Xc + (i + kh) * larg_x + kw;
+                        for (int i = i_min; i < i_max; i++) {
+                            const int in_y = i + kh - alt_pad;
+                            float* restrict ptr_dst = dst_base + i * larg_s;
+                            const float* restrict ptr_x = Xc + in_y * larg_x;
 
                             #pragma omp simd
-                            for (int j = 0; j < larg_s; j++) {
-                                dst[j] += x[j] * val_k;
+                            for (int j = j_min; j < j_max; j++) {
+                                int in_x = j + kw - larg_pad;
+                                ptr_dst[j] += ptr_x[in_x] * val_k;
                             }
                         }
                     }
                 }
             }
-
         }
     }
     
@@ -87,8 +85,11 @@ void cpu_conv2d_backward(const conv2d_bwd_params_t* params) {
     const int filtros = params->filtros;
     const int canais = params->canais;
 
-    const int alt_s  = alt_x  - alt_k  + 1;
-    const int larg_s = larg_x - larg_k + 1;
+    const int alt_pad  = params->alt_pad;
+    const int larg_pad = params->larg_pad;
+
+    const int alt_s  = alt_x  + 2 * alt_pad  - alt_k  + 1;
+    const int larg_s = larg_x + 2 * larg_pad - larg_k + 1;
 
     const int area_x  = alt_x * larg_x;
     const int area_k  = alt_k * larg_k;
@@ -98,9 +99,7 @@ void cpu_conv2d_backward(const conv2d_bwd_params_t* params) {
         #pragma omp parallel for schedule(static)
         for (int f = 0; f < filtros; f++) {
             float soma_bias = 0.0f;
-
             const int f_offset = f * area_gs;
-
             for (int l = 0; l < lotes; l++) {
                 const float* ptr_gs = GS + l * filtros * area_gs + f_offset;
 
@@ -114,51 +113,68 @@ void cpu_conv2d_backward(const conv2d_bwd_params_t* params) {
         }
     }
 
-    #pragma omp parallel for collapse(3) schedule(static)
+    // grad kernel
+    #pragma omp parallel for collapse(2) schedule(static)
     for (int f = 0; f < filtros; f++) {
         for (int c = 0; c < canais; c++) {
+            const int off_k_base = (f * canais + c) * area_k;
+
             for (int kh = 0; kh < alt_k; kh++) {
                 for (int kw = 0; kw < larg_k; kw++) {
+                    int i_min = MAX_ENTRE(0, alt_pad - kh);
+                    int i_max = MIN_ENTRE(alt_s, alt_x + alt_pad - kh);
+                    int j_min = MAX_ENTRE(0, larg_pad - kw);
+                    int j_max = MIN_ENTRE(larg_s, larg_x + larg_pad - kw);
                     float soma = 0.0f;
+
                     for (int l = 0; l < lotes; l++) {
-                        const float* ptr_gs = GS + (l * filtros + f) * area_gs;
-                        const float* ptr_x  = X  + (l * canais + c) * area_x;
-                        const float* janela_x = ptr_x + kh * larg_x + kw;
-                        for (int i = 0; i < alt_s; i++) {
-                            const float* lin_gs = ptr_gs   + i * larg_s;
-                            const float* lin_x  = janela_x + i * larg_x;
-                            for (int j = 0; j < larg_s; j++) {
-                                soma += lin_gs[j] * lin_x[j];
+                        const float* restrict ptr_gs_base = GS + (l * filtros + f) * area_gs;
+                        const float* restrict ptr_x_base  = X  + (l * canais + c) * area_x;
+
+                        for (int i = i_min; i < i_max; i++) {
+                            const int in_y = i + kh - alt_pad;
+                            const float* restrict lin_gs = ptr_gs_base + i * larg_s;
+                            const float* restrict lin_x  = ptr_x_base  + in_y * larg_x;
+                            const int offset_x = kw - larg_pad; 
+
+                            for (int j = j_min; j < j_max; j++) {
+                                soma += lin_gs[j] * lin_x[j + offset_x];
                             }
                         }
                     }
-                    GK[((f * canais + c) * alt_k + kh) * larg_k + kw] += soma;
+                    GK[off_k_base + kh * larg_k + kw] += soma;
                 }
             }
         }
     }
 
+    // grad entrada
     #pragma omp parallel for collapse(2) schedule(static)
     for (int l = 0; l < lotes; l++) {
         for (int c = 0; c < canais; c++) {
-            float* ptr_ge = GE + (l * canais + c) * area_x;
+            float* restrict ptr_ge_base = GE + (l * canais + c) * area_x;
 
             for (int f = 0; f < filtros; f++) {
-                const float* ptr_gs = GS + (l * filtros + f) * area_gs;
-                const float* ptr_k  = K  + (f * canais + c) * area_k;
+                const float* restrict ptr_gs_base = GS + (l * filtros + f) * area_gs;
+                const float* restrict ptr_k_base  = K  + (f * canais + c) * area_k;
 
                 for (int kh = 0; kh < alt_k; kh++) {
                     for (int kw = 0; kw < larg_k; kw++) {
-                        const float val_k = ptr_k[kh * larg_k + kw];
-                        float* janela_ge = ptr_ge + kh * larg_x + kw;
+                        const float val_k = ptr_k_base[kh * larg_k + kw];
+                        int i_min = MAX_ENTRE(0, alt_pad - kh);
+                        int i_max = MIN_ENTRE(alt_s, alt_x + alt_pad - kh);
+                        int j_min = MAX_ENTRE(0, larg_pad - kw);
+                        int j_max = MIN_ENTRE(larg_s, larg_x + larg_pad - kw);
 
-                        for (int i = 0; i < alt_s; i++) {
-                            const float* lin_gs = ptr_gs   + i * larg_s;
-                            float* lin_ge       = janela_ge + i * larg_x;
+                        for (int i = i_min; i < i_max; i++) {
+                            const int in_y = i + kh - alt_pad;
+                            float* restrict lin_ge = ptr_ge_base + in_y * larg_x;
+                            const float* restrict lin_gs = ptr_gs_base + i * larg_s;
+                            const int offset_ge = kw - larg_pad;
 
                             #pragma omp simd
-                            for (int j = 0; j < larg_s; j++) {
-                                lin_ge[j] += lin_gs[j] * val_k;
+                            for (int j = j_min; j < j_max; j++) {
+                                lin_ge[j + offset_ge] += lin_gs[j] * val_k;
                             }
                         }
                     }
@@ -166,4 +182,5 @@ void cpu_conv2d_backward(const conv2d_bwd_params_t* params) {
             }
         }
     }
+
 }

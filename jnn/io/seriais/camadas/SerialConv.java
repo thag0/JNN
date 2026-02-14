@@ -30,8 +30,11 @@ class SerialConv extends SerialBase implements SerializadorCamada<Conv2D> {
         int[] shapeOut = camada.shapeOut();
 		escrever(dos, shapeOut);
 
-		int[] filtro = camada.formatoFiltro();
+		int[] filtro = camada.shapeKernel();
 		escrever(dos, filtro);
+
+		int[] padding = camada.shapePadding();
+		escrever(dos, padding);
 	
 		escrever(dos, camada.temBias());
 
@@ -50,14 +53,16 @@ class SerialConv extends SerialBase implements SerializadorCamada<Conv2D> {
 		int[] shapeIn = lerArrInt(dis);
 		int[] shapeOut = lerArrInt(dis);
 		int[] filtro = lerArrInt(dis);
+		int[] padding = lerArrInt(dis);
 		boolean temBias = lerBoolean(dis);
 		int numFiltros = shapeOut[0];
+		int pad = padding[0];// altura == largura
 
 		float[] kernel = lerArrFloat(dis);
 		float[] bias = null;
 		if (temBias) bias = lerArrFloat(dis);
 		
-		Conv2D camada = new Conv2D(numFiltros, filtro);
+		Conv2D camada = new Conv2D(numFiltros, filtro, pad);
 		camada.setBias(temBias);
 		camada.construir(shapeIn);
 

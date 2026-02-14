@@ -36,18 +36,18 @@ JNIEXPORT void JNICALL Java_jnn_core_JNNnative_matmul
 /*
  * Class:     jnn_core_JNNnative
  * Method:    conv2dForward
- * Signature: ([F[F[FZ[FIIIIIII)V
+ * Signature: ([F[F[FZ[FIIIIIIIII)V
  */
 JNIEXPORT void JNICALL Java_jnn_core_JNNnative_conv2dForward
-  (JNIEnv *, jclass, jfloatArray, jfloatArray, jfloatArray, jboolean, jfloatArray, jint, jint, jint, jint, jint, jint, jint);
+  (JNIEnv *, jclass, jfloatArray, jfloatArray, jfloatArray, jboolean, jfloatArray, jint, jint, jint, jint, jint, jint, jint, jint, jint);
 
 /*
  * Class:     jnn_core_JNNnative
  * Method:    conv2dBackward
- * Signature: ([F[F[F[F[FZ[FIIIIIII)V
+ * Signature: ([F[F[F[F[FZ[FIIIIIIIII)V
  */
 JNIEXPORT void JNICALL Java_jnn_core_JNNnative_conv2dBackward
-  (JNIEnv *, jclass, jfloatArray, jfloatArray, jfloatArray, jfloatArray, jfloatArray, jboolean, jfloatArray, jint, jint, jint, jint, jint, jint, jint);
+  (JNIEnv *, jclass, jfloatArray, jfloatArray, jfloatArray, jfloatArray, jfloatArray, jboolean, jfloatArray, jint, jint, jint, jint, jint, jint, jint, jint, jint);
 
 /*
  * Class:     jnn_core_JNNnative
