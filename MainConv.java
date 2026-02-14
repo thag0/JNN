@@ -11,7 +11,7 @@ import jnn.camadas.acts.Tanh;
 import jnn.camadas.pooling.MaxPool2D;
 import jnn.core.JNNnative;
 import jnn.dataloader.DataLoader;
-import jnn.dataloader.dataset.CIFAR10;
+import jnn.dataloader.dataset.MNIST;
 import jnn.io.JNNserial;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
@@ -35,7 +35,7 @@ public class MainConv {
 	public static void main(String[] args) {
 		ged.limparConsole();
 		
-		DataLoader dlTreino = CIFAR10.treino();
+		DataLoader dlTreino = MNIST.treino();
 		dlTreino.print();
 		
 		JNNnative.jni = true;
@@ -44,7 +44,7 @@ public class MainConv {
 		modelo.setHistorico(true);
 		modelo.print();
 
-		DataLoader dlTeste = CIFAR10.teste();
+		DataLoader dlTeste = MNIST.teste();
 	
 		ArrayList<Float> accs = new ArrayList<>();
 		modelo.treinador().setCallback(info -> {
