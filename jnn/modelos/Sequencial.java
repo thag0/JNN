@@ -1,6 +1,5 @@
 package jnn.modelos;
 
-import java.text.DecimalFormat;
 import java.util.Iterator;
 
 import jnn.camadas.Camada;
@@ -347,38 +346,35 @@ public class Sequencial extends Modelo {
 		final String pad = " ".repeat(4);
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append(nome()).append(" = [\n");
+		sb.append(nome()).append(" [\n");
 
-		//camadas
+		int larguraId = String.valueOf(numCamadas() - 1).length();
+
 		sb.append(
 			pad + String.format(
-			"%-23s%-23s%-23s%-23s\n", "Camada", "Entrada", "Saída", "Parâmetros"
+				"%-" + (larguraId + 3 + 16) + "s%-23s%-23s%-23s\n",
+				"Camada", "Entrada", "Saída", "Parâmetros"
 			)
 		);
 
 		for (Camada camada : this) {
-			
-			//identificador da camada
-			String nomeCamada = camada.id + " - " + camada.nome();
-			
-			//formato de entrada
+			String idFormatado = String.format("%" + larguraId + "d", camada.id);
+			String nomeCamada = idFormatado + " - " + camada.nome();
 			String formEntrada = JNNutils.arrayStr(camada.shapeIn());
-			
-			//formato de saída
-			String formSaida = JNNutils.arrayStr(camada.shapeOut());
-			
-			String parametros = new DecimalFormat("#,###").format(camada.numParams());
+			String formSaida   = JNNutils.arrayStr(camada.shapeOut());
+			String parametros = String.format("%,d", camada.numParams());
 
 			sb.append(
 				pad + String.format(
-					"%-23s%-23s%-23s%-23s\n", nomeCamada, formEntrada, formSaida, parametros
+					"%-" + (larguraId + 3 + 16) + "s%-23s%-23s%-23s\n",
+					nomeCamada, formEntrada, formSaida, parametros
 				)
 			);
 		}
 
 		sb.append("\n");
 
-		//função de perda
+		// Função de perda
 		sb.append(pad).append("Perda: ").append(_perda.nome());
 
 		String params = String.format("%,d", numParams());
