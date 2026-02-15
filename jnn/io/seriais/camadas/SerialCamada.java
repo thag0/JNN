@@ -39,6 +39,7 @@ public class SerialCamada {
             new SerialDropout(),
             new SerialFlatten(),
             new SerialMaxPool(),
+            new SerialGAP(),
 
             //ativações
             new SerialELU(),

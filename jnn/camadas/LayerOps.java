@@ -1037,4 +1037,65 @@ public class LayerOps {
 		}
 	}
 
+	/**
+	 * Realiza a propagação direta através da camada GlobalAvgPool2D.
+	 * @param entrada {@code Tensor} entrada da camada.
+	 * @param saida {@code Tensor} saída da camada.
+	 * @param shapeIn formato base de entrada da camada.
+	 */
+	public void forwardGAP(Tensor entrada, Tensor saida, int[] shapeIn) {
+        final float[] x  = entrada.array();
+        final float[] y = saida.array();
+
+        final int canais = shapeIn[0];
+        final int altura = shapeIn[1];
+        final int largura = shapeIn[2];
+        final int area = altura * largura;
+        final int lotes = (entrada.numDim() == 4) ? entrada.tamDim(0) : 1;
+
+        int idX = 0;
+        int idY = 0;
+        for (int n = 0; n < lotes; n++) {
+            for (int c = 0; c < canais; c++) {
+                float soma = 0.f;
+
+                for (int i = 0; i < area; i++) {
+                    soma += x[idX++];
+                }
+
+                y[idY++] = soma / area;
+            }
+        }
+	}
+
+	/**
+	 * Realiza a propagação reversa através da camada GlobalAvgPool2D.
+	 * @param gradE {@code Tensor} contendo o gradiente em relação a entrada da camada.
+	 * @param grad {@code Tensor} contendo o gradiente da saída da camada.
+	 * @param shapeIn formato base de entrada da camada.
+	 * @param tamLote tamanho de lotes usado na camada.
+	 */
+	public void backwardGAP(Tensor gradE, Tensor grad, int[] shapeIn, int tamLote) {
+        final float[] ge  = gradE.array();
+        final float[] gs = grad.array();
+
+        final int canais = shapeIn[0];
+        final int altura = shapeIn[1];
+        final int largura = shapeIn[2];
+        final int area = altura * largura;
+        final int lotes = (grad.numDim() == 2) ? tamLote : 1;
+
+        int idGS = 0;
+        int idGE  = 0;
+        for (int n = 0; n < lotes; n++) {
+            for (int c = 0; c < canais; c++) {
+                float g = gs[idGS++] / area;
+
+                for (int i = 0; i < area; i++) {
+                    ge[idGE++] = g;
+                }
+            }
+        }
+	}
+
 }

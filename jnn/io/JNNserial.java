@@ -23,6 +23,7 @@ import jnn.camadas.acts.Softplus;
 import jnn.camadas.acts.Swish;
 import jnn.camadas.acts.Tanh;
 import jnn.camadas.pooling.AvgPool2D;
+import jnn.camadas.pooling.GlobalAvgPool2D;
 import jnn.camadas.pooling.MaxPool2D;
 import jnn.core.Dicionario;
 import jnn.io.seriais.SerialBase;
@@ -113,83 +114,71 @@ public class JNNserial extends SerialBase {
 
 				switch (nomeCamada) {
 					case "densa":
-						Densa densa = (Densa) serialCamada.ler(in, nomeCamada);
-						modelo.add(densa);
+						modelo.add((Densa) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "conv2d":
-						Conv2D conv2d = (Conv2D) serialCamada.ler(in, nomeCamada);
-						modelo.add(conv2d);
+						modelo.add((Conv2D) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "flatten":
-						Flatten flatten = (Flatten) serialCamada.ler(in, nomeCamada);
-						modelo.add(flatten);
+						modelo.add((Flatten) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "maxpool2d":
-						MaxPool2D maxpool = (MaxPool2D) serialCamada.ler(in, nomeCamada);
-						modelo.add(maxpool);
+						modelo.add((MaxPool2D) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "avgpool2d":
-						AvgPool2D avgpool = (AvgPool2D) serialCamada.ler(in, nomeCamada);
-						modelo.add(avgpool);
+						modelo.add((AvgPool2D) serialCamada.ler(in, nomeCamada));
+					break;
+
+					case "gap":
+						modelo.add((GlobalAvgPool2D) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "dropout":
-						Dropout dropout = (Dropout) serialCamada.ler(in, nomeCamada);
-						modelo.add(dropout);
+						modelo.add((Dropout) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "elu":
-						ELU elu = (ELU) serialCamada.ler(in, nomeCamada);
-						modelo.add(elu);
+						modelo.add((ELU) serialCamada.ler(in, nomeCamada));
 					break;
 					
 					case "gelu":
-						GELU gelu = (GELU) serialCamada.ler(in, nomeCamada);
-						modelo.add(gelu);
+						modelo.add((GELU) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "leakyrelu":
-						LeakyReLU leakyrelu = (LeakyReLU) serialCamada.ler(in, nomeCamada);
-						modelo.add(leakyrelu);
+						modelo.add((LeakyReLU) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "relu":
-						ReLU relu = (ReLU) serialCamada.ler(in, nomeCamada);
-						modelo.add(relu);
+						modelo.add((ReLU) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "selu":
-						SELU selu = (SELU) serialCamada.ler(in, nomeCamada);
-						modelo.add(selu);
+						modelo.add((SELU) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "sigmoid":
-						Sigmoid sigmoid = (Sigmoid) serialCamada.ler(in, nomeCamada);
-						modelo.add(sigmoid);
+						modelo.add((Sigmoid) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "softmax":
-						Softmax softmax = (Softmax) serialCamada.ler(in, nomeCamada);
-						modelo.add(softmax);
+						modelo.add((Softmax) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "softplus":
-						Softplus softplus = (Softplus) serialCamada.ler(in, nomeCamada);
-						modelo.add(softplus);
+						modelo.add((Softplus) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "swish":
-						Swish swish = (Swish) serialCamada.ler(in, nomeCamada);
-						modelo.add(swish);
+						modelo.add((Swish) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "tanh":
-						Tanh tanh = (Tanh) serialCamada.ler(in, nomeCamada);
-						modelo.add(tanh);
+						modelo.add((Tanh) serialCamada.ler(in, nomeCamada));
 					break;
 				
 					default:
