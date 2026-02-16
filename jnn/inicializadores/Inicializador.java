@@ -30,19 +30,14 @@ public abstract class Inicializador {
 			fans[0] = shape[0];
 			fans[1] = shape[1];
 		
-		} else { // 3D+
-			int fanIn = 1;
-			for (int i = 0; i < shape.length - 1; i++) {
-			  fanIn *= shape[i];
+		} else { // 3D+ (no caso para layout NCHW)
+			int campoReceptivo = 1;
+			for (int i = 2; i < shape.length; i++) {
+				campoReceptivo *= shape[i];
 			}
-		
-			int fanOut = 1;
-			for (int i = shape.length - 1; i >= 1; i--) {
-			  fanOut *= shape[i];
-			}
-		
-			fans[0] = fanIn;
-			fans[1] = fanOut;
+
+			fans[0] = shape[0] * campoReceptivo;
+			fans[1] = shape[1] * campoReceptivo;
 		}
 
 		return fans;

@@ -4,7 +4,12 @@ import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 
 /**
- * Inicializador He para uso dentro da biblioteca.
+ * Inicializador He (Kaiming).
+ *<p>
+ *		Indicado para modelos com funções de ativação ReLU e variações, 
+ *		pois mantém a variância dos gradientes estável ao longo das camadas, 
+ *		reduzindo o risco de vanishing/exploding gradients.
+ *</p>
  */
 public class He extends Inicializador {
 

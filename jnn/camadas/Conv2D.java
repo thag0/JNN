@@ -329,6 +329,34 @@ public class Conv2D extends Camada implements Cloneable {
 	 * @param filtros quantidade de filtros.
 	 * @param padding quantidade de padding aplicado na entrada, pode ser uma {@code String} ("valid" ou "same"),
 	 * ou pode ser um valor inteiro que será aplicado tanto na altura como na largura da entrada.
+	 * @param iniKernel inicializador para os filtros.
+	 */
+	public Conv2D(int filtros, int[] filtro, Object padding, Object iniKernel) {
+		this(filtros, filtro, padding, iniKernel, null);
+	}
+
+	/**
+	 * Instancia uma camada convolucional de acordo com os formatos fornecidos.
+	 * <p>
+	 *    A disposição do formato de entrada deve ser da seguinte forma:
+	 * </p>
+	 * <pre>
+	 *    formEntrada = (canais, altura, largura)
+	 * </pre>
+	 * Onde largura e altura devem corresponder as dimensões dos dados de entrada
+	 * que serão processados pela camada e a profundidade diz respeito a quantidade
+	 * de entradas que a camada deve processar.
+	 * <p>
+	 *    A disposição do formato do filtro deve ser da seguinte forma:
+	 * </p>
+	 * <pre>
+	 *    formFiltro = (altura, largura)
+	 * </pre>
+	 * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
+	 * @param filtro formato dos filtros da camada.
+	 * @param filtros quantidade de filtros.
+	 * @param padding quantidade de padding aplicado na entrada, pode ser uma {@code String} ("valid" ou "same"),
+	 * ou pode ser um valor inteiro que será aplicado tanto na altura como na largura da entrada.
 	 */
 	public Conv2D(int filtros, int[] filtro, Object padding) {
 		this(filtros, filtro, padding, null, null);
