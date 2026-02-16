@@ -22,19 +22,19 @@ public class SerialTensor extends SerialBase {
     /**
      * Formato padrão do Tensor.
      */
-    final String FORMATO = ".tensor";
+    static final String FORMATO = ".tensor";
 
     /**
      * Interface para io de tensores.
      */
-    public SerialTensor() {}
+    protected SerialTensor() {}
     
 	/**
 	 * Exporta os dados do tensor num arquivo {@code .tensor}.
      * @param t {@code Tensor} base.
      * @param caminho caminho de destino, deve conter a extensão {@code .tensor}.
      */
-    public void salvar(Tensor t, String caminho) {
+    public static void salvar(Tensor t, String caminho) {
         File arquivo = new File(caminho);
         if (!arquivo.getName().toLowerCase().endsWith(FORMATO)) {
             throw new IllegalArgumentException("O caminho deve conter a extensão " + FORMATO);
@@ -60,7 +60,7 @@ public class SerialTensor extends SerialBase {
      * @param caminho caminho do arquivo, deve conter a extensão {@code .tensor}.
      * @return {@code Tensor} carregado.
      */
-    public Tensor ler(String caminho) {
+    public static Tensor ler(String caminho) {
         File arquivo = new File(caminho);
         if (!arquivo.getName().toLowerCase().endsWith(FORMATO)) {
             throw new IllegalArgumentException("O caminho deve conter a extensão " + FORMATO);
@@ -89,7 +89,7 @@ public class SerialTensor extends SerialBase {
      * @param caminho caminho da imagem, deve conter a extensão do arquivo.
      * @return {@code Tensor} convertido.
      */
-    public Tensor lerImagem(String caminho) {
+    public static Tensor lerImagem(String caminho) {
         try {
             BufferedImage base = ImageIO.read(new File(caminho));
             

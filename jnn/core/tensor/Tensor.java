@@ -2235,7 +2235,7 @@ public class Tensor implements Iterable<Float>, Cloneable {
 	 * @param caminho caminho de destino.
 	 */
 	public void salvar(String caminho) {
-		new SerialTensor().salvar(this, caminho);
+		SerialTensor.salvar(this, caminho);
 	}
 
 	/**
