@@ -16,6 +16,9 @@ import jnn.core.tensor.Tensor;
  */
 public class HeUniforme extends Inicializador {
 
+    /**
+     * Instancia um inicializador He Uniforme.
+     */
     public HeUniforme() {}
 
     @Override
