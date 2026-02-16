@@ -39,7 +39,7 @@ public class SerialGAP extends SerialBase implements SerializadorCamada<GlobalAv
 
     @Override
     public String nome() {
-        return "gap";
+        return "globalavgpool2d";
     }
 
     @Override

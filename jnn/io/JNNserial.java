@@ -133,7 +133,7 @@ public class JNNserial extends SerialBase {
 						modelo.add((AvgPool2D) serialCamada.ler(in, nomeCamada));
 					break;
 
-					case "gap":
+					case "globalavgpool2d":
 						modelo.add((GlobalAvgPool2D) serialCamada.ler(in, nomeCamada));
 					break;
 
