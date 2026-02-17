@@ -1,4 +1,3 @@
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -12,7 +11,9 @@ import jnn.camadas.pooling.GlobalAvgPool2D;
 import jnn.camadas.pooling.MaxPool2D;
 import jnn.core.JNNnative;
 import jnn.dataloader.DataLoader;
-import jnn.dataloader.dataset.MNIST;
+import jnn.dataloader.dataset.CIFAR10;
+import jnn.dataloader.transform.TNorm;
+import jnn.dataloader.transform.Transform;
 import jnn.io.JNNserial;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
@@ -25,8 +26,8 @@ public class MainConv {
 	static Ged ged = new Ged();
 
 	// controle de treino
-	static final int TREINO_EPOCAS = 10;
-	static final int TREINO_LOTE = 32;
+	static final int TREINO_EPOCAS = 100;
+	static final int TREINO_LOTE = 64;
 	static final boolean TREINO_LOGS = true;
 
 	// caminhos de arquivos externos
@@ -36,25 +37,30 @@ public class MainConv {
 	public static void main(String[] args) {
 		ged.limparConsole();
 		
-		DataLoader dlTreino = MNIST.treino();
-		dlTreino.print();
+		Transform norm = new TNorm(
+			new float[]{0.4914f, 0.4822f, 0.4465f},
+			new float[]{0.247f,  0.243f,  0.261f}
+		);//peguei de um forum do pytorch
 		
+		final DataLoader treino = CIFAR10.treino().aplicarX(norm);
+		treino.print();
+				
+		final DataLoader teste = CIFAR10.teste().aplicarX(norm);
+
 		Sequencial modelo = cnn();
 		modelo.setHistorico(true);
 		modelo.print();
 		
-		DataLoader dlTeste = MNIST.teste();
-		
 		var accs = new ArrayList<Float>();
 		modelo.treinador().setCallback(info -> {
-			float ac = modelo.avaliador().acuracia(dlTeste).item();
+			float ac = modelo.avaliador().acuracia(teste).item();
 			accs.add(ac);
 		});
 		
 		System.out.println("Treinando.");
 		JNNnative.jni = true;
 		long tempo = System.nanoTime();
-			modelo.treinar(dlTreino, TREINO_EPOCAS, TREINO_LOTE, TREINO_LOGS);
+			modelo.treinar(treino, TREINO_EPOCAS, TREINO_LOTE, TREINO_LOGS);
 		tempo = System.nanoTime() - tempo;
 
 		long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempo);
@@ -64,8 +70,8 @@ public class MainConv {
 
 		System.out.println("\nTempo de treino: " + horas + "h " + minutos + "min " + segundos + "s");
 
-		System.out.println("loss: " + modelo.avaliar(dlTeste));
-		System.out.println("acc: " + modelo.avaliador().acuracia(dlTeste));
+		System.out.println("loss: " + modelo.avaliar(teste));
+		System.out.println("acc: " + modelo.avaliador().acuracia(teste));
 
 		JNNserial.salvar(modelo, CAMINHO_SAIDA_MODELO);
 
@@ -101,45 +107,43 @@ public class MainConv {
 	 * @return {@code Sequencial}.
 	 */
 	static Sequencial cnn() {
+		int[] convK = {3, 3};
+		int[] poolK = {2, 2};
+
 		Sequencial modelo = new Sequencial(
-			new Entrada(1, 28, 28),
+			new Entrada(3, 32, 32),
 
-			new Conv2D(16, new int[]{3, 3}),
+			new Conv2D(32, convK, "same", "he"),
 			new ReLU(),
-			new MaxPool2D(new int[]{2, 2}),
-
-			new Conv2D(32, new int[]{3, 3}),
+			new Conv2D(32, convK, "same", "he"),
 			new ReLU(),
-			new MaxPool2D(new int[]{2, 2}),
+			new MaxPool2D(poolK),
+			
+			new Conv2D(64, convK, "same", "he"),
+			new ReLU(),
+			new Conv2D(64, convK, "same", "he"),
+			new ReLU(),
+			new MaxPool2D(poolK),
+			
+			new Conv2D(128, convK, "same", "he"),
+			new ReLU(),
+			new Conv2D(128, convK, "same", "he"),
+			new ReLU(),
+			new MaxPool2D(poolK),
 
-			new Flatten(),
+			new GlobalAvgPool2D(),
 
-			new Densa(50),
+			new Dropout(0.5),
+			new Densa(128, "he"),
 			new ReLU(),
 
-			new Densa(10),
+			new Densa(10, "he"),
 			new Softmax()
 		);
 
 		modelo.compilar("adam", "entropia-cruzada");
 		
 		return modelo;		
-	}
-
-	/**
-	 * Formata o valor recebido para a quantidade de casas após o ponto
-	 * flutuante.
-	 * @param valor valor alvo.
-	 * @param casas quantidade de casas após o ponto flutuante.
-	 * @return
-	 */
-	static String formatarDecimal(float valor, int casas) {
-		String formato = "#.";
-		for (int i = 0; i < casas; i++) formato += "#";
-
-		DecimalFormat df = new DecimalFormat(formato);
-
-		return df.format(valor);
 	}
 
 	/**

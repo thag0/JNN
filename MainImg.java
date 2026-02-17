@@ -52,7 +52,7 @@ public class MainImg {
 		Tensor[] x = JNN.arrayParaTensores(in);
 		Tensor[] y = JNN.arrayParaTensores(out);
 		DataLoader dl = new DataLoader(x, y);
-		dl.transformY(t -> t.div(255));// normalizar saída de 0-255 para 0-1
+		dl.aplicarY(t -> t.div(255));// normalizar saída de 0-255 para 0-1
 		dl.print();
 
 		Modelo modelo = modelo(tamEntrada, tamSaida);

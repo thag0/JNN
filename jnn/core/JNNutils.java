@@ -111,6 +111,19 @@ public final class JNNutils {
 	}
 
 	/**
+	 * Verifica se o conteúdo do array contém valores maiores que zero.
+	 * @param arr array base.
+	 * @return resultado da verificação.
+	 */
+	public static boolean apenasMaiorZero(float[] arr) {
+		for (int i = 0; i < arr.length; i++) {
+			if (arr[i] < 0) return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Compara se os dois arrays são igual em tamanho e numericamente.
 	 * @param a {@code array} 1.
 	 * @param b {@code array} 2.

@@ -2158,9 +2158,7 @@ public class Tensor implements Iterable<Float>, Cloneable {
 			clone.shape = shape.clone();
 			clone.strides = strides.clone();
 			
-			int n = tam();
-			clone.dados = new TensorData(n);
-			clone.dados.copiar(this.dados);
+			clone.dados = new TensorData(this.dados.paraArray());// lidar com views
 			
 			return clone;
 		} catch (CloneNotSupportedException e) {

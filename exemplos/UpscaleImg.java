@@ -36,7 +36,7 @@ public class UpscaleImg {
 		int nEntrada = 2;// posição x y do pixel
 		int nSaida = 1;// valor de escala de cinza/brilho do pixel
 		DataLoader img = JNN.dataloader(dados, nEntrada, nSaida);
-		img.transformY(a -> a.div(255));// normalizar entre 0 e 1
+		img.aplicarX(t -> t.div(255));// normalizar entre 0 e 1
 
 		// Criando modelo
 		// -Neste exemplo queremos que o modelo tenha overfitting
