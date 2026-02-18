@@ -1,10 +1,13 @@
 #include "matmul.h"
+#include "macros.h"
+#include <stdio.h>
 
 // tilling
-#define BLOCO_COL_A 32
-#define BLOCO_COL_B 32
+#define BLOCO_LIN_A 32
+#define BLOCO_COL_A 64
+#define BLOCO_COL_B 64
 
-void _matmul_fastpath(
+static void _matmul_fastpath(
     const float* restrict A, 
     const float* restrict B, 
     float* restrict C,
@@ -17,25 +20,28 @@ void _matmul_fastpath(
     const int std_a_0, 
     const int std_b_0, 
     const int std_c_0) {
+
+    #pragma omp parallel for collapse(2) schedule(static)
+    for (int ii = 0; ii < lin_a; ii += BLOCO_LIN_A) {
+        for (int jj = 0; jj < col_b; jj += BLOCO_COL_B) {
+            const int i_max = MIN_ENTRE(ii + BLOCO_LIN_A, lin_a);
+            const int j_max = MIN_ENTRE(jj + BLOCO_COL_B, col_b);
     
-    #pragma omp parallel for schedule(static)
-    for (int i = 0; i < lin_a; i++) {
-        const int baseA = off_a + i * std_a_0;
-        const int baseC = off_c + i * std_c_0;
-
-        for (int kk = 0; kk < col_a; kk += BLOCO_COL_A) {
-            const int kEnd = (kk + BLOCO_COL_A < col_a) ? kk + BLOCO_COL_A : col_a;
-
-            for (int jj = 0; jj < col_b; jj += BLOCO_COL_B) {
-                const int jEnd = (jj + BLOCO_COL_B < col_b) ? jj + BLOCO_COL_B : col_b;
-
-                for (int k = kk; k < kEnd; k++) {
-                    const float valA = A[baseA + k];
-                    const int baseB = off_b + k * std_b_0;
-
-                    #pragma omp simd
-                    for (int j = jj; j < jEnd; j++) {
-                        C[baseC + j] += valA * B[baseB + j];
+            for (int kk = 0; kk < col_a; kk += BLOCO_COL_A) {
+                const int k_max = MIN_ENTRE(kk + BLOCO_COL_A, col_a);
+    
+                for (int i = ii; i < i_max; i++) {
+                    const int base_a = off_a + i * std_a_0;
+                    const int base_c = off_c + i * std_c_0;
+    
+                    for (int k = kk; k < k_max; k++) {
+                        const float val_a = A[base_a + k];
+                        const int base_b = off_b + k * std_b_0;
+    
+                        #pragma omp simd
+                        for (int j = jj; j < j_max; j++) {
+                            C[base_c + j] += val_a * B[base_b + j];
+                        }
                     }
                 }
             }
@@ -44,7 +50,7 @@ void _matmul_fastpath(
 
 }
 
-void _matmul_generico(
+static void _matmul_generico(
     const float* restrict A, 
     const float* restrict B, 
     float* restrict C,
@@ -54,29 +60,32 @@ void _matmul_generico(
     int std_b_0, int std_b_1,
     int std_c_0, int std_c_1) {
 
-    #pragma omp parallel for schedule(static)
-    for (int i = 0; i < lin_a; i++) {
-        const int base_a = off_a + i * std_a_0;
-        const int base_c = off_c + i * std_c_0;
-
-        for (int kk = 0; kk < col_a; kk += BLOCO_COL_A) {
-            const int fim_k = (kk + BLOCO_COL_A < col_a) ? kk + BLOCO_COL_A : col_a;
-
-            for (int jj = 0; jj < col_b; jj += BLOCO_COL_B) {
-                const int fim_j = (jj + BLOCO_COL_B < col_b) ? jj + BLOCO_COL_B : col_b;
-
-                for (int k = kk; k < fim_k; k++) {
-                    const float val_a = A[base_a + k * std_a_1];
-                    const int base_b = off_b + k * std_b_0;
-
-                    #pragma omp simd
-                    for (int j = jj; j < fim_j; j++) {
-                        C[base_c + j * std_c_1] += val_a * B[base_b + j * std_b_1];
+    #pragma omp parallel for collapse(2) schedule(static)
+    for (int ii = 0; ii < lin_a; ii += BLOCO_LIN_A) {
+        for (int jj = 0; jj < col_b; jj += BLOCO_COL_B) {
+            const int i_max = MIN_ENTRE(ii + BLOCO_LIN_A, lin_a);
+            const int j_max = MIN_ENTRE(jj + BLOCO_COL_B, col_b);
+    
+            for (int kk = 0; kk < col_a; kk += BLOCO_COL_A) {
+                const int k_max = MIN_ENTRE(kk + BLOCO_COL_A, col_a);
+    
+                for (int i = ii; i < i_max; i++) {
+                    const int base_a = off_a + i * std_a_0;
+                    const int base_c = off_c + i * std_c_0;
+    
+                    for (int k = kk; k < k_max; k++) {
+                        const float val_a = A[base_a + k * std_a_1];
+                        const int base_b = off_b + k * std_b_0;
+    
+                        #pragma omp simd
+                        for (int j = jj; j < j_max; j++) {
+                            C[base_c + j * std_c_1] += val_a * B[base_b + j * std_b_1];
+                        }
                     }
                 }
             }
         }
-    } 
+    }
 
 }
 
@@ -100,28 +109,19 @@ void cpu_matmul(const matmul_params_t* params) {
     const int std_c_0 = params->std_c_0;
     const int std_c_1 = params->std_c_1;
 
-    const int fastpath = std_a_1 == 1 && std_b_1 == 1 && std_c_1 == 1;
+    const int fastpath = std_a_1 == 1 && std_b_1 == 1 && std_c_1 == 1;//contiguo row-major
 
     if (fastpath) {
         _matmul_fastpath(
-            A,
-            B,
-            DST,
-            off_a,
-            off_b,
-            off_dst,
-            lin_a,
-            col_a,
-            col_b,
-            std_a_0,
-            std_b_0,
-            std_c_0
+            A, B, DST,
+            off_a, off_b, off_dst,
+            lin_a, col_a, col_b,
+            std_a_0, std_b_0, std_c_0
         ); 
+    
     } else {
         _matmul_generico(
-            A, 
-            B,
-            DST, 
+            A, B, DST, 
             off_a, off_b, off_dst, 
             lin_a, col_a, col_b, 
             std_a_0, std_a_1, 

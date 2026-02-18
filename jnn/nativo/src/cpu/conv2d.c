@@ -1,9 +1,11 @@
 #include "conv2d.h"
+#include "macros.h"
+#include "matmul.h"
+#include "im2col.h"
 
-#define MAX_ENTRE(a, b) ((a) > (b) ? (a) : (b))
-#define MIN_ENTRE(a, b) ((a) < (b) ? (a) : (b))
+#include <stdlib.h>
 
-void cpu_conv2d_forward(const conv2d_fwd_params_t* params) {
+static void _forward_loops(const conv2d_fwd_params_t* params) {
     const float* restrict X = params->X;
     const float* restrict K = params->K;
     const float* restrict B = params->B;
@@ -63,7 +65,110 @@ void cpu_conv2d_forward(const conv2d_fwd_params_t* params) {
             }
         }
     }
+}
+
+static void _forward_im2col(const conv2d_fwd_params_t* params) {
+    const float* restrict X = params->X;
+    const float* restrict K = params->K;
+    const float* restrict B = params->B;
+    float* restrict DST = params->DST;
+
+    const int lotes   = params->lotes;
+    const int filtros = params->filtros;
+    const int canais  = params->canais;
+
+    const int alt_x = params->alt_x;
+    const int larg_x = params->larg_x;
+    const int alt_k = params->alt_k;
+    const int larg_k = params->larg_k;
+    const int alt_pad = params->alt_pad;
+    const int larg_pad = params->larg_pad;
+
+    const bool temBias = params->temBias;
+
+    const int alt_s  = alt_x  + 2 * alt_pad  - alt_k  + 1;
+    const int larg_s = larg_x + 2 * larg_pad - larg_k + 1;
+
+    const int Kdim = canais * alt_k * larg_k;
+    const int Ndim = alt_s * larg_s;
+
+    float* col = malloc(sizeof(float) * Kdim * Ndim);
+
+    matmul_params_t mm = {
+        .A = (float*)K,
+        .B = col,
+        .DST = NULL,
+
+        .off_a = 0,
+        .off_b = 0,
+        .off_dst = 0,
+
+        .std_a_0 = Kdim,
+        .std_a_1 = 1,
+
+        .std_b_0 = Ndim,
+        .std_b_1 = 1,
+
+        .std_c_0 = Ndim,
+        .std_c_1 = 1,
+
+        .lin_a = filtros,
+        .col_a = Kdim,
+        .col_b = Ndim
+    };
+
+    for (int l = 0; l < lotes; l++) {
+        const float* x_lote = X + l * canais * alt_x * larg_x;
+        float* y_lote = DST + l * filtros * Ndim;
+
+        for (int f = 0; f < filtros; f++) {
+            float bias = temBias ? B[f] : 0.f;
+            float* linha = y_lote + f * Ndim;
+            for (int i = 0; i < Ndim; i++) {
+                linha[i] = bias;
+            }
+        }
+
+        im2col_3d(
+            x_lote,
+            col,
+            canais,
+            alt_x, larg_x,
+            alt_k, larg_k,
+            alt_pad, larg_pad,
+            alt_s, larg_s
+        );
+
+        mm.DST = y_lote;
+
+        cpu_matmul(&mm);
+    }
+
+    free(col);
+}
+
+static bool usar_im2col(const conv2d_fwd_params_t* params) {
+    // é meio dificil decidir quando usar mas desse jeito por enquanto
+    // parece balanceado
     
+    const int alt_s  = params->alt_x  + 2 * params->alt_pad  - params->alt_k  + 1;
+    const int larg_s = params->larg_x + 2 * params->larg_pad - params->larg_k + 1;
+    const long Kdim = (long)params->canais * params->alt_k * params->larg_k;
+    const long Ndim = (long)alt_s * larg_s;
+    const long total_gemm_elements = Kdim * Ndim;
+
+    if (params->canais < 4) return false;
+    if (total_gemm_elements < (16 * 1024)) return false;
+    
+    return true;
+}
+
+void cpu_conv2d_forward(const conv2d_fwd_params_t* params) {
+    if (usar_im2col(params)) {
+        _forward_im2col(params);
+    } else {
+        _forward_loops(params);
+    }
 }
 
 void cpu_conv2d_backward(const conv2d_bwd_params_t* params) {
@@ -113,7 +218,7 @@ void cpu_conv2d_backward(const conv2d_bwd_params_t* params) {
         }
     }
 
-    // grad kernel
+    // // grad kernel
     #pragma omp parallel for collapse(2) schedule(static)
     for (int f = 0; f < filtros; f++) {
         for (int c = 0; c < canais; c++) {
