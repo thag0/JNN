@@ -165,7 +165,6 @@ public class DataLoader implements Iterable<Amostra> {
 
     /**
      * Aplica uma transformação nos dados de {@code Y} do DataLoader.
-     * </pre> 
      * @param tf função transformadora.
      * @return {@code DataLoader} alterado.
      */

@@ -19,9 +19,16 @@ public class TNorm implements Transform {
     private float[] desvp;
 
     /**
-     * 
-     * @param media
-     * @param desvp
+     * Inicializa uma transformação de normalização.
+     * <p>
+     *      Os valores passados de média e desvio padrão devem ter o 
+     *      tamanho das dimensões dos tensores que serão usandos.
+     * </p>
+     * <p>
+     *      Exemplo: tensor 3D, media/desvp devem conter 3 elementos.
+     * </p>
+     * @param media valores de média.
+     * @param desvp valores de desvio padrão.
      */
     public TNorm(float[] media, float[] desvp) {
         JNNutils.validarNaoNulo(media, "media == null");
