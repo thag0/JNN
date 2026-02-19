@@ -17,23 +17,26 @@ void im2col_3d(
     for (int c = 0; c < canais; c++) {
         for (int kh = 0; kh < alt_k; kh++) {
             for (int kw = 0; kw < larg_k; kw++) {
-                int row = (c * alt_k + kh) * larg_k + kw;
-                float* restrict col_ptr = COL + row * area_s;
-                memset(col_ptr, 0, area_s * sizeof(float));
+                int linha = (c * alt_k + kh) * larg_k + kw;
+                float* restrict ptr_col = COL + linha * area_s;
+                int h_min = MAX_ENTRE(0, alt_pad - kh);
+                int h_max = MIN_ENTRE(alt_s, alt_x + alt_pad - kh);
+                int w_min = MAX_ENTRE(0, larg_pad - kw);
+                int w_max = MIN_ENTRE(larg_s, larg_x + larg_pad - kw);
 
-                int h_start = MAX_ENTRE(0, alt_pad - kh);
-                int h_end = MIN_ENTRE(alt_s, alt_x + alt_pad - kh);
-                int w_start = MAX_ENTRE(0, larg_pad - kw);
-                int w_end = MIN_ENTRE(larg_s, larg_x + larg_pad - kw);
-
-                for (int i = h_start; i < h_end; i++) {
+                for (int i = h_min; i < h_max; i++) {
                     int in_y = i + kh - alt_pad;
-                    const float* restrict x_ptr = X + (c * alt_x * larg_x) + (in_y * larg_x);
-                    float* restrict dst_ptr = col_ptr + (i * larg_s);
+                    const float* restrict ptr_x = X + (c * alt_x * larg_x) + (in_y * larg_x);
+                    float* restrict ptr_dst = ptr_col + (i * larg_s);
 
-                    for (int j = w_start; j < w_end; j++) {
-                        int in_x = j + kw - larg_pad;
-                        dst_ptr[j] = x_ptr[in_x];
+                    int in_x = w_min + kw - larg_pad;
+                    int largura = w_max - w_min;
+                    const float* x = ptr_x + in_x;
+                    float* dest = ptr_dst + w_min;
+
+                    #pragma omp simd
+                    for (int t = 0; t < largura; t++) {
+                        dest[t] = x[t];
                     }
                 }
             }

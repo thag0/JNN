@@ -8,17 +8,14 @@
 #define BLOCO_COL_B 64
 
 static void _matmul_fastpath(
-    const float* restrict A, 
-    const float* restrict B, 
+    const float* restrict A,
+    const float* restrict B,
     float* restrict C,
-    const int off_a, 
-    const int off_b, 
-    const int off_c,
-    const int lin_a, 
-    const int col_a, 
+    const int lin_a,
+    const int col_a,
     const int col_b,
-    const int std_a_0, 
-    const int std_b_0, 
+    const int std_a_0,
+    const int std_b_0,
     const int std_c_0) {
 
     #pragma omp parallel for collapse(2) schedule(static)
@@ -29,21 +26,34 @@ static void _matmul_fastpath(
     
             for (int kk = 0; kk < col_a; kk += BLOCO_COL_A) {
                 const int k_max = MIN_ENTRE(kk + BLOCO_COL_A, col_a);
-    
+
                 for (int i = ii; i < i_max; i++) {
-                    const int base_a = off_a + i * std_a_0;
-                    const int base_c = off_c + i * std_c_0;
-    
+                    const int base_a = i * std_a_0;
+                    const int base_c = i * std_c_0;
+                    const int largura = j_max - jj;
+                    float acc[BLOCO_COL_B];//acumulador local pra evitar escrever em C toda hora
+
+                    #pragma omp simd
+                    for (int t = 0; t < largura; t++) {
+                        acc[t] = 0.0f;
+                    }
+
                     for (int k = kk; k < k_max; k++) {
                         const float val_a = A[base_a + k];
-                        const int base_b = off_b + k * std_b_0;
-    
+                        const int base_b = k * std_b_0 + jj;
+
                         #pragma omp simd
-                        for (int j = jj; j < j_max; j++) {
-                            C[base_c + j] += val_a * B[base_b + j];
+                        for (int t = 0; t < largura; t++) {
+                            acc[t] += val_a * B[base_b + t];
                         }
                     }
+
+                    #pragma omp simd
+                    for (int t = 0; t < largura; t++) {
+                        C[base_c + jj + t] += acc[t];//acumulaçao unica
+                    }
                 }
+
             }
         }
     }
@@ -109,12 +119,12 @@ void cpu_matmul(const matmul_params_t* params) {
     const int std_c_0 = params->std_c_0;
     const int std_c_1 = params->std_c_1;
 
-    const int fastpath = std_a_1 == 1 && std_b_1 == 1 && std_c_1 == 1;//contiguo row-major
+    int fastpath = std_a_1 == 1 && std_b_1 == 1 && std_c_1 == 1;//contiguo row-major
+    fastpath &= (off_a == 0 && off_b == 0 && off_dst == 0);//sem offset
 
     if (fastpath) {
         _matmul_fastpath(
             A, B, DST,
-            off_a, off_b, off_dst,
             lin_a, col_a, col_b,
             std_a_0, std_b_0, std_c_0
         ); 

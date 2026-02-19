@@ -95,7 +95,7 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
     float* col = malloc(sizeof(float) * Kdim * Ndim);
 
     matmul_params_t mm = {
-        .A = (float*)K,
+        .A = (float*) K,
         .B = col,
         .DST = NULL,
 
@@ -218,7 +218,7 @@ void cpu_conv2d_backward(const conv2d_bwd_params_t* params) {
         }
     }
 
-    // // grad kernel
+    // grad kernel
     #pragma omp parallel for collapse(2) schedule(static)
     for (int f = 0; f < filtros; f++) {
         for (int c = 0; c < canais; c++) {
