@@ -12,6 +12,10 @@ void im2col_3d(
     int alt_s, int larg_s) {
 
     const int area_s = alt_s * larg_s;
+    const int Kdim = canais * alt_k * larg_k;
+
+    //tem que zerar porque pode vir lixo do malloc, principalemnte com padding
+    memset(COL, 0, sizeof(float) * Kdim * area_s);
 
     #pragma omp parallel for collapse(3) schedule(static)
     for (int c = 0; c < canais; c++) {
