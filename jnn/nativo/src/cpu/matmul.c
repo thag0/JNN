@@ -82,15 +82,28 @@ static void _matmul_generico(
                 for (int i = ii; i < i_max; i++) {
                     const int base_a = off_a + i * std_a_0;
                     const int base_c = off_c + i * std_c_0;
-    
+
+                    int largura = j_max - jj;
+                    float acc[BLOCO_COL_B];
+
+                    #pragma omp simd
+                    for (int t = 0; t < largura; t++) {
+                        acc[t] = 0.0f;
+                    }
+
                     for (int k = kk; k < k_max; k++) {
                         const float val_a = A[base_a + k * std_a_1];
-                        const int base_b = off_b + k * std_b_0;
-    
+                        const int base_b = off_b + k * std_b_0 + jj * std_b_1;
+
                         #pragma omp simd
-                        for (int j = jj; j < j_max; j++) {
-                            C[base_c + j * std_c_1] += val_a * B[base_b + j * std_b_1];
+                        for (int t = 0; t < largura; t++) {
+                            acc[t] += val_a * B[base_b + t * std_b_1];
                         }
+                    }
+
+                    #pragma omp simd
+                    for (int t = 0; t < largura; t++) {
+                        C[base_c + (jj + t) * std_c_1] += acc[t];
                     }
                 }
             }
