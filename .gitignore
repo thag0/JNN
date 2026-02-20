@@ -1,0 +1,13 @@
+.vscode
+/testes/bin
+
+/bin/*
+!/bin/jnn.jar
+
+historico-perda.csv
+Renomear.java
+Playground.java
+Conv.java
+Benchmark.java
+TesteConv.java
+TesteJNI.java
