@@ -21,3 +21,13 @@ void im2col_3dT(
     int alt_pad, int larg_pad,
     int alt_s, int larg_s
 );
+
+void col2im_3dT(
+    const float* restrict COLT,
+    float* restrict GE,
+    int canais,
+    int alt_x, int larg_x,
+    int alt_k, int larg_k,
+    int alt_pad, int larg_pad,
+    int alt_s, int larg_s
+);
