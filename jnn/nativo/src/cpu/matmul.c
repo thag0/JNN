@@ -1,6 +1,5 @@
 #include "matmul.h"
 #include "macros.h"
-#include <stdio.h>
 
 // tilling
 #define BLOCO_LIN_A 32
