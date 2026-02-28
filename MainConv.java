@@ -12,7 +12,7 @@ import jnn.camadas.pooling.MaxPool2D;
 import jnn.core.JNNnative;
 import jnn.dataloader.DataLoader;
 import jnn.dataloader.dataset.CIFAR10;
-import jnn.dataloader.transform.TNorm;
+import jnn.dataloader.transform.Norm;
 import jnn.dataloader.transform.Transform;
 import jnn.io.JNNserial;
 import jnn.modelos.Modelo;
@@ -37,7 +37,7 @@ public class MainConv {
 	public static void main(String[] args) {
 		ged.limparConsole();
 		
-		Transform norm = new TNorm(
+		Transform norm = new Norm(
 			new float[]{0.4914f, 0.4822f, 0.4465f},
 			new float[]{0.247f,  0.243f,  0.261f}
 		);//peguei de um forum do pytorch

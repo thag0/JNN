@@ -8,6 +8,7 @@ import jnn.core.tensor.Tensor;
  * @see jnn.core.tensor.Tensor Tensor
  * @see jnn.dataloader.DataLoader DataLoader
  */
+@FunctionalInterface
 public interface Transform {
     
     /**
@@ -24,6 +25,14 @@ public interface Transform {
      */
     default Transform andThen(Transform tr) {
         return t -> tr.apply(apply(t));
+    }
+
+    /**
+     * Retorna o nome da transformação.
+     * @return Nome da transformação.
+     */
+    default public String nome() {
+        return getClass().getSimpleName();
     }
 
 }

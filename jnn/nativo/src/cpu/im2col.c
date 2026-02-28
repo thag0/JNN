@@ -1,6 +1,5 @@
 #include "im2col.h"
 #include "macros.h"
-#include <string.h>
 
 void im2col_3d(
     const float* restrict X,
@@ -12,12 +11,8 @@ void im2col_3d(
     int alt_s, int larg_s) {
 
     const int area_s = alt_s * larg_s;
-    const int Kdim = canais * alt_k * larg_k;
 
-    //tem que zerar porque pode vir lixo do malloc, principalemnte com padding
-    memset(COL, 0, sizeof(float) * Kdim * area_s);
-
-    #pragma omp parallel for collapse(3) schedule(static)
+    #pragma omp parallel for collapse(2) schedule(static)
     for (int c = 0; c < canais; c++) {
         for (int kh = 0; kh < alt_k; kh++) {
             for (int kw = 0; kw < larg_k; kw++) {
@@ -58,9 +53,6 @@ void im2col_3dT(
     int alt_s, int larg_s) {
 
     const int Kdim = canais * alt_k * larg_k;
-    const int Ndim = alt_s * larg_s;
-
-    memset(COLT, 0, sizeof(float) * Kdim * Ndim);//mesma coisa
 
     #pragma omp parallel for collapse(2) schedule(static)
     for (int i = 0; i < alt_s; i++) {

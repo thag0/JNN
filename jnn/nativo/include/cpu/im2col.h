@@ -11,6 +11,16 @@ void im2col_3d(
     int alt_s, int larg_s
 );
 
+void im2col_3d_tiled(
+    const float* restrict X,
+    float* restrict COL,
+    int C,
+    int H, int W,
+    int KH, int KW,
+    int PH, int PW,
+    int OH, int OW
+);
+
 // Versão do im2col que gera a matriz col transposta.
 void im2col_3dT(
     const float* restrict X,

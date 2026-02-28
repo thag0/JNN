@@ -99,13 +99,12 @@ public class Treinador implements Cloneable {
 
 	/**
 	 * Executa a regra de treino durante um determinado número de épocas.
-	 * @param xs {@code Tensores} contendos os dados de entrada.
-	 * @param ys {@code Tensores} contendos os dados de saída (rótulos).
+	 * @param loader {@code DataLoader} com conjunto de dados.
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param tamLote tamanho do lote de amostras.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	public void executar(Tensor[] xs, Tensor[] ys, int epochs, int tamLote, boolean logs) {
+	public void executar(DataLoader loader, int epochs, int tamLote, boolean logs) {
 		if (tamLote < 1) {
 			throw new IllegalArgumentException(
 				"\nTamanho de lote " + tamLote + " inválido."
@@ -124,11 +123,9 @@ public class Treinador implements Cloneable {
 		
 		modelo.treino(true);	
 		metodo.loop(
-			xs,
-			ys,
+			loader,
 			modelo.otm(),
 			modelo.loss(),
-			xs.length,
 			epochs,
 			logs
 		);
@@ -137,46 +134,13 @@ public class Treinador implements Cloneable {
 
 	/**
 	 * Executa a regra de treino durante um determinado número de épocas.
-	 * @param loader {@code DataLoader} com conjunto de amostras.
+	 * @param loader {@code DataLoader} com conjunto de dados.
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 * @see jnn.dataloader.DataLoader
 	 */
 	public void executar(DataLoader loader, int epochs, boolean logs) {
 		executar(loader, epochs, 1, logs);
-	}
-
-	/**
-	 * Executa a regra de treino durante um determinado número de épocas.
-	 * @param loader {@code DataLoader} com conjunto de amostras.
-	 * @param epochs quantidade de épocas de treinamento.
-	 * @param tamLote tamanho do lote de amostras.
-	 * @param logs logs para perda durante as épocas de treinamento.
-	 * @see jnn.dataloader.DataLoader
-	 */
-	public void executar(DataLoader loader, int epochs, int tamLote, boolean logs) {
-		executar(loader.getX(), loader.getY(), epochs, tamLote, logs);
-	}
-
-	/**
-	 * Executa a regra de treino durante um determinado número de épocas.
-	 * @param xs {@code Tensores} contendos os dados de entrada.
-	 * @param ys {@code Tensores} contendos os dados de saída (rótulos).
-	 * @param epochs quantidade de épocas de treinamento.
-	 */
-	public void executar(Tensor[] xs, Tensor[] ys, int epochs) {
-		executar(xs, ys, epochs, 1, false);
-	}
-
-	/**
-	 * Executa a regra de treino durante um determinado número de épocas.
-	 * @param xs {@code Tensores} contendos os dados de entrada.
-	 * @param ys {@code Tensores} contendos os dados de saída (rótulos).
-	 * @param tamLote tamanho do lote de amostras.
-	 * @param epochs quantidade de épocas de treinamento.
-	 */
-	public void executar(Tensor[] xs, Tensor[] ys, int tamLote, int epochs) {
-		executar(xs, ys, epochs, tamLote, false);
 	}
 
 	/**

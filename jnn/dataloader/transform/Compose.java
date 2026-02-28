@@ -9,36 +9,38 @@ import jnn.core.tensor.Tensor;
  *      Age aplicando uma série de transformações em sequência.
  * </p>
  */
-public class TCompose implements Transform {
+public class Compose implements Transform {
 
     /**
      * Sequência de transformações.
      */
-    private final Transform[] transforms;
+    private final Transform[] ts;
 
     /**
      * Inicializa um novo compositor de transformações.
      * @param ts transformações para aplicação.
      */
-    public TCompose(Transform... ts) {
+    public Compose(Transform... ts) {
         JNNutils.validarNaoNulo(ts, "transforms == null");
+
+        if (ts.length == 0) {
+            throw new IllegalArgumentException(
+                "\nNenhuma transformação fornecida para o compositor."
+            );
+        }
         
         for (var t : ts) {
-            if (t == null) {
-                throw new IllegalArgumentException(
-                    "\nCompose não pode receber transformações nulas."
-                );
-            }
+            JNNutils.validarNaoNulo(t, "transform == null");
         }
 
-        this.transforms = ts;
+        this.ts = ts;
     }
 
     @Override
     public Tensor apply(Tensor t) {
         Tensor out = t.clone();
 
-        for (Transform tr : transforms) {
+        for (Transform tr : ts) {
             out = tr.apply(out);
         }
 

@@ -7,12 +7,13 @@ set ENABLE_NATIVE=--enable-native-access=ALL-UNNAMED
 rem deixar esse jar da jnn sempre primeiro
 set CP_JNN_GED=bin\jnn.jar;lib\ged.jar;testes\bin
 set CP_JNN_GED_GEIM=bin\jnn.jar;lib\ged.jar;lib\geim.jar;testes\bin
+set CP_JNN_GED_VIEW=bin\jnn.jar;lib\ged.jar;lib\geim.jar;lib\jnnview.jar;testes\bin
 
 
 @REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED%" MainConv
 @REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED%" Benchmark
-java %ENABLE_NATIVE% -cp "%CP_JNN_GED_GEIM%" Conv
-@REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED" Playground
+@REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED_GEIM%" Conv
+java %ENABLE_NATIVE% -cp "%CP_JNN_GED_VIEW%" Lab
 @REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED%" TesteConv 1 6
 @REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED_GEIM%" TesteJNI
 

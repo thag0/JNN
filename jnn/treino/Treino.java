@@ -1,6 +1,8 @@
 package jnn.treino;
 
 import jnn.core.tensor.Tensor;
+import jnn.dataloader.Amostra;
+import jnn.dataloader.DataLoader;
 import jnn.metrica.perda.Perda;
 import jnn.modelos.Modelo;
 import jnn.otm.Otimizador;
@@ -29,30 +31,32 @@ public class Treino extends MetodoTreino {
 	}
 
 	@Override
-	protected void loop(Tensor[] x, Tensor[] y, Otimizador otm, Perda loss, int amostras, int epochs, boolean logs) {
+	protected void loop(DataLoader loader, Otimizador otm, Perda loss, int epochs, boolean logs) {
 		if (logs) esconderCursor();
 		long tempo = 0;
 
+		final int n = loader.tam();
 		for (int e = 0; e < epochs; e++) {
 			if (logs) tempo = System.nanoTime();
 
 			float perdaEpoca = 0.0f;
-			embaralhar(x, y);
+			loader.embaralhar();
 			
-			for (int i = 0; i < amostras; i++) {
-				Tensor prev = modelo.forward(x[i]);
+			for (int i = 0; i < n; i++) {
+				Amostra a = loader.get(i);
+				Tensor prev = modelo.forward(a.x());
 				
-				if (calcHist) perdaEpoca += loss.forward(prev, y[i]).item();
+				if (calcHist) perdaEpoca += loss.forward(prev, a.y()).item();
 				
 				modelo.gradZero();
-				backpropagation(loss.backward(prev, y[i]));
+				backpropagation(loss.backward(prev, a.y()));
 				otm.update();
 			}
 			
 			if (logs) {
 				tempo = System.nanoTime() - tempo;
 				limparLinha();
-				String log = "Época " + (e+1) + "/" + epochs + " -> perda: " + (perdaEpoca/amostras);
+				String log = "Época " + (e+1) + "/" + epochs + " -> perda: " + (perdaEpoca/n);
 
 				long segundos = (long) tempo / 1_000_000_000;
 				if (segundos < 60) {
@@ -67,7 +71,7 @@ public class Treino extends MetodoTreino {
 				exibirLogTreino(log);
 			}
 
-			if (calcHist) historico.add(perdaEpoca/amostras);
+			if (calcHist) historico.add(perdaEpoca/n);
 
 			if (callback != null) {
 				callback.run(new InfoEpoca(e, perdaEpoca));

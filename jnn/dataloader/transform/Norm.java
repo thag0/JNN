@@ -6,7 +6,7 @@ import jnn.core.tensor.Tensor;
 /**
  * Transformação de normalização.
  */
-public class TNorm implements Transform {
+public class Norm implements Transform {
 
     /**
      * Média para cada canal.
@@ -30,7 +30,7 @@ public class TNorm implements Transform {
      * @param media valores de média.
      * @param desvp valores de desvio padrão.
      */
-    public TNorm(float[] media, float[] desvp) {
+    public Norm(float[] media, float[] desvp) {
         JNNutils.validarNaoNulo(media, "media == null");
         JNNutils.validarNaoNulo(desvp, "desvp == null");
 

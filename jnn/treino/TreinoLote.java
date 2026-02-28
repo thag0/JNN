@@ -2,6 +2,8 @@ package jnn.treino;
 
 import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
+import jnn.dataloader.DataLoader;
+import jnn.dataloader.LoteAmostra;
 import jnn.metrica.perda.Perda;
 import jnn.modelos.Modelo;
 import jnn.otm.Otimizador;
@@ -40,23 +42,22 @@ public class TreinoLote extends MetodoTreino {
 	}
 
 	@Override
-	protected void loop(Tensor[] x, Tensor[] y, Otimizador otm, Perda loss, int amostras, int epochs, boolean logs) {
+	protected void loop(DataLoader loader, Otimizador otm, Perda loss, int epochs, boolean logs) {
 		if (logs) esconderCursor();
 		long tempo = 0;
 
+		final int n = loader.tam();
 		for (int e = 0; e < epochs; e++) {
 			if (logs) tempo = System.nanoTime();
 
-			embaralhar(x, y);
+			loader.embaralhar();
 			float perdaEpoca = 0.0f;
 
-			for (int i = 0; i < amostras; i += tamLote) {
-				int idFim = Math.min(i + tamLote, amostras);
-				Tensor[] loteX = JNNutils.subArray(x, i, idFim);
-				Tensor[] loteY = JNNutils.subArray(y, i, idFim);
+			for (int i = 0; i < n; i += tamLote) {
+				LoteAmostra lote = loader.lote(i, tamLote);
 
                 modelo.gradZero();
-				perdaEpoca += processoLote(loteX, loteY, loss);
+				perdaEpoca += processoLote(lote.arrX(), lote.arrY(), loss);
                 otm.update();      
 			}
 			
@@ -64,7 +65,7 @@ public class TreinoLote extends MetodoTreino {
 				tempo = System.nanoTime() - tempo;
 
 				limparLinha();
-				String log = "[Época " + (e+1) + "/" + epochs + "] loss: " + (perdaEpoca/amostras);
+				String log = "[Época " + (e+1) + "/" + epochs + "] loss: " + (perdaEpoca/n);
 
 				long segundos = (long) tempo / 1_000_000_000;
 				long min = (segundos / 60);
@@ -78,7 +79,7 @@ public class TreinoLote extends MetodoTreino {
 				exibirLogTreino(log);
 			}
 
-			if (calcHist) historico.add(perdaEpoca / amostras);
+			if (calcHist) historico.add(perdaEpoca / n);
 			
 			if (callback != null) {
 				callback.run(new InfoEpoca(e, perdaEpoca));

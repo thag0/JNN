@@ -288,78 +288,11 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 			if (camada.treinavel()) camada.gradZero();
 		}
 	}
-
-	/**
-	 * Realiza as verificações necessárias nos dados usados pelo modelo.
-	 * @param <T> tipo de dados, comumente usando {@code Tensor}.
-	 * @param xs array contendos dados de entrada.
-	 * @param ys array contendos dados de saída.
-	 */
-	private <T> void validarDados(T[] xs, T[] ys) {
-		JNNutils.validarNaoNulo(xs, "xs == null.");
-		JNNutils.validarNaoNulo(ys, "ys == null.");
- 
-		if (xs.length != ys.length) {
-			throw new IllegalArgumentException(
-				"\nDados de entrada e saída devem conter o mesmo tamanho, " +
-				"recebido x = " + xs.length + " e y = " + ys.length
-			);
-		}
-	}
-
-	/**
-	 * Treina o modelo de acordo com as configurações predefinidas.
-	 * @param xs dados de entrada do treino (features).
-	 * @param ys dados de saída correspondente a entrada (classes).
-	 * @param epochs quantidade de épocas de treinamento.
-	 * @param logs logs para perda durante as épocas de treinamento.
-	 */
-	public void treinar(Tensor[] xs, Tensor[] ys, int epochs, boolean logs) {
-		treinar(xs, ys, epochs, 1, logs);
-	}
 	
 	/**
 	 * Treina o modelo de acordo com as configurações predefinidas utilizando o
 	 * treinamento em lotes.
-	 * @param xs {@code Tensores} contendos os dados de entrada.
-	 * @param ys {@code Tensores} contendos os dados de saída (rótulos).
-	 * @param epochs quantidade de épocas de treinamento.
-	 * @param tamLote tamanho do lote de treinamento.
-	 * @param logs logs para perda durante as épocas de treinamento.
-	 */
-	public void treinar(Tensor[] xs, Tensor[] ys, int epochs, int tamLote, boolean logs) {
-		validarCompilacao();
-		validarDados(xs, ys);
-
-		if (epochs < 1) {
-			throw new IllegalArgumentException(
-				"\nValor de épocas deve ser maior que zero, recebido = " + epochs
-			);
-		}
-
-		if (tamLote < 1) {
-			throw new IllegalArgumentException(
-				"\nValor de lote deve ser maior que zero, recebido = " + tamLote
-			);
-		}
-		
-		_treinador.executar(xs, ys, epochs, tamLote, logs);
-	}
-	
-	/**
-	 * Treina o modelo de acordo com as configurações predefinidas.
-	 * @param loader {@code DataLoader} com dados de treino.
-	 * @param epochs quantidade de épocas de treinamento.
-	 * @param logs logs para perda durante as épocas de treinamento.
-	 */
-	public void treinar(DataLoader loader, int epochs, boolean logs) {
-		treinar(loader, epochs, 1, logs);
-	}
-
-	/**
-	 * Treina o modelo de acordo com as configurações predefinidas
-	 * utilizando o treinamento em lotes.
-	 * @param loader {@code DataLoader} com dados de treino.
+	 * @param loader conjunto de dados para treino.
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param tamLote tamanho do lote de treinamento.
 	 * @param logs logs para perda durante as épocas de treinamento.
@@ -380,6 +313,16 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 		}
 		
 		_treinador.executar(loader, epochs, tamLote, logs);
+	}
+	
+	/**
+	 * Treina o modelo de acordo com as configurações predefinidas.
+	 * @param loader conjunto de dados para treino.
+	 * @param epochs quantidade de épocas de treinamento.
+	 * @param logs logs para perda durante as épocas de treinamento.
+	 */
+	public void treinar(DataLoader loader, int epochs, boolean logs) {
+		treinar(loader, epochs, 1, logs);
 	}
 
 	/**
@@ -402,19 +345,20 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * <pre>
 	 * modelo.avaliador()
 	 * </pre>
-	 * @param xs {@code Tensores} contendo dados de entrada.
-	 * @param ys {@code Tensores} contendo dados de saída correspondente as entradas fornecidas.
+	 * @param loader {@code DataLoader} com conjunto de dados.
 	 * @return {@code Tensor} contendo valor de perda.
 	 */
-	public Tensor avaliar(Tensor[] xs, Tensor[] ys) {
+	public Tensor avaliar(DataLoader loader) {
 		validarCompilacao();
-		validarDados(xs, ys);
 
-		// esse tamamho foi o mais ou menos ideial pra não ficar usando
+		Tensor[] xs = loader.getX();
+		Tensor[] ys = loader.getY();
+
+		// esse tamamho foi o mais ou menos ideal pra não ficar usando
 		// tanta memória e teve um leve ganho em tempo de execução.
 		final int batch = 32;
 
-		final int n = xs.length;
+		final int n = loader.tam();
 		float loss = 0;
 		for (int i = 0; i < n; i += batch) {
 			int inicio = i;
@@ -429,25 +373,12 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 			loss += lossLote * tamLote;
 		}
 
+		// TODO arrumar isso em todo lugar que aparecer
+		// o array criado aqui é recriado na hora de criar o tensor.
+		// duplicando memória e forçando o gc
 		return new Tensor(
 			new float[] { loss / n }
 		);
-	}
-
-	/**
-	 * Avalia o modelo, utilizando a função de perda configurada.
-	 * <p>
-	 *    É possível utilizar outras funções de perda mesmo que sejam diferentes
-	 *    da que o modelo usa, através de:
-	 * </p>
-	 * <pre>
-	 * modelo.avaliador()
-	 * </pre>
-	 * @param loader {@code DataLoader} contendo dados de avaliação.
-	 * @return {@code Tensor} contendo valor de perda.
-	 */
-	public Tensor avaliar(DataLoader loader) {
-		return avaliar(loader.getX(), loader.getY());
 	}
 
 	/**

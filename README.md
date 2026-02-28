@@ -21,7 +21,7 @@ Tensor t = new Tensor(arr);
 t.print();
 ```
 
-# *Saída*
+# *No console*
 ```
 Tensor ([[1.0, 2.0],
          [3.0, 4.0]])
@@ -84,6 +84,20 @@ Importante reforçar que o jni por enquanto suporta apenas windows_x64 e que o u
 <img width="1406" height="600" alt="Image" src="https://github.com/user-attachments/assets/886fcf8a-acf4-4bda-86f1-02f1fb4f7e71" />
 
 *Utilizando callback para capturar acurácia do modelo durante o treino*
+
+# **Data Augmentation**
+
+Iniciando um pouco para a área de visão computacional, adicionei suporte para uso de transoformações de dados, que normalmente são aplicadas no momento em que o dado é requerido no treino.
+
+Esse tipo de aborgadem aumenta a capacidade de generalização de modelos focados na áreas, aumentando artificialmente o conjunto de dados.
+
+<img width="838" height="451" alt="Image" src="https://github.com/user-attachments/assets/efd9761c-4848-4ee2-863c-374af08f9581" />
+
+*Técnica de flip horizontal (HFlip)*
+
+<img width="840" height="447" alt="Image" src="https://github.com/user-attachments/assets/f3b4ce60-b996-424b-acfc-df57c95dc696" />
+
+*Técnica de corte aleatório (RandomCrop)*
 
 # **Adicionais**
 Caso queira ajustar a quantidade de threads alocadas para a biblioteca, chame antes do inicio das inicializações:

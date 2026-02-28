@@ -6,6 +6,7 @@ import java.util.Random;
 import jnn.core.JNNlog;
 import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
+import jnn.dataloader.DataLoader;
 import jnn.metrica.perda.Perda;
 import jnn.modelos.Modelo;
 import jnn.otm.Otimizador;
@@ -87,15 +88,13 @@ public abstract class MetodoTreino {
 
 	/**
 	 * Loop principal de treino.
-	 * @param x {@code array} de {@code Tensor} com dados de entrada.
-	 * @param y {@code array} de {@code Tensor} com dados de saída.
+	 * @param loader {@code DataLoader} com conjunto de dados.
 	 * @param otm otimizador.
 	 * @param loss função de perda.
-	 * @param amostras quantidade de amostras.
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param logs exibir logs de avanço;
 	 */
-	protected abstract void loop(Tensor[] x, Tensor[] y, Otimizador otm, Perda loss, int amostras, int epochs, boolean logs);
+	protected abstract void loop(DataLoader loader, Otimizador otm, Perda loss, int epochs, boolean logs);
 
 	/**
 	 * Embaralha ambos os arrays de entrada e saída.

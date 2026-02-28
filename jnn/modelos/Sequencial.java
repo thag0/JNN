@@ -380,7 +380,7 @@ public class Sequencial extends Modelo {
 		String params = String.format("%,d", numParams());
 		sb.append("\n");
 		sb.append(pad).append("Parâmetros: ").append(params).append("\n");
-		sb.append(pad).append("Tamanho: ").append(JNNutils.formatarTamanho(tamBytes()));
+		sb.append(pad).append("Tamanho: ").append(JNNutils.formatarTamBytes(tamBytes()));
 		sb.append("\n").append("]");
 
 		return sb.toString();

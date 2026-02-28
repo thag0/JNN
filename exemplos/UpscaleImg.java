@@ -9,6 +9,7 @@ import geim.Geim;
 import jnn.JNN;
 import jnn.camadas.*;
 import jnn.camadas.acts.Sigmoid;
+import jnn.camadas.acts.Tanh;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;
@@ -36,28 +37,26 @@ public class UpscaleImg {
 		int nEntrada = 2;// posição x y do pixel
 		int nSaida = 1;// valor de escala de cinza/brilho do pixel
 		DataLoader img = JNN.dataloader(dados, nEntrada, nSaida);
-		img.aplicarX(t -> t.div(255));// normalizar entre 0 e 1
+		img.aplicarY(t -> t.div(255));// normalizar entre 0 e 1
 
 		// Criando modelo
 		// -Neste exemplo queremos que o modelo tenha overfitting
 		Sequencial modelo = new Sequencial(
 			new Entrada(nEntrada),
 			new Densa(12),
-			new Sigmoid(),
+			new Tanh(),
 			new Densa(12),
-			new Sigmoid(),
+			new Tanh(),
 			new Densa(nSaida),
 			new Sigmoid()
 		);
 
 		modelo.setHistorico(true);
-		modelo.compilar(new SGD(0.0001, 0.999), "mse");
+		modelo.compilar(new SGD(0.0001, 0.995), "mse");
 		modelo.treinar(img, 5_000, true);
 
 		// Avaliando o modelo
-		Tensor[] xs = img.getX();
-		Tensor[] ys = img.getY();
-		System.out.println("Perda = " + modelo.avaliar(xs, ys).item());
+		System.out.println("Perda = " + modelo.avaliar(img).item());
 
 		// Salvando dados
 		exportarHistoricoPerda(modelo.hist());// histórico de treino para plot

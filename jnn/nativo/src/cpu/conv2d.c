@@ -106,14 +106,9 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
         .off_b = 0,
         .off_dst = 0,
 
-        .std_a_0 = Kdim,
-        .std_a_1 = 1,
-
-        .std_b_0 = Ndim,
-        .std_b_1 = 1,
-
-        .std_c_0 = Ndim,
-        .std_c_1 = 1,
+        .std_a_0 = Kdim, .std_a_1 = 1,
+        .std_b_0 = Ndim, .std_b_1 = 1,
+        .std_c_0 = Ndim, .std_c_1 = 1,
 
         .lin_a = filtros,
         .col_a = Kdim,
@@ -131,6 +126,8 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
                 linha[i] = bias;
             }
         }
+
+        memset(col, 0, sizeof(float) * Kdim * Ndim);
 
         im2col_3d(
             x_lote,
@@ -279,6 +276,8 @@ static void _backward_gk_im2col(const conv2d_bwd_params_t* params) {
         const float* x_lote = X + l * canais * area_x;
         const float* gs_lote = GS + l * filtros * Ndim;
 
+        memset(colT, 0, sizeof(float) * Ndim * Kdim);
+
         // transposta em memória pra cair no fastpath do mm
         im2col_3dT(
             x_lote,
@@ -298,7 +297,7 @@ static void _backward_gk_im2col(const conv2d_bwd_params_t* params) {
 }
 
 static bool _usar_im2col_gk(const conv2d_bwd_params_t* params) {
-    if (params->canais <= 4) return true;
+    if (params->canais <= 4) return false;
 
     const long peso = 
     (long)params->filtros * (params->canais * params->alt_k * params->larg_k) * (params->alt_x * params->larg_x);
@@ -389,14 +388,14 @@ static void _backward_ge_col2im(const conv2d_bwd_params_t* params) {
         const float* gs_lote = params->GS + l * params->filtros * Ndim;
         float* ge_lote = params->GE + l * params->canais * area_x;;
 
+        memset(colT, 0, sizeof(float) * Ndim * Kdim);
+
         //matmul
         //TODO implementar um fastpath pra esse caso
         // C = A(transp) @ B
         #pragma omp parallel for schedule(static)
         for (int n = 0; n < Ndim; n++) {
             float* restrict lin_col = colT + n * Kdim;
-
-            memset(lin_col, 0, sizeof(float) * Kdim);
 
             for (int f = 0; f < params->filtros; f++) {
                 const float val_g = gs_lote[f * Ndim + n];

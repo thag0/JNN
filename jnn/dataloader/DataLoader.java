@@ -47,20 +47,20 @@ public class DataLoader implements Iterable<Amostra> {
 
     /**
      * Inicializa um DataLoader com uma amostra inicial.
-     * @param a {@code Amostra} desejada.
-     * @see jnn.dataloader.Amostra Amostra
-     */
-    public DataLoader(Amostra a) {
-        add(a);
-    }
-
-    /**
-     * Inicializa um DataLoader com uma amostra inicial.
      * @param as {@code Amostra} desejada.
      * @see jnn.dataloader.Amostra Amostra
      */
     public DataLoader(Amostra[] as) {
         add(as);
+    }
+
+    /**
+     * Inicializa um DataLoader com uma amostra inicial.
+     * @param a {@code Amostra} desejada.
+     * @see jnn.dataloader.Amostra Amostra
+     */
+    public DataLoader(Amostra a) {
+        add(a);
     }
 
     /**
@@ -298,13 +298,17 @@ public class DataLoader implements Iterable<Amostra> {
 
     /**
      * Retorna uma amostra a partir do índice informado.
+     * <p>
+     *      Caso exista uma transformação configurada para
+     *      a amostra, tanto em X como em Y, ela será aplicada.
+     * </p>
      * @param id índice desejado.
      * @return {@code Amostra} baseada no índice.
      */
     public Amostra get(int id) {
         if (tam() < 1) {
             throw new IllegalArgumentException(
-                "\nDataLoader vaizo."
+                "\nDataLoader vazio."
             );
         }
 
@@ -314,30 +318,8 @@ public class DataLoader implements Iterable<Amostra> {
             );
         }
 
-        return dados[id];
-    }
-
-    /**
-     * Retorna uma amostra a partir do índice informado, aplicando uma transformação
-     * em X, caso exista.
-     * @param id índice desejado.
-     * @return {@code Amostra} baseada no índice.
-     */
-    public Amostra gett(int id) {
         if (transformX == null && transformY == null) {
-            return get(id);// sem transformar
-        }
-
-        if (tam() < 1) {
-            throw new IllegalArgumentException(
-                "\nDataLoader vaizo."
-            );
-        }
-
-        if (id < 0 || id >= tam()) {
-            throw new IllegalArgumentException(
-                "\nÍndice " + id + " inválido para total de elementos = " + tam() + "."
-            );
+            return dados[id];
         }
 
         Amostra a = dados[id];
@@ -352,11 +334,16 @@ public class DataLoader implements Iterable<Amostra> {
 
     /**
      * Retorna um conjunto de amostras do DataLoader
+     * <p>
+     *      Caso exista uma transformação configurada no DataLoader, 
+     *      tanto em X como em Y, ela será aplicada em todas as amostras
+     *      do lote.
+     * </p>
      * @param in índice de início (inclusivo).
      * @param tam tamanho do subconjunto.
      * @return lote de dados.
      */
-    public Amostra[] lote(int in, int tam) {
+    public LoteAmostra lote(int in, int tam) {
         if (in < 0) {
             throw new IllegalArgumentException(
                 "\nInicio deve ser maior ou igual a zero, mas recebido " + in
@@ -364,9 +351,17 @@ public class DataLoader implements Iterable<Amostra> {
         }
 
         int fim = Math.min(in + tam, tam());
-        Amostra[] lote = JNNutils.subArray(dados, in, fim);
+        int tamLote = fim - in;
+        
+        Tensor[] xs = new Tensor[tamLote];
+        Tensor[] ys = new Tensor[tamLote];
 
-        return lote;
+        for (int i = 0; i < tamLote; i++) {
+            xs[i] = get(in + i).x();
+            ys[i] = get(in + i).y();
+        }
+
+        return new LoteAmostra(xs, ys);
     }
 
     /**
@@ -377,7 +372,19 @@ public class DataLoader implements Iterable<Amostra> {
      * @return {@code DataLoader} com subamostras.
      */
     public DataLoader subLoader(int in, int tam) {
-        return new DataLoader(lote(in ,tam));
+        LoteAmostra lote = lote(in ,tam);
+        return new DataLoader(lote.arrX(), lote.arrY());
+    }
+
+    /**
+     * Retorna um novo {@code DataLoader} sem as transformações configuradas.
+     * @return {@code DataLoader} sem transformações.
+     */
+    public DataLoader semTransform() {
+        DataLoader clone = clone();
+        clone.transformX = null;
+        clone.transformY = null;
+        return clone;
     }
 
     /**
@@ -388,26 +395,15 @@ public class DataLoader implements Iterable<Amostra> {
         int n = tam();
         Tensor[] xs = new Tensor[n];
 
-        for (int i = 0; i < n; i++) {
-            xs[i] = dados[i].x();
-        }
+        if (transformX != null) {
+            for (int i = 0; i < n; i++) {
+                xs[i] = transformX.apply(dados[i].x());
+            }
 
-        return xs;
-    }
-
-    /**
-     * Retorna todos os elementos de {@code X}, aplicando transformações,
-     * caso existam.
-     * @return {@code array} de {@code Tensor} contendo X transformado.
-     */
-    public Tensor[] gettX() {
-        if (transformX == null) return getX();
-
-        int n = tam();
-        Tensor[] xs = new Tensor[n];
-
-        for (int i = 0; i < n; i++) {
-            xs[i] = transformX.apply(dados[i].x());
+        } else {
+            for (int i = 0; i < n; i++) {
+                xs[i] = dados[i].x();
+            }
         }
 
         return xs;
@@ -421,26 +417,15 @@ public class DataLoader implements Iterable<Amostra> {
         int n = tam();
         Tensor[] ys = new Tensor[n];
 
-        for (int i = 0; i < n; i++) {
-            ys[i] = dados[i].y();
-        }
+        if (transformY != null) {
+            for (int i = 0; i < n; i++) {
+                ys[i] = transformY.apply(dados[i].y());
+            }
 
-        return ys;
-    }
-
-    /**
-     * Retorna todos os elementos de {@code Y}, aplicando transformações,
-     * caso existam.
-     * @return {@code array} de {@code Tensor} contendo Y transformado.
-     */
-    public Tensor[] gettY() {
-        if (transformY == null) return getY();
-
-        int n = tam();
-        Tensor[] ys = new Tensor[n];
-
-        for (int i = 0; i < n; i++) {
-            ys[i] = transformY.apply(dados[i].y());
+        } else {
+            for (int i = 0; i < n; i++) {
+                ys[i] = dados[i].y();
+            }
         }
 
         return ys;
@@ -468,6 +453,10 @@ public class DataLoader implements Iterable<Amostra> {
         @Override
         public Amostra next() {
             Amostra amostra = dados[id++];
+
+            if (transformX == null && transformY == null) {
+                return amostra;
+            }
 
             Tensor x = amostra.x();
             Tensor y = amostra.y();
@@ -530,7 +519,10 @@ public class DataLoader implements Iterable<Amostra> {
             sb.append(pad).append("Shape Y: ").append(dados[0].y().shapeStr()).append("\n");
         }
 
-        sb.append(pad).append("Tamanho: ").append(JNNutils.formatarTamanho(tamBytes())).append("\n");
+        sb.append(pad).append("Tamanho: ").append(JNNutils.formatarTamBytes(tamBytes())).append("\n");
+
+        sb.append(pad).append("Tx: ").append(transformX == null ? "-" : transformX.nome()).append("\n");
+        sb.append(pad).append("Ty: ").append(transformY == null ? "-" : transformY.nome()).append("\n");
 
         sb.append("]\n");
 
