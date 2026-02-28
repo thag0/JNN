@@ -20,10 +20,7 @@ public class MAE extends Perda {
 		if (prev.numDim() == 1) {
 			final int tam = prev.tam();
 			float mae = f(prev, real, tam);
-			
-			return new Tensor(
-				new float[]{ (mae/tam) }
-			);
+			return new Tensor(1).set((mae/tam), 0);
 		
 		} else {
 			final int lotes = prev.tamDim(0);
@@ -38,9 +35,7 @@ public class MAE extends Perda {
 				somaLote += somaAmostras / amostras;
 			}
 
-			return new Tensor(
-				new float[]{somaLote / lotes}
-			);
+			return new Tensor(1).set((somaLote / lotes), 0);
 		}
 	}
 

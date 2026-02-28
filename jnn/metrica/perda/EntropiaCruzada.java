@@ -23,9 +23,7 @@ public class EntropiaCruzada extends Perda {
 			int tam = prev.tam();
 			float ec = f(prev, real, tam);
 			
-			return new Tensor(
-				new float[]{ -ec/tam }
-			);
+			return new Tensor(1).set((-ec/tam), 0);
 		}
 
 		int lotes = prev.tamDim(0);
@@ -40,9 +38,7 @@ public class EntropiaCruzada extends Perda {
 			somaLote += -ec;
 		}
 
-		return new Tensor(
-			new float[] {somaLote / lotes}
-		);
+		return new Tensor(1).set((somaLote / lotes), 0);
 	}
 
 	/**

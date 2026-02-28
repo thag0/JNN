@@ -22,10 +22,8 @@ import jnn.core.tensor.Tensor;
         if (prev.numDim() == 1) {
             int tam = prev.tam();
             float ecb = f(prev, real, tam);
-            return new Tensor(
-				new float[]{ -ecb / tam }
-			);
-
+            
+			return new Tensor(1).set((-ecb / tam), 0);
         }
 
 		final int lotes = prev.tamDim(0);
@@ -40,9 +38,8 @@ import jnn.core.tensor.Tensor;
 			somaLote += -soma / amostras;
 		}
 
-		return new Tensor(
-			new float[]{ somaLote / lotes }
-		);        
+
+		return new Tensor(1).set((somaLote / lotes), 0);
 	}
 
 	/**

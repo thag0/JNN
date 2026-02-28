@@ -21,9 +21,7 @@ public class MSE extends Perda {
 			final int tam = prev.tam();
 			float mse = f(prev, real, tam);
 			
-			return new Tensor(
-				new float[]{ (mse/tam) }
-			);
+			return new Tensor(1).set((mse / tam), 0);
 		} 
 
 		final int lotes = prev.tamDim(0);
@@ -38,9 +36,7 @@ public class MSE extends Perda {
 			somaLote += somaAmostras / amostras;
 		}
 
-		return new Tensor(
-			new float[]{somaLote / lotes}
-		);
+		return new Tensor(1).set((somaLote / lotes), 0);
 	}
 
 	/**

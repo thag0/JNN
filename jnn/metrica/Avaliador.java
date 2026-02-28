@@ -208,10 +208,8 @@ public class Avaliador {
 			int tamLote = fim - inicio;
 			acertos += accLote * tamLote;
 		}
-		
-		return new Tensor(
-			new float[] { acertos / n }
-		);
+
+		return new Tensor(1).set(acertos / n, 0);
 	}
 
 	/**

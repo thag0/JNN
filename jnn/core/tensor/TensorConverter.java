@@ -37,7 +37,9 @@ public class TensorConverter {
         validarShape(obj, shape, 0);
         float[] dados = achatarDados(obj, shape);
 
-		return new Tensor(dados).reshape(shape);
+		return new Tensor(dados.length)
+        .copiar(dados)
+        .reshape(shape);
     }
 
     /**

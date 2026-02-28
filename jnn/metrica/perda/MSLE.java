@@ -23,9 +23,7 @@ public class MSLE extends Perda {
 			int tam = prev.tam();
 			float emql = f(prev, real, tam);
 			
-			return new Tensor(
-				new float[]{ (emql/tam) }
-			);
+			return new Tensor(1).set((emql/tam), 0);
 		}
 
         int lotes = prev.tamDim(0);
@@ -39,7 +37,8 @@ public class MSLE extends Perda {
             somaLote += f(p, r, amostras) / amostras;
         }
 
-        return new Tensor(new float[]{ somaLote / lotes });
+
+        return new Tensor(1).set((somaLote / lotes), 0);
 	}
 
 	/**

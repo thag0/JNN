@@ -24,9 +24,7 @@ public class F1Score extends Metrica {
 		Tensor mat = super.matrizConfusao(prev, real);
 		float f1score = f1score(mat);
 
-		return new Tensor(
-			new float[]{ f1score }
-		);
+		return new Tensor(1).set(f1score, 0);
 	}
 
 	/**

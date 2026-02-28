@@ -33,8 +33,6 @@ public class Acuracia extends Metrica {
 
 		float acc = (float) acertos / n;
 
-		return new Tensor(
-			new float[]{ acc }
-		);
+		return new Tensor(1).set(acc, 0);
 	}
 }

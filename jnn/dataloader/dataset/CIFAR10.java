@@ -187,13 +187,13 @@ public class CIFAR10 {
             }
 
             // CIFAR vem em RRR.. GGG.. BBB..
-            Tensor x = new Tensor(img).reshape(3, IMG_TAM, IMG_TAM);
+            Tensor x = new Tensor(img.length).copiar(img).reshape(3, IMG_TAM, IMG_TAM);
 
             float[] y = new float[NUM_CLASSES];
             y[label] = 1.0f;
 
             imagens.add(x);
-            labels.add(new Tensor(y));
+            labels.add(new Tensor(y.length).copiar(y));
         }
     }
 

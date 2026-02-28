@@ -178,7 +178,7 @@ public final class JNNutils {
 
 		Tensor[] arr = new Tensor[n];
 		for (int i = 0; i < n; i++) {
-			arr[i] = new Tensor(new float[]{ array[i] });
+			arr[i] = new Tensor(1).set(array[i], 0);
 			arr[i].nome("amostra " + i);// ajudar no debug
 		}
 

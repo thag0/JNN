@@ -21,9 +21,8 @@ public class RMSE extends Perda {
 			int tam = prev.tam();
 			float rmse = f(prev, real, tam);
 			
-			return new Tensor(
-				new float[]{ (float) Math.sqrt(rmse / tam) }
-			);
+			return new Tensor(1)
+			.set((float) Math.sqrt(rmse / tam), 0);
 		}
 
         int lotes = prev.tamDim(0);
@@ -38,9 +37,8 @@ public class RMSE extends Perda {
             somaLote += Math.sqrt(soma);
         }
 
-        return new Tensor(
-			new float[]{ somaLote / lotes }
-		);
+        return new Tensor(1)
+		.set((somaLote / lotes), 0);
 	}
 
 	/**

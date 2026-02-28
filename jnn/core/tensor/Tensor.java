@@ -1634,9 +1634,7 @@ public class Tensor implements Iterable<Float>, Cloneable {
 			res = fun.apply(res, val);
 		}
 
-		return new Tensor(
-			new float[]{ res }
-		);
+		return new Tensor(1).set(res, 0);
 	}
 
 	/**
@@ -1646,9 +1644,7 @@ public class Tensor implements Iterable<Float>, Cloneable {
 	 */
     public Tensor soma() {
 		float soma = dados.soma();
-		return new Tensor(
-			new float[]{ soma }
-		);
+		return new Tensor(1).set(soma, 0);
     }
 
 	/**
@@ -1658,9 +1654,7 @@ public class Tensor implements Iterable<Float>, Cloneable {
 	 */
 	public Tensor media() {
 		float med = dados.media();
-		return new Tensor(
-			new float[]{ med }
-		);
+		return new Tensor(1).set(med, 0);
     }
 
 	/**
@@ -1670,9 +1664,7 @@ public class Tensor implements Iterable<Float>, Cloneable {
 	 */
 	public Tensor max() {
 		float max = dados.max();
-		return new Tensor(
-			new float[]{ max }
-		);
+		return new Tensor(1).set(max, 0);
 	}
 
 	/**
@@ -1682,9 +1674,7 @@ public class Tensor implements Iterable<Float>, Cloneable {
 	 */
 	public Tensor min() {
 		float min = dados.min();
-		return new Tensor(
-			new float[]{ min }
-		);
+		return new Tensor(1).set(min, 0);
 	}
 
 	/**
@@ -1694,9 +1684,7 @@ public class Tensor implements Iterable<Float>, Cloneable {
      */
 	public Tensor desvp() {
 		float desvp = dados.desvp();
-		return new Tensor(
-			new float[] { desvp }
-		);
+		return new Tensor(1).set(desvp, 0);
 	}
 
 	/**
@@ -2275,7 +2263,7 @@ public class Tensor implements Iterable<Float>, Cloneable {
 
 		// escalar
 		if (numDim() == 1) {
-			return new Tensor(new float[] { dados.get(dim) });
+			return new Tensor(1).set(dados.get(dim), 0);
 		}
 
 		int[] novoShape = Arrays.copyOfRange(shape, 1, shape.length);

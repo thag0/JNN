@@ -373,12 +373,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 			loss += lossLote * tamLote;
 		}
 
-		// TODO arrumar isso em todo lugar que aparecer
-		// o array criado aqui é recriado na hora de criar o tensor.
-		// duplicando memória e forçando o gc
-		return new Tensor(
-			new float[] { loss / n }
-		);
+		return new Tensor(1).set((loss / n), 0);
 	}
 
 	/**
