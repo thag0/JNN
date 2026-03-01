@@ -6,6 +6,7 @@ import jnn.camadas.Camada;
 import jnn.camadas.Entrada;
 import jnn.core.Dicionario;
 import jnn.core.JNNutils;
+import jnn.core.tensor.Tensor;
 import jnn.metrica.Avaliador;
 import jnn.treino.Treinador;
 
@@ -380,8 +381,20 @@ public class Sequencial extends Modelo {
 		String params = String.format("%,d", numParams());
 		sb.append("\n");
 		sb.append(pad).append("Parâmetros: ").append(params).append("\n");
-		sb.append(pad).append("Tamanho: ").append(JNNutils.formatarTamBytes(tamBytes()));
-		sb.append("\n").append("]");
+		
+		long tamParams = 0;
+		for (Camada camada : this) {
+			if (camada.treinavel()) {
+				for (Tensor param : camada.params()) {
+					tamParams += param.tamBytes();
+				}
+			}
+		}
+		sb.append(pad).append("Tamanho Params: ").append(JNNutils.formatarTamBytes(tamParams)).append("\n");
+		
+		sb.append(pad).append("Tamanho Total: ").append(JNNutils.formatarTamBytes(tamBytes())).append("\n");
+
+		sb.append("]");
 
 		return sb.toString();
 	}

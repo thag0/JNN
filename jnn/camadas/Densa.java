@@ -268,16 +268,16 @@ public class Densa extends Camada implements Cloneable {
 			);
 		}
 
-		_saida  	= addParam("Saida", _numNeuronios);
+		_saida  	= addBuffer("Saida", _numNeuronios);
 		_kernel 	= addParam("Kernel", _tamEntrada, _numNeuronios);
-		_gradKernel = addParam("Grad Kernel", _kernel.shape());
+		_gradKernel = addGrad("Grad Kernel", _kernel.shape());
 
 		if (usarBias) {
 			_bias 	  = Optional.of(addParam("Bias", _saida.shape()));
-			_gradBias = Optional.of(addParam("Grad Bias", _saida.shape()));
+			_gradBias = Optional.of(addGrad("Grad Bias", _saida.shape()));
 		}
 
-		_gradEntrada = addParam("Grad Entrada", _tamEntrada);
+		_gradEntrada = addBuffer("Grad Entrada", _tamEntrada);
 		
 		_treinavel = true;// camada pode ser treinada.
 		_construida = true;// camada pode ser usada.
@@ -298,14 +298,19 @@ public class Densa extends Camada implements Cloneable {
 
 	@Override
 	public void ajustarParaLote(int tamLote) {
+		int[] shapeIn, shapeOut;
+
 		if (tamLote == 0) {
-			_gradEntrada = addParam("Grad Entrada", _tamEntrada);
-			_saida = addParam("Saida", _numNeuronios);
-		
+			shapeIn = new int[]{ _tamEntrada };
+			shapeOut = new int[]{ _numNeuronios };
+			
 		} else {
-			_gradEntrada = addParam("Grad Entrada", tamLote,  _tamEntrada);
-			_saida = addParam("Saida", tamLote,  _numNeuronios);
+			shapeIn = new int[]{ tamLote, _tamEntrada };
+			shapeOut = new int[]{ tamLote, _numNeuronios };
 		}
+
+		_gradEntrada = addBuffer("Grad Entrada", shapeIn);
+		_saida 		 = addBuffer("Saida", shapeOut);
 		
 		this._tamLote = tamLote;
 	}
@@ -341,8 +346,6 @@ public class Densa extends Camada implements Cloneable {
 		verificarConstrucao();
 		
 		_gradSaida = g.contiguous();
-
-		// act.backward(this, g);
 		
 		_gradEntrada.zero();
 
@@ -510,18 +513,6 @@ public class Densa extends Camada implements Cloneable {
 	}
 
 	@Override
-	public Tensor kernel() {
-		verificarConstrucao();
-		return _kernel;
-	}
-
-	@Override
-	public Tensor gradKernel() {
-		verificarConstrucao();
-		return _gradKernel;
-	}
-
-	@Override
 	public Tensor bias() {
 		verificarConstrucao();
 
@@ -547,22 +538,15 @@ public class Densa extends Camada implements Cloneable {
 
 	@Override
 	public long tamBytes() {
-		long tamVars = super.tamBytes(); //base camada
+		long tamVars = super.tamBytes(); //base camada + tensores
 		tamVars += 4; //tamEntrada
 		tamVars += 4; //numNeuronios
 		tamVars += 4; //tamLote
 		tamVars += 1; //usarBias
 
 		long tamTensores =
-		_kernel.tamBytes() +
 		_saida.tamBytes() +
-		_gradEntrada.tamBytes() +
-		_gradKernel.tamBytes();
-
-		if (temBias()) {
-			tamTensores += _bias.get().tamBytes();
-			tamTensores += _gradBias.get().tamBytes();
-		}
+		_gradEntrada.tamBytes();
 
 		return tamVars + tamTensores;
 	}

@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import jnn.camadas.Conv2D;
+import jnn.core.tensor.Tensor;
 import jnn.io.seriais.SerialBase;
 import jnn.io.seriais.SerializadorCamada;
 
@@ -38,11 +39,13 @@ class SerialConv extends SerialBase implements SerializadorCamada<Conv2D> {
 	
 		escrever(dos, camada.temBias());
 
-		float[] kernel = camada.kernel().data().paraArray();
+		Tensor[] params = camada.params();
+		
+		float[] kernel = params[0].data().paraArray();
 		escrever(dos, kernel);
 
 		if (camada.temBias()) {
-			float[] bias = camada.bias().data().paraArray();
+			float[] bias = params[1].data().paraArray();
 			escrever(dos, bias);
 		}
 	}
@@ -66,8 +69,11 @@ class SerialConv extends SerialBase implements SerializadorCamada<Conv2D> {
 		camada.setBias(temBias);
 		camada.construir(shapeIn);
 
-		camada.kernel().copiarElementos(kernel);
-		if (temBias) camada.bias().copiarElementos(bias);
+		Tensor[] params = camada.params();
+		
+		params[0].copiarElementos(kernel);
+
+		if (temBias) params[1].copiarElementos(bias);
 
 		return camada;
 	}

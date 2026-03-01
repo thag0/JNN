@@ -130,8 +130,8 @@ public class GlobalAvgPool2D extends Camada implements Cloneable {
 
         shapeOut[0] = shapeIn[0];//canais
 
-        _gradEntrada = addParam("Grad Entrada", shapeIn);
-        _saida       = addParam("Saida", shapeOut);
+        _gradEntrada = addBuffer("Grad Entrada", shapeIn);
+        _saida       = addBuffer("Saida", shapeOut);
 
         _treinavel = false;
         _construida = true;
@@ -161,8 +161,8 @@ public class GlobalAvgPool2D extends Camada implements Cloneable {
             out[1] = shapeOut[0];
         }
 
-        _gradEntrada = addParam("Grad Entrada", in);
-        _saida       = addParam("Saida", out);
+        _gradEntrada = addBuffer("Grad Entrada", in);
+        _saida       = addBuffer("Saida", out);
 
         this.tamLote = tamLote;
     }
@@ -238,7 +238,7 @@ public class GlobalAvgPool2D extends Camada implements Cloneable {
 
     @Override
     public long tamBytes() {
-		long tamVars = super.tamBytes(); //base camada
+		long tamVars = super.tamBytes(); //base camada + tensores
 		tamVars += 4 * shapeIn.length; 
 		tamVars += 4 * shapeOut.length; 
 		tamVars += 4;//tamLote 

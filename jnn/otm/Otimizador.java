@@ -1,10 +1,11 @@
 package jnn.otm;
 
-import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 
 /**
- * <p>Otimizador base</p>
+ * <p>
+ *		Otimizador base
+ * </p>
  * <p>
  *		Novos otimizadores devem implementar os métodos {@code construir()} 
  *		e {@code atualizar()} que são chamados obrigatoriamente no momento da 
@@ -78,13 +79,8 @@ public abstract class Otimizador {
 			}
 		}
 
-		for (Tensor p : params) {
-			_params = JNNutils.addEmArray(_params, p);	
-		}
-
-		for (Tensor g : grads) {
-			_grads = JNNutils.addEmArray(_grads, g);
-		}
+		_params = params;
+		_grads = grads;
 	}
 
 	/**

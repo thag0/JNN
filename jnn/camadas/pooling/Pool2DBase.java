@@ -154,8 +154,8 @@ public abstract class Pool2DBase extends Camada {
 			);
 		}
 		
-		_gradEntrada = addParam("Grad Entrada", shapeIn);
-		_saida 		 = addParam("Saida", shapeOut);
+		_gradEntrada = addBuffer("Grad Entrada", shapeIn);
+		_saida 		 = addBuffer("Saida", shapeOut);
 
 		_construida = true;// camada pode ser usada
     }
@@ -166,8 +166,8 @@ public abstract class Pool2DBase extends Camada {
 	@Override
 	public void ajustarParaLote(int tamLote) {
 		if (tamLote == 0) {
-			_gradEntrada = addParam("Grad Entrada", shapeIn);
-			_saida = addParam("Saida", shapeOut);
+			_gradEntrada = addBuffer("Grad Entrada", shapeIn);
+			_saida = addBuffer("Saida", shapeOut);
 			
 		} else {
 			final int canais = shapeIn[0];
@@ -176,8 +176,8 @@ public abstract class Pool2DBase extends Camada {
 			final int altOut = shapeOut[1];
 			final int largOut = shapeOut[2];
 			
-			_gradEntrada = addParam("Grad Entrada", tamLote, canais, altIn, largIn);
-			_saida = addParam("Saida", tamLote, canais, altOut, largOut);
+			_gradEntrada = addBuffer("Grad Entrada", tamLote, canais, altIn, largIn);
+			_saida = addBuffer("Saida", tamLote, canais, altOut, largOut);
 		}
 
 
@@ -354,18 +354,7 @@ public abstract class Pool2DBase extends Camada {
     
 	@Override
 	public long tamBytes() {
-		String jvmBits = System.getProperty("sun.arch.data.model");
-        long bits = Long.valueOf(jvmBits);
-
-        long tamObj;
-		// overhead da jvm
-        if (bits == 32) tamObj = 8;
-        else if (bits == 64) tamObj = 16;
-        else throw new IllegalStateException(
-            "\nSem suporte para plataforma de " + bits + " bits."
-        );
-
-		long tamVars = super.tamBytes(); //base camada
+		long tamVars = super.tamBytes(); //base camada + tensores
 		tamVars += 4 * shapeIn.length; 
 		tamVars += 4 * shapeOut.length; 
 		tamVars += 4; //tamLote; 
@@ -374,7 +363,7 @@ public abstract class Pool2DBase extends Camada {
 		_saida.tamBytes() +
 		_gradEntrada.tamBytes();
 
-		return tamObj + tamVars + tamTensores;
+		return tamVars + tamTensores;
 	}
 
 }

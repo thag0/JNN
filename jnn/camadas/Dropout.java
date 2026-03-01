@@ -126,9 +126,9 @@ public class Dropout extends Camada implements Cloneable {
 
 		shapeIn = shape.clone();
 
-		_gradEntrada = addParam("Grad Entrada", shapeIn);
-		_mascara 	 = addParam("Mascara", shapeIn);
-		_saida 		 = addParam("Saida", shapeIn);
+		_gradEntrada = addBuffer("Grad Entrada", shapeIn);
+		_mascara 	 = addBuffer("Mascara", shapeIn);
+		_saida 		 = addBuffer("Saida", shapeIn);
 
 		dimBase = _gradEntrada.numDim();
 		
@@ -140,21 +140,21 @@ public class Dropout extends Camada implements Cloneable {
 
 	@Override
 	public void ajustarParaLote(int tamLote) {
+		int[] shape;
 		if (tamLote == 0) {
-			_gradEntrada = addParam("Grad Entrada", shapeIn);
+			shape = shapeIn;
 			
 		} else {
-			int[] shape = new int[shapeIn.length + 1];
+			shape = new int[shapeIn.length + 1];
 			shape[0] = tamLote;
 			for (int i = 0; i < shapeIn.length; i++) {
 				shape[i+1] = shapeIn[i];
 			}
-
-			_gradEntrada = addParam("Grad Entrada", shape);
 		}
-		
-		_saida = addParam("Saida", _gradEntrada.shape());
-		_mascara = addParam("Mascara", _gradEntrada.shape());
+
+		_gradEntrada = addBuffer("Grad Entrada", shape);
+		_saida = addBuffer("Saida", _gradEntrada.shape());
+		_mascara = addBuffer("Mascara", _gradEntrada.shape());
 
 		this.tamLote = tamLote;
 	}
@@ -311,7 +311,7 @@ public class Dropout extends Camada implements Cloneable {
 
 	@Override
 	public long tamBytes() {
-		long tamVars = super.tamBytes(); //base camada
+		long tamVars = super.tamBytes(); //base camada + tensores
 		tamVars += 4; //taxa 
 		tamVars += 4 * shapeIn.length; 
 		tamVars += 4; //dimbase

@@ -449,13 +449,12 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * @return array de {@code Tensor} contendo os parâmetros do modelo.
 	 */
 	public Tensor[] params() {
-		Tensor[] params = new Tensor[0];
+		Tensor[] params = {};
 
 		for (Camada camada : this) {
 			if (camada.treinavel()) {
-				params = JNNutils.addEmArray(params, camada.kernel());
-				if (camada.temBias()) {
-					params = JNNutils.addEmArray(params, camada.bias());
+				for (Tensor p : camada.params()) {
+					params = JNNutils.addEmArray(params, p);
 				}
 			}
 		}
@@ -479,9 +478,8 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 
 		for (Camada camada : this) {
 			if (camada.treinavel()) {
-				grads = JNNutils.addEmArray(grads, camada.gradKernel());
-				if (camada.temBias()) {
-					grads = JNNutils.addEmArray(grads, camada.gradBias());
+				for (Tensor g : camada.grads()) {
+					grads = JNNutils.addEmArray(grads, g);
 				}
 			}
 		}

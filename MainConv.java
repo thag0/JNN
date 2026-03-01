@@ -26,8 +26,8 @@ public class MainConv {
 	static Ged ged = new Ged();
 
 	// controle de treino
-	static final int TREINO_EPOCAS = 100;
-	static final int TREINO_LOTE = 64;
+	static final int TREINO_EPOCAS = 30;
+	static final int TREINO_LOTE = 32;
 	static final boolean TREINO_LOGS = true;
 
 	// caminhos de arquivos externos
@@ -115,25 +115,19 @@ public class MainConv {
 
 			new Conv2D(32, convK, "same", "he"),
 			new ReLU(),
-			new Conv2D(32, convK, "same", "he"),
-			new ReLU(),
 			new MaxPool2D(poolK),
 			
 			new Conv2D(64, convK, "same", "he"),
 			new ReLU(),
-			new Conv2D(64, convK, "same", "he"),
-			new ReLU(),
 			new MaxPool2D(poolK),
 			
-			new Conv2D(128, convK, "same", "he"),
-			new ReLU(),
 			new Conv2D(128, convK, "same", "he"),
 			new ReLU(),
 			new MaxPool2D(poolK),
 
 			new GlobalAvgPool2D(),
 
-			new Dropout(0.5),
+			new Dropout(0.2),
 			new Densa(128, "he"),
 			new ReLU(),
 

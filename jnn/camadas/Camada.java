@@ -1,5 +1,6 @@
 package jnn.camadas;
 
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -74,6 +75,16 @@ public abstract class Camada {
 	 * Identificador único da camada.
 	 */
 	public int id;
+
+	/**
+	 * Array de parâmetros treináveis.
+	 */
+	Tensor[] _params = {};
+
+	/**
+	 * Array de gradientes dos parâmetros treináveis.
+	 */
+	Tensor[] _grads = {};
 
 	/**
 	 * Instancia a camada base usada dentro dos modelos de Rede Neural.
@@ -153,12 +164,46 @@ public abstract class Camada {
 
 	/**
 	 * Inicializa um {@code Tensor} vazio com nome especificado.
+	 * <p>
+	 *		O tensor criado é adicionado aos parâmetros treináveis da camada,
+	 *		este que é passado para o otimizador para atualização durante o treino.
+	 * </p>
 	 * @param shape {@code array} contendo os valores das dimensões do tensor.
 	 * @param nome {@code String} contendo nome desejado.
 	 * @return {@code Tensor} criado.
 	 */
 	protected Tensor addParam(String nome, int... shape) {
-		return new Tensor(shape).nome(nome);
+		Tensor p = new Tensor(shape).nome(nome);
+		_params = JNNutils.addEmArray(_params, p);
+		return p;
+	}
+
+	/**
+	 * Inicializa um {@code Tensor} vazio com nome especificado.
+	 * <p>
+	 *		O tensor criado é adicionado aos gradientes dos parâmetros treináveis 
+	 *		da camada, este que é passado para o otimizador para atualização durante o treino.
+	 * </p>
+	 * @param shape {@code array} contendo os valores das dimensões do tensor.
+	 * @param nome {@code String} contendo nome desejado.
+	 * @return {@code Tensor} criado.
+	 */
+	protected Tensor addGrad(String nome, int... shape) {
+		Tensor g = new Tensor(shape).nome(nome);
+		_grads = JNNutils.addEmArray(_grads, g);
+		return g;
+	}
+
+	/**
+	 * Inicializa um {@code Tensor} vazio com nome especificado.
+	 * @param shape {@code array} contendo os valores das dimensões do tensor.
+	 * @param nome {@code String} contendo nome desejado.
+	 * @return {@code Tensor} criado.
+	 */
+	protected Tensor addBuffer(String nome, int... shape) {
+		Tensor b = new Tensor(shape).nome(nome);
+		// aqui não é adicionado nada
+		return b;
 	}
 
 	/**
@@ -241,32 +286,6 @@ public abstract class Camada {
 	public boolean temBias() {
 		throw new UnsupportedOperationException(
 			"\nCamada " + nome() + " não possui verificação de bias."
-		);
-	}
-
-	/**
-	 * Retorna o kernel da camada.
-	 * <p>
-	 *    <strong> O kernel só existe em camadas treináveis </strong>.
-	 * </p>
-	 * @return {@code Tensor} de kernel da camada.
-	 */
-	public Tensor kernel() {
-		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui kernel."
-		);
-	}
-
-	/**
-	 * Retorna o gradiente do kernel da camada.
-	 * <p>
-	 *    <strong> O gradiente do kernel só existe em camadas treináveis </strong>.
-	 * </p>
-	 * @return {@code Tensor} de gradiente em relação ao kernel da camada.
-	 */
-	public Tensor gradKernel() {
-		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui gradiente de kernel."
 		);
 	}
 
@@ -369,10 +388,39 @@ public abstract class Camada {
             "\nSem suporte para plataforma de " + bits + " bits."
         );
 
+		long tamTensores = 0;
+		if (treinavel()) {
+			for (Tensor p : _params) {
+				tamTensores += p.tamBytes();
+			}
+			
+			for (Tensor g : _grads) {
+				tamTensores += g.tamBytes();
+			}
+		}
+
 		return tamObj +
 			1 + //treinavel 
 			1 + //construida
 			1 + //treinando
-			4; //id
+			4 + //id
+			tamTensores;
 	}
+
+	/**
+	 * Retorna um array contendo os parâmetros treináveis da camada.
+	 * @return array de parâmetros treináveis da camada.
+	 */
+	public Tensor[] params() {
+		return _params;
+	}
+
+	/**
+	 * Retorna um array contendo os gradientes dos parâmetros treináveis da camada.
+	 * @return array de gradientes dos parâmetros treináveis da camada.
+	 */
+	public Tensor[] grads() {
+		return _grads;
+	}
+
 }

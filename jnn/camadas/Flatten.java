@@ -130,8 +130,8 @@ public class Flatten extends Camada implements Cloneable {
 
 		shapeOut = new int[]{ totalFlatten };
 
-		_gradEntrada = addParam("Grad Entrada", shapeIn);
-		_saida 		 = addParam("Saida", shapeOut);
+		_gradEntrada = addBuffer("Grad Entrada", shapeIn);
+		_saida 		 = addBuffer("Saida", shapeOut);
 
 		_construida = true;// camada pode ser usada.
 	}
@@ -142,8 +142,8 @@ public class Flatten extends Camada implements Cloneable {
 	@Override
 	public void ajustarParaLote(int tamLote) {
 		if (tamLote == 0) {
-			_gradEntrada = addParam("Grad Entrada", shapeIn);
-			_saida 		= addParam("Saida", tamSaida());
+			_gradEntrada = addBuffer("Grad Entrada", shapeIn);
+			_saida 		= addBuffer("Saida", tamSaida());
 		
 		} else {
 			int[] shape = new int[shapeIn.length + 1];
@@ -152,8 +152,8 @@ public class Flatten extends Camada implements Cloneable {
 				shape[i+1] = shapeIn[i];
 			}
 
-			_gradEntrada = addParam("Grad Entrada", shape);
-			_saida		= addParam("Saida", tamLote, totalFlatten);
+			_gradEntrada = addBuffer("Grad Entrada", shape);
+			_saida		= addBuffer("Saida", tamLote, totalFlatten);
 		}
 
 		
@@ -301,7 +301,7 @@ public class Flatten extends Camada implements Cloneable {
 
 	@Override
 	public long tamBytes() {
-		long tamVars = super.tamBytes(); //base camada
+		long tamVars = super.tamBytes(); //base camada + tensores
 		tamVars += 4 * shapeIn.length; 
 		tamVars += 4 * shapeOut.length; 
 		tamVars += 4; //totalFlatten
