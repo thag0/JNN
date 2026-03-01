@@ -183,6 +183,16 @@ public final class JNN {
     }
 
     /**
+     * Realiza a operação {@code C = A @ B} (Produto Matricial).
+     * @param a {@code Tensor} A.
+     * @param b {@code Tensor} B.
+     * @param c {@code Tensor} resultado.
+     */
+    public static void matmul(Tensor a, Tensor b, Tensor c) {
+        ops.matmul(a, b, c);
+    }
+
+    /**
      * Realiza a operação {@code A / B}.
      * @param a {@code Tensor} A.
      * @param b {@code Tensor} B.
@@ -190,7 +200,7 @@ public final class JNN {
      */
     public static Tensor div(Tensor a, Tensor b) {
         try {
-            return new Tensor(a).mul(b);
+            return new Tensor(a).div(b);
         } catch(Exception e) {
             //
         }
@@ -266,6 +276,48 @@ public final class JNN {
      */
     public static Tensor conv2D(Tensor a, Tensor b) {
         return ops.conv2D(a, b);
+    }
+
+    /**
+     * Realiza a operação {@code max pooling} em um tensor 2D.
+     * @param x {@code Tensor} de entrada.
+     * @param filtro formato do filtro {@code (altura, largura)}
+     * @return {@code Tensor} resultado 
+     */
+    public static Tensor maxPool2D(Tensor x, int[] filtro) {
+        return ops.maxPool2D(x, filtro);
+    }
+
+    /**
+     * Realiza a operação {@code max pooling} em um tensor 2D.
+     * @param x {@code Tensor} de entrada.
+     * @param filtro formato do filtro {@code (altura, largura)}
+     * @param stride formato do stride {@code (altura, largura)}
+     * @return {@code Tensor} resultado 
+     */
+    public static Tensor maxPool2D(Tensor x, int[] filtro, int[] stride) {
+        return ops.maxPool2D(x, filtro, stride);
+    }
+
+    /**
+     * Realiza a operação {@code average pooling} em um tensor 2D.
+     * @param x {@code Tensor} de entrada.
+     * @param filtro formato do filtro {@code (altura, largura)}
+     * @return {@code Tensor} resultado 
+     */
+    public static Tensor avgPool2D(Tensor x, int[] filtro) {
+        return ops.avgPool2D(x, filtro);
+    }
+
+    /**
+     * Realiza a operação {@ocde average pooling} em um tensor 2D.
+     * @param x {@code Tensor} de entrada.
+     * @param filtro formato do filtro {@code (altura, largura)}
+     * @param stride formato do stride {@code (altura, largura)}
+     * @return {@code Tensor} resultado 
+     */
+    public static Tensor avgPool2D(Tensor x, int[] filtro, int[] stride) {
+        return ops.avgPool2D(x, filtro, stride);
     }
 
     // funções
