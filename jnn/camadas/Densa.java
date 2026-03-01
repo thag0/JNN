@@ -33,13 +33,13 @@ public class Densa extends Camada implements Cloneable {
 	/**
 	 * Variável controlador para o tamanho de entrada da camada densa.
 	 */
-	private int _tamEntrada;
+	private int[] shapeIn = {1};
 	 
 	/**
 	 * Variável controlador para a quantidade de neurônios (unidades) 
 	 * da camada densa.
 	 */
-	private int _numNeuronios;
+	private int[] shapeOut = {1};
 
 	/**
 	 * Auxilar no controle de treinamento em lotes.
@@ -203,7 +203,7 @@ public class Densa extends Camada implements Cloneable {
 			);
 		}
 
-		_numNeuronios = n;
+		shapeOut[0] = n;
 
 		//usar os valores padrão se necessário
 		Dicionario dic = new Dicionario();
@@ -254,30 +254,29 @@ public class Densa extends Camada implements Cloneable {
 			);
 		}
 
-		_tamEntrada = shape[0];
-
-		if (_tamEntrada < 1) {
+		if (shape[0] < 1) {
 			throw new IllegalArgumentException(
 				"\nTamanho de entrada deve ser maior que zero."
 			);
 		}
 
-		if (_numNeuronios < 1) {
+		shapeIn[0] = shape[0];
+
+		if (shapeOut[0] < 1) {
 			throw new IllegalArgumentException(
 				"\nNúmero de neurônios para a camada Densa não foi definido."
 			);
 		}
 
-		_saida  	= addBuffer("Saida", _numNeuronios);
-		_kernel 	= addParam("Kernel", _tamEntrada, _numNeuronios);
-		_gradKernel = addGrad("Grad Kernel", _kernel.shape());
-
+		_gradEntrada = addBuffer("Grad Entrada", shapeIn[0]);
+		_saida  	 = addBuffer("Saida", shapeOut[0]);
+		_kernel 	 = addParam("Kernel", shapeIn[0], shapeOut[0]);
+		_gradKernel  = addGrad("Grad Kernel", _kernel.shape());
+		
 		if (usarBias) {
 			_bias 	  = Optional.of(addParam("Bias", _saida.shape()));
 			_gradBias = Optional.of(addGrad("Grad Bias", _saida.shape()));
 		}
-
-		_gradEntrada = addBuffer("Grad Entrada", _tamEntrada);
 		
 		_treinavel = true;// camada pode ser treinada.
 		_construida = true;// camada pode ser usada.
@@ -298,19 +297,19 @@ public class Densa extends Camada implements Cloneable {
 
 	@Override
 	public void ajustarParaLote(int tamLote) {
-		int[] shapeIn, shapeOut;
+		int[] shapeIn, out;
 
 		if (tamLote == 0) {
-			shapeIn = new int[]{ _tamEntrada };
-			shapeOut = new int[]{ _numNeuronios };
+			shapeIn = new int[]{ tamEntrada() };
+			out = shapeOut;
 			
 		} else {
-			shapeIn = new int[]{ tamLote, _tamEntrada };
-			shapeOut = new int[]{ tamLote, _numNeuronios };
+			shapeIn = new int[]{ tamLote, tamEntrada() };
+			out = new int[]{ tamLote, numNeuronios() };
 		}
 
 		_gradEntrada = addBuffer("Grad Entrada", shapeIn);
-		_saida 		 = addBuffer("Saida", shapeOut);
+		_saida 		 = addBuffer("Saida", out);
 		
 		this._tamLote = tamLote;
 	}
@@ -320,9 +319,11 @@ public class Densa extends Camada implements Cloneable {
 		verificarConstrucao();
 
 		if (x.numDim() == 1) {
+			validarShapes(x.shape(), shapeIn);
 			ajustarParaLote(0);
 			
 		} else if (x.numDim() == 2) {
+			validarShapes(x.shape(), shapeIn);
 			int lotes = x.tamDim(0);
 			if (_tamLote != lotes) {
 				ajustarParaLote(lotes);
@@ -381,7 +382,7 @@ public class Densa extends Camada implements Cloneable {
 	 */
 	public int numNeuronios() {
 		verificarConstrucao();
-		return _kernel.tamDim(1);
+		return shapeOut[0];
 	}
 
 	/**
@@ -390,7 +391,7 @@ public class Densa extends Camada implements Cloneable {
 	 */
 	public int tamEntrada() {
 		verificarConstrucao();
-		return _tamEntrada;
+		return shapeIn[0];
 	}
 
 	/**
@@ -399,7 +400,7 @@ public class Densa extends Camada implements Cloneable {
 	 */
 	public int tamSaida() {
 		verificarConstrucao();
-		return _numNeuronios;
+		return numNeuronios();
 	}
 
 	@Override

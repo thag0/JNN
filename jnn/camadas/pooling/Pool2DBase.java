@@ -29,7 +29,7 @@ public abstract class Pool2DBase extends Camada {
 	/**
 	 * Auxilar no controle de treinamento em lotes.
 	 */
-	protected int tamLote;
+	protected int _tamLote;
 
 	/**
 	 * Tensor contendo os dados de entrada da camada.
@@ -181,7 +181,7 @@ public abstract class Pool2DBase extends Camada {
 		}
 
 
-		this.tamLote = tamLote;
+		this._tamLote = tamLote;
 	}
 
     @Override
@@ -191,13 +191,13 @@ public abstract class Pool2DBase extends Camada {
 		final int numDim = x.numDim();
 
 		if (numDim == 3) {
-			ajustarParaLote(0);
+			validarShapes(x.shape(), shapeIn);
+			if (_tamLote != 0) ajustarParaLote(0);
 		
 		} else if (numDim == 4) {
+			validarShapes(x.shape(), shapeIn);
 			int lotes = x.tamDim(0);
-			if (lotes != this.tamLote) {
-				ajustarParaLote(lotes);
-			}
+			if (lotes != this._tamLote) ajustarParaLote(lotes);
 		
 		} else {
 			throw new UnsupportedOperationException(

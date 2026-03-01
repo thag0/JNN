@@ -54,7 +54,7 @@ public class GlobalAvgPool2D extends Camada implements Cloneable {
 	/**
 	 * Auxilar no controle de treinamento em lotes.
 	 */
-    private int tamLote;
+    private int _tamLote;
 
 	/**
 	 * Tensor contendo os valores de entrada para a camada.
@@ -164,7 +164,7 @@ public class GlobalAvgPool2D extends Camada implements Cloneable {
         _gradEntrada = addBuffer("Grad Entrada", in);
         _saida       = addBuffer("Saida", out);
 
-        this.tamLote = tamLote;
+        this._tamLote = tamLote;
     }
 
     @Override
@@ -174,13 +174,13 @@ public class GlobalAvgPool2D extends Camada implements Cloneable {
         final int numDim = x.numDim();
 
         if (numDim == 3) {
-            ajustarParaLote(0);
-
+            validarShapes(x.shape(), shapeIn);
+            if (_tamLote != 0) ajustarParaLote(0);
+            
         } else if (numDim == 4) {
+            validarShapes(x.shape(), shapeIn);
             int lotes = x.tamDim(0);
-            if (lotes != this.tamLote) {
-                ajustarParaLote(lotes);
-            }
+            if (lotes != this._tamLote) ajustarParaLote(lotes);
 
         } else {
             throw new UnsupportedOperationException(
@@ -202,7 +202,7 @@ public class GlobalAvgPool2D extends Camada implements Cloneable {
         _gradSaida = g.contiguous();
         _gradEntrada.zero();
 
-        lops.backwardGAP(_gradEntrada, _gradSaida, shapeIn, tamLote);
+        lops.backwardGAP(_gradEntrada, _gradSaida, shapeIn, _tamLote);
 
         return _gradEntrada;
     }

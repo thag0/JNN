@@ -106,16 +106,13 @@ public abstract class Ativacao extends Camada implements Cloneable {
         int numDims = x.numDim();
 
         if (numDims == dimBase) {
-            if (_tamLote != 0) {
-                ajustarParaLote(0);
-            }
+            validarShapes(x.shape(), shapeIn);
+            if (_tamLote != 0) ajustarParaLote(0);
 
         } else if (numDims == dimBase + 1) {
+            validarShapes(x.shape(), shapeIn);
             int lote = x.tamDim(0);
-
-            if (lote != this._tamLote) {
-                ajustarParaLote(lote);
-            }
+            if (lote != this._tamLote) ajustarParaLote(lote);
 
         } else {
             throw new UnsupportedOperationException(

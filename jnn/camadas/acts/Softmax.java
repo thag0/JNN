@@ -28,13 +28,14 @@ public class Softmax extends Ativacao {
         int numAmostras = 1;
 
         if (numDim == dimBase) {
-            ajustarParaLote(0);
-        
+            validarShapes(x.shape(), shapeIn);
+            if (_tamLote != 0) ajustarParaLote(0);
+            
         } else if (numDim == dimBase + 1) {
+            validarShapes(x.shape(), shapeIn);
             int lotes = x.tamDim(0);
-            if (lotes != this._tamLote) {
-                ajustarParaLote(lotes);
-            }
+            if (lotes != this._tamLote) ajustarParaLote(lotes);
+            
             numAmostras = lotes;
         
         } else {

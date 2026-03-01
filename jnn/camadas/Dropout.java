@@ -166,13 +166,13 @@ public class Dropout extends Camada implements Cloneable {
 		final int numDim = x.numDim();
 
 		if (numDim == dimBase) {
-			ajustarParaLote(0);
+			validarShapes(x.shape(), shapeIn);
+			if (this.tamLote != 0) ajustarParaLote(0);
 		
 		} else if (numDim == dimBase + 1) {
+			validarShapes(x.shape(), shapeIn);
 			int lotes = x.tamDim(0);
-			if (lotes != this.tamLote) {
-				ajustarParaLote(lotes);
-			}
+			if (lotes != this.tamLote) ajustarParaLote(lotes);
 		
 		} else {
 			throw new UnsupportedOperationException(

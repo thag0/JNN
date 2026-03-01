@@ -546,9 +546,12 @@ public class Conv2D extends Camada implements Cloneable {
 		final int numDim = x.numDim();
 
 		if (numDim == 3) {
+			validarShapes(x.shape(), shapeIn);
 			ajustarParaLote(0);
-		
+			
 		} else if (numDim == 4) {
+			validarShapes(x.shape(), shapeIn);
+
 			int lotes = x.tamDim(0);
 			if (lotes != this.tamLote) {
 				ajustarParaLote(lotes);

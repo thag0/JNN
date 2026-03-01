@@ -118,6 +118,28 @@ public abstract class Camada {
 	}
 
 	/**
+	 * Verifica se o shape recebido é compatível com o shape esperado.
+	 * @param base shape recebido.
+	 * @param alvo shape esperado.
+	 */
+	protected void validarShapes(int[] base, int[] alvo) {
+		// assumindo que base pode ter uma dimensão a mais para o lote.
+
+		int lb = base.length;
+		int la = alvo.length;
+
+		// comparando assim pra ignorar a primeira dimensão (lote)
+		for (int i = 1; i <= la; i++) {
+			if (base[lb - i] != alvo[la - i]) {
+				throw new IllegalArgumentException(
+					"\nShapes incompatíveis, últimas dimensões esperadas = " + JNNutils.arrayStr(alvo) +
+					", recebido = " + JNNutils.arrayStr(base)
+				);
+			}
+		}
+	}
+
+	/**
 	 * Inicaliza os parâmetros treináveis da camada de acordo com os 
 	 * inicializadores definidos.
 	 */
