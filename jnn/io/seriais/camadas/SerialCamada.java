@@ -40,6 +40,7 @@ public class SerialCamada {
             new SerialFlatten(),
             new SerialMaxPool(),
             new SerialGAP(),
+            new SerialBatchNorm(),
 
             //ativações
             new SerialELU(),

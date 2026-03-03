@@ -118,9 +118,6 @@ public class Treinador implements Cloneable {
 
 		metodo.calcHist = calcHist;
 		
-		// só mexer na seed se for mudado o valor padrão.
-		if (seed != 0) metodo.random.setSeed(seed);
-		
 		modelo.treino(true);	
 		metodo.loop(
 			loader,

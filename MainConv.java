@@ -10,13 +10,18 @@ import jnn.camadas.acts.Tanh;
 import jnn.camadas.pooling.GlobalAvgPool2D;
 import jnn.camadas.pooling.MaxPool2D;
 import jnn.core.JNNnative;
+import jnn.core.JNNutils;
 import jnn.dataloader.DataLoader;
 import jnn.dataloader.dataset.CIFAR10;
+import jnn.dataloader.transform.Compose;
+import jnn.dataloader.transform.HFlip;
 import jnn.dataloader.transform.Norm;
+import jnn.dataloader.transform.RandomCrop;
 import jnn.dataloader.transform.Transform;
 import jnn.io.JNNserial;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
+import jnn.otm.Adam;
 
 public class MainConv {
 
@@ -26,7 +31,7 @@ public class MainConv {
 	static Ged ged = new Ged();
 
 	// controle de treino
-	static final int TREINO_EPOCAS = 30;
+	static final int TREINO_EPOCAS = 15;
 	static final int TREINO_LOTE = 32;
 	static final boolean TREINO_LOGS = true;
 
@@ -43,6 +48,10 @@ public class MainConv {
 		);//peguei de um forum do pytorch
 		
 		final DataLoader treino = CIFAR10.treino().aplicarX(norm);
+		treino.setTransformX(new Compose(
+			new HFlip(0.5),
+			new RandomCrop(32, 32, 4, true)
+		));
 		treino.print();
 				
 		final DataLoader teste = CIFAR10.teste().aplicarX(norm);
@@ -53,8 +62,12 @@ public class MainConv {
 		
 		var accs = new ArrayList<Float>();
 		modelo.treinador().setCallback(info -> {
-			float ac = modelo.avaliador().acuracia(teste).item();
+			modelo.treino(false);
+				float ac = modelo.avaliador().acuracia(teste).item();
+			modelo.treino(true);
+			
 			accs.add(ac);
+			System.out.println(" acurácia " + (ac*100) + "%");
 		});
 		
 		System.out.println("Treinando.");
@@ -114,28 +127,41 @@ public class MainConv {
 			new Entrada(3, 32, 32),
 
 			new Conv2D(32, convK, "same", "he"),
+			new BatchNorm2D(),
+			new ReLU(),
+			new Conv2D(32, convK, "same", "he"),
+			new BatchNorm2D(),
 			new ReLU(),
 			new MaxPool2D(poolK),
 			
 			new Conv2D(64, convK, "same", "he"),
+			new BatchNorm2D(),
+			new ReLU(),
+			new Conv2D(128, convK, "same", "he"),
+			new BatchNorm2D(),
 			new ReLU(),
 			new MaxPool2D(poolK),
 			
-			new Conv2D(128, convK, "same", "he"),
+			new Conv2D(256, convK, "same", "he"),
+			new BatchNorm2D(),
 			new ReLU(),
 			new MaxPool2D(poolK),
 
 			new GlobalAvgPool2D(),
 
-			new Dropout(0.2),
-			new Densa(128, "he"),
+			new Dropout(0.5),
+			new Densa(256, "he"),
 			new ReLU(),
 
 			new Densa(10, "he"),
 			new Softmax()
 		);
 
-		modelo.compilar("adam", "entropia-cruzada");
+		for (Camada c : modelo) if (c instanceof Conv2D) c.setBias(false);
+
+		modelo.compilar(new Adam(0.005), "entropia-cruzada");
+
+		JNNutils.randSeed(987654321);
 		
 		return modelo;		
 	}

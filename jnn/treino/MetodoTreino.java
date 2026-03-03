@@ -1,7 +1,6 @@
 package jnn.treino;
 
 import java.util.LinkedList;
-import java.util.Random;
 
 import jnn.core.JNNlog;
 import jnn.core.JNNutils;
@@ -26,11 +25,6 @@ public abstract class MetodoTreino {
 	 * Histórico de perda do modelo durante o treinamento.
 	 */
 	protected LinkedList<Float> historico;
-
-	/**
-	 * Gerador de números pseudo-aleatórios.
-	 */
-	protected Random random;
 
 	/**
 	 * Variável de controle para armazenagem do histórico de treino.
@@ -69,15 +63,6 @@ public abstract class MetodoTreino {
 	}
 
 	/**
-	 * Configura uma seed manual para o método de treino, útil para replicar
-	 * e comparar resultados.
-	 * @param seed nova seed.
-	 */
-	public void setSeed(Number seed) {
-		if (seed != null) random.setSeed(seed.longValue());
-	}
-
-	/**
 	 * Realiza a retropropagação de gradientes através das camadas do modelo.
 	 * @param g {@code Tensor} contendo o gradiente em relação a saída prevista
 	 * pelo modelo.
@@ -103,7 +88,7 @@ public abstract class MetodoTreino {
 	 * @param ys {@code array} com dados de saída.
 	 */
 	protected <T> void embaralhar(T[] xs, T[] ys) {
-		JNNutils.embaralhar(xs, ys, random);
+		JNNutils.embaralhar(xs, ys, null);
 	}
 
 	/** 

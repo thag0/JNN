@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import jnn.camadas.BatchNorm2D;
 import jnn.camadas.Camada;
 import jnn.camadas.Conv2D;
 import jnn.camadas.Densa;
@@ -119,6 +120,10 @@ public class JNNserial extends SerialBase {
 
 					case "conv2d":
 						modelo.add((Conv2D) serialCamada.ler(in, nomeCamada));
+					break;
+
+					case "batchnorm2d":
+						modelo.add((BatchNorm2D) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "flatten":

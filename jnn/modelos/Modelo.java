@@ -350,6 +350,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 */
 	public Tensor avaliar(DataLoader loader) {
 		validarCompilacao();
+		treino(false);// garantia
 
 		Tensor[] xs = loader.getX();
 		Tensor[] ys = loader.getY();
