@@ -68,9 +68,8 @@ public abstract class Ativacao extends Camada implements Cloneable {
         shapeIn = shape.clone();
         dimBase = shape.length;
 
-        _saida       = addParam("Saida", shapeIn);
-        _gradEntrada = addParam("Grad Entrada", shapeIn);
-        _gradSaida   = addParam("Grad Saida", shapeIn);
+        _saida       = addBuffer("Saida", shapeIn);
+        _gradEntrada = addBuffer("Grad Entrada", shapeIn);
 
         _construida = true;
     }
@@ -80,20 +79,22 @@ public abstract class Ativacao extends Camada implements Cloneable {
 
 	@Override
 	public void ajustarParaLote(int tamLote) {
+        int[] shape = {};
+
 		if (tamLote == 0) {
-			_gradEntrada = addParam("Grad Entrada", shapeIn);
-			_saida = addParam("Saida", shapeIn);
-		
+            shape = shapeIn;
+            
 		} else {
-            int[] shape = new int[shapeIn.length + 1];
+            shape = new int[shapeIn.length + 1];
             shape[0] = tamLote;
             for (int i = 0; i < shapeIn.length; i++) {
                 shape[i+1] = shapeIn[i];
             }
 
-			_gradEntrada = addParam("Grad Entrada", shape);
-			_saida = addParam("Saida", shape);
 		}
+
+        _gradEntrada = addBuffer("Grad Entrada", shape);
+        _saida = addBuffer("Saida", shape);
 		
 		this._tamLote = tamLote;
 	}
