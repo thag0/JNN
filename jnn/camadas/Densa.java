@@ -276,6 +276,9 @@ public class Densa extends Camada implements Cloneable {
 		if (usarBias) {
 			_bias 	  = Optional.of(addParam("Bias", _saida.shape()));
 			_gradBias = Optional.of(addGrad("Grad Bias", _saida.shape()));
+		} else {
+			_bias 	  = Optional.empty();
+			_gradBias = Optional.empty();
 		}
 		
 		_treinavel = true;// camada pode ser treinada.
