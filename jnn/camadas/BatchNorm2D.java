@@ -134,17 +134,17 @@ public class BatchNorm2D extends Camada implements Cloneable {
         } else if (x.numDim() == 4) {
             validarShapes(x.shape(), shapeIn);
             int lote = x.tamDim(0);
-            if (this.tamLote != lote) ajustarParaLote(lote);
+            if (this.tamLote != lote) ajustarParaLote(lote);  
             
         } else {
             throw new IllegalArgumentException(
                 "\nEntrada deve ter 3 (C, H, W) ou 4 dimensões (N, C, H, W), recebido " + x.numDim()
             );
         }
-
+        
         _entrada = x.contiguous();
 
-        int lotes = tamLote;
+        int lotes = tamLote == 0 ? 1 : tamLote;
         int canais = shapeIn[0];
         int altX = shapeIn[1];
         int largX = shapeIn[2];
