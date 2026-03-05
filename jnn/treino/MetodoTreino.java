@@ -10,6 +10,7 @@ import jnn.metrica.perda.Perda;
 import jnn.modelos.Modelo;
 import jnn.otm.Otimizador;
 import jnn.treino.callback.CallbackFimEpoca;
+import jnn.treino.scheduler.Scheduler;
 
 /**
  * Método base de treino de modelo.
@@ -37,6 +38,11 @@ public abstract class MetodoTreino {
 	CallbackFimEpoca callback;
 
 	/**
+	 * Scheduler usado a cada final de época.
+	 */
+	Scheduler scheduler;
+
+	/**
 	 * Construtor interno.
 	 * @param modelo modelo base.
 	 * @param hist calcular histórico de perda durante o treino.
@@ -60,6 +66,14 @@ public abstract class MetodoTreino {
 	 */
 	public void setCallback(CallbackFimEpoca callback) {
 		if (callback != null) this.callback = callback;
+	}
+
+	/**
+	 * Configura um scheduler para ser chamado a cada final de época.
+	 * @param scheduler novo scheduler.
+	 */
+	public void setScheduler(Scheduler scheduler) {
+		if (scheduler != null) this.scheduler = scheduler;
 	}
 
 	/**

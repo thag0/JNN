@@ -8,6 +8,7 @@ import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;
 import jnn.treino.callback.CallbackFimEpoca;
+import jnn.treino.scheduler.Scheduler;
 
 /**
  * Interface para treino de modelos da biblioteca.
@@ -43,6 +44,8 @@ public class Treinador implements Cloneable {
 	 * Callback de fim de época.
 	 */
 	private CallbackFimEpoca callback;
+
+	private Scheduler scheduler;
 
 	/**
 	 * Inicializa um novo treinador.
@@ -82,6 +85,14 @@ public class Treinador implements Cloneable {
 	}
 
 	/**
+	 * Configura um scheduler para ser chamado a cada final de época.
+	 * @param scheduler novo scheduler.
+	 */
+	public void setScheduler(Scheduler scheduler) {
+		this.scheduler = scheduler;
+	}
+
+	/**
 	 * Configura a seed do gerador de números aleatórios.
 	 * @param seed nova seed.
 	 */
@@ -115,6 +126,7 @@ public class Treinador implements Cloneable {
 		else setMetodo(new TreinoLote(modelo, tamLote));
 
 		metodo.setCallback(callback);
+		metodo.setScheduler(scheduler);
 
 		metodo.calcHist = calcHist;
 		

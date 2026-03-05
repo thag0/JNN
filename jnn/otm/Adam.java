@@ -45,27 +45,27 @@ public class Adam extends Otimizador {
 	/**
 	 * Valor de taxa de aprendizado do otimizador (Learning Rate).
 	 */
-	final float lr;
+	private float lr;
 
 	/**
 	 * Decaimento do momentum.
 	 */
-	final float beta1;
+	private final float beta1;
 	 
 	/**
 	 * Decaimento do momentum de segunda ordem.
 	 */
-	final float beta2;
+	private final float beta2;
 	 
 	/**
 	 * Usado para evitar divisão por zero.
 	 */
-	final float eps;
+	private final float eps;
 
 	/**
 	 * Correção dos valores de velocidade.
 	 */
-	final boolean amsgrad;
+	private final boolean amsgrad;
 
 	/**
 	 * Coeficientes de momentum.
@@ -91,11 +91,26 @@ public class Adam extends Otimizador {
 	 *  Coeficientes de correção do AMSGrad.
 	 */
 	private Tensor[] ams = {};
+
+	/**
+	 *  Buffers pra evitar alocação.
+	 */
+	private Tensor[] buf = {};
 	
 	/**
 	 * Contador de iterações.
 	 */
 	long iteracao = 0L;
+
+	/**
+	 * Valor cacheado para evitar math.pow.
+	 */
+	private float potBeta1 = 1;
+	
+	/**
+	 * Valor cacheado para evitar math.pow.
+	 */
+	private float potBeta2 = 1;
  
 	/**
 	 * Inicializa uma nova instância de otimizador <strong> Adam </strong> 
@@ -197,10 +212,13 @@ public class Adam extends Otimizador {
 		initParams(params, grads);
 
 		for (Tensor param : _params) {
-			m = JNNutils.addEmArray(m, new Tensor(param.shape()));
-			v = JNNutils.addEmArray(v, new Tensor(param.shape()));
-			mc = JNNutils.addEmArray(mc, new Tensor(param.shape()));
-			vc = JNNutils.addEmArray(vc, new Tensor(param.shape()));
+			int[] shape = param.shape();
+
+			m = JNNutils.addEmArray(m, new Tensor(shape));
+			v = JNNutils.addEmArray(v, new Tensor(shape));
+			mc = JNNutils.addEmArray(mc, new Tensor(shape));
+			vc = JNNutils.addEmArray(vc, new Tensor(shape));
+			buf = JNNutils.addEmArray(buf, new Tensor(shape));
 		}
 
 		if (amsgrad) {
@@ -218,8 +236,11 @@ public class Adam extends Otimizador {
 		
 		iteracao += 1;
 
-		float corr1 = (float) Math.pow(beta1, iteracao);
-		float corr2 = (float) Math.pow(beta2, iteracao);
+		potBeta1 *= beta1;
+		potBeta2 *= beta2;
+
+		float corr1 = potBeta1;
+		float corr2 = potBeta2;
 
 		final int n = _params.length;
 		for (int i = 0; i < n; i++) {
@@ -229,6 +250,7 @@ public class Adam extends Otimizador {
 			TensorData v_i = v[i].data();
 			TensorData mc_i = mc[i].data();
 			TensorData vc_i = vc[i].data();
+			TensorData buf_i = buf[i].data();
 
 			// m = β1*m + (g * (1 - β1))
 			m_i.mul(beta1).add(g_i, 1.0f - beta1);
@@ -247,12 +269,12 @@ public class Adam extends Otimizador {
 				vams_i.maxEntre(vc_i);
 				vc_i.copiar(vams_i);
 			}
-
-			// sqrt(v̂) + eps
-			TensorData den = vc_i.clone().sqrt().add(eps);
+			
+			// den = sqrt(v̂) + eps
+			buf_i.copiar(vc_i).sqrt().add(eps);
 			
 			// p -= (lr * m̂) / (sqrt(v̂) + eps)
-			p_i.addcdiv(mc_i, den, -lr);
+			p_i.addcdiv(mc_i, buf_i, -lr);
 		}
 	}
 
@@ -268,6 +290,20 @@ public class Adam extends Otimizador {
 		addInfo("Amsgrad: " + amsgrad);
 
 		return super.info();
+	}
+
+	@Override
+	public float getLr() {
+		return lr;
+	}
+
+	@Override
+	public void setLr(float lr) {
+		if (lr <= 0) {
+			throw new IllegalArgumentException("\nLearning rate \""+ lr + "\" inválido.");
+		}
+
+		this.lr = lr;
 	}
 
 }

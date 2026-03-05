@@ -151,4 +151,18 @@ public class Adadelta extends Otimizador {
 
 		return super.info();
 	}
+
+	@Override
+	public float getLr() {
+		throw new UnsupportedOperationException(
+			"\n" + nome() + " não suporta learning rate"
+		);
+	}
+	
+	@Override
+	public void setLr(float lr) {
+		throw new UnsupportedOperationException(
+			"\n" + nome() + " não suporta learning rate"
+		);
+	}
 }

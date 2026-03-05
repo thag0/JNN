@@ -96,6 +96,18 @@ public abstract class Otimizador {
 	public abstract void update();
 
 	/**
+	 * Retorna o valor atual da taxa de aprendizado (learning rate).
+	 * @return valor do learning rate.
+	 */
+	public abstract float getLr();
+
+	/**
+	 * Configura um novo valor para a taxa de aprendizado (learning rate).
+	 * @param lr novo learning rate.
+	 */
+	public abstract void setLr(float lr);
+
+	/**
  	 * Exibe as opções de configurações do otimizador.
 	 * @return buffer formatado.
 	 */

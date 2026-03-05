@@ -35,7 +35,7 @@ public class Lion extends Otimizador {
 	/**
 	 * Valor de taxa de aprendizado do otimizador.
 	 */
-	private final float lr;
+	private float lr;
 
 	/**
 	 * Decaimento do momentum.
@@ -144,5 +144,19 @@ public class Lion extends Otimizador {
 
         return super.info();
     }
+
+	@Override
+	public float getLr() {
+		return lr;
+	}
+
+	@Override
+	public void setLr(float lr) {
+		if (lr <= 0) {
+			throw new IllegalArgumentException("\nLearning rate \""+ lr + "\" inválido.");
+		}
+
+		this.lr = lr;
+	}
     
 }

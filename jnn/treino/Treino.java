@@ -73,9 +73,8 @@ public class Treino extends MetodoTreino {
 
 			if (calcHist) historico.add(perdaEpoca/n);
 
-			if (callback != null) {
-				callback.run(new InfoEpoca(e, perdaEpoca));
-			}
+			if (scheduler != null) scheduler.update();
+			if (callback != null)  callback.run(new InfoEpoca(e, perdaEpoca));
 		}
 
 		if (logs) {

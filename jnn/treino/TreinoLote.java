@@ -80,10 +80,9 @@ public class TreinoLote extends MetodoTreino {
 			}
 
 			if (calcHist) historico.add(perdaEpoca / n);
-			
-			if (callback != null) {
-				callback.run(new InfoEpoca(e, perdaEpoca));
-			}
+
+			if (scheduler != null) scheduler.update();
+			if (callback != null)  callback.run(new InfoEpoca(e, perdaEpoca));
 		}
 
 		if (logs) {
@@ -100,15 +99,16 @@ public class TreinoLote extends MetodoTreino {
 	 * @param perdaEpoca valor de perda por época de treinamento.
 	 */
 	private float processoLote(Tensor[] loteX, Tensor[] loteY, Perda loss) {
-		Tensor real = JNNutils.concatenar(loteY);
-
-		Tensor prev = modelo.forward(JNNutils.concatenar(loteX));
-		Tensor g = loss.backward(prev, real);
+		Tensor xs = JNNutils.concatenar(loteX);
+		Tensor ys = JNNutils.concatenar(loteY);
+		
+		Tensor y = modelo.forward(xs);
+		Tensor g = loss.backward(y, ys);
 		
 		modelo.backward(g);
 
 		if (calcHist) {
-			float l = loss.forward(prev, real).item();
+			float l = loss.forward(y, ys).item();
 			int n = loteX.length;
 			return l * n;
 		}

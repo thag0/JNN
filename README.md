@@ -85,6 +85,14 @@ Importante reforçar que o jni por enquanto suporta apenas windows_x64 e que o u
 
 *Utilizando callback para capturar acurácia do modelo durante o treino*
 
+# **Scheduler de treino**
+
+Para melhorar o refinamento de treino, é possível utilizar Scherdulers, tipicamente usados para evitar saltos muito grandes no meio-fim do treino. Eles alteram a taxa de aprendizado do otimizador usado com o objetivo de melhorar a convergência e estabilidade ao decorrer do treino.
+
+<img width="966" height="424" alt="Image" src="https://github.com/user-attachments/assets/b09c2b75-7fa3-4ceb-bbdb-29c85ba5aa60" />
+
+*Configurando um scheduler*
+
 # **Data Augmentation**
 
 Iniciando um pouco para a área de visão computacional, adicionei suporte para uso de transoformações de dados, que normalmente são aplicadas no momento em que o dado é requerido no treino.
