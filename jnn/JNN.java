@@ -310,7 +310,7 @@ public final class JNN {
     }
 
     /**
-     * Realiza a operação {@ocde average pooling} em um tensor 2D.
+     * Realiza a operação {@code average pooling} em um tensor 2D.
      * @param x {@code Tensor} de entrada.
      * @param filtro formato do filtro {@code (altura, largura)}
      * @param stride formato do stride {@code (altura, largura)}
