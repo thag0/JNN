@@ -1,7 +1,9 @@
 #include "im2col.h"
 #include "macros.h"
 
-void im2col_3d(
+#include <string.h>
+
+void im2col(
     const float* restrict X,
     float* restrict COL,
     int canais,
@@ -10,14 +12,16 @@ void im2col_3d(
     int alt_pad, int larg_pad,
     int alt_s, int larg_s) {
 
-    const int area_s = alt_s * larg_s;
+    const int Kdim = canais * alt_k * larg_k;
+    const int Ndim = alt_s * larg_s;
+    memset(COL, 0, sizeof(float) * Kdim * Ndim);// limpar lixo da pool e lidar com padding > 0
 
     #pragma omp parallel for collapse(2) schedule(static)
     for (int c = 0; c < canais; c++) {
         for (int kh = 0; kh < alt_k; kh++) {
             for (int kw = 0; kw < larg_k; kw++) {
                 int linha = (c * alt_k + kh) * larg_k + kw;
-                float* restrict ptr_col = COL + linha * area_s;
+                float* restrict ptr_col = COL + linha * Ndim;
                 int h_min = MAX_ENTRE(0, alt_pad - kh);
                 int h_max = MIN_ENTRE(alt_s, alt_x + alt_pad - kh);
                 int w_min = MAX_ENTRE(0, larg_pad - kw);
@@ -41,9 +45,10 @@ void im2col_3d(
             }
         }
     }
+
 }
 
-void im2col_3dT(
+void im2col_T(
     const float* restrict X,
     float* restrict COLT,
     int canais,
@@ -53,6 +58,8 @@ void im2col_3dT(
     int alt_s, int larg_s) {
 
     const int Kdim = canais * alt_k * larg_k;
+    const int Ndim = alt_s * larg_s;
+    memset(COLT, 0, sizeof(float) * Kdim * Ndim);// limpar lixo da pool e lidar com padding > 0
 
     #pragma omp parallel for collapse(2) schedule(static)
     for (int i = 0; i < alt_s; i++) {
@@ -82,7 +89,7 @@ void im2col_3dT(
     }
 }
 
-void col2im_3dT(
+void col2im_T(
     const float* restrict COLT,
     float* restrict GE,
     int canais,

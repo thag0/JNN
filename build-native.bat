@@ -39,6 +39,7 @@ set DLL=jnn_native.dll
 set SRC=^
  jnn\nativo\src\jni\jnn_jni.c ^
  jnn\nativo\src\dispatch\dispatcher.c ^
+ jnn\nativo\src\mem\*.c ^
  jnn\nativo\src\cpu\*.c
 
 if not exist "%OUT_DIR%" mkdir "%OUT_DIR%"
@@ -56,6 +57,7 @@ gcc ^
  -I"%JAVA_HOME%\include\win32" ^
  -I"jnn\nativo\include\cpu" ^
  -I"jnn\nativo\include\dispatch" ^
+ -I"jnn\nativo\include\mem" ^
  -I"jnn\nativo\include\jni" ^
  %SRC% ^
  -o "%OUT_DIR%\%DLL%"

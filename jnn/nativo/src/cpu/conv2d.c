@@ -2,8 +2,8 @@
 #include "macros.h"
 #include "matmul.h"
 #include "im2col.h"
+#include "mem_pool.h"
 
-#include <stdlib.h>
 #include <string.h>
 
 // forward
@@ -95,7 +95,7 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
     const int Kdim = canais * alt_k * larg_k;
     const int Ndim = alt_s * larg_s;
 
-    float* col = malloc(sizeof(float) * Kdim * Ndim);
+    float* col = get_mem_pool(sizeof(float) * Kdim * Ndim);
 
     matmul_params_t mm = {
         .A = (float*) K,
@@ -127,9 +127,7 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
             }
         }
 
-        memset(col, 0, sizeof(float) * Kdim * Ndim);
-
-        im2col_3d(
+        im2col(
             x_lote,
             col,
             canais,
@@ -144,7 +142,6 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
         cpu_matmul(&mm);
     }
 
-    free(col);
 }
 
 static bool _usar_im2col_fw(const conv2d_fwd_params_t* params) {
@@ -162,7 +159,7 @@ static bool _usar_im2col_fw(const conv2d_fwd_params_t* params) {
     if (alt_s * larg_s < 64) return false;
 
     const long flops = 2L * lotes * filtros * alt_s * larg_s * canais * alt_k * larg_k;
-    const long limiar = 1e7;
+    const long limiar = 1e8;
     
     return flops > limiar;
 }
@@ -258,7 +255,7 @@ static void _backward_gk_im2col(const conv2d_bwd_params_t* params) {
 
     const int Kdim = canais * alt_k * larg_k;
     const int Ndim = alt_s * larg_s;
-    float* colT = malloc(sizeof(float) * Ndim * Kdim);
+    float* colT = get_mem_pool(sizeof(float) * Ndim * Kdim);
 
     matmul_params_t mm = {
         .A = NULL,
@@ -276,10 +273,8 @@ static void _backward_gk_im2col(const conv2d_bwd_params_t* params) {
         const float* x_lote = X + l * canais * area_x;
         const float* gs_lote = GS + l * filtros * Ndim;
 
-        memset(colT, 0, sizeof(float) * Ndim * Kdim);
-
         // transposta em memória pra cair no fastpath do mm
-        im2col_3dT(
+        im2col_T(
             x_lote,
             colT, 
             canais, 
@@ -293,7 +288,6 @@ static void _backward_gk_im2col(const conv2d_bwd_params_t* params) {
         cpu_matmul(&mm); 
     }
 
-    free(colT);
 }
 
 static bool _usar_im2col_gk(const conv2d_bwd_params_t* params) {
@@ -382,12 +376,13 @@ static void _backward_ge_col2im(const conv2d_bwd_params_t* params) {
 
     const int Ndim = alt_s * larg_s;
     const int Kdim = params->canais * alt_k * larg_k;
-    float* colT = malloc(sizeof(float) * Ndim * Kdim);
+    float* colT = get_mem_pool(sizeof(float) * Ndim * Kdim);
 
     for (int l = 0; l < params->lotes; l++) {
         const float* gs_lote = params->GS + l * params->filtros * Ndim;
         float* ge_lote = params->GE + l * params->canais * area_x;;
 
+        // limpar lixo da pool e lidar com padding > 0
         memset(colT, 0, sizeof(float) * Ndim * Kdim);
 
         //matmul
@@ -408,7 +403,7 @@ static void _backward_ge_col2im(const conv2d_bwd_params_t* params) {
             }
         }
  
-        col2im_3dT(
+        col2im_T(
             colT, ge_lote,
             params->canais, 
             alt_x, larg_x,
@@ -418,7 +413,6 @@ static void _backward_ge_col2im(const conv2d_bwd_params_t* params) {
         );
     }
 
-    free(colT);
 }
 
 static bool _usar_col2im_ge(const conv2d_bwd_params_t* params) {

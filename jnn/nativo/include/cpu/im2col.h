@@ -1,7 +1,7 @@
 #pragma once
 
 // Transforma os dados de entrada no formato im2col (CHW).
-void im2col_3d(
+void im2col(
     const float* restrict X,
     float* restrict COL,
     int canais,
@@ -11,18 +11,8 @@ void im2col_3d(
     int alt_s, int larg_s
 );
 
-void im2col_3d_tiled(
-    const float* restrict X,
-    float* restrict COL,
-    int C,
-    int H, int W,
-    int KH, int KW,
-    int PH, int PW,
-    int OH, int OW
-);
-
 // Versão do im2col que gera a matriz col transposta.
-void im2col_3dT(
+void im2col_T(
     const float* restrict X,
     float* restrict COLT,
     int canais,
@@ -32,7 +22,7 @@ void im2col_3dT(
     int alt_s, int larg_s
 );
 
-void col2im_3dT(
+void col2im_T(
     const float* restrict COLT,
     float* restrict GE,
     int canais,
