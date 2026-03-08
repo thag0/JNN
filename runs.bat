@@ -8,14 +8,15 @@ set MEM_OPS=-Xmx6g -Xms6g
 rem deixar esse jar da jnn sempre primeiro
 set CP_JNN_GED=bin\jnn.jar;lib\ged.jar;testes\bin
 set CP_JNN_GED_GEIM=bin\jnn.jar;lib\ged.jar;lib\geim.jar;testes\bin
-set CP_JNN_GED_VIEW=bin\jnn.jar;lib\ged.jar;lib\geim.jar;lib\jnnview.jar;testes\bin
+set CP_JNN_GED_GEIM_VIEW=bin\jnn.jar;lib\ged.jar;lib\geim.jar;lib\jnnview.jar;testes\bin
 
 
 @REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED%" MainConv "¨%MEM_OPS%"
+java %ENABLE_NATIVE% -cp "%CP_JNN_GED_GEIM_VIEW%" MainImg
 @REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED%" Benchmark
 @REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED_GEIM%" Conv
 @REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED_VIEW%" Lab
-java %ENABLE_NATIVE% -cp "%CP_JNN_GED%" TesteConv 1 4
+@REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED%" TesteConv 1 4
 @REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED_GEIM%" TesteJNI
 
 @rem exemplos

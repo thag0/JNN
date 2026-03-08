@@ -10,29 +10,25 @@ import geim.imagem.Imagem;
 import jnn.JNN;
 import jnn.camadas.Densa;
 import jnn.camadas.Entrada;
+import jnn.camadas.acts.Sigmoid;
+import jnn.camadas.acts.Tanh;
 import jnn.core.parallel.PoolFactory;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
-import render.JanelaTreino;
-
-// Por enquanto esse script não está rodando devido a problemas com a 
-// parte nativa da biblioteca além do forte acoplamento junto da parte
-// de desenho.
-
-// futuramente vou resolver esses problemas.
+import jnn.treino.scheduler.StepLR;
+import jnnview.JNNwindow;
 
 public class MainImg {
 	static Ged ged = new Ged();
 	static Geim geim = new Geim();
 
-	static final int EPOCAS = 10 * 1000;
-	static final double ESCALA_RENDER = 10;
+	static final int EPOCAS = 5 * 1000;
+	static final int ESCALA_RENDER = 10;
 	static final boolean historico = true;
 	static final String CAMINHO_HISTORICO = "historico-perda.csv";
 	static final String CAMINHO_IMAGEM = "./dados/mnist/img_0.png";
-	// static final String caminhoImagem = "./dados/32x32/circulos.png";
 
 	public static void main(String[] args) {      
 		ged.limparConsole();
@@ -71,6 +67,8 @@ public class MainImg {
 			exportarHistorico(modelo, CAMINHO_HISTORICO);
 			executarComando("python grafico.py " + CAMINHO_HISTORICO);
 		}
+
+		exportarImagemEscalaCinza(modelo, 28, 28, 10, "img-ampliada.png");
 	}
 
 	/**
@@ -82,9 +80,12 @@ public class MainImg {
 	static Modelo modelo(int in, int out) {
 		Sequencial modelo = new Sequencial(
 			new Entrada(in),
-			new Densa(14, "tanh"),
-			new Densa(14, "tanh"),
-			new Densa(out, "sigmoid")
+			new Densa(14),
+			new Tanh(),
+			new Densa(14),
+			new Tanh(),
+			new Densa(out),
+			new Sigmoid()
 		);
 
 		Object optm = "sgd";
@@ -92,6 +93,8 @@ public class MainImg {
 
 		modelo.compilar(optm, loss);
 		modelo.setHistorico(historico);
+
+		modelo.treinador().setScheduler(new StepLR(modelo.otm(), 25, 0.98f));
 
 		return modelo;
 	}
@@ -106,15 +109,14 @@ public class MainImg {
 	 */
 	static long treinoEmPainel(Modelo modelo, DataLoader loader, int altura, int largura) {
 		final int FPS = 60_000000;
-		final int EPOCAS_POR_FRAME = 55;
+		final int EPOCAS_POR_FRAME = 65;
 
-		//acelerar o processo de desenho
-		//bom em situações de janelas muito grandes
-		int n = Runtime.getRuntime().availableProcessors();
-		int numThreads = (n > 1) ? (int)(n * 0.25) : 2;
-
-		JanelaTreino jt = new JanelaTreino(largura, altura, ESCALA_RENDER, numThreads);
-		jt.desenharTreino(modelo, 0);
+		Tensor in = new Tensor(2);
+		Tensor img = new Tensor(altura, largura);
+		JNNwindow window = new JNNwindow((int) ESCALA_RENDER);
+		window.atualizar(img.array(), img.shape());
+		
+		window.exibir("Titulo");
 		
 		//trabalhar com o tempo de renderização baseado no fps
 		double intervaloDesenho = 1_000_000_000/FPS;
@@ -123,9 +125,12 @@ public class MainImg {
 
 		int i = 0;
 		long tempoTreino = System.nanoTime();
-		while (i < EPOCAS && jt.isVisible()) {
+		while (i < EPOCAS && window.isVisible()) {
 			modelo.treinar(loader, EPOCAS_POR_FRAME, false);
-			jt.desenharTreino(modelo, i);
+			gerarImagem(modelo, in, img);
+			window.atualizar(img.array(), img.shape());
+			window.exibir(i + "/" + EPOCAS);
+			
 			i += EPOCAS_POR_FRAME;
 
 			try {
@@ -140,9 +145,32 @@ public class MainImg {
 		}
 
 		tempoTreino = System.nanoTime() - tempoTreino;
-		jt.dispose();
 		
 		return tempoTreino;
+	}
+
+	/**
+	 * Atualiza a imagem para o render.
+	 * @param modelo modelo base.
+	 * @param in tensor cache de entrada.
+	 * @param img imagem final para desenho.
+	 */
+	static void gerarImagem(Modelo modelo, Tensor in, Tensor img) {
+		float[] dataImg = img.array();
+		int alt = img.tamDim(0);
+		int larg = img.tamDim(1);
+
+		float[] dataIn = in.array();
+
+		for (int y = 0; y < alt; y++) {
+			dataIn[1] = (float) y / (alt-1);
+
+			for (int x = 0; x < larg; x++) {
+				dataIn[0] = (float) x / (larg - 1);		
+				float b = modelo.forward(in).item();
+				dataImg[y * larg + x] = b;
+			}
+		}
 	}
 
 	/**
@@ -170,18 +198,6 @@ public class MainImg {
 	}
 
 	/**
-	 * Formata o valor recebido para a quantidade de casas após o ponto
-	 * flutuante.
-	 * @param x valor alvo.
-	 * @param casas quantidade de casas após o ponto flutuante.
-	 * @return
-	 */
-	static String formatarDecimal(float x, int casas) {
-		String formato = "#." + "#".repeat(casas);
-		return new DecimalFormat(formato).format(x);
-	}
-
-	/**
 	 * Executa um comando do terminald Windows.
 	 * @param comando comando para o prompt.
 	 */
@@ -202,6 +218,8 @@ public class MainImg {
 	 * @param caminho caminho para o arquivo.
 	 */
 	static void exportarImagemEscalaCinza(Modelo modelo, int altBase, int largBase, double escala, String caminho) {
+		modelo.loteZero();
+
 		if (escala <= 0) throw new IllegalArgumentException("O valor de escala não pode ser menor que 1.");
 		if (modelo.camadaSaida().tamSaida() != 1) {
 			throw new IllegalArgumentException(
