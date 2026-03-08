@@ -3,7 +3,6 @@
 // https://www.netlib.org/lapack/explore-html/dd/d09/group__gemm_ga8cad871c590600454d22564eff4fed6b.html
 
 #include "gemm.h"
-#include "macros.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -11,7 +10,7 @@
 // tilling
 #define BLOCO_LIN_A 32
 #define BLOCO_COL_A 64
-#define BLOCO_COL_B 64
+#define BLOCO_COL_B 32
 
 // microkernel
 #include <immintrin.h>
@@ -104,7 +103,7 @@ static inline void _kernel_scalar(
                 acc += A[i*lda + k] * B[k*ldb + j];
             }
 
-            C[i*ldc + j] += acc;
+            C[i*ldc + j] = acc;
         }
     }
 }
@@ -120,7 +119,7 @@ void _gemm(
     int ldb,
     int ldc) {
 
-    #pragma omp parallel for schedule(dynamic)
+    #pragma omp parallel for
     for (int i = 0; i < M; i += MR) {
         int _M = (i + MR <= M) ? MR : (M - i);
 
@@ -184,12 +183,12 @@ void cpu_gemm(const gemm_params_t* params) {
         // como tem um buffer de memoria, as alocações nao sao um problema
         // mas ai depende do tamanho da matriz
 
-        const float* novo_A = A + off_a;
-        const float* novo_B = B + off_b;
-        float*       novo_C = DST + off_dst;
+        const float* restrict novo_A = A + off_a;
+        const float* restrict novo_B = B + off_b;
+        float* restrict       novo_C = DST + off_dst;
 
-        float *ptr_a = NULL;
-        float *ptr_b = NULL;
+        float* restrict ptr_a = NULL;
+        float* restrict ptr_b = NULL;
 
         int novo_std_a_0 = std_a_0;
         int novo_std_b_0 = std_b_0;
@@ -203,7 +202,7 @@ void cpu_gemm(const gemm_params_t* params) {
         }
     
         if (std_b_1 != 1) {
-            ptr_b = (float*) malloc(sizeof(float) * col_a * col_b);
+            ptr_b = (float*) _aligned_malloc(sizeof(float) * col_a * col_b, 64);
             _empacotar_matriz(novo_B, ptr_b, col_a, col_b, std_b_0, std_b_1);
             novo_B = ptr_b;
             novo_std_b_0 = col_b;
@@ -215,7 +214,7 @@ void cpu_gemm(const gemm_params_t* params) {
             novo_std_a_0, novo_std_b_0, novo_std_c_0
         );
     
-        if (ptr_b) free(ptr_b);
+        if (ptr_b) _aligned_free(ptr_b);
     }
 
 }
