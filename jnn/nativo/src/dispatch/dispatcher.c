@@ -11,13 +11,13 @@ int jnn_get_backend() {
     return BACKEND_ATUAL;
 }
  
-void jnn_matmul_dispatcher(const matmul_params_t* p) {
+void jnn_matmul_dispatcher(const gemm_params_t* p) {
     switch (BACKEND_ATUAL) {
         case JNN_BACKEND_CPU:
-            cpu_matmul(p);
+            cpu_gemm(p);
         break;
 
-        default: cpu_matmul(p);
+        default: cpu_gemm(p);
     }
 }
 

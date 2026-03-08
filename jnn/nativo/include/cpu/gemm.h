@@ -14,7 +14,7 @@ typedef struct {
     int lin_a;
     int col_a;
     int col_b;
-} matmul_params_t;
+} gemm_params_t;
 
 // Realiza a multiplicação matricial entre A e B, salvando de DST.
-void cpu_matmul(const matmul_params_t* params);
+void cpu_gemm(const gemm_params_t* params);

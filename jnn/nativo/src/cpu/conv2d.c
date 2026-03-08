@@ -1,6 +1,6 @@
 #include "conv2d.h"
 #include "macros.h"
-#include "matmul.h"
+#include "gemm.h"
 #include "im2col.h"
 #include "mem_pool.h"
 
@@ -97,7 +97,7 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
 
     float* col = get_mem_pool(sizeof(float) * Kdim * Ndim);
 
-    matmul_params_t mm = {
+    gemm_params_t mm = {
         .A = (float*) K,
         .B = col,
         .DST = NULL,
@@ -115,9 +115,12 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
         .col_b = Ndim
     };
 
+    const int C_x_AreaX = canais * alt_x * larg_x;// cache 
+    const int filtros_x_Ndim = filtros * Ndim;// cache
+    
     for (int l = 0; l < lotes; l++) {
-        const float* x_lote = X + l * canais * alt_x * larg_x;
-        float* y_lote = DST + l * filtros * Ndim;
+        const float* x_lote = X + l * C_x_AreaX;
+        float* y_lote = DST + l * filtros_x_Ndim;
 
         for (int f = 0; f < filtros; f++) {
             float bias = temBias ? B[f] : 0.f;
@@ -139,7 +142,7 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
 
         mm.DST = y_lote;
 
-        cpu_matmul(&mm);
+        cpu_gemm(&mm);
     }
 
 }
@@ -148,20 +151,19 @@ static bool _usar_im2col_fw(const conv2d_fwd_params_t* params) {
     const int alt_s  = params->alt_x  + 2 * params->alt_pad  - params->alt_k  + 1;
     const int larg_s = params->larg_x + 2 * params->larg_pad - params->larg_k + 1;
 
-    const long lotes = params->lotes;
-    const long canais = params->canais;
-    const long filtros = params->filtros;
-    const long alt_k = params->alt_k;
-    const long larg_k = params->larg_k;
-    
-    if (filtros < 16) return false;    
-    if (alt_k < 3 && larg_k < 3) return false;
-    if (alt_s * larg_s < 64) return false;
+    const int M = params->filtros;
+    const int K = params->canais * params->alt_k * params->larg_k;
+    const int N = alt_s * larg_s;
 
-    const long flops = 2L * lotes * filtros * alt_s * larg_s * canais * alt_k * larg_k;
-    const long limiar = 1e8;
-    
-    return flops > limiar;
+    if (params->alt_k < 3 && params->larg_k < 3) {
+        return true;
+    }
+
+    if (K < 32) return false;
+    if (N < 64) return false;
+    if (M < 16) return false;
+
+    return true;
 }
 
 void cpu_conv2d_forward(const conv2d_fwd_params_t* params) {
@@ -257,7 +259,7 @@ static void _backward_gk_im2col(const conv2d_bwd_params_t* params) {
     const int Ndim = alt_s * larg_s;
     float* colT = get_mem_pool(sizeof(float) * Ndim * Kdim);
 
-    matmul_params_t mm = {
+    gemm_params_t mm = {
         .A = NULL,
         .B = colT,
         .DST = GK,
@@ -285,7 +287,7 @@ static void _backward_gk_im2col(const conv2d_bwd_params_t* params) {
         );
 
         mm.A = (float*)gs_lote;
-        cpu_matmul(&mm); 
+        cpu_gemm(&mm); 
     }
 
 }
@@ -378,37 +380,34 @@ static void _backward_ge_col2im(const conv2d_bwd_params_t* params) {
     const int Kdim = params->canais * alt_k * larg_k;
     float* colT = get_mem_pool(sizeof(float) * Ndim * Kdim);
 
+    #pragma omp parallel for schedule(static)
     for (int l = 0; l < params->lotes; l++) {
         const float* gs_lote = params->GS + l * params->filtros * Ndim;
-        float* ge_lote = params->GE + l * params->canais * area_x;;
+        float* ge_lote       = params->GE + l * params->canais * area_x;
 
-        // limpar lixo da pool e lidar com padding > 0
         memset(colT, 0, sizeof(float) * Ndim * Kdim);
 
-        //matmul
-        //TODO implementar um fastpath pra esse caso
-        // C = A(transp) @ B
-        #pragma omp parallel for schedule(static)
-        for (int n = 0; n < Ndim; n++) {
-            float* restrict lin_col = colT + n * Kdim;
+        gemm_params_t mm = {
+            .A   = (float*)gs_lote,
+            .B   = (float*)params->K,
+            .DST = colT,
+            .lin_a  = Ndim,
+            .col_a  = params->filtros,
+            .col_b  = Kdim,
+            .std_a_0 = 1,    .std_a_1 = Ndim,
+            .std_b_0 = Kdim, .std_b_1 = 1,
+            .std_c_0 = Kdim, .std_c_1 = 1
+        };
 
-            for (int f = 0; f < params->filtros; f++) {
-                const float val_g = gs_lote[f * Ndim + n];
-                const float* restrict lin_k = params->K + f * Kdim;
+        cpu_gemm(&mm);
 
-                #pragma omp simd
-                for (int k = 0; k < Kdim; k++) {
-                    lin_col[k] += val_g * lin_k[k];
-                }
-            }
-        }
- 
         col2im_T(
-            colT, ge_lote,
-            params->canais, 
-            alt_x, larg_x,
+            colT, 
+            ge_lote, 
+            params->canais,
+            alt_x, larg_x, 
             alt_k, larg_k,
-            alt_pad, larg_pad,
+            alt_pad, larg_pad, 
             alt_s, larg_s
         );
     }

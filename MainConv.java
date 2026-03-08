@@ -10,7 +10,6 @@ import jnn.camadas.acts.Tanh;
 import jnn.camadas.pooling.GlobalAvgPool2D;
 import jnn.camadas.pooling.MaxPool2D;
 import jnn.core.JNNnative;
-import jnn.core.JNNutils;
 import jnn.dataloader.DataLoader;
 import jnn.dataloader.dataset.CIFAR10;
 import jnn.dataloader.transform.Compose;
@@ -137,20 +136,23 @@ public class MainConv {
 			new Conv2D(64, convK, "same", "he"),
 			new BatchNorm2D(),
 			new ReLU(),
-			new Conv2D(128, convK, "same", "he"),
+			new Conv2D(64, convK, "same", "he"),
 			new BatchNorm2D(),
 			new ReLU(),
 			new MaxPool2D(poolK),
 			
-			new Conv2D(256, convK, "same", "he"),
+			new Conv2D(64, convK, "same", "he"),
+			new BatchNorm2D(),
+			new ReLU(),
+			new Conv2D(64, convK, "same", "he"),
 			new BatchNorm2D(),
 			new ReLU(),
 			new MaxPool2D(poolK),
 
 			new GlobalAvgPool2D(),
 
-			new Dropout(0.5),
-			new Densa(256, "he"),
+			new Dropout(0.3),
+			new Densa(64, "he"),
 			new ReLU(),
 
 			new Densa(10, "he"),
@@ -160,8 +162,6 @@ public class MainConv {
 		for (Camada c : modelo) if (c instanceof Conv2D) c.setBias(false);
 
 		modelo.compilar(new Adam(0.005), "entropia-cruzada");
-
-		JNNutils.randSeed(987654321);
 		
 		return modelo;		
 	}

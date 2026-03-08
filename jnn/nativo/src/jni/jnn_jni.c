@@ -2,7 +2,7 @@
 #include <omp.h>
 
 #include "dispatcher.h"
-#include "matmul.h"
+#include "gemm.h"
 #include "conv2d.h"
 #include "maxpool.h"
 
@@ -47,7 +47,7 @@ Java_jnn_core_JNNnative_matmul(
 ) {
     (void) cls;
 
-    matmul_params_t p = {
+    gemm_params_t p = {
         .A = (*env)->GetPrimitiveArrayCritical(env, A_arr, NULL),
         .B = (*env)->GetPrimitiveArrayCritical(env, B_arr, NULL),
         .DST = (*env)->GetPrimitiveArrayCritical(env, C_arr, NULL),
