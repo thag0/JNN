@@ -2,6 +2,7 @@
 #include "macros.h"
 
 #include <string.h>
+#include <stdbool.h>
 
 void im2col(
     const float* restrict X,
@@ -58,10 +59,8 @@ void im2col_T(
     int alt_s, int larg_s) {
 
     const int Kdim = canais * alt_k * larg_k;
-    const int Ndim = alt_s * larg_s;
-    memset(COLT, 0, sizeof(float) * Kdim * Ndim);// limpar lixo da pool e lidar com padding > 0
 
-    #pragma omp parallel for collapse(2) schedule(static)
+    #pragma omp parallel for schedule(static)
     for (int i = 0; i < alt_s; i++) {
         for (int j = 0; j < larg_s; j++) {
             const int n = i * larg_s + j;
@@ -73,20 +72,24 @@ void im2col_T(
 
                 for (int kh = 0; kh < alt_k; kh++) {
                     int in_y = i + kh - alt_pad;
-                    if ((unsigned)in_y >= (unsigned)alt_x) continue;
-
+                    bool y_valido = (unsigned)in_y < (unsigned)alt_x; 
                     const float* restrict lin_x = X + base_x_c + in_y * larg_x;
 
                     for (int kw = 0; kw < larg_k; kw++) {
                         int in_x = j + kw - larg_pad;
-                        if ((unsigned)in_x >= (unsigned)larg_x) continue;
                         const int k = base_k_c + kh * larg_k + kw;
-                        lin_col[k] = lin_x[in_x];
+                        
+                        if (y_valido && (unsigned)in_x < (unsigned)larg_x) {
+                            lin_col[k] = lin_x[in_x];
+                        } else {
+                            lin_col[k] = 0.0f;
+                        }
                     }
                 }
             }
         }
     }
+
 }
 
 void col2im_T(

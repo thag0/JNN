@@ -52,6 +52,7 @@ gcc ^
  -ffast-math ^
  -mfma ^
  -mavx2 ^
+ -funroll-loops ^
  -fopenmp ^
  -I"%JAVA_HOME%\include" ^
  -I"%JAVA_HOME%\include\win32" ^

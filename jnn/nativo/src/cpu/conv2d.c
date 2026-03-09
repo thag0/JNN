@@ -275,7 +275,7 @@ static void _backward_gk_im2col(const conv2d_bwd_params_t* params) {
         const float* x_lote = X + l * canais * area_x;
         const float* gs_lote = GS + l * filtros * Ndim;
 
-        // transposta em memória pra cair no fastpath do mm
+        // transposta em memória pra cair no fastpath da gemm
         im2col_T(
             x_lote,
             colT, 
@@ -380,7 +380,6 @@ static void _backward_ge_col2im(const conv2d_bwd_params_t* params) {
     const int Kdim = params->canais * alt_k * larg_k;
     float* colT = get_mem_pool(sizeof(float) * Ndim * Kdim);
 
-    #pragma omp parallel for schedule(static)
     for (int l = 0; l < params->lotes; l++) {
         const float* gs_lote = params->GS + l * params->filtros * Ndim;
         float* ge_lote       = params->GE + l * params->canais * area_x;
