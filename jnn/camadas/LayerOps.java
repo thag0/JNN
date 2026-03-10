@@ -234,7 +234,7 @@ public class LayerOps {
 		final int altPad = padding[0];
 		final int largPad = padding[1];
 
-		if (JNNnative.jni) {
+		if (JNNnative.isOn()) {
 			JNNnative.conv2dForward(
 				entrada.array(),
 				kernel.array(),
@@ -514,7 +514,7 @@ public class LayerOps {
 		final int altPad = padding[0];
 		final int largPad = padding[1];
 	
-		if (JNNnative.jni) {
+		if (JNNnative.isOn()) {
 			JNNnative.conv2dBackward(
 				entrada.array(),
 				kernel.array(),
@@ -686,7 +686,7 @@ public class LayerOps {
 	private void forwardMaxPool2DNormal(Tensor entrada, Tensor saida, int[] filtro, int[] stride) {
 		final int canais = entrada.tamDim(0);
 		
-		if (JNNnative.jni) {
+		if (JNNnative.isOn()) {
 			final int lotes = 1;
 			final int altX = entrada.tamDim(1);
 			final int largX = entrada.tamDim(2);
@@ -724,7 +724,7 @@ public class LayerOps {
 	private void forwardMaxPool2DLotes(Tensor entrada, Tensor saida, int[] filtro, int[] stride) {
 		final int lotes = entrada.tamDim(0);
 		
-		if (JNNnative.jni) {
+		if (JNNnative.isOn()) {
 			final int canais = entrada.tamDim(1);
 			final int altX = entrada.tamDim(2);
 			final int largX = entrada.tamDim(3);
@@ -785,7 +785,7 @@ public class LayerOps {
 		final int altG = grad.tamDim(1);
 		final int largG = grad.tamDim(2);
 
-		if (JNNnative.jni) {
+		if (JNNnative.isOn()) {
 			final int lotes = 1;
 
 			JNNnative.maxPool2dBackward(
@@ -859,7 +859,7 @@ public class LayerOps {
 	private void backwardMaxPool2DLotes(Tensor entrada, Tensor grad, Tensor gradE, int[] filtro, int[] stride) {
 		final int lotes = entrada.tamDim(0);
 		
-		if (JNNnative.jni) {
+		if (JNNnative.isOn()) {
 			final int canais = entrada.tamDim(1);
 			final int altX = entrada.tamDim(2);
 			final int largX = entrada.tamDim(3);

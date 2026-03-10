@@ -18,7 +18,12 @@ public class JNNlog {
         /**
          * Tipo específico para logs relacionados à paralelismo.
          */
-        PARALLEL
+        PARALLEL,
+
+        /**
+         * Tipo específico para logs relacionados à interface nativa.
+         */
+        NATIVO
     };
     
     /**

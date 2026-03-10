@@ -29,7 +29,7 @@ public class ReLU extends Ativacao {
 
 		_entrada = x.contiguous();
 
-        if (JNNnative.jni) {
+        if (JNNnative.isOn()) {
             JNNnative.relu(
                 _entrada.array(),
                 _saida.array(),
@@ -52,7 +52,7 @@ public class ReLU extends Ativacao {
 
 		_gradSaida = g.contiguous();
 
-        if (JNNnative.jni) {
+        if (JNNnative.isOn()) {
             JNNnative.relud(
                 _entrada.array(), 
                 _gradSaida.array(), 

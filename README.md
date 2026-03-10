@@ -56,14 +56,16 @@ Sequencial modelo = new Sequencial(
 *Exemplo de treino com o modelo sequencial, usando o otimizador sgd (Stochastic Gradient Descent) e função de perda mse (Mean Squared Error) usando dataset Iris*
 
 # **Interface com código nativo**
-Para acelerar processos críticos que demandam muito tempo em java, implementei a aceleração usando código nativo em C, por enquanto essas funcionalidades estão beneficiando apenas as camadas Densa e Conv2D (que são as mais pesadas), mas tenho interesse em expandir esse cenário de aceleração e quem sabe futuramente implementar cuda.
+Para acelerar processos críticos que demandam muito tempo em java, implementei a aceleração usando código nativo em C, por enquanto apenas algumas funcionalidades mais necessárias de imediato possuem suporte, mas tenho interesse em expandir esse cenário de aceleração e quem sabe futuramente implementar cuda.
 
 Para ativar o uso de JNI basta adicionar estre trecho no início do programa:
 ```
-JNNNative.jni = true;
+JNNnative.on();
 ```
 
-Compile com
+Se tudo der certo, a biblioteca carregará as dependências e a partir desse ponto usará aceleração via código nativo, em trechos que tiverem suporte.
+
+Depois compile com
 
 ```
 javac -cp "jnn.jar" NomeDoPrograma.java
@@ -75,7 +77,7 @@ E rode com
 java --enable-native-access=ALL-UNNAMED -cp "jnn.jar" NomeDoPrograma
 ```
 
-Importante reforçar que o jni por enquanto suporta apenas windows_x64 e que o usuário deve ter instalado o OpenMP na máquina.
+Importante reforçar que o jni por enquanto suporta apenas windows_x64 e que usa paralelismo via OpenMP.
 
 # **Callbacks de treino**
 

@@ -20,7 +20,7 @@ public final class OpsCPU extends Ops {
 
     @Override
 	public void matmul(Tensor a, Tensor b, Tensor dst) {
-		if (JNNnative.jni) OpsLinear.matmulJNI(a, b, dst);
+		if (JNNnative.isOn()) OpsLinear.matmulJNI(a, b, dst);
 		else OpsLinear.matmul(a, b, dst);
 	}
 

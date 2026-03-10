@@ -70,7 +70,7 @@ public class MainConv {
 		});
 		
 		System.out.println("Treinando.");
-		JNNnative.jni = true;
+		JNNnative.on();
 		long tempo = System.nanoTime();
 			modelo.treinar(treino, TREINO_EPOCAS, TREINO_LOTE, TREINO_LOGS);
 		tempo = System.nanoTime() - tempo;

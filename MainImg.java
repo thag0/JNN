@@ -1,5 +1,4 @@
 import java.awt.image.BufferedImage;
-import java.text.DecimalFormat;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 

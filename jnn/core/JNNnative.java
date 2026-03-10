@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
+import jnn.core.JNNlog.TipoLog;
+
 /**
  * Interface para implementação nativa em C.
  */
@@ -25,20 +27,43 @@ public final class JNNnative {
     /**
      * Controla se operações internas usarão backend nativo.
      */
-    public static boolean jni = false;
+    private static boolean jni = false;
 
     /**
      * Backend com implementações focadas em cpu.
      */
     public static final int JNNNative_BACKEND_CPU = 1;
 
-    static {
+    /**
+     * Tenta carregar os dados necessários para utilizar código nativo.
+     * <p>
+     *      Essa operação pode falhar, se isso acontecer, a interface é desativada.
+     * </p>
+     */
+    public static void on() {
         try {
             carregarDoJar();
-        
+            jni = true;
+
         } catch (Exception e) {
-            throw new RuntimeException("\nErro ao carregar DLL", e);
+            jni = false;
+            JNNlog.logln(
+                TipoLog.NATIVO,
+                "Ocorreu um erro ao utilizar a interface nativa, implementaçõs aceleradas via código nativo não funcionarão."
+            );
+            JNNlog.logln(TipoLog.NATIVO, ("Causa: " + e.getMessage()));
         }
+    }
+
+    /**
+     * Desativa a utilização da interface nativa, por qualquer motivo que seja.
+     */
+    public static void off() {
+        if (isOn()) jni = !jni;//jeito legal
+    }
+
+    public static boolean isOn() {
+        return jni == true;
     }
 
     /**
@@ -49,7 +74,7 @@ public final class JNNnative {
         InputStream is = JNNnative.class.getResourceAsStream(caminhoDLL + nomeDLL);
 
         if (is == null) {
-            throw new FileNotFoundException("\nDLL não encontrada: " + nomeDLL);
+            throw new FileNotFoundException("DLL não encontrada: " + nomeDLL);
         }
 
         Path tmp = Files.createTempDirectory("jnn_native");
