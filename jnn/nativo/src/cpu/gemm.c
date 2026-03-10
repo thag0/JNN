@@ -3,6 +3,7 @@
 // https://www.netlib.org/lapack/explore-html/dd/d09/group__gemm_ga8cad871c590600454d22564eff4fed6b.html
 
 #include "gemm.h"
+#include "mem_pool.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -16,21 +17,6 @@
 #include <immintrin.h>
 #define MR 4
 #define NR 8
-
-static _Thread_local float* _pack_buff_data = NULL;
-static _Thread_local size_t _pack_buff_tam = 0;
-
-// auxiliar pra reutilizar memoria e evitar alocações
-static float* _get_pack_mem(size_t tam_bytes) {
-    if (tam_bytes > _pack_buff_tam) {
-        _aligned_free(_pack_buff_data);
-        size_t bytes = (tam_bytes + 63) & ~63;
-        _pack_buff_data = _aligned_malloc(bytes, 64);
-        _pack_buff_tam = bytes;
-    }
-
-    return _pack_buff_data;
-}
 
 static void _empacotar_matriz(
     const float* restrict X,
@@ -195,14 +181,14 @@ void cpu_gemm(const gemm_params_t* params) {
         int novo_std_c_0 = std_c_0;
     
         if (std_a_1 != 1) {
-            ptr_a = _get_pack_mem(sizeof(float) * lin_a * col_a);
+            ptr_a = get_gemm_mem_pool_a(sizeof(float) * lin_a * col_a);
             _empacotar_matriz(novo_A, ptr_a, lin_a, col_a, std_a_0, std_a_1);
             novo_A = ptr_a;
             novo_std_a_0 = col_a;
         }
     
         if (std_b_1 != 1) {
-            ptr_b = (float*) _aligned_malloc(sizeof(float) * col_a * col_b, 64);
+            ptr_b = get_gemm_mem_pool_a(sizeof(float) * col_a * col_b);
             _empacotar_matriz(novo_B, ptr_b, col_a, col_b, std_b_0, std_b_1);
             novo_B = ptr_b;
             novo_std_b_0 = col_b;
@@ -213,8 +199,6 @@ void cpu_gemm(const gemm_params_t* params) {
             lin_a, col_a, col_b,
             novo_std_a_0, novo_std_b_0, novo_std_c_0
         );
-    
-        if (ptr_b) _aligned_free(ptr_b);
     }
 
 }
