@@ -275,7 +275,47 @@ Java_jnn_core_JNNnative_maxPool2dBackward(
 
     jnn_maxpool2d_bw_dispatcher(&p);
 
-    (*env)->ReleasePrimitiveArrayCritical(env, x_arr, X, JNI_ABORT);
+    (*env)->ReleasePrimitiveArrayCritical(env, x_arr,   X, JNI_ABORT);
     (*env)->ReleasePrimitiveArrayCritical(env, gs_arr, GS, JNI_ABORT);
     (*env)->ReleasePrimitiveArrayCritical(env, ge_arr, GE, 0);
+}
+
+JNIEXPORT void JNICALL Java_jnn_core_JNNnative_relu(
+    JNIEnv *env, 
+    jclass cls, 
+    jfloatArray src, 
+    jfloatArray dst, 
+    jint n
+) {
+    (void) cls;
+    
+    const float* restrict X = (*env)->GetPrimitiveArrayCritical(env, src, NULL);
+    float* restrict Y       = (*env)->GetPrimitiveArrayCritical(env, dst, NULL);
+
+    jnn_relu(X, Y, n);
+
+    (*env)->ReleasePrimitiveArrayCritical(env, src, (void*)X, JNI_ABORT);
+    (*env)->ReleasePrimitiveArrayCritical(env, dst, Y, 0);
+}
+
+JNIEXPORT void JNICALL Java_jnn_core_JNNnative_relud(
+    JNIEnv *env, 
+    jclass cls, 
+    jfloatArray g, 
+    jfloatArray dst, 
+    jfloatArray x, 
+    jint tam
+) {
+    
+    (void) cls;
+
+    const float* restrict G = (*env)->GetPrimitiveArrayCritical(env, g, NULL);
+    const float* restrict X = (*env)->GetPrimitiveArrayCritical(env, x, NULL);
+    float* restrict     DST = (*env)->GetPrimitiveArrayCritical(env, dst, NULL);
+
+    jnn_relud(X, G, DST, tam);
+
+    (*env)->ReleasePrimitiveArrayCritical(env, g, (void*)G, JNI_ABORT);
+    (*env)->ReleasePrimitiveArrayCritical(env, x, (void*)X, JNI_ABORT);
+    (*env)->ReleasePrimitiveArrayCritical(env, dst, DST, 0);
 }

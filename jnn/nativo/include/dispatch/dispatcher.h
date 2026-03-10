@@ -2,6 +2,7 @@
 #include "gemm.h"
 #include "conv2d.h"
 #include "maxpool.h"
+#include "acts.h"
 
 // Tipo de backend nativo.
 typedef enum {
@@ -28,3 +29,11 @@ void jnn_maxpool2d_fw_dispatcher(const maxpool2d_fwd_params_t* p);
 
 // Executa o backward da camada MaxPool2D de acordo com o backend nativo atual.
 void jnn_maxpool2d_bw_dispatcher(const maxpool2d_bwd_params_t* p);
+
+// ativações
+
+// Executa a função de ativalçai ReLU em dst, usando src como base.
+void jnn_relu(const float* restrict src, float* restrict dst, int n);
+
+// Executa a derivad da função de ativalçai ReLU em dst, usando x e src como base.
+void jnn_relud(const float* restrict x, const float* restrict g, float* restrict dst, int n);

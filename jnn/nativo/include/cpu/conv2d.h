@@ -2,7 +2,7 @@
 
 #include <stdbool.h>
 
-typedef struct conv2d_fwd_params_t {
+typedef struct {
     const float* restrict X;
     const float* restrict K;
     const float* restrict B;

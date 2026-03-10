@@ -60,3 +60,11 @@ void jnn_maxpool2d_bw_dispatcher(const maxpool2d_bwd_params_t* p) {
         default: cpu_maxpool2d_backward(p);
     }  
 }
+
+void jnn_relu(const float* restrict src, float* restrict dst, int n) {
+    relu(src, dst, n);
+}
+
+void jnn_relud(const float* restrict x, const float* restrict g, float* restrict dst, int n) {
+    relud(x, g, dst, n);
+}

@@ -65,6 +65,22 @@ JNIEXPORT void JNICALL Java_jnn_core_JNNnative_maxPool2dForward
 JNIEXPORT void JNICALL Java_jnn_core_JNNnative_maxPool2dBackward
   (JNIEnv *, jclass, jfloatArray, jfloatArray, jfloatArray, jint, jint, jint, jint, jint, jint, jint, jint, jint, jint);
 
+/*
+ * Class:     jnn_core_JNNnative
+ * Method:    relu
+ * Signature: ([F[FI)V
+ */
+JNIEXPORT void JNICALL Java_jnn_core_JNNnative_relu
+  (JNIEnv *, jclass, jfloatArray, jfloatArray, jint);
+
+/*
+ * Class:     jnn_core_JNNnative
+ * Method:    relud
+ * Signature: ([F[F[FI)V
+ */
+JNIEXPORT void JNICALL Java_jnn_core_JNNnative_relud
+  (JNIEnv *, jclass, jfloatArray, jfloatArray, jfloatArray, jint);
+
 #ifdef __cplusplus
 }
 #endif

@@ -230,4 +230,23 @@ public final class JNNnative {
         int largStride
     );
 
+    /**
+     * Aplica a função de ativação ReLU no conjunto de dados de saída, usando
+     * src como fonte de dados.
+     * @param x Dados de entrada.
+     * @param dst Dados de destino da operação.
+     * @param n tamanhos conjuntos de dados (devem ser iguais).
+     */
+    public static native void relu(float[] src, float[] dst, int n);
+    
+    /**
+     * Aplica a derivada da função de ativação ReLU no conjunto de dados 
+     * de saída, usando x e src como fonte de dados.
+     * @param x Dados de entrada.
+     * @param g Dados do gradiente em relação a saída da camada.
+     * @param dst Dados de destino da operação.
+     * @param n tamanhos conjuntos de dados (devem ser iguais).
+     */
+    public static native void relud(float[] x, float[] g, float[] dst, int n);
+
 }

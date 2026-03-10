@@ -1,5 +1,6 @@
 package jnn.camadas.acts;
 
+import jnn.core.JNNnative;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -28,11 +29,19 @@ public class ReLU extends Ativacao {
 
 		_entrada = x.contiguous();
 
-        relu(
-            _entrada.array(), _entrada.offset(),
-            _saida.array(), _saida.offset(),
-            _entrada.tam()
-        );
+        if (JNNnative.jni) {
+            JNNnative.relu(
+                _entrada.array(),
+                _saida.array(),
+                _entrada.tam()
+            );
+        } else {
+            relu(
+                _entrada.array(),
+                _saida.array(),
+                _entrada.tam()
+            );
+        }
 
         return _saida;
     }
@@ -43,28 +52,37 @@ public class ReLU extends Ativacao {
 
 		_gradSaida = g.contiguous();
 
-        relud(
-            _gradSaida.array(), _gradSaida.offset(),
-            _gradEntrada.array(), _gradEntrada.offset(),
-            _entrada.array(), _entrada.offset(),
-            _entrada.tam()
-        );
+        if (JNNnative.jni) {
+            JNNnative.relud(
+                _entrada.array(), 
+                _gradSaida.array(), 
+                _gradEntrada.array(), 
+                _entrada.tam()
+            );
+        } else {
+            relud(
+                _entrada.array(),
+                _gradSaida.array(), 
+                _gradEntrada.array(), 
+                _entrada.tam()
+            );
+        }
 
         return _gradEntrada;
     }
 
-    private void relu(float[] x, int offX, float[] dest, int offDest, int n) {
+    private static void relu(float[] x, float[] dst, int n) {
         for (int i = 0; i < n; i++) {
-            float val = x[offX + i];
-            dest[offDest + i] = val > 0 ? val : 0;
+            float val = x[i];
+            dst[i] = val > 0 ? val : 0;
         }
     }
 
-    private void relud(float[] g, int offG, float[] gradE, int offGE, float[] x, int offX, int n) {
+    private static void relud(float[] x, float[] g, float[] dst, int n) {
         for (int i = 0; i < n; i++) {
-            final float grad = g[offG + i];
-            final float entrada = x[offX + i];
-            gradE[offGE + i] = grad * (entrada > 0 ? 1 : 0);
+            final float grad = g[i];
+            final float entrada = x[i];
+            dst[i] = grad * (entrada > 0 ? 1 : 0);
         }
     }
     
