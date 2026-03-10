@@ -102,34 +102,7 @@ void col2im_T(
     int alt_s, int larg_s) {
 
     const int Kdim = canais * alt_k * larg_k;
-    const int Ndim = alt_s * larg_s;
     const int area_x = alt_x * larg_x;
-
-    // #pragma omp parallel for schedule(static)
-    // for (int c = 0; c < canais; c++) {
-    //     for (int n = 0; n < Ndim; n++) {
-    //         const int i = n / larg_s;
-    //         const int j = n % larg_s;
-
-    //         const float* restrict lin_col = COLT + n * Kdim;
-    //         const int base_k_c = c * alt_k * larg_k;
-
-    //         for (int kh = 0; kh < alt_k; kh++) {
-    //             const int in_y = i + kh - alt_pad;
-    //             if ((unsigned)in_y >= (unsigned)alt_x) continue;
-
-    //             float* restrict lin_ge = GE + c * area_x + in_y * larg_x;
-
-    //             for (int kw = 0; kw < larg_k; kw++) {
-    //                 const int in_x = j + kw - larg_pad;
-    //                 if ((unsigned)in_x >= (unsigned)larg_x) continue;
-
-    //                 const int k = base_k_c + kh * larg_k + kw;
-    //                 lin_ge[in_x] += lin_col[k];
-    //             }
-    //         }
-    //     }
-    // }
 
     #pragma omp parallel for schedule(static)
     for (int c = 0; c < canais; c++) {
