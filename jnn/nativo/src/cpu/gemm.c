@@ -137,7 +137,7 @@ void _gemm(
 void cpu_gemm(const gemm_params_t* params) {
     const float* restrict A = params->A;
     const float* restrict B = params->B;
-    float* restrict DST = params->DST;
+    float* restrict       C = params->DST;
 
     const int lin_a = params->lin_a;
     const int col_a = params->col_a;
@@ -159,7 +159,7 @@ void cpu_gemm(const gemm_params_t* params) {
 
     if (fastpath) {
         _gemm(
-            A, B, DST, 
+            A, B, C, 
             lin_a, col_a, col_b,
             std_a_0, std_b_0, std_c_0
         );
@@ -171,33 +171,33 @@ void cpu_gemm(const gemm_params_t* params) {
 
         const float* restrict novo_A = A + off_a;
         const float* restrict novo_B = B + off_b;
-        float* restrict       novo_C = DST + off_dst;
+        float* restrict       novo_C = C + off_dst;
 
         float* restrict ptr_a = NULL;
         float* restrict ptr_b = NULL;
 
-        int novo_std_a_0 = std_a_0;
-        int novo_std_b_0 = std_b_0;
-        int novo_std_c_0 = std_c_0;
+        int lda = std_a_0;
+        int ldb = std_b_0;
+        int ldc = std_c_0;
     
         if (std_a_1 != 1) {
             ptr_a = get_gemm_mem_pool_a(sizeof(float) * lin_a * col_a);
             _empacotar_matriz(novo_A, ptr_a, lin_a, col_a, std_a_0, std_a_1);
             novo_A = ptr_a;
-            novo_std_a_0 = col_a;
+            lda = col_a;
         }
     
         if (std_b_1 != 1) {
-            ptr_b = get_gemm_mem_pool_a(sizeof(float) * col_a * col_b);
+            ptr_b = get_gemm_mem_pool_b(sizeof(float) * col_a * col_b);
             _empacotar_matriz(novo_B, ptr_b, col_a, col_b, std_b_0, std_b_1);
             novo_B = ptr_b;
-            novo_std_b_0 = col_b;
+            ldb = col_b;
         }
     
         _gemm(
             novo_A, novo_B, novo_C,
             lin_a, col_a, col_b,
-            novo_std_a_0, novo_std_b_0, novo_std_c_0
+            lda, ldb, ldc
         );
     }
 
