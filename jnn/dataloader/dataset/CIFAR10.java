@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
+import jnn.core.JNNlog;
+import jnn.core.JNNlog.TipoLog;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 
@@ -216,7 +218,6 @@ public class CIFAR10 {
 
         if (!Files.exists(tarGz)) {
             String url = BASE + ARQUIVO_TAR;
-            System.out.println("Baixando " + url);
             baixar(url, tarGz);
         }
 
@@ -245,6 +246,7 @@ public class CIFAR10 {
      * @throws IOException caso ocorra algum erro.
      */
     private static void baixar(String url, Path destino) throws IOException {
+        JNNlog.logln(TipoLog.DATASET, "CIFAR-10 - Baixando conteúdo: " + url);
         try (InputStream in = URI.create(url).toURL().openStream()) {
             Files.copy(in, destino, StandardCopyOption.REPLACE_EXISTING);
         }

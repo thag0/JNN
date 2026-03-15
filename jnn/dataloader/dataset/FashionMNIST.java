@@ -18,6 +18,8 @@ import java.util.zip.GZIPInputStream;
 
 import javax.net.ssl.SSLException;
 
+import jnn.core.JNNlog;
+import jnn.core.JNNlog.TipoLog;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 
@@ -142,7 +144,6 @@ public class FashionMNIST {
     private static void talvezBaixar(Path destino) throws IOException {
         if (!Files.exists(destino)) {
             String url = BASE + destino.getFileName().toString();
-            System.out.println("Baixando " + url);
 
             try {
                 baixar(url, destino);
@@ -184,6 +185,7 @@ public class FashionMNIST {
      * @throws IOException caso ocorra algum erro.
      */
     private static void baixar(String url, Path destino) throws IOException {
+        JNNlog.logln(TipoLog.DATASET, "FashionMNIST - Baixando conteúdo: " + url);
         try (InputStream in = URI.create(url).toURL().openStream()) {
             Files.copy(in, destino, StandardCopyOption.REPLACE_EXISTING);
         }

@@ -11,19 +11,24 @@ public class JNNlog {
     public enum TipoLog {
 
         /**
-         * Tipo específico para logs relacionados ao treino.
+         * Logs relacionados ao treino.
          */
         TREINO,
         
         /**
-         * Tipo específico para logs relacionados à paralelismo.
+         * Logs relacionados à paralelismo.
          */
         PARALLEL,
 
         /**
-         * Tipo específico para logs relacionados à interface nativa.
+         * Logs relacionados à interface nativa.
          */
-        NATIVO
+        NATIVO,
+
+        /**
+         * Logs relacionados aos datasets.
+         */
+        DATASET
     };
     
     /**
