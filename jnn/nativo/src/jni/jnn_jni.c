@@ -301,21 +301,20 @@ JNIEXPORT void JNICALL Java_jnn_core_JNNnative_relu(
 JNIEXPORT void JNICALL Java_jnn_core_JNNnative_relud(
     JNIEnv *env, 
     jclass cls, 
+    jfloatArray x,
     jfloatArray g, 
     jfloatArray dst, 
-    jfloatArray x, 
     jint tam
-) {
-    
+) { 
     (void) cls;
 
-    const float* restrict G = (*env)->GetPrimitiveArrayCritical(env, g, NULL);
     const float* restrict X = (*env)->GetPrimitiveArrayCritical(env, x, NULL);
+    const float* restrict G = (*env)->GetPrimitiveArrayCritical(env, g, NULL);
     float* restrict     DST = (*env)->GetPrimitiveArrayCritical(env, dst, NULL);
 
     jnn_relud(X, G, DST, tam);
 
-    (*env)->ReleasePrimitiveArrayCritical(env, g, (void*)G, JNI_ABORT);
     (*env)->ReleasePrimitiveArrayCritical(env, x, (void*)X, JNI_ABORT);
+    (*env)->ReleasePrimitiveArrayCritical(env, g, (void*)G, JNI_ABORT);
     (*env)->ReleasePrimitiveArrayCritical(env, dst, DST, 0);
 }

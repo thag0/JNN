@@ -75,6 +75,7 @@ void im2col_T(
                     bool y_valido = (unsigned)in_y < (unsigned)alt_x; 
                     const float* restrict lin_x = X + base_x_c + in_y * larg_x;
 
+                    #pragma omp simd
                     for (int kw = 0; kw < larg_k; kw++) {
                         int in_x = j + kw - larg_pad;
                         const int k = base_k_c + kh * larg_k + kw;
@@ -102,29 +103,30 @@ void col2im_T(
     int alt_s, int larg_s) {
 
     const int Kdim = canais * alt_k * larg_k;
+    const int Ndim = alt_s * larg_s;
     const int area_x = alt_x * larg_x;
 
     #pragma omp parallel for schedule(static)
     for (int c = 0; c < canais; c++) {
-        float* restrict ge_c    = GE + c * area_x;
-        const int       base_kc = c * alt_k * larg_k;
+        for (int n = 0; n < Ndim; n++) {
+            const int i = n / larg_s;
+            const int j = n % larg_s;
 
-        for (int i = 0; i < alt_s; i++) {
-            for (int j = 0; j < larg_s; j++) {
-                const float* restrict col_ij = COLT + (i * larg_s + j) * Kdim + base_kc;
+            const float* restrict lin_col = COLT + n * Kdim;
+            const int base_k_c = c * alt_k * larg_k;
 
-                for (int kh = 0; kh < alt_k; kh++) {
-                    const int in_y = i + kh - alt_pad;
-                    if ((unsigned)in_y >= (unsigned)alt_x) continue;
+            for (int kh = 0; kh < alt_k; kh++) {
+                const int in_y = i + kh - alt_pad;
+                if ((unsigned)in_y >= (unsigned)alt_x) continue;
 
-                    float* restrict lin_ge = ge_c + in_y * larg_x;
-                    const float* restrict col_kh = col_ij + kh * larg_k;
+                float* restrict lin_ge = GE + c * area_x + in_y * larg_x;
 
-                    for (int kw = 0; kw < larg_k; kw++) {
-                        const int in_x = j + kw - larg_pad;
-                        if ((unsigned)in_x >= (unsigned)larg_x) continue;
-                        lin_ge[in_x] += col_kh[kw];
-                    }
+                for (int kw = 0; kw < larg_k; kw++) {
+                    const int in_x = j + kw - larg_pad;
+                    if ((unsigned)in_x >= (unsigned)larg_x) continue;
+
+                    const int k = base_k_c + kh * larg_k + kw;
+                    lin_ge[in_x] += lin_col[k];
                 }
             }
         }

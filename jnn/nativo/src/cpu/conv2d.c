@@ -25,8 +25,6 @@ static void _forward_loops(const conv2d_fwd_params_t* params) {
     const int filtros = params->filtros;
     const int canais = params->canais;
 
-    const bool temBias = params->temBias;
-
     const int alt_s  = (alt_x  + 2 * alt_pad  - alt_k ) + 1;
     const int larg_s = (larg_x + 2 * larg_pad - larg_k) + 1;
 
@@ -38,7 +36,9 @@ static void _forward_loops(const conv2d_fwd_params_t* params) {
     for (int l = 0; l < lotes; l++) {
         for (int f = 0; f < filtros; f++) {
             float* restrict dst_base = DST + (l * filtros + f) * area_s;
-            for (int i = 0; i < area_s; i++) dst_base[i] = temBias ? B[f] : 0.0f;
+
+            float bias = params->temBias ? B[f] : 0.0f;
+            for (int i = 0; i < area_s; i++) dst_base[i] = bias;
 
             for (int c = 0; c < canais; c++) {
                 const float* restrict Xc = X + (l * canais + c) * area_x;
@@ -68,6 +68,7 @@ static void _forward_loops(const conv2d_fwd_params_t* params) {
             }
         }
     }
+
 }
 
 static void _forward_im2col(const conv2d_fwd_params_t* params) {
@@ -156,14 +157,17 @@ static bool _usar_im2col_fw(const conv2d_fwd_params_t* params) {
     const int N = alt_s * larg_s;
 
     if (params->alt_k < 3 && params->larg_k < 3) {
-        return true;
+        return false;
     }
 
     if (K < 32) return false;
     if (N < 64) return false;
-    if (M < 16) return false;
+    if (M < 32) return false;
 
-    return true;
+    const long peso = (long)M * K * N;
+    const long limiar = 2e6;
+
+    return peso > limiar;
 }
 
 void cpu_conv2d_forward(const conv2d_fwd_params_t* params) {
@@ -442,8 +446,6 @@ void cpu_conv2d_backward(const conv2d_bwd_params_t* params) {
     const float* restrict GS = params->GS;
     float* restrict GB       = params->GB;
 
-    const bool temBias = params->temBias;
-
     const int alt_x = params->alt_x;
     const int larg_x = params->larg_x;
     const int alt_k = params->alt_k;
@@ -459,7 +461,7 @@ void cpu_conv2d_backward(const conv2d_bwd_params_t* params) {
     const int larg_s = larg_x + 2 * larg_pad - larg_k + 1;
     const int area_gs = alt_s * larg_s;
 
-    if (temBias) {
+    if (params->temBias) {
         #pragma omp parallel for schedule(static)
         for (int f = 0; f < filtros; f++) {
             float soma_bias = 0.0f;
