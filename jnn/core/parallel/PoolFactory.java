@@ -18,7 +18,12 @@ public class PoolFactory {
     /**
      * Quantidade de threads padrão por pool.
      */
-    static int numThreads = MAX_DISPONIVEL / 2;// normalmente threads físicas.
+    static volatile int numThreads = MAX_DISPONIVEL / 2;// normalmente threads físicas.
+
+    /**
+     * Pool global.
+     */
+    static final ForkJoinPool common = pool(numThreads); 
 
     /**
      * Construtor privado.
@@ -27,26 +32,34 @@ public class PoolFactory {
 
     /**
      * Cria uma nova pool de threads utilizando o valor padrão.
+     * @param t número de threads desejadas para pool.
      * @return {@code ForkJoinPool}
      */
-    public static synchronized ForkJoinPool pool() {
-        return new ForkJoinPool(numThreads);
+    public static ForkJoinPool pool(int t) {
+        return new ForkJoinPool(t);
     }
 
     /**
      * Cria uma nova pool de threads utilizando o valor padrão.
-     * @param t número de threads desejadas para pool.
      * @return {@code ForkJoinPool}
      */
-    public static synchronized ForkJoinPool pool(int t) {
-        return new ForkJoinPool(t);
+    public static ForkJoinPool pool() {
+        return pool(numThreads);
+    }
+
+    /**
+     * Retorna a pool global.
+     * @return pool global.
+     */
+    public static ForkJoinPool common() {
+        return common;
     }
 
     /**
      * Configura um novo valor padrão para criação de novas pools.
      * @param t quantidade de threads desejada.
      */
-    public static synchronized void setThreads(int t) {
+    public static void setThreads(int t) {
         if (t < 1) {
             throw new IllegalArgumentException(
                 "\nValor de threads " + t + " inválido."
@@ -68,7 +81,7 @@ public class PoolFactory {
      * Retorna a quantidade de threads configurada para novas pools.
      * @return número de threads.
      */
-    public static synchronized int getThreads() {
+    public static int getThreads() {
         return numThreads;
     }
 

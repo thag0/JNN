@@ -35,26 +35,21 @@ import jnn.core.tensor.Tensor;
  *    camadas anteriores usadas pelos modelos.
  * </p>
  * <h2>
- *    Existem dois detalhes importantes na implementação das camadas.
+ *    Detalhe adicional.
  * </h2>
  * <ul>
- *    <li>
- *       Primeiramente que os elementos das camadas devem ser pré inicializados 
- *       para evitar alocações dinâmicas durante a execução dos modelos e isso 
- *       se dá por dois motivos: ter controle das dimensões dos objetos criandos 
- *       durante toda a execução dos algoritmos e também criar uma espécie de cache 
- *       para evitar muitas instanciações em runtime.
- *    </li>
- *    <li>
- *       Segundo, que as funções de ativação não são camadas independentes e sim 
- *       funções que atuam sobre os elementos das camadas, e guardam os resultados 
- * 		 na saída da camada.
- *    </li>
+ *	<li>
+ *		Os elementos das camadas devem ser pré inicializados para evitar alocações 
+ *		dinâmicas durante a execução dos modelos e isso se dá por dois motivos: ter 
+ *		controle das dimensões dos objetos criandos durante toda a execução dos 
+ *		algoritmos e também criar uma espécie de cache para evitar muitas instanciações
+ *		em runtime.
+ *	</li>
  * </ul>
  */
 public abstract class Camada {
 
-	// TODO fazer validação dos shapes dos tensores recebidos no forward e backward, pra ontem
+	// TODO fazer validação dos shapes dos tensores recebidos no backward
 
 	/**
 	 * Controlador para uso dentro dos algoritmos de treino.
@@ -96,13 +91,16 @@ public abstract class Camada {
 	protected Camada() {}
 
 	/**
-	 * Monta a estrutura da camada.
+	 * Aloca a estrutura da camada, alocando os recursos necessários 
+	 * para funcionamento.
 	 * <p>
-	 *		A construção da camada envolve inicializar seus atributos como 
-	 *		entrada, kernels, bias, além de elementos auxiliares que são 
-	 *		importantes para o seu funcionamento correto.
+	 *		Essa operação NÃO incializa valores, apenas aloca em 
+	 *		memória os atributos da camada.
 	 * </p>
-	 * @param shape formato para os dados de entrada da camada.
+	 * <p>
+	 *		Para inicializar kernels e bias use <strong>inicializar()</strong>
+	 * </p>
+	 * @param shape formato de entrada da camada.
 	 */
 	public abstract void construir(int[] shape);
 
@@ -140,8 +138,8 @@ public abstract class Camada {
 	}
 
 	/**
-	 * Inicaliza os parâmetros treináveis da camada de acordo com os 
-	 * inicializadores definidos.
+	 * Gera os valores iniciais para parâmetros treináveis da camada de 
+	 * acordo com os seus inicializadores definidos.
 	 */
 	public abstract void inicializar();
 
@@ -231,6 +229,9 @@ public abstract class Camada {
 	/**
 	 * Adapta os parâmetros relevante da camada para lidar
 	 * com lotes de dados.
+	 * <p>
+	 *		Essa operação não altera kernels e bias.
+	 * </p>
 	 * @param tamLote tamanho do lote de dados.
 	 */
 	public void ajustarParaLote(int tamLote) {

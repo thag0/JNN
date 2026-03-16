@@ -11,26 +11,21 @@ import jnn.inicializadores.Zeros;
 
 /**
  * <h2>
- *    Camada Convolucional
+ *		Camada Convolucional
  * </h2>
  * <p>
- *    A camada convolucional realiza operações de convolução sobre a entrada
- *    utilizando filtros (kernels) para extrair características locais.
+ *		Aplica uma convolução bidimensional sobre um tensor de entrada composto
+ *		por múltiplos canais espaciais. A camada utiliza um conjunto de filtros
+ *		(kernels) deslizantes que percorrem as dimensões espaciais da entrada
+ *		(altura e largura), produzindo um conjunto de mapas de características
+ *		como saída.
  * </p>
- * <h3>
- *    Detalhe adicional:
- * </h3>
- * Na realidade a operação realizada dentro da camada convolucional é chamada de
- * correlação cruzada, é nela que aplicamos os kernels pela entrada recebida. A 
- * operação de convolução tem a peculiaridade de rotacionar o filtro 180° antes 
- * de ser executada.
+ * <p>
+ *		Caso o bias seja configurado, ele será adicionado na saída da camada.
+ * </p>
+ * @see <a href="https://github.com/thag0/JNN/blob/main/jnn/camadas/Conv2D.java"> Conv2D </a>
  */
 public class Conv2D extends Camada implements Cloneable {
-
-	/**
-	 * Utilitário.
-	 */
-	private LayerOps lops = new LayerOps();
 
 	/**
 	 * Formato de entrada da camada convolucional, dado por:
@@ -158,33 +153,22 @@ public class Conv2D extends Camada implements Cloneable {
 	private Inicializador iniK = new GlorotUniforme();
 
 	/**
-	 * Inicializador para os bias da camada.
+	 * Inicializador para o bias da camada.
 	 */
 	private Inicializador iniB = new Zeros();
 
 	/**
-	 * Instancia uma camada convolucional de acordo com os formatos fornecidos.
-	 * <p>
-	 *    A disposição do formato de entrada deve ser da seguinte forma:
-	 * </p>
-	 * <pre>
-	 *    formEntrada = (canais, altura, largura)
-	 * </pre>
-	 * Onde largura e altura devem corresponder as dimensões dos dados de entrada
-	 * que serão processados pela camada e a profundidade diz respeito a quantidade
-	 * de entradas que a camada deve processar.
-	 * <p>
-	 *    A disposição do formato do filtro deve ser da seguinte forma:
-	 * </p>
-	 * <pre>
-	 *    formFiltro = (altura, largura)
-	 * </pre>
-	 * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-	 * @param entrada formato de entrada da camada.
+	 * Utilitário.
+	 */
+	private LayerOps lops = new LayerOps();
+
+	/**
+	 * Instancia uma camada Conv2D.
+	 * @param entrada formato de entrada (canais, altura, largura).
 	 * @param filtros quantidade de filtros.
-	 * @param filtro formato dos filtros da camada (altura, largura).
+	 * @param filtro formato dos filtros (altura, largura).
 	 * @param pad quantidade de padding aplicado na entrada, pode ser uma {@code String} ("valid" ou "same"),
-	 * ou pode ser um valor inteiro que será aplicado tanto na altura como na largura da entrada.
+	 * ou pode ser um valor {@code inteiro} que será aplicado tanto na altura como na largura da entrada.
 	 * @param iniK inicializador para os filtros.
 	 * @param iniB inicializador para os bias.
 	 */
@@ -194,26 +178,10 @@ public class Conv2D extends Camada implements Cloneable {
 	}
 
 	/**
-	 * Instancia uma camada convolucional de acordo com os formatos fornecidos.
-	 * <p>
-	 *    A disposição do formato de entrada deve ser da seguinte forma:
-	 * </p>
-	 * <pre>
-	 *    formEntrada = (canais, altura, largura)
-	 * </pre>
-	 * Onde largura e altura devem corresponder as dimensões dos dados de entrada
-	 * que serão processados pela camada e a profundidade diz respeito a quantidade
-	 * de entradas que a camada deve processar.
-	 * <p>
-	 *    A disposição do formato do filtro deve ser da seguinte forma:
-	 * </p>
-	 * <pre>
-	 *    formFiltro = (altura, largura)
-	 * </pre>
-	 * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-	 * @param entrada formato de entrada da camada.
+	 * Instancia uma camada Conv2D.
+	 * @param entrada formato de entrada (canais, altura, largura).
 	 * @param filtros quantidade de filtros.
-	 * @param filtro formato dos filtros da camada (altura, largura).
+	 * @param filtro formato dos filtros (altura, largura).
 	 * @param pad quantidade de padding aplicado na entrada, pode ser uma {@code String} ("valid" ou "same"),
 	 * ou pode ser um valor inteiro que será aplicado tanto na altura como na largura da entrada.
 	 */
@@ -222,51 +190,19 @@ public class Conv2D extends Camada implements Cloneable {
 	}
 
 	/**
-	 * Instancia uma camada convolucional de acordo com os formatos fornecidos.
-	 * <p>
-	 *    A disposição do formato de entrada deve ser da seguinte forma:
-	 * </p>
-	 * <pre>
-	 *    formEntrada = (canais, altura, largura)
-	 * </pre>
-	 * Onde largura e altura devem corresponder as dimensões dos dados de entrada
-	 * que serão processados pela camada e a profundidade diz respeito a quantidade
-	 * de entradas que a camada deve processar.
-	 * <p>
-	 *    A disposição do formato do filtro deve ser da seguinte forma:
-	 * </p>
-	 * <pre>
-	 *    formFiltro = (altura, largura)
-	 * </pre>
-	 * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-	 * @param entrada formato de entrada da camada.
+	 * Instancia uma camada Conv2D.
+	 * @param entrada formato de entrada (canais, altura, largura).
 	 * @param filtros quantidade de filtros.
-	 * @param filtro formato dos filtros da camada (altura, largura).
+	 * @param filtro formato dos filtros (altura, largura).
 	 */
 	public Conv2D(int[] entrada, int filtros, int[] filtro) {
 		this(entrada, filtros, filtro, "valid", null, null);
 	}
 
 	/**
-	 * Instancia uma camada convolucional de acordo com os formatos fornecidos.
-	 * <p>
-	 *    A disposição do formato de entrada deve ser da seguinte forma:
-	 * </p>
-	 * <pre>
-	 *    formEntrada = (canais, altura, largura)
-	 * </pre>
-	 * Onde largura e altura devem corresponder as dimensões dos dados de entrada
-	 * que serão processados pela camada e a profundidade diz respeito a quantidade
-	 * de entradas que a camada deve processar.
-	 * <p>
-	 *    A disposição do formato do filtro deve ser da seguinte forma:
-	 * </p>
-	 * <pre>
-	 *    formFiltro = (altura, largura)
-	 * </pre>
-	 * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-	 * @param filtro formato dos filtros da camada.
+	 * Instancia uma camada Conv2D.
 	 * @param filtros quantidade de filtros.
+	 * @param filtro formato dos filtros (altura, largura).
 	 * @param pad quantidade de padding aplicado na entrada, pode ser uma {@code String} ("valid" ou "same"),
 	 * ou pode ser um valor inteiro que será aplicado tanto na altura como na largura da entrada.
 	 * @param iniK inicializador para os filtros.
@@ -308,25 +244,9 @@ public class Conv2D extends Camada implements Cloneable {
 	}
 
 	/**
-	 * Instancia uma camada convolucional de acordo com os formatos fornecidos.
-	 * <p>
-	 *    A disposição do formato de entrada deve ser da seguinte forma:
-	 * </p>
-	 * <pre>
-	 *    formEntrada = (canais, altura, largura)
-	 * </pre>
-	 * Onde largura e altura devem corresponder as dimensões dos dados de entrada
-	 * que serão processados pela camada e a profundidade diz respeito a quantidade
-	 * de entradas que a camada deve processar.
-	 * <p>
-	 *    A disposição do formato do filtro deve ser da seguinte forma:
-	 * </p>
-	 * <pre>
-	 *    formFiltro = (altura, largura)
-	 * </pre>
-	 * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-	 * @param filtro formato dos filtros da camada.
+	 * Instancia uma camada Conv2D.
 	 * @param filtros quantidade de filtros.
+	 * @param filtro formato dos filtros (altura, largura).
 	 * @param pad quantidade de padding aplicado na entrada, pode ser uma {@code String} ("valid" ou "same"),
 	 * ou pode ser um valor inteiro que será aplicado tanto na altura como na largura da entrada.
 	 * @param iniK inicializador para os filtros.
@@ -336,25 +256,9 @@ public class Conv2D extends Camada implements Cloneable {
 	}
 
 	/**
-	 * Instancia uma camada convolucional de acordo com os formatos fornecidos.
-	 * <p>
-	 *    A disposição do formato de entrada deve ser da seguinte forma:
-	 * </p>
-	 * <pre>
-	 *    formEntrada = (canais, altura, largura)
-	 * </pre>
-	 * Onde largura e altura devem corresponder as dimensões dos dados de entrada
-	 * que serão processados pela camada e a profundidade diz respeito a quantidade
-	 * de entradas que a camada deve processar.
-	 * <p>
-	 *    A disposição do formato do filtro deve ser da seguinte forma:
-	 * </p>
-	 * <pre>
-	 *    formFiltro = (altura, largura)
-	 * </pre>
-	 * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-	 * @param filtro formato dos filtros da camada.
+	 * Instancia uma camada Conv2D.
 	 * @param filtros quantidade de filtros.
+	 * @param filtro formato dos filtros (altura, largura).
 	 * @param pad quantidade de padding aplicado na entrada, pode ser uma {@code String} ("valid" ou "same"),
 	 * ou pode ser um valor inteiro que será aplicado tanto na altura como na largura da entrada.
 	 */
@@ -363,25 +267,9 @@ public class Conv2D extends Camada implements Cloneable {
 	}
 
 	/**
-	 * Instancia uma camada convolucional de acordo com os formatos fornecidos.
-	 * <p>
-	 *    A disposição do formato de entrada deve ser da seguinte forma:
-	 * </p>
-	 * <pre>
-	 *    formEntrada = (canais, altura, largura)
-	 * </pre>
-	 * Onde largura e altura devem corresponder as dimensões dos dados de entrada
-	 * que serão processados pela camada e a profundidade diz respeito a quantidade
-	 * de entradas que a camada deve processar.
-	 * <p>
-	 *    A disposição do formato do filtro deve ser da seguinte forma:
-	 * </p>
-	 * <pre>
-	 *    formFiltro = (altura, largura)
-	 * </pre>
-	 * Onde largura e altura correspondem as dimensões que os filtros devem assumir.
-	 * @param filtro formato dos filtros da camada.
+	 * Instancia uma camada Conv2D.
 	 * @param filtros quantidade de filtros.
+	 * @param filtro formato dos filtros (altura, largura).
 	 */
 	public Conv2D(int filtros, int[] filtro) {
 		this(filtros, filtro, null, null, null);
@@ -431,18 +319,7 @@ public class Conv2D extends Camada implements Cloneable {
 			);
 		}
 	}
-	
-	/**
-	 * Inicializa os parâmetros necessários para a camada Convolucional.
-	 * <p>
-	 *    O formato de entrada deve ser um array contendo o tamanho de 
-	 *    cada dimensão de entrada da camada, e deve estar no formato:
-	 * </p>
-	 * <pre>
-	 *    entrada = (canais, altura, largura)
-	 * </pre>
-	 * @param shape formato de entrada para a camada.
-	 */
+
 	@Override
 	public void construir(int[] shape) {
 		JNNutils.validarNaoNulo(shape, "shape == null.");
@@ -473,8 +350,8 @@ public class Conv2D extends Camada implements Cloneable {
 			throw new IllegalArgumentException(
 				"\nCamada não pode ser construida:" +
 				"\nFormato de entrada " + JNNutils.arrayStr(shape) +
-				" e formato dos filtros " + 
-				JNNutils.arrayStr(new int[]{shapeOut[0], shapeFiltro[0], shapeFiltro[1]}) +
+				", filtros " + JNNutils.arrayStr(new int[]{shapeOut[0], shapeFiltro[0], shapeFiltro[1]}) +
+				" e padidng " + JNNutils.arrayStr(shapePad) +
 				" resultam num formato de saída inválido " + JNNutils.arrayStr(shapeOut)
 			);
 		}
@@ -482,7 +359,7 @@ public class Conv2D extends Camada implements Cloneable {
 		_kernel       = addParam("Kernel", shapeOut[0], shapeIn[0], shapeFiltro[0], shapeFiltro[1]);
 		_gradKernel   = addGrad("Grad Kernel", _kernel.shape());
 
-		_gradEntrada  = addBuffer("Grad Entrada", shapeIn);
+		_gradEntrada  = addBuffer("Grad Entrada", shapeIn);// não é passado pro otimizador
 		_saida        = addBuffer("Saida", shapeOut);
 
 		if (usarBias) {
@@ -577,8 +454,6 @@ public class Conv2D extends Camada implements Cloneable {
 		verificarConstrucao();
 
 		_gradSaida = g.contiguous();
-
-		_gradEntrada.zero();// zerar acumulações anteriores
 
 		lops.backwardConv2D(
 			_entrada,
