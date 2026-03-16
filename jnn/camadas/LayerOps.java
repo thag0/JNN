@@ -129,7 +129,7 @@ public class LayerOps {
 		Optional<Tensor> bias,
 		Tensor saida,
 		int[] padding) {
-
+		//TODO depois otimizar aqui
 		saida.zero();//zerar acumulações anteriores
 
 		final int[] shapeK = kernel.shape();
@@ -250,8 +250,6 @@ public class LayerOps {
 			return;
 		}
 
-		saida.zero();
-
 		final int altS  = altX - altK + 1 + 2 * altPad;
 		final int largS = largX - largK + 1 + 2 * largPad;
 
@@ -269,56 +267,53 @@ public class LayerOps {
 		final int offYBase = saida.offset();
 
 		List<ForkJoinTask<?>> tarefas = new ArrayList<>(filtros);
-		
+
 		for (int f = 0; f < filtros; f++) {
 			final int filtro = f;
 
 			tarefas.add(pool.submit(() -> {
 				final int offKf = offKBase + filtro * canais * areaK;
-				final float biasF = (dataB != null) ? dataB[filtro] : 0.0f;
+				final float valBias = (dataB != null) ? dataB[filtro] : 0.0f;
 
 				for (int l = 0; l < lotes; l++) {
 					final int offY = offYBase + (l * filtros + filtro) * areaS;
 					final int offXL = offXBase + (l * canais) * areaX;
 
 					for (int i = 0; i < areaS; i++) {
-						dataS[offY + i] = biasF;
+						dataS[offY + i] = valBias;
 					}
 
 					for (int c = 0; c < canais; c++) {
 						final int offXLc = offXL + c * areaX;
 						final int offKFc = offKf + c * areaK;
 
-						for (int hOut = 0; hOut < altS; hOut++) {
-							for (int wOut = 0; wOut < largS; wOut++) {
-								float soma = dataS[offY + hOut * largS + wOut];
+						for (int kh = 0; kh < altK; kh++) {
+							final int i_min = Math.max(altPad - kh, 0);
+							final int i_max = Math.min(altX + altPad - kh, altS);
 
-								for (int kh = 0; kh < altK; kh++) {
-									final int inH = hOut + kh - altPad;
-									if (inH < 0 || inH >= altX) continue;//depois tirar isso
+							for (int kw = 0; kw < largK; kw++) {
+								final int j_min = Math.max(largPad - kw, 0);
+								final int j_max = Math.min(largX + largPad - kw, largS);
+								final float valK = dataK[offKFc + kh * largK + kw];								
 
-									for (int kw = 0; kw < largK; kw++) {
-										final int inW = wOut + kw - largPad;
-										if (inW < 0 || inW >= largX) continue;//depois tirar isso
+								for (int i = i_min; i < i_max; i++) {
+									final int in_y = i + kh - altPad;
+									final int baseDst = offY + i * largS;
+									final int baseX   = offXLc + in_y * largX;
 
-										final int idxX = offXLc + inH * largX + inW;
-										final int idxK = offKFc + kh * largK + kw;
-										soma += dataX[idxX] * dataK[idxK];
+									for (int j = j_min; j < j_max; j++) {
+										final int in_x = j + kw - largPad;
+										dataS[baseDst + j] += dataX[baseX + in_x] * valK;
 									}
 								}
-
-								dataS[offY + hOut * largS + wOut] = soma;
 							}
 						}
 					}
 				}
 			}));
-		}
+		}		
 		
-		for (int i = 0; i < tarefas.size(); i++) {
-			tarefas.get(i).join();
-		}
-		
+		for (var tarefa : tarefas) tarefa.join();
 	}
 
 	/**
