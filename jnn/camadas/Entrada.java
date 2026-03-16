@@ -60,7 +60,7 @@ public class Entrada extends Camada {
 	public void construir(int[] shape) {}
 
 	@Override
-	public void inicializar() {}
+	public void init() {}
 
 	@Override
 	public Tensor forward(Tensor x) {

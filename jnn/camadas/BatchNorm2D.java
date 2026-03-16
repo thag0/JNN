@@ -7,10 +7,8 @@ import jnn.core.tensor.Tensor;
  * Experimental ainda
  */
 public class BatchNorm2D extends Camada implements Cloneable {
-
     private float eps;
     private float momentum;
-    
     public Tensor _gamma;// escala (da pra chamar de kernel)
     public Tensor _beta;// deslocamento (também da pra chamar de bias)
     public Tensor _runningMean;// media movel (para inferencia)
@@ -90,7 +88,7 @@ public class BatchNorm2D extends Camada implements Cloneable {
     }
 
     @Override
-    public void inicializar() {
+    public void init() {
         verificarConstrucao();
         
         _gamma.preencher(1);
@@ -102,7 +100,7 @@ public class BatchNorm2D extends Camada implements Cloneable {
 
     @Override
     public void ajustarParaLote(int tamLote) {
-        int[] shape = {};
+        int[] shape;
         
         if (tamLote == 0) {
             shape = shapeIn;

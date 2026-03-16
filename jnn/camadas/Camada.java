@@ -141,7 +141,7 @@ public abstract class Camada {
 	 * Gera os valores iniciais para parâmetros treináveis da camada de 
 	 * acordo com os seus inicializadores definidos.
 	 */
-	public abstract void inicializar();
+	public abstract void init();
 
 	/**
 	 * Configura o id da camada. O id deve indicar dentro de um modelo, em 

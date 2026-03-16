@@ -375,7 +375,7 @@ public class Conv2D extends Camada implements Cloneable {
 	}
 
 	@Override
-	public void inicializar() {
+	public void init() {
 		verificarConstrucao();
 		
 		iniK.forward(_kernel);

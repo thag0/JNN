@@ -161,7 +161,7 @@ public abstract class Pool2DBase extends Camada {
     }
 
     @Override
-    public void inicializar() {}
+    public void init() {}
 
 	@Override
 	public void ajustarParaLote(int tamLote) {

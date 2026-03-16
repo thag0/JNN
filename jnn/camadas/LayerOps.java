@@ -67,6 +67,7 @@ public class LayerOps {
 	 * @see jnn.camadas.Densa Densa
 	 */
 	public void backwardDensa(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
+		gradE.zero();// zerar acumulaçoes anteriores
 		ops.matmul(gradS, kernel.transpor(), gradE);
 		
 		if (gradS.numDim() == 1) {//amostra única

@@ -283,7 +283,7 @@ public class Sequencial extends Modelo {
 			
 			if (i != 0) camada.construir(camada(i-1).shapeOut());
 			
-			camada.inicializar();
+			camada.init();
 			camada.setId(i);
 		}
 

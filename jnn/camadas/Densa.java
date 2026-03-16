@@ -286,7 +286,7 @@ public class Densa extends Camada implements Cloneable {
 	}
 
 	@Override
-	public void inicializar() {
+	public void init() {
 		verificarConstrucao();
 
 		iniKernel.forward(_kernel);
@@ -350,8 +350,6 @@ public class Densa extends Camada implements Cloneable {
 		verificarConstrucao();
 		
 		_gradSaida = g.contiguous();
-		
-		_gradEntrada.zero();
 
 		lops.backwardDensa(
 			_entrada,

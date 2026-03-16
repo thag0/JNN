@@ -137,7 +137,7 @@ public class Flatten extends Camada implements Cloneable {
 	}
 
 	@Override
-	public void inicializar() {}
+	public void init() {}
 
 	@Override
 	public void ajustarParaLote(int tamLote) {
