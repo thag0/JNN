@@ -19,12 +19,12 @@ public class SGD extends Otimizador {
 	/**
 	 * Taxa de aprendizado padrão do otimizador.
 	 */
-	private static final float PADRAO_LR = 0.01f;
+	private static final float PADRAO_LR = 0.001f;
 
 	/**
 	 * Taxa de momentum padrão do otimizador.
 	 */
-	private static final float PADRAO_MOMENTUM = 0.9f;
+	private static final float PADRAO_MOMENTUM = 0f;
 
 	/**
 	 * Uso do acelerador de nesterov padrão.
