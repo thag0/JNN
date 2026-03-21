@@ -308,7 +308,9 @@ public class LayerOps {
 
 		final int altPad = padding[0];
 		final int largPad = padding[1];
-	
+		
+		gradE.zero();// zerar acumulaçoes anteriores
+
 		if (JNNnative.isOn()) {
 			JNNnative.conv2dBackward(
 				entrada.array(),
@@ -326,8 +328,6 @@ public class LayerOps {
 
 			return;
 		}
-
-		gradE.zero();// zerar acumulaçoes anteriores
 
 		final int[] shapeGS = gradS.shape();
 		final int altS = shapeGS[2]; 
