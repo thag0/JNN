@@ -13,7 +13,7 @@ static void* _get_pool(mem_pool_t* pool, size_t tam_bytes) {
     if (pool->tam < tam_bytes) {
         if (pool->data != NULL) _aligned_free(pool->data);
         
-        size_t bytes = (tam_bytes + 63) & ~63;
+        size_t bytes = (tam_bytes + (_ALINHAMENTO-1)) & (~(_ALINHAMENTO-1));
         void* novo  = _aligned_malloc(bytes, _ALINHAMENTO);
         assert(novo != NULL && "Falha ao alocar memória para o pool");
 

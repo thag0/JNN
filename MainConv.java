@@ -20,7 +20,8 @@ import jnn.dataloader.transform.Transform;
 import jnn.io.JNNserial;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
-import jnn.otm.Adam;
+import jnn.otm.SGD;
+import jnn.treino.scheduler.StepLR;
 
 public class MainConv {
 
@@ -31,7 +32,7 @@ public class MainConv {
 
 	// controle de treino
 	static final int TREINO_EPOCAS = 15;
-	static final int TREINO_LOTE = 32;
+	static final int TREINO_LOTE = 64;
 	static final boolean TREINO_LOGS = true;
 
 	// caminhos de arquivos externos
@@ -58,6 +59,8 @@ public class MainConv {
 		Sequencial modelo = cnn();
 		modelo.setHistorico(true);
 		modelo.print();
+
+		modelo.treinador().setScheduler(new StepLR(modelo.otm(), 3, 0.95f));
 		
 		var accs = new ArrayList<Float>();
 		modelo.treinador().setCallback(info -> {
@@ -66,7 +69,7 @@ public class MainConv {
 			modelo.treino(true);
 			
 			accs.add(ac);
-			System.out.println(" acurácia " + (ac*100) + "%");
+			System.out.println(" acurácia: " + (ac*100) + "%");
 		});
 		
 		System.out.println("Treinando.");
@@ -151,18 +154,20 @@ public class MainConv {
 
 			new GlobalAvgPool2D(),
 
-			new Dropout(0.3),
+			new Dropout(0.5),
 			new Densa(64, "he"),
 			new ReLU(),
 
-			new Densa(10, "he"),
+			new Densa(10, "glorot-uniforme"),
 			new Softmax()
 		);
 
-		for (Camada c : modelo) if (c instanceof Conv2D) c.setBias(false);
-
-		modelo.compilar(new Adam(0.005), "entropia-cruzada");
+		for (var camada : modelo) if (camada instanceof Conv2D) camada.setBias(false);
 		
+		Object otm = new SGD(0.01, 0.9);
+		Object loss = "entropia-cruzada";
+		modelo.compilar(otm, loss);
+
 		return modelo;		
 	}
 

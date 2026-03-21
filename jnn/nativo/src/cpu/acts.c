@@ -1,5 +1,4 @@
 #include "acts.h"
-
 #include <math.h>
 
 void relu(const float* restrict src, float* restrict dst, int tam) {

@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "dispatcher.h"
 
 static jnn_backend_t BACKEND_ATUAL = JNN_BACKEND_CPU;
