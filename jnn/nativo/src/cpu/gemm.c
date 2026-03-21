@@ -11,7 +11,7 @@
 // tilling
 #define BLOCO_LIN_A 32
 #define BLOCO_COL_A 64
-#define BLOCO_COL_B 32
+#define BLOCO_COL_B 64
 
 // microkernel
 #include <immintrin.h>
@@ -105,34 +105,48 @@ void _gemm(
     int ldb,
     int ldc) {
 
-    #pragma omp parallel for
-    for (int i = 0; i < M; i += MR) {
-        int _M = (i + MR <= M) ? MR : (M - i);
+    #pragma omp parallel for schedule(static)
+    for (int ii = 0; ii < M; ii += BLOCO_LIN_A) {
+        int M_bloco = (ii + BLOCO_LIN_A <= M) ? BLOCO_LIN_A : (M - ii);
+        
+        for (int jj = 0; jj < N; jj += BLOCO_COL_B) {
+            int N_bloco = (jj + BLOCO_COL_B <= N) ? BLOCO_COL_B : (N - jj);
 
-        for (int j = 0; j < N; j += NR) {
-            int _N = (j + NR <= N) ? NR : (N - j);
-            const float* ptr_a = A + i * lda;
-            const float* ptr_b = B + j;
-            float* ptr_c = C + i * ldc + j;
+            for (int kk = 0; kk < K; kk += BLOCO_COL_A) {
+                int K_bloco = (kk + BLOCO_COL_A <= K) ? BLOCO_COL_A : (K - kk);
+                const float* A_bloco = A + ii * lda + kk;
+                const float* B_bloco = B + kk * ldb + jj;
+                float*       C_bloco = C + ii * ldc + jj;
 
-            if (_M == MR && _N == NR) {
-                _microkernel_4x8(
-                    ptr_a, ptr_b, ptr_c,
-                    K,
-                    lda, ldb, ldc
-                );
-            } else {
-                _kernel_scalar(
-                    ptr_a, ptr_b, ptr_c,
-                    _M, _N, K,
-                    lda, ldb, ldc
-                );
+                for (int i = 0; i < M_bloco; i += MR) {
+                    int _M = (i + MR <= M_bloco) ? MR : (M_bloco - i);
+
+                    for (int j = 0; j < N_bloco; j += NR) {
+                        int _N = (j + NR <= N_bloco) ? NR : (N_bloco - j);
+                        const float* ptr_a = A_bloco + i * lda;
+                        const float* ptr_b = B_bloco + j;
+                        float* ptr_c = C_bloco + i * ldc + j;
+
+                        if (_M == MR && _N == NR) {
+                            _microkernel_4x8(
+                                ptr_a, ptr_b, ptr_c,
+                                K_bloco,
+                                lda, ldb, ldc
+                            );
+                        } else {
+                            _kernel_scalar(
+                                ptr_a, ptr_b, ptr_c,
+                                _M, _N, K_bloco,
+                                lda, ldb, ldc
+                            );
+                        }
+                    }
+                }
             }
         }
     }
     
 }
-
 
 void cpu_gemm(const gemm_params_t* params) {
     const float* restrict A = params->A;
