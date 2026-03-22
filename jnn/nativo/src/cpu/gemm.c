@@ -85,6 +85,7 @@ static inline void _kernel_scalar(
         for (int j = 0; j < N; j++) {
             float acc = C[i*ldc + j];
 
+            #pragma omp simd
             for (int k = 0; k < K; k++) {
                 acc += A[i*lda + k] * B[k*ldb + j];
             }
@@ -105,7 +106,7 @@ void _gemm(
     int ldb,
     int ldc) {
 
-    #pragma omp parallel for collapse(2)
+    #pragma omp parallel for collapse(2) schedule(static)
     for (int ii = 0; ii < M; ii += BLOCO_LIN_A) {
         for (int jj = 0; jj < N; jj += BLOCO_COL_B) {
         

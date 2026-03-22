@@ -25,7 +25,7 @@ void cpu_batchnorm2d_forward(const bn2d_fwd_params_t* params) {
     const float eps = params->eps;
 
     if (params->treinando) {
-        #pragma omp parallel for
+        #pragma omp parallel for schedule(static)
         for (int c = 0; c < canais; c++) {
             double soma = 0.0;
 
@@ -40,7 +40,7 @@ void cpu_batchnorm2d_forward(const bn2d_fwd_params_t* params) {
             media[c] = (float)(soma / M);
         }
 
-        #pragma omp parallel for
+        #pragma omp parallel for schedule(static)
         for (int c = 0; c < canais; c++) {
             float m = media[c];
             double soma = 0.0;
@@ -57,7 +57,7 @@ void cpu_batchnorm2d_forward(const bn2d_fwd_params_t* params) {
             var[c] = (float)(soma / M);
         }
 
-        #pragma omp parallel for
+        #pragma omp parallel for schedule(static)
         for (int c = 0; c < canais; c++) {
             float invStd = 1.0f / sqrtf(var[c] + eps);
             float g = gamma[c];
@@ -83,7 +83,7 @@ void cpu_batchnorm2d_forward(const bn2d_fwd_params_t* params) {
 
     } else {
 
-        #pragma omp parallel for
+        #pragma omp parallel for schedule(static)
         for (int c = 0; c < canais; c++) {
             float invStd = 1.0f / sqrtf(rv[c] + eps);
             float g = gamma[c];
@@ -120,7 +120,7 @@ void cpu_batchnorm2d_backward(const bn2d_bwd_params_t* params) {
     float* restrict gg = params->gg;
     float* restrict gb = params->gb;
 
-    #pragma omp parallel for
+    #pragma omp parallel for schedule(static)
     for (int c = 0; c < canais; c++) {
         double somaGamma = 0.0;
         double somaBeta  = 0.0;
@@ -141,7 +141,7 @@ void cpu_batchnorm2d_backward(const bn2d_bwd_params_t* params) {
         gb[c] += (float)somaBeta;
     }
 
-    #pragma omp parallel for
+    #pragma omp parallel for schedule(static)
     for (int c = 0; c < canais; c++) {
         float g = gamma[c];
         float inv_std = 1.0f / sqrtf(var[c] + params->eps);
