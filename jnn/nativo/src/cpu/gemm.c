@@ -105,11 +105,11 @@ void _gemm(
     int ldb,
     int ldc) {
 
-    #pragma omp parallel for schedule(static)
+    #pragma omp parallel for collapse(2)
     for (int ii = 0; ii < M; ii += BLOCO_LIN_A) {
-        int M_bloco = (ii + BLOCO_LIN_A <= M) ? BLOCO_LIN_A : (M - ii);
-        
         for (int jj = 0; jj < N; jj += BLOCO_COL_B) {
+        
+            int M_bloco = (ii + BLOCO_LIN_A <= M) ? BLOCO_LIN_A : (M - ii);
             int N_bloco = (jj + BLOCO_COL_B <= N) ? BLOCO_COL_B : (N - jj);
 
             for (int kk = 0; kk < K; kk += BLOCO_COL_A) {
