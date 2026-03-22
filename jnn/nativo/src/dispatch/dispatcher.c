@@ -60,6 +60,26 @@ void jnn_maxpool2d_bw_dispatcher(const maxpool2d_bwd_params_t* p) {
     }  
 }
 
+void jnn_batchnorm2d_fw_dispatcher(const bn2d_fwd_params_t* p) {
+    switch (BACKEND_ATUAL) {
+        case JNN_BACKEND_CPU:
+            cpu_batchnorm2d_forward(p);
+        break;
+            
+        default: cpu_batchnorm2d_forward(p);
+    }  
+}
+
+void jnn_batchnorm2d_bw_dispatcher(const bn2d_bwd_params_t* p) {
+    switch (BACKEND_ATUAL) {
+        case JNN_BACKEND_CPU:
+            cpu_batchnorm2d_backward(p);
+        break;
+            
+        default: cpu_batchnorm2d_backward(p);
+    }  
+}
+
 void jnn_relu(const float* restrict src, float* restrict dst, int n) {
     relu(src, dst, n);
 }

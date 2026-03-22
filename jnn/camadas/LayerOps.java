@@ -891,4 +891,257 @@ public class LayerOps {
         }
 	}
 
+	/**
+	 * Realiza a propagação direta através da camada BatchNorm2D.
+	 * @param entrada entrada da camada.
+	 * @param gamma escala.
+	 * @param beta deslocamento.
+	 * @param entradaNorm entrada normalizada.
+	 * @param mediaMovel media movel por canal.
+	 * @param varianciaMovel variancia movel por canal.
+	 * @param media média por canal.
+	 * @param variancia variancia por canal.
+	 * @param saida saída da camada.
+	 * @param momentum momentum.
+	 * @param eps epsilon.
+	 * @param treinando controlador de treino/teste.
+	 */
+	public void forwardBatchNorm2D(
+		Tensor entrada,
+		Tensor gamma,
+		Tensor beta,
+		Tensor entradaNorm,
+		Tensor mediaMovel,
+		Tensor varianciaMovel,
+		Tensor media,
+		Tensor variancia,
+		Tensor saida,
+		float momentum,
+		float eps,
+		boolean treinando) {
+			
+		boolean entrada3D = entrada.numDim() == 3;
+
+        int lotes	= entrada3D ? 					  1  : entrada.tamDim(0);
+        int canais	= entrada3D ? entrada.tamDim(0) : entrada.tamDim(1);
+        int altX	= entrada3D ? entrada.tamDim(1) : entrada.tamDim(2);
+        int largX	= entrada3D ? entrada.tamDim(2) : entrada.tamDim(3);
+
+        float[] dataX = entrada.array();
+        float[] dataY = saida.array();
+        float[] dataGamma = gamma.array();
+        float[] dataBeta  = beta.array();
+        float[] dataRM = mediaMovel.array();
+        float[] dataRV = varianciaMovel.array();
+
+		float[] dataMedia = media.array();
+		float[] dataVar  = variancia.array();
+		float[] dataXNorm = entradaNorm.array();
+
+		if (JNNnative.isOn()) {
+			JNNnative.batchNorm2DForward(
+				dataX,
+				dataY,
+				dataGamma,
+				dataBeta,
+				dataRM,
+				dataRV,
+				dataMedia,
+				dataVar,
+				dataXNorm,
+				lotes, canais,
+				altX, largX,
+				momentum,
+				eps,
+				treinando
+			);
+
+			return;
+		}
+
+        int areaX = altX * largX;
+        int M = lotes * areaX;
+
+        if (treinando) {
+            for (int c = 0; c < canais; c++) {
+                double soma = 0;
+                for (int n = 0; n < lotes; n++) {
+                    int base = n * canais * areaX + c * areaX;
+                    for (int i = 0; i < areaX; i++) {
+                        soma += dataX[base + i];
+                    }
+                }
+                dataMedia[c] = (float) soma / M;
+            }
+
+            for (int c = 0; c < canais; c++) {
+                float valMed = dataMedia[c];
+                double soma = 0;
+                
+                for (int n = 0; n < lotes; n++) {
+                    int base = n * canais * areaX + c * areaX;
+                    for (int i = 0; i < areaX; i++) {
+                        float dif = dataX[base + i] - valMed;
+                        soma += dif * dif;
+                    }
+                }
+                dataVar[c] = (float) soma / M;
+            }
+
+            for (int c = 0; c < canais; c++) {
+                float invStd = 1.0f / (float)Math.sqrt(dataVar[c] + eps);
+                float g = dataGamma[c];
+                float b = dataBeta[c];
+                float m = dataMedia[c];
+
+                for (int n = 0; n < lotes; n++) {
+                    int base = n * canais * areaX + c * areaX;
+                    for (int i = 0; i < areaX; i++) {
+                        int id = base + i;
+                        float norm = (dataX[id] - m) * invStd;
+                        dataXNorm[id] = norm;
+                        dataY[id]  = g * norm + b;
+                    }
+                }
+
+                float varDesviezada = (M > 1) ? (dataVar[c] * M / (M - 1f)) : dataVar[c];
+                dataRM[c] = (1 - momentum) * dataRM[c] + momentum * dataMedia[c];
+                dataRV[c] = (1 - momentum) * dataRV[c]  + momentum * varDesviezada;
+            }
+
+        } else {
+            for (int c = 0; c < canais; c++) {
+                float invStd = 1.0f / (float)Math.sqrt(dataRV[c] + eps);
+                float g = dataGamma[c];
+                float b = dataBeta[c];
+                float m = dataRM[c];
+
+                for (int n = 0; n < lotes; n++) {
+                    int base = n*canais*areaX + c*areaX;
+
+                    for (int i = 0; i < areaX; i++) {
+                        int id = base + i;
+                        dataY[id] = g * (dataX[id] - m) * invStd + b;
+                    }
+                }
+            }
+        }
+
+	}
+
+	/**
+	 * Realiza a propagação reversa através da camada BatchNorm2D.
+	 * @param gradE gradiente em relação a entrada da camada.
+	 * @param entradaNorm entrada normalizada.
+	 * @param variancia variancia por canal.
+	 * @param gamma escala.
+	 * @param gradGamma gradiente da escala.
+	 * @param gradBeta gradiente do deslocamento.
+	 * @param gradS gradiente em relação a saída da camada.
+	 * @param eps epsilon.
+	 */
+	public void backwardBatchNorm2D(
+		Tensor gradE,
+		Tensor entradaNorm,
+		Tensor variancia,
+		Tensor gamma,
+		Tensor gradGamma,
+		Tensor gradBeta,
+		Tensor gradS,
+		float eps) {
+
+        gradE.zero();
+
+		boolean entrada3D = gradE.numDim() == 3;
+
+        int lotes	= entrada3D ?					1  : gradE.tamDim(0);
+        int canais	= entrada3D ? gradE.tamDim(0) : gradE.tamDim(1);
+        int altura	= entrada3D ? gradE.tamDim(1) : gradE.tamDim(2);
+        int largura	= entrada3D ? gradE.tamDim(2) : gradE.tamDim(3);
+		
+        float[] dataXNorm = entradaNorm.array();
+        float[] dataVar = variancia.array();
+        float[] dataGamma = gamma.array();
+		
+        float[] dataGE = gradE.array();
+        float[] dataGS = gradS.array();
+        float[] dataGG = gradGamma.array();
+        float[] dataGB = gradBeta.array();
+		
+		if (JNNnative.isOn()) {
+			JNNnative.batchNorm2DBackward(
+				dataXNorm,
+				dataVar,
+				dataGamma,
+				dataGE,
+				dataGS,
+				dataGG,
+				dataGB,
+				lotes,
+				canais,
+				altura,
+				largura, 
+				eps
+			);
+
+			return;
+		}
+
+		int areaX = altura * largura;
+		int M = lotes * areaX;
+		
+        for (int c = 0; c < canais; c++) {
+            double somaGamma = 0;
+            double somaBeta  = 0;
+
+            for (int n = 0; n < lotes; n++) {
+                int base = n * canais * areaX + c * areaX;
+
+                for (int i = 0; i < areaX; i++) {
+                    int id = base + i;
+                    float grad = dataGS[id];
+                    somaGamma += grad * dataXNorm[id];
+                    somaBeta  += grad;
+                }
+            }
+
+            dataGG[c] += (float) somaGamma;
+            dataGB[c] += (float) somaBeta;
+        }
+
+        for (int c = 0; c < canais; c++) {
+            float valGamma = dataGamma[c];
+            float invStd = 1.0f / (float)Math.sqrt(dataVar[c] + eps);
+
+            double somaG = 0;
+            double somaGENorm = 0;
+
+            for (int n = 0; n < lotes; n++) {
+                int base = n * canais * areaX + c * areaX;
+
+                for (int i = 0; i < areaX; i++) {
+                    int id = base + i;
+                    float grad = dataGS[id];
+                    somaG += grad;
+                    somaGENorm += grad * dataXNorm[id];
+                }
+            }
+
+            float coef = valGamma * invStd / M;
+
+            for (int n = 0; n < lotes; n++) {
+                int base = n * canais * areaX + c * areaX;
+
+                for (int i = 0; i < areaX; i++) {
+                    int idx = base + i;
+                    float grad = dataGS[idx];
+                    float xNorm = dataXNorm[idx];
+
+                    dataGE[idx] = (float) (coef * (M * grad - somaG - xNorm * somaGENorm));
+                }
+            }
+        }
+
+	}
+
 }

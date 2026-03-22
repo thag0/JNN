@@ -62,8 +62,13 @@ public final class JNNnative {
         if (isOn()) jni = !jni;//jeito legal
     }
 
+    /**
+     * Retorna o estado atual de uso da interface nativa.
+     * @return {@code true} caso esteja ativa, {@code false} caso
+     * contrário.
+     */
     public static boolean isOn() {
-        return jni == true;
+        return jni;
     }
 
     /**
@@ -256,9 +261,73 @@ public final class JNNnative {
     );
 
     /**
+     * Realiza a progração direta pela camada BatchNorm2D.
+     * @param x entrada da camada.
+     * @param y saída da camada.
+     * @param gamma escala.
+     * @param beta deslocamento.
+     * @param mediaMovel media móvel por canal.
+     * @param varianciaMovel variancia móvel por canal.
+     * @param media media por canal.
+     * @param var variancia por canal.
+     * @param xNorm entrada normalizada.
+     * @param lotes quantidade de lotes.
+     * @param canais quantidade de canais de entrada.
+     * @param altX altura da entrada.
+     * @param largX largura da entrada.
+     * @param momentum fator de suavização.
+     * @param eps epsilon
+     * @param treinando controlador treino/teste.
+     */
+    public static native void batchNorm2DForward(
+        float[] x,
+        float[] y,
+        float[] gamma,
+        float[] beta,
+        float[] mediaMovel,
+        float[] varianciaMovel,
+        float[] media,
+        float[] var,
+        float[] xNorm,
+        int lotes, int canais,
+        int altX, int largX,
+        float momentum, 
+        float eps,
+        boolean treinando
+    );
+
+    /**
+     * Realiza a progração reversa pela camada BatchNorm2D.
+     * @param xNorm entrada normalizada.
+     * @param var variancia por canal.
+     * @param gamma escala.
+     * @param ge gradiente de entrada.
+     * @param gs gradiente de saída.
+     * @param gg gradiente do gamma.
+     * @param gb gradiente do beta.
+     * @param lotes quantidade de lotes.
+     * @param canais quantidade de canais de entrada.
+     * @param altX altura da entrada.
+     * @param largX largura da entrada.
+     * @param eps epsilon.
+     */
+    public static native void batchNorm2DBackward(
+        float[] xNorm,
+        float[] var,
+        float[] gamma,
+        float[] ge,
+        float[] gs,
+        float[] gg,
+        float[] gb,
+        int lotes, int canais,
+        int altX, int largX,
+        float eps
+    );
+
+    /**
      * Aplica a função de ativação ReLU no conjunto de dados de saída, usando
      * src como fonte de dados.
-     * @param x Dados de entrada.
+     * @param src Dados de entrada.
      * @param dst Dados de destino da operação.
      * @param n tamanhos conjuntos de dados (devem ser iguais).
      */

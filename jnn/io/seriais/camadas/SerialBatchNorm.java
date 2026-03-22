@@ -9,7 +9,17 @@ import jnn.core.tensor.Tensor;
 import jnn.io.seriais.SerialBase;
 import jnn.io.seriais.SerializadorCamada;
 
+/**
+ * Interface de IO para camada BatchNorm2D.
+ * @see jnn.camadas.BatchNorm2D
+ */
 public class SerialBatchNorm extends SerialBase implements SerializadorCamada<BatchNorm2D> {
+
+	/**
+	 * Interface de IO para camada MaxPool2D.
+	 * @see jnn.camadas.pooling.AvgPool2D
+	 */
+    public SerialBatchNorm() {}
 
     @Override
     public void serializar(BatchNorm2D camada, DataOutputStream dos) throws IOException {
@@ -23,8 +33,8 @@ public class SerialBatchNorm extends SerialBase implements SerializadorCamada<Ba
         escrever(dos, params[0].data().paraArray());//gamma
         escrever(dos, params[1].data().paraArray());//beta
     
-        escrever(dos, camada._runningMean.data().paraArray());
-        escrever(dos, camada._runningVar.data().paraArray());
+        escrever(dos, camada._mediaMovel.data().paraArray());
+        escrever(dos, camada._varianciaMovel.data().paraArray());
     }
 
     @Override
@@ -45,8 +55,8 @@ public class SerialBatchNorm extends SerialBase implements SerializadorCamada<Ba
         params[0].copiarElementos(gamma);
         params[1].copiarElementos(beta);
     
-        bn._runningMean.copiarElementos(runMean);
-        bn._runningVar.copiarElementos(runVar);
+        bn._mediaMovel.copiarElementos(runMean);
+        bn._varianciaMovel.copiarElementos(runVar);
 
         return bn;
     }

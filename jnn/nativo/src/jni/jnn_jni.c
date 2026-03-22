@@ -5,6 +5,7 @@
 #include "gemm.h"
 #include "conv2d.h"
 #include "maxpool.h"
+#include "batchnorm2d.h"
 
 static inline int jnn_native_num_threads() {
     int p = omp_get_num_procs();
@@ -278,6 +279,141 @@ Java_jnn_core_JNNnative_maxPool2dBackward(
     (*env)->ReleasePrimitiveArrayCritical(env, x_arr,   X, JNI_ABORT);
     (*env)->ReleasePrimitiveArrayCritical(env, gs_arr, GS, JNI_ABORT);
     (*env)->ReleasePrimitiveArrayCritical(env, ge_arr, GE, 0);
+}
+
+JNIEXPORT void JNICALL Java_jnn_core_JNNnative_batchNorm2DForward(
+    JNIEnv *env,
+    jclass cls, 
+    jfloatArray x, 
+    jfloatArray y, 
+    jfloatArray gamma, 
+    jfloatArray beta, 
+    jfloatArray media_movel, 
+    jfloatArray variancia_movel,
+    jfloatArray media,
+    jfloatArray var,
+    jfloatArray x_norm,
+    jint lotes, 
+    jint canais, 
+    jint alt_x, 
+    jint larg_x, 
+    jfloat momentum, 
+    jfloat eps, 
+    jboolean treinando
+) {
+    (void) cls;
+
+    float* restrict X = (*env)->GetPrimitiveArrayCritical(env, x, NULL);
+    float* restrict Y = (*env)->GetPrimitiveArrayCritical(env, y, NULL);
+    float* restrict G = (*env)->GetPrimitiveArrayCritical(env, gamma, NULL);
+    float* restrict B = (*env)->GetPrimitiveArrayCritical(env, beta, NULL);
+    float* restrict MM = (*env)->GetPrimitiveArrayCritical(env, media_movel, NULL);
+    float* restrict VM = (*env)->GetPrimitiveArrayCritical(env, variancia_movel, NULL);
+    float* restrict MD = (*env)->GetPrimitiveArrayCritical(env, media, NULL);
+    float* restrict VR = (*env)->GetPrimitiveArrayCritical(env, var, NULL);
+    float* restrict XN = (*env)->GetPrimitiveArrayCritical(env, x_norm, NULL);
+
+    bn2d_fwd_params_t p = {
+        .x = X,
+        .y = Y,
+        .gamma = G,
+        .beta = B,
+        .media_movel = MM,
+        .variancia_movel = VM,
+        .media = MD,
+        .var = VR,
+        .x_norm = XN,
+        
+        .lotes = lotes,
+        .canais = canais,
+        .alt_x = alt_x,
+        .larg_x = larg_x,
+        
+        .momentum = momentum,
+        .eps = eps,
+
+        .treinando = treinando
+    };
+
+    jnn_batchnorm2d_fw_dispatcher(&p);
+
+    (*env)->ReleasePrimitiveArrayCritical(env, x, X, JNI_ABORT);
+    (*env)->ReleasePrimitiveArrayCritical(env, gamma, G, JNI_ABORT);
+    (*env)->ReleasePrimitiveArrayCritical(env, beta, B, JNI_ABORT);
+
+    (*env)->ReleasePrimitiveArrayCritical(env, y, Y, 0);
+
+    if (treinando) {
+        (*env)->ReleasePrimitiveArrayCritical(env, media_movel, MM, 0);
+        (*env)->ReleasePrimitiveArrayCritical(env, variancia_movel, VM, 0);
+        (*env)->ReleasePrimitiveArrayCritical(env, media, MD, 0);
+        (*env)->ReleasePrimitiveArrayCritical(env, var, VR, 0);
+        (*env)->ReleasePrimitiveArrayCritical(env, x_norm, XN, 0);
+        
+    } else {
+        (*env)->ReleasePrimitiveArrayCritical(env, media_movel, MM, JNI_ABORT);
+        (*env)->ReleasePrimitiveArrayCritical(env, variancia_movel, VM, JNI_ABORT);
+        (*env)->ReleasePrimitiveArrayCritical(env, media, MD, JNI_ABORT);
+        (*env)->ReleasePrimitiveArrayCritical(env, var, VR, JNI_ABORT);
+        (*env)->ReleasePrimitiveArrayCritical(env, x_norm, XN, JNI_ABORT);
+    }
+}
+
+
+JNIEXPORT void JNICALL Java_jnn_core_JNNnative_batchNorm2DBackward(
+    JNIEnv *env,
+    jclass cls,
+    jfloatArray x_norm,
+    jfloatArray var,
+    jfloatArray gamma,
+    jfloatArray ge,
+    jfloatArray gs,
+    jfloatArray gg,
+    jfloatArray gb,
+    jint lotes,
+    jint canais,
+    jint alt_x,
+    jint larg_x,
+    jfloat eps
+) {
+    (void) cls;
+
+    float* restrict XN = (*env)->GetPrimitiveArrayCritical(env, x_norm, NULL);
+    float* restrict VAR = (*env)->GetPrimitiveArrayCritical(env, var, NULL);
+    float* restrict GAMMA = (*env)->GetPrimitiveArrayCritical(env, gamma, NULL);
+    float* restrict GE = (*env)->GetPrimitiveArrayCritical(env, ge, NULL);
+    float* restrict GS = (*env)->GetPrimitiveArrayCritical(env, gs, NULL);
+    float* restrict GG = (*env)->GetPrimitiveArrayCritical(env, gg, NULL);
+    float* restrict GB = (*env)->GetPrimitiveArrayCritical(env, gb, NULL);
+
+    bn2d_bwd_params_t p = {
+        .x_norm = XN,
+        .var = VAR,
+        .gamma = GAMMA,
+        .ge = GE,
+        .gs = GS,
+        .gg = GG,
+        .gb = GB,
+
+        .lotes = lotes,
+        .canais = canais,
+        .alt_x = alt_x,
+        .larg_x = larg_x,
+        
+        .eps = eps,
+    };
+
+    jnn_batchnorm2d_bw_dispatcher(&p);
+
+    (*env)->ReleasePrimitiveArrayCritical(env, x_norm, XN, JNI_ABORT);
+    (*env)->ReleasePrimitiveArrayCritical(env, var, VAR, JNI_ABORT);
+    (*env)->ReleasePrimitiveArrayCritical(env, gamma, GAMMA, JNI_ABORT);
+    (*env)->ReleasePrimitiveArrayCritical(env, gs, GS, JNI_ABORT);
+    
+    (*env)->ReleasePrimitiveArrayCritical(env, ge, GE, 0);
+    (*env)->ReleasePrimitiveArrayCritical(env, gg, GG, 0);
+    (*env)->ReleasePrimitiveArrayCritical(env, gb, GB, 0);
+
 }
 
 JNIEXPORT void JNICALL Java_jnn_core_JNNnative_relu(

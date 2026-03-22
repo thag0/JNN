@@ -67,6 +67,22 @@ JNIEXPORT void JNICALL Java_jnn_core_JNNnative_maxPool2dBackward
 
 /*
  * Class:     jnn_core_JNNnative
+ * Method:    batchNorm2DForward
+ * Signature: ([F[F[F[F[F[F[F[F[FIIIIFFZ)V
+ */
+JNIEXPORT void JNICALL Java_jnn_core_JNNnative_batchNorm2DForward
+  (JNIEnv *, jclass, jfloatArray, jfloatArray, jfloatArray, jfloatArray, jfloatArray, jfloatArray, jfloatArray, jfloatArray, jfloatArray, jint, jint, jint, jint, jfloat, jfloat, jboolean);
+
+/*
+ * Class:     jnn_core_JNNnative
+ * Method:    batchNorm2DBackward
+ * Signature: ([F[F[F[F[F[F[FIIIIF)V
+ */
+JNIEXPORT void JNICALL Java_jnn_core_JNNnative_batchNorm2DBackward
+  (JNIEnv *, jclass, jfloatArray, jfloatArray, jfloatArray, jfloatArray, jfloatArray, jfloatArray, jfloatArray, jint, jint, jint, jint, jfloat);
+
+/*
+ * Class:     jnn_core_JNNnative
  * Method:    relu
  * Signature: ([F[FI)V
  */

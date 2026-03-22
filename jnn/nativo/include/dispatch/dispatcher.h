@@ -3,6 +3,7 @@
 #include "conv2d.h"
 #include "maxpool.h"
 #include "acts.h"
+#include "batchnorm2d.h"
 
 // Tipo de backend nativo.
 typedef enum {
@@ -29,6 +30,12 @@ void jnn_maxpool2d_fw_dispatcher(const maxpool2d_fwd_params_t* p);
 
 // Executa o backward da camada MaxPool2D de acordo com o backend nativo atual.
 void jnn_maxpool2d_bw_dispatcher(const maxpool2d_bwd_params_t* p);
+
+// Executa o forward da camada BatchNorm2D de acordo com o backend nativo atual.
+void jnn_batchnorm2d_fw_dispatcher(const bn2d_fwd_params_t* p);
+
+// Executa o backward da camada BatchNorm2D de acordo com o backend nativo atual.
+void jnn_batchnorm2d_bw_dispatcher(const bn2d_bwd_params_t* p);
 
 // ativações
 
