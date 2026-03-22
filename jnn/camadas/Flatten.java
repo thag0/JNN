@@ -38,11 +38,6 @@ public class Flatten extends Camada implements Cloneable {
 	private int totalFlatten;
 
 	/**
-	 * Auxiliar pra controle de treinamento em lotes.
-	 */
-	private int _tamLote;
-
-	/**
 	 * Tensor contendo os valores de entrada para a camada,
 	 * que serão usados para o processo de feedforward.
 	 * <p>
@@ -157,7 +152,7 @@ public class Flatten extends Camada implements Cloneable {
 		}
 
 		
-		this._tamLote = tamLote;
+		this.tamLote = tamLote;
 	}
 
 	@Override
@@ -166,12 +161,12 @@ public class Flatten extends Camada implements Cloneable {
 
 		if (x.numDim() == shapeIn.length) {
 			validarShapes(x.shape(), shapeIn);
-			if (_tamLote != 0) ajustarParaLote(0);
+			if (this.tamLote != 0) ajustarParaLote(0);
 		
 		} else if (x.numDim() == shapeIn.length + 1) {
 			validarShapes(x.shape(), shapeIn);
 			int lotes = x.tamDim(0);
-			if (lotes != this._tamLote) ajustarParaLote(lotes);
+			if (lotes != this.tamLote) ajustarParaLote(lotes);
 		
 		} else {
 			throw new UnsupportedOperationException(
@@ -305,7 +300,6 @@ public class Flatten extends Camada implements Cloneable {
 		tamVars += 4 * shapeIn.length; 
 		tamVars += 4 * shapeOut.length; 
 		tamVars += 4; //totalFlatten
-		tamVars += 4; //tamLote
 
 		long tamTensores =
 		_saida.tamBytes() +

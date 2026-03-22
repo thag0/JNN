@@ -92,11 +92,6 @@ public class Conv2D extends Camada implements Cloneable {
 	 * Auxiliar na verificação de uso do bias.
 	 */
 	private boolean usarBias = true;
-
-	/**
-	 * Auxilar no controle de treinamento em lotes.
-	 */
-	private int tamLote;
 	
 	/**
 	 * Tensor contendo os valores de saídas da camada.

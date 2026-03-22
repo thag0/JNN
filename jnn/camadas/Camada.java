@@ -67,6 +67,11 @@ public abstract class Camada {
 	protected boolean treinando = false;
 
 	/**
+	 * Auxilar no controle de treinamento em lotes.
+	 */
+	protected int tamLote;
+
+	/**
 	 * Identificador único da camada.
 	 */
 	public int id;
@@ -426,6 +431,7 @@ public abstract class Camada {
 			1 + //treinavel 
 			1 + //construida
 			1 + //treinando
+			4 + //tamLote
 			4 + //id
 			tamTensores;
 	}

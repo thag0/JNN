@@ -42,11 +42,6 @@ public class Dropout extends Camada implements Cloneable {
 	private int dimBase;
 
 	/**
-	 * Auxilar no controle de treinamento em lotes.
-	 */
-	private int tamLote;
-
-	/**
 	 * Tensor contendo os valores de entrada para a camada.
 	 */
 	public Tensor _entrada;
@@ -315,7 +310,6 @@ public class Dropout extends Camada implements Cloneable {
 		tamVars += 4; //taxa 
 		tamVars += 4 * shapeIn.length; 
 		tamVars += 4; //dimbase
-		tamVars += 4; //tamLote
 
 		long tamTensores = 
 		_gradEntrada.tamBytes() +

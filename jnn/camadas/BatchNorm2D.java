@@ -118,11 +118,6 @@ public class BatchNorm2D extends Camada implements Cloneable {
      */
     private int[] shapeIn = {1, 1, 1};
 
-	/**
-	 * Auxilar no controle de treinamento em lotes.
-	 */
-	private int tamLote;
-
     /**
      * Utilitário.
      */

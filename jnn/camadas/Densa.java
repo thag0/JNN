@@ -42,11 +42,6 @@ public class Densa extends Camada implements Cloneable {
 	private int[] shapeOut = {1};
 
 	/**
-	 * Auxilar no controle de treinamento em lotes.
-	 */
-	private int _tamLote;
-
-	/**
 	 * Tensor contendo os valores dos pesos de cada conexão da
 	 * entrada com a saída da camada.
 	 * <p>
@@ -314,7 +309,7 @@ public class Densa extends Camada implements Cloneable {
 		_gradEntrada = addBuffer("Grad Entrada", shapeIn);
 		_saida 		 = addBuffer("Saida", out);
 		
-		this._tamLote = tamLote;
+		this.tamLote = tamLote;
 	}
 
 	@Override
@@ -328,7 +323,7 @@ public class Densa extends Camada implements Cloneable {
 		} else if (x.numDim() == 2) {
 			validarShapes(x.shape(), shapeIn);
 			int lotes = x.tamDim(0);
-			if (_tamLote != lotes) {
+			if (this.tamLote != lotes) {
 				ajustarParaLote(lotes);
 			}
 			
@@ -543,7 +538,6 @@ public class Densa extends Camada implements Cloneable {
 		long tamVars = super.tamBytes(); //base camada + tensores
 		tamVars += 4; //tamEntrada
 		tamVars += 4; //numNeuronios
-		tamVars += 4; //tamLote
 		tamVars += 1; //usarBias
 
 		long tamTensores =
