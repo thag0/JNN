@@ -180,21 +180,17 @@ public class LayerOps {
 		final float[] dataS = saida.array();
 		final float[] dataB = bias.isPresent() ? bias.get().array() : null;
 
-		final int offXBase = entrada.offset();
-		final int offKBase = kernel.offset();
-		final int offYBase = saida.offset();
-
 		var tasks = new ArrayList<ForkJoinTask<?>>(filtros);
 
 		for (int f = 0; f < filtros; f++) {
-			final int filtro = f;
-			final int offKf = offKBase + filtro * canais * areaK;
-			final float valBias = (dataB != null) ? dataB[filtro] : 0.0f;
+			for (int l = 0; l < lotes; l++) {
+				final int filtro = f, lote = l;
+				final int offKf =  filtro * canais * areaK;
+				final float valBias = (dataB != null) ? dataB[filtro] : 0.0f;
 			
-			tasks.add(pool.submit(() -> {
-				for (int l = 0; l < lotes; l++) {
-					final int offY = offYBase + (l * filtros + filtro) * areaS;
-					final int offXL = offXBase + (l * canais) * areaX;
+				tasks.add(pool.submit(() -> {
+					final int offY =  (lote * filtros + filtro) * areaS;
+					final int offXL = (lote * canais) * areaX;
 
 					for (int i = 0; i < areaS; i++) {
 						dataS[offY + i] = valBias;
@@ -205,29 +201,30 @@ public class LayerOps {
 						final int offKFc = offKf + c * areaK;
 
 						for (int kh = 0; kh < altK; kh++) {
-							final int i_min = Math.max(altPad - kh, 0);
-							final int i_max = Math.min(altX + altPad - kh, altS);
+							final int iMin = Math.max(altPad - kh, 0);
+							final int iMax = Math.min(altX + altPad - kh, altS);
 
 							for (int kw = 0; kw < largK; kw++) {
-								final int j_min = Math.max(largPad - kw, 0);
-								final int j_max = Math.min(largX + largPad - kw, largS);
+								final int jMin = Math.max(largPad - kw, 0);
+								final int jMax = Math.min(largX + largPad - kw, largS);
 								final float valK = dataK[offKFc + kh * largK + kw];								
 
-								for (int i = i_min; i < i_max; i++) {
-									final int in_y = i + kh - altPad;
+								for (int i = iMin; i < iMax; i++) {
+									final int inY = i + kh - altPad;
 									final int baseDst = offY + i * largS;
-									final int baseX   = offXLc + in_y * largX;
+									final int baseX   = offXLc + inY * largX;
 
-									for (int j = j_min; j < j_max; j++) {
-										final int in_x = j + kw - largPad;
-										dataS[baseDst + j] += dataX[baseX + in_x] * valK;
+									for (int j = jMin; j < jMax; j++) {
+										final int inX = j + kw - largPad;
+										dataS[baseDst + j] += dataX[baseX + inX] * valK;
 									}
 								}
 							}
 						}
 					}
-				}
-			}));
+				}));
+
+			}
 		}
 		
 		for (var task : tasks) task.join();
