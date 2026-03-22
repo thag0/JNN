@@ -257,41 +257,43 @@ static void _backward_gk_im2col(const conv2d_bwd_params_t* params) {
     const int filtros = params->filtros;
     const int canais = params->canais;
 
-    const int area_x  = alt_x * larg_x;
-
     const int Kdim = canais * alt_k * larg_k;
     const int Ndim = alt_s * larg_s;
-    float* colT = get_mem_pool(sizeof(float) * Ndim * Kdim);
+    float* col = get_mem_pool(sizeof(float) * Kdim * Ndim);
 
     gemm_params_t mm = {
         .A = NULL,
-        .B = colT,
+        .B = col,
         .DST = GK,
+
+        .off_a = 0, .off_b = 0, .off_dst = 0,
+
+        .std_a_0 = Ndim, .std_a_1 = 1,
+        .std_b_0 = 1, .std_b_1 = Ndim,
+        .std_c_0 = Kdim, .std_c_1 = 1,
+
         .lin_a = filtros,
         .col_a = Ndim,
-        .col_b = Kdim,
-        .std_a_0 = Ndim, .std_a_1 = 1,
-        .std_b_0 = Kdim, .std_b_1 = 1,
-        .std_c_0 = Kdim, .std_c_1 = 1
+        .col_b = Kdim
     };
 
     for (int l = 0; l < lotes; l++) {
-        const float* x_lote = X + l * canais * area_x;
-        const float* gs_lote = GS + l * filtros * Ndim;
+        const float* x_lote  = X  + l * (canais * alt_x * larg_x);
+        const float* gs_lote = GS + l * (filtros * Ndim);
 
-        // transposta em memória pra cair no fastpath da gemm
-        im2col_T(
+        im2col(
             x_lote,
-            colT, 
-            canais, 
-            alt_x, larg_x, 
-            alt_k, larg_k, 
-            alt_pad, larg_pad, 
-            alt_s, larg_s  
+            col,
+            canais,
+            alt_x, larg_x,
+            alt_k, larg_k,
+            alt_pad, larg_pad,
+            alt_s, larg_s
         );
 
-        mm.A = (float*)gs_lote;
-        cpu_gemm(&mm); 
+        mm.A = (float*) gs_lote;
+
+        cpu_gemm(&mm);
     }
 
 }
@@ -301,7 +303,7 @@ static bool _usar_im2col_gk(const conv2d_bwd_params_t* params) {
 
     const long peso = 
     (long)params->filtros * (params->canais * params->alt_k * params->larg_k) * (params->alt_x * params->larg_x);
-    const int limiar = 1000000;
+    const int limiar = 1500000;
     
     return peso > limiar;
 }
