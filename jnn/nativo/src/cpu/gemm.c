@@ -9,9 +9,9 @@
 #include <stdint.h>
 
 // tilling
-#define BLOCO_LIN_A 32
+#define BLOCO_LIN_A 16
 #define BLOCO_COL_A 64
-#define BLOCO_COL_B 64
+#define BLOCO_COL_B 32
 
 // microkernel
 #include <immintrin.h>
@@ -50,18 +50,24 @@ static inline void _microkernel_4x8(
     __m256 c2 = _mm256_loadu_ps(C + 2*ldc);
     __m256 c3 = _mm256_loadu_ps(C + 3*ldc);
 
-    for (int k = 0; k < K; k++) {
-        __m256 b = _mm256_loadu_ps(B + k*ldb);
+    const float* restrict ptr_a = A;
+    const float* restrict ptr_b = B;
 
-        __m256 a0 = _mm256_set1_ps(A[0*lda + k]);
-        __m256 a1 = _mm256_set1_ps(A[1*lda + k]);
-        __m256 a2 = _mm256_set1_ps(A[2*lda + k]);
-        __m256 a3 = _mm256_set1_ps(A[3*lda + k]);
+    for (int k = 0; k < K; k++) {
+        __m256 b = _mm256_loadu_ps(ptr_b);
+
+        __m256 a0 = _mm256_broadcast_ss(ptr_a + 0*lda);
+        __m256 a1 = _mm256_broadcast_ss(ptr_a + 1*lda);
+        __m256 a2 = _mm256_broadcast_ss(ptr_a + 2*lda);
+        __m256 a3 = _mm256_broadcast_ss(ptr_a + 3*lda);
 
         c0 = _mm256_fmadd_ps(a0, b, c0);
         c1 = _mm256_fmadd_ps(a1, b, c1);
         c2 = _mm256_fmadd_ps(a2, b, c2);
         c3 = _mm256_fmadd_ps(a3, b, c3);
+
+        ptr_a += 1;
+        ptr_b += ldb;
     }
 
     _mm256_storeu_ps(C + 0*ldc, c0);
