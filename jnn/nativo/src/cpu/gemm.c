@@ -24,7 +24,7 @@ static void _empacotar_matriz(
     int lin, int col,
     int std_lin, int std_col) {
 
-    #pragma omp parallel for schedule(static)
+    #pragma omp parallel for schedule(static) proc_bind(close)
     for (int i = 0; i < lin; i++) {
         const float* lin_x = X + i * std_lin;
         float* lin_y = Y + i * col;
@@ -106,7 +106,7 @@ void _gemm(
     int ldb,
     int ldc) {
 
-    #pragma omp parallel for collapse(2) schedule(static)
+    #pragma omp parallel for collapse(2) schedule(static) proc_bind(close)
     for (int ii = 0; ii < M; ii += BLOCO_LIN_A) {
         for (int jj = 0; jj < N; jj += BLOCO_COL_B) {
         

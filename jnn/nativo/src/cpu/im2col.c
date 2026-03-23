@@ -17,7 +17,7 @@ void im2col(
     const int Ndim = alt_s * larg_s;
     memset(COL, 0, sizeof(float) * Kdim * Ndim);// limpar lixo da pool e lidar com padding > 0
 
-    #pragma omp parallel for collapse(2) schedule(static)
+    #pragma omp parallel for schedule(static) proc_bind(close)
     for (int c = 0; c < canais; c++) {
         for (int kh = 0; kh < alt_k; kh++) {
             for (int kw = 0; kw < larg_k; kw++) {
@@ -35,7 +35,7 @@ void im2col(
 
                     int in_x = w_min + kw - larg_pad;
                     int largura = w_max - w_min;
-                    const float* x = ptr_x + in_x;
+                    const float* restrict x = ptr_x + in_x;
                     float* dest = ptr_dst + w_min;
 
                     #pragma omp simd
@@ -60,7 +60,7 @@ void im2col_T(
 
     const int Kdim = canais * alt_k * larg_k;
 
-    #pragma omp parallel for schedule(static)
+    #pragma omp parallel for schedule(static) proc_bind(close)
     for (int i = 0; i < alt_s; i++) {
         for (int j = 0; j < larg_s; j++) {
             const int n = i * larg_s + j;
@@ -106,7 +106,7 @@ void col2im_T(
     const int Ndim = alt_s * larg_s;
     const int area_x = alt_x * larg_x;
 
-    #pragma omp parallel for schedule(static)
+    #pragma omp parallel for schedule(static) proc_bind(close)
     for (int c = 0; c < canais; c++) {
         for (int n = 0; n < Ndim; n++) {
             const int i = n / larg_s;

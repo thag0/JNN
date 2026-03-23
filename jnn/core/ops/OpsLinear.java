@@ -194,25 +194,35 @@ public class OpsLinear {
 
 		final int BK = 64;
 		final int BJ = 64;
+		float[] acc = new float[BJ];
 
 		for (int i = 0; i < linA; i++) {
 			final int baseA = offA + i * s0A;
 			final int baseC = offC + i * s0C;
 
-			for (int kk = 0; kk < colA; kk += BK) {
-				final int kEnd = Math.min(kk + BK, colA);
+			for (int jj = 0; jj < colB; jj += BJ) {
+				final int jEnd = Math.min(jj + BJ, colB);
+				final int width = jEnd - jj;
 
-				for (int jj = 0; jj < colB; jj += BJ) {
-					final int jEnd = Math.min(jj + BJ, colB);
+				for (int j = 0; j < width; j++) {
+					acc[j] = C[baseC + jj + j];
+				}
+
+				for (int kk = 0; kk < colA; kk += BK) {
+					final int kEnd = Math.min(kk + BK, colA);
 
 					for (int k = kk; k < kEnd; k++) {
 						final float valA = A[baseA + k];
-						final int baseB = offB + k * s0B;
+						final int baseB = offB + k * s0B + jj;
 
-						for (int j = jj; j < jEnd; j++) {
-							C[baseC + j] += valA * B[baseB + j];
+						for (int j = 0; j < width; j++) {
+							acc[j] += valA * B[baseB + j];
 						}
 					}
+				}
+
+				for (int j = 0; j < width; j++) {
+					C[baseC + jj + j] = acc[j];
 				}
 			}
 		}

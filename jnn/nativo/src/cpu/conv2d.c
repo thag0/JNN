@@ -32,7 +32,7 @@ static void _forward_loops(const conv2d_fwd_params_t* params) {
     const int area_k = alt_k * larg_k;
     const int area_s = alt_s * larg_s;
 
-    #pragma omp parallel for collapse(2) schedule(static)
+    #pragma omp parallel for collapse(2) schedule(static) proc_bind(close)
     for (int l = 0; l < lotes; l++) {
         for (int f = 0; f < filtros; f++) {
             float* restrict dst_base = DST + (l * filtros + f) * area_s;
@@ -203,7 +203,7 @@ static void _backward_gk_loops(const conv2d_bwd_params_t* params) {
     const int area_k  = alt_k * larg_k;
     const int area_gs = alt_s * larg_s;
 
-    #pragma omp parallel for collapse(2) schedule(static)
+    #pragma omp parallel for collapse(2) schedule(static) proc_bind(close)
     for (int f = 0; f < filtros; f++) {
         for (int c = 0; c < canais; c++) {
             const int off_k_base = (f * canais + c) * area_k;
@@ -334,7 +334,7 @@ static void _backward_ge_loops(const conv2d_bwd_params_t* params) {
     const int area_k  = alt_k * larg_k;
     const int area_gs = alt_s * larg_s;
 
-    #pragma omp parallel for collapse(2) schedule(static)
+    #pragma omp parallel for collapse(2) schedule(static) proc_bind(close)
     for (int l = 0; l < params->lotes; l++) {
         for (int c = 0; c < canais; c++) {
             float* restrict ptr_ge_base = params->GE + (l * canais + c) * area_x;
@@ -464,7 +464,7 @@ void cpu_conv2d_backward(const conv2d_bwd_params_t* params) {
     const int area_gs = alt_s * larg_s;
 
     if (params->temBias) {
-        #pragma omp parallel for schedule(static)
+        #pragma omp parallel for schedule(static) proc_bind(close)
         for (int f = 0; f < filtros; f++) {
             float soma_bias = 0.0f;
             const int f_offset = f * area_gs;

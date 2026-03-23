@@ -41,6 +41,8 @@ public final class JNNnative {
      * </p>
      */
     public static void on() {
+        if (isOn()) return;
+        
         try {
             carregarDoJar();
             jni = true;
@@ -355,7 +357,7 @@ public final class JNNnative {
     /**
      * Aplica a derivada da função de ativação Sigmoid no conjunto de dados 
      * de saída, usando x e src como fonte de dados.
-     * @param x Dados de entrada.
+     * @param sig Dados de entrada.
      * @param g Dados do gradiente em relação a saída da camada.
      * @param dst Dados de destino da operação.
      * @param n tamanhos conjuntos de dados (devem ser iguais).
