@@ -80,10 +80,20 @@ void jnn_batchnorm2d_bw_dispatcher(const bn2d_bwd_params_t* p) {
     }  
 }
 
-void jnn_relu(const float* restrict src, float* restrict dst, int n) {
+// ativações
+
+void jnn_relu(float* restrict src, float* restrict dst, int n) {
     relu(src, dst, n);
 }
 
-void jnn_relud(const float* restrict x, const float* restrict g, float* restrict dst, int n) {
-    relud(x, g, dst, n);
+void jnn_relu_d(float* restrict x, float* restrict g, float* restrict dst, int n) {
+    relu_d(x, g, dst, n);
+}
+
+void jnn_sigmoid(float* restrict src, float* restrict dst, int n) {
+    sigmoid(src, dst, n);
+}
+
+void jnn_sigmoid_d(float* restrict sig, float* restrict g, float* restrict dst, int n) {
+    sigmoid_d(sig, g, dst, n);
 }

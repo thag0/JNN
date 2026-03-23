@@ -421,14 +421,14 @@ JNIEXPORT void JNICALL Java_jnn_core_JNNnative_relu(
     jclass cls, 
     jfloatArray src, 
     jfloatArray dst, 
-    jint n
+    jint tam
 ) {
     (void) cls;
     
-    const float* restrict X = (*env)->GetPrimitiveArrayCritical(env, src, NULL);
-    float* restrict Y       = (*env)->GetPrimitiveArrayCritical(env, dst, NULL);
+    float* restrict X = (*env)->GetPrimitiveArrayCritical(env, src, NULL);
+    float* restrict Y = (*env)->GetPrimitiveArrayCritical(env, dst, NULL);
 
-    jnn_relu(X, Y, n);
+    jnn_relu(X, Y, (size_t) tam);
 
     (*env)->ReleasePrimitiveArrayCritical(env, src, (void*)X, JNI_ABORT);
     (*env)->ReleasePrimitiveArrayCritical(env, dst, Y, 0);
@@ -444,13 +444,54 @@ JNIEXPORT void JNICALL Java_jnn_core_JNNnative_relud(
 ) { 
     (void) cls;
 
-    const float* restrict X = (*env)->GetPrimitiveArrayCritical(env, x, NULL);
-    const float* restrict G = (*env)->GetPrimitiveArrayCritical(env, g, NULL);
-    float* restrict     DST = (*env)->GetPrimitiveArrayCritical(env, dst, NULL);
+    float* restrict X = (*env)->GetPrimitiveArrayCritical(env, x, NULL);
+    float* restrict G = (*env)->GetPrimitiveArrayCritical(env, g, NULL);
+    float* restrict DST = (*env)->GetPrimitiveArrayCritical(env, dst, NULL);
 
-    jnn_relud(X, G, DST, tam);
+    jnn_relu_d(X, G, DST, (size_t) tam);
 
     (*env)->ReleasePrimitiveArrayCritical(env, x, (void*)X, JNI_ABORT);
+    (*env)->ReleasePrimitiveArrayCritical(env, g, (void*)G, JNI_ABORT);
+    (*env)->ReleasePrimitiveArrayCritical(env, dst, DST, 0);
+}
+
+
+JNIEXPORT void JNICALL Java_jnn_core_JNNnative_sigmoid(
+    JNIEnv *env, 
+    jclass cls, 
+    jfloatArray src, 
+    jfloatArray dst,
+    jint tam
+) {
+    (void) cls;
+
+    float* restrict X = (*env)->GetPrimitiveArrayCritical(env, src, NULL);
+    float* restrict Y = (*env)->GetPrimitiveArrayCritical(env, dst, NULL);
+
+    sigmoid(X, Y, (size_t) tam);
+
+    (*env)->ReleasePrimitiveArrayCritical(env, src, X, JNI_ABORT);
+    (*env)->ReleasePrimitiveArrayCritical(env, dst, Y, 0);
+}
+
+
+JNIEXPORT void JNICALL Java_jnn_core_JNNnative_sigmoidd(
+    JNIEnv * env,
+    jclass cls,
+    jfloatArray sig,
+    jfloatArray g,
+    jfloatArray dst,
+    jint tam
+) {
+    (void) cls;
+
+    float* restrict SIG = (*env)->GetPrimitiveArrayCritical(env, sig, NULL);
+    float* restrict G   = (*env)->GetPrimitiveArrayCritical(env, g, NULL);
+    float* restrict DST = (*env)->GetPrimitiveArrayCritical(env, dst, NULL);
+
+    jnn_sigmoid_d(SIG, G, DST, (size_t) tam);
+
+    (*env)->ReleasePrimitiveArrayCritical(env, sig, (void*)SIG, JNI_ABORT);
     (*env)->ReleasePrimitiveArrayCritical(env, g, (void*)G, JNI_ABORT);
     (*env)->ReleasePrimitiveArrayCritical(env, dst, DST, 0);
 }

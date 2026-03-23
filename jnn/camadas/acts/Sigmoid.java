@@ -1,5 +1,6 @@
 package jnn.camadas.acts;
 
+import jnn.core.JNNnative;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -28,11 +29,19 @@ public class Sigmoid extends Ativacao {
 
 		_entrada = x.contiguous();
 
-        sigmoid(
-            _entrada.array(), _entrada.offset(),
-            _saida.array(), _saida.offset(),
-            _entrada.tam()
-        );
+        if (JNNnative.isOn()) {
+            JNNnative.sigmoid(
+                _entrada.array(),
+                _saida.array(),
+                _entrada.tam()
+            );
+        } else {
+            sigmoid(
+                _entrada.array(),
+                _saida.array(),
+                _entrada.tam()
+            );
+        }
 
         return _saida;
     }
@@ -43,28 +52,37 @@ public class Sigmoid extends Ativacao {
 
 		_gradSaida = g.contiguous();
 
-        sigmoidd(
-            _gradSaida.array(), _gradSaida.offset(),
-            _gradEntrada.array(), _gradEntrada.offset(),
-            _saida.array(), _saida.offset(),
-            _entrada.tam()
-        );
+        if (JNNnative.isOn()) {
+            JNNnative.sigmoidd(
+                _saida.array(),
+                _gradSaida.array(),
+                _gradEntrada.array(),
+                _entrada.tam()
+            );
+        } else {
+            sigmoidd(
+                _saida.array(),
+                _gradSaida.array(),
+                _gradEntrada.array(),
+                _entrada.tam()
+            );
+        }
 
         return _gradEntrada;
     }
 
-    private void sigmoid(float[] x, int offX, float[] dest, int offDest, int n) {
+    private void sigmoid(float[] x, float[] dest, int n) {
         for (int i = 0; i < n; i++) {
-            float val = x[offX + i];
-            dest[offDest + i] = (float) (1.0f / (1.0 + Math.exp(-val)));
+            float val = x[i];
+            dest[i] = (float) (1.0f / (1.0 + Math.exp(-val)));
         }
     }
 
-    private void sigmoidd(float[] g, int offG, float[] gradE, int offGE, float[] sig, int offSig, int n) {
+    private void sigmoidd(float[] sig, float[] g, float[] gradE, int n) {
         for (int i = 0; i < n; i++) {
-            final float grad = g[offG + i];
-            final float s = sig[offSig + i];
-            gradE[offGE + i] = grad * (s * (1f - s));
+            final float grad = g[i];
+            final float s = sig[i];
+            gradE[i] = grad * (s * (1f - s));
         }
     }
     

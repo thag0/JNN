@@ -97,6 +97,22 @@ JNIEXPORT void JNICALL Java_jnn_core_JNNnative_relu
 JNIEXPORT void JNICALL Java_jnn_core_JNNnative_relud
   (JNIEnv *, jclass, jfloatArray, jfloatArray, jfloatArray, jint);
 
+/*
+ * Class:     jnn_core_JNNnative
+ * Method:    sigmoid
+ * Signature: ([F[FI)V
+ */
+JNIEXPORT void JNICALL Java_jnn_core_JNNnative_sigmoid
+  (JNIEnv *, jclass, jfloatArray, jfloatArray, jint);
+
+/*
+ * Class:     jnn_core_JNNnative
+ * Method:    sigmoidd
+ * Signature: ([F[F[FI)V
+ */
+JNIEXPORT void JNICALL Java_jnn_core_JNNnative_sigmoidd
+  (JNIEnv *, jclass, jfloatArray, jfloatArray, jfloatArray, jint);
+
 #ifdef __cplusplus
 }
 #endif

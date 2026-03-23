@@ -40,7 +40,13 @@ void jnn_batchnorm2d_bw_dispatcher(const bn2d_bwd_params_t* p);
 // ativações
 
 // Executa a função de ativalçai ReLU em dst, usando src como base.
-void jnn_relu(const float* restrict src, float* restrict dst, int n);
+void jnn_relu(float* restrict src, float* restrict dst, int n);
 
 // Executa a derivad da função de ativalçai ReLU em dst, usando x e src como base.
-void jnn_relud(const float* restrict x, const float* restrict g, float* restrict dst, int n);
+void jnn_relu_d(float* restrict x, float* restrict g, float* restrict dst, int n);
+
+// Executa a função de ativalçai Sigmoid em dst, usando src como base.
+void jnn_sigmoid(float* restrict src, float* restrict dst, int n);
+
+// Executa a derivad da função de ativalçai Sigmoid em dst, usando x e src como base.
+void jnn_sigmoid_d(float* restrict x, float* restrict g, float* restrict dst, int n);
