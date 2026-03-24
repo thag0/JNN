@@ -96,10 +96,10 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
     const int Kdim = canais * alt_k * larg_k;
     const int Ndim = alt_s * larg_s;
 
-    float* col = get_mem_pool(sizeof(float) * Kdim * Ndim);
+    float* restrict col = get_mem_pool(sizeof(float) * Kdim * Ndim);
 
     gemm_params_t mm = {
-        .A = (float*) K,
+        .A = (float* restrict) K,
         .B = col,
         .C = NULL,
 
@@ -118,12 +118,12 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
     const int filtros_x_Ndim = filtros * Ndim;// cache
     
     for (int l = 0; l < lotes; l++) {
-        const float* x_lote = X + l * C_x_AreaX;
+        const float* restrict x_lote = X + l * C_x_AreaX;
         float* y_lote = DST + l * filtros_x_Ndim;
 
         for (int f = 0; f < filtros; f++) {
             float bias = temBias ? B[f] : 0.f;
-            float* linha = y_lote + f * Ndim;
+            float* restrict linha = y_lote + f * Ndim;
             for (int i = 0; i < Ndim; i++) {
                 linha[i] = bias;
             }
@@ -257,7 +257,7 @@ static void _backward_gk_im2col(const conv2d_bwd_params_t* params) {
 
     const int Kdim = canais * alt_k * larg_k;
     const int Ndim = alt_s * larg_s;
-    float* col = get_mem_pool(sizeof(float) * Kdim * Ndim);
+    float* restrict col = get_mem_pool(sizeof(float) * Kdim * Ndim);
 
     gemm_params_t mm = {
         .A = NULL,
@@ -276,8 +276,8 @@ static void _backward_gk_im2col(const conv2d_bwd_params_t* params) {
     };
 
     for (int l = 0; l < lotes; l++) {
-        const float* x_lote  = X  + l * (canais * alt_x * larg_x);
-        const float* gs_lote = GS + l * (filtros * Ndim);
+        const float* restrict x_lote  = X  + l * (canais * alt_x * larg_x);
+        const float* restrict gs_lote = GS + l * (filtros * Ndim);
 
         im2col(
             x_lote,
@@ -289,7 +289,7 @@ static void _backward_gk_im2col(const conv2d_bwd_params_t* params) {
             alt_s, larg_s
         );
 
-        mm.A = (float*) gs_lote;
+        mm.A = (float* restrict) gs_lote;
 
         cpu_gemm(&mm);
     }
@@ -382,10 +382,10 @@ static void _backward_ge_col2im(const conv2d_bwd_params_t* params) {
 
     const int Ndim = alt_s * larg_s;
     const int Kdim = params->canais * alt_k * larg_k;
-    float* colT = get_mem_pool(sizeof(float) * Ndim * Kdim);
+    float* restrict colT = get_mem_pool(sizeof(float) * Ndim * Kdim);
 
     gemm_params_t mm = {
-        .B = (float*)params->K,
+        .B = (float* restrict)params->K,
         .C = colT,
 
         .lin_a  = Ndim, .col_a  = params->filtros, .col_b  = Kdim,
@@ -396,8 +396,8 @@ static void _backward_ge_col2im(const conv2d_bwd_params_t* params) {
     };
     
     for (int l = 0; l < params->lotes; l++) {
-        const float* gs_lote = params->GS + l * params->filtros * Ndim;
-        float* ge_lote       = params->GE + l * params->canais * area_x;
+        const float* restrict gs_lote = params->GS + l * params->filtros * Ndim;
+        float* restrict ge_lote       = params->GE + l * params->canais * area_x;
         
         memset(colT, 0, sizeof(float) * Ndim * Kdim);
         
@@ -468,7 +468,7 @@ void cpu_conv2d_backward(const conv2d_bwd_params_t* params) {
             float soma_bias = 0.0f;
             const int f_offset = f * area_gs;
             for (int l = 0; l < lotes; l++) {
-                const float* ptr_gs = GS + l * filtros * area_gs + f_offset;
+                const float* restrict ptr_gs = GS + l * filtros * area_gs + f_offset;
 
                 #pragma omp simd reduction(+:soma_bias)
                 for (int i = 0; i < area_gs; i++) {

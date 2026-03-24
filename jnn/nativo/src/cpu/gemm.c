@@ -18,7 +18,7 @@
 #define MR 4
 #define NR 8
 
-static void _empacotar_matriz(
+static void _para_row_major(
     const float* restrict X,
     float* restrict Y,
     int lin, int col,
@@ -26,8 +26,8 @@ static void _empacotar_matriz(
 
     #pragma omp parallel for schedule(static) proc_bind(close)
     for (int i = 0; i < lin; i++) {
-        const float* lin_x = X + i * std_lin;
-        float* lin_y = Y + i * col;
+        const float* restrict lin_x = X + i * std_lin;
+        float* restrict lin_y = Y + i * col;
 
         #pragma omp simd
         for (int j = 0; j < col; j++) {
@@ -90,10 +90,11 @@ static inline void _kernel_scalar(
     for (int i = 0; i < M; i++) {
         for (int j = 0; j < N; j++) {
             float acc = C[i*ldc + j];
+            const int base_a = i * lda;
 
             #pragma omp simd
             for (int k = 0; k < K; k++) {
-                acc += A[i*lda + k] * B[k*ldb + j];
+                acc += A[base_a + k] * B[k*ldb + j];
             }
 
             C[i*ldc + j] = acc;
@@ -101,7 +102,7 @@ static inline void _kernel_scalar(
     }
 }
 
-void _gemm(
+static void gemm(
     const float* restrict A,
     const float* restrict B,
     float* restrict C,
@@ -117,21 +118,21 @@ void _gemm(
         for (int jj = 0; jj < N; jj += BLOCO_COL_B) {
             int M_bloco = (ii + BLOCO_LIN_A <= M) ? BLOCO_LIN_A : (M - ii);
             int N_bloco = (jj + BLOCO_COL_B <= N) ? BLOCO_COL_B : (N - jj);
-            float* C_bloco = C + ii * ldc + jj;
+            float* restrict C_bloco = C + ii * ldc + jj;
 
             for (int kk = 0; kk < K; kk += BLOCO_COL_A) {
                 int K_bloco = (kk + BLOCO_COL_A <= K) ? BLOCO_COL_A : (K - kk);
-                const float* A_bloco = A + ii * lda + kk;
-                const float* B_bloco = B + kk * ldb + jj;
+                const float* restrict A_bloco = A + ii * lda + kk;
+                const float* restrict B_bloco = B + kk * ldb + jj;
 
                 for (int i = 0; i < M_bloco; i += MR) {
                     int _M = (i + MR <= M_bloco) ? MR : (M_bloco - i);
-                    const float* ptr_a = A_bloco + i * lda;
+                    const float* restrict ptr_a = A_bloco + i * lda;
 
                     for (int j = 0; j < N_bloco; j += NR) {
                         int _N = (j + NR <= N_bloco) ? NR : (N_bloco - j);
-                        const float* ptr_b = B_bloco + j;
-                        float* ptr_c = C_bloco + i * ldc + j;
+                        const float* restrict ptr_b = B_bloco + j;
+                        float* restrict ptr_c = C_bloco + i * ldc + j;
 
                         if (_M == MR && _N == NR) {
                             _microkernel_4x8(
@@ -171,7 +172,7 @@ void cpu_gemm(gemm_params_t* params) {
     const int std_c_1 = params->std_c_1;
 
     if (std_a_1 == 1 && std_b_1 == 1 && std_c_1 == 1) {//contiguo row-major
-        _gemm(
+        gemm(
             A, B, C, 
             lin_a, col_a, col_b,
             std_a_0, std_b_0, std_c_0
@@ -186,19 +187,19 @@ void cpu_gemm(gemm_params_t* params) {
     
         if (std_a_1 != 1) {
             ptr_a = get_gemm_mem_pool_a(sizeof(float) * lin_a * col_a);
-            _empacotar_matriz(A, ptr_a, lin_a, col_a, std_a_0, std_a_1);
+            _para_row_major(A, ptr_a, lin_a, col_a, std_a_0, std_a_1);
             A = ptr_a;
             lda = col_a;
         }
     
         if (std_b_1 != 1) {
             ptr_b = get_gemm_mem_pool_b(sizeof(float) * col_a * col_b);
-            _empacotar_matriz(B, ptr_b, col_a, col_b, std_b_0, std_b_1);
+            _para_row_major(B, ptr_b, col_a, col_b, std_b_0, std_b_1);
             B = ptr_b;
             ldb = col_b;
         }
     
-        _gemm(
+        gemm(
             A, B, C,
             lin_a, col_a, col_b,
             lda, ldb, ldc
