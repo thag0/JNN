@@ -3,9 +3,9 @@
 typedef struct {
     float* restrict A;
     float* restrict B;
-    float* restrict DST;
+    float* restrict C;
 
-    int off_a, off_b, off_dst;
+    int off_a, off_b, off_c;
 
     int std_a_0, std_a_1;
     int std_b_0, std_b_1;
@@ -17,4 +17,4 @@ typedef struct {
 } gemm_params_t;
 
 // Realiza a multiplicação matricial entre A e B, salvando de DST.
-void cpu_gemm(const gemm_params_t* params);
+void cpu_gemm(gemm_params_t* params);

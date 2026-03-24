@@ -17,7 +17,7 @@ if not exist %OUT_DIR% mkdir %OUT_DIR%
 javac -cp "%CP_JNN_GED_GEIM%" -d %OUT_DIR% Conv.java
 @REM javac -cp "%CP_JNN_GED_GEIM_VIEW%" -d %OUT_DIR% Lab.java
 @REM javac -cp "%CP_JNN_GED%" -d %OUT_DIR% TesteConv.java
-@REM javac -cp "%CP_JNN_GED_GEIM%" -d %OUT_DIR% TesteJNI.java
+javac -cp "%CP_JNN_GED_GEIM%" -d %OUT_DIR% TesteJNI.java
 
 @rem Exemplos
 @REM javac -cp "%CP_JNN_GED%" -d %OUT_DIR% exemplos\Iris.java

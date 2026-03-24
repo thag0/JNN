@@ -51,11 +51,11 @@ Java_jnn_core_JNNnative_matmul(
     gemm_params_t p = {
         .A = (*env)->GetPrimitiveArrayCritical(env, A_arr, NULL),
         .B = (*env)->GetPrimitiveArrayCritical(env, B_arr, NULL),
-        .DST = (*env)->GetPrimitiveArrayCritical(env, C_arr, NULL),
+        .C = (*env)->GetPrimitiveArrayCritical(env, C_arr, NULL),
     
         .off_a = off_a,
         .off_b = off_b,
-        .off_dst = off_c,
+        .off_c = off_c,
     
         .std_a_0 = std_a_0,
         .std_a_1 = std_a_1,
@@ -74,7 +74,7 @@ Java_jnn_core_JNNnative_matmul(
 
     (*env)->ReleasePrimitiveArrayCritical(env, A_arr, p.A, JNI_ABORT);
     (*env)->ReleasePrimitiveArrayCritical(env, B_arr, p.B, JNI_ABORT);
-    (*env)->ReleasePrimitiveArrayCritical(env, C_arr, p.DST, 0);
+    (*env)->ReleasePrimitiveArrayCritical(env, C_arr, p.C, 0);
 }
 
 JNIEXPORT void JNICALL

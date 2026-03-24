@@ -101,11 +101,9 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
     gemm_params_t mm = {
         .A = (float*) K,
         .B = col,
-        .DST = NULL,
+        .C = NULL,
 
-        .off_a = 0,
-        .off_b = 0,
-        .off_dst = 0,
+        .off_a = 0, .off_b = 0, .off_c = 0,
 
         .std_a_0 = Kdim, .std_a_1 = 1,
         .std_b_0 = Ndim, .std_b_1 = 1,
@@ -141,7 +139,7 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
             alt_s, larg_s
         );
 
-        mm.DST = y_lote;
+        mm.C = y_lote;
 
         cpu_gemm(&mm);
     }
@@ -264,12 +262,12 @@ static void _backward_gk_im2col(const conv2d_bwd_params_t* params) {
     gemm_params_t mm = {
         .A = NULL,
         .B = col,
-        .DST = GK,
+        .C = GK,
 
-        .off_a = 0, .off_b = 0, .off_dst = 0,
+        .off_a = 0, .off_b = 0, .off_c = 0,
 
         .std_a_0 = Ndim, .std_a_1 = 1,
-        .std_b_0 = 1, .std_b_1 = Ndim,
+        .std_b_0 = 1, .std_b_1 = Ndim,// transposto
         .std_c_0 = Kdim, .std_c_1 = 1,
 
         .lin_a = filtros,
@@ -386,23 +384,24 @@ static void _backward_ge_col2im(const conv2d_bwd_params_t* params) {
     const int Kdim = params->canais * alt_k * larg_k;
     float* colT = get_mem_pool(sizeof(float) * Ndim * Kdim);
 
+    gemm_params_t mm = {
+        .B = (float*)params->K,
+        .C = colT,
+
+        .lin_a  = Ndim, .col_a  = params->filtros, .col_b  = Kdim,
+        
+        .std_a_0 = 1,    .std_a_1 = Ndim,
+        .std_b_0 = Kdim, .std_b_1 = 1,
+        .std_c_0 = Kdim, .std_c_1 = 1
+    };
+    
     for (int l = 0; l < params->lotes; l++) {
         const float* gs_lote = params->GS + l * params->filtros * Ndim;
         float* ge_lote       = params->GE + l * params->canais * area_x;
-
+        
         memset(colT, 0, sizeof(float) * Ndim * Kdim);
-
-        gemm_params_t mm = {
-            .A   = (float*)gs_lote,
-            .B   = (float*)params->K,
-            .DST = colT,
-            .lin_a  = Ndim,
-            .col_a  = params->filtros,
-            .col_b  = Kdim,
-            .std_a_0 = 1,    .std_a_1 = Ndim,
-            .std_b_0 = Kdim, .std_b_1 = 1,
-            .std_c_0 = Kdim, .std_c_1 = 1
-        };
+        
+        mm.A = (float*) gs_lote,
 
         cpu_gemm(&mm);
 

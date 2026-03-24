@@ -115,22 +115,21 @@ void _gemm(
     #pragma omp parallel for collapse(2) schedule(static) proc_bind(close)
     for (int ii = 0; ii < M; ii += BLOCO_LIN_A) {
         for (int jj = 0; jj < N; jj += BLOCO_COL_B) {
-        
             int M_bloco = (ii + BLOCO_LIN_A <= M) ? BLOCO_LIN_A : (M - ii);
             int N_bloco = (jj + BLOCO_COL_B <= N) ? BLOCO_COL_B : (N - jj);
+            float* C_bloco = C + ii * ldc + jj;
 
             for (int kk = 0; kk < K; kk += BLOCO_COL_A) {
                 int K_bloco = (kk + BLOCO_COL_A <= K) ? BLOCO_COL_A : (K - kk);
                 const float* A_bloco = A + ii * lda + kk;
                 const float* B_bloco = B + kk * ldb + jj;
-                float*       C_bloco = C + ii * ldc + jj;
 
                 for (int i = 0; i < M_bloco; i += MR) {
                     int _M = (i + MR <= M_bloco) ? MR : (M_bloco - i);
+                    const float* ptr_a = A_bloco + i * lda;
 
                     for (int j = 0; j < N_bloco; j += NR) {
                         int _N = (j + NR <= N_bloco) ? NR : (N_bloco - j);
-                        const float* ptr_a = A_bloco + i * lda;
                         const float* ptr_b = B_bloco + j;
                         float* ptr_c = C_bloco + i * ldc + j;
 
@@ -155,18 +154,14 @@ void _gemm(
     
 }
 
-void cpu_gemm(const gemm_params_t* params) {
-    const float* restrict A = params->A;
-    const float* restrict B = params->B;
-    float* restrict       C = params->DST;
+void cpu_gemm(gemm_params_t* params) {
+    const float* restrict A = params->A + params->off_a;
+    const float* restrict B = params->B + params->off_b;
+    float* restrict       C = params->C + params->off_c;
 
     const int lin_a = params->lin_a;
     const int col_a = params->col_a;
     const int col_b = params->col_b;
-
-    const int off_a = params->off_a;
-    const int off_b = params->off_b;
-    const int off_dst = params->off_dst;
 
     const int std_a_0 = params->std_a_0;
     const int std_a_1 = params->std_a_1;
@@ -175,48 +170,36 @@ void cpu_gemm(const gemm_params_t* params) {
     const int std_c_0 = params->std_c_0;
     const int std_c_1 = params->std_c_1;
 
-    int fastpath = std_a_1 == 1 && std_b_1 == 1 && std_c_1 == 1;//contiguo row-major
-    fastpath &= (off_a == 0 && off_b == 0 && off_dst == 0);//sem offset
-
-    if (fastpath) {
+    if (std_a_1 == 1 && std_b_1 == 1 && std_c_1 == 1) {//contiguo row-major
         _gemm(
             A, B, C, 
             lin_a, col_a, col_b,
             std_a_0, std_b_0, std_c_0
         );
-
     } else {
-        // se precisar, empacota as matrizes pra cair no fastpath
-        // como tem um buffer de memoria, as alocações nao sao um problema
-        // mas ai depende do tamanho da matriz
-
-        const float* restrict novo_A = A + off_a;
-        const float* restrict novo_B = B + off_b;
-        float* restrict       novo_C = C + off_dst;
-
-        float* restrict ptr_a = NULL;
-        float* restrict ptr_b = NULL;
-
         int lda = std_a_0;
         int ldb = std_b_0;
         int ldc = std_c_0;
+
+        float* restrict ptr_a = NULL;
+        float* restrict ptr_b = NULL;
     
         if (std_a_1 != 1) {
             ptr_a = get_gemm_mem_pool_a(sizeof(float) * lin_a * col_a);
-            _empacotar_matriz(novo_A, ptr_a, lin_a, col_a, std_a_0, std_a_1);
-            novo_A = ptr_a;
+            _empacotar_matriz(A, ptr_a, lin_a, col_a, std_a_0, std_a_1);
+            A = ptr_a;
             lda = col_a;
         }
     
         if (std_b_1 != 1) {
             ptr_b = get_gemm_mem_pool_b(sizeof(float) * col_a * col_b);
-            _empacotar_matriz(novo_B, ptr_b, col_a, col_b, std_b_0, std_b_1);
-            novo_B = ptr_b;
+            _empacotar_matriz(B, ptr_b, col_a, col_b, std_b_0, std_b_1);
+            B = ptr_b;
             ldb = col_b;
         }
     
         _gemm(
-            novo_A, novo_B, novo_C,
+            A, B, C,
             lin_a, col_a, col_b,
             lda, ldb, ldc
         );
