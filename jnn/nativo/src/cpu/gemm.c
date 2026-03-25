@@ -8,15 +8,15 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-// tilling
-#define BLOCO_LIN_A 16
-#define BLOCO_COL_A 64
-#define BLOCO_COL_B 32
-
 // microkernel
 #include <immintrin.h>
 #define MR 4
 #define NR 8
+
+// tilling
+#define TILE_M 32//multiplo de MR
+#define TILE_K 64
+#define TILE_N 32//multiplo de NR
 
 static void _para_row_major(
     const float* restrict X,
@@ -114,14 +114,14 @@ static void gemm(
     int ldc) {
 
     #pragma omp parallel for collapse(2) schedule(static) proc_bind(close)
-    for (int ii = 0; ii < M; ii += BLOCO_LIN_A) {
-        for (int jj = 0; jj < N; jj += BLOCO_COL_B) {
-            int M_bloco = (ii + BLOCO_LIN_A <= M) ? BLOCO_LIN_A : (M - ii);
-            int N_bloco = (jj + BLOCO_COL_B <= N) ? BLOCO_COL_B : (N - jj);
+    for (int ii = 0; ii < M; ii += TILE_M) {
+        for (int jj = 0; jj < N; jj += TILE_N) {
+            int M_bloco = (ii + TILE_M <= M) ? TILE_M : (M - ii);
+            int N_bloco = (jj + TILE_N <= N) ? TILE_N : (N - jj);
             float* restrict C_bloco = C + ii * ldc + jj;
 
-            for (int kk = 0; kk < K; kk += BLOCO_COL_A) {
-                int K_bloco = (kk + BLOCO_COL_A <= K) ? BLOCO_COL_A : (K - kk);
+            for (int kk = 0; kk < K; kk += TILE_K) {
+                int K_bloco = (kk + TILE_K <= K) ? TILE_K : (K - kk);
                 const float* restrict A_bloco = A + ii * lda + kk;
                 const float* restrict B_bloco = B + kk * ldb + jj;
 
