@@ -49,50 +49,6 @@ void im2col(
 
 }
 
-void im2col_T(
-    const float* restrict X,
-    float* restrict COLT,
-    int canais,
-    int alt_x, int larg_x,
-    int alt_k, int larg_k,
-    int alt_pad, int larg_pad,
-    int alt_s, int larg_s) {
-
-    const int Kdim = canais * alt_k * larg_k;
-
-    #pragma omp parallel for schedule(static) proc_bind(close)
-    for (int i = 0; i < alt_s; i++) {
-        for (int j = 0; j < larg_s; j++) {
-            const int n = i * larg_s + j;
-            float* restrict lin_col = COLT + n * Kdim;
-
-            for (int c = 0; c < canais; c++) {
-                const int base_x_c = c * alt_x * larg_x;
-                const int base_k_c = c * alt_k * larg_k;
-
-                for (int kh = 0; kh < alt_k; kh++) {
-                    int in_y = i + kh - alt_pad;
-                    bool y_valido = (unsigned)in_y < (unsigned)alt_x; 
-                    const float* restrict lin_x = X + base_x_c + in_y * larg_x;
-
-                    #pragma omp simd
-                    for (int kw = 0; kw < larg_k; kw++) {
-                        int in_x = j + kw - larg_pad;
-                        const int k = base_k_c + kh * larg_k + kw;
-                        
-                        if (y_valido && (unsigned)in_x < (unsigned)larg_x) {
-                            lin_col[k] = lin_x[in_x];
-                        } else {
-                            lin_col[k] = 0.0f;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-}
-
 void col2im_T(
     const float* restrict COLT,
     float* restrict GE,
