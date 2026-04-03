@@ -14,9 +14,8 @@ void arena_init(arena_t* arena, size_t capacidade) {
     arena->data = _aligned_malloc(arena->capacidade, ARENA_ALINHAMENTO);
     
     if (!arena->data) {
-        _aligned_free(arena);
-        printf("RuntimeError:Falha ao alocar dados da arena.");
-        abort();
+        fprintf(stderr, "RuntimeError: Falha ao alocar dados da arena.\n");
+        exit(EXIT_FAILURE);
     }
 }
 
@@ -25,12 +24,9 @@ void* arena_alloc(arena_t* arena, size_t size_bytes) {
     size_t offset_novo = offset_alinhado + size_bytes;
 
     if (offset_novo > arena->capacidade) {
-        printf(
-            "RuntimeError: Capacidade de %zu bytes excedida na arena," 
-            " considere pre-alocar mais memoria com JNNnative.setTamArena().", 
-            arena->capacidade
-        );
-        abort();
+        fprintf(stderr, "RuntimeError: Capacidade de %zu bytes excedida na arena,", arena->capacidade);
+        fprintf(stderr, " considere pre-alocar mais memoria com JNNnative.setTamArena().\n");
+        exit(EXIT_FAILURE);
     }
 
     void* ptr = arena->data + offset_alinhado;
@@ -44,9 +40,12 @@ size_t arena_checkpoint(arena_t* arena) {
 }
 
 void arena_restore(arena_t* arena, size_t checkpoint) {
-    if (checkpoint <= arena->offset) {
-        arena->offset = checkpoint;
+    if (checkpoint > arena->capacidade) {
+        fprintf(stderr, "RuntimeError: Checkpoint inválido para restauração na arena.\n");
+        exit(EXIT_FAILURE);
     }
+
+    arena->offset = checkpoint;
 }
 
 void arena_reset(arena_t* arena) {
