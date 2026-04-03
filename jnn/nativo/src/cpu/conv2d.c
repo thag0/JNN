@@ -1,8 +1,8 @@
 #include "conv2d.h"
-#include "macros.h"
 #include "gemm.h"
 #include "im2col.h"
-#include "mem_pool.h"
+#include "arena.h"
+#include "common.h"
 
 #include <string.h>
 
@@ -96,7 +96,8 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
     const int Kdim = canais * alt_k * larg_k;
     const int Ndim = alt_s * larg_s;
 
-    float* restrict col = get_mem_pool(sizeof(float) * Kdim * Ndim);
+    size_t checkpoint = arena_checkpoint(&arena);
+    float* restrict col = arena_alloc(&arena, sizeof(float) * Kdim * Ndim);
 
     gemm_params_t mm = {
         .A = (float* restrict) K,
@@ -144,6 +145,7 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
         cpu_gemm(&mm);
     }
 
+    arena_restore(&arena, checkpoint);
 }
 
 static bool _usar_im2col_fw(const conv2d_fwd_params_t* params) {
@@ -257,7 +259,9 @@ static void _backward_gk_im2col(const conv2d_bwd_params_t* params) {
 
     const int Kdim = canais * alt_k * larg_k;
     const int Ndim = alt_s * larg_s;
-    float* restrict col = get_mem_pool(sizeof(float) * Kdim * Ndim);
+    
+    size_t checkpoint = arena_checkpoint(&arena);
+    float* restrict col = arena_alloc(&arena, sizeof(float) * Kdim * Ndim);
 
     gemm_params_t mm = {
         .A = NULL,
@@ -294,6 +298,7 @@ static void _backward_gk_im2col(const conv2d_bwd_params_t* params) {
         cpu_gemm(&mm);
     }
 
+    arena_restore(&arena, checkpoint);
 }
 
 static bool _usar_im2col_gk(const conv2d_bwd_params_t* params) {
@@ -382,7 +387,9 @@ static void _backward_ge_col2im(const conv2d_bwd_params_t* params) {
 
     const int Ndim = alt_s * larg_s;
     const int Kdim = params->canais * alt_k * larg_k;
-    float* restrict colT = get_mem_pool(sizeof(float) * Ndim * Kdim);
+    
+    size_t checkpoint = arena_checkpoint(&arena);
+    float* restrict colT = arena_alloc(&arena, sizeof(float) * Ndim * Kdim);
 
     gemm_params_t mm = {
         .B = (float* restrict)params->K,
@@ -416,6 +423,7 @@ static void _backward_ge_col2im(const conv2d_bwd_params_t* params) {
         );
     }
 
+    arena_restore(&arena, checkpoint);
 }
 
 static bool _usar_col2im_ge(const conv2d_bwd_params_t* params) {

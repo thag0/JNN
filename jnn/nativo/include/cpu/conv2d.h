@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include "arena.h"
 
 typedef struct {
     const float* restrict X;

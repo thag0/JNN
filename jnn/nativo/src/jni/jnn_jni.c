@@ -1,6 +1,8 @@
 #include <jni.h>
 #include <omp.h>
 
+#include "arena.h"
+#include "common.h"
 #include "dispatcher.h"
 #include "gemm.h"
 #include "conv2d.h"
@@ -18,7 +20,20 @@ JNI_OnLoad(JavaVM* vm, void* reserved) {
     (void) reserved;
 
     omp_set_num_threads(jnn_native_num_threads());
+
+    if (arena.data == NULL) {
+        arena_init(&arena, ARENA_CAP_MB(ARENA_INITIAL_CAP_MB));
+    }
+
     return JNI_VERSION_1_8;
+}
+
+JNIEXPORT void JNICALL
+Java_jnn_core_JNNnative_setTamArena(JNIEnv* env, jclass cls, jint size_bytes) {
+    (void) env;
+    (void) cls;
+
+    arena_init(&arena, size_bytes);
 }
 
 JNIEXPORT void JNICALL

@@ -109,6 +109,12 @@ public final class JNNnative {
     public static native void setBackend(int backend);
 
     /**
+     * Configura o tamanho usado para a arena de memória do código nativo.
+     * @param size_bytes novo tamanho em bytes.
+     */
+    public static native void setTamArena(int size_bytes);
+
+    /**
      * Realiza a multiplicação matricial entre A e B.
      * <p>
      *      Essa função já assume que A e B são compatíveis.

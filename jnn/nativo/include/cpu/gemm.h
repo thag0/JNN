@@ -1,5 +1,7 @@
 #pragma once
 
+#include "arena.h"
+
 typedef struct {
     float* restrict A;
     float* restrict B;

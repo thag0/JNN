@@ -3,7 +3,8 @@
 // https://www.netlib.org/lapack/explore-html/dd/d09/group__gemm_ga8cad871c590600454d22564eff4fed6b.html
 
 #include "gemm.h"
-#include "mem_pool.h"
+#include "arena.h"
+#include "common.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -184,16 +185,18 @@ void cpu_gemm(gemm_params_t* params) {
 
         float* restrict ptr_a = NULL;
         float* restrict ptr_b = NULL;
+
+        size_t checkpoint = arena_checkpoint(&arena);
     
         if (std_a_1 != 1) {
-            ptr_a = get_gemm_mem_pool_a(sizeof(float) * lin_a * col_a);
+            ptr_a = arena_alloc(&arena, sizeof(float) * lin_a * col_a);
             _para_row_major(A, ptr_a, lin_a, col_a, std_a_0, std_a_1);
             A = ptr_a;
             lda = col_a;
         }
     
         if (std_b_1 != 1) {
-            ptr_b = get_gemm_mem_pool_b(sizeof(float) * col_a * col_b);
+            ptr_b = arena_alloc(&arena, sizeof(float) * col_a * col_b);
             _para_row_major(B, ptr_b, col_a, col_b, std_b_0, std_b_1);
             B = ptr_b;
             ldb = col_b;
@@ -204,6 +207,8 @@ void cpu_gemm(gemm_params_t* params) {
             lin_a, col_a, col_b,
             lda, ldb, ldc
         );
+
+        arena_restore(&arena, checkpoint);
     }
 
 }

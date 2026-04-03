@@ -1,8 +1,8 @@
 #include "im2col.h"
-#include "macros.h"
 
 #include <string.h>
 #include <stdbool.h>
+#include "common.h"
 
 void im2col(
     const float* restrict X,
