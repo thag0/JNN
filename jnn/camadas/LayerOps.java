@@ -1,6 +1,5 @@
 package jnn.camadas;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
@@ -8,7 +7,7 @@ import java.util.concurrent.ForkJoinTask;
 
 import jnn.core.JNNnative;
 import jnn.core.ops.Ops;
-import jnn.core.parallel.PoolFactory;
+import jnn.core.parallel.JNNparallel;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -24,7 +23,7 @@ public class LayerOps {
 	/**
 	 * Operador para paralelização.
 	 */
-	private final ForkJoinPool pool = PoolFactory.common();
+	private final ForkJoinPool pool = JNNparallel.common();
 
     /**
      * Utilitário para operações de forward e backward de camadas.
@@ -33,24 +32,26 @@ public class LayerOps {
     
 	/**
 	 * Realiza a peopagação direta através da camada Densa.
-	 * @param entrada {@code Tensor} contendo a entrada da camada.
+	 * @param in {@code Tensor} contendo a entrada da camada.
 	 * @param kernel {@code Tensor} contendos o kernel/pesos da camada.
 	 * @param bias {@code Tensor} contendo o bias da camada {@code (podendo ser nulo)}.
-	 * @param saida {@code Tensor} de destino do resultado.
+	 * @param out {@code Tensor} de destino do resultado.
 	 * @see jnn.camadas.Densa Densa
 	 */
-	public void forwardDensa(Tensor entrada, Tensor kernel, Optional<Tensor> bias, Tensor saida) {
-		saida.zero();// zerar acumulos anteriores
+	public void forwardDensa(Tensor in, Tensor kernel, Optional<Tensor> bias, Tensor out) {
+		out.zero();// zerar acumulos anteriores
 
-		ops.matmul(entrada, kernel, saida);
+		ops.matmul(in, kernel, out);
 
 		bias.ifPresent(b -> {
-			if (entrada.numDim() == 1) {//amostra única
-				saida.add(b);
+			final int inDim = in.numDim();
 
-			} else if (entrada.numDim() == 2) {//lote de amostras
-				saida.copiar(
-					saida.broadcast(b, (_s, _b) -> _s + _b)
+			if (inDim == 1) {//amostra única
+				out.add(b);
+
+			} else if (inDim == 2) {//lote de amostras
+				out.copiar(
+					out.broadcast(b, (_s, _b) -> _s + _b)
 				);
 			}
 		});
@@ -58,87 +59,78 @@ public class LayerOps {
 
 	/**
 	 * Realiza a propagação reversa através da camada densa.
-	 * @param entrada {@code Tensor} contendo a entrada da camada.
+	 * @param in {@code Tensor} contendo a entrada da camada.
 	 * @param kernel {@code Tensor} contendos o kernel/pesos da camada.
-	 * @param gradS {@code Tensor} contendo o gradiente em relação a saída da camada.
+	 * @param grad {@code Tensor} contendo o gradiente em relação a saída da camada.
 	 * @param gradK {@code Tensor} contendo o gradiente em relação ao kernel/pesos da camada.
 	 * @param gradB {@code Tensor} contendo o gradiente em relação ao bias da camada {@code (podendo ser nulo)}.
-	 * @param gradE {@code Tensor} contendo o gradiente em relação à entrada da camada.
+	 * @param gradIn {@code Tensor} contendo o gradiente em relação à entrada da camada.
 	 * @see jnn.camadas.Densa Densa
 	 */
-	public void backwardDensa(Tensor entrada, Tensor kernel, Tensor gradS, Tensor gradK, Optional<Tensor> gradB, Tensor gradE) {
-		gradE.zero();// zerar acumulaçoes anteriores
-		ops.matmul(gradS, kernel.transpor(), gradE);
+	public void backwardDensa(Tensor in, Tensor kernel, Tensor grad, Tensor gradK, Optional<Tensor> gradB, Tensor gradIn) {
+		gradIn.zero();// zerar acumulaçoes anteriores
 		
-		if (gradS.numDim() == 1) {//amostra única
-			ops.matmul(entrada.unsqueeze(0).transpor(), gradS, gradK);
-			gradB.ifPresent(gb -> gb.add(gradS));
+		final int gradDim = grad.numDim();
+		if (gradDim == 1) {//amostra única
+			ops.matmul(in.unsqueeze(0).transpor(), grad, gradK);
+			gradB.ifPresent(gb -> gb.add(grad));
 		
-		} else if (gradS.numDim() == 2) {//lote de amostras
-			ops.matmul(entrada.transpor(), gradS, gradK);
+		} else if (gradDim == 2) {//lote de amostras
+			ops.matmul(in.transpor(), grad, gradK);
 			
-			int lotes = gradS.tamDim(0);
+			final int batches = grad.tamDim(0);
 			gradB.ifPresent(gb -> {
-				for (int i = 0; i < lotes; i++) {					
-					gb.add(gradS.subTensor(i));
+				for (int i = 0; i < batches; i++) {					
+					gb.add(grad.subTensor(i));
 				}
 			});
 		}
 
+		ops.matmul(grad, kernel.transpor(), gradIn);
 	}
 
 	/**
 	 * Realiza a propagação direta através da camada convolucional.
-	 * @param entrada {@code Tensor} contendo a entrada da camada.
+	 * @param in {@code Tensor} contendo a entrada da camada.
 	 * @param kernel {@code Tensor} contendos o kernel/filtros da camada.
 	 * @param bias {@code Tensor} contendo o bias da camada {@code (podendo ser nulo)}.
-	 * @param saida {@code Tensor} de destino do resultado.
+	 * @param out {@code Tensor} de destino do resultado.
 	 * @param padding {@code array} contendo o formato de padding (altura, largura)
 	 * @see jnn.camadas.Conv2D Conv2D
 	 */
 	public void forwardConv2D(
-		Tensor entrada,
+		Tensor in,
 		Tensor kernel,
 		Optional<Tensor> bias,
-		Tensor saida,
+		Tensor out,
 		int[] padding) {
 
-		int dims = entrada.numDim();
-		if (dims != 3 && dims != 4) {
-			throw new IllegalArgumentException(
-				"\nEntrada esperada 3D (C, H, W) ou 4D (N, C, H, W), recebido " + dims + "D."
-			);
-		}
+		final int inDim = in.numDim();
 
-		if (dims == 3) {
-			entrada = entrada.unsqueeze(0);
-			saida = saida.unsqueeze(0);
-		}
+		if (inDim == 4) {
+			runConv2DForward(in, kernel, bias, out, padding);
 		
-		runConv2DForward(entrada, kernel, bias, saida, padding);
-		
-		if (dims == 3) {
-			entrada = entrada.squeeze(0);
-			saida = saida.squeeze(0);
+		} else if (inDim == 3) {
+			runConv2DForward(in.unsqueeze(0), kernel, bias, out.unsqueeze(0), padding);
 		}
 	}
 
 	/**
 	 * Realiza a operação de forward da camada Conv2D usando o formato NCHW.
-	 * @param entrada entrada.
+	 * @param in entrada.
 	 * @param kernel kernel.
 	 * @param bias bias.
-	 * @param saida saída.
-	 * @param padding padding.
+	 * @param out saída.
+	 * @param pad padding.
 	 */
 	private void runConv2DForward(
-		Tensor entrada,
+		Tensor in,
 		Tensor kernel,
 		Optional<Tensor> bias,
-		Tensor saida,
-		int[] padding) {
+		Tensor out,
+		int[] pad) {
 		
-		final int[] shapeX = entrada.shape();
+		final int[] shapeX = in.shape();
 		final int[] shapeK = kernel.shape();
 		final int lotes = shapeX[0];
 		final int canais = shapeX[1];
@@ -146,19 +138,25 @@ public class LayerOps {
 		final int altX = shapeX[2];
 		final int largX = shapeX[3];
 		
-		final int altK = shapeK[2];
+		final int altK  = shapeK[2];
 		final int largK = shapeK[3];
 
-		final int altPad = padding[0];
-		final int largPad = padding[1];
+		final int altPad  = pad[0];
+		final int largPad = pad[1];
+
+		final float[] dataX = in.array();
+		final float[] dataK = kernel.array();
+		final float[] dataS = out.array();
+
+		final boolean temBias = bias.isPresent();
+		final float[] dataB = temBias ? bias.get().array() : null;
 
 		if (JNNnative.isOn()) {
 			JNNnative.conv2dForward(
-				entrada.array(),
-				kernel.array(),
-				bias.isPresent() ? bias.get().array() : null,
-				bias.isPresent(),
-				saida.array(),
+				dataX,
+				dataK,
+				dataB, temBias,
+				dataS,
 				lotes, canais, filtros,
 				altX, largX,
 				altK, largK,
@@ -175,19 +173,14 @@ public class LayerOps {
 		final int areaK = altK * largK;
 		final int areaS = altS * largS;
 
-		final float[] dataX = entrada.array();
-		final float[] dataK = kernel.array();
-		final float[] dataS = saida.array();
-		final float[] dataB = bias.isPresent() ? bias.get().array() : null;
-
 		var tasks = new ArrayList<ForkJoinTask<?>>(filtros);
 
 		for (int f = 0; f < filtros; f++) {
 			for (int l = 0; l < lotes; l++) {
 				final int filtro = f, lote = l;
 				final int offKf =  filtro * canais * areaK;
-				final float valBias = (dataB != null) ? dataB[filtro] : 0.0f;
-			
+				final float valBias = temBias ? dataB[filtro] : 0.0f;
+
 				tasks.add(pool.submit(() -> {
 					final int offY =  (lote * filtros + filtro) * areaS;
 					final int offXL = (lote * canais) * areaX;
@@ -232,66 +225,63 @@ public class LayerOps {
 
 	/**
 	 * Realiza a propagação reversa através da camada convolucional.
-	 * @param entrada {@code Tensor} contendo a entrada da camada.
+	 * @param in {@code Tensor} contendo a entrada da camada.
 	 * @param kernel {@code Tensor} contendos o kernel/filtros da camada.
-	 * @param gradS {@code Tensor} contendo o gradiente em relação a saída da camada.
+	 * @param grad {@code Tensor} contendo o gradiente em relação a saída da camada.
 	 * @param gradK {@code Tensor} contendo o gradiente em relação ao kernel/filtros da camada.
 	 * @param gradB {@code Tensor} contendo o gradiente em relação ao bias da camada {@code (podendo ser nulo)}.
-	 * @param gradE {@code Tensor} contendo o gradiente em relação à entrada da camada.
-	 * @param padding {@code array} contendo o formato de padding (altura, largura)
+	 * @param gradIn {@code Tensor} contendo o gradiente em relação à entrada da camada.
+	 * @param pad {@code array} contendo o formato de padding (altura, largura)
 	 * @see jnn.camadas.Conv2D Conv2D
 	 */
 	public void backwardConv2D(
-		Tensor entrada, 
+		Tensor in, 
 		Tensor kernel, 
-		Tensor gradS, 
+		Tensor grad, 
 		Tensor gradK, 
 		Optional<Tensor> gradB, 
-		Tensor gradE, 
-		int[] padding) {
+		Tensor gradIn, 
+		int[] pad) {
 
-		int dims = entrada.numDim();
-		if (dims != 3 && dims != 4) {
-			throw new IllegalArgumentException(
-				"\nEntrada esperada 3D (C, H, W) ou 4D (N, C, H, W), recebido " + dims + "D."
+		final int inDim = in.numDim();
+		
+		if (inDim == 4) {
+			runConv2DBackward(in, kernel, grad, gradK, gradB, gradIn, pad);
+			
+		} else if (inDim == 3) {
+			runConv2DBackward(
+				in.unsqueeze(0), 
+				kernel, 
+				grad.unsqueeze(0), 
+				gradK, 
+				gradB, 
+				gradIn.unsqueeze(0), 
+				pad
 			);
 		}
-
-		if (dims == 3) {
-			entrada = entrada.unsqueeze(0);
-			gradE = gradE.unsqueeze(0);
-			gradS = gradS.unsqueeze(0);
-		}
 		
-		runConv2DBackward(entrada, kernel, gradS, gradK, gradB, gradE, padding);
-		
-		if (dims == 3) {
-			entrada = entrada.squeeze(0);
-			gradE = gradE.squeeze(0);
-			gradS = gradS.squeeze(0);
-		}
 	}
 
 	/**
 	 * Operador interno da camada Conv2D para lidar com lotes.
-	 * @param entrada entrada
+	 * @param in entrada
 	 * @param kernel kernel
-	 * @param gradS gradS
+	 * @param grad gradS
 	 * @param gradK gradK
 	 * @param gradB gradB
-	 * @param gradE gradE
-	 * @param padding padding
+	 * @param gradIn gradE
+	 * @param pad padding
 	 */
 	private void runConv2DBackward(
-		Tensor entrada,
+		Tensor in,
 		Tensor kernel,
-		Tensor gradS,
+		Tensor grad,
 		Tensor gradK,
 		Optional<Tensor> gradB,
-		Tensor gradE,
-		int[] padding) {
+		Tensor gradIn,
+		int[] pad) {
 
-		final int[] shapeX = entrada.shape();
+		final int[] shapeX = in.shape();
 		final int[] shapeK = kernel.shape();
 
 		final int lotes = shapeX[0];
@@ -303,20 +293,28 @@ public class LayerOps {
 		final int altK = shapeK[2];
 		final int largK = shapeK[3];
 
-		final int altPad = padding[0];
-		final int largPad = padding[1];
+		final int altPad  = pad[0];
+		final int largPad = pad[1];
+
+		final float[] dataX = in.array();
+		final float[] dataK = kernel.array();
+		final float[] dataGS = grad.array();
+		final float[] dataGK = gradK.array();
+		final float[] dataGE = gradIn.array();
+
+		final boolean temBias = gradB.isPresent();
+		final float[] dataGB = temBias ? gradB.get().array() : null;
 		
-		gradE.zero();// zerar acumulaçoes anteriores
+		gradIn.zero();// zerar acumulaçoes anteriores
 
 		if (JNNnative.isOn()) {
 			JNNnative.conv2dBackward(
-				entrada.array(),
-				kernel.array(),
-				gradS.array(),
-				gradK.array(),
-				gradB.isPresent() ? gradB.get().array() : null,
-				gradB.isPresent(),
-				gradE.array(),
+				dataX,
+				dataK,
+				dataGS,
+				dataGK,
+				dataGB, temBias,
+				dataGE,
 				lotes, canais, filtros, 
 				altX, largX, 
 				altK, largK,
@@ -326,77 +324,62 @@ public class LayerOps {
 			return;
 		}
 
-		final int[] shapeGS = gradS.shape();
-		final int altS = shapeGS[2]; 
+		final int[] shapeGS = grad.shape();
+		final int altS  = shapeGS[2]; 
     	final int largS = shapeGS[3];
 
-		final int areaX = altX * largX;
-		final int areaK = altK * largK;
+		final int areaX  = altX * largX;
+		final int areaK  = altK * largK;
 		final int areaGS = altS * largS;
 
-		final float[] dataX = entrada.array();
-		final float[] dataK = kernel.array();
-		final float[] dataGS = gradS.array();
-		final float[] dataGK = gradK.array();
-		final float[] dataGE = gradE.array();
-		
-		final int offXBase = entrada.offset();
-		final int offKBase = kernel.offset();
-		final int offGSBase = gradS.offset();
-		final int offGKBase = gradK.offset();
-		final int offGEBase = gradE.offset();
-
-		final boolean temBias = gradB.isPresent();
-		final float[] dataGB = temBias ? gradB.get().array() : null;
-		final int offGBBase = temBias ? gradB.get().offset() : 0;
-
-		List<ForkJoinTask<?>> tarefas1 = new ArrayList<>(filtros);
+		var tasks = new ArrayList<ForkJoinTask<?>>(filtros);
 
 		for (int f = 0; f < filtros; f++) {
 			final int filtro = f;
-			tarefas1.add(pool.submit(() -> {
+
+			tasks.add(pool.submit(() -> {
 		
 				if (temBias) {
 					float soma = 0f;
 					for (int l = 0; l < lotes; l++) {
-						final int offGSlf = offGSBase + (l * filtros + filtro) * areaGS;
+						final int offGSlf = (l * filtros + filtro) * areaGS;
 						for (int i = 0; i < areaGS; i++) {
 							soma += dataGS[offGSlf + i];
 						}
 					}
-					dataGB[offGBBase + filtro] += soma;
+					dataGB[filtro] += soma;
 				}
 
 				for (int c = 0; c < canais; c++) {
-					final int offGK_fc = offGKBase + (filtro * canais + c) * areaK;
+					final int offGK_fc = (filtro * canais + c) * areaK;
 
 					for (int kh = 0; kh < altK; kh++) {
+						int iMin = Math.max(0, altPad - kh);
+						int iMax = Math.min(altS, altX + altPad - kh);
+
 						for (int kw = 0; kw < largK; kw++) {
-							int iMin = Math.max(0, altPad - kh);
-							int iMax = Math.min(altS, altX + altPad - kh);
 							int jMin = Math.max(0, largPad - kw);
 							int jMax = Math.min(largS, largX + largPad - kw);
 							float soma = 0f;
 
 							for (int l = 0; l < lotes; l++) {
-								final int offGS_loteFilter = offGSBase + (l * filtros + filtro) * areaGS;
-								final int offX_loteCanal   = offXBase + (l * canais + c) * areaX;
+								final int offGSLoteFiltro = (l * filtros + filtro) * areaGS;
+								final int offXLoteCanal   = (l * canais + c) * areaX;
 
 								for (int hOut = iMin; hOut < iMax; hOut++) {
 									int inH = hOut + kh - altPad;
-									
-									final int idxGS_Line = offGS_loteFilter + hOut * largS;
-									final int idxX_Line  = offX_loteCanal   + inH * largX;
-									
-									int inW_Offset = kw - largPad;
+									final int idxGS_Line = offGSLoteFiltro + hOut * largS;
+									final int idxX_Line  = offXLoteCanal   + inH * largX;
+									int offInW = kw - largPad;
 
 									for (int wOut = jMin; wOut < jMax; wOut++) {
-										float valGS = dataGS[idxGS_Line + wOut];
-										float valX  = dataX[idxX_Line + (wOut + inW_Offset)];
-										soma += valX * valGS;
+										float g = dataGS[idxGS_Line + wOut];
+										float x  = dataX[idxX_Line + (wOut + offInW)];
+										soma += x * g;
 									}
 								}
 							}
+
 							dataGK[offGK_fc + kh * largK + kw] += soma;
 						}
 					}
@@ -404,40 +387,42 @@ public class LayerOps {
 			}));
 		}
 		
-		for (ForkJoinTask<?> t : tarefas1) t.join();
+		for (var task : tasks) task.join();
 
-		List<ForkJoinTask<?>> tarefas2 = new ArrayList<>(lotes);
+		tasks.clear();
 
 		for (int l = 0; l < lotes; l++) {
 			final int lote = l;
 
-			tarefas2.add(pool.submit(() -> {
-				final int offGE_lote = offGEBase + lote * canais * areaX;
-				final int offGS_lote = offGSBase + lote * filtros * areaGS;
+			tasks.add(pool.submit(() -> {
+				final int offGELote = lote * canais * areaX;
+				final int offGSlote = lote * filtros * areaGS;
 
 				for (int c = 0; c < canais; c++) {
-					final int offGE_loteCanal = offGE_lote + c * areaX;
+					final int offGELoteCanal = offGELote + c * areaX;
 
 					for (int f = 0; f < filtros; f++) {
-						final int offGS_loteFilter = offGS_lote + f * areaGS;
-						final int offK_filterCanal = offKBase + (f * canais + c) * areaK;
+						final int offGSLoteFiltro = offGSlote + f * areaGS;
+						final int offKFiltroCanal = (f * canais + c) * areaK;
 
 						for (int kh = 0; kh < altK; kh++) {
+							int iStart = Math.max(0, altPad - kh);
+							int iEnd   = Math.min(altS, altX + altPad - kh);
+							
 							for (int kw = 0; kw < largK; kw++) {
-								float valK = dataK[offK_filterCanal + kh * largK + kw];
-								int iStart = Math.max(0, altPad - kh);
-								int iEnd   = Math.min(altS, altX + altPad - kh);
+								final float k = dataK[offKFiltroCanal + kh * largK + kw];
 								int jStart = Math.max(0, largPad - kw);
 								int jEnd   = Math.min(largS, largX + largPad - kw);
-								int inW_Offset = kw - largPad;
+								int offInW = kw - largPad;
 
 								for (int outH = iStart; outH < iEnd; outH++) {
 									int inH = outH + kh - altPad;
-									int idxGE_Line = offGE_loteCanal + inH * largX;
-									int idxGS_Line = offGS_loteFilter + outH * largS;
+									int idLinGE = offGELoteCanal + inH * largX;
+									int idLinGS = offGSLoteFiltro + outH * largS;
 
 									for (int outW = jStart; outW < jEnd; outW++) {
-										dataGE[idxGE_Line + (outW + inW_Offset)] += dataGS[idxGS_Line + outW] * valK;
+										float g = dataGS[idLinGS + outW];
+										dataGE[idLinGE + (outW + offInW)] += g * k;
 									}
 								}
 							}
@@ -447,8 +432,7 @@ public class LayerOps {
 			}));
 		}
 
-		for (var t : tarefas2) t.join();
-
+		for (var task : tasks) task.join();
 	}
 
 	/**

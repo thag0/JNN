@@ -11,7 +11,7 @@ import jnn.camadas.Densa;
 import jnn.camadas.Entrada;
 import jnn.camadas.acts.Sigmoid;
 import jnn.camadas.acts.Tanh;
-import jnn.core.parallel.PoolFactory;
+import jnn.core.parallel.JNNparallel;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;
@@ -183,7 +183,7 @@ public class MainImg {
 		float[][] valores = new float[perdas.length][1];
 
 		final int t = Runtime.getRuntime().availableProcessors();
-		try (ForkJoinPool pool = PoolFactory.pool(t)) {
+		try (ForkJoinPool pool = JNNparallel.pool(t)) {
 			for (int i = 0, n = valores.length; i < n; i++) {
 				final int id = i;
 				pool.submit(() -> {

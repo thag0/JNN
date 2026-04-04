@@ -5,10 +5,14 @@ import java.util.concurrent.ForkJoinPool;
 import jnn.core.JNNlog;
 import jnn.core.JNNlog.TipoLog;
 
+// Ainda quero mudar como isso funciona
+// Comparado ao OpenMP usado na parte nativa a diferença é absurda
+// Tenho ideias de criar uma propria "ThreadPool" usando "Thread" manual e gerenciar por aqui
+
 /**
- * Molde de criação para multiprocessamento.
+ * Interface de paralelismo.
  */
-public class PoolFactory {
+public class JNNparallel {
     
     /**
      * Máxima quantidade de threads disponível para a JVM.
@@ -28,7 +32,7 @@ public class PoolFactory {
     /**
      * Construtor privado.
      */
-    private PoolFactory() {}
+    private JNNparallel() {}
 
     /**
      * Cria uma nova pool de threads utilizando o valor padrão.

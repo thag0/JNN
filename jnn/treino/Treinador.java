@@ -3,7 +3,7 @@ package jnn.treino;
 import java.util.LinkedList;
 import java.util.concurrent.ForkJoinPool;
 
-import jnn.core.parallel.PoolFactory;
+import jnn.core.parallel.JNNparallel;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;
@@ -179,7 +179,7 @@ public class Treinador implements Cloneable {
 		float[] h = new float[hist.length];
 
 		final int t = Runtime.getRuntime().availableProcessors();
-		try (ForkJoinPool pool = PoolFactory.pool(t)) {
+		try (ForkJoinPool pool = JNNparallel.pool(t)) {
 			for (int i = 0; i < h.length; i++) {
 				final int id = i;
 				pool.execute(() -> h[id] = hist[id]);
