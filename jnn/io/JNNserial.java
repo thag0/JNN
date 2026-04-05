@@ -27,11 +27,10 @@ import jnn.camadas.pooling.AvgPool2D;
 import jnn.camadas.pooling.GlobalAvgPool2D;
 import jnn.camadas.pooling.MaxPool2D;
 import jnn.core.Dicionario;
+import jnn.core.JNNutils;
 import jnn.io.seriais.SerialBase;
 import jnn.io.seriais.camadas.SerialCamada;
-import jnn.metrica.perda.Perda;
 import jnn.modelos.Sequencial;
-import jnn.otm.Otimizador;
 
 /**
  * Classe responsável por tratar da gravação/leitura de modelos
@@ -67,12 +66,8 @@ public class JNNserial extends SerialBase {
 			);
 		}
 
-		if (!modelo._compilado) {
-			throw new IllegalStateException(
-				"\nO modelo deve ser compilado."
-			);
-		}
-
+		// garantia de compilação do modelo e
+		// de que as dimensões das camadas estão
 		modelo.loteZero();
 
 		try (DataOutputStream out = new DataOutputStream(new FileOutputStream(arquivo))) {
@@ -97,93 +92,95 @@ public class JNNserial extends SerialBase {
 	 * @return modelo {@code Sequencial} lido a partir do arquivo.
 	 */
 	static public Sequencial lerSequencial(String caminho) {
-		Sequencial modelo = new Sequencial();
-		Dicionario dicio = new Dicionario();
-
-        File arquivo = new File(caminho);
+		File arquivo = new File(caminho);
         if (!arquivo.getName().toLowerCase().endsWith(formatoModelo)) {
-            throw new IllegalArgumentException("O caminho deve conter a extensão " + formatoModelo);
+			throw new IllegalArgumentException("O caminho deve conter a extensão " + formatoModelo);
         }
-
+		
+		Dicionario dicio = new Dicionario();
+		Camada[] cs = {};
+		String otmStr = "";
+		String lossStr = "";
+		
 		try (DataInputStream in = new DataInputStream(new FileInputStream(arquivo))) {
 			int numCamadas = lerInt(in);
-			String otmStr = lerString(in);
-			String lossStr = lerString(in);
+			otmStr = lerString(in);
+			lossStr = lerString(in);
 
 			for (int i = 0; i < numCamadas; i++) {
 				String nomeCamada = lerString(in).toLowerCase();
 
 				switch (nomeCamada) {
 					case "densa":
-						modelo.add((Densa) serialCamada.ler(in, nomeCamada));
+						cs = JNNutils.addEmArray(cs, (Densa) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "conv2d":
-						modelo.add((Conv2D) serialCamada.ler(in, nomeCamada));
+						cs = JNNutils.addEmArray(cs, (Conv2D) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "batchnorm2d":
-						modelo.add((BatchNorm2D) serialCamada.ler(in, nomeCamada));
+						cs = JNNutils.addEmArray(cs, (BatchNorm2D) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "flatten":
-						modelo.add((Flatten) serialCamada.ler(in, nomeCamada));
+						cs = JNNutils.addEmArray(cs, (Flatten) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "maxpool2d":
-						modelo.add((MaxPool2D) serialCamada.ler(in, nomeCamada));
+						cs = JNNutils.addEmArray(cs, (MaxPool2D) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "avgpool2d":
-						modelo.add((AvgPool2D) serialCamada.ler(in, nomeCamada));
+						cs = JNNutils.addEmArray(cs, (AvgPool2D) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "globalavgpool2d":
-						modelo.add((GlobalAvgPool2D) serialCamada.ler(in, nomeCamada));
+						cs = JNNutils.addEmArray(cs, (GlobalAvgPool2D) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "dropout":
-						modelo.add((Dropout) serialCamada.ler(in, nomeCamada));
+						cs = JNNutils.addEmArray(cs, (Dropout) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "elu":
-						modelo.add((ELU) serialCamada.ler(in, nomeCamada));
+						cs = JNNutils.addEmArray(cs, (ELU) serialCamada.ler(in, nomeCamada));
 					break;
 					
 					case "gelu":
-						modelo.add((GELU) serialCamada.ler(in, nomeCamada));
+						cs = JNNutils.addEmArray(cs, (GELU) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "leakyrelu":
-						modelo.add((LeakyReLU) serialCamada.ler(in, nomeCamada));
+						cs = JNNutils.addEmArray(cs, (LeakyReLU) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "relu":
-						modelo.add((ReLU) serialCamada.ler(in, nomeCamada));
+						cs = JNNutils.addEmArray(cs, (ReLU) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "selu":
-						modelo.add((SELU) serialCamada.ler(in, nomeCamada));
+						cs = JNNutils.addEmArray(cs, (SELU) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "sigmoid":
-						modelo.add((Sigmoid) serialCamada.ler(in, nomeCamada));
+						cs = JNNutils.addEmArray(cs, (Sigmoid) serialCamada.ler(in, nomeCamada));
 					break;
-
+						
 					case "softmax":
-						modelo.add((Softmax) serialCamada.ler(in, nomeCamada));
+						cs = JNNutils.addEmArray(cs, (Softmax) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "softplus":
-						modelo.add((Softplus) serialCamada.ler(in, nomeCamada));
+						cs = JNNutils.addEmArray(cs, (Softplus) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "swish":
-						modelo.add((Swish) serialCamada.ler(in, nomeCamada));
+						cs = JNNutils.addEmArray(cs, (Swish) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "tanh":
-						modelo.add((Tanh) serialCamada.ler(in, nomeCamada));
+						cs = JNNutils.addEmArray(cs, (Tanh) serialCamada.ler(in, nomeCamada));
 					break;
 				
 					default:
@@ -192,25 +189,21 @@ public class JNNserial extends SerialBase {
 						);
 				}
 			}
-
-			modelo._compilado = true;
-			for (int i = 0; i < modelo.numCamadas(); i++) {
-				modelo.camada(i).setId(i);
-			}
-
-			Otimizador otm = dicio.getOtimizador(dicio.getOtimizador(otmStr));
-			Perda loss = dicio.getPerda(dicio.getPerda(lossStr));
-
-			modelo.setOtimizador(otm);
-			otm.construir(modelo.params(), modelo.grads());
-			
-			modelo.setPerda(loss);
-
 		} catch (IOException e) {
 			System.out.println("Erro ao ler o modelo.");
 			e.printStackTrace();
 			System.exit(1);
 		}
+
+		Sequencial modelo = new Sequencial(cs);
+		for (int i = 0; i < modelo.numCamadas(); i++) modelo.camada(i).setId(i);
+		modelo.setOtimizador(dicio.getOtimizador(otmStr));
+		modelo.otm().construir(modelo.params(), modelo.grads());
+		modelo.setPerda(dicio.getPerda(lossStr));
+
+		// mudar isso depois para algo como "modelo.compilar(otm, loss, false)"
+		// onde o false faria com que os parametros lidos não fossem mexidos na compilação
+		modelo._compilado = true;
 
 		return modelo;
 	}

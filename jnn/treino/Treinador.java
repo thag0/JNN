@@ -36,15 +36,13 @@ public class Treinador implements Cloneable {
 	protected boolean calcHist;
 
 	/**
-	 * Seed para o gerador de número aleatórios.
-	 */
-	protected long seed = 0L;// seed padrão
-
-	/**
 	 * Callback de fim de época.
 	 */
 	private CallbackFimEpoca callback;
 
+	/**
+	 * Agendador para lr dinâmico dos otimizadores.
+	 */
 	private Scheduler scheduler;
 
 	/**
@@ -90,14 +88,6 @@ public class Treinador implements Cloneable {
 	 */
 	public void setScheduler(Scheduler scheduler) {
 		this.scheduler = scheduler;
-	}
-
-	/**
-	 * Configura a seed do gerador de números aleatórios.
-	 * @param seed nova seed.
-	 */
-	public void setSeed(Number seed) {
-		this.seed = seed.longValue();
 	}
 
 	/**

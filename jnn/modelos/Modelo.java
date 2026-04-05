@@ -23,14 +23,13 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	protected String nome = getClass().getSimpleName();
 
 	/**
-	 * <strong> Não alterar </strong>
 	 * <p>
 	 *		Auxiliar no controle da compilação do modelo, ajuda a 
 	 *		evitar uso indevido caso ainda não tenha suas variáveis 
 	 *		e dependências inicializadas previamente.
 	 * </p>
 	 */
-	public boolean _compilado;
+	public boolean _compilado;//mudar isso para protected assim que possivel
 
 	/**
 	 * Função de perda para avaliar o erro durante o treino.
@@ -43,15 +42,6 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	protected Otimizador _otimizador;
 
 	/**
-	 * Ponto inicial para os geradores aleatórios.
-	 * <p>
-	 *		Uma nova seed só é configurada se seu valor for
-	 *		diferente de zero.
-	 * </p>
-	 */
-	protected long seedInicial = 0;
-
-	/**
 	 * Gerenciador de treino do modelo.
 	 */
 	protected Treinador _treinador;
@@ -60,7 +50,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * Auxiliar na verificação de armazenagem do histórico
 	 * de perda do modelo durante o treinamento.
 	 */
-	protected boolean calcularHistorico = false;
+	protected boolean histTreino = false;
 
 	/**
 	 * Responsável pelo retorno de desempenho do modelo.
@@ -71,16 +61,6 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * </p>
 	 */
 	protected Avaliador _avaliador;
-
-	/**
-	 * Utilitário.
-	 */
-	protected JNNutils utils;
-	
-	/**
-	 * Auxiliar de verificação da alteração do método de treino.
-	 */
-	protected boolean configTreino = false;
 
 	/**
 	 * Inicialização implicita de um modelo.
@@ -106,24 +86,6 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	}
 
 	/**
-	 * Configura a nova seed inicial para os geradores de números aleatórios utilizados 
-	 * durante o processo de inicialização de parâmetros treináveis do modelo.
-	 * <p>
-	 *    Configurações personalizadas de seed permitem fazer testes com diferentes
-	 *    parâmetros, buscando encontrar um melhor ajuste para o modelo.
-	 * </p>
-	 * <p>
-	 *    A configuração de seed deve ser feita antes da compilação do modelo para
-	 *    surtir efeito.
-	 * </p>
-	 * @param seed nova seed.
-	 */
-	public void setSeed(Number seed) {
-		JNNutils.validarNaoNulo(seed, "seed == null.");
-		seedInicial = seed.longValue();
-	}
-
-	/**
 	 * Define se, durante o processo de treinamento, o modelo irá salvar os dados 
 	 * relacionados a função de perda de cada época.
 	 * <p>
@@ -138,7 +100,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * durante cada época de treinamento.
 	 */
 	public void setHistorico(boolean calc) {
-		calcularHistorico = calc;
+		histTreino = calc;
 		_treinador.setHistorico(calc);
 	}
 
@@ -169,18 +131,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	}
 
 	/**
-	 * Configura um novo treinador para o modelo.
-	 * @param t {@code Treinador} novo.
-	 */
-	public void setTreinador(Treinador t) {
-		JNNutils.validarNaoNulo(t, "t == null.");
-		_treinador = t;
-		configTreino = true;
-	}
-
-	/**
-	 * Inicializa os parâmetros necessários para a criação do modelo,
-	 * além de gerar os valores iniciais para os kernels e bias.
+	 * Inicializa os parâmetros necessários para a criação do modelo.
 	 * <p>
 	 *    Caso nenhuma configuração inicial seja feita, o modelo será 
 	 *    compilado com os valores padrões. 
@@ -492,6 +443,8 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * Remove as dimensões de lote das camadas do modelo.
 	 */
 	public void loteZero() {
+		validarCompilacao();
+		
 		for (Camada camada : this) {
 			camada.ajustarParaLote(0);
 		}

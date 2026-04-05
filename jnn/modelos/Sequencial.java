@@ -286,8 +286,6 @@ public class Sequencial extends Modelo {
 			camada.init();
 			camada.setId(i);
 		}
-
-		if (seedInicial != 0) _treinador.setSeed(seedInicial);
 		
 		Dicionario dicio = new Dicionario();
 		_perda = dicio.getPerda(loss);
@@ -410,13 +408,12 @@ public class Sequencial extends Modelo {
 		Sequencial clone = (Sequencial) super.clone();
 
 		clone._avaliador = new Avaliador(clone);
-		clone.calcularHistorico = this.calcularHistorico;
+		clone.histTreino = this.histTreino;
 		clone.nome = "Clone de " + nome();
 		
 		Dicionario dicio = new Dicionario();
 		clone._otimizador = dicio.getOtimizador(_otimizador.nome());
 		clone._perda = dicio.getPerda(_perda.nome());
-		clone.seedInicial = this.seedInicial;
 		clone._treinador = new Treinador(clone);
 		
 		int nCamadas = numCamadas();

@@ -368,4 +368,9 @@ public class BatchNorm2D extends Camada implements Cloneable {
         }
     }
 
+    @Override
+    public boolean temBias() {
+        return true; //beta funciona como bias
+    }
+
 }
