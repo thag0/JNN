@@ -49,7 +49,7 @@ public class Treino extends MetodoTreino {
 				if (calcHist) perdaEpoca += loss.forward(prev, a.y()).item();
 				
 				modelo.gradZero();
-				backpropagation(loss.backward(prev, a.y()));
+				modelo.backward(loss.backward(prev, a.y()));
 				otm.update();
 			}
 			

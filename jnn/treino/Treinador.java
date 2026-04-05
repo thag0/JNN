@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.concurrent.ForkJoinPool;
 
 import jnn.core.parallel.JNNparallel;
-import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;
 import jnn.treino.callback.CallbackFimEpoca;
@@ -149,15 +148,6 @@ public class Treinador implements Cloneable {
 	 */
 	public void executar(DataLoader loader, int epochs) {
 		executar(loader, epochs, 1, false);
-	}
-
-	/**
-	 * Realiza a retropropagação de gradientes através das camadas do modelo.
-	 * @param g {@code Tensor} contendo o gradiente em relação a saída prevista
-	 * pelo modelo.
-	 */
-	public void backpropagation(Tensor g) {
-		metodo.backpropagation(g);
 	}
 
 	/**

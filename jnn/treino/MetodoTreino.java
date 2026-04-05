@@ -4,7 +4,6 @@ import java.util.LinkedList;
 
 import jnn.core.JNNlog;
 import jnn.core.JNNutils;
-import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.metrica.perda.Perda;
 import jnn.modelos.Modelo;
@@ -74,15 +73,6 @@ public abstract class MetodoTreino {
 	 */
 	public void setScheduler(Scheduler scheduler) {
 		if (scheduler != null) this.scheduler = scheduler;
-	}
-
-	/**
-	 * Realiza a retropropagação de gradientes através das camadas do modelo.
-	 * @param g {@code Tensor} contendo o gradiente em relação a saída prevista
-	 * pelo modelo.
-	 */
-	protected void backpropagation(Tensor g) {
-		modelo.backward(g);// implementação com checks
 	}
 
 	/**
