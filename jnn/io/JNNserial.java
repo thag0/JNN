@@ -196,14 +196,15 @@ public class JNNserial extends SerialBase {
 		}
 
 		Sequencial modelo = new Sequencial(cs);
+		
+		// mudar isso depois para algo como "modelo.compilar(otm, loss, false)"
+		// onde o false faria com que os parametros lidos não fossem mexidos na compilação
+		modelo._compilado = true;
+
 		for (int i = 0; i < modelo.numCamadas(); i++) modelo.camada(i).setId(i);
 		modelo.setOtimizador(dicio.getOtimizador(otmStr));
 		modelo.otm().construir(modelo.params(), modelo.grads());
 		modelo.setPerda(dicio.getPerda(lossStr));
-
-		// mudar isso depois para algo como "modelo.compilar(otm, loss, false)"
-		// onde o false faria com que os parametros lidos não fossem mexidos na compilação
-		modelo._compilado = true;
 
 		return modelo;
 	}
