@@ -17,12 +17,23 @@ public final class JNNnative {
     /**
      * Nome da biblioteca dinâmica (windows).
      */
-    static final String nomeDLL = "jnn_native.dll";
+    static final String DLL_JNN = "jnn_native.dll";
     
     /**
      * Caminho dentro do arquivo final .jar
      */
-    static final String caminhoDLL = "/nativo/cpu/win64/";
+    static final String PATH_BASE = "/nativo/cpu/win64/";
+
+    /**
+     * Dependências.
+     */
+    static final String[] DLLS = {
+        "libgcc_s_seh-1.dll",
+        "libwinpthread-1.dll",
+        "libgomp-1.dll",
+
+        DLL_JNN //tem que ta por ultimo
+    };
 
     /**
      * Controla se operações internas usarão backend nativo.
@@ -78,20 +89,23 @@ public final class JNNnative {
      * @throws IOException caso ocora algum erro.
      */
     private static void carregarDoJar() throws IOException {
-        InputStream is = JNNnative.class.getResourceAsStream(caminhoDLL + nomeDLL);
+        Path tmpDir = Files.createTempDirectory("jnn_native");
+        tmpDir.toFile().deleteOnExit();
 
-        if (is == null) {
-            throw new FileNotFoundException("DLL não encontrada: " + nomeDLL);
+        for (String nome : DLLS) {
+            try (InputStream is = JNNnative.class.getResourceAsStream(PATH_BASE + nome)) {
+
+                if (is == null) {
+                    throw new FileNotFoundException("DLL não encontrada: " + nome);
+                }
+
+                Path destino = tmpDir.resolve(nome);
+                Files.copy(is, destino, StandardCopyOption.REPLACE_EXISTING);
+                destino.toFile().deleteOnExit();
+
+                System.load(destino.toAbsolutePath().toString());
+            }
         }
-
-        Path tmp = Files.createTempDirectory("jnn_native");
-        tmp.toFile().deleteOnExit();
-
-        Path dll = tmp.resolve(nomeDLL);
-        Files.copy(is, dll, StandardCopyOption.REPLACE_EXISTING);
-        dll.toFile().deleteOnExit();
-
-        System.load(dll.toAbsolutePath().toString());
     }
 
     private JNNnative() {}
