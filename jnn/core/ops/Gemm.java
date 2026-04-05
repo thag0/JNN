@@ -6,79 +6,12 @@ import jnn.core.tensor.Tensor;
 /**
  * Implementações internas de operações lineares.
  */
-public class OpsLinear {
+public class Gemm {
 
 	/**
 	 * Construtor privado.
 	 */
-	private OpsLinear() {}
-    
-	/**
-	 * Realiza a operação {@code A + B} elemento a elemento.
-	 * @param a {@code Tensor} A.
-	 * @param b {@code Tensor} B.
-	 * @return {@code Tensor} resultado.
-	 */
-    public static Tensor matadd(Tensor a, Tensor b) {
-		if (!a.compShape(b)) {
-			throw new IllegalArgumentException(
-				"\nDimensões do tensor A " + a.shapeStr() + 
-				" e B " + b.shapeStr() + " devem ser iguais."
-			);
-		}
-
-		return a.map(b, (x, y) -> x + y);
-    }
-
-	/**
-	 * Realiza a operação {@code A - B} elemento a elemento.
-	 * @param a {@code Tensor} A.
-	 * @param b {@code Tensor} B.
-	 * @return {@code Tensor} resultado.
-	 */
-	public static Tensor matsub(Tensor a, Tensor b) {
-		if (!a.compShape(b)) {
-			throw new IllegalArgumentException(
-				"\nDimensões do tensor A " + a.shapeStr() + 
-				" e B " + b.shapeStr() + " devem ser iguais."
-			);
-		}
-
-		return a.map(b, (x, y) -> x - y);
-	}
-
-	/**
-	 * Realiza a operação {@code A * B} elemento a elemento.
-	 * @param a {@code Tensor} A.
-	 * @param b {@code Tensor} B.
-	 * @return {@code Tensor} resultado.
-	 */
-	public static Tensor mathad(Tensor a, Tensor b) {
-		if (!a.compShape(b)) {
-			throw new IllegalArgumentException(
-				"\nDimensões do tensor A " + a.shapeStr() + 
-				" e B " + b.shapeStr() + " devem ser iguais."
-			);
-		}
-
-		return a.map(b, (x, y) -> x * y);
-	}
-
-	/**
-	 * Realiza a operação {@code A / B} elemento a elemento.
-	 * @param a {@code Tensor} A.
-	 * @param b {@code Tensor} B.
-	 * @return {@code Tensor} resultado.
-	 */
-	public static Tensor matdiv(Tensor a, Tensor b) {
-		if (!a.compShape(b)) {
-			throw new IllegalArgumentException(
-				"\nDimensões do tensor A " + a.shapeStr() + 
-				" e B " + b.shapeStr() + " devem ser iguais."
-			);
-		}
-		return a.map(b, (x, y) -> x / y);
-	}
+	private Gemm() {}
 
 	/**
 	 * Realiza a operação {@code A @ B} (multiplicação matricial).
@@ -173,6 +106,17 @@ public class OpsLinear {
 		final float[] dataA = a.array();
 		final float[] dataB = b.array();
 		final float[] dataD = dst.array();
+
+		if (JNNnative.isOn()) {
+			JNNnative.matmul(
+				dataA, offsetA, s0A, s1A, 
+				dataB, offsetB, s0B, s1B, 
+				dataD, offsetD, s0D, s1D, 
+				linA, colA, colB
+			);
+
+			return;
+		}
 
 		if (s1A == 1 && s1B == 1 && s1D == 1) {// tensores contiguos
 			matmulFastPath(

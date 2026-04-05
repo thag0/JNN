@@ -9,20 +9,12 @@ import jnn.core.tensor.Tensor;
  *		Utilitário auxliar em operações utilizando {@code Tensor}
  * @see jnn.core.tensor.Tensor Tensor
  */
-public abstract class Ops {
+public class Ops {
 
 	/**
-	 * Construtor privado.
+	 * Concentração de operações da biblioteca.
 	 */
-	protected Ops() {}
-
-	/**
-	 * Retorna as implementações em {@code CPU} da biblioteca.
-	 * @return {@code Backend} em CPU.
-	 */
-	public static Ops get() {
-		return new OpsCPU();
-	}
+	public Ops() {}
 
 	/**
 	 * Realiza a operação {@code  A * B}
@@ -30,7 +22,9 @@ public abstract class Ops {
 	 * @param b {@code Tensor} B.
 	 * @return {@code Tensor} resultado.
 	 */
-	public abstract Tensor matmul(Tensor a, Tensor b);
+	public Tensor matmul(Tensor a, Tensor b) {
+		return Gemm.matmul(a, b);
+	}
 
 	/**
 	 * Realiza a operação {@code  A * B}
@@ -38,7 +32,9 @@ public abstract class Ops {
 	 * @param b {@code Tensor} B.
 	 * @param dst {@code Tensor} de destino.
 	 */
-	public abstract void matmul(Tensor a, Tensor b, Tensor dst);
+	public void matmul(Tensor a, Tensor b, Tensor dst) {
+		Gemm.matmul(a, b, dst);
+	}
 
 	/**
 	 * Realiza a operação de correlação cruzada entre o tensor de entrada e o kernel.
@@ -46,7 +42,9 @@ public abstract class Ops {
 	 * @param k {@code Tensor} utilizado para filtro.
 	 * @return {@code Tensor} resultado.
 	 */
-	public abstract Tensor corr2D(Tensor x, Tensor k);
+	public Tensor corr2D(Tensor x, Tensor k) {
+		return OpsConv.corr2D(x, k);
+	}
 
 	/**
 	 * Realiza a operação de correlação cruzada entre o tensor de entrada e o kernel.
@@ -54,28 +52,9 @@ public abstract class Ops {
 	 * @param k {@code Tensor} utilizado para filtro.
 	 * @param dst {@code Tensor} resultado.
 	 */
-	public abstract void corr2D(Tensor x, Tensor k, Tensor dst);
-
-	/**
-	 * Método especial para camadas convolucionais.
-	 * @param dataX conjunto de dados de entrada.
-	 * @param offX offset dos dados de entrada.
-	 * @param dataK conjunto de dados do kernel.
-	 * @param offK offset dos dados do kernel.
-	 * @param dataDst conjunto de dados de destino.
-	 * @param offDst offset dos dados de destino.
-	 * @param W largura da entrada.
-	 * @param H altura da entrada.
-	 * @param kW largura do kernel.
-	 * @param kH altura do kernel.
-	 */
-	public abstract void corr2D(
-		float[] dataX, int offX, 
-		float[] dataK, int offK, 
-		float[] dataDst, int offDst, 
-		int W, int H, 
-		int kW, int kH
-	);
+	public void corr2D(Tensor x, Tensor k, Tensor dst) {
+		OpsConv.corr2D(x, k, dst);
+	}
 
 	/**
 	 * Realiza a operação de convolução entre o tensor de entrada e o kernel.
@@ -83,7 +62,9 @@ public abstract class Ops {
 	 * @param k {@code Tensor} utilizado para filtro.
 	 * @return {@code Tensor} resultado.
 	 */
-	public abstract Tensor conv2D(Tensor x, Tensor k);
+	public Tensor conv2D(Tensor x, Tensor k) {
+		return OpsConv.conv2D(x, k);
+	}
 
 	/**
 	 * Realiza a operação de convolução entre o tensor de entrada e o kernel.
@@ -91,7 +72,9 @@ public abstract class Ops {
 	 * @param k {@code Tensor} utilizado para filtro.
 	 * @param dst {@code Tensor} resultado.
 	 */
-	public abstract void conv2D(Tensor x, Tensor k, Tensor dst);
+	public void conv2D(Tensor x, Tensor k, Tensor dst) {
+		OpsConv.conv2D(x, k, dst);
+	}
 
 	/**
 	 * Realiza a operação de convolução no modo "full" entre o tensor de entrada e o kernel.
@@ -99,7 +82,9 @@ public abstract class Ops {
 	 * @param k {@code Tensor} utilizado para filtro.
 	 * @return {@code Tensor} resultado.
 	 */
-	public abstract Tensor conv2DFull(Tensor x, Tensor k);
+	public Tensor conv2DFull(Tensor x, Tensor k) {
+		return OpsConv.conv2DFull(x, k);
+	}
 
 	/**
 	 * Realiza a operação de convolução entre o tensor de entrada e o kernel.
@@ -107,29 +92,9 @@ public abstract class Ops {
 	 * @param kernel {@code Tensor} contendo o filtro que será aplicado à entrada.
 	 * @param saida {@code Tensor} de destino.
 	 */
-	public abstract void conv2DFull(Tensor entrada, Tensor kernel, Tensor saida);
-
-	/**
-	 * Realiza a operação de convolução da entrada {@code X} utilizando o 
-	 * kernel {@code K}, no modo "full".
-	 * @param dataX {@code array} contendo os dados de entrada.
-	 * @param offX offset do array dos dados de entrada.
-	 * @param dataK {@code array} contendo os dados do kernel.
-	 * @param offK offset do array dos dados do kernel.
-	 * @param dataDst {@code array} contendo os dados de destino.
-	 * @param offDst offset do array dos dados de destino.
-	 * @param W largura da entrada.
-	 * @param H altura da entrada.
-	 * @param kW largura do kernel.
-	 * @param kH altura do kernel.
-	 */
-	public abstract void conv2DFull(
-		float[] dataX, int offX,
-		float[] dataK, int offK,
-		float[] dataDst, int offDst,
-		int W, int H,
-		int kW, int kH
-	);
+	public void conv2DFull(Tensor entrada, Tensor kernel, Tensor saida) {
+		OpsConv.conv2DFull(entrada, kernel, saida);
+	}
 
 	/**
 	 * Realiza a operação de agrupamento máximo.
@@ -137,7 +102,9 @@ public abstract class Ops {
 	 * @param filtro formato do filtro (altura, largura)
 	 * @return {@code Tensor} resultado.
 	 */
-	public abstract Tensor maxPool2D(Tensor x, int[] filtro);
+	public Tensor maxPool2D(Tensor x, int[] filtro) {
+		return OpsPooling.maxPool2D(x, filtro);
+	}
 
 	/**
 	 * Realiza a operação de agrupamento máximo.
@@ -146,7 +113,9 @@ public abstract class Ops {
 	 * @param stride formato dos strides (altura, largura)
 	 * @return {@code Tensor} resultado.
 	 */
-	public abstract Tensor maxPool2D(Tensor x, int[] filtro, int[] stride);
+	public Tensor maxPool2D(Tensor x, int[] filtro, int[] stride) {
+		return OpsPooling.maxPool2D(x, filtro, stride);
+	}
 
 	/**
 	 * Realiza a operação de agrupamento máximo.
@@ -155,7 +124,9 @@ public abstract class Ops {
 	 * @param filtro formato do filtro (altura, largura)
 	 * @param stride formato dos strides (altura, largura)
 	 */
-	public abstract void maxPool2D(Tensor x, Tensor dst, int[] filtro, int[] stride);
+	public void maxPool2D(Tensor x, Tensor dst, int[] filtro, int[] stride) {
+		OpsPooling.maxPool2D(x, dst, filtro, stride);
+	}
 
 	/**
 	 * Realiza a operação de agrupamento médio.
@@ -163,7 +134,9 @@ public abstract class Ops {
 	 * @param filtro formato do filtro (altura, largura)
 	 * @return {@code Tensor} resultado.
 	 */
-	public abstract Tensor avgPool2D(Tensor x, int[] filtro);
+	public Tensor avgPool2D(Tensor x, int[] filtro) {
+		return OpsPooling.avgPool2D(x, filtro);
+	}
 
 	/**
 	 * Realiza a operação de agrupamento médio.
@@ -172,7 +145,9 @@ public abstract class Ops {
 	 * @param stride formato dos strides (altura, largura)
 	 * @return {@code Tensor} resultado.
 	 */
-	public abstract Tensor avgPool2D(Tensor x, int[] filtro, int[] stride);
+	public Tensor avgPool2D(Tensor x, int[] filtro, int[] stride) {
+		return OpsPooling.avgPool2D(x, filtro, stride);
+	}
 
 	/**
 	 * Realiza a operação de agrupamento médio.
@@ -181,6 +156,8 @@ public abstract class Ops {
 	 * @param filtro formato do filtro (altura, largura)
 	 * @param stride formato dos strides (altura, largura)
 	 */
-	public abstract void avgPool2D(Tensor x, Tensor dst, int[] filtro, int[] stride);
+	public void avgPool2D(Tensor x, Tensor dst, int[] filtro, int[] stride) {
+		OpsPooling.avgPool2D(x, dst, filtro, stride);
+	}
 	
 }

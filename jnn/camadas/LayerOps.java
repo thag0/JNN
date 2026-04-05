@@ -18,7 +18,7 @@ public class LayerOps {
 	/**
 	 * Operador interno.
 	 */
-    Ops ops = Ops.get();
+    Ops ops = new Ops(); 
 
 	/**
 	 * Operador para paralelização.

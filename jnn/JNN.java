@@ -36,7 +36,7 @@ public final class JNN {
     /**
      * Operador para tensores.
      */
-    private static Ops ops = Ops.get();
+    private static Ops ops = new Ops();
 
     /**
      * Construtor privado.
