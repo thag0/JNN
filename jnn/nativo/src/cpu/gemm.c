@@ -157,9 +157,9 @@ static void gemm(
 }
 
 void cpu_gemm(gemm_params_t* params) {
-    const float* restrict A = params->A + params->off_a;
-    const float* restrict B = params->B + params->off_b;
-    float* restrict       C = params->C + params->off_c;
+    const float* restrict A = params->A;
+    const float* restrict B = params->B;
+    float* restrict       C = params->C;
 
     const int lin_a = params->lin_a;
     const int col_a = params->col_a;
@@ -186,17 +186,17 @@ void cpu_gemm(gemm_params_t* params) {
         float* restrict ptr_a = NULL;
         float* restrict ptr_b = NULL;
 
-        size_t checkpoint = arena_checkpoint(&arena);
+        size_t checkpoint = arena_checkpoint(&mem_arena);
     
         if (std_a_1 != 1) {
-            ptr_a = arena_alloc(&arena, sizeof(float) * lin_a * col_a);
+            ptr_a = arena_alloc(&mem_arena, sizeof(float) * lin_a * col_a);
             _para_row_major(A, ptr_a, lin_a, col_a, std_a_0, std_a_1);
             A = ptr_a;
             lda = col_a;
         }
     
         if (std_b_1 != 1) {
-            ptr_b = arena_alloc(&arena, sizeof(float) * col_a * col_b);
+            ptr_b = arena_alloc(&mem_arena, sizeof(float) * col_a * col_b);
             _para_row_major(B, ptr_b, col_a, col_b, std_b_0, std_b_1);
             B = ptr_b;
             ldb = col_b;
@@ -208,7 +208,7 @@ void cpu_gemm(gemm_params_t* params) {
             lda, ldb, ldc
         );
 
-        arena_restore(&arena, checkpoint);
+        arena_restore(&mem_arena, checkpoint);
     }
 
 }

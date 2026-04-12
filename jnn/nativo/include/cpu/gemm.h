@@ -7,8 +7,6 @@ typedef struct {
     float* restrict B;
     float* restrict C;
 
-    int off_a, off_b, off_c;
-
     int std_a_0, std_a_1;
     int std_b_0, std_b_1;
     int std_c_0, std_c_1;

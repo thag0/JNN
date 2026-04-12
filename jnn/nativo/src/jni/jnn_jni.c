@@ -9,6 +9,8 @@
 #include "maxpool.h"
 #include "batchnorm2d.h"
 
+#define JNI_ARENA_CAP_INICIAL_MB ARENA_CAP_MB(128)
+
 static inline int jnn_native_num_threads() {
     int p = omp_get_num_procs();
     return p > 1 ? p / 2 : 1;
@@ -21,9 +23,7 @@ JNI_OnLoad(JavaVM* vm, void* reserved) {
 
     omp_set_num_threads(jnn_native_num_threads());
 
-    if (arena.data == NULL) {
-        arena_init(&arena, ARENA_CAP_MB(ARENA_INITIAL_CAP_MB));
-    }
+    if (!mem_arena.data) arena_init(&mem_arena, JNI_ARENA_CAP_INICIAL_MB);
 
     return JNI_VERSION_1_8;
 }
@@ -33,7 +33,7 @@ Java_jnn_core_JNNnative_setTamArena(JNIEnv* env, jclass cls, jint size_bytes) {
     (void) env;
     (void) cls;
 
-    arena_init(&arena, size_bytes);
+    arena_init(&mem_arena, size_bytes);
 }
 
 JNIEXPORT void JNICALL
@@ -63,33 +63,29 @@ Java_jnn_core_JNNnative_matmul(
 ) {
     (void) cls;
 
+    float* restrict A = (*env)->GetPrimitiveArrayCritical(env, A_arr, NULL);
+    float* restrict B = (*env)->GetPrimitiveArrayCritical(env, B_arr, NULL);
+    float* restrict C = (*env)->GetPrimitiveArrayCritical(env, C_arr, NULL);
+
     gemm_params_t p = {
-        .A = (*env)->GetPrimitiveArrayCritical(env, A_arr, NULL),
-        .B = (*env)->GetPrimitiveArrayCritical(env, B_arr, NULL),
-        .C = (*env)->GetPrimitiveArrayCritical(env, C_arr, NULL),
+        .A = A + off_a,
+        .B = B + off_b,
+        .C = C + off_c,
     
-        .off_a = off_a,
-        .off_b = off_b,
-        .off_c = off_c,
-    
-        .std_a_0 = std_a_0,
-        .std_a_1 = std_a_1,
-        .std_b_0 = std_b_0,
-        .std_b_1 = std_b_1,
-        .std_c_0 = std_c_0,
-        .std_c_1 = std_c_1,
+        .std_a_0 = std_a_0, .std_a_1 = std_a_1,
+        .std_b_0 = std_b_0, .std_b_1 = std_b_1,
+        .std_c_0 = std_c_0, .std_c_1 = std_c_1,
     
         .lin_a = lin_a,
         .col_a = col_a,
         .col_b = col_b
     };
 
-
     jnn_matmul_dispatcher(&p);
 
-    (*env)->ReleasePrimitiveArrayCritical(env, A_arr, p.A, JNI_ABORT);
-    (*env)->ReleasePrimitiveArrayCritical(env, B_arr, p.B, JNI_ABORT);
-    (*env)->ReleasePrimitiveArrayCritical(env, C_arr, p.C, 0);
+    (*env)->ReleasePrimitiveArrayCritical(env, A_arr, A, JNI_ABORT);
+    (*env)->ReleasePrimitiveArrayCritical(env, B_arr, B, JNI_ABORT);
+    (*env)->ReleasePrimitiveArrayCritical(env, C_arr, C, 0);
 }
 
 JNIEXPORT void JNICALL

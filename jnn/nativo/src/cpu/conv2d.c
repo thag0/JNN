@@ -96,15 +96,13 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
     const int Kdim = canais * alt_k * larg_k;
     const int Ndim = alt_s * larg_s;
 
-    size_t checkpoint = arena_checkpoint(&arena);
-    float* restrict col = arena_alloc(&arena, sizeof(float) * Kdim * Ndim);
+    size_t checkpoint = arena_checkpoint(&mem_arena);
+    float* restrict col = arena_alloc(&mem_arena, sizeof(float) * Kdim * Ndim);
 
     gemm_params_t mm = {
         .A = (float* restrict) K,
         .B = col,
         .C = NULL,
-
-        .off_a = 0, .off_b = 0, .off_c = 0,
 
         .std_a_0 = Kdim, .std_a_1 = 1,
         .std_b_0 = Ndim, .std_b_1 = 1,
@@ -145,7 +143,7 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
         cpu_gemm(&mm);
     }
 
-    arena_restore(&arena, checkpoint);
+    arena_restore(&mem_arena, checkpoint);
 }
 
 static bool _usar_im2col_fw(const conv2d_fwd_params_t* params) {
@@ -260,15 +258,13 @@ static void _backward_gk_im2col(const conv2d_bwd_params_t* params) {
     const int Kdim = canais * alt_k * larg_k;
     const int Ndim = alt_s * larg_s;
     
-    size_t checkpoint = arena_checkpoint(&arena);
-    float* restrict col = arena_alloc(&arena, sizeof(float) * Kdim * Ndim);
+    size_t checkpoint = arena_checkpoint(&mem_arena);
+    float* restrict col = arena_alloc(&mem_arena, sizeof(float) * Kdim * Ndim);
 
     gemm_params_t mm = {
         .A = NULL,
         .B = col,
         .C = GK,
-
-        .off_a = 0, .off_b = 0, .off_c = 0,
 
         .std_a_0 = Ndim, .std_a_1 = 1,
         .std_b_0 = 1, .std_b_1 = Ndim,// transposto
@@ -298,7 +294,7 @@ static void _backward_gk_im2col(const conv2d_bwd_params_t* params) {
         cpu_gemm(&mm);
     }
 
-    arena_restore(&arena, checkpoint);
+    arena_restore(&mem_arena, checkpoint);
 }
 
 static bool _usar_im2col_gk(const conv2d_bwd_params_t* params) {
@@ -388,8 +384,8 @@ static void _backward_ge_col2im(const conv2d_bwd_params_t* params) {
     const int Ndim = alt_s * larg_s;
     const int Kdim = params->canais * alt_k * larg_k;
     
-    size_t checkpoint = arena_checkpoint(&arena);
-    float* restrict colT = arena_alloc(&arena, sizeof(float) * Ndim * Kdim);
+    size_t checkpoint = arena_checkpoint(&mem_arena);
+    float* restrict colT = arena_alloc(&mem_arena, sizeof(float) * Ndim * Kdim);
 
     gemm_params_t mm = {
         .B = (float* restrict)params->K,
@@ -423,7 +419,7 @@ static void _backward_ge_col2im(const conv2d_bwd_params_t* params) {
         );
     }
 
-    arena_restore(&arena, checkpoint);
+    arena_restore(&mem_arena, checkpoint);
 }
 
 static bool _usar_col2im_ge(const conv2d_bwd_params_t* params) {

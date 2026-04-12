@@ -145,10 +145,10 @@ public class MainConv {
 			new ReLU(),
 			new MaxPool2D(poolK),
 			
-			new Conv2D(64, convK, "same", "he"),
+			new Conv2D(128, convK, "same", "he"),
 			new BatchNorm2D(),
 			new ReLU(),
-			new Conv2D(64, convK, "same", "he"),
+			new Conv2D(256, convK, "same", "he"),
 			new BatchNorm2D(),
 			new ReLU(),
 			new MaxPool2D(poolK),
@@ -156,7 +156,7 @@ public class MainConv {
 			new GlobalAvgPool2D(),
 
 			new Dropout(0.5),
-			new Densa(64, "he"),
+			new Densa(256, "he"),
 			new ReLU(),
 
 			new Densa(10, "glorot-uniforme"),
