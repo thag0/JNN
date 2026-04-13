@@ -6,7 +6,6 @@ import jnn.camadas.Camada;
 import jnn.camadas.Entrada;
 import jnn.core.Dicionario;
 import jnn.core.JNNutils;
-import jnn.core.tensor.Tensor;
 import jnn.metrica.Avaliador;
 import jnn.treino.Treinador;
 
@@ -291,7 +290,7 @@ public class Sequencial extends Modelo {
 		_perda = dicio.getPerda(loss);
 		
 		_otimizador = dicio.getOtimizador(otm);
-		_otimizador.construir(params(), grads());
+		_otimizador.construir(params());
 		
 		_compilado = true;// modelo pode ser usado.
 	}
@@ -383,8 +382,8 @@ public class Sequencial extends Modelo {
 		long tamParams = 0;
 		for (Camada camada : this) {
 			if (camada.treinavel()) {
-				for (Tensor param : camada.params()) {
-					tamParams += param.tamBytes();
+				for (var param : camada.params()) {
+					tamParams += param.weight.tamBytes();
 				}
 			}
 		}

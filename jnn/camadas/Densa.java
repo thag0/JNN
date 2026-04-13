@@ -265,12 +265,17 @@ public class Densa extends Camada implements Cloneable {
 
 		_gradEntrada = addBuffer("Grad Entrada", shapeIn[0]);
 		_saida  	 = addBuffer("Saida", shapeOut[0]);
-		_kernel 	 = addParam("Kernel", shapeIn[0], shapeOut[0]);
-		_gradKernel  = addGrad("Grad Kernel", _kernel.shape());
+
+		int[] shapeKernel = {shapeIn[0], shapeOut[0]};
+		addParam("kernel", shapeKernel);
+
+		_kernel 	 = _params[0].weight;
+		_gradKernel  = _params[0].grad;
 		
 		if (usarBias) {
-			_bias 	  = Optional.of(addParam("Bias", _saida.shape()));
-			_gradBias = Optional.of(addGrad("Grad Bias", _saida.shape()));
+			addParam("bias", _saida.shape());
+			_bias 	  = Optional.of(_params[1].weight);
+			_gradBias = Optional.of(_params[1].grad);
 		} else {
 			_bias 	  = Optional.empty();
 			_gradBias = Optional.empty();
@@ -408,10 +413,12 @@ public class Densa extends Camada implements Cloneable {
 	public int numParams() {
 		verificarConstrucao();
 
-		int parametros = _kernel.tam();
-		if (temBias()) parametros += bias().tam();
+		int p = 0;
+		for (var param : params()) {
+			p += param.weight.tam();
+		}
 
-		return parametros;
+		return p;
 	}
 
 	@Override

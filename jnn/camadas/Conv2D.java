@@ -351,15 +351,18 @@ public class Conv2D extends Camada implements Cloneable {
 			);
 		}
 
-		_kernel       = addParam("Kernel", shapeOut[0], shapeIn[0], shapeFiltro[0], shapeFiltro[1]);
-		_gradKernel   = addGrad("Grad Kernel", _kernel.shape());
+		int[] shapeKernel = {shapeOut[0], shapeIn[0], shapeFiltro[0], shapeFiltro[1]};
+		addParam("kernel", shapeKernel);
+		_kernel       = _params[0].weight;
+		_gradKernel   = _params[0].grad;
 
 		_gradEntrada  = addBuffer("Grad Entrada", shapeIn);// não é passado pro otimizador
 		_saida        = addBuffer("Saida", shapeOut);
 
 		if (usarBias) {
-			_bias      = Optional.of(addParam("Bias", shapeOut[0]));
-			_gradBias  = Optional.of(addGrad("GradBias", _bias.get().shape()));
+			addParam("bias", shapeOut[0]);
+			_bias      = Optional.of(_params[1].weight);
+			_gradBias  = Optional.of(_params[1].grad);
 		} else {
 			_bias      = Optional.empty();
 			_gradBias  = Optional.empty();
@@ -496,8 +499,8 @@ public class Conv2D extends Camada implements Cloneable {
 		verificarConstrucao();
 
 		int p = 0;
-		for (Tensor param : params()) {
-			p += param.tam();
+		for (var param : params()) {
+			p += param.weight.tam();
 		}
 
 		return p;

@@ -1,6 +1,7 @@
 package jnn.otm;
 
 import jnn.core.JNNutils;
+import jnn.core.Parametro;
 import jnn.core.tensor.Tensor;
 import jnn.core.tensor.TensorData;
 
@@ -208,24 +209,23 @@ public class Adam extends Otimizador {
 	}
 
 	@Override
-	public void construir(Tensor[] params, Tensor[] grads) {
-		initParams(params, grads);
+	public void construir(Parametro[] params) {
+		initParams(params);
 
-		for (Tensor param : _params) {
-			int[] shape = param.shape();
+		for (var param : _params) {
+			int[] shape = param.weight.shape();
 
 			m = JNNutils.addEmArray(m, new Tensor(shape));
 			v = JNNutils.addEmArray(v, new Tensor(shape));
 			mc = JNNutils.addEmArray(mc, new Tensor(shape));
 			vc = JNNutils.addEmArray(vc, new Tensor(shape));
 			buf = JNNutils.addEmArray(buf, new Tensor(shape));
-		}
 
-		if (amsgrad) {
-			for (Tensor param : _params) {
-				ams = JNNutils.addEmArray(ams, new Tensor(param.shape()));
+			if (amsgrad) {
+				ams = JNNutils.addEmArray(ams, new Tensor(shape));
 			}
 		}
+
 		
 		_construido = true;// otimizador pode ser usado
 	}
@@ -244,8 +244,8 @@ public class Adam extends Otimizador {
 
 		final int n = _params.length;
 		for (int i = 0; i < n; i++) {
-			TensorData p_i = _params[i].data();
-			TensorData g_i = _grads[i].data();
+			TensorData p_i = _params[i].weight.data();
+			TensorData g_i = _params[i].grad.data();
 			TensorData m_i = m[i].data();
 			TensorData v_i = v[i].data();
 			TensorData mc_i = mc[i].data();

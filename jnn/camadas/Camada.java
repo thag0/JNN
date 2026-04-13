@@ -1,6 +1,7 @@
 package jnn.camadas;
 
 import jnn.core.JNNutils;
+import jnn.core.Parametro;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -79,12 +80,7 @@ public abstract class Camada {
 	/**
 	 * Array de parâmetros treináveis.
 	 */
-	Tensor[] _params = {};
-
-	/**
-	 * Array de gradientes dos parâmetros treináveis.
-	 */
-	Tensor[] _grads = {};
+	Parametro[] _params = {};
 
 	/**
 	 * Instancia a camada base usada dentro dos modelos de Rede Neural.
@@ -197,26 +193,9 @@ public abstract class Camada {
 	 * @param nome {@code String} contendo nome desejado.
 	 * @return {@code Tensor} criado.
 	 */
-	protected Tensor addParam(String nome, int... shape) {
-		Tensor p = new Tensor(shape).nome(nome);
+	protected void addParam(String nome, int... shape) {
+		Parametro p = new Parametro(nome, shape);
 		_params = JNNutils.addEmArray(_params, p);
-		return p;
-	}
-
-	/**
-	 * Inicializa um {@code Tensor} vazio com nome especificado.
-	 * <p>
-	 *		O tensor criado é adicionado aos gradientes dos parâmetros treináveis 
-	 *		da camada, este que é passado para o otimizador para atualização durante o treino.
-	 * </p>
-	 * @param shape {@code array} contendo os valores das dimensões do tensor.
-	 * @param nome {@code String} contendo nome desejado.
-	 * @return {@code Tensor} criado.
-	 */
-	protected Tensor addGrad(String nome, int... shape) {
-		Tensor g = new Tensor(shape).nome(nome);
-		_grads = JNNutils.addEmArray(_grads, g);
-		return g;
 	}
 
 	/**
@@ -418,12 +397,9 @@ public abstract class Camada {
 
 		long tamTensores = 0;
 		if (treinavel()) {
-			for (Tensor p : _params) {
-				tamTensores += p.tamBytes();
-			}
-			
-			for (Tensor g : _grads) {
-				tamTensores += g.tamBytes();
+			for (var param : _params) {
+				tamTensores += param.weight.tamBytes();
+				tamTensores += param.grad.tamBytes();
 			}
 		}
 
@@ -440,16 +416,8 @@ public abstract class Camada {
 	 * Retorna um array contendo os parâmetros treináveis da camada.
 	 * @return array de parâmetros treináveis da camada.
 	 */
-	public Tensor[] params() {
+	public Parametro[] params() {
 		return _params;
-	}
-
-	/**
-	 * Retorna um array contendo os gradientes dos parâmetros treináveis da camada.
-	 * @return array de gradientes dos parâmetros treináveis da camada.
-	 */
-	public Tensor[] grads() {
-		return _grads;
 	}
 
 }

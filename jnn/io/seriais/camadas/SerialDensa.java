@@ -5,7 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import jnn.camadas.Densa;
-import jnn.core.tensor.Tensor;
+import jnn.core.Parametro;
 import jnn.io.seriais.SerialBase;
 import jnn.io.seriais.SerializadorCamada;
 
@@ -33,13 +33,13 @@ class SerialDensa extends SerialBase implements SerializadorCamada<Densa> {
 	
 		escrever(dos, camada.temBias());
 		
-		Tensor[] params = camada.params();
+		Parametro[] params = camada.params();
 
-		float[] kernel = params[0].data().paraArray();
+		float[] kernel = params[0].weight.data().paraArray();
 		escrever(dos, kernel);
 
 		if (camada.temBias()) {
-			float[] bias = params[1].data().paraArray();
+			float[] bias = params[1].weight.data().paraArray();
 			escrever(dos, bias);
 		}
 	}
@@ -58,9 +58,9 @@ class SerialDensa extends SerialBase implements SerializadorCamada<Densa> {
 		camada.setBias(temBias);
 		camada.construir(shapeIn);
 		
-		Tensor[] params = camada.params();
-		params[0].copiarElementos(kernel);
-		if (temBias) params[1].copiarElementos(bias);
+		Parametro[] params = camada.params();
+		params[0].weight.copiarElementos(kernel);
+		if (temBias) params[1].weight.copiarElementos(bias);
 
 		return camada;
 	}

@@ -203,7 +203,7 @@ public class JNNserial extends SerialBase {
 
 		for (int i = 0; i < modelo.numCamadas(); i++) modelo.camada(i).setId(i);
 		modelo.setOtimizador(dicio.getOtimizador(otmStr));
-		modelo.otm().construir(modelo.params(), modelo.grads());
+		modelo.otm().construir(modelo.params());
 		modelo.setPerda(dicio.getPerda(lossStr));
 
 		return modelo;

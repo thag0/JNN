@@ -1,6 +1,7 @@
 package jnn.otm;
 
 import jnn.core.JNNutils;
+import jnn.core.Parametro;
 import jnn.core.tensor.Tensor;
 import jnn.core.tensor.TensorData;
 
@@ -99,13 +100,15 @@ public class Adadelta extends Otimizador {
 	}
 
 	@Override
-	public void construir(Tensor[] params, Tensor[] grads) {
-		initParams(params, grads);
+	public void construir(Parametro[] params) {
+		initParams(params);
 
-		for (Tensor param : _params) {
-			acg = JNNutils.addEmArray(acg, new Tensor(param.shape()));
-			deltas = JNNutils.addEmArray(deltas, new Tensor(param.shape()));
-			acd = JNNutils.addEmArray(acd, new Tensor(param.shape()));
+		for (var param : _params) {
+			Tensor w = param.weight;
+
+			acg = JNNutils.addEmArray(acg, new Tensor(w.shape()));
+			deltas = JNNutils.addEmArray(deltas, new Tensor(w.shape()));
+			acd = JNNutils.addEmArray(acd, new Tensor(w.shape()));
 		}
 
 		_construido = true;// otimizador pode ser usado
@@ -115,10 +118,9 @@ public class Adadelta extends Otimizador {
 	public void update() {
 		checkInicial();
 		
-		final int n = _params.length;
-		for (int i = 0; i < n; i++) {
-			TensorData p_i   = _params[i].data();
-			TensorData g_i   = _grads[i].data();
+		for (int i = 0, n = _params.length; i < n; i++) {
+			TensorData p_i   = _params[i].weight.data();
+			TensorData g_i   = _params[i].grad.data();
 			TensorData acg_i = acg[i].data();// E[g²]
 			TensorData acd_i = acd[i].data();// E[Δx²]
 			TensorData d_i   = deltas[i].data();

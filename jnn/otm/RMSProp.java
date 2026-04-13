@@ -1,6 +1,7 @@
 package jnn.otm;
 
 import jnn.core.JNNutils;
+import jnn.core.Parametro;
 import jnn.core.tensor.Tensor;
 import jnn.core.tensor.TensorData;
 
@@ -116,11 +117,12 @@ public class RMSProp extends Otimizador {
 	}
 
 	@Override
-	public void construir(Tensor[] params, Tensor[] grads) {
-		initParams(params, grads);
+	public void construir(Parametro[] params) {
+		initParams(params);
 
-		for (Tensor param : _params) {
-			ac = JNNutils.addEmArray(ac, new Tensor(param.shape()));
+		for (var param : _params) {
+			Tensor w = param.weight;
+			ac = JNNutils.addEmArray(ac, new Tensor(w.shape()));
 		}
 		
 		_construido = true;// otimizador pode ser usado
@@ -132,8 +134,8 @@ public class RMSProp extends Otimizador {
 		
 		final int n = _params.length;
 		for (int i = 0; i < n; i++) {
-			TensorData p_i  = _params[i].data();
-			TensorData g_i  = _grads[i].data();
+			TensorData p_i  = _params[i].weight.data();
+			TensorData g_i  = _params[i].grad.data();
 			TensorData ac_i = ac[i].data();
 
 			// ac = (rho * ac) + ((1 - rho) * g²)

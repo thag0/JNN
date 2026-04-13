@@ -173,10 +173,13 @@ public class BatchNorm2D extends Camada implements Cloneable {
 
         int canais = shapeIn[0];
 
-        _gamma = addParam("Gamma", canais);
-        _beta = addParam("Beta", canais);
-        _gradGamma = addGrad("Grad Gamma", canais);
-        _gradBeta = addGrad("Grad Beta", canais);
+        addParam("gamma", canais);
+        _gamma     = _params[0].weight;
+        _gradGamma = _params[0].grad;
+        
+        addParam("beta", canais);
+        _beta     = _params[1].weight;
+        _gradBeta = _params[1].grad;
 
         _gradEntrada = addBuffer("Grad Entrada", shape);
         _saida = addBuffer("Saida", shape);

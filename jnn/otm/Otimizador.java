@@ -1,5 +1,6 @@
 package jnn.otm;
 
+import jnn.core.Parametro;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -17,12 +18,7 @@ public abstract class Otimizador {
 	/**
 	 * Conjunto de elementos que serão otimizados.
 	 */
-	protected Tensor[] _params = {};
-
-	/**
-	 * Conjunto de gradientes dos parâmetros.
-	 */
-	protected Tensor[] _grads = {};
+	protected Parametro[] _params = {};
 
 	/**
 	 * Buffer de informações sobre o otimizador.
@@ -61,34 +57,29 @@ public abstract class Otimizador {
 	 * @param params array de {@code Tensor} contendo os parâmetros desejados.
 	 * @param grads array de {@code Tensor} contendo os gradientes desejados.
 	 */
-	protected void initParams(Tensor[] params, Tensor[] grads) {
-		if (params.length != grads.length) {
-			throw new IllegalStateException(
-				"\nQuantidade de parâmetros e gradientes deve ser igual. " + 
-				"\nRecebido: p = " + params.length + ", g = " + grads.length
-			);
-		}
-
+	protected void initParams(Parametro[] params) {
 		int n = params.length;
 		for (int i = 0; i < n; i++) {
-			if (!params[i].compShape(grads[i])) {
+			Parametro p = params[i];
+			Tensor w = p.weight;
+			Tensor g = p.grad;
+
+			if (!w.compShape(g)) {
 				throw new IllegalArgumentException(
-					"\nParâmetro " + i + params[i].shapeStr() + " deve conter" +
-					" o mesmo formato do gradiente " + i + grads[i].shapeStr()
+					"\nPeso " + i + w.shapeStr() + " deve conter" +
+					" o mesmo formato do gradiente " + i + g.shapeStr()
 				);
 			}
 		}
 
 		_params = params;
-		_grads = grads;
 	}
 
 	/**
 	 * Inicializa os parâmetros necessários do otimizador.
 	 * @param params array de {@code Tensor} contendo os parâmetros desejados.
-	 * @param grads array de {@code Tensor} contendo os gradientes relacionados aos parâmetros.
 	 */
-	public abstract void construir(Tensor[] params, Tensor[] grads);
+	public abstract void construir(Parametro[] params);
 
 	/**
 	 * Executa um passo de atualização do otimizador.

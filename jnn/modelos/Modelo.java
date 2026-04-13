@@ -2,6 +2,7 @@ package jnn.modelos;
 
 import jnn.camadas.Camada;
 import jnn.core.JNNutils;
+import jnn.core.Parametro;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.metrica.Avaliador;
@@ -400,43 +401,18 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * Onde: {@code k = kernel} e {@code b = bias}.
 	 * @return array de {@code Tensor} contendo os parâmetros do modelo.
 	 */
-	public Tensor[] params() {
-		Tensor[] params = {};
+	public Parametro[] params() {
+		Parametro[] params = {};
 
 		for (Camada camada : this) {
 			if (camada.treinavel()) {
-				for (Tensor p : camada.params()) {
+				for (var p : camada.params()) {
 					params = JNNutils.addEmArray(params, p);
 				}
 			}
 		}
 
 		return params;
-	}
-
-	/**
-	 * Retorna o conjunto de gradientes em relação aos parâmetros do modelo.
-	 * <p>
-	 * 		A sequência fornecida dos gradientes é dada por:
-	 * </p>
-	 * <pre>
-	 * 	params = [gk1, gb1, gk2, gb2, gk3, gb3, ...]
-	 * </pre>
-	 * Onde: {@code gk = gradKernel} e {@code gb = gradBias}.
-	 * @return array de {@code Tensor} contendo os gradientes do modelo.
-	 */
-	public Tensor[] grads() {
-		Tensor[] grads = {};
-
-		for (Camada camada : this) {
-			if (camada.treinavel()) {
-				for (Tensor g : camada.grads()) {
-					grads = JNNutils.addEmArray(grads, g);
-				}
-			}
-		}
-
-		return grads;
 	}
 
 	/**

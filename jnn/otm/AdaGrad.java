@@ -1,6 +1,7 @@
 package jnn.otm;
 
 import jnn.core.JNNutils;
+import jnn.core.Parametro;
 import jnn.core.tensor.Tensor;
 import jnn.core.tensor.TensorData;
 
@@ -91,14 +92,14 @@ public class AdaGrad extends Otimizador {
 	}
 
 	@Override
-	public void construir(Tensor[] params, Tensor[] grads) {
-		initParams(params, grads);
+	public void construir(Parametro[] params) {
+		initParams(params);
 		
 		float valorInicial = 0.1f;
-		for (Tensor param : _params) {
+		for (var param : _params) {
 			ac = JNNutils.addEmArray(
 				ac,
-				new Tensor(param.shape()).preencher(valorInicial)
+				new Tensor(param.weight.shape()).preencher(valorInicial)
 			);
 		}
 		
@@ -111,8 +112,8 @@ public class AdaGrad extends Otimizador {
 		
 		final int n = _params.length;
 		for (int i = 0; i < n; i++) {
-			TensorData p_i = _params[i].data();
-			TensorData g_i = _grads[i].data();
+			TensorData p_i = _params[i].weight.data();
+			TensorData g_i = _params[i].grad.data();
 			TensorData ac_i = ac[i].data();
 
 			// ac += g²

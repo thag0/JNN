@@ -5,7 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import jnn.camadas.BatchNorm2D;
-import jnn.core.tensor.Tensor;
+import jnn.core.Parametro;
 import jnn.io.seriais.SerialBase;
 import jnn.io.seriais.SerializadorCamada;
 
@@ -29,9 +29,9 @@ public class SerialBatchNorm extends SerialBase implements SerializadorCamada<Ba
         escrever(dos, camada.eps());
         escrever(dos, camada.momentum());
 
-        Tensor[] params = camada.params();
-        escrever(dos, params[0].data().paraArray());//gamma
-        escrever(dos, params[1].data().paraArray());//beta
+        Parametro[] params = camada.params();
+        escrever(dos, params[0].weight.data().paraArray());//gamma
+        escrever(dos, params[1].weight.data().paraArray());//beta
     
         escrever(dos, camada._mediaMovel.data().paraArray());
         escrever(dos, camada._varianciaMovel.data().paraArray());
@@ -51,9 +51,9 @@ public class SerialBatchNorm extends SerialBase implements SerializadorCamada<Ba
         BatchNorm2D bn = new BatchNorm2D(momentum, eps);
         bn.construir(shapeIn);
 
-        Tensor[] params = bn.params();
-        params[0].copiarElementos(gamma);
-        params[1].copiarElementos(beta);
+        Parametro[] params = bn.params();
+        params[0].weight.copiarElementos(gamma);
+        params[1].weight.copiarElementos(beta);
     
         bn._mediaMovel.copiarElementos(runMean);
         bn._varianciaMovel.copiarElementos(runVar);
