@@ -224,20 +224,14 @@ public class Densa extends Camada implements Cloneable {
 				"\nNúmero de neurônios para a camada Densa não foi definido."
 			);
 		}
+		
+		_kernel = addParam("kernel", shapeIn[0], shapeOut[0]);
+		
+		if (usarBias) _bias = Optional.of(addParam("bias", _saida.shape()));
+		else _bias = Optional.empty();
 
 		_gradEntrada = addBuffer("Grad Entrada", shapeIn[0]);
 		_saida  	 = addBuffer("Saida", shapeOut[0]);
-
-		int[] shapeKernel = {shapeIn[0], shapeOut[0]};
-		addParam("kernel", shapeKernel);
-		_kernel = _params[0];
-		
-		if (usarBias) {
-			addParam("bias", _saida.shape());
-			_bias = Optional.of(_params[1]);
-		} else {
-			_bias = Optional.empty();
-		}
 		
 		_treinavel = true;// camada pode ser treinada.
 		construida = true;// camada pode ser usada.

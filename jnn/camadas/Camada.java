@@ -184,18 +184,18 @@ public abstract class Camada {
 	}
 
 	/**
-	 * Inicializa um {@code Tensor} vazio com nome especificado.
+	 * Inicializa um {@code Parametro} vazio com nome especificado.
 	 * <p>
-	 *		O tensor criado é adicionado aos parâmetros treináveis da camada,
-	 *		este que é passado para o otimizador para atualização durante o treino.
+	 *		O parâmetro serve como base para passagem aos otimizadores.
 	 * </p>
-	 * @param shape {@code array} contendo os valores das dimensões do tensor.
 	 * @param nome {@code String} contendo nome desejado.
-	 * @return {@code Tensor} criado.
+	 * @param shape {@code array} contendo os valores das dimensões do tensor.
+	 * @return {@code Parametro} criado.
 	 */
-	protected void addParam(String nome, int... shape) {
+	protected Parametro addParam(String nome, int... shape) {
 		Parametro p = new Parametro(nome, shape);
 		_params = JNNutils.addEmArray(_params, p);
+		return p;
 	}
 
 	/**

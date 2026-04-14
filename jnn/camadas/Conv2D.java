@@ -332,19 +332,16 @@ public class Conv2D extends Camada implements Cloneable {
 			);
 		}
 
-		int[] shapeKernel = {shapeOut[0], shapeIn[0], shapeFiltro[0], shapeFiltro[1]};
-		addParam("kernel", shapeKernel);
-		_kernel = _params[0];
+		_kernel = addParam(
+			"kernel", 
+			shapeOut[0], shapeIn[0], shapeFiltro[0], shapeFiltro[1]
+		);
+		
+		if (usarBias) _bias = Optional.of(addParam("bias", shapeOut[0]));
+		else _bias = Optional.empty();
 
 		_gradEntrada  = addBuffer("Grad Entrada", shapeIn);// não é passado pro otimizador
 		_saida        = addBuffer("Saida", shapeOut);
-
-		if (usarBias) {
-			addParam("bias", shapeOut[0]);
-			_bias = Optional.of(_params[1]);
-		} else {
-			_bias = Optional.empty();
-		}
 		
 		_treinavel = true;// camada pode ser treinada.
 		construida = true;// camada pode ser usada.
