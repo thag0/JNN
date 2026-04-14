@@ -244,7 +244,7 @@ public class Densa extends Camada implements Cloneable {
 	}
 
 	@Override
-	public void init() {
+	public void initParams() {
 		verificarConstrucao();
 
 		iniKernel.forward(_kernel.weight);

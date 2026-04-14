@@ -183,7 +183,7 @@ public class BatchNorm2D extends Camada implements Cloneable {
     }
 
     @Override
-    public void init() {
+    public void initParams() {
         verificarConstrucao();
         
         _gamma.weight.preencher(1);

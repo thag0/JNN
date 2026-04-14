@@ -133,7 +133,7 @@ public class GlobalAvgPool2D extends Camada implements Cloneable {
     }
 
     @Override
-    public void init() {}
+    public void initParams() {}
 
     @Override
     public void ajustarParaLote(int tamLote) {

@@ -75,7 +75,7 @@ public abstract class Ativacao extends Camada implements Cloneable {
     }
 
     @Override
-    public void init() {}
+    public void initParams() {}
 
 	@Override
 	public void ajustarParaLote(int tamLote) {
