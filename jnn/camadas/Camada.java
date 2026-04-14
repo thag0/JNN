@@ -310,16 +310,6 @@ public abstract class Camada {
 	}
 
 	/**
-	 * Retorna os gradientes em relação ao bias da camada.
-	 * @return {@code Tensor} de gradientes em relação ao bias da camada.
-	 */
-	public Tensor gradBias() {
-		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui gradiente para bias."
-		);      
-	}
-
-	/**
 	 * Retorna o gradiente em relação à entrada da camada.
 	 * @return {@code Tensor} contendo os gradientes em relação à entrada da camada.
 	 */
@@ -375,9 +365,22 @@ public abstract class Camada {
 	 */
 	public String info() {
 		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui exibição de informações."
+			"\nCamada " + nome() + " não possui implementação para info()"
 		);
 	}
+
+    @Override
+    public String toString() {
+		StringBuilder sb = new StringBuilder(info());
+
+		int pos = sb.lastIndexOf("]"); // encontra o fechamento
+
+		String hashStr = "    <hash: " + Integer.toHexString(hashCode()) + ">\n";
+
+		sb.insert(pos, hashStr);
+
+		return sb.toString();
+    }
 
 	/**
 	 * Retorna o tamanho em bytes na memória ocupado pela camada.

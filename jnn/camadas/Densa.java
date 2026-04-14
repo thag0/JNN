@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import jnn.core.Dicionario;
 import jnn.core.JNNutils;
+import jnn.core.Parametro;
 import jnn.core.tensor.Tensor;
 import jnn.inicializadores.GlorotUniforme;
 import jnn.inicializadores.Inicializador;
@@ -42,34 +43,17 @@ public class Densa extends Camada implements Cloneable {
 	private int[] shapeOut = {1};
 
 	/**
-	 * Tensor contendo os valores dos pesos de cada conexão da
-	 * entrada com a saída da camada.
-	 * <p>
-	 *    O formato da matriz de pesos é definido por:
-	 * </p>
-	 * <pre>
-	 *    pesos = (entrada, neuronios)
-	 * </pre>
-	 * Assim, a disposição dos pesos é dada da seguinte forma:
-	 * <pre>
-	 * pesos = [
-	 *    n1p1, n2p1, n3p1, nNpN
-	 *    n1p2, n2p2, n3p2, nNpN
-	 *    n1p3, n2p3, n3p3, nNpN
-	 * ]
-	 * </pre>
-	 * Onde <strong>n</strong> é o neurônio (ou unidade) e <strong>p</strong>
-	 * é seu peso correspondente.
+	 * Parâmetro contendo os valores dos pesos de cada conexão da
+	 * entrada com a saída da camada, com formato:
+	 * <pre>kernel = (entrada, neuronios)</pre>
 	 */
-	public Tensor _kernel;
+	public Parametro _kernel;
 
 	/**
-	 * Tensor contendo os viéses da camada, seu formato se dá por:
-	 * <pre>
-	 * b = (neuronios)
-	 * </pre>
+	 * Parâmetro contendo o bias da camada, seu formato se dá por:
+	 * <pre>bias = (neuronios)</pre>
 	 */
-	public Optional<Tensor> _bias;
+	public Optional<Parametro> _bias;
 
 	/**
 	 * Auxiliar na verificação do uso do bias na camada.
@@ -113,28 +97,6 @@ public class Densa extends Camada implements Cloneable {
 	 * </pre>
 	 */
 	public Tensor _gradEntrada;
-
-	/**
-	 * Tensor contendo os valores dos gradientes para os pesos da camada.
-	 * <p>
-	 *    O formato da matriz de gradiente dos pesos é definido por:
-	 * </p>
-	 * <pre>
-	 *    gradPesos = (entrada, neuronios)
-	 * </pre>
-	 */
-	public Tensor _gradKernel;
-
-	/**
-	 * Tensor contendo os valores dos gradientes para os bias da camada.
-	 * <p>
-	 *    O formato da matriz de gradientes dos bias é definido por:
-	 * </p>
-	 * <pre>
-	 *    gradBias = (neuronios)
-	 * </pre>
-	 */
-	public Optional<Tensor> _gradBias;
 
 	/**
 	 * Inicializador para os pesos da camada.
@@ -268,17 +230,13 @@ public class Densa extends Camada implements Cloneable {
 
 		int[] shapeKernel = {shapeIn[0], shapeOut[0]};
 		addParam("kernel", shapeKernel);
-
-		_kernel 	 = _params[0].weight;
-		_gradKernel  = _params[0].grad;
+		_kernel = _params[0];
 		
 		if (usarBias) {
 			addParam("bias", _saida.shape());
-			_bias 	  = Optional.of(_params[1].weight);
-			_gradBias = Optional.of(_params[1].grad);
+			_bias = Optional.of(_params[1]);
 		} else {
-			_bias 	  = Optional.empty();
-			_gradBias = Optional.empty();
+			_bias = Optional.empty();
 		}
 		
 		_treinavel = true;// camada pode ser treinada.
@@ -289,8 +247,8 @@ public class Densa extends Camada implements Cloneable {
 	public void init() {
 		verificarConstrucao();
 
-		iniKernel.forward(_kernel);
-		_bias.ifPresent(b -> iniBias.forward(b));
+		iniKernel.forward(_kernel.weight);
+		_bias.ifPresent(b -> iniBias.forward(b.weight));
 	}
 
 	@Override
@@ -355,8 +313,7 @@ public class Densa extends Camada implements Cloneable {
 			_entrada,
 			_kernel,
 			_gradSaida,
-			_gradKernel,
-			_gradBias,
+			_bias,
 			_gradEntrada
 		);
 
@@ -367,8 +324,8 @@ public class Densa extends Camada implements Cloneable {
 	public void gradZero() {
 		verificarConstrucao();
 
-		_gradKernel.zero();
-		_gradBias.ifPresent(gb -> gb.zero());
+		_kernel.grad.zero();
+		_bias.ifPresent(b -> b.grad.zero());
 	}
 
 	@Override
@@ -431,34 +388,17 @@ public class Densa extends Camada implements Cloneable {
 		sb.append(nome() + " (id " + id + ") = [\n");
 
 		sb.append(pad).append("Entrada: " + tamEntrada() + "\n");
-		sb.append(pad).append("Neurônios: " + numNeuronios() + "\n");
 		sb.append(pad).append("Saida: " + tamSaida() + "\n");
 		sb.append("\n");
 
-		sb.append(pad + "Pesos:  " + _kernel.shapeStr() + "\n");
+		sb.append(pad).append(_kernel).append("\n");
 
-		sb.append(pad + "Bias:   ");
 		if (temBias()) {
-			sb.append(_bias.get().shapeStr() + "\n");
-		} else {
-			sb.append(" n/a\n");
+			sb.append(pad).append(_bias.get()).append("\n");
 		}
 
 		sb.append("]\n");
 
-		return sb.toString();
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder(info());
-		int tamanho = sb.length();
-
-		sb.delete(tamanho-1, tamanho);// remover ultimo "\n"    
-		
-		sb.append(" <hash: " + Integer.toHexString(hashCode()) + ">");
-		sb.append("\n");
-		
 		return sb.toString();
 	}
 
@@ -471,15 +411,16 @@ public class Densa extends Camada implements Cloneable {
 		clone.lops = new LayerOps();
 		clone._treinavel = this._treinavel;
 
+		clone._kernel = new Parametro("kernel", _kernel.weight);
+		clone._kernel.grad.copiar(_kernel.grad);
+
 		clone.usarBias = this.usarBias;
 		if (temBias()) {
-			clone._bias = Optional.of(bias());
-			clone._gradBias = Optional.of(gradBias());
+			clone._bias = Optional.of(new Parametro("bias", _bias.get().weight));
+			clone._bias.get().grad.copiar(_bias.get().grad);
 		}
 
-		clone._kernel = this._kernel.clone();
 		clone._saida = this._saida.clone();
-		clone._gradKernel = this._gradKernel.clone();
 
 		return clone;
 	}
@@ -520,18 +461,11 @@ public class Densa extends Camada implements Cloneable {
 	public Tensor bias() {
 		verificarConstrucao();
 
-		return _bias.orElseThrow(() -> new IllegalStateException(
-			"\nA camada " + nome() + " (" + id + ") não possui bias configurado."
-		));
-	}
+		if (temBias()) return _bias.get().weight;
 
-	@Override
-	public Tensor gradBias() {
-		verificarConstrucao();
-
-		return _gradBias.orElseThrow(() -> new IllegalStateException(
+		throw new RuntimeException(
 			"\nA camada " + nome() + " (" + id + ") não possui bias configurado."
-		));
+		);
 	}
 
 	@Override

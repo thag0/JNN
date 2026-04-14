@@ -265,19 +265,6 @@ public class Flatten extends Camada implements Cloneable {
 	}
 
 	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder(info());
-		int tamanho = sb.length();
-
-		sb.delete(tamanho-1, tamanho);//remover ultimo "\n"    
-		
-		sb.append(" <hash: " + Integer.toHexString(hashCode()) + ">");
-		sb.append("\n");
-		
-		return sb.toString();
-	}
-
-	@Override
 	public Flatten clone() {
 		Flatten clone = (Flatten) super.clone();
 

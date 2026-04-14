@@ -6,6 +6,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 
 import jnn.core.JNNnative;
+import jnn.core.Parametro;
 import jnn.core.ops.Ops;
 import jnn.core.parallel.JNNparallel;
 import jnn.core.tensor.Tensor;
@@ -38,20 +39,20 @@ public class LayerOps {
 	 * @param out {@code Tensor} de destino do resultado.
 	 * @see jnn.camadas.Densa Densa
 	 */
-	public void forwardDensa(Tensor in, Tensor kernel, Optional<Tensor> bias, Tensor out) {
+	public void forwardDensa(Tensor in, Parametro kernel, Optional<Parametro> bias, Tensor out) {
 		out.zero();// zerar acumulos anteriores
 
-		ops.matmul(in, kernel, out);
+		ops.matmul(in, kernel.weight, out);
 
 		bias.ifPresent(b -> {
 			final int inDim = in.numDim();
-
+	
 			if (inDim == 1) {//amostra única
-				out.add(b);
-
+				out.add(b.weight);
+	
 			} else if (inDim == 2) {//lote de amostras
 				out.copiar(
-					out.broadcast(b, (_s, _b) -> _s + _b)
+					out.broadcast(b.weight, (_s, _b) -> _s + _b)
 				);
 			}
 		});
@@ -62,31 +63,30 @@ public class LayerOps {
 	 * @param in {@code Tensor} contendo a entrada da camada.
 	 * @param kernel {@code Tensor} contendos o kernel/pesos da camada.
 	 * @param grad {@code Tensor} contendo o gradiente em relação a saída da camada.
-	 * @param gradK {@code Tensor} contendo o gradiente em relação ao kernel/pesos da camada.
-	 * @param gradB {@code Tensor} contendo o gradiente em relação ao bias da camada {@code (podendo ser nulo)}.
+	 * @param bias {@code Tensor} bias da camada (se houver).
 	 * @param gradIn {@code Tensor} contendo o gradiente em relação à entrada da camada.
 	 * @see jnn.camadas.Densa Densa
 	 */
-	public void backwardDensa(Tensor in, Tensor kernel, Tensor grad, Tensor gradK, Optional<Tensor> gradB, Tensor gradIn) {
+	public void backwardDensa(Tensor in, Parametro kernel, Tensor grad, Optional<Parametro> bias, Tensor gradIn) {
 		gradIn.zero();// zerar acumulaçoes anteriores
 		
 		final int gradDim = grad.numDim();
 		if (gradDim == 1) {//amostra única
-			ops.matmul(in.unsqueeze(0).transpor(), grad, gradK);
-			gradB.ifPresent(gb -> gb.add(grad));
+			ops.matmul(in.unsqueeze(0).transpor(), grad, kernel.grad);
+			bias.ifPresent(b -> b.grad.add(grad));
 		
 		} else if (gradDim == 2) {//lote de amostras
-			ops.matmul(in.transpor(), grad, gradK);
+			ops.matmul(in.transpor(), grad, kernel.grad);
 			
 			final int batches = grad.tamDim(0);
-			gradB.ifPresent(gb -> {
+			bias.ifPresent(b -> {
 				for (int i = 0; i < batches; i++) {					
-					gb.add(grad.subTensor(i));
+					b.grad.add(grad.subTensor(i));
 				}
 			});
 		}
 
-		ops.matmul(grad, kernel.transpor(), gradIn);
+		ops.matmul(grad, kernel.weight.transpor(), gradIn);
 	}
 
 	/**
@@ -100,8 +100,8 @@ public class LayerOps {
 	 */
 	public void forwardConv2D(
 		Tensor in,
-		Tensor kernel,
-		Optional<Tensor> bias,
+		Parametro kernel,
+		Optional<Parametro> bias,
 		Tensor out,
 		int[] padding) {
 
@@ -125,13 +125,13 @@ public class LayerOps {
 	 */
 	private void runConv2DForward(
 		Tensor in,
-		Tensor kernel,
-		Optional<Tensor> bias,
+		Parametro kernel,
+		Optional<Parametro> bias,
 		Tensor out,
 		int[] pad) {
 		
 		final int[] shapeX = in.shape();
-		final int[] shapeK = kernel.shape();
+		final int[] shapeK = kernel.weight.shape();
 		final int lotes = shapeX[0];
 		final int canais = shapeX[1];
 		final int filtros = shapeK[0];
@@ -145,11 +145,11 @@ public class LayerOps {
 		final int largPad = pad[1];
 
 		final float[] dataX = in.array();
-		final float[] dataK = kernel.array();
+		final float[] dataK = kernel.weight.array();
 		final float[] dataS = out.array();
 
 		final boolean temBias = bias.isPresent();
-		final float[] dataB = temBias ? bias.get().array() : null;
+		final float[] dataB = temBias ? bias.get().weight.array() : null;
 
 		if (JNNnative.isOn()) {
 			JNNnative.conv2dForward(
@@ -228,33 +228,30 @@ public class LayerOps {
 	 * @param in {@code Tensor} contendo a entrada da camada.
 	 * @param kernel {@code Tensor} contendos o kernel/filtros da camada.
 	 * @param grad {@code Tensor} contendo o gradiente em relação a saída da camada.
-	 * @param gradK {@code Tensor} contendo o gradiente em relação ao kernel/filtros da camada.
-	 * @param gradB {@code Tensor} contendo o gradiente em relação ao bias da camada {@code (podendo ser nulo)}.
+	 * @param bias {@code Tensor} contendo o bias da camada.
 	 * @param gradIn {@code Tensor} contendo o gradiente em relação à entrada da camada.
 	 * @param pad {@code array} contendo o formato de padding (altura, largura)
 	 * @see jnn.camadas.Conv2D Conv2D
 	 */
 	public void backwardConv2D(
 		Tensor in, 
-		Tensor kernel, 
-		Tensor grad, 
-		Tensor gradK, 
-		Optional<Tensor> gradB, 
+		Parametro kernel, 
+		Tensor grad,  
+		Optional<Parametro> bias, 
 		Tensor gradIn, 
 		int[] pad) {
 
 		final int inDim = in.numDim();
 		
 		if (inDim == 4) {
-			runConv2DBackward(in, kernel, grad, gradK, gradB, gradIn, pad);
+			runConv2DBackward(in, kernel, grad, bias, gradIn, pad);
 			
 		} else if (inDim == 3) {
 			runConv2DBackward(
 				in.unsqueeze(0), 
 				kernel, 
-				grad.unsqueeze(0), 
-				gradK, 
-				gradB, 
+				grad.unsqueeze(0),  
+				bias, 
 				gradIn.unsqueeze(0), 
 				pad
 			);
@@ -268,21 +265,20 @@ public class LayerOps {
 	 * @param kernel kernel
 	 * @param grad gradS
 	 * @param gradK gradK
-	 * @param gradB gradB
+	 * @param bias bias
 	 * @param gradIn gradE
 	 * @param pad padding
 	 */
 	private void runConv2DBackward(
 		Tensor in,
-		Tensor kernel,
+		Parametro kernel,
 		Tensor grad,
-		Tensor gradK,
-		Optional<Tensor> gradB,
+		Optional<Parametro> bias,
 		Tensor gradIn,
 		int[] pad) {
 
 		final int[] shapeX = in.shape();
-		final int[] shapeK = kernel.shape();
+		final int[] shapeK = kernel.weight.shape();
 
 		final int lotes = shapeX[0];
 		final int canais = shapeX[1];
@@ -297,13 +293,13 @@ public class LayerOps {
 		final int largPad = pad[1];
 
 		final float[] dataX = in.array();
-		final float[] dataK = kernel.array();
+		final float[] dataK = kernel.weight.array();
 		final float[] dataGS = grad.array();
-		final float[] dataGK = gradK.array();
+		final float[] dataGK = kernel.grad.array();
 		final float[] dataGE = gradIn.array();
 
-		final boolean temBias = gradB.isPresent();
-		final float[] dataGB = temBias ? gradB.get().array() : null;
+		final boolean temBias = bias.isPresent();
+		final float[] dataGB = temBias ? bias.get().grad.array() : null;
 		
 		gradIn.zero();// zerar acumulaçoes anteriores
 
@@ -889,8 +885,8 @@ public class LayerOps {
 	 */
 	public void forwardBatchNorm2D(
 		Tensor entrada,
-		Tensor gamma,
-		Tensor beta,
+		Parametro gamma,
+		Parametro beta,
 		Tensor entradaNorm,
 		Tensor mediaMovel,
 		Tensor varianciaMovel,
@@ -910,8 +906,8 @@ public class LayerOps {
 
         float[] dataX = entrada.array();
         float[] dataY = saida.array();
-        float[] dataGamma = gamma.array();
-        float[] dataBeta  = beta.array();
+        float[] dataGamma = gamma.weight.array();
+        float[] dataBeta  = beta.weight.array();
         float[] dataRM = mediaMovel.array();
         float[] dataRV = varianciaMovel.array();
 
@@ -1025,9 +1021,8 @@ public class LayerOps {
 		Tensor gradE,
 		Tensor entradaNorm,
 		Tensor variancia,
-		Tensor gamma,
-		Tensor gradGamma,
-		Tensor gradBeta,
+		Parametro gamma,
+		Parametro beta,
 		Tensor gradS,
 		float eps) {
 
@@ -1042,12 +1037,12 @@ public class LayerOps {
 		
         float[] dataXNorm = entradaNorm.array();
         float[] dataVar = variancia.array();
-        float[] dataGamma = gamma.array();
+        float[] dataGamma = gamma.weight.array();
 		
         float[] dataGE = gradE.array();
         float[] dataGS = gradS.array();
-        float[] dataGG = gradGamma.array();
-        float[] dataGB = gradBeta.array();
+        float[] dataGG = gamma.grad.array();
+        float[] dataGB = beta.grad.array();
 		
 		if (JNNnative.isOn()) {
 			JNNnative.batchNorm2DBackward(

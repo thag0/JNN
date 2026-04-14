@@ -1,6 +1,7 @@
 package jnn.camadas;
 
 import jnn.core.JNNutils;
+import jnn.core.Parametro;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -26,13 +27,13 @@ public class BatchNorm2D extends Camada implements Cloneable {
      * Parâmetro de escala treinável, com formato:
      * <pre>gamma = (canais)</pre>
      */
-    public Tensor _gamma;
+    public Parametro _gamma;
     
     /**
      * Parâmetro de deslocamento treinável, com fomato:
      * <pre>beta = (canais)</pre>
      */
-    public Tensor _beta;
+    public Parametro _beta;
 
     /**
      * Média móvel acumulada durante o treinamento, utilizada na 
@@ -58,25 +59,13 @@ public class BatchNorm2D extends Camada implements Cloneable {
      * Média calculada de cada lote, com fomato:
      * <pre>media = (canais)</pre>
     */
-   public Tensor _media;
+    public Tensor _media;
    
    /**
     * Variância calculada de cada lote, com fomato:
      * <pre>var = (canais)</pre>
      */
     public Tensor _variancia;
-
-    /**
-     * Gradientes da escala, com fomato:
-     * <pre>gradGamma = (canais)</pre>
-     */
-    public Tensor _gradGamma;
-
-    /**
-     * Gradientes do deslocamento, com fomato:
-     * <pre>gradBeta = (canais)</pre>
-     */    
-    public Tensor _gradBeta;
 
 	/**
 	 * Entrada da camada, com fomato:
@@ -174,12 +163,10 @@ public class BatchNorm2D extends Camada implements Cloneable {
         int canais = shapeIn[0];
 
         addParam("gamma", canais);
-        _gamma     = _params[0].weight;
-        _gradGamma = _params[0].grad;
+        _gamma = _params[0];
         
         addParam("beta", canais);
-        _beta     = _params[1].weight;
-        _gradBeta = _params[1].grad;
+        _beta = _params[1];
 
         _gradEntrada = addBuffer("Grad Entrada", shape);
         _saida = addBuffer("Saida", shape);
@@ -199,8 +186,8 @@ public class BatchNorm2D extends Camada implements Cloneable {
     public void init() {
         verificarConstrucao();
         
-        _gamma.preencher(1);
-        _beta.preencher(0);
+        _gamma.weight.preencher(1);
+        _beta.weight.preencher(0);
 
         _mediaMovel.preencher(0);
         _varianciaMovel.preencher(1);
@@ -284,8 +271,7 @@ public class BatchNorm2D extends Camada implements Cloneable {
             _entradaNorm,
             _variancia,
             _gamma,
-            _gradGamma,
-            _gradBeta,
+            _beta,
             _gradSaida,
             eps
         );
@@ -297,8 +283,8 @@ public class BatchNorm2D extends Camada implements Cloneable {
     public void gradZero() {
         verificarConstrucao();
 
-        _gradGamma.preencher(0);
-        _gradBeta.preencher(0);
+        _gamma.grad.preencher(0);
+        _beta.grad.preencher(0);
     }
 
     @Override
@@ -314,7 +300,7 @@ public class BatchNorm2D extends Camada implements Cloneable {
 
     @Override
     public int numParams() {
-        return _gamma.tam() + _beta.tam();
+        return _gamma.weight.tam() + _beta.weight.tam();
     }
 
     @Override
@@ -350,15 +336,14 @@ public class BatchNorm2D extends Camada implements Cloneable {
         try {
             BatchNorm2D clone = (BatchNorm2D) super.clone();
             
-            clone._gamma = _gamma.clone();
-            clone._beta = _beta.clone();
+            clone._gamma = new Parametro("gamma", _gamma.weight);
+            clone._beta = new Parametro("beta", _beta.weight);
+
             clone._mediaMovel = _mediaMovel.clone();
             clone._varianciaMovel = _varianciaMovel.clone();
             clone._entradaNorm = _entradaNorm.clone();
             clone._media = _media.clone();
             clone._variancia = _variancia.clone();
-            clone._gradGamma = _gradGamma.clone();
-            clone._gradBeta = _gradBeta.clone();
             clone._gradEntrada = _gradEntrada.clone();
             clone._saida = _saida.clone();
             
@@ -375,5 +360,25 @@ public class BatchNorm2D extends Camada implements Cloneable {
     public boolean temBias() {
         return true; //beta funciona como bias
     }
+
+	@Override
+	public String info() {
+		verificarConstrucao();
+
+		StringBuilder sb = new StringBuilder();
+		String pad = " ".repeat(4);
+		
+		sb.append(nome() + " (id " + id + ") = [\n");
+
+		sb.append(pad).append("Entrada: ").append(JNNutils.arrayStr(shapeIn)).append("\n");
+		sb.append("\n");
+
+		sb.append(pad).append(_gamma).append("\n");
+        sb.append(pad).append(_beta).append("\n");
+
+		sb.append("]\n");
+
+		return sb.toString();
+	}
 
 }

@@ -28,20 +28,34 @@ public class Parametro {
         grad = JNN.zeros(shape).nome("grad " + nome);
     }
 
+    /**
+     * Inicializa um novo parâmetro a partir de um tensor de base, os valores de peso
+     * serão copiados.
+     * @param nome nome para identificação.
+     * @param like {@code Tensor} base.
+     */
+    public Parametro(String nome, Tensor like) {
+        weight = like.clone();
+        grad = JNN.zeros(like.shape()).nome("grad " + nome);
+    }
+
+    /**
+     * Retorna o shape do peso.
+     * @return shape do peso.
+     */
+    public int[] shape() {
+        return weight.shape().clone();
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         
-        sb.append("Parametro (")
+        sb.append("Parametro(")
         
-        .append('"')
-        .append(weight.nome())
-        .append('"')
-        .append(" = ")
-        .append(JNNutils.arrayStr(weight.shape()))
-        
-        .append(", tam: ")
-        .append(JNNutils.formatarTamBytes(weight.tamBytes()))
+        .append('"').append(weight.nome()).append('"')
+        .append(", shape ").append(JNNutils.arrayStr(weight.shape()))
+        .append(", tam: ").append(JNNutils.formatarTamBytes(weight.tamBytes()))
         
         .append(")");
 

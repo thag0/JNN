@@ -256,4 +256,17 @@ public class GlobalAvgPool2D extends Camada implements Cloneable {
         return clone;
     }
 
+    @Override
+    public String info() {
+        StringBuilder sb = new StringBuilder();
+        String pad = " ".repeat(4);
+
+		sb.append(nome()).append(" (id ").append(id).append(") = [\n");
+        sb.append(pad).append("Entrada: ").append(JNNutils.arrayStr(shapeIn)).append("\n");
+        sb.append(pad).append("Saida: ").append(JNNutils.arrayStr(shapeOut)).append("\n");
+        sb.append("]\n");
+
+        return sb.toString();
+    }
+
 }

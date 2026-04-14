@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import jnn.core.Dicionario;
 import jnn.core.JNNutils;
+import jnn.core.Parametro;
 import jnn.core.tensor.Tensor;
 import jnn.inicializadores.GlorotUniforme;
 import jnn.inicializadores.Inicializador;
@@ -76,7 +77,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 * </p>
 	 * <pre>kernel = (filtros, canais, altura, largura) </pre>
 	 */
-	public Tensor _kernel;
+	public Parametro _kernel;
 
 	/**
 	 * Tensor contendo os bias (vieses) para cada valor de 
@@ -86,7 +87,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 * </p>
 	 * <pre>bias = (filtros) </pre>
 	 */
-	public Optional<Tensor> _bias;
+	public Optional<Parametro> _bias;
 
 	/**
 	 * Auxiliar na verificação de uso do bias.
@@ -121,26 +122,6 @@ public class Conv2D extends Camada implements Cloneable {
 	 * <pre>gradSaida = (filtros, altura, largura) </pre>
 	 */
 	public Tensor _gradSaida;
-
-	/**
-	 * Tensor contendo os valores dos gradientes relativos a cada
-	 * filtro da camada.
-	 * <p>
-	 *    O formato dos gradientes para os filtros é dado por:
-	 * </p>
-	 * <pre>gradFiltros = (filtros, canais, altura, largura) </pre>
-	 */
-	public Tensor _gradKernel;
-
-	/**
-	 * Tensor contendo os valores dos gradientes relativos a cada
-	 * bias da camada.
-	 * <p>
-	 *    O formato dos gradientes para os bias é dado por:
-	 * </p>
-	 * <pre>gradBias = (filtros) </pre>
-	 */
-	public Optional<Tensor> _gradBias;
 
 	/**
 	 * Inicializador para os filtros da camada.
@@ -353,19 +334,16 @@ public class Conv2D extends Camada implements Cloneable {
 
 		int[] shapeKernel = {shapeOut[0], shapeIn[0], shapeFiltro[0], shapeFiltro[1]};
 		addParam("kernel", shapeKernel);
-		_kernel       = _params[0].weight;
-		_gradKernel   = _params[0].grad;
+		_kernel = _params[0];
 
 		_gradEntrada  = addBuffer("Grad Entrada", shapeIn);// não é passado pro otimizador
 		_saida        = addBuffer("Saida", shapeOut);
 
 		if (usarBias) {
 			addParam("bias", shapeOut[0]);
-			_bias      = Optional.of(_params[1].weight);
-			_gradBias  = Optional.of(_params[1].grad);
+			_bias = Optional.of(_params[1]);
 		} else {
-			_bias      = Optional.empty();
-			_gradBias  = Optional.empty();
+			_bias = Optional.empty();
 		}
 		
 		_treinavel = true;// camada pode ser treinada.
@@ -376,8 +354,8 @@ public class Conv2D extends Camada implements Cloneable {
 	public void init() {
 		verificarConstrucao();
 		
-		iniK.forward(_kernel);
-		_bias.ifPresent(b -> iniB.forward(b));
+		iniK.forward(_kernel.weight);
+		_bias.ifPresent(b -> iniB.forward(b.weight));
 	}
 
 	@Override
@@ -457,8 +435,7 @@ public class Conv2D extends Camada implements Cloneable {
 			_entrada,
 			_kernel,
 			_gradSaida,
-			_gradKernel,
-			_gradBias,
+			_bias,
 			_gradEntrada,
 			shapePad
 		);
@@ -470,8 +447,8 @@ public class Conv2D extends Camada implements Cloneable {
 	public void gradZero() {
 		verificarConstrucao();
 
-		_gradKernel.zero();
-		_gradBias.ifPresent(gb -> gb.zero());
+		_kernel.grad.zero();
+		_bias.ifPresent(b -> b.grad.zero());
 	}
 
 	/**
@@ -480,7 +457,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 */
 	public int numFiltros() {
 		verificarConstrucao();
-		return _kernel.tamDim(0);
+		return _kernel.weight.tamDim(0);
 	}
 
 	@Override
@@ -531,30 +508,14 @@ public class Conv2D extends Camada implements Cloneable {
 		sb.append(pad).append("Padding: ").append(JNNutils.arrayStr(shapePad)).append("\n");
 		sb.append("\n");
 
-		sb.append(pad).append("Kernel: ").append(_kernel.shapeStr()).append("\n");
+		sb.append(pad).append(_kernel).append("\n");
 
-		sb.append(pad).append("Bias: ");
 		if (temBias()) {
-			sb.append(_bias.get().shapeStr()).append("\n");
-		} else {
-			sb.append(" N/A\n");
+			sb.append(pad).append(_bias.get()).append("\n");
 		}
 
 		sb.append("]\n");
 
-		return sb.toString();
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder(info());
-		int tamanho = sb.length();
-
-		sb.delete(tamanho-1, tamanho);//remover ultimo "\n"    
-		
-		sb.append(" <hash: " + Integer.toHexString(hashCode()) + ">");
-		sb.append("\n");
-		
 		return sb.toString();
 	}
 
@@ -566,13 +527,14 @@ public class Conv2D extends Camada implements Cloneable {
 		clone.usarBias = this.usarBias;
 		clone._treinavel = this._treinavel;
 
-		clone._kernel = this._kernel.clone();
-		clone._gradKernel = this._gradKernel.clone();
+		clone._kernel = new Parametro("kernel", _kernel.weight);
+		clone._kernel.grad.copiar(_kernel.grad);
+		
 		clone._gradEntrada = this._gradEntrada.clone();
-
+		
 		if (temBias()) {
-			clone._bias = Optional.of(bias());
-			clone._gradBias = Optional.of(gradBias());
+			clone._bias = Optional.of(new Parametro("bias", _bias.get().weight));
+			clone._bias.get().grad.copiar(_bias.get().grad);
 		}
 
 		clone._saida = this._saida.clone();
@@ -630,18 +592,11 @@ public class Conv2D extends Camada implements Cloneable {
 	public Tensor bias() {
 		verificarConstrucao();
 
-		return _bias.orElseThrow(() -> new IllegalStateException(
-			"\nA camada " + nome() + " (" + id + ") não possui bias configurado."
-		));
-	}
+		if (temBias()) return _bias.get().weight;
 
-	@Override
-	public Tensor gradBias() {
-		verificarConstrucao();
-
-		return _gradBias.orElseThrow(() -> new IllegalStateException(
+		throw new RuntimeException(
 			"\nA camada " + nome() + " (" + id + ") não possui bias configurado."
-		));
+		);
 	}
 
 	@Override
