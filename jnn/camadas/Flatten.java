@@ -128,7 +128,7 @@ public class Flatten extends Camada implements Cloneable {
 		_gradEntrada = addBuffer("Grad Entrada", shapeIn);
 		_saida 		 = addBuffer("Saida", shapeOut);
 
-		_construida = true;// camada pode ser usada.
+		construida = true;// camada pode ser usada.
 	}
 
 	@Override
@@ -270,7 +270,7 @@ public class Flatten extends Camada implements Cloneable {
 
 		clone._treinavel = this._treinavel;
 		clone.treinando = this.treinando;
-		clone._construida = this._construida;
+		clone.construida = this.construida;
 
 		clone.shapeIn = shapeIn.clone();
 		clone.shapeOut = shapeOut.clone();

@@ -240,7 +240,7 @@ public class Densa extends Camada implements Cloneable {
 		}
 		
 		_treinavel = true;// camada pode ser treinada.
-		_construida = true;// camada pode ser usada.
+		construida = true;// camada pode ser usada.
 	}
 
 	@Override

@@ -129,7 +129,7 @@ public class GlobalAvgPool2D extends Camada implements Cloneable {
         _saida       = addBuffer("Saida", shapeOut);
 
         _treinavel = false;
-        _construida = true;
+        construida = true;
     }
 
     @Override

@@ -179,7 +179,7 @@ public class BatchNorm2D extends Camada implements Cloneable {
         _variancia = addBuffer("Variancia", canais);
 
 		_treinavel = true;// camada pode ser treinada.
-		_construida = true;// camada pode ser usada.
+		construida = true;// camada pode ser usada.
     }
 
     @Override

@@ -269,7 +269,7 @@ public class Sequencial extends Modelo {
 			camada(0).construir(shape);
 		
 		} else {
-			if (!camada(0)._construida) {
+			if (!camada(0).construida()) {
 				throw new IllegalArgumentException(
 					"\nÉ necessário que a primeira camada (" + camada(0).nome() +
 					") seja construída."

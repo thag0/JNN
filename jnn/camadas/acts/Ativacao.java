@@ -71,7 +71,7 @@ public abstract class Ativacao extends Camada implements Cloneable {
         _saida       = addBuffer("Saida", shapeIn);
         _gradEntrada = addBuffer("Grad Entrada", shapeIn);
 
-        _construida = true;
+        construida = true;
     }
 
     @Override

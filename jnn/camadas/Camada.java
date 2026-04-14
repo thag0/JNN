@@ -60,7 +60,7 @@ public abstract class Camada {
 	/**
 	 * Controlador de construção da camada.
 	 */
-	public boolean _construida = false;
+	protected boolean construida = false;
 
 	/**
 	 * Controlador de treino da camada.
@@ -109,7 +109,7 @@ public abstract class Camada {
 	 * Verificador de inicialização para evitar problemas.
 	 */
 	protected void verificarConstrucao() {
-		if (!_construida) {
+		if (!construida) {
 			throw new IllegalStateException(
 				"\nCamada " + nome() + " (id = " + id + ") não foi construída."
 			);
@@ -421,6 +421,14 @@ public abstract class Camada {
 	 */
 	public Parametro[] params() {
 		return _params;
+	}
+
+	/**
+	 * Retorna se a camada está construída.
+	 * @return camada construída.
+	 */
+	public boolean construida() {
+		return construida;
 	}
 
 }

@@ -127,7 +127,7 @@ public class Dropout extends Camada implements Cloneable {
 
 		dimBase = _gradEntrada.numDim();
 		
-		_construida = true;// camada pode ser usada
+		construida = true;// camada pode ser usada
 	}
 
 	@Override

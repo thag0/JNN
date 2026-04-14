@@ -347,7 +347,7 @@ public class Conv2D extends Camada implements Cloneable {
 		}
 		
 		_treinavel = true;// camada pode ser treinada.
-		_construida = true;// camada pode ser usada.
+		construida = true;// camada pode ser usada.
 	}
 
 	@Override
