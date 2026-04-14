@@ -1012,8 +1012,7 @@ public class LayerOps {
 	 * @param entradaNorm entrada normalizada.
 	 * @param variancia variancia por canal.
 	 * @param gamma escala.
-	 * @param gradGamma gradiente da escala.
-	 * @param gradBeta gradiente do deslocamento.
+	 * @param beta deslocamento.
 	 * @param gradS gradiente em relação a saída da camada.
 	 * @param eps epsilon.
 	 */
