@@ -227,7 +227,7 @@ public class Densa extends Camada implements Cloneable {
 		
 		_kernel = addParam("kernel", shapeIn[0], shapeOut[0]);
 		
-		if (usarBias) _bias = Optional.of(addParam("bias", _saida.shape()));
+		if (usarBias) _bias = Optional.of(addParam("bias", shapeOut[0]));
 		else _bias = Optional.empty();
 
 		_gradEntrada = addBuffer("Grad Entrada", shapeIn[0]);
