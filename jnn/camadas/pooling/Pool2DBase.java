@@ -274,7 +274,7 @@ public abstract class Pool2DBase extends Camada {
 	 * Retorna o formato do filtro (altura, largura) usado pela camada.
 	 * @return formato do filtro da camada.
 	 */
-	public int[] formatoFiltro() {
+	public int[] shapeFiltro() {
 		verificarConstrucao();
 		return _filtro.clone();
 	}
@@ -283,7 +283,7 @@ public abstract class Pool2DBase extends Camada {
 	 * Retorna o formato dos strides (altura, largura) usado pela camada.
 	 * @return formato dos strides da camada.
 	 */
-	public int[] formatoStride() {
+	public int[] shapeStride() {
 		verificarConstrucao();
 		return _stride.clone();
 	}
@@ -301,14 +301,14 @@ public abstract class Pool2DBase extends Camada {
 		StringBuilder sb = new StringBuilder();
 		String pad = " ".repeat(4);
 		
-		sb.append(nome() + " (id " + this.id + ") = [\n");
+		sb.append(nome()).append("(\n");
 
-		sb.append(pad).append("Entrada: " + JNNutils.arrayStr(shapeIn()) + "\n");
-		sb.append(pad).append("Filtro: " + JNNutils.arrayStr(_filtro) + "\n");
-		sb.append(pad).append("Strides: " + JNNutils.arrayStr(_stride) + "\n");
-		sb.append(pad).append("Saída: " + JNNutils.arrayStr(shapeOut()) + "\n");
+		sb.append(pad).append("In: ").append(JNNutils.arrayStr(shapeIn())).append("\n");
+		sb.append(pad).append("Out: ").append(JNNutils.arrayStr(shapeOut())).append("\n");
+		sb.append(pad).append("Kernel: ").append(JNNutils.arrayStr(shapeFiltro())).append("\n");
+		sb.append(pad).append("Stride: ").append(JNNutils.arrayStr(shapeStride())).append("\n");
 
-		sb.append("]\n");
+		sb.append(")");
 
 		return sb.toString();
 	}

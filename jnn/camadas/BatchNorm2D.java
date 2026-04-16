@@ -365,15 +365,15 @@ public class BatchNorm2D extends Camada implements Cloneable {
 		StringBuilder sb = new StringBuilder();
 		String pad = " ".repeat(4);
 		
-		sb.append(nome() + " (id " + id + ") = [\n");
+		sb.append(nome()).append("(\n");
 
-		sb.append(pad).append("Entrada: ").append(JNNutils.arrayStr(shapeIn)).append("\n");
-		sb.append("\n");
+		sb.append(pad).append("In: ").append(JNNutils.arrayStr(shapeIn)).append("\n");
+        sb.append(pad).append("Momentum: ").append(momentum).append("\n");
 
 		sb.append(pad).append(_gamma).append("\n");
         sb.append(pad).append(_beta).append("\n");
 
-		sb.append("]\n");
+		sb.append(")");
 
 		return sb.toString();
 	}

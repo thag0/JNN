@@ -497,21 +497,16 @@ public class Conv2D extends Camada implements Cloneable {
 		StringBuilder sb = new StringBuilder();
 		String pad = " ".repeat(4);
 		
-		sb.append(nome()).append(" (id ").append(id).append(") = [\n");
+		sb.append(nome()).append("(").append("\n");
 
-		sb.append(pad).append("Entrada: ").append(JNNutils.arrayStr(shapeIn)).append("\n");
-		sb.append(pad).append("Filtros: ").append(numFiltros()).append("\n");
-		sb.append(pad).append("Saida: ").append(JNNutils.arrayStr(shapeOut)).append("\n");
+		sb.append(pad).append("In: ").append(JNNutils.arrayStr(shapeIn)).append("\n");
+		sb.append(pad).append("Out: ").append(JNNutils.arrayStr(shapeOut)).append("\n");
 		sb.append(pad).append("Padding: ").append(JNNutils.arrayStr(shapePad)).append("\n");
-		sb.append("\n");
 
 		sb.append(pad).append(_kernel).append("\n");
+		if (temBias()) sb.append(pad).append(_bias.get()).append("\n");
 
-		if (temBias()) {
-			sb.append(pad).append(_bias.get()).append("\n");
-		}
-
-		sb.append("]\n");
+		sb.append(")");
 
 		return sb.toString();
 	}

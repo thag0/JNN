@@ -379,19 +379,15 @@ public class Densa extends Camada implements Cloneable {
 		StringBuilder sb = new StringBuilder();
 		String pad = " ".repeat(4);
 		
-		sb.append(nome() + " (id " + id + ") = [\n");
+		sb.append(nome()).append("(\n");
 
-		sb.append(pad).append("Entrada: " + tamEntrada() + "\n");
-		sb.append(pad).append("Saida: " + tamSaida() + "\n");
-		sb.append("\n");
+		sb.append(pad).append("In: ").append(JNNutils.arrayStr(shapeIn)).append("\n");
+		sb.append(pad).append("Out: ").append(JNNutils.arrayStr(shapeOut)).append("\n");
 
 		sb.append(pad).append(_kernel).append("\n");
+		if (temBias()) sb.append(pad).append(_bias.get()).append("\n");
 
-		if (temBias()) {
-			sb.append(pad).append(_bias.get()).append("\n");
-		}
-
-		sb.append("]\n");
+		sb.append(")");
 
 		return sb.toString();
 	}

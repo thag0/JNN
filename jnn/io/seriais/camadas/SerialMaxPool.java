@@ -30,10 +30,10 @@ class SerialMaxPool extends SerialBase implements SerializadorCamada<MaxPool2D> 
 		int[] shapeOut = camada.shapeOut();
 		escrever(dos, shapeOut);
 
-		int[] shapeFiltro = camada.formatoFiltro();
+		int[] shapeFiltro = camada.shapeFiltro();
 		escrever(dos, shapeFiltro);
 		
-		int[] shapeStride = camada.formatoStride();
+		int[] shapeStride = camada.shapeStride();
 		escrever(dos, shapeStride);
 	}
 

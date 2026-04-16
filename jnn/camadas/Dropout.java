@@ -274,13 +274,13 @@ public class Dropout extends Camada implements Cloneable {
 		StringBuilder sb = new StringBuilder();
 		String pad = " ".repeat(4);
 		
-		sb.append(nome() + " (id " + this.id + ") = [\n");
+		sb.append(nome()).append("(\n");
 
-		sb.append(pad).append("Taxa: " + taxa() + "\n");
-		sb.append(pad).append("Entrada: " + JNNutils.arrayStr(shapeIn) + "\n");
-		sb.append(pad).append("Saída: " + JNNutils.arrayStr(shapeIn) + "\n");
+		sb.append(pad).append("In: ").append(JNNutils.arrayStr(shapeIn)).append("\n");
+		sb.append(pad).append("Out: ").append(JNNutils.arrayStr(shapeIn)).append("\n");
+		sb.append(pad).append("Taxa: ").append(taxa()).append("\n");
 
-		sb.append("]\n");
+		sb.append(")");
 
 		return sb.toString();
 	}

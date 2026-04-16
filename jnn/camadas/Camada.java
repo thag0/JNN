@@ -371,15 +371,7 @@ public abstract class Camada {
 
     @Override
     public String toString() {
-		StringBuilder sb = new StringBuilder(info());
-
-		int pos = sb.lastIndexOf("]"); // encontra o fechamento
-
-		String hashStr = "    <hash: " + Integer.toHexString(hashCode()) + ">\n";
-
-		sb.insert(pos, hashStr);
-
-		return sb.toString();
+		return info();
     }
 
 	/**
