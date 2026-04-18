@@ -375,6 +375,13 @@ public abstract class Camada {
     }
 
 	/**
+	 * Exibe as informações da camada via console.
+	 */
+	public void print() {
+		System.out.println(info());
+	}
+
+	/**
 	 * Retorna o tamanho em bytes na memória ocupado pela camada.
 	 * @return tamanho aproximado em bytes.
 	 */

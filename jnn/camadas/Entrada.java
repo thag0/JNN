@@ -93,5 +93,18 @@ public class Entrada extends Camada {
 	public int numParams() {
 		return 0;
 	}
+
+	@Override
+	public String info() {
+		StringBuilder sb = new StringBuilder();
+
+		String pad = " ".repeat(4);
+		
+		sb.append(nome()).append("(").append("\n");
+		sb.append(pad).append("In: ").append(JNNutils.arrayStr(shape)).append("\n");
+		sb.append(")");
+
+		return sb.toString();
+	}
 	
 }
