@@ -401,12 +401,12 @@ public class Densa extends Camada implements Cloneable {
 		clone.lops = new LayerOps();
 		clone._treinavel = this._treinavel;
 
-		clone._kernel = new Parametro("kernel", _kernel.weight);
+		clone._kernel = _kernel.clone();
 		clone._kernel.grad.copiar(_kernel.grad);
 
 		clone.usarBias = this.usarBias;
 		if (temBias()) {
-			clone._bias = Optional.of(new Parametro("bias", _bias.get().weight));
+			clone._bias = Optional.of(_bias.get().clone());
 			clone._bias.get().grad.copiar(_bias.get().grad);
 		}
 

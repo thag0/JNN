@@ -69,4 +69,11 @@ public class Parametro {
         System.out.println(toString());
     }
 
+    @Override
+    public Parametro clone() {
+        Parametro clone = new Parametro(weight.nome(), weight);
+        clone.grad.copiar(grad);
+        return clone;
+    }
+
 }

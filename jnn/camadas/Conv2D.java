@@ -519,13 +519,13 @@ public class Conv2D extends Camada implements Cloneable {
 		clone.usarBias = this.usarBias;
 		clone._treinavel = this._treinavel;
 
-		clone._kernel = new Parametro("kernel", _kernel.weight);
+		clone._kernel = _kernel.clone();
 		clone._kernel.grad.copiar(_kernel.grad);
 		
 		clone._gradEntrada = this._gradEntrada.clone();
 		
 		if (temBias()) {
-			clone._bias = Optional.of(new Parametro("bias", _bias.get().weight));
+			clone._bias = Optional.of(_bias.get().clone());
 			clone._bias.get().grad.copiar(_bias.get().grad);
 		}
 

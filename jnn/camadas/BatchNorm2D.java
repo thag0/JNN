@@ -333,8 +333,8 @@ public class BatchNorm2D extends Camada implements Cloneable {
         try {
             BatchNorm2D clone = (BatchNorm2D) super.clone();
             
-            clone._gamma = new Parametro("gamma", _gamma.weight);
-            clone._beta = new Parametro("beta", _beta.weight);
+            clone._gamma = _gamma.clone();
+            clone._beta = _beta.clone();
 
             clone._mediaMovel = _mediaMovel.clone();
             clone._varianciaMovel = _varianciaMovel.clone();
