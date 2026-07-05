@@ -1,5 +1,6 @@
 package jnn.dataloader;
 
+import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -29,14 +30,8 @@ public class Amostra {
      * @param y {@code Tensor} com dados de saída.
      */
     public Amostra(Tensor x, Tensor y) {
-        if (x == null || y == null) {
-            throw new IllegalArgumentException(
-                "\nDados X e Y da amostra não podem ser nulos."
-            );
-        }
-
-        this.x = x;
-        this.y = y;
+        this.x = JNNutils.validarNaoNulo(x, "x == null");
+        this.y = JNNutils.validarNaoNulo(y, "y == null");
     }
 
     /**

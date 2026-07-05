@@ -243,42 +243,38 @@ public final class JNNutils {
 
 	/**
 	 * Verifica se o objeto recebido é nulo.
+	 * @param <T> tipo do objeto.
 	 * @param obj objeto de comparação.
 	 * @param msg mensagem personalizada de erro.
 	 * @throws NullPointerException caso o objeto seja nulo.
+	 * @return objeto caso não seja nulo.
 	 */
-	public static void validarNaoNulo(Object obj, String msg) {
+	public static <T> T validarNaoNulo(T obj, String msg) {
 		if (obj == null) {
-			String str;
-
-			if (msg == null) {
-				str = "obj == null.";
-				
-			} else {
-				msg = msg.trim();
-				str = msg.isEmpty() ? "obj == null." : msg;
-			}
-
-			throw new NullPointerException("\n" + str);
+			throw new NullPointerException(
+				"\n" + (msg == null || msg.isBlank() ? "obj == null." : msg.trim())
+			);
 		}
+
+		return obj;
 	}
 
 	/**
 	 * Adiciona um novo elemento ao array.
 	 * @param <T> tipo dos elementos do array
 	 * @param arr {@code array}.
-	 * @param elm elemento para adição.
+	 * @param e elemento para adição.
 	 * @return novo array com elemento adicionado.
 	 */
-	public static <T> T[] addEmArray(T[] arr, T elm) {
-		validarNaoNulo(arr, "Array nulo");
-		validarNaoNulo(elm, "elemento nulo");
+	public static <T> T[] addEmArray(T[] arr, T e) {
+		validarNaoNulo(arr, "arr = null");
+		validarNaoNulo(e, "e = null");
 		
 		@SuppressWarnings("unchecked")
 		T[] novo = (T[]) Array.newInstance(arr.getClass().getComponentType(), arr.length + 1);
 
 		System.arraycopy(arr, 0, novo, 0, arr.length);
-		novo[novo.length-1] = elm;
+		novo[novo.length-1] = e;
 		
 		return novo;
 	}
