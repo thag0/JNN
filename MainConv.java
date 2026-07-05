@@ -12,6 +12,7 @@ import jnn.camadas.pooling.MaxPool2D;
 import jnn.core.JNNnative;
 import jnn.dataloader.DataLoader;
 import jnn.dataloader.dataset.CIFAR10;
+import jnn.dataloader.transform.ColorJitter;
 import jnn.dataloader.transform.Compose;
 import jnn.dataloader.transform.HFlip;
 import jnn.dataloader.transform.Norm;
@@ -49,6 +50,7 @@ public class MainConv {
 		
 		final DataLoader treino = CIFAR10.treino().aplicarX(norm);
 		treino.setTransformX(new Compose(
+			new ColorJitter(.15, .15, .15, 0.3),
 			new HFlip(0.5),
 			new RandomCrop(32, 32, 4, true)
 		));
