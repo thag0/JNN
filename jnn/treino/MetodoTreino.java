@@ -47,7 +47,7 @@ public abstract class MetodoTreino {
 	 * @param hist calcular histórico de perda durante o treino.
 	 */
 	protected MetodoTreino(Modelo modelo, boolean hist) {
-		this.modelo = modelo;
+		this.modelo = modelo;// já é validado != null pelo Treinador
 		this.calcHist = hist;
 	}
 

@@ -33,13 +33,7 @@ public class Avaliador {
 	 * @param modelo modelo base.
 	 */
 	public Avaliador(Modelo modelo) {
-		if (modelo == null) {
-			throw new IllegalArgumentException(
-				"\nModelo == null."
-			);
-		}
-
-		this.modelo = modelo;
+		this.modelo = JNNutils.validarNaoNulo(modelo, "modelo == null");
 	}
 
 	/**

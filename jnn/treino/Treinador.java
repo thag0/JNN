@@ -3,6 +3,7 @@ package jnn.treino;
 import java.util.LinkedList;
 import java.util.concurrent.ForkJoinPool;
 
+import jnn.core.JNNutils;
 import jnn.core.parallel.JNNparallel;
 import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;
@@ -50,7 +51,7 @@ public class Treinador implements Cloneable {
 	 * @param hist calcular histórico de perda.
 	 */
 	public Treinador(Modelo modelo, boolean hist) {
-		this.modelo = modelo;
+		this.modelo = JNNutils.validarNaoNulo(modelo, "modelo == null");
 		this.calcHist = hist;
 	}
 

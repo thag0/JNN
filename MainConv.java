@@ -32,8 +32,8 @@ public class MainConv {
 	static Ged ged = new Ged();
 
 	// controle de treino
-	static final int TREINO_EPOCAS = 15;
-	static final int TREINO_LOTE = 64;
+	static final int TREINO_EPOCAS = 25;
+	static final int TREINO_LOTE = 32;
 	static final boolean TREINO_LOGS = true;
 
 	// caminhos de arquivos externos
@@ -50,7 +50,7 @@ public class MainConv {
 		
 		final DataLoader treino = CIFAR10.treino().aplicarX(norm);
 		treino.setTransformX(new Compose(
-			new ColorJitter(.15, .15, .15, 0.3),
+			new ColorJitter(.1, .1, .1, 0.35),
 			new HFlip(0.5),
 			new RandomCrop(32, 32, 4, true)
 		));
@@ -76,7 +76,7 @@ public class MainConv {
 		
 		System.out.println("Treinando.");
 		JNNnative.on();
-		JNNnative.setTamArena(3 * 1024 * 1024);
+		JNNnative.setTamArena(6 * 1024 * 1024);
 		long tempo = System.nanoTime();
 			modelo.treinar(treino, TREINO_EPOCAS, TREINO_LOTE, TREINO_LOGS);
 		tempo = System.nanoTime() - tempo;
@@ -134,7 +134,7 @@ public class MainConv {
 			new Conv2D(32, convK, "same", "he"),
 			new BatchNorm2D(),
 			new ReLU(),
-			new Conv2D(32, convK, "same", "he"),
+			new Conv2D(64, convK, "same", "he"),
 			new BatchNorm2D(),
 			new ReLU(),
 			new MaxPool2D(poolK),
@@ -142,7 +142,7 @@ public class MainConv {
 			new Conv2D(64, convK, "same", "he"),
 			new BatchNorm2D(),
 			new ReLU(),
-			new Conv2D(64, convK, "same", "he"),
+			new Conv2D(128, convK, "same", "he"),
 			new BatchNorm2D(),
 			new ReLU(),
 			new MaxPool2D(poolK),
