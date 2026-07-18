@@ -16,15 +16,14 @@ import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
-import jnn.treino.scheduler.StepLR;
-import jnnview.JNNwindow;
+import jnnview.JNNview;
 
 public class MainImg {
 	static Ged ged = new Ged();
 	static Geim geim = new Geim();
 
 	static final int EPOCAS = 5 * 1000;
-	static final int ESCALA_RENDER = 10;
+	static final int ESCALA_RENDER = 8;
 	static final boolean historico = true;
 	static final String CAMINHO_HISTORICO = "historico-perda.csv";
 	static final String CAMINHO_IMAGEM = "./dados/mnist/img_0.png";
@@ -52,6 +51,7 @@ public class MainImg {
 
 		Modelo modelo = modelo(tamEntrada, tamSaida);
 		modelo.print();
+		modelo.otm().print();
 
 		System.out.println("Treinando.");
 		long tempo = treinoEmPainel(modelo, dl, imagem.getWidth(), imagem.getHeight());
@@ -79,21 +79,19 @@ public class MainImg {
 	static Modelo modelo(int in, int out) {
 		Sequencial modelo = new Sequencial(
 			new Entrada(in),
-			new Densa(14),
+			new Densa(16),
 			new Tanh(),
-			new Densa(14),
+			new Densa(16),
 			new Tanh(),
 			new Densa(out),
 			new Sigmoid()
 		);
 
-		Object optm = "sgd";
+		Object optm = "nadam";
 		Object loss = "mse"; 
 
 		modelo.compilar(optm, loss);
 		modelo.setHistorico(historico);
-
-		modelo.treinador().setScheduler(new StepLR(modelo.otm(), 25, 0.98f));
 
 		return modelo;
 	}
@@ -107,44 +105,30 @@ public class MainImg {
 	 * @return tempo (em nano segundos) do treino.
 	 */
 	static long treinoEmPainel(Modelo modelo, DataLoader loader, int altura, int largura) {
-		final int FPS = 60_000000;
 		final int EPOCAS_POR_FRAME = 65;
 
 		Tensor in = new Tensor(2);
 		Tensor img = new Tensor(altura, largura);
-		JNNwindow window = new JNNwindow((int) ESCALA_RENDER);
-		window.atualizar(img.array(), img.shape());
+		JNNview window = new JNNview((int) ESCALA_RENDER);
+		window.update(img.array(), img.shape());
 		
-		window.exibir("Titulo");
-		
-		//trabalhar com o tempo de renderização baseado no fps
-		double intervaloDesenho = 1_000_000_000/FPS;
-		double proximoTempoDesenho = System.nanoTime() + intervaloDesenho;
-		double tempoRestante;
+		window.on("Titulo");
 
 		int i = 0;
 		long tempoTreino = System.nanoTime();
 		while (i < EPOCAS && window.isVisible()) {
 			modelo.treinar(loader, EPOCAS_POR_FRAME, false);
 			gerarImagem(modelo, in, img);
-			window.atualizar(img.array(), img.shape());
-			window.exibir(i + "/" + EPOCAS);
+			window.update(img.array(), img.shape());
+			window.on(i + "/" + EPOCAS);
 			
 			i += EPOCAS_POR_FRAME;
-
-			try {
-				tempoRestante = proximoTempoDesenho - System.nanoTime();
-				tempoRestante /= 1_000_000;
-				if (tempoRestante < 0) tempoRestante = 0;
-
-				Thread.sleep((long)tempoRestante);
-				proximoTempoDesenho += intervaloDesenho;
-
-			} catch (Exception e) {}
 		}
 
 		tempoTreino = System.nanoTime() - tempoTreino;
 		
+		window.off();
+
 		return tempoTreino;
 	}
 
