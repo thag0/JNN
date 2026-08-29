@@ -429,12 +429,13 @@ static bool _usar_col2im_ge(const conv2d_bwd_params_t* params) {
     long im2col_size = 
     (long) params->lotes *
     params->canais *
+    params->filtros *
     params->alt_k *
     params->larg_k *
     params->larg_x *
     params->alt_x;
 
-    const long limiar = 2000000;
+    const long limiar = 3200000;
 
     return im2col_size > limiar;
 }

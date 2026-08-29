@@ -11,8 +11,8 @@ set CP_JNN_GED_GEIM_VIEW=bin\jnn.jar;lib\ged.jar;lib\geim.jar;lib\jnnview.jar
 
 if not exist %OUT_DIR% mkdir %OUT_DIR%
 
-@REM javac -cp "%CP_JNN_GED%" -d %OUT_DIR% MainConv.java
-javac -cp "%CP_JNN_GED_GEIM_VIEW%" -d %OUT_DIR% MainImg.java
+javac -cp "%CP_JNN_GED%" -d %OUT_DIR% MainConv.java
+@REM javac -cp "%CP_JNN_GED_GEIM_VIEW%" -d %OUT_DIR% MainImg.java
 @REM javac -cp "%CP_JNN_GED%" -d %OUT_DIR% Benchmark.java
 @REM javac -cp "%CP_JNN_GED_GEIM%" -d %OUT_DIR% Conv.java
 @REM javac -cp "%CP_JNN_GED_GEIM_VIEW%" -d %OUT_DIR% Lab.java

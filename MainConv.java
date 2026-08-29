@@ -32,7 +32,7 @@ public class MainConv {
 	static Ged ged = new Ged();
 
 	// controle de treino
-	static final int TREINO_EPOCAS = 25;
+	static final int TREINO_EPOCAS = 30;
 	static final int TREINO_LOTE = 32;
 	static final boolean TREINO_LOGS = true;
 
@@ -131,7 +131,7 @@ public class MainConv {
 		Sequencial modelo = new Sequencial(
 			new Entrada(3, 32, 32),
 
-			new Conv2D(32, convK, "same", "he"),
+			new Conv2D(64, convK, "same", "he"),
 			new BatchNorm2D(),
 			new ReLU(),
 			new Conv2D(64, convK, "same", "he"),
@@ -142,7 +142,7 @@ public class MainConv {
 			new Conv2D(64, convK, "same", "he"),
 			new BatchNorm2D(),
 			new ReLU(),
-			new Conv2D(128, convK, "same", "he"),
+			new Conv2D(64, convK, "same", "he"),
 			new BatchNorm2D(),
 			new ReLU(),
 			new MaxPool2D(poolK),
@@ -159,6 +159,9 @@ public class MainConv {
 
 			new Dropout(0.5),
 			new Densa(256, "he"),
+			new ReLU(),
+
+			new Densa(128, "he"),
 			new ReLU(),
 
 			new Densa(10, "glorot-uniforme"),
