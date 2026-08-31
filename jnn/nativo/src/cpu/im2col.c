@@ -20,11 +20,12 @@ void im2col(
     #pragma omp parallel for schedule(static) proc_bind(close)
     for (int c = 0; c < canais; c++) {
         for (int kh = 0; kh < alt_k; kh++) {
+            int h_min = MAX_ENTRE(0, alt_pad - kh);
+            int h_max = MIN_ENTRE(alt_s, alt_x + alt_pad - kh);
+            
             for (int kw = 0; kw < larg_k; kw++) {
                 int linha = (c * alt_k + kh) * larg_k + kw;
                 float* restrict ptr_col = COL + linha * Ndim;
-                int h_min = MAX_ENTRE(0, alt_pad - kh);
-                int h_max = MIN_ENTRE(alt_s, alt_x + alt_pad - kh);
                 int w_min = MAX_ENTRE(0, larg_pad - kw);
                 int w_max = MIN_ENTRE(larg_s, larg_x + larg_pad - kw);
 
@@ -59,30 +60,34 @@ void col2im_T(
     int alt_s, int larg_s) {
 
     const int Kdim = canais * alt_k * larg_k;
-    const int Ndim = alt_s * larg_s;
     const int area_x = alt_x * larg_x;
 
     #pragma omp parallel for schedule(static) proc_bind(close)
     for (int c = 0; c < canais; c++) {
-        for (int n = 0; n < Ndim; n++) {
-            const int i = n / larg_s;
-            const int j = n % larg_s;
+        const int base_k_c = c * alt_k * larg_k;
+        float* restrict ge_c = GE + c * area_x;
 
-            const float* restrict lin_col = COLT + n * Kdim;
-            const int base_k_c = c * alt_k * larg_k;
+        for (int i = 0; i < alt_s; i++) {
+            const int kh_min = MAX_ENTRE(0, alt_pad - i);
+            const int kh_max = MIN_ENTRE(alt_k, alt_x + alt_pad - i);
 
-            for (int kh = 0; kh < alt_k; kh++) {
-                const int in_y = i + kh - alt_pad;
-                if ((unsigned)in_y >= (unsigned)alt_x) continue;
+            for (int j = 0; j < larg_s; j++) {
+                const int kw_min = MAX_ENTRE(0, larg_pad - j);
+                const int kw_max = MIN_ENTRE(larg_k, larg_x + larg_pad - j);
 
-                float* restrict lin_ge = GE + c * area_x + in_y * larg_x;
+                const int n = i * larg_s + j;
+                const float* restrict lin_col = COLT + n * Kdim + base_k_c;
 
-                for (int kw = 0; kw < larg_k; kw++) {
-                    const int in_x = j + kw - larg_pad;
-                    if ((unsigned)in_x >= (unsigned)larg_x) continue;
+                for (int kh = kh_min; kh < kh_max; kh++) {
+                    const int in_y = i + kh - alt_pad;
+                    float* restrict lin_ge = ge_c + in_y * larg_x;
+                    const float* restrict lin_col_kh = lin_col + kh * larg_k;
 
-                    const int k = base_k_c + kh * larg_k + kw;
-                    lin_ge[in_x] += lin_col[k];
+                    #pragma omp simd
+                    for (int kw = kw_min; kw < kw_max; kw++) {
+                        const int in_x = j + kw - larg_pad;
+                        lin_ge[in_x] += lin_col_kh[kw];
+                    }
                 }
             }
         }
