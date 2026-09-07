@@ -38,19 +38,22 @@ static void _forward_loops(const conv2d_fwd_params_t* params) {
             float* restrict dst_base = DST + (l * filtros + f) * area_s;
 
             float bias = params->temBias ? B[f] : 0.0f;
-            for (int i = 0; i < area_s; i++) dst_base[i] = bias;
+            for (int i = 0; i < area_s; i++) {
+                dst_base[i] = bias;
+            }
 
             for (int c = 0; c < canais; c++) {
                 const float* restrict Xc = X + (l * canais + c) * area_x;
                 const float* restrict Kc = K + (f * canais + c) * area_k;
 
                 for (int kh = 0; kh < alt_k; kh++) {
+                    const int i_max = MIN_ENTRE(alt_x + alt_pad - kh, alt_s);
+                    const int i_min = MAX_ENTRE(alt_pad - kh, 0);
+                    
                     for (int kw = 0; kw < larg_k; kw++) {
                         const float val_k = Kc[kh * larg_k + kw];
                         const int j_max = MIN_ENTRE(larg_x + larg_pad - kw, larg_s);
                         const int j_min = MAX_ENTRE(larg_pad - kw, 0);
-                        const int i_max = MIN_ENTRE(alt_x + alt_pad - kh, alt_s);
-                        const int i_min = MAX_ENTRE(alt_pad - kh, 0);
 
                         for (int i = i_min; i < i_max; i++) {
                             const int in_y = i + kh - alt_pad;
