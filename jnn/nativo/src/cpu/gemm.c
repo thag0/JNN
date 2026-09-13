@@ -11,13 +11,13 @@
 
 // microkernel
 #include <immintrin.h>
-#define MR 4
+#define MR 8
 #define NR 8
 
 // tilling
 #define TILE_M 32//multiplo de MR
 #define TILE_K 64
-#define TILE_N 32//multiplo de NR
+#define TILE_N 64//multiplo de NR
 
 static void _para_row_major(
     const float* restrict X,
@@ -37,7 +37,7 @@ static void _para_row_major(
     }
 }
 
-static inline void _microkernel_4x8(
+static inline void _microkernel_8x8(
     const float* restrict A,
     const float* restrict B,
     float* restrict C,
@@ -50,6 +50,10 @@ static inline void _microkernel_4x8(
     __m256 c1 = _mm256_loadu_ps(C + 1*ldc);
     __m256 c2 = _mm256_loadu_ps(C + 2*ldc);
     __m256 c3 = _mm256_loadu_ps(C + 3*ldc);
+    __m256 c4 = _mm256_loadu_ps(C + 4*ldc);
+    __m256 c5 = _mm256_loadu_ps(C + 5*ldc);
+    __m256 c6 = _mm256_loadu_ps(C + 6*ldc);
+    __m256 c7 = _mm256_loadu_ps(C + 7*ldc);
 
     const float* restrict ptr_a = A;
     const float* restrict ptr_b = B;
@@ -57,15 +61,14 @@ static inline void _microkernel_4x8(
     for (int k = 0; k < K; k++) {
         __m256 b = _mm256_loadu_ps(ptr_b);
 
-        __m256 a0 = _mm256_broadcast_ss(ptr_a + 0*lda);
-        __m256 a1 = _mm256_broadcast_ss(ptr_a + 1*lda);
-        __m256 a2 = _mm256_broadcast_ss(ptr_a + 2*lda);
-        __m256 a3 = _mm256_broadcast_ss(ptr_a + 3*lda);
-
-        c0 = _mm256_fmadd_ps(a0, b, c0);
-        c1 = _mm256_fmadd_ps(a1, b, c1);
-        c2 = _mm256_fmadd_ps(a2, b, c2);
-        c3 = _mm256_fmadd_ps(a3, b, c3);
+        c0 = _mm256_fmadd_ps(_mm256_broadcast_ss(ptr_a + 0*lda), b, c0);
+        c1 = _mm256_fmadd_ps(_mm256_broadcast_ss(ptr_a + 1*lda), b, c1);
+        c2 = _mm256_fmadd_ps(_mm256_broadcast_ss(ptr_a + 2*lda), b, c2);
+        c3 = _mm256_fmadd_ps(_mm256_broadcast_ss(ptr_a + 3*lda), b, c3);
+        c4 = _mm256_fmadd_ps(_mm256_broadcast_ss(ptr_a + 4*lda), b, c4);
+        c5 = _mm256_fmadd_ps(_mm256_broadcast_ss(ptr_a + 5*lda), b, c5);
+        c6 = _mm256_fmadd_ps(_mm256_broadcast_ss(ptr_a + 6*lda), b, c6);
+        c7 = _mm256_fmadd_ps(_mm256_broadcast_ss(ptr_a + 7*lda), b, c7);
 
         ptr_a += 1;
         ptr_b += ldb;
@@ -75,6 +78,10 @@ static inline void _microkernel_4x8(
     _mm256_storeu_ps(C + 1*ldc, c1);
     _mm256_storeu_ps(C + 2*ldc, c2);
     _mm256_storeu_ps(C + 3*ldc, c3);
+    _mm256_storeu_ps(C + 4*ldc, c4);
+    _mm256_storeu_ps(C + 5*ldc, c5);
+    _mm256_storeu_ps(C + 6*ldc, c6);
+    _mm256_storeu_ps(C + 7*ldc, c7);
 }
 
 static inline void _kernel_scalar(
@@ -136,7 +143,7 @@ static void gemm(
                         float* restrict ptr_c = C_bloco + i * ldc + j;
 
                         if (_M == MR && _N == NR) {
-                            _microkernel_4x8(
+                            _microkernel_8x8(
                                 ptr_a, ptr_b, ptr_c,
                                 K_bloco,
                                 lda, ldb, ldc
