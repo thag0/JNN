@@ -12,33 +12,36 @@ void im2col(
     int alt_k, int larg_k,
     int alt_pad, int larg_pad,
     int alt_s, int larg_s) {
-
-    const int Kdim = canais * alt_k * larg_k;
+        
     const int Ndim = alt_s * larg_s;
-    memset(COL, 0, sizeof(float) * Kdim * Ndim);// limpar lixo da pool e lidar com padding > 0
-
-    #pragma omp parallel for schedule(static) proc_bind(close)
+    
+    #pragma omp parallel for collapse(3) schedule(static) proc_bind(close)
     for (int c = 0; c < canais; c++) {
         for (int kh = 0; kh < alt_k; kh++) {
-            int h_min = MAX_ENTRE(0, alt_pad - kh);
-            int h_max = MIN_ENTRE(alt_s, alt_x + alt_pad - kh);
-            
             for (int kw = 0; kw < larg_k; kw++) {
                 int linha = (c * alt_k + kh) * larg_k + kw;
-                float* restrict ptr_col = COL + linha * Ndim;
+                float* restrict ptr_col = COL + (size_t)linha * Ndim;
+
+                int h_min = MAX_ENTRE(0, alt_pad - kh);
+                int h_max = MIN_ENTRE(alt_s, alt_x + alt_pad - kh);
                 int w_min = MAX_ENTRE(0, larg_pad - kw);
                 int w_max = MIN_ENTRE(larg_s, larg_x + larg_pad - kw);
+                int largura = w_max - w_min;
+                int in_x = w_min + kw - larg_pad;
+
+                if (h_min > 0) memset(ptr_col, 0, sizeof(float) * h_min * larg_s);
+                if (h_max < alt_s) memset(ptr_col + h_max * larg_s, 0, sizeof(float) * (alt_s - h_max) * larg_s);
 
                 for (int i = h_min; i < h_max; i++) {
                     int in_y = i + kh - alt_pad;
-                    const float* restrict ptr_x = X + (c * alt_x * larg_x) + (in_y * larg_x);
-                    float* restrict ptr_dst = ptr_col + (i * larg_s);
-
-                    int in_x = w_min + kw - larg_pad;
-                    int largura = w_max - w_min;
+                    const float* restrict ptr_x = X + (c * alt_x * larg_x) + in_y * larg_x;
                     const float* restrict x = ptr_x + in_x;
-                    float* dest = ptr_dst + w_min;
+                    float* restrict dest_row = ptr_col + i * larg_s;
 
+                    if (w_min > 0) memset(dest_row, 0, sizeof(float) * w_min);
+                    if (w_max < larg_s) memset(dest_row + w_max, 0, sizeof(float) * (larg_s - w_max));
+
+                    float* restrict dest = dest_row + w_min;
                     #pragma omp simd
                     for (int t = 0; t < largura; t++) {
                         dest[t] = x[t];
