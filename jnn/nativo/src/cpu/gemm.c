@@ -96,16 +96,18 @@ static inline void _kernel_scalar(
     int ldc) {
 
     for (int i = 0; i < M; i++) {
+        const int base_a = i * lda;
+        const int base_c = i * ldc;
+
         for (int j = 0; j < N; j++) {
-            float acc = C[i*ldc + j];
-            const int base_a = i * lda;
+            float acc = C[base_c + j];
 
             #pragma omp simd
             for (int k = 0; k < K; k++) {
                 acc += A[base_a + k] * B[k*ldb + j];
             }
 
-            C[i*ldc + j] = acc;
+            C[base_c + j] = acc;
         }
     }
 }
