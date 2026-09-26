@@ -11,7 +11,7 @@ set CP_JNN_GED_GEIM=bin\jnn.jar;lib\ged.jar;lib\geim.jar;testes\bin
 set CP_JNN_GED_GEIM_VIEW=bin\jnn.jar;lib\ged.jar;lib\geim.jar;lib\jnnview.jar;testes\bin
 
 
-@REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED%" MainConv "%MEM_OPS%"
+@REM  java %ENABLE_NATIVE% -cp "%CP_JNN_GED%" MainConv "%MEM_OPS%"
 @REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED_GEIM_VIEW%" MainImg
 @REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED%" Benchmark
 @REM java %ENABLE_NATIVE% -cp "%CP_JNN_GED_GEIM%" Conv

@@ -102,7 +102,7 @@ static inline void _kernel_scalar(
         for (int j = 0; j < N; j++) {
             float acc = C[base_c + j];
 
-            #pragma omp simd
+            #pragma omp simd reduction(+:acc)
             for (int k = 0; k < K; k++) {
                 acc += A[base_a + k] * B[k*ldb + j];
             }
@@ -170,50 +170,42 @@ void cpu_gemm(gemm_params_t* params) {
     const float* restrict B = params->B;
     float* restrict       C = params->C;
 
-    const int lin_a = params->lin_a;
-    const int col_a = params->col_a;
-    const int col_b = params->col_b;
+    const bool trans_a = params->std_a_1 != 1;
+    const bool trans_b = params->std_b_1 != 1;
 
-    const int std_a_0 = params->std_a_0;
-    const int std_a_1 = params->std_a_1;
-    const int std_b_0 = params->std_b_0;
-    const int std_b_1 = params->std_b_1;
-    const int std_c_0 = params->std_c_0;
-    const int std_c_1 = params->std_c_1;
+    int lda = params->std_a_0;
+    int ldb = params->std_b_0;
+    int ldc = params->std_c_0;
 
-    if (std_a_1 == 1 && std_b_1 == 1 && std_c_1 == 1) {//contiguo row-major
+    if (!trans_a && !trans_b && params->std_c_1 == 1) {//contiguo row-major
         gemm(
             A, B, C, 
-            lin_a, col_a, col_b,
-            std_a_0, std_b_0, std_c_0
+            params->lin_a, params->col_a, params->col_b,
+            lda, ldb, ldc
         );
     } else {
-        int lda = std_a_0;
-        int ldb = std_b_0;
-        int ldc = std_c_0;
-
         float* restrict ptr_a = NULL;
         float* restrict ptr_b = NULL;
 
         size_t checkpoint = arena_checkpoint(&mem_arena);
     
-        if (std_a_1 != 1) {
-            ptr_a = arena_alloc(&mem_arena, sizeof(float) * lin_a * col_a);
-            _para_row_major(A, ptr_a, lin_a, col_a, std_a_0, std_a_1);
+        if (trans_a) {
+            ptr_a = arena_alloc(&mem_arena, sizeof(float) * params->lin_a * params->col_a);
+            _para_row_major(A, ptr_a, params->lin_a, params->col_a, params->std_a_0, params->std_a_1);
             A = ptr_a;
-            lda = col_a;
+            lda = params->col_a;
         }
     
-        if (std_b_1 != 1) {
-            ptr_b = arena_alloc(&mem_arena, sizeof(float) * col_a * col_b);
-            _para_row_major(B, ptr_b, col_a, col_b, std_b_0, std_b_1);
+        if (trans_b) {
+            ptr_b = arena_alloc(&mem_arena, sizeof(float) * params->col_a * params->col_b);
+            _para_row_major(B, ptr_b, params->col_a, params->col_b, params->std_b_0, params->std_b_1);
             B = ptr_b;
-            ldb = col_b;
+            ldb = params->col_b;
         }
     
         gemm(
             A, B, C,
-            lin_a, col_a, col_b,
+            params->lin_a, params->col_a, params->col_b,
             lda, ldb, ldc
         );
 
