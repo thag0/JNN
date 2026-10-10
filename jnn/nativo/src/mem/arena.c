@@ -21,16 +21,35 @@ void arena_init(arena_t* arena, size_t capacidade) {
 
 void* arena_alloc(arena_t* arena, size_t size_bytes) {
     size_t offset_alinhado = alinhar(arena->offset, ARENA_ALINHAMENTO);
-    size_t offset_novo = offset_alinhado + size_bytes;
 
-    if (offset_novo > arena->capacidade) {
-        fprintf(stderr, "RuntimeError: Capacidade de %zu bytes excedida na arena,", arena->capacidade);
-        fprintf(stderr, " considere pre-alocar mais memoria com JNNnative.setTamArena().\n");
+    if (offset_alinhado > arena->capacidade || size_bytes > arena->capacidade - offset_alinhado) {
+        double capacidade = (double)arena->capacidade;
+        const char *unidade = "B";
+
+        if (capacidade >= 1024.0 * 1024.0 * 1024.0) {
+            capacidade /= 1024.0 * 1024.0 * 1024.0;
+            unidade = "GB";
+        } else if (capacidade >= 1024.0 * 1024.0) {
+            capacidade /= 1024.0 * 1024.0;
+            unidade = "MB";
+        } else if (capacidade >= 1024.0) {
+            capacidade /= 1024.0;
+            unidade = "KB";
+        }
+
+        fprintf(
+            stderr,
+            "RuntimeError: Capacidade de %zu bytes (%.2f %s) excedida na arena,",
+            arena->capacidade, capacidade, unidade
+        );
+
+        fprintf(stderr," considere pre-alocar mais memoria com JNNnative.setTamArena().\n");
+
         exit(EXIT_FAILURE);
     }
 
     void* ptr = arena->data + offset_alinhado;
-    arena->offset = offset_novo;
+    arena->offset = offset_alinhado + size_bytes;
 
     return ptr;
 }
@@ -40,7 +59,7 @@ size_t arena_checkpoint(arena_t* arena) {
 }
 
 void arena_restore(arena_t* arena, size_t checkpoint) {
-    if (checkpoint > arena->capacidade) {
+    if (checkpoint > arena->offset) {
         fprintf(stderr, "RuntimeError: Checkpoint inválido para restauração na arena.\n");
         exit(EXIT_FAILURE);
     }
@@ -49,5 +68,12 @@ void arena_restore(arena_t* arena, size_t checkpoint) {
 }
 
 void arena_reset(arena_t* arena) {
+    arena->offset = 0;
+}
+
+void arena_free(arena_t* arena) {
+    _aligned_free(arena->data);
+    arena->data = NULL;
+    arena->capacidade = 0;
     arena->offset = 0;
 }

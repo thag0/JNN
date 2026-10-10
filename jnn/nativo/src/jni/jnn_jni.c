@@ -29,11 +29,21 @@ JNI_OnLoad(JavaVM* vm, void* reserved) {
 }
 
 JNIEXPORT void JNICALL
-Java_jnn_core_JNNnative_setTamArena(JNIEnv* env, jclass cls, jint size_bytes) {
-    (void) env;
+Java_jnn_core_JNNnative_setTamArena(JNIEnv* env, jclass cls, jlong size_bytes) {
     (void) cls;
 
-    arena_init(&mem_arena, size_bytes);
+    if (size_bytes <= 0) {
+        (*env)->ThrowNew(
+            env, 
+            (*env)->FindClass(env, "java/lang/IllegalArgumentException"), 
+            "Tamanho da arena deve ser positivo"
+        );
+        
+        return;
+    }
+
+    if (mem_arena.data) arena_free(&mem_arena);
+    arena_init(&mem_arena, (size_t) size_bytes);
 }
 
 JNIEXPORT void JNICALL

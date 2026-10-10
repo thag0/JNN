@@ -126,7 +126,7 @@ public final class JNNnative {
      * Configura o tamanho usado para a arena de memória do código nativo.
      * @param size_bytes novo tamanho em bytes.
      */
-    public static native void setTamArena(int size_bytes);
+    public static native void setTamArena(long size_bytes);
 
     /**
      * Realiza a multiplicação matricial entre A e B.
