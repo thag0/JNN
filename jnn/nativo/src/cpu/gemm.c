@@ -132,10 +132,11 @@ static void gemm(
     const float beta) {
 
     // melhorar isso aqui depois pra evitar passar duas vezes por C
-    if (beta != 1.0f) {
+    #pragma omp parallel for schedule(static)
+    for (int i = 0; i < M; ++i) {
         #pragma omp simd
-        for (int i = 0; i < M*N; i++) {
-            C[i] *= beta;
+        for (int j = 0; j < N; ++j) {
+            C[(size_t)i * ldc + j] *= beta;
         }
     }
 
