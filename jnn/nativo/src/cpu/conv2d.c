@@ -224,7 +224,7 @@ static void _backward_gk_loops(const conv2d_bwd_params_t* params) {
                             const float* restrict lin_x  = ptr_x_base  + in_y * larg_x;
                             const int offset_x = kw - larg_pad; 
 
-                            #pragma omp simd
+                            #pragma omp simd reduction(+:soma)
                             for (int j = j_min; j < j_max; j++) {
                                 soma += lin_gs[j] * lin_x[j + offset_x];
                             }

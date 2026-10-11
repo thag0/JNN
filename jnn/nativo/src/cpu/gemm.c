@@ -203,20 +203,22 @@ void cpu_gemm(
             beta
         );
     } else {
-        float* restrict ptr_a = A;
-        float* restrict ptr_b = B;
+        const float* restrict ptr_a = A;
+        const float* restrict ptr_b = B;
 
         size_t checkpoint = arena_checkpoint(&mem_arena);
     
         if (trans_a) {
-            ptr_a = arena_alloc(&mem_arena, sizeof(float) * M * K);
-            _para_row_major(A, ptr_a, K, M, lda);
+            float* temp_a = arena_alloc(&mem_arena, sizeof(float) * M * K);
+            _para_row_major(A, temp_a, K, M, lda);
+            ptr_a = temp_a;
             lda = K;
         }
     
         if (trans_b) {
-            ptr_b = arena_alloc(&mem_arena, sizeof(float) * K * N);
-            _para_row_major(B, ptr_b, N, K, ldb);
+            float* temp_b = arena_alloc(&mem_arena, sizeof(float) * K * N);
+            _para_row_major(B, temp_b, N, K, ldb);
+            ptr_b = temp_b;
             ldb = N;
         }
     
