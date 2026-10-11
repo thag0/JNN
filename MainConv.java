@@ -12,6 +12,7 @@ import jnn.camadas.pooling.MaxPool2D;
 import jnn.core.JNNnative;
 import jnn.dataloader.DataLoader;
 import jnn.dataloader.dataset.CIFAR10;
+import jnn.dataloader.dataset.MNIST;
 import jnn.dataloader.transform.ColorJitter;
 import jnn.dataloader.transform.Compose;
 import jnn.dataloader.transform.HFlip;
@@ -43,20 +44,11 @@ public class MainConv {
 	public static void main(String[] args) {
 		ged.limparConsole();
 		
-		Transform norm = new Norm(
-			new float[]{0.4914f, 0.4822f, 0.4465f},
-			new float[]{0.247f,  0.243f,  0.261f}
-		);//peguei de um forum do pytorch
-		
-		final DataLoader treino = CIFAR10.treino().aplicarX(norm);
-		treino.setTransformX(new Compose(
-			new ColorJitter(.1, .1, .1, 0.35),
-			new HFlip(0.5),
-			new RandomCrop(32, 32, 4, true)
-		));
+		DataLoader[] data = getData("cifar10");
+		final DataLoader treino = data[0];
+		final DataLoader teste  = data[1];
+
 		treino.print();
-				
-		final DataLoader teste = CIFAR10.teste().aplicarX(norm);
 
 		Sequencial modelo = cnn();
 		modelo.setHistorico(true);
@@ -97,6 +89,43 @@ public class MainConv {
 		executarComando("python grafico.py " + CAMINHO_HISTORICO);
 	}
 
+	static DataLoader[] getData(String dataset) {
+		DataLoader treino = null, teste = null;
+
+		switch (dataset.toLowerCase().trim()) {
+			case "mnist":	
+				treino = MNIST.treino();
+				teste = MNIST.teste();
+			break;
+
+			case "cifar10":
+				Transform norm = new Norm(
+					new float[]{0.4914f, 0.4822f, 0.4465f},
+					new float[]{0.247f,  0.243f,  0.261f}
+				);//peguei de um forum do pytorch
+				
+				treino = CIFAR10.treino().aplicarX(norm);
+				treino.setTransformX(new Compose(
+					new ColorJitter(.1, .1, .1, 0.35),
+					new HFlip(0.5),
+					new RandomCrop(32, 32, 4, true)
+				));
+					
+				teste = CIFAR10.teste().aplicarX(norm);
+			break;
+
+			default:
+				throw new IllegalArgumentException("dataset \'" + dataset +"\' inválido");
+		}
+	
+		//
+
+		return new DataLoader[]{
+			treino,
+			teste
+		};
+	}
+
 	/**
 	 * Cria um modelo Multilayer Perceptron.
 	 * @return {@code Sequencial}.
@@ -131,10 +160,10 @@ public class MainConv {
 		Sequencial modelo = new Sequencial(
 			new Entrada(3, 32, 32),
 
-			new Conv2D(64, convK, "same", "he"),
+			new Conv2D(32, convK, "same", "he"),
 			new BatchNorm2D(),
 			new ReLU(),
-			new Conv2D(64, convK, "same", "he"),
+			new Conv2D(32, convK, "same", "he"),
 			new BatchNorm2D(),
 			new ReLU(),
 			new MaxPool2D(poolK),

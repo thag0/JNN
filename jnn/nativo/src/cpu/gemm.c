@@ -20,21 +20,28 @@
 #define TILE_N 64//multiplo de NR
 
 static void _para_row_major(
-    const float* restrict X,
-    float* restrict Y,
+    const float* restrict src,
+    float* restrict dst,
     int lin, int col,
-    int std_lin, int std_col) {
+    int ld_src) {
 
-    #pragma omp parallel for schedule(static) proc_bind(close)
-    for (int i = 0; i < lin; i++) {
-        const float* restrict lin_x = X + i * std_lin;
-        float* restrict lin_y = Y + i * col;
+    const int tile = 16;
 
-        #pragma omp simd
-        for (int j = 0; j < col; j++) {
-            lin_y[j] = lin_x[j * std_col];
+    #pragma omp parallel for collapse(2) schedule(static) proc_bind(close)
+    for (int ii = 0; ii < lin; ii += tile) {
+        for (int jj = 0; jj < col; jj += tile) {
+            const int i_end = MIN_ENTRE(ii + tile, lin);
+            const int j_end = MIN_ENTRE(jj + tile, col);
+
+            for (int i = ii; i < i_end; ++i) {
+                #pragma omp simd
+                for (int j = jj; j < j_end; ++j) {
+                    dst[(size_t)j * lin + i] = src[(size_t)i * ld_src + j];
+                }
+            }
         }
     }
+
 }
 
 static inline void _microkernel_8x8(
@@ -121,7 +128,16 @@ static void gemm(
     int N,
     int lda,
     int ldb,
-    int ldc) {
+    int ldc,
+    const float beta) {
+
+    // melhorar isso aqui depois pra evitar passar duas vezes por C
+    if (beta != 1.0f) {
+        #pragma omp simd
+        for (int i = 0; i < M*N; i++) {
+            C[i] *= beta;
+        }
+    }
 
     #pragma omp parallel for collapse(2) schedule(static) proc_bind(close)
     for (int ii = 0; ii < M; ii += TILE_M) {
@@ -165,48 +181,50 @@ static void gemm(
     
 }
 
-void cpu_gemm(gemm_params_t* params) {
-    const float* restrict A = params->A;
-    const float* restrict B = params->B;
-    float* restrict       C = params->C;
+void cpu_gemm(
+    const float* restrict A,
+    const float* restrict B,
+    float* restrict C,
+    int lda, 
+    int ldb, 
+    int ldc, 
+    int M,
+    int K,
+    int N,
+    bool trans_a,
+    bool trans_b,
+    float beta) {
 
-    const bool trans_a = params->std_a_1 != 1;
-    const bool trans_b = params->std_b_1 != 1;
-
-    int lda = params->std_a_0;
-    int ldb = params->std_b_0;
-    int ldc = params->std_c_0;
-
-    if (!trans_a && !trans_b && params->std_c_1 == 1) {//contiguo row-major
+    if (!trans_a && !trans_b) {//contiguo row-major
         gemm(
             A, B, C, 
-            params->lin_a, params->col_a, params->col_b,
-            lda, ldb, ldc
+            M, K, N,
+            lda, ldb, ldc,
+            beta
         );
     } else {
-        float* restrict ptr_a = NULL;
-        float* restrict ptr_b = NULL;
+        float* restrict ptr_a = A;
+        float* restrict ptr_b = B;
 
         size_t checkpoint = arena_checkpoint(&mem_arena);
     
         if (trans_a) {
-            ptr_a = arena_alloc(&mem_arena, sizeof(float) * params->lin_a * params->col_a);
-            _para_row_major(A, ptr_a, params->lin_a, params->col_a, params->std_a_0, params->std_a_1);
-            A = ptr_a;
-            lda = params->col_a;
+            ptr_a = arena_alloc(&mem_arena, sizeof(float) * M * K);
+            _para_row_major(A, ptr_a, K, M, lda);
+            lda = K;
         }
     
         if (trans_b) {
-            ptr_b = arena_alloc(&mem_arena, sizeof(float) * params->col_a * params->col_b);
-            _para_row_major(B, ptr_b, params->col_a, params->col_b, params->std_b_0, params->std_b_1);
-            B = ptr_b;
-            ldb = params->col_b;
+            ptr_b = arena_alloc(&mem_arena, sizeof(float) * K * N);
+            _para_row_major(B, ptr_b, N, K, ldb);
+            ldb = N;
         }
     
         gemm(
-            A, B, C,
-            params->lin_a, params->col_a, params->col_b,
-            lda, ldb, ldc
+            ptr_a, ptr_b, C,
+            M, K, N,
+            lda, ldb, ldc,
+            beta
         );
 
         arena_restore(&mem_arena, checkpoint);

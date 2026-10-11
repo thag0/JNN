@@ -72,26 +72,33 @@ Java_jnn_core_JNNnative_matmul(
     jint lin_a, jint col_a, jint col_b
 ) {
     (void) cls;
+    (void) std_c_1;
 
     float* restrict A = (*env)->GetPrimitiveArrayCritical(env, A_arr, NULL);
     float* restrict B = (*env)->GetPrimitiveArrayCritical(env, B_arr, NULL);
     float* restrict C = (*env)->GetPrimitiveArrayCritical(env, C_arr, NULL);
 
-    gemm_params_t p = {
-        .A = A + off_a,
-        .B = B + off_b,
-        .C = C + off_c,
-    
-        .std_a_0 = std_a_0, .std_a_1 = std_a_1,
-        .std_b_0 = std_b_0, .std_b_1 = std_b_1,
-        .std_c_0 = std_c_0, .std_c_1 = std_c_1,
-    
-        .lin_a = lin_a,
-        .col_a = col_a,
-        .col_b = col_b
-    };
+    bool trans_a = std_a_0 == 1 && std_a_1 != 1;
+    bool trans_b = std_b_0 == 1 && std_b_1 != 1;
 
-    jnn_matmul_dispatcher(&p);
+    int lda = trans_a ? std_a_1 : std_a_0;
+    int ldb = trans_b ? std_b_1 : std_b_0;
+    int ldc = std_c_0;
+
+    jnn_matmul_dispatcher(
+        A + off_a,
+        B + off_b,
+        C + off_c,
+        lda,
+        ldb,
+        ldc,
+        lin_a,
+        col_a,
+        col_b,
+        trans_a,
+        trans_b,
+        1.0f// padrão acumular na gemm
+    );
 
     (*env)->ReleasePrimitiveArrayCritical(env, A_arr, A, JNI_ABORT);
     (*env)->ReleasePrimitiveArrayCritical(env, B_arr, B, JNI_ABORT);

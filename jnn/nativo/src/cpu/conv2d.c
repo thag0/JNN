@@ -102,20 +102,6 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
     size_t checkpoint = arena_checkpoint(&mem_arena);
     float* restrict col = arena_alloc(&mem_arena, sizeof(float) * Kdim * Ndim);
 
-    gemm_params_t mm = {
-        .A = (float* restrict) K,
-        .B = col,
-        .C = NULL,
-
-        .std_a_0 = Kdim, .std_a_1 = 1,
-        .std_b_0 = Ndim, .std_b_1 = 1,
-        .std_c_0 = Ndim, .std_c_1 = 1,
-
-        .lin_a = filtros,
-        .col_a = Kdim,
-        .col_b = Ndim
-    };
-
     const int C_x_AreaX = canais * alt_x * larg_x;// cache 
     const int filtros_x_Ndim = filtros * Ndim;// cache
     
@@ -141,9 +127,20 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
             alt_s, larg_s
         );
 
-        mm.C = y_lote;
-
-        cpu_gemm(&mm);
+        cpu_gemm(
+            K,
+            col,
+            y_lote,
+            Kdim,
+            Ndim,
+            Ndim,
+            filtros,
+            Kdim,
+            Ndim,
+            false,
+            false,
+            1.0f
+        );
     }
 
     arena_restore(&mem_arena, checkpoint);
@@ -264,20 +261,6 @@ static void _backward_gk_im2col(const conv2d_bwd_params_t* params) {
     size_t checkpoint = arena_checkpoint(&mem_arena);
     float* restrict col = arena_alloc(&mem_arena, sizeof(float) * Kdim * Ndim);
 
-    gemm_params_t mm = {
-        .A = NULL,
-        .B = col,
-        .C = GK,
-
-        .std_a_0 = Ndim, .std_a_1 = 1,
-        .std_b_0 = 1, .std_b_1 = Ndim,// transposto
-        .std_c_0 = Kdim, .std_c_1 = 1,
-
-        .lin_a = filtros,
-        .col_a = Ndim,
-        .col_b = Kdim
-    };
-
     for (int l = 0; l < lotes; l++) {
         const float* restrict x_lote  = X  + l * (canais * alt_x * larg_x);
         const float* restrict gs_lote = GS + l * (filtros * Ndim);
@@ -292,9 +275,13 @@ static void _backward_gk_im2col(const conv2d_bwd_params_t* params) {
             alt_s, larg_s
         );
 
-        mm.A = (float* restrict) gs_lote;
-
-        cpu_gemm(&mm);
+        cpu_gemm(
+            gs_lote, col, GK,
+            Ndim, Ndim, Kdim,
+            filtros, Ndim, Kdim,
+            false, true,
+            1.0f
+        );
     }
 
     arena_restore(&mem_arena, checkpoint);
@@ -381,35 +368,25 @@ static void _backward_ge_col2im(const conv2d_bwd_params_t* params) {
 
     const int alt_s  = alt_x  + 2 * alt_pad  - alt_k  + 1;
     const int larg_s = larg_x + 2 * larg_pad - larg_k + 1;
-
-    const int area_x  = alt_x * larg_x;
+    const int area_x = alt_x * larg_x;
 
     const int Ndim = alt_s * larg_s;
     const int Kdim = params->canais * alt_k * larg_k;
     
     size_t checkpoint = arena_checkpoint(&mem_arena);
     float* restrict colT = arena_alloc(&mem_arena, sizeof(float) * Ndim * Kdim);
-
-    gemm_params_t mm = {
-        .B = (float* restrict)params->K,
-        .C = colT,
-
-        .lin_a  = Ndim, .col_a  = params->filtros, .col_b  = Kdim,
-        
-        .std_a_0 = 1,    .std_a_1 = Ndim,
-        .std_b_0 = Kdim, .std_b_1 = 1,
-        .std_c_0 = Kdim, .std_c_1 = 1
-    };
     
     for (int l = 0; l < params->lotes; l++) {
         const float* restrict gs_lote = params->GS + l * params->filtros * Ndim;
         float* restrict ge_lote       = params->GE + l * params->canais * area_x;
-        
-        memset(colT, 0, sizeof(float) * Ndim * Kdim);
-        
-        mm.A = (float*) gs_lote,
 
-        cpu_gemm(&mm);
+        cpu_gemm(
+            gs_lote, params->K, colT,
+            Ndim, Kdim, Kdim,
+            Ndim, params->filtros, Kdim,
+            true, false,
+            0.0f
+        );
 
         col2im_T(
             colT, 

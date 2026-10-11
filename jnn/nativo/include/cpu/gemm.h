@@ -1,20 +1,33 @@
 #pragma once
 
+#include <stdbool.h>
 #include "arena.h"
 
-typedef struct {
-    float* restrict A;
-    float* restrict B;
-    float* restrict C;
-
-    int std_a_0, std_a_1;
-    int std_b_0, std_b_1;
-    int std_c_0, std_c_1;
-
-    int lin_a;
-    int col_a;
-    int col_b;
-} gemm_params_t;
-
 // Realiza a multiplicação matricial entre A e B, salvando de DST.
-void cpu_gemm(gemm_params_t* params);
+//
+// A: Dados de A 
+// B: Dados de B 
+// C: Dados de C,
+// lda: Tamanho da dimensão principal de A
+// ldb: Tamanho da dimensão principal de B
+// ldc: Tamanho da dimensão principal de C
+// M: linhas de A
+// K: colunas de A
+// N: colunas de B
+// trans_a: Flag se A deve ser tratado transposto
+// trans_b: Flag se B deve ser tratado transposto
+// beta: constante mutiplicativa de C
+void cpu_gemm(
+    const float* restrict A,
+    const float* restrict B,
+    float* restrict C,
+    int lda,
+    int ldb,
+    int ldc,
+    int M,
+    int K,
+    int N,
+    bool trans_a,
+    bool trans_b,
+    float beta
+);

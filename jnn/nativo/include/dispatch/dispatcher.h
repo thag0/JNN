@@ -17,7 +17,20 @@ void jnn_set_backend(jnn_backend_t backend);
 int jnn_get_backend();
 
 // Executa matmul de acordo com o backend nativo atual.
-void jnn_matmul_dispatcher(gemm_params_t* p);
+void jnn_matmul_dispatcher(
+    const float* restrict A,
+    const float* restrict B,
+    float* restrict C,
+    int lda,
+    int ldb,
+    int ldc,
+    int M,
+    int K,
+    int N,
+    bool trans_a,
+    bool trans_b,
+    const float beta
+);
 
 // Executa o forward da camada Conv2D de acordo com o backend nativo atual.
 void jnn_conv2d_fw_dispatcher(const conv2d_fwd_params_t* p);
