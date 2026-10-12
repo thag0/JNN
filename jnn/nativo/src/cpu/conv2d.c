@@ -14,55 +14,45 @@ static void _forward_loops(const conv2d_fwd_params_t* params) {
     const float* restrict B = params->B;
     float* restrict DST = params->DST;
 
-    const int alt_x = params->alt_x;
-    const int larg_x = params->larg_x;
-    const int alt_k = params->alt_k;
-    const int larg_k = params->larg_k;
-    const int alt_pad = params->alt_pad;
-    const int larg_pad = params->larg_pad;
-    
-    const int lotes = params->lotes;
-    const int filtros = params->filtros;
-    const int canais = params->canais;
+    const int alt_s  = (params->alt_x  + 2 * params->alt_pad  - params->alt_k ) + 1;
+    const int larg_s = (params->larg_x + 2 * params->larg_pad - params->larg_k) + 1;
 
-    const int alt_s  = (alt_x  + 2 * alt_pad  - alt_k ) + 1;
-    const int larg_s = (larg_x + 2 * larg_pad - larg_k) + 1;
-
-    const int area_x = alt_x * larg_x;
-    const int area_k = alt_k * larg_k;
+    const int area_x = params->alt_x * params->larg_x;
+    const int area_k = params->alt_k * params->larg_k;
     const int area_s = alt_s * larg_s;
 
     #pragma omp parallel for collapse(2) schedule(static) proc_bind(close)
-    for (int l = 0; l < lotes; l++) {
-        for (int f = 0; f < filtros; f++) {
-            float* restrict dst_base = DST + (l * filtros + f) * area_s;
+    for (int l = 0; l < params->lotes; l++) {
+        for (int f = 0; f < params->filtros; f++) {
+            float* restrict dst_base = DST + (l * params->filtros + f) * area_s;
 
             float bias = params->temBias ? B[f] : 0.0f;
+            #pragma omp simd
             for (int i = 0; i < area_s; i++) {
                 dst_base[i] = bias;
             }
 
-            for (int c = 0; c < canais; c++) {
-                const float* restrict Xc = X + (l * canais + c) * area_x;
-                const float* restrict Kc = K + (f * canais + c) * area_k;
+            for (int c = 0; c < params->canais; c++) {
+                const float* restrict Xc = X + (l * params->canais + c) * area_x;
+                const float* restrict Kc = K + (f * params->canais + c) * area_k;
 
-                for (int kh = 0; kh < alt_k; kh++) {
-                    const int i_max = MIN_ENTRE(alt_x + alt_pad - kh, alt_s);
-                    const int i_min = MAX_ENTRE(alt_pad - kh, 0);
+                for (int kh = 0; kh < params->alt_k; kh++) {
+                    const int i_max = MIN_ENTRE(params->alt_x + params->alt_pad - kh, alt_s);
+                    const int i_min = MAX_ENTRE(params->alt_pad - kh, 0);
                     
-                    for (int kw = 0; kw < larg_k; kw++) {
-                        const float val_k = Kc[kh * larg_k + kw];
-                        const int j_max = MIN_ENTRE(larg_x + larg_pad - kw, larg_s);
-                        const int j_min = MAX_ENTRE(larg_pad - kw, 0);
+                    for (int kw = 0; kw < params->larg_k; kw++) {
+                        const float val_k = Kc[kh * params->larg_k + kw];
+                        const int j_max = MIN_ENTRE(params->larg_x + params->larg_pad - kw, larg_s);
+                        const int j_min = MAX_ENTRE(params->larg_pad - kw, 0);
 
                         for (int i = i_min; i < i_max; i++) {
-                            const int in_y = i + kh - alt_pad;
+                            const int in_y = i + kh - params->alt_pad;
                             float* restrict ptr_dst = dst_base + i * larg_s;
-                            const float* restrict ptr_x = Xc + in_y * larg_x;
+                            const float* restrict ptr_x = Xc + in_y * params->larg_x;
 
                             #pragma omp simd
                             for (int j = j_min; j < j_max; j++) {
-                                int in_x = j + kw - larg_pad;
+                                int in_x = j + kw - params->larg_pad;
                                 ptr_dst[j] += ptr_x[in_x] * val_k;
                             }
                         }
@@ -80,37 +70,24 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
     const float* restrict B = params->B;
     float* restrict DST = params->DST;
 
-    const int lotes   = params->lotes;
-    const int filtros = params->filtros;
-    const int canais  = params->canais;
+    const int alt_s  = params->alt_x  + 2 * params->alt_pad  - params->alt_k  + 1;
+    const int larg_s = params->larg_x + 2 * params->larg_pad - params->larg_k + 1;
 
-    const int alt_x = params->alt_x;
-    const int larg_x = params->larg_x;
-    const int alt_k = params->alt_k;
-    const int larg_k = params->larg_k;
-    const int alt_pad = params->alt_pad;
-    const int larg_pad = params->larg_pad;
-
-    const bool temBias = params->temBias;
-
-    const int alt_s  = alt_x  + 2 * alt_pad  - alt_k  + 1;
-    const int larg_s = larg_x + 2 * larg_pad - larg_k + 1;
-
-    const int Kdim = canais * alt_k * larg_k;
+    const int Kdim = params->canais * params->alt_k * params->larg_k;
     const int Ndim = alt_s * larg_s;
 
     size_t checkpoint = arena_checkpoint(&mem_arena);
     float* restrict col = arena_alloc(&mem_arena, sizeof(float) * Kdim * Ndim);
 
-    const int C_x_AreaX = canais * alt_x * larg_x;// cache 
-    const int filtros_x_Ndim = filtros * Ndim;// cache
+    const int C_x_AreaX = params->canais * params->alt_x * params->larg_x;// cache 
+    const int filtros_x_Ndim = params->filtros * Ndim;// cache
     
-    for (int l = 0; l < lotes; l++) {
+    for (int l = 0; l < params->lotes; l++) {
         const float* restrict x_lote = X + l * C_x_AreaX;
         float* y_lote = DST + l * filtros_x_Ndim;
 
-        for (int f = 0; f < filtros; f++) {
-            float bias = temBias ? B[f] : 0.f;
+        for (int f = 0; f < params->filtros; f++) {
+            float bias = params->temBias ? B[f] : 0.f;
             float* restrict linha = y_lote + f * Ndim;
             for (int i = 0; i < Ndim; i++) {
                 linha[i] = bias;
@@ -118,27 +95,19 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
         }
 
         im2col(
-            x_lote,
-            col,
-            canais,
-            alt_x, larg_x,
-            alt_k, larg_k,
-            alt_pad, larg_pad,
+            x_lote, col,
+            params->canais,
+            params->alt_x, params->larg_x,
+            params->alt_k, params->larg_k,
+            params->alt_pad, params->larg_pad,
             alt_s, larg_s
         );
 
         cpu_gemm(
-            K,
-            col,
-            y_lote,
-            Kdim,
-            Ndim,
-            Ndim,
-            filtros,
-            Kdim,
-            Ndim,
-            false,
-            false,
+            K, col, y_lote,
+            Kdim, Ndim, Ndim,
+            params->filtros, Kdim, Ndim,
+            false, false,
             1.0f
         );
     }
@@ -183,46 +152,36 @@ static void _backward_gk_loops(const conv2d_bwd_params_t* params) {
     const float* restrict GS = params->GS;    
     float* restrict GK       = params->GK;
 
-    const int lotes  = params->lotes;
-    const int filtros = params->filtros;
-    const int canais = params->canais;
+    const int alt_s  = params->alt_x  + 2 * params->alt_pad  - params->alt_k  + 1;
+    const int larg_s = params->larg_x + 2 * params->larg_pad - params->larg_k + 1;
 
-    const int alt_x = params->alt_x;
-    const int larg_x = params->larg_x;
-    const int alt_k = params->alt_k;
-    const int larg_k = params->larg_k;
-    const int alt_pad  = params->alt_pad;
-    const int larg_pad = params->larg_pad;
-
-    const int alt_s  = alt_x  + 2 * alt_pad  - alt_k  + 1;
-    const int larg_s = larg_x + 2 * larg_pad - larg_k + 1;
-
-    const int area_x  = alt_x * larg_x;
-    const int area_k  = alt_k * larg_k;
+    const int area_x  = params->alt_x * params->larg_x;
+    const int area_k  = params->alt_k * params->larg_k;
     const int area_gs = alt_s * larg_s;
 
     #pragma omp parallel for collapse(2) schedule(static) proc_bind(close)
-    for (int f = 0; f < filtros; f++) {
-        for (int c = 0; c < canais; c++) {
-            const int off_k_base = (f * canais + c) * area_k;
+    for (int f = 0; f < params->filtros; f++) {
+        for (int c = 0; c < params->canais; c++) {
+            const int off_k_base = (f * params->canais + c) * area_k;
 
-            for (int kh = 0; kh < alt_k; kh++) {
-                for (int kw = 0; kw < larg_k; kw++) {
-                    int i_min = MAX_ENTRE(0, alt_pad - kh);
-                    int i_max = MIN_ENTRE(alt_s, alt_x + alt_pad - kh);
-                    int j_min = MAX_ENTRE(0, larg_pad - kw);
-                    int j_max = MIN_ENTRE(larg_s, larg_x + larg_pad - kw);
+            for (int kh = 0; kh < params->alt_k; kh++) {
+                int i_min = MAX_ENTRE(0, params->alt_pad - kh);
+                int i_max = MIN_ENTRE(alt_s, params->alt_x + params->alt_pad - kh);
+                
+                for (int kw = 0; kw < params->larg_k; kw++) {
+                    int j_min = MAX_ENTRE(0, params->larg_pad - kw);
+                    int j_max = MIN_ENTRE(larg_s, params->larg_x + params->larg_pad - kw);
                     float soma = 0.0f;
 
-                    for (int l = 0; l < lotes; l++) {
-                        const float* restrict ptr_gs_base = GS + (l * filtros + f) * area_gs;
-                        const float* restrict ptr_x_base  = X  + (l * canais + c) * area_x;
+                    for (int l = 0; l < params->lotes; l++) {
+                        const float* restrict ptr_gs_base = GS + (l * params->filtros + f) * area_gs;
+                        const float* restrict ptr_x_base  = X  + (l * params->canais + c) * area_x;
 
                         for (int i = i_min; i < i_max; i++) {
-                            const int in_y = i + kh - alt_pad;
+                            const int in_y = i + kh - params->alt_pad;
                             const float* restrict lin_gs = ptr_gs_base + i * larg_s;
-                            const float* restrict lin_x  = ptr_x_base  + in_y * larg_x;
-                            const int offset_x = kw - larg_pad; 
+                            const float* restrict lin_x  = ptr_x_base  + in_y * params->larg_x;
+                            const int offset_x = kw - params->larg_pad; 
 
                             #pragma omp simd reduction(+:soma)
                             for (int j = j_min; j < j_max; j++) {
@@ -230,7 +189,7 @@ static void _backward_gk_loops(const conv2d_bwd_params_t* params) {
                             }
                         }
                     }
-                    GK[off_k_base + kh * larg_k + kw] += soma;
+                    GK[off_k_base + kh * params->larg_k + kw] += soma;
                 }
             }
         }
@@ -242,43 +201,32 @@ static void _backward_gk_im2col(const conv2d_bwd_params_t* params) {
     const float* restrict GS = params->GS;    
     float* restrict GK       = params->GK;
 
-    const int alt_x = params->alt_x;
-    const int larg_x = params->larg_x;
-    const int alt_k = params->alt_k;
-    const int larg_k = params->larg_k;
-    const int alt_pad  = params->alt_pad;
-    const int larg_pad = params->larg_pad;
-    const int alt_s  = alt_x  + 2 * alt_pad  - alt_k  + 1;
-    const int larg_s = larg_x + 2 * larg_pad - larg_k + 1;
+    const int alt_s  = params->alt_x  + 2 * params->alt_pad  - params->alt_k  + 1;
+    const int larg_s = params->larg_x + 2 * params->larg_pad - params->larg_k + 1;
 
-    const int lotes  = params->lotes;
-    const int filtros = params->filtros;
-    const int canais = params->canais;
-
-    const int Kdim = canais * alt_k * larg_k;
+    const int Kdim = params->canais * params->alt_k * params->larg_k;
     const int Ndim = alt_s * larg_s;
     
     size_t checkpoint = arena_checkpoint(&mem_arena);
     float* restrict col = arena_alloc(&mem_arena, sizeof(float) * Kdim * Ndim);
 
-    for (int l = 0; l < lotes; l++) {
-        const float* restrict x_lote  = X  + l * (canais * alt_x * larg_x);
-        const float* restrict gs_lote = GS + l * (filtros * Ndim);
+    for (int l = 0; l < params->lotes; l++) {
+        const float* restrict x_lote  = X  + l * (params->canais * params->alt_x * params->larg_x);
+        const float* restrict gs_lote = GS + l * (params->filtros * Ndim);
 
         im2col(
-            x_lote,
-            col,
-            canais,
-            alt_x, larg_x,
-            alt_k, larg_k,
-            alt_pad, larg_pad,
+            x_lote, col,
+            params->canais,
+            params->alt_x, params->larg_x,
+            params->alt_k, params->larg_k,
+            params->alt_pad, params->larg_pad,
             alt_s, larg_s
         );
 
         cpu_gemm(
             gs_lote, col, GK,
-            Ndim, Ndim, Kdim,
-            filtros, Ndim, Kdim,
+            Ndim, Kdim, Kdim,
+            params->filtros, Ndim, Kdim,
             false, true,
             1.0f
         );
@@ -291,7 +239,13 @@ static bool _usar_im2col_gk(const conv2d_bwd_params_t* params) {
     if (params->canais <= 4) return false;
 
     const long peso = 
-    (long)params->filtros * (params->canais * params->alt_k * params->larg_k) * (params->alt_x * params->larg_x);
+    (long)params->filtros * 
+    params->canais * 
+    params->alt_k * 
+    params->larg_k * 
+    params->alt_x * 
+    params->larg_x;
+
     const int limiar = 1500000;
     
     return peso > limiar;
@@ -306,45 +260,36 @@ static void _backward_gk(const conv2d_bwd_params_t* params) {
 }
 
 static void _backward_ge_loops(const conv2d_bwd_params_t* params) {
-    const int filtros = params->filtros;
-    const int canais = params->canais;
+    const int alt_s  = params->alt_x  + 2 * params->alt_pad  - params->alt_k  + 1;
+    const int larg_s = params->larg_x + 2 * params->larg_pad - params->larg_k + 1;
 
-    const int alt_x = params->alt_x;
-    const int larg_x = params->larg_x;
-    const int alt_k = params->alt_k;
-    const int larg_k = params->larg_k;
-    const int alt_pad  = params->alt_pad;
-    const int larg_pad = params->larg_pad;
-
-    const int alt_s  = alt_x  + 2 * alt_pad  - alt_k  + 1;
-    const int larg_s = larg_x + 2 * larg_pad - larg_k + 1;
-
-    const int area_x  = alt_x * larg_x;
-    const int area_k  = alt_k * larg_k;
+    const int area_x  = params->alt_x * params->larg_x;
+    const int area_k  = params->alt_k * params->larg_k;
     const int area_gs = alt_s * larg_s;
 
     #pragma omp parallel for collapse(2) schedule(static) proc_bind(close)
     for (int l = 0; l < params->lotes; l++) {
-        for (int c = 0; c < canais; c++) {
-            float* restrict ptr_ge_base = params->GE + (l * canais + c) * area_x;
+        for (int c = 0; c < params->canais; c++) {
+            float* restrict ptr_ge_base = params->GE + (l * params->canais + c) * area_x;
 
             for (int f = 0; f < params->filtros; f++) {
-                const float* restrict ptr_gs_base = params->GS + (l * filtros + f) * area_gs;
-                const float* restrict ptr_k_base  = params->K  + (f * canais + c) * area_k;
+                const float* restrict ptr_gs_base = params->GS + (l * params->filtros + f) * area_gs;
+                const float* restrict ptr_k_base  = params->K  + (f * params->canais + c) * area_k;
 
-                for (int kh = 0; kh < alt_k; kh++) {
-                    for (int kw = 0; kw < larg_k; kw++) {
-                        const float val_k = ptr_k_base[kh * larg_k + kw];
-                        int i_min = MAX_ENTRE(0, alt_pad - kh);
-                        int i_max = MIN_ENTRE(alt_s, alt_x + alt_pad - kh);
-                        int j_min = MAX_ENTRE(0, larg_pad - kw);
-                        int j_max = MIN_ENTRE(larg_s, larg_x + larg_pad - kw);
+                for (int kh = 0; kh < params->alt_k; kh++) {
+                    int i_min = MAX_ENTRE(0, params->alt_pad - kh);
+                    int i_max = MIN_ENTRE(alt_s, params->alt_x + params->alt_pad - kh);
+                    
+                    for (int kw = 0; kw < params->larg_k; kw++) {
+                        const int offset_ge = kw - params->larg_pad;
+                        const float val_k = ptr_k_base[kh * params->larg_k + kw];
+                        int j_min = MAX_ENTRE(0, params->larg_pad - kw);
+                        int j_max = MIN_ENTRE(larg_s, params->larg_x + params->larg_pad - kw);
 
                         for (int i = i_min; i < i_max; i++) {
-                            const int in_y = i + kh - alt_pad;
-                            float* restrict lin_ge = ptr_ge_base + in_y * larg_x;
+                            const int in_y = i + kh - params->alt_pad;
+                            float* restrict lin_ge = ptr_ge_base + in_y * params->larg_x;
                             const float* restrict lin_gs = ptr_gs_base + i * larg_s;
-                            const int offset_ge = kw - larg_pad;
 
                             #pragma omp simd
                             for (int j = j_min; j < j_max; j++) {
@@ -359,19 +304,12 @@ static void _backward_ge_loops(const conv2d_bwd_params_t* params) {
 }
 
 static void _backward_ge_col2im(const conv2d_bwd_params_t* params) {
-    const int alt_x = params->alt_x;
-    const int larg_x = params->larg_x;
-    const int alt_k = params->alt_k;
-    const int larg_k = params->larg_k;
-    const int alt_pad  = params->alt_pad;
-    const int larg_pad = params->larg_pad;
-
-    const int alt_s  = alt_x  + 2 * alt_pad  - alt_k  + 1;
-    const int larg_s = larg_x + 2 * larg_pad - larg_k + 1;
-    const int area_x = alt_x * larg_x;
+    const int alt_s  = params->alt_x  + 2 * params->alt_pad  - params->alt_k  + 1;
+    const int larg_s = params->larg_x + 2 * params->larg_pad - params->larg_k + 1;
+    const int area_x = params->alt_x * params->larg_x;
 
     const int Ndim = alt_s * larg_s;
-    const int Kdim = params->canais * alt_k * larg_k;
+    const int Kdim = params->canais * params->alt_k * params->larg_k;
     
     size_t checkpoint = arena_checkpoint(&mem_arena);
     float* restrict colT = arena_alloc(&mem_arena, sizeof(float) * Ndim * Kdim);
@@ -392,9 +330,9 @@ static void _backward_ge_col2im(const conv2d_bwd_params_t* params) {
             colT, 
             ge_lote, 
             params->canais,
-            alt_x, larg_x, 
-            alt_k, larg_k,
-            alt_pad, larg_pad, 
+            params->alt_x, params->larg_x, 
+            params->alt_k, params->larg_k,
+            params->alt_pad, params->larg_pad, 
             alt_s, larg_s
         );
     }
@@ -432,28 +370,17 @@ void cpu_conv2d_backward(const conv2d_bwd_params_t* params) {
     const float* restrict GS = params->GS;
     float* restrict GB       = params->GB;
 
-    const int alt_x = params->alt_x;
-    const int larg_x = params->larg_x;
-    const int alt_k = params->alt_k;
-    const int larg_k = params->larg_k;
-
-    const int lotes  = params->lotes;
-    const int filtros = params->filtros;
-
-    const int alt_pad  = params->alt_pad;
-    const int larg_pad = params->larg_pad;
-
-    const int alt_s  = alt_x  + 2 * alt_pad  - alt_k  + 1;
-    const int larg_s = larg_x + 2 * larg_pad - larg_k + 1;
+    const int alt_s  = params->alt_x  + 2 * params->alt_pad  - params->alt_k  + 1;
+    const int larg_s = params->larg_x + 2 * params->larg_pad - params->larg_k + 1;
     const int area_gs = alt_s * larg_s;
 
     if (params->temBias) {
         #pragma omp parallel for schedule(static) proc_bind(close)
-        for (int f = 0; f < filtros; f++) {
+        for (int f = 0; f < params->filtros; f++) {
             float soma_bias = 0.0f;
             const int f_offset = f * area_gs;
-            for (int l = 0; l < lotes; l++) {
-                const float* restrict ptr_gs = GS + l * filtros * area_gs + f_offset;
+            for (int l = 0; l < params->lotes; l++) {
+                const float* restrict ptr_gs = GS + l * params->filtros * area_gs + f_offset;
 
                 #pragma omp simd reduction(+:soma_bias)
                 for (int i = 0; i < area_gs; i++) {
