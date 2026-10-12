@@ -44,13 +44,13 @@ public class MainConv {
 	public static void main(String[] args) {
 		ged.limparConsole();
 		
-		DataLoader[] data = getData("cifar10");
+		DataLoader[] data = getData("mnist");
 		final DataLoader treino = data[0];
 		final DataLoader teste  = data[1];
 
 		treino.print();
 
-		Sequencial modelo = cnn();
+		Sequencial modelo = cnnMNIST();
 		modelo.setHistorico(true);
 		modelo.print();
 
@@ -199,6 +199,39 @@ public class MainConv {
 
 		for (var camada : modelo) if (camada instanceof Conv2D) camada.setBias(false);
 		
+		Object otm = new SGD(0.001, 0.96);
+		Object loss = "entropia-cruzada";
+		modelo.compilar(otm, loss);
+
+		return modelo;		
+	}
+
+	static Sequencial cnnMNIST() {
+		int[] convK = {3, 3};
+		int[] poolK = {2, 2};
+
+		Sequencial modelo = new Sequencial(
+			new Entrada(1, 28, 28),
+
+			new Conv2D(16, convK, "same", "he"),
+			new ReLU(),
+			new MaxPool2D(poolK),
+			
+			new Conv2D(32, convK, "same", "he"),
+			new ReLU(),
+			new Conv2D(64, convK, "same", "he"),
+			new ReLU(),
+			new MaxPool2D(poolK),
+
+			new GlobalAvgPool2D(),
+
+			new Densa(64, "he"),
+			new ReLU(),
+
+			new Densa(10, "glorot-uniforme"),
+			new Softmax()
+		);
+
 		Object otm = new SGD(0.01, 0.9);
 		Object loss = "entropia-cruzada";
 		modelo.compilar(otm, loss);
