@@ -30,18 +30,49 @@ static void _para_row_major(
     #pragma omp parallel for collapse(2) schedule(static) proc_bind(close)
     for (int ii = 0; ii < lin; ii += tile) {
         for (int jj = 0; jj < col; jj += tile) {
-            const int i_end = MIN_ENTRE(ii + tile, lin);
-            const int j_end = MIN_ENTRE(jj + tile, col);
+            const int i_fim = MIN_ENTRE(ii + tile, lin);
+            const int j_fim = MIN_ENTRE(jj + tile, col);
 
-            for (int i = ii; i < i_end; ++i) {
+            for (int i = ii; i < i_fim; i++) {
                 #pragma omp simd
-                for (int j = jj; j < j_end; ++j) {
-                    dst[(size_t)j * lin + i] = src[(size_t)i * ld_src + j];
+                for (int j = jj; j < j_fim; j++) {
+                    dst[j * lin + i] = src[i * ld_src + j];
                 }
             }
         }
     }
 
+}
+
+static inline void _pack_b(
+    const float* restrict B,
+    float* restrict b_pack,
+    int kk,
+    int jj,
+    int K_bloco,
+    int N_bloco,
+    int ldb,
+    bool trans_b) {
+
+    if (!trans_b) {
+        for (int k = 0; k < K_bloco; k++) {
+            const float* src = B + (kk + k) * ldb + jj;
+            float* dst = b_pack + k * TILE_N;
+
+            #pragma omp simd
+            for (int j = 0; j < N_bloco; j++) {
+                dst[j] = src[j];
+            }
+        }
+    } else {
+        for (int j = 0; j < N_bloco; j++) {
+            const float* src = B + (jj + j) * ldb + kk;
+
+            for (int k = 0; k < K_bloco; k++) {
+                b_pack[(size_t)k * TILE_N + j] = src[k];
+            }
+        }
+    }
 }
 
 static inline void _microkernel_8x8(
@@ -129,49 +160,49 @@ static void gemm(
     int lda,
     int ldb,
     int ldc,
-    const float beta) {
-
-    // melhorar isso aqui depois pra evitar passar duas vezes por C
-    #pragma omp parallel for schedule(static)
-    for (int i = 0; i < M; ++i) {
-        #pragma omp simd
-        for (int j = 0; j < N; ++j) {
-            C[(size_t)i * ldc + j] *= beta;
-        }
-    }
+    bool trans_b) {
 
     #pragma omp parallel for collapse(2) schedule(static) proc_bind(close)
     for (int ii = 0; ii < M; ii += TILE_M) {
         for (int jj = 0; jj < N; jj += TILE_N) {
-            int M_bloco = (ii + TILE_M <= M) ? TILE_M : (M - ii);
-            int N_bloco = (jj + TILE_N <= N) ? TILE_N : (N - jj);
+            const int M_bloco = MIN_ENTRE(TILE_M, M - ii);
+            const int N_bloco = MIN_ENTRE(TILE_N, N - jj);
             float* restrict C_bloco = C + ii * ldc + jj;
+            float b_pack[TILE_K * TILE_N];
 
             for (int kk = 0; kk < K; kk += TILE_K) {
-                int K_bloco = (kk + TILE_K <= K) ? TILE_K : (K - kk);
-                const float* restrict A_bloco = A + ii * lda + kk;
-                const float* restrict B_bloco = B + kk * ldb + jj;
+                const int K_bloco = MIN_ENTRE(TILE_K, K - kk);
+
+                _pack_b(
+                    B, b_pack,
+                    kk, jj,
+                    K_bloco, N_bloco,
+                    ldb,
+                    trans_b
+                );
+
+                const float* restrict A_bloco =  A + ii * lda + kk;
 
                 for (int i = 0; i < M_bloco; i += MR) {
-                    int _M = (i + MR <= M_bloco) ? MR : (M_bloco - i);
+                    const int _M = MIN_ENTRE(MR, M_bloco - i);
                     const float* restrict ptr_a = A_bloco + i * lda;
 
                     for (int j = 0; j < N_bloco; j += NR) {
-                        int _N = (j + NR <= N_bloco) ? NR : (N_bloco - j);
-                        const float* restrict ptr_b = B_bloco + j;
+                        const int _N = MIN_ENTRE(NR, N_bloco - j);
+                        const float* restrict ptr_b = b_pack + j;
                         float* restrict ptr_c = C_bloco + i * ldc + j;
 
                         if (_M == MR && _N == NR) {
                             _microkernel_8x8(
                                 ptr_a, ptr_b, ptr_c,
                                 K_bloco,
-                                lda, ldb, ldc
+                                lda, TILE_N, ldc
                             );
                         } else {
                             _kernel_scalar(
                                 ptr_a, ptr_b, ptr_c,
                                 _M, _N, K_bloco,
-                                lda, ldb, ldc
+                                lda, TILE_N, ldc
                             );
                         }
                     }
@@ -196,41 +227,40 @@ void cpu_gemm(
     bool trans_b,
     float beta) {
 
-    if (!trans_a && !trans_b) {//contiguo row-major
-        gemm(
-            A, B, C, 
-            M, K, N,
-            lda, ldb, ldc,
-            beta
-        );
-    } else {
-        const float* restrict ptr_a = A;
-        const float* restrict ptr_b = B;
+    // melhorar isso aqui depois pra evitar passar duas vezes por C
+    #pragma omp parallel for schedule(static)
+    for (int i = 0; i < M; i++) {
+        #pragma omp simd
+        for (int j = 0; j < N; j++) {
+            C[(size_t)i * ldc + j] *= beta;
+        }
+    }
 
+    if (trans_a) {
+        const float* restrict ptr_a = A;    
         size_t checkpoint = arena_checkpoint(&mem_arena);
-    
-        if (trans_a) {
-            float* temp_a = arena_alloc(&mem_arena, sizeof(float) * M * K);
-            _para_row_major(A, temp_a, K, M, lda);
-            ptr_a = temp_a;
-            lda = K;
-        }
-    
-        if (trans_b) {
-            float* temp_b = arena_alloc(&mem_arena, sizeof(float) * K * N);
-            _para_row_major(B, temp_b, N, K, ldb);
-            ptr_b = temp_b;
-            ldb = N;
-        }
-    
+        float* temp_a = arena_alloc(&mem_arena, sizeof(float) * M * K);
+
+        _para_row_major(A, temp_a, K, M, lda);
+        ptr_a = temp_a;
+        lda = K;
+
         gemm(
-            ptr_a, ptr_b, C,
+            ptr_a, B, C,
             M, K, N,
             lda, ldb, ldc,
-            beta
+            trans_b
         );
 
         arena_restore(&mem_arena, checkpoint);
+        return;
     }
+
+    gemm(
+        A, B, C, 
+        M, K, N,
+        lda, ldb, ldc,
+        trans_b
+    );
 
 }

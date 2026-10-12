@@ -44,13 +44,13 @@ public class MainConv {
 	public static void main(String[] args) {
 		ged.limparConsole();
 		
-		DataLoader[] data = getData("mnist");
+		DataLoader[] data = getData("cifar10");
 		final DataLoader treino = data[0];
 		final DataLoader teste  = data[1];
 
 		treino.print();
 
-		Sequencial modelo = cnnMNIST();
+		Sequencial modelo = cnnCifar10();
 		modelo.setHistorico(true);
 		modelo.print();
 
@@ -153,7 +153,7 @@ public class MainConv {
 	 * Cria um modelo Convoluiconal.
 	 * @return {@code Sequencial}.
 	 */
-	static Sequencial cnn() {
+	static Sequencial cnnCifar10() {
 		int[] convK = {3, 3};
 		int[] poolK = {2, 2};
 
