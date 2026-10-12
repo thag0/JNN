@@ -2,8 +2,8 @@
 
 // Transforma os dados de entrada no formato im2col (CHW).
 void im2col(
-    const float* restrict X,
-    float* restrict COL,
+    const float* restrict x,
+    float* restrict col,
     int canais,
     int alt_x, int larg_x,
     int alt_k, int larg_k,
@@ -11,10 +11,10 @@ void im2col(
     int alt_s, int larg_s
 );
 
-//Aplica o col2im transposto
-void col2im_T(
-    const float* restrict COLT,
-    float* restrict GE,
+//Aplica o col2im
+void col2im(
+    const float* restrict col,
+    float* restrict dst,
     int canais,
     int alt_x, int larg_x,
     int alt_k, int larg_k,

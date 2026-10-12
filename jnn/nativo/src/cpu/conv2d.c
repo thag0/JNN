@@ -312,23 +312,22 @@ static void _backward_ge_col2im(const conv2d_bwd_params_t* params) {
     const int Kdim = params->canais * params->alt_k * params->larg_k;
     
     size_t checkpoint = arena_checkpoint(&mem_arena);
-    float* restrict colT = arena_alloc(&mem_arena, sizeof(float) * Ndim * Kdim);
+    float* restrict col = arena_alloc(&mem_arena, sizeof(float) * Ndim * Kdim);
     
     for (int l = 0; l < params->lotes; l++) {
         const float* restrict gs_lote = params->GS + l * params->filtros * Ndim;
         float* restrict ge_lote       = params->GE + l * params->canais * area_x;
 
         cpu_gemm(
-            gs_lote, params->K, colT,
+            gs_lote, params->K, col,
             Ndim, Kdim, Kdim,
             Ndim, params->filtros, Kdim,
             true, false,
             0.0f
         );
 
-        col2im_T(
-            colT, 
-            ge_lote, 
+        col2im(
+            col, ge_lote, 
             params->canais,
             params->alt_x, params->larg_x, 
             params->alt_k, params->larg_k,

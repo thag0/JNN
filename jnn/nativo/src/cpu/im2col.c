@@ -5,8 +5,8 @@
 #include "common.h"
 
 void im2col(
-    const float* restrict X,
-    float* restrict COL,
+    const float* restrict x,
+    float* restrict col,
     int canais,
     int alt_x, int larg_x,
     int alt_k, int larg_k,
@@ -20,7 +20,7 @@ void im2col(
         for (int kh = 0; kh < alt_k; kh++) {
             for (int kw = 0; kw < larg_k; kw++) {
                 int linha = (c * alt_k + kh) * larg_k + kw;
-                float* restrict ptr_col = COL + (size_t)linha * Ndim;
+                float* restrict ptr_col = col + (size_t)linha * Ndim;
 
                 int h_min = MAX_ENTRE(0, alt_pad - kh);
                 int h_max = MIN_ENTRE(alt_s, alt_x + alt_pad - kh);
@@ -34,17 +34,17 @@ void im2col(
 
                 for (int i = h_min; i < h_max; i++) {
                     int in_y = i + kh - alt_pad;
-                    const float* restrict ptr_x = X + (c * alt_x * larg_x) + in_y * larg_x;
+                    const float* restrict ptr_x = x + (c * alt_x * larg_x) + in_y * larg_x;
                     const float* restrict x = ptr_x + in_x;
-                    float* restrict dest_row = ptr_col + i * larg_s;
+                    float* restrict lin_dst = ptr_col + i * larg_s;
 
-                    if (w_min > 0) memset(dest_row, 0, sizeof(float) * w_min);
-                    if (w_max < larg_s) memset(dest_row + w_max, 0, sizeof(float) * (larg_s - w_max));
+                    if (w_min > 0) memset(lin_dst, 0, sizeof(float) * w_min);
+                    if (w_max < larg_s) memset(lin_dst + w_max, 0, sizeof(float) * (larg_s - w_max));
 
-                    float* restrict dest = dest_row + w_min;
+                    float* restrict dst = lin_dst + w_min;
                     #pragma omp simd
                     for (int t = 0; t < largura; t++) {
-                        dest[t] = x[t];
+                        dst[t] = x[t];
                     }
                 }
             }
@@ -53,9 +53,9 @@ void im2col(
 
 }
 
-void col2im_T(
-    const float* restrict COLT,
-    float* restrict GE,
+void col2im(
+    const float* restrict col,
+    float* restrict dst,
     int canais,
     int alt_x, int larg_x,
     int alt_k, int larg_k,
@@ -68,7 +68,7 @@ void col2im_T(
     #pragma omp parallel for schedule(static) proc_bind(close)
     for (int c = 0; c < canais; c++) {
         const int base_k_c = c * alt_k * larg_k;
-        float* restrict ge_c = GE + c * area_x;
+        float* restrict dst_c = dst + c * area_x;
 
         for (int i = 0; i < alt_s; i++) {
             const int kh_min = MAX_ENTRE(0, alt_pad - i);
@@ -79,17 +79,17 @@ void col2im_T(
                 const int kw_max = MIN_ENTRE(larg_k, larg_x + larg_pad - j);
 
                 const int n = i * larg_s + j;
-                const float* restrict lin_col = COLT + n * Kdim + base_k_c;
+                const float* restrict lin_col = col + n * Kdim + base_k_c;
 
                 for (int kh = kh_min; kh < kh_max; kh++) {
                     const int in_y = i + kh - alt_pad;
-                    float* restrict lin_ge = ge_c + in_y * larg_x;
+                    float* restrict lin_dst = dst_c + in_y * larg_x;
                     const float* restrict lin_col_kh = lin_col + kh * larg_k;
 
                     #pragma omp simd
                     for (int kw = kw_min; kw < kw_max; kw++) {
                         const int in_x = j + kw - larg_pad;
-                        lin_ge[in_x] += lin_col_kh[kw];
+                        lin_dst[in_x] += lin_col_kh[kw];
                     }
                 }
             }
