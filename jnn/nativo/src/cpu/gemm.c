@@ -228,11 +228,13 @@ void cpu_gemm(
     float beta) {
 
     // melhorar isso aqui depois pra evitar passar duas vezes por C
-    #pragma omp parallel for schedule(static)
-    for (int i = 0; i < M; i++) {
-        #pragma omp simd
-        for (int j = 0; j < N; j++) {
-            C[(size_t)i * ldc + j] *= beta;
+    if (beta != 1.0f) {
+        #pragma omp parallel for schedule(static)
+        for (int i = 0; i < M; i++) {
+            #pragma omp simd
+            for (int j = 0; j < N; j++) {
+                C[(size_t)i * ldc + j] *= beta;
+            }
         }
     }
 
