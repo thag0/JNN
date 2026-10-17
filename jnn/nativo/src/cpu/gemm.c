@@ -19,29 +19,93 @@
 #define TILE_K 64
 #define TILE_N 64//multiplo de NR
 
-static void _para_row_major(
-    const float* restrict src,
-    float* restrict dst,
-    int lin, int col,
-    int ld_src) {
+//
+#define PARA_CADA_ACC(M) M(0); M(1); M(2); M(3); M(4); M(5); M(6); M(7)
+#define ZERO_ACC(i) c##i = _mm256_setzero_ps()
+#define LOAD_ACC(i) c##i = _mm256_loadu_ps(C + (i) * ldc)
+#define MUL_ACC(i) c##i = _mm256_mul_ps(_mm256_loadu_ps(C + (i) * ldc), vb)
+#define UPDATE_ACC(i) c##i = _mm256_fmadd_ps(_mm256_broadcast_ss(ptr_a + (i)), b, c##i)
+#define STORE_ACC(i) _mm256_storeu_ps(C + (i) * ldc, c##i)
 
-    const int tile = 16;
+static inline void _microkernel_8x8(
+    const float* restrict A,
+    const float* restrict B,
+    float* restrict C,
+    int K,
+    int ldb,
+    int ldc,
+    float beta) {
 
-    #pragma omp parallel for collapse(2) schedule(static) proc_bind(close)
-    for (int ii = 0; ii < lin; ii += tile) {
-        for (int jj = 0; jj < col; jj += tile) {
-            const int i_fim = MIN_ENTRE(ii + tile, lin);
-            const int j_fim = MIN_ENTRE(jj + tile, col);
+    __m256 c0, c1, c2, c3, c4, c5, c6, c7;
 
-            for (int i = ii; i < i_fim; i++) {
-                #pragma omp simd
-                for (int j = jj; j < j_fim; j++) {
-                    dst[j * lin + i] = src[i * ld_src + j];
+    if (beta == 0.0f) {
+        PARA_CADA_ACC(ZERO_ACC);
+    
+    } else if (beta == 1.0f) {
+        PARA_CADA_ACC(LOAD_ACC);
+    
+    } else {
+        const __m256 vb = _mm256_set1_ps(beta);
+        PARA_CADA_ACC(MUL_ACC);
+    }
+
+    const float* restrict ptr_a = A;
+    const float* restrict ptr_b = B;
+
+    for (int k = 0; k < K; k++) {
+        const __m256 b = _mm256_load_ps(ptr_b);
+
+        PARA_CADA_ACC(UPDATE_ACC);
+
+        ptr_a += MR;
+        ptr_b += ldb;
+    }
+
+    PARA_CADA_ACC(STORE_ACC);
+}
+//
+
+static inline void _pack_a(
+    const float* restrict A,
+    float* restrict a_pack,
+    int ii,
+    int kk,
+    int M_bloco,
+    int K_bloco,
+    int lda,
+    bool trans_a) {
+
+    for (int i = 0; i < M_bloco; i += MR) {
+        const int mr = MIN_ENTRE(MR, M_bloco - i);
+        float* restrict dst = a_pack + (size_t)i * K_bloco;
+
+        if (!trans_a) {
+            for (int r = 0; r < mr; r++) {
+                const float* src = A + (size_t)(ii + i + r) * lda + kk;
+
+                for (int k = 0; k < K_bloco; k++) {
+                    dst[k * MR + r] = src[k];
+                }
+            }
+            for (int r = mr; r < MR; r++) {
+                for (int k = 0; k < K_bloco; k++) {
+                    dst[k * MR + r] = 0.0f;
+                }
+            }
+        } else {
+            for (int k = 0; k < K_bloco; k++) {
+                const float* src = A + (size_t)(kk + k) * lda + ii + i;
+                float* d = dst + k * MR;
+
+                for (int r = 0; r < mr; r++) {
+                    d[r] = src[r];
+                }
+                for (int r = mr; r < MR; r++) {
+                    d[r] = 0.0f;
                 }
             }
         }
     }
-
 }
 
 static inline void _pack_b(
@@ -75,53 +139,6 @@ static inline void _pack_b(
     }
 }
 
-static inline void _microkernel_8x8(
-    const float* restrict A,
-    const float* restrict B,
-    float* restrict C,
-    int K,
-    int lda,
-    int ldb,
-    int ldc) {
-
-    __m256 c0 = _mm256_loadu_ps(C + 0*ldc);
-    __m256 c1 = _mm256_loadu_ps(C + 1*ldc);
-    __m256 c2 = _mm256_loadu_ps(C + 2*ldc);
-    __m256 c3 = _mm256_loadu_ps(C + 3*ldc);
-    __m256 c4 = _mm256_loadu_ps(C + 4*ldc);
-    __m256 c5 = _mm256_loadu_ps(C + 5*ldc);
-    __m256 c6 = _mm256_loadu_ps(C + 6*ldc);
-    __m256 c7 = _mm256_loadu_ps(C + 7*ldc);
-
-    const float* restrict ptr_a = A;
-    const float* restrict ptr_b = B;
-
-    for (int k = 0; k < K; k++) {
-        __m256 b = _mm256_loadu_ps(ptr_b);
-
-        c0 = _mm256_fmadd_ps(_mm256_broadcast_ss(ptr_a + 0*lda), b, c0);
-        c1 = _mm256_fmadd_ps(_mm256_broadcast_ss(ptr_a + 1*lda), b, c1);
-        c2 = _mm256_fmadd_ps(_mm256_broadcast_ss(ptr_a + 2*lda), b, c2);
-        c3 = _mm256_fmadd_ps(_mm256_broadcast_ss(ptr_a + 3*lda), b, c3);
-        c4 = _mm256_fmadd_ps(_mm256_broadcast_ss(ptr_a + 4*lda), b, c4);
-        c5 = _mm256_fmadd_ps(_mm256_broadcast_ss(ptr_a + 5*lda), b, c5);
-        c6 = _mm256_fmadd_ps(_mm256_broadcast_ss(ptr_a + 6*lda), b, c6);
-        c7 = _mm256_fmadd_ps(_mm256_broadcast_ss(ptr_a + 7*lda), b, c7);
-
-        ptr_a += 1;
-        ptr_b += ldb;
-    }
-
-    _mm256_storeu_ps(C + 0*ldc, c0);
-    _mm256_storeu_ps(C + 1*ldc, c1);
-    _mm256_storeu_ps(C + 2*ldc, c2);
-    _mm256_storeu_ps(C + 3*ldc, c3);
-    _mm256_storeu_ps(C + 4*ldc, c4);
-    _mm256_storeu_ps(C + 5*ldc, c5);
-    _mm256_storeu_ps(C + 6*ldc, c6);
-    _mm256_storeu_ps(C + 7*ldc, c7);
-}
-
 static inline void _kernel_scalar(
     const float* restrict A,
     const float* restrict B,
@@ -129,88 +146,34 @@ static inline void _kernel_scalar(
     int M,
     int N,
     int K,
-    int lda,
-    int ldb,
-    int ldc) {
-
-    for (int i = 0; i < M; i++) {
-        const int base_a = i * lda;
-        const int base_c = i * ldc;
-
-        for (int j = 0; j < N; j++) {
-            float acc = C[base_c + j];
-
-            #pragma omp simd reduction(+:acc)
-            for (int k = 0; k < K; k++) {
-                acc += A[base_a + k] * B[k*ldb + j];
-            }
-
-            C[base_c + j] = acc;
-        }
-    }
-}
-
-static void gemm(
-    const float* restrict A,
-    const float* restrict B,
-    float* restrict C,
-    int M,
-    int K,
-    int N,
-    int lda,
     int ldb,
     int ldc,
-    bool trans_b) {
+    float beta) {
 
-    #pragma omp parallel for collapse(2) schedule(static) proc_bind(close)
-    for (int ii = 0; ii < M; ii += TILE_M) {
-        for (int jj = 0; jj < N; jj += TILE_N) {
-            const int M_bloco = MIN_ENTRE(TILE_M, M - ii);
-            const int N_bloco = MIN_ENTRE(TILE_N, N - jj);
-            float* restrict C_bloco = C + ii * ldc + jj;
-            float b_pack[TILE_K * TILE_N];
+    for (int i = 0; i < M; i++) {
+        float* restrict c = C + i * ldc;
 
-            for (int kk = 0; kk < K; kk += TILE_K) {
-                const int K_bloco = MIN_ENTRE(TILE_K, K - kk);
+        if (beta == 0.0f) {
+            for (int j = 0; j < N; j++) {
+                c[j] = 0.0f;
+            }
+        } else if (beta != 1.0f) {
+            for (int j = 0; j < N; j++) {
+                c[j] *= beta;
+            }
+        }
 
-                _pack_b(
-                    B, b_pack,
-                    kk, jj,
-                    K_bloco, N_bloco,
-                    ldb,
-                    trans_b
-                );
+        for (int k = 0; k < K; k++) {
+            const float a = A[k * MR + i];
+            const float* restrict b = B + k * ldb;
 
-                const float* restrict A_bloco =  A + ii * lda + kk;
-
-                for (int i = 0; i < M_bloco; i += MR) {
-                    const int _M = MIN_ENTRE(MR, M_bloco - i);
-                    const float* restrict ptr_a = A_bloco + i * lda;
-
-                    for (int j = 0; j < N_bloco; j += NR) {
-                        const int _N = MIN_ENTRE(NR, N_bloco - j);
-                        const float* restrict ptr_b = b_pack + j;
-                        float* restrict ptr_c = C_bloco + i * ldc + j;
-
-                        if (_M == MR && _N == NR) {
-                            _microkernel_8x8(
-                                ptr_a, ptr_b, ptr_c,
-                                K_bloco,
-                                lda, TILE_N, ldc
-                            );
-                        } else {
-                            _kernel_scalar(
-                                ptr_a, ptr_b, ptr_c,
-                                _M, _N, K_bloco,
-                                lda, TILE_N, ldc
-                            );
-                        }
-                    }
-                }
+            #pragma omp simd
+            for (int j = 0; j < N; j++) {
+                c[j] += a * b[j];
             }
         }
     }
-    
+
 }
 
 void cpu_gemm(
@@ -227,42 +190,51 @@ void cpu_gemm(
     float* restrict C,
     int ldc) {
 
-    // melhorar isso aqui depois pra evitar passar duas vezes por C
-    if (beta != 1.0f) {
-        #pragma omp parallel for schedule(static)
-        for (int i = 0; i < M; i++) {
-            #pragma omp simd
-            for (int j = 0; j < N; j++) {
-                C[(size_t)i * ldc + j] *= beta;
+    #pragma omp parallel for collapse(2) schedule(static) proc_bind(close)
+    for (int ii = 0; ii < M; ii += TILE_M) {
+        for (int jj = 0; jj < N; jj += TILE_N) {
+            const int M_bloco = MIN_ENTRE(TILE_M, M - ii);
+            const int N_bloco = MIN_ENTRE(TILE_N, N - jj);
+            float* restrict C_bloco = C + (size_t)ii * ldc + jj;
+
+            _Alignas(32) float a_pack[TILE_M * TILE_K];
+            _Alignas(32) float b_pack[TILE_K * TILE_N];
+
+            for (int kk = 0; kk < K; kk += TILE_K) {
+                const int K_bloco = MIN_ENTRE(TILE_K, K - kk);
+                const float beta_tile = (kk == 0) ? beta : 1.0f;
+
+                _pack_a(A, a_pack, ii, kk, M_bloco, K_bloco, lda, trans_a);
+                _pack_b(B, b_pack, kk, jj, K_bloco, N_bloco, ldb, trans_b);
+
+                for (int i = 0; i < M_bloco; i += MR) {
+                    const int _M = MIN_ENTRE(MR, M_bloco - i);
+                    const float* restrict ptr_a = a_pack + (size_t)i * K_bloco;
+
+                    for (int j = 0; j < N_bloco; j += NR) {
+                        const int _N = MIN_ENTRE(NR, N_bloco - j);
+                        const float* restrict ptr_b = b_pack + j;
+                        float* restrict ptr_c = C_bloco + (size_t)i * ldc + j;
+
+                        if (_M == MR && _N == NR) {
+                            _microkernel_8x8(
+                                ptr_a, ptr_b, ptr_c,
+                                K_bloco,
+                                TILE_N, ldc,
+                                beta_tile
+                            );
+                        } else {
+                            _kernel_scalar(
+                                ptr_a, ptr_b, ptr_c,
+                                _M, _N, K_bloco,
+                                TILE_N, ldc,
+                                beta_tile
+                            );
+                        }
+                    }
+                }
             }
         }
     }
-
-    if (trans_a) {
-        const float* restrict ptr_a = A;    
-        size_t checkpoint = arena_checkpoint(&mem_arena);
-        float* temp_a = arena_alloc(&mem_arena, sizeof(float) * M * K);
-
-        _para_row_major(A, temp_a, K, M, lda);
-        ptr_a = temp_a;
-        lda = K;
-
-        gemm(
-            ptr_a, B, C,
-            M, K, N,
-            lda, ldb, ldc,
-            trans_b
-        );
-
-        arena_restore(&mem_arena, checkpoint);
-        return;
-    }
-
-    gemm(
-        A, B, C, 
-        M, K, N,
-        lda, ldb, ldc,
-        trans_b
-    );
-
+    
 }

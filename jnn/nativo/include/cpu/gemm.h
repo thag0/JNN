@@ -23,8 +23,8 @@ void cpu_gemm(
     bool trans_b,
 
     int M,
-    int K,
     int N,
+    int K,
 
     const float* restrict A,
     int lda,
