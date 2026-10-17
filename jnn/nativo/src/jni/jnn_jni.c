@@ -86,18 +86,18 @@ Java_jnn_core_JNNnative_matmul(
     int ldc = std_c_0;
 
     jnn_matmul_dispatcher(
-        A + off_a,
-        B + off_b,
-        C + off_c,
-        lda,
-        ldb,
-        ldc,
-        lin_a,
-        col_a,
-        col_b,
         trans_a,
         trans_b,
-        1.0f// padrão acumular na gemm
+        lin_a,
+        col_b,
+        col_a,
+        A + off_a,
+        lda,
+        B + off_b,
+        ldb,
+        1.0f, // padrão acumular na gemm
+        C + off_c,
+        ldc
     );
 
     (*env)->ReleasePrimitiveArrayCritical(env, A_arr, A, JNI_ABORT);

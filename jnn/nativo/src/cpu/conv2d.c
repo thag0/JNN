@@ -104,11 +104,18 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
         );
 
         cpu_gemm(
-            K, col, y_lote,
-            Kdim, Ndim, Ndim,
-            params->filtros, Kdim, Ndim,
-            false, false,
-            1.0f
+            false, 
+            false,
+            params->filtros, 
+            Ndim,
+            Kdim, 
+            K,
+            Kdim,
+            col,
+            Ndim,
+            1.0f,
+            y_lote,
+            Ndim
         );
     }
 
@@ -224,11 +231,18 @@ static void _backward_gk_im2col(const conv2d_bwd_params_t* params) {
         );
 
         cpu_gemm(
-            gs_lote, col, GK,
-            Ndim, Kdim, Kdim,
-            params->filtros, Ndim, Kdim,
-            false, true,
-            1.0f
+            false, 
+            true,
+            params->filtros, 
+            Kdim,
+            Ndim,
+            gs_lote, 
+            Ndim, 
+            col,
+            Kdim,
+            1.0f,
+            GK,
+            Kdim
         );
     }
 
@@ -317,13 +331,20 @@ static void _backward_ge_col2im(const conv2d_bwd_params_t* params) {
     for (int l = 0; l < params->lotes; l++) {
         const float* restrict gs_lote = params->GS + l * params->filtros * Ndim;
         float* restrict ge_lote       = params->GE + l * params->canais * area_x;
-
+        
         cpu_gemm(
-            gs_lote, params->K, col,
-            Ndim, Kdim, Kdim,
-            Ndim, params->filtros, Kdim,
-            true, false,
-            0.0f
+            true, 
+            false,
+            Ndim,
+            Kdim,
+            params->filtros, 
+            gs_lote,
+            Ndim,
+            params->K,
+            Kdim,
+            0.0f,
+            col,
+            Kdim
         );
 
         col2im(

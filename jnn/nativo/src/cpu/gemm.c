@@ -214,18 +214,18 @@ static void gemm(
 }
 
 void cpu_gemm(
-    const float* restrict A,
-    const float* restrict B,
-    float* restrict C,
-    int lda, 
-    int ldb, 
-    int ldc, 
-    int M,
-    int K,
-    int N,
     bool trans_a,
     bool trans_b,
-    float beta) {
+    int M,
+    int N,
+    int K,
+    const float* restrict A,
+    int lda,
+    const float* restrict B,
+    int ldb,
+    float beta,
+    float* restrict C,
+    int ldc) {
 
     // melhorar isso aqui depois pra evitar passar duas vezes por C
     if (beta != 1.0f) {

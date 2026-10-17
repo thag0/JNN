@@ -11,33 +11,33 @@ int jnn_get_backend() {
 }
  
 void jnn_matmul_dispatcher(
-    const float* restrict A,
-    const float* restrict B,
-    float* restrict C,
-    int lda, 
-    int ldb, 
-    int ldc,
-    int M,
-    int K,
-    int N,
     bool trans_a,
     bool trans_b,
-    const float beta) {
+    int M,
+    int N,
+    int K,
+    const float* restrict A,
+    int lda, 
+    const float* restrict B,
+    int ldb, 
+    const float beta,
+    float* restrict C,
+    int ldc) {
 
     switch (BACKEND_ATUAL) {
         default: cpu_gemm(
-            A,
-            B,
-            C,
-            lda, 
-            ldb, 
-            ldc, 
-            M,
-            K,
-            N,
             trans_a,
             trans_b,
-            beta
+            M,
+            N,
+            K,
+            A,
+            lda,
+            B,
+            ldb, 
+            beta,
+            C,
+            ldc
         );
     }
 }
