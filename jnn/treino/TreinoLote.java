@@ -45,6 +45,7 @@ public class TreinoLote extends MetodoTreino {
 	protected void loop(DataLoader loader, Otimizador otm, Perda loss, int epochs, boolean logs) {
 		if (logs) esconderCursor();
 		long tempo = 0;
+		int largEpocas = String.valueOf(epochs).length();
 
 		final int n = loader.tam();
 		for (int e = 0; e < epochs; e++) {
@@ -65,7 +66,8 @@ public class TreinoLote extends MetodoTreino {
 				tempo = System.nanoTime() - tempo;
 
 				limparLinha();
-				String log = "[Época " + (e+1) + "/" + epochs + "] loss: " + (perdaEpoca/n);
+				String perda = String.format("%.8f", (perdaEpoca/n)).replaceAll(",", ".");
+				String log = String.format("(Época %" + largEpocas + "d/%" + largEpocas + "d) loss: %s", (e + 1), epochs, perda);
 
 				long segundos = (long) tempo / 1_000_000_000;
 				long min = (segundos / 60);
