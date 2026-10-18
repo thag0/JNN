@@ -123,25 +123,35 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
 }
 
 static bool _usar_im2col_fw(const conv2d_fwd_params_t* params) {
-    const int alt_s  = params->alt_x  + 2 * params->alt_pad  - params->alt_k  + 1;
-    const int larg_s = params->larg_x + 2 * params->larg_pad - params->larg_k + 1;
+    const long alt_s = (long)params->alt_x + 2L * params->alt_pad - params->alt_k + 1;
+    const long larg_s = (long)params->larg_x + 2L * params->larg_pad - params->larg_k + 1;
+    const long M = params->filtros;
+    const long K = (long)params->canais * params->alt_k * params->larg_k;
+    const long N = alt_s * larg_s;
+    
+    const long operacoes = M * K * N;
+    const long custo_im2col = K * N;
 
-    const int M = params->filtros;
-    const int K = params->canais * params->alt_k * params->larg_k;
-    const int N = alt_s * larg_s;
-
-    if (params->alt_k < 3 && params->larg_k < 3) {
-        return false;
+    long limiar;
+    if (M >= 64) {
+        limiar = 250000L;
+    } else if (M >= 32) {
+        limiar = 500000L;
+    } else if (M >= 16) {
+        limiar = 900000L;
+    } else if (M >= 8) {
+        limiar = 1600000L;
+    } else {
+        limiar = 2800000L;
     }
 
-    if (K < 32) return false;
-    if (N < 64) return false;
-    if (M < 32) return false;
+    if (params->alt_k * params->larg_k >= 9) limiar = limiar * 3L / 4L;
+    if (N < 16) return false;
+    if (M < 4 && custo_im2col > 4096L) return false;
+    if (N >= 256) limiar = limiar * 3L / 4L;
+    if (K < 16 && M < 32) limiar = limiar * 2L;
 
-    const long peso = (long)M * K * N;
-    const long limiar = 2e6;
-
-    return peso > limiar;
+    return operacoes > limiar;
 }
 
 void cpu_conv2d_forward(const conv2d_fwd_params_t* params) {
