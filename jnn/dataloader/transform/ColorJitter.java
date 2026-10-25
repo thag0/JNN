@@ -4,11 +4,10 @@ import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 
 /**
- * Transformação de variação de cor aplicadas com uma certa probabilidade.
+ * Transformação de variação de cor aplicadas.
  */
 public class ColorJitter implements Transform {
 
-    private final float PROB;
     private final float BRILHO;
     private final float CONTRASTE;
     private final float SATURACAO;
@@ -18,13 +17,11 @@ public class ColorJitter implements Transform {
      * @param brilho taxa de variação de brilho.
      * @param contraste taxa de variação no constraste.
      * @param saturacao taxa de variação de saturação.
-     * @param prob taxa de atualização dos parâmetros.
      */
-    public ColorJitter(Number brilho, Number contraste, Number saturacao, Number prob) {
+    public ColorJitter(Number brilho, Number contraste, Number saturacao) {
         this.BRILHO = brilho.floatValue();
         this.CONTRASTE = contraste.floatValue();
         this.SATURACAO = saturacao.floatValue();
-        this.PROB = prob.floatValue();
 
         if (BRILHO < 0) {
             throw new IllegalArgumentException(
@@ -43,40 +40,78 @@ public class ColorJitter implements Transform {
                 "\nValor de saturação deve ser maior que zero."
             );
         }
-        
-        if (PROB < 0 || PROB > 1) {
-            throw new IllegalArgumentException(
-                "\nTaxa de probabilidade deve estar entre 0 e 1."
-            );
-        }
+
     }
 
     @Override
     public Tensor apply(Tensor t) {
-        if (JNNutils.randFloat() > PROB) return t;
+        int[] shape = t.shape();
+
+        if (shape.length != 3 || shape[0] != 3) {
+            throw new IllegalArgumentException(
+                "ColorJitter espera um tensor RGB (3, H, W)."
+            );
+        }
 
         Tensor out = t.clone();
 
-        if (BRILHO > 0) ajustarBrilho(out);
-        if (CONTRASTE > 0) ajustarContraste(out);
-        if (SATURACAO > 0) ajustarSaturacao(out);
+        float brilho = fator(BRILHO);
+        float contraste = fator(CONTRASTE);
+        float saturacao = fator(SATURACAO);
+
+        int[] ordem = {0, 1, 2};
+        for (int i = ordem.length - 1; i > 0; i--) {
+            int j = (int) (JNNutils.randFloat() * (i + 1));
+            if (j > i) j = i;
+
+            int tmp = ordem[i];
+            ordem[i] = ordem[j];
+            ordem[j] = tmp;
+        }
+
+        for (int op : ordem) {
+            switch (op) {
+                case 0:
+                    if (BRILHO > 0) ajustarBrilho(out, brilho);
+                break;
+
+                case 1:
+                    if (CONTRASTE > 0) ajustarContraste(out, contraste);
+                break;
+
+                case 2:
+                    if (SATURACAO > 0) ajustarSaturacao(out, saturacao);
+                break;
+            }
+        }
 
         return out;
+    }
+
+    private float fator(float intensidade) {
+        if (intensidade == 0) return 1f;
+
+        return 1.0f + (2.0f * JNNutils.randFloat() - 1.0f) * intensidade;
+    }
+
+    /**
+     * Trava o valor de entrada entre 0 e 1.
+     * @param x entrada.
+     * @return valor dentro do intervalo.
+     */
+    private float clamp(float x) {
+        return Math.clamp(x, 0.0f, 1.0f);
     }
 
     /**
      * Aplica as correções que afetam o brilho.
      * @param t {@code Tensor} base.
      */
-    private void ajustarBrilho(Tensor t) {
-        float fator = 1.f + (JNNutils.randFloat() * 2 - 1) * BRILHO;
+    private void ajustarBrilho(Tensor t, float fator) {
         float[] x = t.array();
 
         for (int i = 0; i < x.length; i++) {
-            x[i] *= fator;
-
-            if (x[i] < 0) x[i] = 0;
-            if (x[i] > 1) x[i] = 1;
+            x[i] = clamp(x[i] * fator);
         }
     }
 
@@ -84,19 +119,17 @@ public class ColorJitter implements Transform {
      * Aplica as correções que afetam o contraste.
      * @param t {@code Tensor} base.
      */
-    private void ajustarContraste(Tensor t) {
-        float fator = 1.f + (JNNutils.randFloat() * 2 - 1) * CONTRASTE;
+    private void ajustarContraste(Tensor t, float fator) {
         float[] x = t.array();
 
-        float media = 0f;
-        for (float val : x) media += val;
+        float media = 0.0f;
+        for (int i = 0; i < x.length; i++) {
+            media += x[i];
+        }
         media /= x.length;
 
         for (int i = 0; i < x.length; i++) {
-            x[i] = (x[i] - media) * fator + media;
-
-            if (x[i] < 0) x[i] = 0;
-            if (x[i] > 1) x[i] = 1;           
+            x[i] = clamp((x[i] - media) * fator + media);
         }
     }
 
@@ -104,33 +137,21 @@ public class ColorJitter implements Transform {
      * Aplica as correções que afetam a saturação.
      * @param t {@code Tensor} base.
      */
-    private void ajustarSaturacao(Tensor t) {
+    private void ajustarSaturacao(Tensor t, float fator) {
         int[] shape = t.shape();
-
-        if (shape[0] != 3) throw new RuntimeException("\nEro");
-
-        float fator = 1f + (JNNutils.randFloat() * 2 - 1) * SATURACAO;
-    
-        int h = shape[1];
-        int w = shape[2];
-        int area = h * w;
-
+        int area = shape[1] * shape[2];
         float[] x = t.array();
 
         for (int i = 0; i < area; i++) {
             float r = x[i];
             float g = x[i + area];
             float b = x[i + 2 * area];
-        
+
             float cinza = 0.299f * r + 0.587f * g + 0.114f * b;
 
-            x[i]          = cinza + fator * (r - cinza);
-            x[i + area]   = cinza + fator * (g - cinza);
-            x[i + 2*area] = cinza + fator * (b - cinza);
-
-            x[i]          = Math.max(0, Math.min(1, x[i]));
-            x[i + area]   = Math.max(0, Math.min(1, x[i + area]));
-            x[i + 2*area] = Math.max(0, Math.min(1, x[i + 2*area]));
+            x[i]          = clamp(cinza + fator * (r - cinza));
+            x[i + area]   = clamp(cinza + fator * (g - cinza));
+            x[i + 2*area] = clamp(cinza + fator * (b - cinza));
         }
     }
     

@@ -104,11 +104,12 @@ public class MainConv {
 					new float[]{0.247f,  0.243f,  0.261f}
 				);//peguei de um forum do pytorch
 				
-				treino = CIFAR10.treino().aplicarX(norm);
+				treino = CIFAR10.treino();
 				treino.setTransformX(new Compose(
-					new ColorJitter(.1, .1, .1, 0.35),
+					new ColorJitter(.1, .1, .1),
 					new HFlip(0.5),
-					new RandomCrop(32, 32, 4, true)
+					new RandomCrop(32, 32, 4, true),
+					norm
 				));
 					
 				teste = CIFAR10.teste().aplicarX(norm);
