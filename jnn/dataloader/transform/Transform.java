@@ -15,7 +15,6 @@ public interface Transform {
      * Aplica uma transformação no {@code Tensor}.
      * @param in {@code Tensor} base.
      * @param out {@code Tensor} de destino.
-     * @return {@code Tensor} transformado.
      */
     void apply(Tensor in, Tensor out);
 
