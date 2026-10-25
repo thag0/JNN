@@ -238,3 +238,66 @@ void cpu_gemm(
     }
     
 }
+
+void cpu_gemm_st(
+    bool trans_a,
+    bool trans_b,
+    int M,
+    int N,
+    int K,
+    const float* restrict A,
+    int lda,
+    const float* restrict B,
+    int ldb,
+    float beta,
+    float* restrict C,
+    int ldc) {
+
+    _Alignas(32) float a_pack[TILE_M * TILE_K];
+    _Alignas(32) float b_pack[TILE_K * TILE_N];
+
+    for (int ii = 0; ii < M; ii += TILE_M) {
+        const int M_bloco = MIN_ENTRE(TILE_M, M - ii);
+        
+        for (int jj = 0; jj < N; jj += TILE_N) {
+            const int N_bloco = MIN_ENTRE(TILE_N, N - jj);
+            float* restrict C_bloco = C + (size_t)ii * ldc + jj;
+
+            for (int kk = 0; kk < K; kk += TILE_K) {
+                const int K_bloco = MIN_ENTRE(TILE_K, K - kk);
+                const float beta_tile = (kk == 0) ? beta : 1.0f;
+
+                _pack_a(A, a_pack, ii, kk, M_bloco, K_bloco, lda, trans_a);
+                _pack_b(B, b_pack, kk, jj, K_bloco, N_bloco, ldb, trans_b);
+
+                for (int i = 0; i < M_bloco; i += MR) {
+                    const int _M = MIN_ENTRE(MR, M_bloco - i);
+                    const float* restrict ptr_a = a_pack + (size_t)i * K_bloco;
+
+                    for (int j = 0; j < N_bloco; j += NR) {
+                        const int _N = MIN_ENTRE(NR, N_bloco - j);
+                        const float* restrict ptr_b = b_pack + j;
+                        float* restrict ptr_c = C_bloco + (size_t)i * ldc + j;
+
+                        if (_M == MR && _N == NR) {
+                            _microkernel_8x8(
+                                ptr_a, ptr_b, ptr_c,
+                                K_bloco,
+                                TILE_N, ldc,
+                                beta_tile
+                            );
+                        } else {
+                            _kernel_scalar(
+                                ptr_a, ptr_b, ptr_c,
+                                _M, _N, K_bloco,
+                                TILE_N, ldc,
+                                beta_tile
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+}

@@ -4,7 +4,7 @@
 #include "arena.h"
 #include "common.h"
 
-#include <string.h>
+#include <omp.h>
 
 // forward
 
@@ -73,14 +73,14 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
     const int alt_s  = params->alt_x  + 2 * params->alt_pad  - params->alt_k  + 1;
     const int larg_s = params->larg_x + 2 * params->larg_pad - params->larg_k + 1;
 
-    const int Kdim = params->canais * params->alt_k * params->larg_k;
-    const int Ndim = alt_s * larg_s;
+    const int K_dim = params->canais * params->alt_k * params->larg_k;
+    const int N_dim = alt_s * larg_s;
 
     size_t checkpoint = arena_checkpoint(&mem_arena);
-    float* restrict col = arena_alloc(&mem_arena, sizeof(float) * Kdim * Ndim);
+    float* restrict col = arena_alloc(&mem_arena, sizeof(float) * K_dim * N_dim);
 
     const int C_x_AreaX = params->canais * params->alt_x * params->larg_x;// cache 
-    const int filtros_x_Ndim = params->filtros * Ndim;// cache
+    const int filtros_x_Ndim = params->filtros * N_dim;// cache
     
     for (int l = 0; l < params->lotes; l++) {
         const float* restrict x_lote = X + l * C_x_AreaX;
@@ -88,8 +88,8 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
 
         for (int f = 0; f < params->filtros; f++) {
             float bias = params->temBias ? B[f] : 0.f;
-            float* restrict linha = y_lote + f * Ndim;
-            for (int i = 0; i < Ndim; i++) {
+            float* restrict linha = y_lote + f * N_dim;
+            for (int i = 0; i < N_dim; i++) {
                 linha[i] = bias;
             }
         }
@@ -107,15 +107,15 @@ static void _forward_im2col(const conv2d_fwd_params_t* params) {
             false, 
             false,
             params->filtros, 
-            Ndim,
-            Kdim, 
+            N_dim,
+            K_dim, 
             K,
-            Kdim,
+            K_dim,
             col,
-            Ndim,
+            N_dim,
             1.0f,
             y_lote,
-            Ndim
+            N_dim
         );
     }
 
@@ -221,15 +221,15 @@ static void _backward_gk_im2col(const conv2d_bwd_params_t* params) {
     const int alt_s  = params->alt_x  + 2 * params->alt_pad  - params->alt_k  + 1;
     const int larg_s = params->larg_x + 2 * params->larg_pad - params->larg_k + 1;
 
-    const int Kdim = params->canais * params->alt_k * params->larg_k;
-    const int Ndim = alt_s * larg_s;
+    const int K_dim = params->canais * params->alt_k * params->larg_k;
+    const int N_dim = alt_s * larg_s;
     
     size_t checkpoint = arena_checkpoint(&mem_arena);
-    float* restrict col = arena_alloc(&mem_arena, sizeof(float) * Kdim * Ndim);
+    float* restrict col = arena_alloc(&mem_arena, sizeof(float) * K_dim * N_dim);
 
     for (int l = 0; l < params->lotes; l++) {
         const float* restrict x_lote  = X  + l * (params->canais * params->alt_x * params->larg_x);
-        const float* restrict gs_lote = GS + l * (params->filtros * Ndim);
+        const float* restrict gs_lote = GS + l * (params->filtros * N_dim);
 
         im2col(
             x_lote, col,
@@ -241,18 +241,12 @@ static void _backward_gk_im2col(const conv2d_bwd_params_t* params) {
         );
 
         cpu_gemm(
-            false, 
-            true,
-            params->filtros, 
-            Kdim,
-            Ndim,
-            gs_lote, 
-            Ndim, 
-            col,
-            Kdim,
+            false, true,
+            params->filtros, K_dim, N_dim,
+            gs_lote, N_dim, 
+            col, K_dim,
             1.0f,
-            GK,
-            Kdim
+            GK, K_dim
         );
     }
 
@@ -327,43 +321,61 @@ static void _backward_ge_loops(const conv2d_bwd_params_t* params) {
     }    
 }
 
-static void _backward_ge_col2im(const conv2d_bwd_params_t* params) {
-    const int alt_s  = params->alt_x  + 2 * params->alt_pad  - params->alt_k  + 1;
-    const int larg_s = params->larg_x + 2 * params->larg_pad - params->larg_k + 1;
-    const int area_x = params->alt_x * params->larg_x;
+static void _flip_conv_kernel(const float* restrict K, float* restrict k_flip, int filtros, int canais, int alt_k, int larg_k) {
+    const int area_k = alt_k * larg_k;
 
-    const int Ndim = alt_s * larg_s;
-    const int Kdim = params->canais * params->alt_k * params->larg_k;
+    for (int c = 0; c < canais; c++) {
+        float* restrict dst_c = k_flip + (size_t)c * filtros * area_k;
+        
+        for (int f = 0; f < filtros; f++) {
+            const float* restrict src = K + ((size_t)f * canais + c) * area_k;
+            float* restrict dst = dst_c + (size_t)f * area_k;
+            
+            for (int t = 0; t < area_k; t++) {
+                dst[t] = src[area_k - 1 - t];
+            }
+        }
+    }
+}
+
+static void _backward_ge_conv(const conv2d_bwd_params_t* params) {
+    const int alt_s  = params->alt_x  + 2*params->alt_pad  - params->alt_k  + 1;
+    const int larg_s = params->larg_x + 2*params->larg_pad - params->larg_k + 1;
+    
+    const int pad_h  = params->alt_k  - 1 - params->alt_pad;
+    const int pad_w  = params->larg_k - 1 - params->larg_pad;
+    
+    const int K_dim = params->filtros * params->alt_k * params->larg_k;
+    const int N_dim = params->alt_x * params->larg_x;
+    const int threads = omp_get_max_threads();
     
     size_t checkpoint = arena_checkpoint(&mem_arena);
-    float* restrict col = arena_alloc(&mem_arena, sizeof(float) * Ndim * Kdim);
-    
+    float* col_full       = arena_alloc(&mem_arena, sizeof(float) * (size_t)threads * K_dim * N_dim);
+    float* kernel_flipped = arena_alloc(&mem_arena, sizeof(float) * (size_t)params->canais * K_dim);
+    _flip_conv_kernel(params->K, kernel_flipped, params->filtros, params->canais, params->alt_k, params->larg_k);
+
+    #pragma omp parallel for schedule(static) proc_bind(close)
     for (int l = 0; l < params->lotes; l++) {
-        const float* restrict gs_lote = params->GS + l * params->filtros * Ndim;
-        float* restrict ge_lote       = params->GE + l * params->canais * area_x;
-        
-        cpu_gemm(
-            true, 
-            false,
-            Ndim,
-            Kdim,
-            params->filtros, 
-            gs_lote,
-            Ndim,
-            params->K,
-            Kdim,
-            0.0f,
-            col,
-            Kdim
+        float* col = col_full + (size_t)omp_get_thread_num() * K_dim * N_dim;
+        const float* gs_lote = params->GS + (size_t)l * params->filtros * alt_s * larg_s;
+        float* ge_lote       = params->GE + (size_t)l * params->canais * N_dim;
+
+        im2col_st(
+            gs_lote, col,
+            params->filtros,
+            alt_s, larg_s,
+            params->alt_k, params->larg_k,
+            pad_h, pad_w,
+            params->alt_x, params->larg_x
         );
 
-        col2im(
-            col, ge_lote, 
-            params->canais,
-            params->alt_x, params->larg_x, 
-            params->alt_k, params->larg_k,
-            params->alt_pad, params->larg_pad, 
-            alt_s, larg_s
+        cpu_gemm_st(
+            false, false, 
+            params->canais, N_dim, K_dim,
+            kernel_flipped, K_dim,
+            col, N_dim,
+            1.0f,
+            ge_lote, N_dim
         );
     }
 
@@ -390,7 +402,7 @@ static bool _usar_col2im_ge(const conv2d_bwd_params_t* params) {
 
 static void _backward_ge(const conv2d_bwd_params_t* params) {
     if (_usar_col2im_ge(params)) {
-        _backward_ge_col2im(params);
+        _backward_ge_conv(params);
     } else {
         _backward_ge_loops(params);
     }

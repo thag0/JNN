@@ -160,10 +160,10 @@ public class MainConv {
 		Sequencial modelo = new Sequencial(
 			new Entrada(3, 32, 32),
 
-			new Conv2D(32, convK, "same", "he"),
+			new Conv2D(64, convK, "same", "he"),
 			new BatchNorm2D(),
 			new ReLU(),
-			new Conv2D(32, convK, "same", "he"),
+			new Conv2D(64, convK, "same", "he"),
 			new BatchNorm2D(),
 			new ReLU(),
 			new MaxPool2D(poolK),
