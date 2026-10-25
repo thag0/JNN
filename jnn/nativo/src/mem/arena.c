@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 static inline size_t alinhar(size_t x, size_t alinhamento) {
     return (x + (alinhamento - 1)) & ~(alinhamento - 1);
@@ -19,7 +20,7 @@ void arena_init(arena_t* arena, size_t capacidade) {
     }
 }
 
-void* arena_alloc(arena_t* arena, size_t size_bytes) {
+static void* arena_alloc_ex(arena_t* arena, size_t size_bytes, bool zero) {
     size_t offset_alinhado = alinhar(arena->offset, ARENA_ALINHAMENTO);
 
     if (offset_alinhado > arena->capacidade || size_bytes > arena->capacidade - offset_alinhado) {
@@ -51,7 +52,17 @@ void* arena_alloc(arena_t* arena, size_t size_bytes) {
     void* ptr = arena->data + offset_alinhado;
     arena->offset = offset_alinhado + size_bytes;
 
+    if (zero) memset(ptr, 0, size_bytes);
+
     return ptr;
+}
+
+void* arena_alloc(arena_t* arena, size_t size_bytes) {
+    return arena_alloc_ex(arena, size_bytes, false);
+}
+
+void* arena_alloc_zero(arena_t* arena, size_t size_bytes) {
+    return arena_alloc_ex(arena, size_bytes, true);
 }
 
 size_t arena_checkpoint(arena_t* arena) {

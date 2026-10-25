@@ -22,6 +22,10 @@ void arena_init(arena_t* arena, size_t capacidade);
 // O bloco pode conter um valor um pouco maior para preservar o alinhamento.
 void* arena_alloc(arena_t* arena, size_t size_bytes);
 
+// Aloca um bloco de memória na arena com o conteúdo zerado.
+// O bloco pode conter um valor um pouco maior para preservar o alinhamento.
+void* arena_alloc_zero(arena_t* arena, size_t size_bytes);
+
 // Libera os dados da arena de volta ao sistema operacional.
 void arena_free(arena_t* arena);
 
