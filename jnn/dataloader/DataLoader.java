@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.function.Predicate;
 
@@ -134,6 +135,18 @@ public class DataLoader implements Iterable<Amostra> {
     }
 
     /**
+     * Aplica a transformação no tensor de entrada.
+     * @param tf transformação.
+     * @param in tensor base.
+     * @return tensor com transformação aplicada.
+     */
+    private Tensor transformar(Transform tf, Tensor in) {
+        Tensor out = new Tensor(in.shape());
+        tf.apply(in, out);
+        return out;
+    }
+
+    /**
      * Embaralha os dados do DataLoader usando o algoritmo Fisher-Yates
      * @see jnn.core.JNNutils JNNutils. 
      */
@@ -157,7 +170,7 @@ public class DataLoader implements Iterable<Amostra> {
      */
     public DataLoader aplicarX(Transform tf) {
         for (Amostra a : dados) {
-            a.setX(tf.apply(a.x()));
+            a.setX(transformar(tf, a.x()));
         }
 
         return this;
@@ -170,7 +183,7 @@ public class DataLoader implements Iterable<Amostra> {
      */
     public DataLoader aplicarY(Transform tf) {
         for (Amostra a : dados) {
-            a.setY(tf.apply(a.y()));
+            a.setY(transformar(tf, a.y()));
         }
 
         return this;
@@ -183,10 +196,7 @@ public class DataLoader implements Iterable<Amostra> {
      * @return {@code DataLoader} alterado.
      */
     public DataLoader setTransformX(Transform tf) {
-        if (tf != null) {
-            this.transformX = tf;
-        }
-
+        if (tf != null) this.transformX = tf;
         return this;
     }
 
@@ -197,10 +207,7 @@ public class DataLoader implements Iterable<Amostra> {
      * @return {@code DataLoader} alterado.
      */
     public DataLoader setTransformY(Transform tf) {
-        if (tf != null) {
-            this.transformY = tf;
-        }
-        
+        if (tf != null) this.transformY = tf;
         return this;
     }
 
@@ -326,8 +333,8 @@ public class DataLoader implements Iterable<Amostra> {
         Tensor x = a.x();
         Tensor y = a.y();
 
-        if (transformX != null) x = transformX.apply(x);
-        if (transformY != null) y = transformY.apply(y);
+        if (transformX != null) x = transformar(transformX, x);
+        if (transformY != null) y = transformar(transformY, y);
 
         return new Amostra(x, y);
     }
@@ -395,15 +402,9 @@ public class DataLoader implements Iterable<Amostra> {
         int n = tam();
         Tensor[] xs = new Tensor[n];
 
-        if (transformX != null) {
-            for (int i = 0; i < n; i++) {
-                xs[i] = transformX.apply(dados[i].x());
-            }
-
-        } else {
-            for (int i = 0; i < n; i++) {
-                xs[i] = dados[i].x();
-            }
+        for (int i = 0; i < n; i++) {
+            Tensor x = dados[i].x();
+            xs[i] = (transformX == null) ? x : transformar(transformX, x);
         }
 
         return xs;
@@ -417,15 +418,9 @@ public class DataLoader implements Iterable<Amostra> {
         int n = tam();
         Tensor[] ys = new Tensor[n];
 
-        if (transformY != null) {
-            for (int i = 0; i < n; i++) {
-                ys[i] = transformY.apply(dados[i].y());
-            }
-
-        } else {
-            for (int i = 0; i < n; i++) {
-                ys[i] = dados[i].y();
-            }
+        for (int i = 0; i < n; i++) {
+            Tensor y = dados[i].y();
+            ys[i] = (transformY == null) ? y : transformar(transformY, y);
         }
 
         return ys;
@@ -452,19 +447,11 @@ public class DataLoader implements Iterable<Amostra> {
 
         @Override
         public Amostra next() {
-            Amostra amostra = dados[id++];
-
-            if (transformX == null && transformY == null) {
-                return amostra;
+            if (!hasNext()) {
+                throw new NoSuchElementException();
             }
 
-            Tensor x = amostra.x();
-            Tensor y = amostra.y();
-
-            if (transformX != null) x = transformX.apply(x);
-            if (transformY != null) y = transformY.apply(y);
-
-            return new Amostra(x, y);
+            return get(id++);
         }
         
     }

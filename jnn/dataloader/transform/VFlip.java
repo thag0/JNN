@@ -29,37 +29,39 @@ public class VFlip implements Transform {
     }
 
     @Override
-    public Tensor apply(Tensor t) {
-        if (JNNutils.randFloat() > p) return t;
+    public void apply(Tensor in, Tensor out) {
+        validarShapes(in, out);
 
-        int[] s = t.shape();
-        if (s.length != 3) {
+        if (JNNutils.randFloat() > p) {
+            out.copiar(in);
+            return ;
+        }
+
+        int[] shape = in.shape();
+        if (shape.length != 3) {
             throw new IllegalArgumentException("\nEsperado tensor 3D (CHW)");
         }
 
-        final int canais = s[0];
-        final int altura = s[1];
-        final int largura = s[2];
+        final int canais  = shape[0];
+        final int altura  = shape[1];
+        final int largura = shape[2];
 
-        Tensor out = new Tensor(t);
-        float[] x = out.array();
+        float[] src = in.array();
+        float[] dst = out.array();
 
         final int area = altura * largura;
         for (int c = 0; c < canais; c++) {
             int base = c * area;
 
-            for (int h = 0; h < altura / 2; h++) {
+            for (int h = 0; h < altura; h++) {
                 int cima = base + h * largura;
                 int baixo = base + (altura - 1 - h) * largura;
 
                 for (int w = 0; w < largura; w++) {
-                    float tmp = x[cima + w];
-                    x[cima + w] = x[baixo + w];
-                    x[baixo + w] = tmp;
+                    dst[cima + w] = src[baixo + w];
                 }
             }
         }
 
-        return out;
     }
 }

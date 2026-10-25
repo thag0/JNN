@@ -13,18 +13,24 @@ public interface Transform {
     
     /**
      * Aplica uma transformação no {@code Tensor}.
-     * @param t {@code Tensor} base.
+     * @param in {@code Tensor} base.
+     * @param out {@code Tensor} de destino.
      * @return {@code Tensor} transformado.
      */
-    Tensor apply(Tensor t);
+    void apply(Tensor in, Tensor out);
 
     /**
-     * Reaplica uma transformação no {@code Tensor}.
-     * @param tr {@code Transform} que será aplicada na sequência.
-     * @return {@code Tensor} transformado.
+     * Verifica se os shapes dos tensores de entrada e saída são compatíveis.
+     * @param in {@code Tensor} de entrada.
+     * @param out {@code Tensor} de destino.
      */
-    default Transform andThen(Transform tr) {
-        return t -> tr.apply(apply(t));
+    default public void validarShapes(Tensor in, Tensor out) {
+        if (!in.compShape(out)) {
+            throw new IllegalArgumentException(
+                "\nOs tensores de entrada e saída devem conter o mesmo tamanho, mas " +
+                "in = " + in.shapeStr() + " e out = " + out.shapeStr()
+            );
+        }
     }
 
     /**

@@ -44,8 +44,10 @@ public class ColorJitter implements Transform {
     }
 
     @Override
-    public Tensor apply(Tensor t) {
-        int[] shape = t.shape();
+    public void apply(Tensor in, Tensor out) {
+        validarShapes(in, out);
+
+        int[] shape = in.shape();
 
         if (shape.length != 3 || shape[0] != 3) {
             throw new IllegalArgumentException(
@@ -53,9 +55,7 @@ public class ColorJitter implements Transform {
             );
         }
 
-        Tensor out = t.clone();
-
-        float brilho = fator(BRILHO);
+        float brilho    = fator(BRILHO);
         float contraste = fator(CONTRASTE);
         float saturacao = fator(SATURACAO);
 
@@ -72,20 +72,18 @@ public class ColorJitter implements Transform {
         for (int op : ordem) {
             switch (op) {
                 case 0:
-                    if (BRILHO > 0) ajustarBrilho(out, brilho);
+                    if (BRILHO > 0) ajustarBrilho(in, out, brilho);
                 break;
 
                 case 1:
-                    if (CONTRASTE > 0) ajustarContraste(out, contraste);
+                    if (CONTRASTE > 0) ajustarContraste(in, out, contraste);
                 break;
 
                 case 2:
-                    if (SATURACAO > 0) ajustarSaturacao(out, saturacao);
+                    if (SATURACAO > 0) ajustarSaturacao(in, out, saturacao);
                 break;
             }
         }
-
-        return out;
     }
 
     private float fator(float intensidade) {
@@ -105,53 +103,65 @@ public class ColorJitter implements Transform {
 
     /**
      * Aplica as correções que afetam o brilho.
-     * @param t {@code Tensor} base.
+     * @param in {@code Tensor} base.
+     * @param out {@code Tensor} de destino.
+     * @param fator fator de aplicação.
      */
-    private void ajustarBrilho(Tensor t, float fator) {
-        float[] x = t.array();
+    private void ajustarBrilho(Tensor in, Tensor out, float fator) {
+        float[] src = in.array();
+        float[] dst = out.array();
 
-        for (int i = 0; i < x.length; i++) {
-            x[i] = clamp(x[i] * fator);
+        int n = src.length;
+        for (int i = 0; i < n; i++) {
+            dst[i] = clamp(src[i] * fator);
         }
     }
 
     /**
      * Aplica as correções que afetam o contraste.
-     * @param t {@code Tensor} base.
+     * @param in {@code Tensor} base.
+     * @param out {@code Tensor} de destino.
+     * @param fator fator de aplicação.
      */
-    private void ajustarContraste(Tensor t, float fator) {
-        float[] x = t.array();
+    private void ajustarContraste(Tensor in, Tensor out, float fator) {
+        float[] src = in.array();
+        float[] dst = out.array();
 
         float media = 0.0f;
-        for (int i = 0; i < x.length; i++) {
-            media += x[i];
+        int n = src.length;
+        for (int i = 0; i < n; i++) {
+            media += src[i];
         }
-        media /= x.length;
+        media /= n;
 
-        for (int i = 0; i < x.length; i++) {
-            x[i] = clamp((x[i] - media) * fator + media);
+        for (int i = 0; i < n; i++) {
+            dst[i] = clamp((src[i] - media) * fator + media);
         }
     }
 
     /**
      * Aplica as correções que afetam a saturação.
-     * @param t {@code Tensor} base.
+     * @param in {@code Tensor} base.
+     * @param out {@code Tensor} de destino.
+     * @param fator fator de aplicação.
      */
-    private void ajustarSaturacao(Tensor t, float fator) {
-        int[] shape = t.shape();
+    private void ajustarSaturacao(Tensor in, Tensor out, float fator) {
+        int[] shape = in.shape();
         int area = shape[1] * shape[2];
-        float[] x = t.array();
+        
+        float[] src = in.array();
+        float[] dst = out.array();
 
         for (int i = 0; i < area; i++) {
-            float r = x[i];
-            float g = x[i + area];
-            float b = x[i + 2 * area];
+            float r = src[i];
+            float g = src[i + area];
+            float b = src[i + 2 * area];
 
             float cinza = 0.299f * r + 0.587f * g + 0.114f * b;
 
-            x[i]          = clamp(cinza + fator * (r - cinza));
-            x[i + area]   = clamp(cinza + fator * (g - cinza));
-            x[i + 2*area] = clamp(cinza + fator * (b - cinza));
+            dst[i]          = clamp(cinza + fator * (r - cinza));
+            dst[i + area]   = clamp(cinza + fator * (g - cinza));
+            dst[i + 2*area] = clamp(cinza + fator * (b - cinza));
         }
     }
     

@@ -29,20 +29,25 @@ public class HFlip implements Transform {
     }
 
     @Override
-    public Tensor apply(Tensor t) {
-        if (JNNutils.randFloat() > p) return t;
+    public void apply(Tensor in, Tensor out) {
+        validarShapes(in, out);
 
-        int[] s = t.shape();
-        if (s.length != 3) {
+        if (JNNutils.randFloat() > p) {
+            out.copiar(in);
+            return;
+        } 
+
+        int[] shape = in.shape();
+        if (shape.length != 3) {
             throw new IllegalArgumentException("\nEsperado tensor 3D (CHW)");
         }     
 
-        final int canais = s[0];
-        final int altura = s[1];
-        final int largura = s[2];
+        final int canais  = shape[0];
+        final int altura  = shape[1];
+        final int largura = shape[2];
 
-        Tensor out = new Tensor(t);
-        float[] x = out.array();
+        float[] src = in.array();
+        float[] dst = out.array();
 
         final int area = altura * largura;
 
@@ -55,9 +60,8 @@ public class HFlip implements Transform {
                 int dir = linha + largura - 1;
 
                 while (esq < dir) {
-                    float tmp = x[esq];
-                    x[esq] = x[dir];
-                    x[dir] = tmp;
+                    dst[esq] = src[dir];
+                    dst[dir] = src[esq];
 
                     esq++;
                     dir--;
@@ -65,7 +69,6 @@ public class HFlip implements Transform {
             }
         }
 
-        return out;
     }
 
 }

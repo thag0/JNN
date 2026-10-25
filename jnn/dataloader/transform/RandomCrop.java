@@ -52,15 +52,17 @@ public class RandomCrop implements Transform {
     }
 
     @Override
-    public Tensor apply(Tensor t) {
-        int[] s = t.shape();
-        if (s.length != 3) {
+    public void apply(Tensor in, Tensor out) {
+        validarShapes(in, out);
+
+        int[] shape = in.shape();
+        if (shape.length != 3) {
             throw new IllegalArgumentException("\nEsperado tensor 3D (CHW)");
         }    
 
-        final int canais = s[0];
-        final int altura = s[1];
-        final int largura = s[2];
+        final int canais  = shape[0];
+        final int altura  = shape[1];
+        final int largura = shape[2];
 
         final int altP  = altura  + 2 * pad;
         final int largP = largura + 2 * pad;
@@ -68,10 +70,8 @@ public class RandomCrop implements Transform {
         int y0 = rng.nextInt(altP - altS + 1);
         int x0 = rng.nextInt(largP - largS + 1);
 
-        Tensor out = new Tensor(canais, altS, largS);
-
-        float[] x = t.array();
-        float[] y = out.array();
+        float[] src = in.array();
+        float[] dst = out.array();
 
         final int areaX = altura * largura;
         final int areaS = altS * largS;
@@ -90,7 +90,7 @@ public class RandomCrop implements Transform {
                         int srcX = x0 + w - pad;
                         if (srcX < 0 || srcX >= largura) continue;
 
-                        y[dstRow + w] = x[baseX + srcY * largura + srcX];
+                        dst[dstRow + w] = src[baseX + srcY * largura + srcX];
                     }
                 }
             }
@@ -107,13 +107,11 @@ public class RandomCrop implements Transform {
 
                     for (int w = 0; w < largS; w++) {
                         int idX = reflect(x0 + w - pad, largura);
-                        y[linY + w] = x[linX + idX];
+                        dst[linY + w] = src[linX + idX];
                     }
                 }
             }
         }
-
-        return out;
     }
 
     /**

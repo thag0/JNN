@@ -51,8 +51,10 @@ public class Norm implements Transform {
     }
 
     @Override
-    public Tensor apply(Tensor t) {
-        final int[] shape = t.shape();
+    public void apply(Tensor in, Tensor out) {
+        validarShapes(in, out);
+
+        final int[] shape = in.shape();
         final int dims = shape.length;
 
         int canais;
@@ -71,7 +73,7 @@ public class Norm implements Transform {
         
         } else {
             throw new IllegalArgumentException(
-                "\nSuporte até tensor 4D, recebido " + t.numDim() + "D."
+                "\nSuporte até tensor 4D, recebido " + in.numDim() + "D."
             );
         }
 
@@ -79,12 +81,12 @@ public class Norm implements Transform {
             throw new IllegalArgumentException(
                 "\nNúmero de canais do tensor (" + canais +
                 ") não corresponde ao tamanho de media/desvp (" +
-                media.length + "). Shape=" + t.shapeStr()
+                media.length + "). Shape=" + in.shapeStr()
             );
         }
 
-        Tensor norm = t.clone();
-        float[] data = norm.array();
+        float[] src = in.array();
+        float[] dst = out.array();
 
         int stdCanal;
         int stdAmostra;
@@ -106,7 +108,7 @@ public class Norm implements Transform {
             stdAmostra = canais * stdCanal;
         }
 
-        final int total = data.length;
+        final int total = dst.length;
 
         for (int baseAmostra = 0; baseAmostra < total; baseAmostra += stdAmostra) {
             for (int c = 0; c < canais; c++) {
@@ -117,12 +119,10 @@ public class Norm implements Transform {
                 int fim = inicio + stdCanal;
 
                 for (int i = inicio; i < fim; i++) {
-                    data[i] = (data[i] - m) / sd;
+                    dst[i] = (src[i] - m) / sd;
                 }
             }
         }
-
-        return norm;
     }
     
 }

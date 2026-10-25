@@ -28,24 +28,32 @@ public class LabelSmoothing implements Transform {
     }
 
     @Override
-    public Tensor apply(Tensor t) {
-        int[] s = t.shape();
-        if (s.length != 1) {
+    public void apply(Tensor in, Tensor out) {
+        validarShapes(in, out);
+
+        int[] shape = in.shape();
+        if (shape.length != 1) {
             throw new IllegalArgumentException(
                 "\nEsperado tensor 1D representando probabilidades de classe."
             );
         }
 
-        final int classes = s[0];
+        final int classes = shape[0];
 
-        Tensor out = new Tensor(t);
-        float[] y = out.array();
+        if (classes < 2) {
+            throw new IllegalArgumentException(
+                "\nLabel smoothing exige pelo menos duas classes."
+            );
+        }
+
+        float[] src = in.array();
+        float[] dst = out.array();
 
         int alvo = 0;
-        float max = y[0];
+        float max = src[0];
         for (int i = 1; i < classes; i++) {
-            if (y[i] > max) {
-                max = y[i];
+            if (src[i] > max) {
+                max = src[i];
                 alvo = i;
             }
         }
@@ -54,11 +62,9 @@ public class LabelSmoothing implements Transform {
         float valMaior  = 1f - eps;
 
         for (int i = 0; i < classes; i++) {
-            y[i] = valMenor;
+            dst[i] = valMenor;
         }
 
-        y[alvo] = valMaior;
-
-        return out;
+        dst[alvo] = valMaior;
     }
 }

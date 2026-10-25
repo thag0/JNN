@@ -37,14 +37,33 @@ public class Compose implements Transform {
     }
 
     @Override
-    public Tensor apply(Tensor t) {
-        Tensor out = t.clone();
+    public void apply(Tensor in, Tensor out) {
+        validarShapes(in, out);
 
-        for (Transform tr : ts) {
-            out = tr.apply(out);
+        int n = ts.length;
+
+        if (n == 1) {
+            ts[0].apply(in, out);
+            return;
         }
 
-        return out;
+        Tensor a = new Tensor(in);
+        Tensor b = new Tensor(in);
+
+        Tensor src = in;
+        Tensor dst;
+
+        for (int i = 0; i < n; i++) {
+            if (i == n - 1) {
+                dst = out;
+            } else {
+                dst = (i % 2 == 0) ? a : b;
+            }
+
+            ts[i].apply(src, dst);
+            src = dst;
+        }
+
     }
     
 }
