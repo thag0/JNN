@@ -48,7 +48,7 @@ public class Aleatorio extends Inicializador {
 
 	@Override
 	public void forward(Tensor tensor) {
-		tensor.aplicar(_ -> JNNutils.randFloat(min, max));
+		tensor.apply(_ -> JNNutils.randFloat(min, max));
 	}
 	
 }

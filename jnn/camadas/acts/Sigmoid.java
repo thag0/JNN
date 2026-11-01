@@ -33,13 +33,13 @@ public class Sigmoid extends Ativacao {
             JNNnative.sigmoid(
                 _entrada.array(),
                 _saida.array(),
-                _entrada.tam()
+                _entrada.len()
             );
         } else {
             sigmoid(
                 _entrada.array(),
                 _saida.array(),
-                _entrada.tam()
+                _entrada.len()
             );
         }
 
@@ -57,14 +57,14 @@ public class Sigmoid extends Ativacao {
                 _saida.array(),
                 _gradSaida.array(),
                 _gradEntrada.array(),
-                _entrada.tam()
+                _entrada.len()
             );
         } else {
             sigmoidd(
                 _saida.array(),
                 _gradSaida.array(),
                 _gradEntrada.array(),
-                _entrada.tam()
+                _entrada.len()
             );
         }
 

@@ -214,7 +214,7 @@ public class FashionMNIST {
                 arr[p] = (buffer.get() & 0xFF) / 255.0f;
             }
 
-            imgs[i] = new Tensor(arr.length).copiar(arr).reshape(1, linhas, colunas);
+            imgs[i] = new Tensor(arr.length).copy(arr).reshape(1, linhas, colunas);
         }
 
         return imgs;
@@ -237,7 +237,7 @@ public class FashionMNIST {
             int label = buffer.get() & 0xFF;
             float[] data = new float[10];
             data[label] = 1.0f;
-            labels[i] = new Tensor(data.length).copiar(data).nome("Label-" + label);
+            labels[i] = new Tensor(data.length).copy(data).name("Label-" + label);
         }
 
         return labels;

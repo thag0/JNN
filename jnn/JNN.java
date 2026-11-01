@@ -69,7 +69,7 @@ public final class JNN {
      * @return {@code Tensor} preenchido.
      */
     public static Tensor ones(int... shape) {
-        return zeros(shape).preencher(1.0);
+        return zeros(shape).fill(1.0);
     }
 
     /**
@@ -97,7 +97,7 @@ public final class JNN {
      * @return {@code Tensor} aleatório.
      */
     public static Tensor rand(int... shape) {
-        return new Tensor(shape).aplicar(x -> JNNutils.randFloat(-1, 1));
+        return new Tensor(shape).apply(x -> JNNutils.randFloat(-1, 1));
     }
 
     /**
@@ -110,10 +110,10 @@ public final class JNN {
         Tensor t = new Tensor(shape);
 
         if (gen == null) {
-            t.aplicar(x -> JNNutils.randFloat(-1, 1));
+            t.apply(x -> JNNutils.randFloat(-1, 1));
         
         } else {
-            t.aplicar(x -> gen.nextFloat(-1, 1));
+            t.apply(x -> gen.nextFloat(-1, 1));
         }
 
         return t;
@@ -217,7 +217,7 @@ public final class JNN {
      */
     public static Tensor pow(Tensor t, Number exp) {
         double e = exp.doubleValue();
-        return new Tensor(t).aplicar(x -> (float) Math.pow(x, e));
+        return new Tensor(t).apply(x -> (float) Math.pow(x, e));
     }
 
     /**
@@ -244,7 +244,7 @@ public final class JNN {
      * @return {@code Tensor} resultado.
      */
     public static Tensor media(Tensor t) {
-        return new Tensor(t).media();
+        return new Tensor(t).mean();
     }
 
     /**
@@ -253,7 +253,7 @@ public final class JNN {
      * @return {@code Tensor} resultado.
      */
     public static Tensor desvp(Tensor t) {
-        return new Tensor(t).desvp();
+        return new Tensor(t).std();
     }
 
     /**
@@ -633,7 +633,7 @@ public final class JNN {
      */
     public static Tensor norm(Tensor t, Number min, Number max) {
         Tensor norm = new Tensor(t);
-        return norm.norm(min, max);
+        return norm.normMinMax(min, max);
     }
   
     // dataloader

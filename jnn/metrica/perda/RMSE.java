@@ -18,15 +18,15 @@ public class RMSE extends Perda {
 		verificarDimensoes(prev, real);
 		
 		if (prev.numDim() == 1) {
-			int tam = prev.tam();
+			int tam = prev.len();
 			float rmse = f(prev, real, tam);
 			
 			return new Tensor(1)
 			.set((float) Math.sqrt(rmse / tam), 0);
 		}
 
-        int lotes = prev.tamDim(0);
-        int amostras = prev.tamDim(1);
+        int lotes = prev.lenDim(0);
+        int amostras = prev.lenDim(1);
 
         float somaLote = 0;
         for (int i = 0; i < lotes; i++) {
@@ -61,7 +61,7 @@ public class RMSE extends Perda {
 	@Override
 	public Tensor backward(Tensor prev, Tensor real) {
 		super.verificarDimensoes(prev, real);
-		final int tam = prev.tam();
+		final int tam = prev.len();
 		float rrmse = (float) Math.sqrt(forward(prev, real).item());
 
 		return prev.map(

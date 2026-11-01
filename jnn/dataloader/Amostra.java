@@ -123,8 +123,8 @@ public class Amostra {
             "\nSem suporte para plataforma de " + bits + " bits."
         );
 
-        long tamX = x.tamBytes();
-        long tamY = y.tamBytes();
+        long tamX = x.sizeBytes();
+        long tamY = y.sizeBytes();
         long tamNome = 8 + nome.length() * 2;
 
         return tamObj + tamX + tamY + tamNome;

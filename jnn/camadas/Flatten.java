@@ -165,7 +165,7 @@ public class Flatten extends Camada implements Cloneable {
 		
 		} else if (x.numDim() == shapeIn.length + 1) {
 			validarShapes(x.shape(), shapeIn);
-			int lotes = x.tamDim(0);
+			int lotes = x.lenDim(0);
 			if (lotes != this.tamLote) ajustarParaLote(lotes);
 		
 		} else {
@@ -176,7 +176,7 @@ public class Flatten extends Camada implements Cloneable {
 		}
 
 		_entrada = x.contiguous();
-		_saida.copiarElementos(_entrada);
+		_saida.copyElements(_entrada);
 
 		return _saida;
 	}
@@ -185,7 +185,7 @@ public class Flatten extends Camada implements Cloneable {
 	public Tensor backward(Tensor g) {
 		verificarConstrucao();
 
-		_gradEntrada.copiarElementos(g);
+		_gradEntrada.copyElements(g);
 
 		return _gradEntrada;
 	}
@@ -289,8 +289,8 @@ public class Flatten extends Camada implements Cloneable {
 		tamVars += 4; //totalFlatten
 
 		long tamTensores =
-		_saida.tamBytes() +
-		_gradEntrada.tamBytes();
+		_saida.sizeBytes() +
+		_gradEntrada.sizeBytes();
 
 		return tamVars + tamTensores;
 	}

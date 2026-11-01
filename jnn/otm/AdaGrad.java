@@ -99,7 +99,7 @@ public class AdaGrad extends Otimizador {
 		for (var param : _params) {
 			ac = JNNutils.addEmArray(
 				ac,
-				new Tensor(param.weight.shape()).preencher(valorInicial)
+				new Tensor(param.weight.shape()).fill(valorInicial)
 			);
 		}
 		

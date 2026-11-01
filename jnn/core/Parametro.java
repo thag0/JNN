@@ -24,8 +24,8 @@ public class Parametro {
      * @param shape formato desejado.
      */
     public Parametro(String nome, int... shape) {
-        weight = JNN.zeros(shape).nome(nome);
-        grad = JNN.zeros(shape).nome("grad " + nome);
+        weight = JNN.zeros(shape).name(nome);
+        grad = JNN.zeros(shape).name("grad " + nome);
     }
 
     /**
@@ -36,7 +36,7 @@ public class Parametro {
      */
     public Parametro(String nome, Tensor like) {
         weight = like.clone();
-        grad = JNN.zeros(like.shape()).nome("grad " + nome);
+        grad = JNN.zeros(like.shape()).name("grad " + nome);
     }
 
     /**
@@ -53,9 +53,9 @@ public class Parametro {
         
         sb.append("Parametro(")
         
-        .append('"').append(weight.nome()).append('"')
+        .append('"').append(weight.name()).append('"')
         .append(", shape ").append(JNNutils.arrayStr(weight.shape()))
-        .append(", tam: ").append(JNNutils.formatarTamBytes(weight.tamBytes()))
+        .append(", tam: ").append(JNNutils.formatarTamBytes(weight.sizeBytes()))
         
         .append(")");
 
@@ -71,8 +71,8 @@ public class Parametro {
 
     @Override
     public Parametro clone() {
-        Parametro clone = new Parametro(weight.nome(), weight);
-        clone.grad.copiar(grad);
+        Parametro clone = new Parametro(weight.name(), weight);
+        clone.grad.copy(grad);
         return clone;
     }
 

@@ -24,7 +24,7 @@ public class He extends Inicializador {
 		int fanIn = calcularFans(tensor)[0];
 		float desvP = (float) Math.sqrt(2.0 / fanIn);
 
-		tensor.aplicar(_ -> JNNutils.randGaussianf() * desvP);
+		tensor.apply(_ -> JNNutils.randGaussianf() * desvP);
 	}
 
 }

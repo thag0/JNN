@@ -65,7 +65,7 @@ public abstract class Otimizador {
 			Tensor w = p.weight;
 			Tensor g = p.grad;
 
-			if (!w.compShape(g)) {
+			if (!w.compareShape(g)) {
 				throw new IllegalArgumentException(
 					"\nPeso " + i + w.shapeStr() + " deve conter" +
 					" o mesmo formato do gradiente " + i + g.shapeStr()

@@ -279,7 +279,7 @@ public class Densa extends Camada implements Cloneable {
 			
 		} else if (x.numDim() == 2) {
 			validarShapes(x.shape(), shapeIn);
-			int lotes = x.tamDim(0);
+			int lotes = x.lenDim(0);
 			if (this.tamLote != lotes) {
 				ajustarParaLote(lotes);
 			}
@@ -366,7 +366,7 @@ public class Densa extends Camada implements Cloneable {
 
 		int p = 0;
 		for (var param : params()) {
-			p += param.weight.tam();
+			p += param.weight.len();
 		}
 
 		return p;
@@ -470,8 +470,8 @@ public class Densa extends Camada implements Cloneable {
 		tamVars += 1; //usarBias
 
 		long tamTensores =
-		_saida.tamBytes() +
-		_gradEntrada.tamBytes();
+		_saida.sizeBytes() +
+		_gradEntrada.sizeBytes();
 
 		return tamVars + tamTensores;
 	}

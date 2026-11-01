@@ -33,7 +33,7 @@ public class Softmax extends Ativacao {
             
         } else if (numDim == dimBase + 1) {
             validarShapes(x.shape(), shapeIn);
-            int lotes = x.tamDim(0);
+            int lotes = x.lenDim(0);
             if (lotes != this._tamLote) ajustarParaLote(lotes);
             
             numAmostras = lotes;
@@ -48,7 +48,7 @@ public class Softmax extends Ativacao {
 
         _entrada = x.contiguous();
 
-        int tamArray = _entrada.tam() / numAmostras;
+        int tamArray = _entrada.len() / numAmostras;
 
         softmax(
             _entrada.array(), _entrada.offset(),
@@ -66,7 +66,7 @@ public class Softmax extends Ativacao {
 
         _gradSaida = g.contiguous();
         
-        int totalElementos = _gradSaida.tam();
+        int totalElementos = _gradSaida.len();
         int tamVetor = 1;
         for(int s : shapeIn) tamVetor *= s;
         int samples = totalElementos / tamVetor;

@@ -88,7 +88,7 @@ public class Iris {
 		modelo
 		.avaliador()
 		.matrizConfusao(teste)
-		.nome("Matriz de confusão")
+		.name("Matriz de confusão")
 		.print();
 
 		String nomeArquivo = "historico-perda.csv";

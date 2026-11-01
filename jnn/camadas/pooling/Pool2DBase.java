@@ -191,7 +191,7 @@ public abstract class Pool2DBase extends Camada {
 		
 		} else if (numDim == 4) {
 			validarShapes(x.shape(), shapeIn);
-			int lotes = x.tamDim(0);
+			int lotes = x.lenDim(0);
 			if (lotes != this.tamLote) ajustarParaLote(lotes);
 		
 		} else {
@@ -341,8 +341,8 @@ public abstract class Pool2DBase extends Camada {
 		tamVars += 4 * shapeOut.length;
 
 		long tamTensores =
-		_saida.tamBytes() +
-		_gradEntrada.tamBytes();
+		_saida.sizeBytes() +
+		_gradEntrada.sizeBytes();
 
 		return tamVars + tamTensores;
 	}

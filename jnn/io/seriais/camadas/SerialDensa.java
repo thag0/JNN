@@ -35,11 +35,11 @@ class SerialDensa extends SerialBase implements SerializadorCamada<Densa> {
 		
 		Parametro[] params = camada.params();
 
-		float[] kernel = params[0].weight.data().paraArray();
+		float[] kernel = params[0].weight.data().toArray();
 		escrever(dos, kernel);
 
 		if (camada.temBias()) {
-			float[] bias = params[1].weight.data().paraArray();
+			float[] bias = params[1].weight.data().toArray();
 			escrever(dos, bias);
 		}
 	}
@@ -59,8 +59,8 @@ class SerialDensa extends SerialBase implements SerializadorCamada<Densa> {
 		camada.construir(shapeIn);
 		
 		Parametro[] params = camada.params();
-		params[0].weight.copiarElementos(kernel);
-		if (temBias) params[1].weight.copiarElementos(bias);
+		params[0].weight.copyElements(kernel);
+		if (temBias) params[1].weight.copyElements(bias);
 
 		return camada;
 	}

@@ -53,8 +53,6 @@ public class MainConv {
 		Sequencial modelo = cnnCifar10();
 		modelo.setHistorico(true);
 		modelo.print();
-
-		modelo.treinador().setScheduler(new StepLR(modelo.otm(), 3, 0.95f));
 		
 		var accs = new ArrayList<Float>();
 		modelo.treinador().setCallback(info -> {

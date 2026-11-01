@@ -55,7 +55,7 @@ public class TensorImg extends Widget {
 		int altPixel  = altura / alt;
 
 		if (img.max().item() > 1) {
-			img = img.clone().norm(0, 1);
+			img = img.clone().normMinMax(0, 1);
 		}
 
 		for (int i = 0; i < alt; i++) {

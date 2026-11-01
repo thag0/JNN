@@ -259,19 +259,19 @@ public class Adam extends Otimizador {
 			v_i.mul(beta2).addcmul(g_i, g_i, 1.0f - beta2);
 
 			// m̂ = m / (1 - β1^t)
-			mc_i.copiar(m_i).div(1.0f - corr1);
+			mc_i.copy(m_i).div(1.0f - corr1);
 
 			// v̂ = v / (1 - β2^t)
-			vc_i.copiar(v_i).div(1.0f - corr2);
+			vc_i.copy(v_i).div(1.0f - corr2);
 
 			if (amsgrad) {// vc = max(vc, vams)
 				TensorData vams_i = ams[i].data();
-				vams_i.maxEntre(vc_i);
-				vc_i.copiar(vams_i);
+				vams_i.maxBetween(vc_i);
+				vc_i.copy(vams_i);
 			}
 			
 			// den = sqrt(v̂) + eps
-			buf_i.copiar(vc_i).sqrt().add(eps);
+			buf_i.copy(vc_i).sqrt().add(eps);
 			
 			// p -= (lr * m̂) / (sqrt(v̂) + eps)
 			p_i.addcdiv(mc_i, buf_i, -lr);

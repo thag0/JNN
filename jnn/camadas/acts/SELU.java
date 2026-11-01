@@ -62,7 +62,7 @@ public class SELU extends Ativacao {
         selu(
             _entrada.array(), _entrada.offset(),
             _saida.array(), _saida.offset(),
-            _entrada.tam()
+            _entrada.len()
         );
 
         return _saida;
@@ -78,7 +78,7 @@ public class SELU extends Ativacao {
             _gradSaida.array(), _gradSaida.offset(),
             _gradEntrada.array(), _gradEntrada.offset(),
             _entrada.array(), _entrada.offset(),
-            _entrada.tam()
+            _entrada.len()
         );
 
         return _gradEntrada;

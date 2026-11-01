@@ -18,7 +18,7 @@ public class TensorData {
     /**
      * Array de elementos.
      */
-    private final float[] dados;
+    private final float[] data;
 
     /**
      * Índice inicial. (para views)
@@ -32,7 +32,7 @@ public class TensorData {
      *      o conjunto for uma view de outro TensorData.
      * </p>
      */
-    private final int tam; 
+    private final int len; 
 
     /**
      * Inicializa um {@code TensorData} a partir de dados bem definidos.
@@ -41,29 +41,29 @@ public class TensorData {
      * </p>
      * @param arr {@code array} base.
      * @param offset indice inicial a partir do array base.
-     * @param tam tamanho final do conjunto de elementos.
+     * @param len tamanho final do conjunto de elementos.
      */
-    public TensorData(float[] arr, int offset, int tam) {
+    public TensorData(float[] arr, int offset, int len) {
         if (arr == null) {
             throw new IllegalArgumentException(
                 "\nArray nulo."
             );
         }
-        if (offset < 0 || tam < 0) {
+        if (offset < 0 || len < 0) {
             throw new IllegalArgumentException(
                 "\nOffset e tamanho devem ser maiores que zero."
             );
         }
-        if (offset + tam > arr.length) {
+        if (offset + len > arr.length) {
             throw new IllegalArgumentException(
                 "\nOffset + tamanho excede o tamanho do array. (" +
-                (offset + tam) + " > " + arr.length + ")"
+                (offset + len) + " > " + arr.length + ")"
             );
         }
 
         this.offset = offset;
-        this.tam = tam;
-        this.dados = arr;
+        this.len = len;
+        this.data = arr;
     }
 
     /**
@@ -80,9 +80,9 @@ public class TensorData {
             );
         }
 
-        this.dados = Arrays.copyOf(arr, arr.length);
+        this.data = Arrays.copyOf(arr, arr.length);
         this.offset = 0;
-        this.tam = arr.length;
+        this.len = arr.length;
     }
 
     /**
@@ -90,51 +90,51 @@ public class TensorData {
      * <p>
      *      O conteúdo estará zerado.
      * </p>
-     * @param tam tamanho desejado.
+     * @param len tamanho desejado.
      */
-    public TensorData(int tam) {
-        if (tam < 1) {
+    public TensorData(int len) {
+        if (len < 1) {
             throw new IllegalArgumentException(
-                "\nTamanho deve ser maior que zero, mas recebido " + tam + "."
+                "\nTamanho deve ser maior que zero, mas recebido " + len + "."
             );
         }
 
-        this.dados = new float[tam];
+        this.data = new float[len];
         this.offset = 0;
-        this.tam = dados.length;
+        this.len = data.length;
     }
 
     /**
      * Retorna um novo {@code TensorData} que é uma visualização a partir
      * da instância local.
-     * @param inicio índicide inicial do conjunto de elementos.
-     * @param tam tamamnho do conjunto de elementos.
+     * @param start índicide inicial do conjunto de elementos.
+     * @param len tamamnho do conjunto de elementos.
      * @return view da instância local.
      */
-    public TensorData view(int inicio, int tam) {
-        if (inicio < 0 || tam < 0 || inicio + tam > this.tam) {
+    public TensorData view(int start, int len) {
+        if (start < 0 || len < 0 || start + len > this.len) {
             throw new IllegalArgumentException("\nView fora do limite do tensor data.");
         }
-        return new TensorData(dados, offset + inicio, tam);
+        return new TensorData(data, offset + start, len);
     }
 
     /**
      * Retorna o valor contido no conjunto de dados.
-     * @param id índice linear baseado no array de dados.
+     * @param i índice linear baseado no array de dados.
      * @return valor obtido.
      */
-    public float get(int id) {
-        return dados[offset + id];
+    public float get(int i) {
+        return data[offset + i];
     }
 
     /**
      * Altera o valor contido no conjunto de dados.
      * @param x valor base.
-     * @param id índice linear baseado no array de dados.
+     * @param i índice linear baseado no array de dados.
      * @return TensorData local alterado.
      */
-    public TensorData set(float x, int id) {
-        dados[offset + id] = x;
+    public TensorData set(float x, int i) {
+        data[offset + i] = x;
         return this;
     }
 
@@ -143,10 +143,10 @@ public class TensorData {
      * @param x valor base.
      * @return TensorData local alterado.
      */
-    public TensorData preencher(float x) {
-        final float[] d = dados;
+    public TensorData fill(float x) {
+        final float[] d = data;
         final int inicio = offset;
-        final int fim = offset + tam;
+        final int fim = offset + len;
 
         for (int i = inicio; i < fim; i++) {
             d[i] = x;
@@ -158,22 +158,22 @@ public class TensorData {
 	/**
 	 * Preenche o conteúdo de dados usando um contador iniciado com
 	 * valor 1 que é alterado a cada elemento.
-	 * @param cres contador crescente (1, 2, 3, ...), caso falso o
+	 * @param pos contador crescente (1, 2, 3, ...), caso falso o
 	 * contador é decrescente (-1, -2, -3, ...).
      * @return TensorData local alterado.
 	 */
-    public TensorData preencherContador(boolean cres) {
-        final float[] d = dados;
+    public TensorData fillCount(boolean pos) {
+        final float[] d = data;
         final int inicio = offset;
-        final int fim = offset + tam;
+        final int fim = offset + len;
 
-        if (cres) {
+        if (pos) {
             for (int i = inicio; i < fim; i++) {
-                d[offset + i] = i+1;
+                d[i] = i - inicio + 1;
             }
         } else {
             for (int i = inicio; i < fim; i++) {
-                d[offset + i] = - i -1;
+                d[i] = -(i - inicio + 1);
             }
         }
 
@@ -185,7 +185,7 @@ public class TensorData {
      * @return TensorData local alterado.
      */
     public TensorData zero() {
-        return preencher(0.0f);
+        return fill(0.0f);
     }
 
     /**
@@ -193,15 +193,15 @@ public class TensorData {
      * @param arr {@code array} base.
      * @return TensorData local alterado.
      */
-    public TensorData copiar(float[] arr) {
-        final int n = tam;
+    public TensorData copy(float[] arr) {
+        final int n = len;
         if (arr.length != n) {
             throw new IllegalArgumentException(
                 "\nTamanho do array (" + arr.length + ") deve ser igual ao tamanho de dados (" + n + ")."
             );
         }
 
-        System.arraycopy(arr, 0, dados, offset, n);
+        System.arraycopy(arr, 0, data, offset, n);
 
         return this;
     }
@@ -211,16 +211,16 @@ public class TensorData {
      * @param td {@code TensorData} base.
      * @return TensorData local alterado.
      */
-    public TensorData copiar(TensorData td) {
-        final int n = tam();
+    public TensorData copy(TensorData td) {
+        final int n = len();
 
-        if (td.tam() != n) {
+        if (td.len() != n) {
             throw new IllegalArgumentException(
-                "\nTamanhos incompatíveis: " + n + " != " + td.tam()
+                "\nTamanhos incompatíveis: " + n + " != " + td.len()
             );
         }
 
-        System.arraycopy(td.dados, td.offset, this.dados, this.offset, n);
+        System.arraycopy(td.data, td.offset, this.data, this.offset, n);
 
         return this;
     }
@@ -235,15 +235,15 @@ public class TensorData {
      * @return valor resultante do produto interno.
      */
     public float dot(TensorData td) {
-        final int n = tam();
-        if (td.tam() != n) {
+        final int n = len();
+        if (td.len() != n) {
             throw new IllegalArgumentException(
                 "\nTamanhos incompatíveis."
             );
         }
 
-        final float[] da = dados;
-        final float[] db = td.dados;
+        final float[] da = data;
+        final float[] db = td.data;
         final int offA = offset;
         final int offB = td.offset;
 
@@ -267,24 +267,24 @@ public class TensorData {
      * @see <a href="https://www.netlib.org/lapack/explore-html/d5/d4b/group__axpy.html">
      *      LAPACK axpy</a>
      * @param td {@code TensorData} base.
-     * @param alfa escalar multiplicativo.
+     * @param alpha escalar multiplicativo.
      * @return TensorData local alterado.
      */
-    public TensorData add(TensorData td, float alfa) {
-        final int n = tam();
-        if (td.tam() != n) {
+    public TensorData add(TensorData td, float alpha) {
+        final int n = len();
+        if (td.len() != n) {
             throw new IllegalArgumentException(
                 "\nTamanhos incompatíveis."
             );
         }
 
-        final float[] da = dados;
-        final float[] db = td.dados;
+        final float[] da = data;
+        final float[] db = td.data;
         final int offA = offset;
         final int offB = td.offset;
 
         for (int i = 0; i < n; i++) {
-            da[offA + i] += alfa * db[offB + i];        
+            da[offA + i] += alpha * db[offB + i];        
         }
 
         return this;
@@ -313,15 +313,15 @@ public class TensorData {
      * @return TensorData local alterado.
      */
     public TensorData sub(TensorData td) {
-        final int n = tam();
-        if (n != td.tam()) {
+        final int n = len();
+        if (n != td.len()) {
             throw new IllegalArgumentException(
                 "\nAmbos os TensorData devem possuir o mesmo tamanho."
             );
         }
 
-        final float[] a = this.dados;
-        final float[] b = td.dados;
+        final float[] a = this.data;
+        final float[] b = td.data;
         final int baseA = this.offset;
         final int baseB = td.offset;
 
@@ -342,15 +342,15 @@ public class TensorData {
      * @return TensorData local alterado.
      */
     public TensorData mul(TensorData td) {
-        final int n = tam();
-        if (n != td.tam()) {
+        final int n = len();
+        if (n != td.len()) {
             throw new IllegalArgumentException(
                 "\nAmbos os TensorData devem possuir o mesmo tamanho."
             );
         }
 
-        final float[] a = this.dados;
-        final float[] b = td.dados;
+        final float[] a = this.data;
+        final float[] b = td.data;
         final int baseA = this.offset;
         final int baseB = td.offset;
 
@@ -371,15 +371,15 @@ public class TensorData {
      * @return TensorData local alterado.
      */
     public TensorData div(TensorData td) {
-        final int n = tam();
-        if (n != td.tam()) {
+        final int n = len();
+        if (n != td.len()) {
             throw new IllegalArgumentException(
                 "\nAmbos os TensorData devem possuir o mesmo tamanho."
             );
         }
 
-        final float[] a = this.dados;
-        final float[] b = td.dados;
+        final float[] a = this.data;
+        final float[] b = td.data;
         final int baseA = this.offset;
         final int baseB = td.offset;
 
@@ -396,9 +396,9 @@ public class TensorData {
      * @return TensorData local alterado.
      */
     public TensorData add(float x) {
-        final float[] d = dados;
+        final float[] d = data;
         final int inicio = offset;
-        final int fim = offset + tam;
+        final int fim = offset + len;
 
         for (int i = inicio; i < fim; i++) {
             d[i] += x;
@@ -422,9 +422,9 @@ public class TensorData {
      * @return TensorData local alterado.
      */
     public TensorData mul(float x) {
-        final float[] d = dados;
+        final float[] d = data;
         final int inicio = offset;
-        final int fim = offset + tam;
+        final int fim = offset + len;
 
         for (int i = inicio; i < fim; i++) {
             d[i] *= x;
@@ -439,9 +439,9 @@ public class TensorData {
      * @return TensorData local alterado.
      */
     public TensorData div(float x) {
-        final float[] d = dados;
+        final float[] d = data;
         final int inicio = offset;
-        final int fim = offset + tam;
+        final int fim = offset + len;
 
         for (int i = inicio; i < fim; i++) {
             d[i] /= x;
@@ -453,17 +453,17 @@ public class TensorData {
     /**
      * Adiciona um valor de acordo com um índice linear.
      * @param x valor base.
-     * @param id índice baseado no array do conjunto de elementos.
+     * @param i índice baseado no array do conjunto de elementos.
      * @return TensorData local alterado.
      */
-    public TensorData add(float x, int id) {
-        if (id < 0 || id >= tam) {
+    public TensorData add(float x, int i) {
+        if (i < 0 || i >= len) {
             throw new IllegalArgumentException(
-                "\nÍndice " + id + " inválido."
+                "\nÍndice " + i + " inválido."
             );
         }
 
-        dados[offset + id] += x;
+        data[offset + i] += x;
 
         return this;
     }
@@ -471,27 +471,27 @@ public class TensorData {
     /**
      * Subtrai um valor de acordo com um índice linear.
      * @param x valor base.
-     * @param id índice baseado no array do conjunto de elementos.
+     * @param i índice baseado no array do conjunto de elementos.
      * @return TensorData local alterado.
      */
-    public TensorData sub(float x, int id) {
-        return add(-x, id);
+    public TensorData sub(float x, int i) {
+        return add(-x, i);
     }
 
     /**
      * Multiplica um valor de acordo com um índice linear.
      * @param x valor base.
-     * @param id índice baseado no array do conjunto de elementos.
+     * @param i índice baseado no array do conjunto de elementos.
      * @return TensorData local alterado.
      */
-    public TensorData mul(float x, int id) {
-        if (id < 0 || id >= tam) {
+    public TensorData mul(float x, int i) {
+        if (i < 0 || i >= len) {
             throw new IllegalArgumentException(
-                "\nÍndice " + id + " inválido."
+                "\nÍndice " + i + " inválido."
             );
         }
 
-        dados[offset + id] *= x;
+        data[offset + i] *= x;
 
         return this;
     }
@@ -499,17 +499,17 @@ public class TensorData {
     /**
      * Divide um valor de acordo com um índice linear.
      * @param x valor base.
-     * @param id índice baseado no array do conjunto de elementos.
+     * @param i índice baseado no array do conjunto de elementos.
      * @return TensorData local alterado.
      */
-    public TensorData div(float x, int id) {
-        if (id < 0 || id >= tam) {
+    public TensorData div(float x, int i) {
+        if (i < 0 || i >= len) {
             throw new IllegalArgumentException(
-                "\nÍndice " + id + " inválido."
+                "\nÍndice " + i + " inválido."
             );
         }
 
-        dados[offset + id] /= x;
+        data[offset + i] /= x;
 
         return this;
     }
@@ -520,14 +520,14 @@ public class TensorData {
      * @return TensorData local alterado.
      */
     public TensorData add(float[] arr) {
-        final int n = tam();
+        final int n = len();
         if (arr.length != n) {
             throw new IllegalArgumentException(
                 "\nTamanho do array (" + arr.length + ") deve ser igual ao tamanho de dados (" + n + ")."
             );
         }
 
-        final float[] d = dados;
+        final float[] d = data;
 
         for (int i = 0; i < n; i++) {
             d[offset + i] += arr[i];
@@ -542,14 +542,14 @@ public class TensorData {
      * @return TensorData local alterado.
      */
     public TensorData sub(float[] arr) {
-        final int n = tam();
+        final int n = len();
         if (arr.length != n) {
             throw new IllegalArgumentException(
                 "\nTamanho do array (" + arr.length + ") deve ser igual ao tamanho de dados (" + n + ")."
             );
         }
 
-        final float[] d = dados;
+        final float[] d = data;
 
         for (int i = 0; i < n; i++) {
             d[offset + i] -= arr[i];
@@ -564,14 +564,14 @@ public class TensorData {
      * @return TensorData local alterado.
      */
     public TensorData mul(float[] arr) {
-        final int n = tam();
+        final int n = len();
         if (arr.length != n) {
             throw new IllegalArgumentException(
                 "\nTamanho do array (" + arr.length + ") deve ser igual ao tamanho de dados (" + n + ")."
             );
         }
 
-        final float[] d = dados;
+        final float[] d = data;
 
         for (int i = 0; i < n; i++) {
             d[offset + i] *= arr[i];
@@ -586,14 +586,14 @@ public class TensorData {
      * @return TensorData local alterado.
      */
     public TensorData div(float[] arr) {
-        final int n = tam();
+        final int n = len();
         if (arr.length != n) {
             throw new IllegalArgumentException(
                 "\nTamanho do array (" + arr.length + ") deve ser igual ao tamanho de dados (" + n + ")."
             );
         }
 
-        final float[] d = dados;
+        final float[] d = data;
 
         for (int i = 0; i < n; i++) {
             d[offset + i] /= arr[i];
@@ -607,10 +607,10 @@ public class TensorData {
      * @param fun função base.
      * @return TensorData local alterado.
      */
-    public TensorData aplicar(FloatUnaryOperator fun) {
-        final float[] d = dados;
+    public TensorData apply(FloatUnaryOperator fun) {
+        final float[] d = data;
         final int inicio = offset;
-        final int fim = inicio + tam;
+        final int fim = inicio + len;
 
         for (int i = inicio; i < fim; i++) {
             d[i] = fun.apply(d[i]);
@@ -627,15 +627,15 @@ public class TensorData {
      * @param fun função a ser aplicada em cada elemento de {@code td}.
      * @return {@code TensorData} local alterado.
      */
-    public TensorData aplicar(TensorData td, FloatUnaryOperator fun) {
-        final int n = tam();
+    public TensorData apply(TensorData td, FloatUnaryOperator fun) {
+        final int n = len();
         
-        if (td.tam() != n) {
+        if (td.len() != n) {
             throw new IllegalArgumentException("\nTamanhos incompatíveis.");
         }
 
-        final float[] da = dados;
-        final float[] db = td.dados;
+        final float[] da = data;
+        final float[] db = td.data;
         final int offA = offset;
         final int offB = td.offset;
 
@@ -661,25 +661,25 @@ public class TensorData {
      *      torch.addcdiv (PyTorch) </a>
      * @param a {@code TensorData} A.
      * @param b {@code TensorData} B.
-     * @param alfa {@code valor} escalar multiplicativo.
+     * @param alpha {@code valor} escalar multiplicativo.
      * @return TensorData local alterado.
      */
-    public TensorData addcmul(TensorData a, TensorData b, float alfa) {
-        final int n = tam();
+    public TensorData addcmul(TensorData a, TensorData b, float alpha) {
+        final int n = len();
 
-        if (a.tam() != n || b.tam() != n) {
+        if (a.len() != n || b.len() != n) {
             throw new IllegalArgumentException("\nTamanhos incompatíveis.");
         }
 
-        final float[] d  = dados;
-        final float[] db = a.dados;
-        final float[] dc = b.dados;
+        final float[] d  = data;
+        final float[] db = a.data;
+        final float[] dc = b.data;
         final int offA = offset;
         final int offB = a.offset;
         final int offC = b.offset;
 
         for (int i = 0; i < n; i++) {
-            d[offA + i] += alfa * (db[offB + i] * dc[offC + i]);
+            d[offA + i] += alpha * (db[offB + i] * dc[offC + i]);
         }
 
         return this;
@@ -701,24 +701,24 @@ public class TensorData {
      *      </a>
      * @param a {@code TensorData} numerador.
      * @param b {@code TensorData} denominador.
-     * @param alfa {@code valor} escalar multiplicativo.
+     * @param alpha {@code valor} escalar multiplicativo.
      * @return TensorData local alterado.
      */
-    public TensorData addcdiv(TensorData a, TensorData b, float alfa) {
-        final int n = tam();
-        if (a.tam() != n || b.tam() != n) {
+    public TensorData addcdiv(TensorData a, TensorData b, float alpha) {
+        final int n = len();
+        if (a.len() != n || b.len() != n) {
             throw new IllegalArgumentException("\nTamanhos incompatíveis.");
         }
 
-        final float[] d  = dados;
-        final float[] db = a.dados;
-        final float[] dc = b.dados;
+        final float[] d  = data;
+        final float[] db = a.data;
+        final float[] dc = b.data;
         final int offA = offset;
         final int offB = a.offset;
         final int offC = b.offset;
 
         for (int i = 0; i < n; i++) {
-            d[offA + i] += alfa * (db[offB + i] / dc[offC + i]);
+            d[offA + i] += alpha * (db[offB + i] / dc[offC + i]);
         }
 
         return this;
@@ -730,13 +730,13 @@ public class TensorData {
      * @param td {@code TensorData} para comparação.
      * @return TensorData local alterado.
      */
-    public TensorData maxEntre(TensorData td) {
-        final int n = tam();
-        if (td.tam() != n)
+    public TensorData maxBetween(TensorData td) {
+        final int n = len();
+        if (td.len() != n)
             throw new IllegalArgumentException("\nTamanhos incompatíveis.");
 
-        final float[] da = dados;
-        final float[] db = td.dados;
+        final float[] da = data;
+        final float[] db = td.data;
         final int offA = offset;
         final int offB = td.offset;
 
@@ -753,9 +753,9 @@ public class TensorData {
      * @return TensorData local alterado.
      */
     public TensorData signum() {
-        final float[] d = dados;
+        final float[] d = data;
         final int inicio = offset;
-        final int fim = inicio + tam;
+        final int fim = inicio + len;
 
         for (int i = inicio; i < fim; i++) {
             d[i] = Math.signum(d[i]);
@@ -769,9 +769,9 @@ public class TensorData {
      * @return TensorData local alterado.
      */
     public TensorData sqrt() {
-        final float[] d = dados;
+        final float[] d = data;
         final int inicio = offset;
-        final int fim = inicio + tam;
+        final int fim = inicio + len;
 
         for (int i = inicio; i < fim; i++) {
             d[i] = (float) Math.sqrt(d[i]);
@@ -784,10 +784,10 @@ public class TensorData {
      * Retorna a soma dos elementos do conjunto de dados.
      * @return soma dos elementos.
      */
-    public float soma() {
-        final float[] d = dados;
+    public float sum() {
+        final float[] d = data;
         final int inicio = offset;
-        final int fim = inicio + tam;
+        final int fim = inicio + len;
         
         float soma = 0.0f;
         for (int i = inicio; i < fim; i++) {
@@ -803,9 +803,9 @@ public class TensorData {
      */
     public float max() {
         float max = get(0);
-        final float[] d = dados;
+        final float[] d = data;
         final int inicio = offset + 1;
-        final int fim = offset + tam();
+        final int fim = offset + len();
         
         for (int i = inicio; i < fim; i++) {
             if (d[i] > max) max = d[i];
@@ -820,9 +820,9 @@ public class TensorData {
      */
     public float min() {
         float min = get(0);
-        final float[] d = dados;
+        final float[] d = data;
         final int inicio = offset + 1;
-        final int fim = offset + tam();
+        final int fim = offset + len();
         
         for (int i = inicio; i < fim; i++) {
             if (d[i] < min) min = d[i];
@@ -835,26 +835,26 @@ public class TensorData {
      * Retorna a média aritmética dos valores do conjunto de dados.
      * @return média.
      */
-    public float media() {
-        return soma() / tam;
+    public float mean() {
+        return sum() / len;
     }
 
     /**
      * Retorna o desvio padrão dos valores do conjunto de dados.
      * @return desvio padrão.
      */
-    public float desvp() {
-        float media = media();
-        final float[] d = dados;
+    public float std() {
+        float media = mean();
+        final float[] d = data;
         final int inicio = offset;
-        final int fim = inicio + tam();
+        final int fim = inicio + len();
         
         double soma = 0.0d;
         for (int i = inicio; i < fim; i++) {
             soma += Math.pow(d[i] - media, 2);
         }
 
-        return (float) Math.sqrt(soma / tam);
+        return (float) Math.sqrt(soma / len);
     }
 
 	/**
@@ -870,9 +870,9 @@ public class TensorData {
             );
         }
 
-        final float[] d = dados;
+        final float[] d = data;
         final int inicio = offset;
-        final int fim = inicio + tam;
+        final int fim = inicio + len;
 
         for (int i = inicio; i < fim; i++) {
             d[i] = Math.clamp(d[i], min, max);
@@ -891,7 +891,7 @@ public class TensorData {
      * @return referência do conjunto de dados.
      */
     public float[] data() {
-        return dados;
+        return data;
     }
 
     /**
@@ -903,8 +903,8 @@ public class TensorData {
      * </p>
      * @return {@code clone} do conjunto de dados.
      */
-    public float[] paraArray() {
-        return Arrays.copyOfRange(dados, offset, offset + tam);
+    public float[] toArray() {
+        return Arrays.copyOfRange(data, offset, offset + len);
     }
 
     /**
@@ -915,8 +915,8 @@ public class TensorData {
      * </p>
      * @return tamanho do conjunto de dados.
      */
-    public int tam() {
-        return tam;
+    public int len() {
+        return len;
     }
 
     /**
@@ -931,7 +931,7 @@ public class TensorData {
      * Retorna o tamanho em memória aproximado (em bytes) do objeto TensorData.
      * @return tamanho em bytes aproximado.
      */
-    public long tamBytes() {
+    public long sizeBytes() {
 		String jvmBits = System.getProperty("sun.arch.data.model");
         long bits = Long.valueOf(jvmBits);
 
@@ -943,7 +943,7 @@ public class TensorData {
             "\nSem suporte para plataforma de " + bits + " bits."
         );
 
-        long tamArr = 4 * tam();// float 4 bytes
+        long tamArr = 4 * len();// float 4 bytes
         long tamOffset = 4;// int 4 bytes
         long tamTam = 4;// int 4 bytes
 		return tamObj + tamArr + tamOffset + tamTam;
@@ -951,8 +951,8 @@ public class TensorData {
 
     @Override
     public TensorData clone() {
-        float[] novo = new float[tam];
-        System.arraycopy(dados, offset, novo, 0, tam);
+        float[] novo = new float[len];
+        System.arraycopy(data, offset, novo, 0, len);
         
         return new TensorData(novo);
     }
@@ -963,14 +963,14 @@ public class TensorData {
      * caso contrário.
      */
     public boolean isView() {
-        return offset > 0 || tam < dados.length;
+        return offset > 0 || len < data.length;
     }
 
     /**
      * Gera uma String personalizada representando o TensorData.
      * @return {@code String} formatada
      */
-    private String construirInfo() {
+    private String buildInfo() {
         StringBuilder sb = new StringBuilder();
 
         // usando get() para adaptar quando for uma view
@@ -979,19 +979,19 @@ public class TensorData {
         sb.append("TensorData = [\n");
         sb.append(tab).append("[").append(get(0));
         
-        if (tam < 10) {
-            for (int i = 1; i < tam; i++) sb.append(", ").append(get(i));
+        if (len < 10) {
+            for (int i = 1; i < len; i++) sb.append(", ").append(get(i));
         } else {
             // primeiros 5 elementos
             for (int i = 1; i < 5; i++) sb.append(", ").append(get(i));
             // ultimos 5 elementos
-            sb.append(" ... "). append(get(tam-5));
-            for (int i = tam-4; i < tam; i++) sb.append(", ").append(get(i));
+            sb.append(" ... "). append(get(len-5));
+            for (int i = len-4; i < len; i++) sb.append(", ").append(get(i));
         }
 
         sb.append("]\n");
         sb.append(tab).append("View: ").append(isView()).append("\n");
-        sb.append(tab).append("Tam: ").append(tam).append("\n");
+        sb.append(tab).append("Tam: ").append(len).append("\n");
         sb.append("]");
 
         return sb.toString();
@@ -999,13 +999,13 @@ public class TensorData {
 
     @Override
     public String toString() {
-        return construirInfo();
+        return buildInfo();
     }
 
     /**
      * Exibe, via terminal, as informações do conjunto de dados.
      */
     public void print() {
-        System.out.println(construirInfo());
+        System.out.println(buildInfo());
     }
 }

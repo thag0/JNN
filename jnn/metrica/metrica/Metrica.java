@@ -77,7 +77,7 @@ abstract class Metrica {
 			);
 		}
 
-		int nClasses = prev[0].tam();
+		int nClasses = prev[0].len();
 		Tensor mc = new Tensor(nClasses, nClasses);
 
 		for (int i = 0; i < prev.length; i++) {

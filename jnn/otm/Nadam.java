@@ -195,10 +195,10 @@ public class Nadam extends Otimizador {
 			v_i.mul(beta2).addcmul(g_i, g_i, 1.0f - beta2);
 
 			// m̂ = (β1 * m + (1-β1)*g) / (1 - β1^t)
-        	mc_i.copiar(m_i).mul(beta1).add(g_i, 1.0f - beta1).div(fb1);
+        	mc_i.copy(m_i).mul(beta1).add(g_i, 1.0f - beta1).div(fb1);
 			
 			// v̂ = v/(1-β2^t)
-			vc_i.copiar(v_i).div(fb2);
+			vc_i.copy(v_i).div(fb2);
 
 			// den = sqrt(v̂) + eps
 			TensorData den = vc_i.sqrt().add(eps);

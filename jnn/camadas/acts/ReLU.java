@@ -33,13 +33,13 @@ public class ReLU extends Ativacao {
             JNNnative.relu(
                 _entrada.array(),
                 _saida.array(),
-                _entrada.tam()
+                _entrada.len()
             );
         } else {
             relu(
                 _entrada.array(),
                 _saida.array(),
-                _entrada.tam()
+                _entrada.len()
             );
         }
 
@@ -57,14 +57,14 @@ public class ReLU extends Ativacao {
                 _entrada.array(), 
                 _gradSaida.array(), 
                 _gradEntrada.array(), 
-                _entrada.tam()
+                _entrada.len()
             );
         } else {
             relud(
                 _entrada.array(),
                 _gradSaida.array(), 
                 _gradEntrada.array(), 
-                _entrada.tam()
+                _entrada.len()
             );
         }
 

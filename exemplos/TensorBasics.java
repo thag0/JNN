@@ -45,13 +45,13 @@ public class TensorBasics {
 
         // 2 - Transpor
         Tensor h = new Tensor(3, 2);
-        Tensor i = h.transpor();// Formato final (2, 3)
+        Tensor i = h.transpose();// Formato final (2, 3)
 
         // Transformações
         // Existem algumas operações que alteram o conteúdo do Tensor 
         // utilizando funções especiais a critério da necessidade do usuário.
         Tensor j = new Tensor(2, 2);
-        Tensor k = j.aplicar(val -> val * 2);// Multiplica todos o valores do Tensor por 2.
+        Tensor k = j.apply(val -> val * 2);// Multiplica todos o valores do Tensor por 2.
         Tensor l = j.reduce(0, (val1, val2) -> val1 + val2);// Soma todos os valores do Tensor por redução.
 
         // Broadcasting

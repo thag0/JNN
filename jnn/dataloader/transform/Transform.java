@@ -24,7 +24,7 @@ public interface Transform {
      * @param out {@code Tensor} de destino.
      */
     default public void validarShapes(Tensor in, Tensor out) {
-        if (!in.compShape(out)) {
+        if (!in.compareShape(out)) {
             throw new IllegalArgumentException(
                 "\nOs tensores de entrada e saída devem conter o mesmo tamanho, mas " +
                 "in = " + in.shapeStr() + " e out = " + out.shapeStr()

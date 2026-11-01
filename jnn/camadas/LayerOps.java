@@ -51,7 +51,7 @@ public class LayerOps {
 				out.add(b.weight);
 	
 			} else if (inDim == 2) {//lote de amostras
-				out.copiar(
+				out.copy(
 					out.broadcast(b.weight, (_s, _b) -> _s + _b)
 				);
 			}
@@ -72,13 +72,13 @@ public class LayerOps {
 		
 		final int gradDim = grad.numDim();
 		if (gradDim == 1) {//amostra única
-			ops.matmul(in.unsqueeze(0).transpor(), grad, kernel.grad);
+			ops.matmul(in.unsqueeze(0).transpose(), grad, kernel.grad);
 			bias.ifPresent(b -> b.grad.add(grad));
 		
 		} else if (gradDim == 2) {//lote de amostras
-			ops.matmul(in.transpor(), grad, kernel.grad);
+			ops.matmul(in.transpose(), grad, kernel.grad);
 			
-			final int batches = grad.tamDim(0);
+			final int batches = grad.lenDim(0);
 			bias.ifPresent(b -> {
 				for (int i = 0; i < batches; i++) {					
 					b.grad.add(grad.subTensor(i));
@@ -86,7 +86,7 @@ public class LayerOps {
 			});
 		}
 
-		ops.matmul(grad, kernel.weight.transpor(), gradIn);
+		ops.matmul(grad, kernel.weight.transpose(), gradIn);
 	}
 
 	/**
@@ -454,12 +454,12 @@ public class LayerOps {
 	 * @param stride stride.
 	 */
 	private void forwardMaxPool2DNormal(Tensor entrada, Tensor saida, int[] filtro, int[] stride) {
-		final int canais = entrada.tamDim(0);
+		final int canais = entrada.lenDim(0);
 		
 		if (JNNnative.isOn()) {
 			final int lotes = 1;
-			final int altX = entrada.tamDim(1);
-			final int largX = entrada.tamDim(2);
+			final int altX = entrada.lenDim(1);
+			final int largX = entrada.lenDim(2);
 			
 			JNNnative.maxPool2dForward(
 				entrada.array(),
@@ -492,12 +492,12 @@ public class LayerOps {
 	 * @param stride stride.
 	 */
 	private void forwardMaxPool2DLotes(Tensor entrada, Tensor saida, int[] filtro, int[] stride) {
-		final int lotes = entrada.tamDim(0);
+		final int lotes = entrada.lenDim(0);
 		
 		if (JNNnative.isOn()) {
-			final int canais = entrada.tamDim(1);
-			final int altX = entrada.tamDim(2);
-			final int largX = entrada.tamDim(3);
+			final int canais = entrada.lenDim(1);
+			final int altX = entrada.lenDim(2);
+			final int largX = entrada.lenDim(3);
 
 			JNNnative.maxPool2dForward(
 				entrada.array(),
@@ -549,11 +549,11 @@ public class LayerOps {
 	 * @param stride stride.
 	 */
 	private void backwardMaxPool2DNormal(Tensor entrada, Tensor grad, Tensor gradE, int[] filtro, int[] stride) {
-		final int canais = entrada.tamDim(0);
-		final int altX = entrada.tamDim(1);
-		final int largX = entrada.tamDim(2);
-		final int altG = grad.tamDim(1);
-		final int largG = grad.tamDim(2);
+		final int canais = entrada.lenDim(0);
+		final int altX = entrada.lenDim(1);
+		final int largX = entrada.lenDim(2);
+		final int altG = grad.lenDim(1);
+		final int largG = grad.lenDim(2);
 
 		if (JNNnative.isOn()) {
 			final int lotes = 1;
@@ -627,14 +627,14 @@ public class LayerOps {
 	 * @param stride stride.
 	 */
 	private void backwardMaxPool2DLotes(Tensor entrada, Tensor grad, Tensor gradE, int[] filtro, int[] stride) {
-		final int lotes = entrada.tamDim(0);
+		final int lotes = entrada.lenDim(0);
 		
 		if (JNNnative.isOn()) {
-			final int canais = entrada.tamDim(1);
-			final int altX = entrada.tamDim(2);
-			final int largX = entrada.tamDim(3);
-			final int altG = grad.tamDim(2);
-			final int largG = grad.tamDim(3);
+			final int canais = entrada.lenDim(1);
+			final int altX = entrada.lenDim(2);
+			final int largX = entrada.lenDim(3);
+			final int altG = grad.lenDim(2);
+			final int largG = grad.lenDim(3);
 
 			JNNnative.maxPool2dBackward(
 				entrada.array(),
@@ -687,7 +687,7 @@ public class LayerOps {
 	 * @param stride formato dos strides {@code (altura, largura)}
 	 */
 	private void forwardAvgPool2DNormal(Tensor entrada, Tensor saida, int[] filtro, int[] stride) {
-		final int canais = entrada.tamDim(0);
+		final int canais = entrada.lenDim(0);
 		for (int i = 0; i < canais; i++) {
 			ops.avgPool2D(entrada.subTensor(i), saida.subTensor(i), filtro, stride);
 		}
@@ -702,7 +702,7 @@ public class LayerOps {
 	 */
 	private void forwardAvgPool2DLotes(Tensor entrada, Tensor saida, int[] filtro, int[] stride) {
 		// por enquanto ta assim por compatibilidade.
-		final int lotes = entrada.tamDim(0);
+		final int lotes = entrada.lenDim(0);
 		for (int i = 0; i < lotes; i++) {
 			forwardAvgPool2DNormal(
 				entrada.subTensor(i), 
@@ -795,7 +795,7 @@ public class LayerOps {
 	private void backwardAvgPool2DLotes(Tensor entrada, Tensor grad, Tensor gradE, int[] filtro, int[] stride) {
 		// TODO melhorar isso
 		// por enquanto vai ficar assim por compatibilidade.
-		final int lotes = entrada.tamDim(0);
+		final int lotes = entrada.lenDim(0);
 		for (int i = 0; i < lotes; i++) {
 			backwardAvgPool2DNormal(
 				entrada.subTensor(i), 
@@ -821,7 +821,7 @@ public class LayerOps {
         final int altura = shapeIn[1];
         final int largura = shapeIn[2];
         final int area = altura * largura;
-        final int lotes = (entrada.numDim() == 4) ? entrada.tamDim(0) : 1;
+        final int lotes = (entrada.numDim() == 4) ? entrada.lenDim(0) : 1;
 
         int idX = 0;
         int idY = 0;
@@ -899,10 +899,10 @@ public class LayerOps {
 			
 		boolean entrada3D = entrada.numDim() == 3;
 
-        int lotes	= entrada3D ? 					  1  : entrada.tamDim(0);
-        int canais	= entrada3D ? entrada.tamDim(0) : entrada.tamDim(1);
-        int altX	= entrada3D ? entrada.tamDim(1) : entrada.tamDim(2);
-        int largX	= entrada3D ? entrada.tamDim(2) : entrada.tamDim(3);
+        int lotes	= entrada3D ? 					  1  : entrada.lenDim(0);
+        int canais	= entrada3D ? entrada.lenDim(0) : entrada.lenDim(1);
+        int altX	= entrada3D ? entrada.lenDim(1) : entrada.lenDim(2);
+        int largX	= entrada3D ? entrada.lenDim(2) : entrada.lenDim(3);
 
         float[] dataX = entrada.array();
         float[] dataY = saida.array();
@@ -1029,10 +1029,10 @@ public class LayerOps {
 
 		boolean entrada3D = gradE.numDim() == 3;
 
-        int lotes	= entrada3D ?					1  : gradE.tamDim(0);
-        int canais	= entrada3D ? gradE.tamDim(0) : gradE.tamDim(1);
-        int altura	= entrada3D ? gradE.tamDim(1) : gradE.tamDim(2);
-        int largura	= entrada3D ? gradE.tamDim(2) : gradE.tamDim(3);
+        int lotes	= entrada3D ?					1  : gradE.lenDim(0);
+        int canais	= entrada3D ? gradE.lenDim(0) : gradE.lenDim(1);
+        int altura	= entrada3D ? gradE.lenDim(1) : gradE.lenDim(2);
+        int largura	= entrada3D ? gradE.lenDim(2) : gradE.lenDim(3);
 		
         float[] dataXNorm = entradaNorm.array();
         float[] dataVar = variancia.array();

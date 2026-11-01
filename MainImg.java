@@ -140,8 +140,8 @@ public class MainImg {
 	 */
 	static void gerarImagem(Modelo modelo, Tensor in, Tensor img) {
 		float[] dataImg = img.array();
-		int alt = img.tamDim(0);
-		int larg = img.tamDim(1);
+		int alt = img.lenDim(0);
+		int larg = img.lenDim(1);
 
 		float[] dataIn = in.array();
 

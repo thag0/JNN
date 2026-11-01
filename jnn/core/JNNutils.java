@@ -179,7 +179,7 @@ public final class JNNutils {
 		Tensor[] arr = new Tensor[n];
 		for (int i = 0; i < n; i++) {
 			arr[i] = new Tensor(1).set(array[i], 0);
-			arr[i].nome("amostra " + i);// ajudar no debug
+			arr[i].name("amostra " + i);// ajudar no debug
 		}
 
 		return arr;
@@ -198,8 +198,8 @@ public final class JNNutils {
 		Tensor[] arr = new Tensor[lin];
 		for (int i = 0; i < lin; i++) {
 			arr[i] = new Tensor(col);
-			arr[i].copiarElementos(array[i]);
-			arr[i].nome("amostra " + i);// ajudar no debug
+			arr[i].copyElements(array[i]);
+			arr[i].name("amostra " + i);// ajudar no debug
 		}
 
 		return arr;
@@ -217,7 +217,7 @@ public final class JNNutils {
 		int n = array.length;
 		for (int i = 0; i < n; i++) {
 			arr[i] = new Tensor(array[i]);
-			arr[i].nome("amostra " + i);// ajudar no debug
+			arr[i].name("amostra " + i);// ajudar no debug
 		}
 
 		return arr;	
@@ -235,7 +235,7 @@ public final class JNNutils {
 		int n = array.length;
 		for (int i = 0; i < n; i++) {
 			arr[i] = new Tensor(array[i]);
-			arr[i].nome("amostra " + i);// ajudar no debug
+			arr[i].name("amostra " + i);// ajudar no debug
 		}
 
 		return arr;
@@ -320,7 +320,7 @@ public final class JNNutils {
 
 		Tensor c = new Tensor(novoShape);
 		for (int i = 0; i < batch; i++) {
-			c.subTensor(i).copiar(ts[i]);
+			c.subTensor(i).copy(ts[i]);
 		}
 
 		return c;

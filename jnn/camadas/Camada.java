@@ -205,7 +205,7 @@ public abstract class Camada {
 	 * @return {@code Tensor} criado.
 	 */
 	protected Tensor addBuffer(String nome, int... shape) {
-		Tensor b = new Tensor(shape).nome(nome);
+		Tensor b = new Tensor(shape).name(nome);
 		// aqui não é adicionado nada
 		return b;
 	}
@@ -400,8 +400,8 @@ public abstract class Camada {
 		long tamTensores = 0;
 		if (treinavel()) {
 			for (var param : _params) {
-				tamTensores += param.weight.tamBytes();
-				tamTensores += param.grad.tamBytes();
+				tamTensores += param.weight.sizeBytes();
+				tamTensores += param.grad.sizeBytes();
 			}
 		}
 

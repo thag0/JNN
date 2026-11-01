@@ -16,7 +16,7 @@ public class Gaussiano extends Inicializador {
 
 	@Override
 	public void forward(Tensor tensor) {
-		tensor.aplicar(_ -> JNNutils.randGaussianf());
+		tensor.apply(_ -> JNNutils.randGaussianf());
 	}
 	
 }

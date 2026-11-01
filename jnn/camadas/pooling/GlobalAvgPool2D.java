@@ -174,7 +174,7 @@ public class GlobalAvgPool2D extends Camada implements Cloneable {
             
         } else if (numDim == 4) {
             validarShapes(x.shape(), shapeIn);
-            int lotes = x.tamDim(0);
+            int lotes = x.lenDim(0);
             if (lotes != this.tamLote) ajustarParaLote(lotes);
 
         } else {
@@ -238,8 +238,8 @@ public class GlobalAvgPool2D extends Camada implements Cloneable {
 		tamVars += 4;//tamLote 
 
 		long tamTensores =
-		_saida.tamBytes() +
-		_gradEntrada.tamBytes();
+		_saida.sizeBytes() +
+		_gradEntrada.sizeBytes();
 
 		return tamVars + tamTensores;
     }

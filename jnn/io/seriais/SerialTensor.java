@@ -46,7 +46,7 @@ public class SerialTensor extends SerialBase {
             escrever(out, shape);
 
             // copiar internamente o conteúdo pra tratar casos de views
-            float[] data = t.data().paraArray();
+            float[] data = t.data().toArray();
             escrever(out, data);
 
         } catch (IOException e) {

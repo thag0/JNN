@@ -26,7 +26,7 @@ public class HeUniforme extends Inicializador {
 		int fanIn = calcularFans(t)[0];
 		float limit = (float) Math.sqrt(6.0 / fanIn);
 		
-		t.aplicar(_ -> randUniform(-limit, limit));
+		t.apply(_ -> randUniform(-limit, limit));
     }
 
 	private float randUniform(float min, float max) {

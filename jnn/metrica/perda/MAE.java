@@ -18,13 +18,13 @@ public class MAE extends Perda {
 		verificarDimensoes(prev, real);
 
 		if (prev.numDim() == 1) {
-			final int tam = prev.tam();
+			final int tam = prev.len();
 			float mae = f(prev, real, tam);
 			return new Tensor(1).set((mae/tam), 0);
 		
 		} else {
-			final int lotes = prev.tamDim(0);
-			final int amostras = prev.tamDim(1);
+			final int lotes = prev.lenDim(0);
+			final int amostras = prev.lenDim(1);
 
 			float somaLote = 0;
 			for (int i = 0; i < lotes; i++) {
@@ -60,7 +60,7 @@ public class MAE extends Perda {
 		verificarDimensoes(prev, real);
 
 		if (prev.numDim() == 1) {
-			final int tam = prev.tamDim(0);
+			final int tam = prev.lenDim(0);
 			return prev.map(real,
 				(p, r) -> {
 					float d = p - r;
@@ -71,8 +71,8 @@ public class MAE extends Perda {
 			);
 		
 		} else {
-			int lotes = prev.tamDim(0);
-			int amostras = prev.tamDim(1);
+			int lotes = prev.lenDim(0);
+			int amostras = prev.lenDim(1);
 			float escala = 1.0f / (amostras * lotes);
 
 			return prev.map(real, (p, r) -> {

@@ -183,11 +183,11 @@ public class BatchNorm2D extends Camada implements Cloneable {
     public void initParams() {
         verificarConstrucao();
         
-        _gamma.weight.preencher(1);
-        _beta.weight.preencher(0);
+        _gamma.weight.fill(1);
+        _beta.weight.fill(0);
 
-        _mediaMovel.preencher(0);
-        _varianciaMovel.preencher(1);
+        _mediaMovel.fill(0);
+        _varianciaMovel.fill(1);
     }
 
     @Override
@@ -223,7 +223,7 @@ public class BatchNorm2D extends Camada implements Cloneable {
 
         } else if (x.numDim() == 4) {
             validarShapes(x.shape(), shapeIn);
-            int lote = x.tamDim(0);
+            int lote = x.lenDim(0);
             if (this.tamLote != lote) ajustarParaLote(lote);  
             
         } else {
@@ -280,8 +280,8 @@ public class BatchNorm2D extends Camada implements Cloneable {
     public void gradZero() {
         verificarConstrucao();
 
-        _gamma.grad.preencher(0);
-        _beta.grad.preencher(0);
+        _gamma.grad.fill(0);
+        _beta.grad.fill(0);
     }
 
     @Override
@@ -297,7 +297,7 @@ public class BatchNorm2D extends Camada implements Cloneable {
 
     @Override
     public int numParams() {
-        return _gamma.weight.tam() + _beta.weight.tam();
+        return _gamma.weight.len() + _beta.weight.len();
     }
 
     @Override

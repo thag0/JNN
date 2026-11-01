@@ -383,7 +383,7 @@ public class Sequencial extends Modelo {
 		for (Camada camada : this) {
 			if (camada.treinavel()) {
 				for (var param : camada.params()) {
-					tamParams += param.weight.tamBytes();
+					tamParams += param.weight.sizeBytes();
 				}
 			}
 		}

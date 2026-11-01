@@ -33,7 +33,7 @@ public class HFlip implements Transform {
         validarShapes(in, out);
 
         if (JNNutils.randFloat() > p) {
-            out.copiar(in);
+            out.copy(in);
             return;
         } 
 

@@ -32,7 +32,7 @@ public class Constante extends Inicializador {
 
 	@Override
 	public void forward(Tensor tensor) {
-		tensor.preencher(val);
+		tensor.fill(val);
 	}
 	
 }

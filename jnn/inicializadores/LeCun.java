@@ -19,7 +19,7 @@ public class LeCun extends Inicializador {
         int fanIn = calcularFans(tensor)[0];
         float var = 1.0f / fanIn;
 
-		tensor.aplicar(_ -> JNNutils.randGaussianf() * (float) Math.sqrt(var));
+		tensor.apply(_ -> JNNutils.randGaussianf() * (float) Math.sqrt(var));
 	}
 
 }

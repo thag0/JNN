@@ -52,7 +52,7 @@ public abstract class Perda {
 			);
 		}
 
-		if (!prev.compShape(real)) {
+		if (!prev.compareShape(real)) {
 			throw new IllegalArgumentException(
 				"\nAs dimensões dos tensores não coincidem, prev = " + prev.shapeStr() +
 				" e real = " + real.shapeStr()

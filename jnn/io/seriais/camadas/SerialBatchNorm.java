@@ -30,11 +30,11 @@ public class SerialBatchNorm extends SerialBase implements SerializadorCamada<Ba
         escrever(dos, camada.momentum());
 
         Parametro[] params = camada.params();
-        escrever(dos, params[0].weight.data().paraArray());//gamma
-        escrever(dos, params[1].weight.data().paraArray());//beta
+        escrever(dos, params[0].weight.data().toArray());//gamma
+        escrever(dos, params[1].weight.data().toArray());//beta
     
-        escrever(dos, camada._mediaMovel.data().paraArray());
-        escrever(dos, camada._varianciaMovel.data().paraArray());
+        escrever(dos, camada._mediaMovel.data().toArray());
+        escrever(dos, camada._varianciaMovel.data().toArray());
     }
 
     @Override
@@ -52,11 +52,11 @@ public class SerialBatchNorm extends SerialBase implements SerializadorCamada<Ba
         bn.construir(shapeIn);
 
         Parametro[] params = bn.params();
-        params[0].weight.copiarElementos(gamma);
-        params[1].weight.copiarElementos(beta);
+        params[0].weight.copyElements(gamma);
+        params[1].weight.copyElements(beta);
     
-        bn._mediaMovel.copiarElementos(runMean);
-        bn._varianciaMovel.copiarElementos(runVar);
+        bn._mediaMovel.copyElements(runMean);
+        bn._varianciaMovel.copyElements(runVar);
 
         return bn;
     }

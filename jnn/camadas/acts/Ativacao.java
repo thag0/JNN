@@ -112,7 +112,7 @@ public abstract class Ativacao extends Camada implements Cloneable {
 
         } else if (numDims == dimBase + 1) {
             validarShapes(x.shape(), shapeIn);
-            int lote = x.tamDim(0);
+            int lote = x.lenDim(0);
             if (lote != this._tamLote) ajustarParaLote(lote);
 
         } else {
@@ -161,7 +161,7 @@ public abstract class Ativacao extends Camada implements Cloneable {
 
     @Override
     public int tamSaida() {
-        return saida().tam();
+        return saida().len();
     }
 
     @Override
@@ -188,8 +188,8 @@ public abstract class Ativacao extends Camada implements Cloneable {
         tamVars += 4;//dimBase
         
         long tamTensores =
-        _gradEntrada.tamBytes() +
-        _saida.tamBytes();
+        _gradEntrada.sizeBytes() +
+        _saida.sizeBytes();
 
         return tamVars + tamTensores;
     }

@@ -402,7 +402,7 @@ public class Conv2D extends Camada implements Cloneable {
 		} else if (numDim == 4) {
 			validarShapes(x.shape(), shapeIn);
 
-			int lotes = x.tamDim(0);
+			int lotes = x.lenDim(0);
 			if (lotes != this.tamLote) {
 				ajustarParaLote(lotes);
 			}
@@ -454,7 +454,7 @@ public class Conv2D extends Camada implements Cloneable {
 	 */
 	public int numFiltros() {
 		verificarConstrucao();
-		return _kernel.weight.tamDim(0);
+		return _kernel.weight.lenDim(0);
 	}
 
 	@Override
@@ -474,7 +474,7 @@ public class Conv2D extends Camada implements Cloneable {
 
 		int p = 0;
 		for (var param : params()) {
-			p += param.weight.tam();
+			p += param.weight.len();
 		}
 
 		return p;
@@ -487,7 +487,7 @@ public class Conv2D extends Camada implements Cloneable {
 
 	@Override 
 	public int tamSaida() {
-		return saida().tam();
+		return saida().len();
 	}
 
 	@Override
@@ -604,8 +604,8 @@ public class Conv2D extends Camada implements Cloneable {
 		tamVars += 2 * shapePad.length; 
 
 		long tamTensores =
-		_saida.tamBytes() +
-		_gradEntrada.tamBytes();
+		_saida.sizeBytes() +
+		_gradEntrada.sizeBytes();
 
 		return tamVars + tamTensores;
 	}

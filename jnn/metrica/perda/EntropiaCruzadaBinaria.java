@@ -20,14 +20,14 @@ import jnn.core.tensor.Tensor;
 		verificarDimensoes(prev, real);
 
         if (prev.numDim() == 1) {
-            int tam = prev.tam();
+            int tam = prev.len();
             float ecb = f(prev, real, tam);
             
 			return new Tensor(1).set((-ecb / tam), 0);
         }
 
-		final int lotes = prev.tamDim(0);
-		final int amostras = prev.tamDim(1);
+		final int lotes = prev.lenDim(0);
+		final int amostras = prev.lenDim(1);
 
 		float somaLote = 0.0f;
 		for (int i = 0; i < lotes; i++) {
@@ -65,13 +65,13 @@ import jnn.core.tensor.Tensor;
 		verificarDimensoes(prev, real);
 		
 		if (prev.numDim() == 1) {
-			final int tam = prev.tam();
+			final int tam = prev.len();
 			return prev.map(real,
 				(p, r) -> (((1.0f - r) / (1.0f - p)) - (r / p)) / tam
 			);
 		} 
 		
-		int amostras = prev.tamDim(1);
+		int amostras = prev.lenDim(1);
 		return prev.map(real,
 			(p, r) -> (((1.0f - r) / (1.0f - p + eps)) - (r / (p + eps))) / amostras
 		);

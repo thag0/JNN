@@ -22,6 +22,6 @@ public class GlorotUniforme extends Inicializador {
 		int fout = fans[1];
 		float limite = (float) Math.sqrt(6.0 / (fin + fout));
 
-		tensor.aplicar(_ -> JNNutils.randFloat() * (2.0f * limite) - limite);
+		tensor.apply(_ -> JNNutils.randFloat() * (2.0f * limite) - limite);
 	}
 }

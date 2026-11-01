@@ -166,7 +166,7 @@ public class Dropout extends Camada implements Cloneable {
 		
 		} else if (numDim == dimBase + 1) {
 			validarShapes(x.shape(), shapeIn);
-			int lotes = x.tamDim(0);
+			int lotes = x.lenDim(0);
 			if (lotes != this.tamLote) ajustarParaLote(lotes);
 		
 		} else {
@@ -179,7 +179,7 @@ public class Dropout extends Camada implements Cloneable {
 
 		_entrada = x.contiguous();
 
-		_saida.copiar(_entrada);
+		_saida.copy(_entrada);
 
 		if (treinando) {
 			gerarMascaras();
@@ -206,7 +206,7 @@ public class Dropout extends Camada implements Cloneable {
 	 * passado para a saída, nos valores iguais a 0, a entrada será desconsiderada. 
 	 */
 	private void gerarMascaras() {
-		_mascara.aplicar(
+		_mascara.apply(
 			_ ->  (JNNutils.randFloat() >= taxa) ? (1.0f / (1.0f - taxa)) : 0.0f
 		);
 	}
@@ -215,7 +215,7 @@ public class Dropout extends Camada implements Cloneable {
 	public Tensor backward(Tensor g) {
 		verificarConstrucao();
 
-		_gradEntrada.copiar(g);
+		_gradEntrada.copy(g);
 
 		if (treinando) _gradEntrada.mul(_mascara);
 
@@ -299,9 +299,9 @@ public class Dropout extends Camada implements Cloneable {
 		tamVars += 4; //dimbase
 
 		long tamTensores = 
-		_gradEntrada.tamBytes() +
-		_mascara.tamBytes() +
-		_saida.tamBytes();
+		_gradEntrada.sizeBytes() +
+		_mascara.sizeBytes() +
+		_saida.sizeBytes();
 
 		return tamVars + tamTensores;
 	}

@@ -133,7 +133,7 @@ public class Adadelta extends Otimizador {
 			TensorData num = acd_i.clone().add(eps).sqrt();
 
 			// delta = - (num/den) * g
-			d_i.copiar(num).mul(-1).div(den).mul(g_i);
+			d_i.copy(num).mul(-1).div(den).mul(g_i);
 
 			// E[Δx²] = (rho * E[Δx²]) + ((1 - rho) * (delta²))
 			acd_i.mul(rho).addcmul(d_i, d_i, 1.0f - rho);
