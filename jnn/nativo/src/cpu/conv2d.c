@@ -214,40 +214,60 @@ static void _backward_gk_loops(const conv2d_bwd_params_t* params) {
 }
 
 static void _backward_gk_im2col(const conv2d_bwd_params_t* params) {
-    const float* restrict X  = params->X;
-    const float* restrict GS = params->GS;    
-    float* restrict GK       = params->GK;
-
     const int alt_s  = params->alt_x  + 2 * params->alt_pad  - params->alt_k  + 1;
     const int larg_s = params->larg_x + 2 * params->larg_pad - params->larg_k + 1;
 
     const int K_dim = params->canais * params->alt_k * params->larg_k;
     const int N_dim = alt_s * larg_s;
-    
+
+    const size_t tam_gk   = (size_t)params->filtros * K_dim;
+    const size_t area_x_c = (size_t)params->canais * params->alt_x * params->larg_x;
+    const size_t area_gs  = (size_t)params->filtros * N_dim;
+
+    const int threads = omp_get_max_threads();
+
     size_t checkpoint = arena_checkpoint(&mem_arena);
-    float* restrict col = arena_alloc(&mem_arena, sizeof(float) * K_dim * N_dim);
+    float* col_full = arena_alloc(&mem_arena, sizeof(float) * (size_t)threads * K_dim * N_dim);
+    float* gk_full  = arena_alloc_zero(&mem_arena, sizeof(float) * (size_t)threads * tam_gk);
 
-    for (int l = 0; l < params->lotes; l++) {
-        const float* restrict x_lote  = X  + l * (params->canais * params->alt_x * params->larg_x);
-        const float* restrict gs_lote = GS + l * (params->filtros * N_dim);
+    float* restrict GK = params->GK;
 
-        im2col(
-            x_lote, col,
-            params->canais,
-            params->alt_x, params->larg_x,
-            params->alt_k, params->larg_k,
-            params->alt_pad, params->larg_pad,
-            alt_s, larg_s
-        );
+    #pragma omp parallel proc_bind(close)
+    {
+        const int t = omp_get_thread_num();
+        float* thread_col = col_full + (size_t)t * K_dim * N_dim;
+        float* thread_gk  = gk_full  + (size_t)t * tam_gk;
 
-        cpu_gemm(
-            false, true,
-            params->filtros, K_dim, N_dim,
-            gs_lote, N_dim, 
-            col, K_dim,
-            1.0f,
-            GK, K_dim
-        );
+        #pragma omp for schedule(static)
+        for (int l = 0; l < params->lotes; l++) {
+            im2col_st(
+                params->X + (size_t)l * area_x_c, thread_col,
+                params->canais,
+                params->alt_x, params->larg_x,
+                params->alt_k, params->larg_k,
+                params->alt_pad, params->larg_pad,
+                alt_s, larg_s
+            );
+
+            cpu_gemm_st(
+                false, true,
+                params->filtros, K_dim, N_dim,
+                params->GS + (size_t)l * area_gs, N_dim,
+                thread_col, N_dim,
+                1.0f,
+                thread_gk, K_dim
+            );
+        }
+
+        #pragma omp for simd schedule(static)
+        for (size_t i = 0; i < tam_gk; i++) {
+            float soma = 0.0f;
+            for (int k = 0; k < threads; k++) {
+                soma += gk_full[(size_t)k * tam_gk + i];
+            }
+
+            GK[i] += soma;
+        }
     }
 
     arena_restore(&mem_arena, checkpoint);
