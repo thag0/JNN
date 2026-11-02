@@ -16,6 +16,7 @@ import jnn.dataloader.dataset.MNIST;
 import jnn.dataloader.transform.ColorJitter;
 import jnn.dataloader.transform.Compose;
 import jnn.dataloader.transform.HFlip;
+import jnn.dataloader.transform.LabelSmoothing;
 import jnn.dataloader.transform.Norm;
 import jnn.dataloader.transform.RandomCrop;
 import jnn.dataloader.transform.Transform;
@@ -23,6 +24,7 @@ import jnn.io.JNNserial;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
 import jnn.otm.SGD;
+import jnn.otm.scheduler.CosineAnnealingLR;
 
 public class MainConv {
 
@@ -62,6 +64,15 @@ public class MainConv {
 			accs.add(ac);
 			System.out.println(" acurácia: " + (ac*100) + "%");
 		});
+
+		modelo.treinador().setScheduler(
+			new CosineAnnealingLR(
+				modelo.otm(),
+				0.0001f,
+				modelo.otm().getLr(),
+				(TREINO_EPOCAS * (treino.len() / TREINO_LOTE))
+			)
+		);
 		
 		System.out.println("Treinando.");
 		JNNnative.on();
@@ -103,20 +114,19 @@ public class MainConv {
 				
 				treino = CIFAR10.treino();
 				treino.setTransformX(new Compose(
-					new ColorJitter(.1, .1, .1),
+					new ColorJitter(.2, .2, .2),
 					new HFlip(0.5),
 					new RandomCrop(32, 32, 4, true),
 					norm
 				));
 					
 				teste = CIFAR10.teste().applyX(norm);
+				teste.applyY(new LabelSmoothing(1e-1));
 			break;
 
 			default:
 				throw new IllegalArgumentException("dataset \'" + dataset +"\' inválido");
 		}
-	
-		//
 
 		return new DataLoader[]{
 			treino,
@@ -158,10 +168,10 @@ public class MainConv {
 		Sequencial modelo = new Sequencial(
 			new Entrada(3, 32, 32),
 
-			new Conv2D(64, convK, "same", "he"),
+			new Conv2D(32, convK, "same", "he"),
 			new BatchNorm2D(),
 			new ReLU(),
-			new Conv2D(64, convK, "same", "he"),
+			new Conv2D(32, convK, "same", "he"),
 			new BatchNorm2D(),
 			new ReLU(),
 			new MaxPool2D(poolK),
@@ -177,27 +187,21 @@ public class MainConv {
 			new Conv2D(128, convK, "same", "he"),
 			new BatchNorm2D(),
 			new ReLU(),
-			new Conv2D(256, convK, "same", "he"),
+			new Conv2D(128, convK, "same", "he"),
 			new BatchNorm2D(),
 			new ReLU(),
 			new MaxPool2D(poolK),
 
 			new GlobalAvgPool2D(),
 
-			new Dropout(0.5),
-			new Densa(256, "he"),
-			new ReLU(),
-
-			new Densa(128, "he"),
-			new ReLU(),
-
+			new Dropout(0.2),
 			new Densa(10, "glorot-uniforme"),
 			new Softmax()
 		);
 
 		for (var camada : modelo) if (camada instanceof Conv2D) camada.setBias(false);
 		
-		Object otm = new SGD(0.001, 0.96);
+		Object otm = new SGD(0.01, 0.9, true);
 		Object loss = "entropia-cruzada";
 		modelo.compilar(otm, loss);
 

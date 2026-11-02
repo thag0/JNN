@@ -7,8 +7,8 @@ import jnn.core.JNNutils;
 import jnn.core.parallel.JNNparallel;
 import jnn.dataloader.DataLoader;
 import jnn.modelos.Modelo;
+import jnn.otm.scheduler.Scheduler;
 import jnn.treino.callback.CallbackFimEpoca;
-import jnn.treino.scheduler.Scheduler;
 
 /**
  * Interface para treino de modelos da biblioteca.

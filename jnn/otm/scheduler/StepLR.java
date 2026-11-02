@@ -1,4 +1,4 @@
-package jnn.treino.scheduler;
+package jnn.otm.scheduler;
 
 import jnn.otm.Otimizador;
 

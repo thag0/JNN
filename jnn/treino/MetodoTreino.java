@@ -8,8 +8,8 @@ import jnn.dataloader.DataLoader;
 import jnn.metrica.perda.Perda;
 import jnn.modelos.Modelo;
 import jnn.otm.Otimizador;
+import jnn.otm.scheduler.Scheduler;
 import jnn.treino.callback.CallbackFimEpoca;
-import jnn.treino.scheduler.Scheduler;
 
 /**
  * Método base de treino de modelo.
