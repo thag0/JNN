@@ -30,6 +30,25 @@ public final class JNNutils {
 	}
 
 	/**
+	 * Retorna um valor aleatório no intervalor [min, max[.
+	 * @param min valor mínimo (inclusivo).
+	 * @param max valor máximo (exclusivo).
+	 * @return valor gerado.
+	 */
+	public static int randInt(int min, int max) {
+		return rng.nextInt(min, max);
+	}
+
+	/**
+	 * Retorna um valor aleatório no intervalo de [0, max[.
+	 * @param max valor máximo (exclusivo).
+	 * @return valor gerado.
+	 */
+	public static int randInt(int max) {
+		return rng.nextInt(0, max);
+	}
+
+	/**
 	 * Retorna um número normalmente distribuído com média = 0 
 	 * e desvio padrão = 1.
 	 * @return valor gerado.
