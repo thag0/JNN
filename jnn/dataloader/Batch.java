@@ -5,7 +5,7 @@ import jnn.core.tensor.Tensor;
 /**
  * Conteiner para armazenar um conjunto de amostras.
  */
-public class LoteAmostra {
+public class Batch {
     
     /**
      * Dados de entrada (X).
@@ -22,7 +22,7 @@ public class LoteAmostra {
      * @param x Dados de entrada (X).
      * @param y Dados de saída (Y).
      */
-    public LoteAmostra(Tensor[] x, Tensor[] y) {
+    public Batch(Tensor[] x, Tensor[] y) {
         if (x.length != y.length) {
             throw new IllegalArgumentException(
                 "\nQuantidade de elementos de X e Y devem ser iguais."
@@ -53,7 +53,7 @@ public class LoteAmostra {
     * Retorna o número de amostras no lote.
     * @return Número de amostras no lote.
     */
-    public int tam() {
+    public int len() {
         return xs.length;
     }
 

@@ -1,7 +1,7 @@
 package jnn.treino;
 
 import jnn.core.tensor.Tensor;
-import jnn.dataloader.Amostra;
+import jnn.dataloader.Sample;
 import jnn.dataloader.DataLoader;
 import jnn.metrica.perda.Perda;
 import jnn.modelos.Modelo;
@@ -36,15 +36,15 @@ public class Treino extends MetodoTreino {
 		long tempo = 0;
 		int largEpocas = String.valueOf(epochs).length();
 
-		final int n = loader.tam();
+		final int n = loader.len();
 		for (int e = 0; e < epochs; e++) {
 			if (logs) tempo = System.nanoTime();
 
 			float perdaEpoca = 0.0f;
-			loader.embaralhar();
+			loader.suffle();
 			
 			for (int i = 0; i < n; i++) {
-				Amostra a = loader.get(i);
+				Sample a = loader.get(i);
 				Tensor prev = modelo.forward(a.x());
 				
 				if (calcHist) perdaEpoca += loss.forward(prev, a.y()).item();

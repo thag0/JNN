@@ -3,7 +3,7 @@ package jnn.treino;
 import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
-import jnn.dataloader.LoteAmostra;
+import jnn.dataloader.Batch;
 import jnn.metrica.perda.Perda;
 import jnn.modelos.Modelo;
 import jnn.otm.Otimizador;
@@ -47,15 +47,15 @@ public class TreinoLote extends MetodoTreino {
 		long tempo = 0;
 		int largEpocas = String.valueOf(epochs).length();
 
-		final int n = loader.tam();
+		final int n = loader.len();
 		for (int e = 0; e < epochs; e++) {
 			if (logs) tempo = System.nanoTime();
 
-			loader.embaralhar();
+			loader.suffle();
 			float perdaEpoca = 0.0f;
 
 			for (int i = 0; i < n; i += tamLote) {
-				LoteAmostra lote = loader.lote(i, tamLote);
+				Batch lote = loader.batch(i, tamLote);
 
                 modelo.gradZero();
 				perdaEpoca += processoLote(lote.arrX(), lote.arrY(), loss);

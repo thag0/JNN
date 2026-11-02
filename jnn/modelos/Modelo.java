@@ -311,7 +311,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 		// tanta memória e teve um leve ganho em tempo de execução.
 		final int batch = 32;
 
-		final int n = loader.tam();
+		final int n = loader.len();
 		float loss = 0;
 		for (int i = 0; i < n; i += batch) {
 			int inicio = i;

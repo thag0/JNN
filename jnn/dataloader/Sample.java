@@ -7,7 +7,7 @@ import jnn.core.tensor.Tensor;
  * Conteiner mais simples de um conjunto de entrada (X) e
  * saída (Y) de um Dataset.
  */
-public class Amostra {
+public class Sample {
 
     /**
      * Amostra de entrada.
@@ -22,30 +22,30 @@ public class Amostra {
     /**
      * Nome da amostra, pra facilitar o debug.
      */
-    private String nome = "Amostra";
+    private String nome = "Sample";
 
     /**
-     * Inicializa uma nova {@code Amostra}.
+     * Inicializa uma nova {@code Sample}.
      * @param x {@code Tensor} com dados de entrada.
      * @param y {@code Tensor} com dados de saída.
      */
-    public Amostra(Tensor x, Tensor y) {
+    public Sample(Tensor x, Tensor y) {
         this.x = JNNutils.validarNaoNulo(x, "x == null");
         this.y = JNNutils.validarNaoNulo(y, "y == null");
     }
 
     /**
-     * Inicializa uma nova {@code Amostra}.
+     * Inicializa uma nova {@code Sample}.
      * @param x {@code Tensor} com dados de entrada.
      * @param y {@code Tensor} com dados de saída.
-     * @param nome {@code String} para um nome personalizado da amostra.
+     * @param name {@code String} para um nome personalizado da amostra.
      */
-    public Amostra(Tensor x, Tensor y, String nome) {
+    public Sample(Tensor x, Tensor y, String name) {
         this(x, y);
     
-        nome = nome.trim();
-        if (!(nome.isEmpty()) || !(nome.isBlank())) {
-            this.nome = nome;
+        name = name.trim();
+        if (!(name.isEmpty()) || !(name.isBlank())) {
+            this.nome = name;
         }
     }
 
@@ -112,7 +112,7 @@ public class Amostra {
      * Retorna o tamanho da amostra em bytes na memória.
      * @return quantidade de bytes estimada.
      */
-    public long tamBytes() {
+    public long sizeBytes() {
         String jvmBits = System.getProperty("sun.arch.data.model");
         long bits = Long.valueOf(jvmBits);
 

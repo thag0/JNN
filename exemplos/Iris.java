@@ -46,8 +46,8 @@ public class Iris {
 
 		// Gerando o dataset
 		DataLoader loader = JNN.dataloader(dados, numEntradas, numSaidas);
-		loader.embaralhar();
-		DataLoader[] ds = loader.separar(0.75, 0.25);// separando 75% treino, 25% teste
+		loader.suffle();
+		DataLoader[] ds = loader.split(0.75, 0.25);// separando 75% treino, 25% teste
 		DataLoader treino = ds[0];
 		
 		// Criando um modelo

@@ -45,21 +45,23 @@ public class MainImg {
 
 		Tensor[] x = JNN.arrayParaTensores(in);
 		Tensor[] y = JNN.arrayParaTensores(out);
-		DataLoader dl = new DataLoader(x, y);
-		dl.aplicarY(t -> t.div(255));// normalizar saída de 0-255 para 0-1
-		dl.print();
+		DataLoader loader = new DataLoader(x, y);
+		for (var sample : loader) {
+			sample.y().div(255);// normalizar saída de 0-255 para 0-1
+		}
+		loader.print();
 
 		Modelo modelo = modelo(tamEntrada, tamSaida);
 		modelo.print();
 		modelo.otm().print();
 
 		System.out.println("Treinando.");
-		long tempo = treinoEmPainel(modelo, dl, imagem.getWidth(), imagem.getHeight());
+		long tempo = treinoEmPainel(modelo, loader, imagem.getWidth(), imagem.getHeight());
 		long hrs = TimeUnit.NANOSECONDS.toHours(tempo);
 		long min = TimeUnit.NANOSECONDS.toMinutes(tempo);
 		long sec = TimeUnit.NANOSECONDS.toSeconds(tempo);
 
-		System.out.println("Perda = " + modelo.avaliar(dl).item());
+		System.out.println("Perda = " + modelo.avaliar(loader).item());
 		System.out.println("Tempo de treinamento: " + hrs + "h " + min + "m " + sec + "s");
 
 		if (historico) {

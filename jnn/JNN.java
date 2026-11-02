@@ -5,7 +5,7 @@ import jnn.core.JNNutils;
 import jnn.core.ops.Ops;
 import jnn.core.tensor.Tensor;
 import jnn.core.tensor.TensorConverter;
-import jnn.dataloader.Amostra;
+import jnn.dataloader.Sample;
 import jnn.dataloader.DataLoader;
 import jnn.inicializadores.Identidade;
 import jnn.inicializadores.Inicializador;
@@ -665,7 +665,7 @@ public final class JNN {
      * @return {@code DataLoader}.
      * @see jnn.dataloader.DataLoader DataLoader
      */
-    public static DataLoader dataloader(Amostra[] as) {
+    public static DataLoader dataloader(Sample[] as) {
         return new DataLoader(as);
     }
 
@@ -675,7 +675,7 @@ public final class JNN {
      * @return {@code DataLoader}.
      * @see jnn.dataloader.DataLoader DataLoader
      */
-    public static DataLoader dataloader(Amostra a) {
+    public static DataLoader dataloader(Sample a) {
         return new DataLoader(a);
     }
     

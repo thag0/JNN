@@ -23,7 +23,6 @@ import jnn.io.JNNserial;
 import jnn.modelos.Modelo;
 import jnn.modelos.Sequencial;
 import jnn.otm.SGD;
-import jnn.treino.scheduler.StepLR;
 
 public class MainConv {
 
@@ -110,7 +109,7 @@ public class MainConv {
 					norm
 				));
 					
-				teste = CIFAR10.teste().aplicarX(norm);
+				teste = CIFAR10.teste().applyX(norm);
 			break;
 
 			default:
