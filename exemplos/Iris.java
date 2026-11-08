@@ -12,7 +12,7 @@ import jnn.layers.Dropout;
 import jnn.layers.Input;
 import jnn.layers.acts.Softmax;
 import jnn.layers.acts.Tanh;
-import jnn.models.Sequencial;
+import jnn.models.Sequential;
 
 /**
  * Exemplo de criação, treino e validação de um modelo da biblioteca
@@ -50,7 +50,7 @@ public class Iris {
 		DataLoader treino = ds[0];
 		
 		// Criando um modelo
-		Sequencial modelo = new Sequencial(
+		Sequential modelo = new Sequential(
 			new Input(numEntradas),
 			new Dense(10),
 			new Tanh(),

@@ -15,7 +15,7 @@ import jnn.layers.Input;
 import jnn.layers.acts.Sigmoid;
 import jnn.layers.acts.Tanh;
 import jnn.models.Model;
-import jnn.models.Sequencial;
+import jnn.models.Sequential;
 import jnnview.JNNview;
 
 public class MainImg {
@@ -79,7 +79,7 @@ public class MainImg {
 	 * @return {@code Modelo} criado.
 	 */
 	static Model modelo(int in, int out) {
-		Sequencial modelo = new Sequencial(
+		Sequential modelo = new Sequential(
 			new Input(in),
 			new Dense(16),
 			new Tanh(),
@@ -250,7 +250,7 @@ public class MainImg {
 					
 						clones[id].forward(in);
 					
-						saida[0] = clones[id].saidaParaArray()[0] * 255f;
+						saida[0] = clones[id].outputToArray()[0] * 255f;
 
 						synchronized(imagemAmpliada) {
 							imagemAmpliada.set(x, y, (int)saida[0], (int)saida[0], (int)saida[0]);
@@ -332,7 +332,7 @@ public class MainImg {
 						entrada[1] = (float)y / (alturaImagem-1);
 					
 						redes[id].forward(in);
-						float[] s = redes[id].saidaParaArray();
+						float[] s = redes[id].outputToArray();
 					
 						saida[0] = s[0] * 255f;
 						saida[1] = s[1] * 255f;

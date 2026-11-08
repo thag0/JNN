@@ -23,7 +23,7 @@ public class Xor{
 		final int in  = 2;// Entradas X
 		final int out = 1;// Saídas Y
 
-		Sequencial modelo = new Sequencial(
+		Sequential modelo = new Sequential(
 			new Input(in),
 			new Dense(3),
 			new Sigmoid(),
@@ -47,7 +47,7 @@ public class Xor{
 	 * Validação do modelo xor usando uma tabela verdade.
 	 * @param modelo modelo base.
 	 */
-	static void verificar(Sequencial modelo) {
+	static void verificar(Sequential modelo) {
 		System.out.println("\n-- Tabela verdade --");
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < 2; j++) {

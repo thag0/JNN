@@ -13,7 +13,7 @@ import jnn.layers.*;
 import jnn.layers.acts.Sigmoid;
 import jnn.layers.acts.Tanh;
 import jnn.models.Model;
-import jnn.models.Sequencial;
+import jnn.models.Sequential;
 import jnn.otm.SGD;
 
 /**
@@ -41,7 +41,7 @@ public class UpscaleImg {
 
 		// Criando modelo
 		// -Neste exemplo queremos que o modelo tenha overfitting
-		Sequencial modelo = new Sequencial(
+		Sequential modelo = new Sequential(
 			new Input(nEntrada),
 			new Dense(12),
 			new Tanh(),
@@ -175,7 +175,7 @@ public class UpscaleImg {
 					
 						clones[id].forward(in);
 					
-						saida[0] = clones[id].saidaParaArray()[0] * 255;
+						saida[0] = clones[id].outputToArray()[0] * 255;
 
 						synchronized(ampliada) {
 							ampliada.set(x, y, (int)saida[0], (int)saida[0], (int)saida[0]);

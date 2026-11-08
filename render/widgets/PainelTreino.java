@@ -42,7 +42,7 @@ public class PainelTreino extends Widget {
       
       
       if (nSaida == 1) {//escala de cinza
-         float[] saida = modelo.saidaParaArray();//saida 1D
+         float[] saida = modelo.outputToArray();//saida 1D
          float s = saida[0];
 
          for (y = 0; y < this.altura; y++) {
@@ -63,7 +63,7 @@ public class PainelTreino extends Widget {
          } 
 
       } else if (nSaida == 3) {//rgb
-         float[] saida = modelo.saidaParaArray();//saida 3D
+         float[] saida = modelo.outputToArray();//saida 3D
          float saidaR = saida[0];
          float saidaG = saida[1];
          float saidaB = saida[2];

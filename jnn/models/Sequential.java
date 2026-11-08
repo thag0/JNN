@@ -153,12 +153,12 @@ import jnn.treino.Treinador;
  * @author Thiago Barroso, acadêmico de Engenharia da Computação pela Universidade Federal do Pará, 
  * Campus Tucuruí. Dezembro/2023.
  */
-public class Sequencial extends Model {
+public class Sequential extends Model {
 
 	/**
 	 * Lista de camadas do modelo.
 	 */
-	private Layer[] _camadas;
+	private Layer[] _layers;
 
 	/**
 	 * Instancia um modelo sequencial com o conjunto de camadas vazio.
@@ -171,8 +171,8 @@ public class Sequencial extends Model {
 	 *    usando o método {@code add()}.
 	 * </p>
 	 */
-	public Sequencial() {
-		_camadas = new Layer[0];
+	public Sequential() {
+		_layers = new Layer[0];
 		_compiled = false;
 	}
 
@@ -183,24 +183,24 @@ public class Sequencial extends Model {
 	 *    É necessário especificar o formato de entrada da primeira camada
 	 *    do modelo.
 	 * </p>
-	 * @param camadas conjunto de camadas que serão usadas pelo modelo.
+	 * @param ls conjunto de camadas que serão usadas pelo modelo.
 	 * @throws IllegalArgumentException caso o conjunto de camadas seja nulo
 	 * ou alguma camada contida seja.
 	 */
-	public Sequencial(Layer... camadas) {
+	public Sequential(Layer... ls) {
 		this();// evitar repetição de código
 
-		JNNutils.validarNaoNulo(camadas, "camadas == null.");
+		JNNutils.validarNaoNulo(ls, "camadas == null.");
 
-		if (camadas.length < 1) {
+		if (ls.length < 1) {
 			throw new IllegalArgumentException(
 				"\nConjunto de camadas vazio."
 			);
 		}
 		
-		add(camadas[0]);
-		for (int i = 1; i < camadas.length; i++) {
-			if (!(camadas[i] instanceof Input)) add(camadas[i]);
+		add(ls[0]);
+		for (int i = 1; i < ls.length; i++) {
+			if (!(ls[i] instanceof Input)) add(ls[i]);
 		}
 	}
 
@@ -212,11 +212,11 @@ public class Sequencial extends Model {
 	 *    já que é necessário saber o formato de entrada do modelo.
 	 * </p>
 	 * Ao adicionar novas camadas, o modelo precisará ser compilado novamente.
-	 * @param c nova camada.
+	 * @param l nova camada.
 	 * @throws IllegalArgumentException se a camada fornecida for nula,
 	 */
-	public void add(Layer c) {
-		_camadas = JNNutils.addEmArray(_camadas, c);
+	public void add(Layer l) {
+		_layers = JNNutils.addEmArray(_layers, l);
 		_compiled = false;
 	}
 
@@ -226,27 +226,27 @@ public class Sequencial extends Model {
 	 * @throws IllegalArgumentException caso o modelo já não possua nenhuma 
 	 * camada disponível.
 	 */
-	public Layer rem() {
-		if (_camadas.length < 1) {
+	public Layer pop() {
+		if (_layers.length < 1) {
 			throw new IllegalArgumentException(
 				"\nNão há camadas no modelo."
 			);
 		}
 
-		Layer ultima = outputLayer();
+		Layer last = outputLayer();
 
-		Layer[] novas = _camadas;
-		_camadas = new Layer[_camadas.length-1];
-		System.arraycopy(novas, 0, _camadas, 0, _camadas.length);
+		Layer[] newLayers = _layers;
+		_layers = new Layer[_layers.length-1];
+		System.arraycopy(newLayers, 0, _layers, 0, _layers.length);
 
 		_compiled = false;
 
-		return ultima;
+		return last;
 	}
 
 	@Override
-	public void compile(Object otm, Object loss) {
-		if (layers().length < 1) {
+	public void compile(Object optim, Object loss) {
+		if (numLayers() < 1) {
 			throw new IllegalStateException(
 				"\nNão há camadas no modelo."
 			);
@@ -257,8 +257,8 @@ public class Sequencial extends Model {
 
 			// remover camada de entrada do modelo
 			Layer[] temp = layers();
-			_camadas = new Layer[numLayers()-1];
-			System.arraycopy(temp, 1, _camadas, 0, numLayers());
+			_layers = new Layer[numLayers() - 1];
+			System.arraycopy(temp, 1, _layers, 0, numLayers());
 
 			if (numLayers() < 1) {
 				throw new IllegalStateException(
@@ -278,53 +278,53 @@ public class Sequencial extends Model {
 		}
 
 		for (int i = 0; i < numLayers(); i++) {
-			Layer camada = layer(i);
+			Layer layer = layer(i);
 			
-			if (i != 0) camada.build(layer(i-1).shapeOut());
+			if (i != 0) layer.build(layer(i-1).shapeOut());
 			
-			camada.initParams();
-			camada.setId(i);
+			layer.initParams();
+			layer.setId(i);
 		}
 		
 		Dicionario dicio = new Dicionario();
 		_loss = dicio.getLoss(loss);
 		
-		_optimizer = dicio.getOtimizador(otm);
+		_optimizer = dicio.getOtimizador(optim);
 		_optimizer.construir(params());
 		
 		_compiled = true;// modelo pode ser usado.
 	}
 
 	@Override
-	public Layer layer(int id){
-		if ((id < 0) || (id >= _camadas.length)) {
+	public Layer layer(int i) {
+		if ((i < 0) || (i >= _layers.length)) {
 			throw new IllegalArgumentException(
-				"O índice fornecido (" + id + 
+				"O índice fornecido (" + i + 
 				") é inválido ou fora de alcance."
 			);
 		}
 	
-		return _camadas[id];
+		return _layers[i];
 	}
 
 	@Override
 	public Layer[] layers() {
-		return _camadas;
+		return _layers;
 	}
 
 	@Override
 	public Layer outputLayer() {
-		if (_camadas.length < 1) {
+		if (_layers.length < 1) {
 			throw new UnsupportedOperationException(
 				"\nO modelo não possui camadas adiciondas."
 			);
 		}
 
-		return _camadas[_camadas.length-1];
+		return _layers[_layers.length - 1];
 	}
 
 	@Override
-	public float[] saidaParaArray() {
+	public float[] outputToArray() {
 		validateCompilation();
 		return outputLayer().output().array();
 	}
@@ -336,7 +336,7 @@ public class Sequencial extends Model {
 
 	@Override
 	public int numLayers() {
-		return _camadas.length;
+		return _layers.length;
 	}
 
 	@Override
@@ -403,8 +403,8 @@ public class Sequencial extends Model {
 	}
 
 	@Override
-	public Sequencial clone() {
-		Sequencial clone = (Sequencial) super.clone();
+	public Sequential clone() {
+		Sequential clone = (Sequential) super.clone();
 
 		clone._evaluator = new Evaluator(clone);
 		clone.trainHistory = this.trainHistory;
@@ -416,9 +416,9 @@ public class Sequencial extends Model {
 		clone._trainer = new Treinador(clone);
 		
 		int nCamadas = numLayers();
-		clone._camadas = new Layer[nCamadas];
+		clone._layers = new Layer[nCamadas];
 		for (int i = 0; i < nCamadas; i++) {
-			clone._camadas[i] = layer(i).clone();
+			clone._layers[i] = layer(i).clone();
 		}
 		clone._compiled = this._compiled;
 
@@ -427,7 +427,7 @@ public class Sequencial extends Model {
 
 	@Override
 	public Iterator<Layer> iterator() {
-		return new ModelIterator(_camadas);
+		return new ModelIterator(_layers);
 	}
 
 	@Override

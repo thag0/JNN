@@ -428,7 +428,7 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 	 * Retorna um array contendo a saída serializada do modelo.
 	 * @return saída do modelo.
 	 */
-	public abstract float[] saidaParaArray();
+	public abstract float[] outputToArray();
 
 	/**
 	 * Copia os dados de saída da última camada do modelo para o array.
@@ -437,7 +437,7 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 	public void copyFromOutput(float[] arr) {
 		JNNutils.validarNaoNulo(arr, "arr == null.");
 		
-		float[] saida = saidaParaArray();
+		float[] saida = outputToArray();
 		
 		if (saida.length != arr.length) {
 			throw new IllegalArgumentException(

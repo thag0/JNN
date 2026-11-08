@@ -3,7 +3,7 @@ package exemplos;
 import ged.Ged;
 import jnn.io.JNNserial;
 import jnn.layers.Dense;
-import jnn.models.Sequencial;
+import jnn.models.Sequential;
 
 /**
  * Exemplo básico de serialização de um modelo em um arquivo externo.
@@ -18,7 +18,7 @@ public class ModelIO {
 		String caminho = "./dados/modelos/modelo.nn";
 
 		// Criando um modelo base
-		Sequencial modelo = new Sequencial(
+		Sequential modelo = new Sequential(
 			new Dense(784),
 			new Dense(16),
 			new Dense(16),

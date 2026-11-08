@@ -30,7 +30,7 @@ import jnn.layers.acts.Tanh;
 import jnn.layers.pooling.AvgPool2D;
 import jnn.layers.pooling.GlobalAvgPool2D;
 import jnn.layers.pooling.MaxPool2D;
-import jnn.models.Sequencial;
+import jnn.models.Sequential;
 
 /**
  * Classe responsável por tratar da gravação/leitura de modelos
@@ -58,7 +58,7 @@ public class JNNserial extends SerialBase {
 	 * @param modelo modelo {@code Sequencial}.
 	 * @param caminho caminho com nome e extensão do arquivo {@code .nn}.
 	 */
-	static public void salvar(Sequencial modelo, String caminho) {
+	static public void salvar(Sequential modelo, String caminho) {
 		File arquivo = new File(caminho);
 		if (!arquivo.getName().toLowerCase().endsWith(formatoModelo)) {
 			throw new IllegalArgumentException(
@@ -91,7 +91,7 @@ public class JNNserial extends SerialBase {
 	 * @param caminho caminho onde está saldo o arquivo {@code .nn} do modelo;
 	 * @return modelo {@code Sequencial} lido a partir do arquivo.
 	 */
-	static public Sequencial lerSequencial(String caminho) {
+	static public Sequential lerSequencial(String caminho) {
 		File arquivo = new File(caminho);
         if (!arquivo.getName().toLowerCase().endsWith(formatoModelo)) {
 			throw new IllegalArgumentException("O caminho deve conter a extensão " + formatoModelo);
@@ -195,7 +195,7 @@ public class JNNserial extends SerialBase {
 			System.exit(1);
 		}
 
-		Sequencial modelo = new Sequencial(cs);
+		Sequential modelo = new Sequential(cs);
 		
 		// mudar isso depois para algo como "modelo.compilar(otm, loss, false)"
 		// onde o false faria com que os parametros lidos não fossem mexidos na compilação

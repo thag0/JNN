@@ -22,7 +22,7 @@ import jnn.layers.acts.Tanh;
 import jnn.layers.pooling.GlobalAvgPool2D;
 import jnn.layers.pooling.MaxPool2D;
 import jnn.models.Model;
-import jnn.models.Sequencial;
+import jnn.models.Sequential;
 import jnn.otm.SGD;
 import jnn.otm.scheduler.CosineAnnealingLR;
 
@@ -51,7 +51,7 @@ public class MainConv {
 
 		treino.print();
 
-		Sequencial modelo = cnnCifar10();
+		Sequential modelo = cnnCifar10();
 		modelo.setHistorico(true);
 		modelo.print();
 		
@@ -138,8 +138,8 @@ public class MainConv {
 	 * Cria um modelo Multilayer Perceptron.
 	 * @return {@code Sequencial}.
 	 */
-	static Sequencial mlp() {
-		Sequencial modelo = new Sequencial(
+	static Sequential mlp() {
+		Sequential modelo = new Sequential(
 			new Input(1, 28, 28),
 			new Flatten(),
 			new Dense(40),
@@ -161,11 +161,11 @@ public class MainConv {
 	 * Cria um modelo Convoluiconal.
 	 * @return {@code Sequencial}.
 	 */
-	static Sequencial cnnCifar10() {
+	static Sequential cnnCifar10() {
 		int[] convK = {3, 3};
 		int[] poolK = {2, 2};
 
-		Sequencial modelo = new Sequencial(
+		Sequential modelo = new Sequential(
 			new Input(3, 32, 32),
 
 			new Conv2D(32, convK, "same", "he"),
@@ -208,11 +208,11 @@ public class MainConv {
 		return modelo;		
 	}
 
-	static Sequencial cnnMNIST() {
+	static Sequential cnnMNIST() {
 		int[] convK = {3, 3};
 		int[] poolK = {2, 2};
 
-		Sequencial modelo = new Sequencial(
+		Sequential modelo = new Sequential(
 			new Input(1, 28, 28),
 
 			new Conv2D(16, convK, "same", "he"),
