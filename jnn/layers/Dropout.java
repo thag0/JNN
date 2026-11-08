@@ -156,7 +156,7 @@ public class Dropout extends Layer implements Cloneable {
 
 	@Override
 	public Tensor forward(Tensor x) {
-		isBuilt();
+		validateBuid();
 
 		final int numDim = x.numDim();
 
@@ -213,7 +213,7 @@ public class Dropout extends Layer implements Cloneable {
 
 	@Override
 	public Tensor backward(Tensor g) {
-		isBuilt();
+		validateBuid();
 
 		_gradInput.copy(g);
 
@@ -224,13 +224,13 @@ public class Dropout extends Layer implements Cloneable {
 
 	@Override
 	public Tensor output() {
-		isBuilt();
+		validateBuid();
 		return _output;
 	}
 
 	@Override
 	public int[] shapeIn() {
-		isBuilt();
+		validateBuid();
 		return shapeIn.clone();
 	}
 
@@ -254,7 +254,7 @@ public class Dropout extends Layer implements Cloneable {
 
 	@Override
 	public Dropout clone() {
-		isBuilt();
+		validateBuid();
 
 		Dropout clone = (Dropout) super.clone();
 		clone.shapeIn = this.shapeIn.clone();
@@ -269,7 +269,7 @@ public class Dropout extends Layer implements Cloneable {
 
 	@Override
 	public String info() {
-		isBuilt();
+		validateBuid();
 
 		StringBuilder sb = new StringBuilder();
 		String pad = " ".repeat(4);
@@ -287,7 +287,7 @@ public class Dropout extends Layer implements Cloneable {
 
 	@Override
 	public Tensor gradInput() {
-		isBuilt();
+		validateBuid();
 		return _gradInput;
 	}
 

@@ -269,7 +269,7 @@ public class Sequential extends Model {
 			layer(0).build(shape);
 		
 		} else {
-			if (!layer(0).construida()) {
+			if (!layer(0).isBuilt()) {
 				throw new IllegalArgumentException(
 					"\nÉ necessário que a primeira camada (" + layer(0).name() +
 					") seja construída."

@@ -166,7 +166,7 @@ public class GlobalAvgPool2D extends Layer implements Cloneable {
 
     @Override
     public Tensor forward(Tensor x) {
-        isBuilt();
+        validateBuid();
 
         final int numDim = x.numDim();
 
@@ -194,7 +194,7 @@ public class GlobalAvgPool2D extends Layer implements Cloneable {
 
     @Override
     public Tensor backward(Tensor g) {
-        isBuilt();
+        validateBuid();
 
         _gradOutput = g.contiguous();
 
@@ -205,13 +205,13 @@ public class GlobalAvgPool2D extends Layer implements Cloneable {
 
     @Override
     public int[] shapeIn() {
-        isBuilt();
+        validateBuid();
         return shapeIn.clone();
     }
 
     @Override
     public int[] shapeOut() {
-        isBuilt();
+        validateBuid();
         return shapeOut.clone();
     }
 
@@ -222,13 +222,13 @@ public class GlobalAvgPool2D extends Layer implements Cloneable {
 
     @Override
     public Tensor output() {
-        isBuilt();
+        validateBuid();
         return _output;
     }
 
 	@Override
 	public Tensor gradInput() {
-		isBuilt();
+		validateBuid();
 		return _gradInput; 
 	}
 
@@ -248,7 +248,7 @@ public class GlobalAvgPool2D extends Layer implements Cloneable {
 
     @Override
     public Layer clone() {
-        isBuilt();
+        validateBuid();
 
         GlobalAvgPool2D clone = (GlobalAvgPool2D) super.clone();
 

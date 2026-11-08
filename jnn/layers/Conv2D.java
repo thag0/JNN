@@ -349,7 +349,7 @@ public class Conv2D extends Layer implements Cloneable {
 
 	@Override
 	public void initParams() {
-		isBuilt();
+		validateBuid();
 		
 		kernelInit.forward(_kernel.weight);
 		_bias.ifPresent(b -> biasInit.forward(b.weight));
@@ -393,7 +393,7 @@ public class Conv2D extends Layer implements Cloneable {
 
 	@Override
 	public Tensor forward(Tensor x) {
-		isBuilt();
+		validateBuid();
 
 		final int numDim = x.numDim();
 
@@ -426,7 +426,7 @@ public class Conv2D extends Layer implements Cloneable {
 
 	@Override
 	public Tensor backward(Tensor g) {
-		isBuilt();
+		validateBuid();
 
 		_gradOutput = g.contiguous();
 
@@ -444,7 +444,7 @@ public class Conv2D extends Layer implements Cloneable {
 
 	@Override
 	public void zeroGrad() {
-		isBuilt();
+		validateBuid();
 
 		_kernel.grad.zero();
 		_bias.ifPresent(b -> b.grad.zero());
@@ -455,13 +455,13 @@ public class Conv2D extends Layer implements Cloneable {
 	 * @return quantiadde de filtros presentes na camada.
 	 */
 	public int numFilters() {
-		isBuilt();
+		validateBuid();
 		return _kernel.weight.lenDim(0);
 	}
 
 	@Override
 	public Tensor output() {
-		isBuilt();
+		validateBuid();
 		return _output;
 	}
 
@@ -472,7 +472,7 @@ public class Conv2D extends Layer implements Cloneable {
 
 	@Override
 	public int numParams() {
-		isBuilt();
+		validateBuid();
 
 		int p = 0;
 		for (var param : params()) {
@@ -494,7 +494,7 @@ public class Conv2D extends Layer implements Cloneable {
 
 	@Override
 	public String info() {
-		isBuilt();
+		validateBuid();
 
 		StringBuilder sb = new StringBuilder();
 		String pad = " ".repeat(4);
@@ -515,7 +515,7 @@ public class Conv2D extends Layer implements Cloneable {
 
 	@Override
 	public Conv2D clone() {
-		isBuilt();
+		validateBuid();
 
 		Conv2D clone = (Conv2D) super.clone();
 		clone.useBias = this.useBias;
@@ -544,7 +544,7 @@ public class Conv2D extends Layer implements Cloneable {
 	 */
 	@Override
 	public int[] shapeIn() {
-		isBuilt();
+		validateBuid();
 		return shapeIn.clone();
 	}
  
@@ -558,7 +558,7 @@ public class Conv2D extends Layer implements Cloneable {
 	 */
 	@Override
 	public int[] shapeOut() {
-		isBuilt();
+		validateBuid();
 		return shapeOut.clone();
 	}
 
@@ -567,7 +567,7 @@ public class Conv2D extends Layer implements Cloneable {
 	 * @return formato de cada filtro (altura, largura).
 	 */
 	public int[] shapeKernel() {
-		isBuilt();
+		validateBuid();
 		return shapeKernel.clone();
 	}
 
@@ -576,13 +576,13 @@ public class Conv2D extends Layer implements Cloneable {
 	 * @return formato do padding (altura, largura).
 	 */
 	public int[] shapePadding() {
-		isBuilt();
+		validateBuid();
 		return shapePad.clone();
 	}
 
 	@Override
 	public Tensor bias() {
-		isBuilt();
+		validateBuid();
 
 		if (hasBias()) return _bias.get().weight;
 
@@ -593,7 +593,7 @@ public class Conv2D extends Layer implements Cloneable {
 
 	@Override
 	public Tensor gradInput() {
-		isBuilt();
+		validateBuid();
 		return _gradInput; 
 	}
 

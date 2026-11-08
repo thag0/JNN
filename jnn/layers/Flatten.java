@@ -157,7 +157,7 @@ public class Flatten extends Layer implements Cloneable {
 
 	@Override
 	public Tensor forward(Tensor x) {
-		isBuilt();
+		validateBuid();
 
 		if (x.numDim() == shapeIn.length) {
 			validateShapes(x.shape(), shapeIn);
@@ -183,7 +183,7 @@ public class Flatten extends Layer implements Cloneable {
 
 	@Override
 	public Tensor backward(Tensor g) {
-		isBuilt();
+		validateBuid();
 
 		_gradEntrada.copyElements(g);
 
@@ -192,7 +192,7 @@ public class Flatten extends Layer implements Cloneable {
 
 	@Override
 	public Tensor output() {
-		isBuilt();
+		validateBuid();
 		return _saida;
 	}
 
@@ -216,7 +216,7 @@ public class Flatten extends Layer implements Cloneable {
 
 	@Override
 	public int[] shapeIn() {
-		isBuilt();
+		validateBuid();
 		return shapeIn.clone();
 	}
 
@@ -232,7 +232,7 @@ public class Flatten extends Layer implements Cloneable {
 	 */
 	 @Override
 	public int[] shapeOut() {
-		isBuilt();
+		validateBuid();
 		return _saida.shape().clone();
 	}
 
@@ -243,13 +243,13 @@ public class Flatten extends Layer implements Cloneable {
 
 	@Override
 	public Tensor gradInput() {
-		isBuilt();
+		validateBuid();
 		return _gradEntrada;
 	}
 
 	@Override
 	public String info() {
-		isBuilt();
+		validateBuid();
 
 		StringBuilder sb = new StringBuilder();
 		String pad = " ".repeat(4);

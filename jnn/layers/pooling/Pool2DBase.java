@@ -181,7 +181,7 @@ public abstract class Pool2DBase extends Layer {
 
     @Override
     public Tensor forward(Tensor x) {
-		isBuilt();
+		validateBuid();
 
 		final int numDim = x.numDim();
 
@@ -221,7 +221,7 @@ public abstract class Pool2DBase extends Layer {
 
     @Override
     public Tensor backward(Tensor g) {
-		isBuilt();
+		validateBuid();
 
 		if (g.numDim() != _gradEntrada.numDim()) {
 			throw new IllegalStateException(
@@ -249,19 +249,19 @@ public abstract class Pool2DBase extends Layer {
 
     @Override
     public Tensor output() {
-        isBuilt();
+        validateBuid();
 		return _saida;
     }
 
     @Override
     public int[] shapeIn() {
-		isBuilt();
+		validateBuid();
 		return shapeIn;
     }
 
     @Override
     public int[] shapeOut() {
-        isBuilt();
+        validateBuid();
 		return shapeOut;
     }
 
@@ -275,7 +275,7 @@ public abstract class Pool2DBase extends Layer {
 	 * @return formato do filtro da camada.
 	 */
 	public int[] shapeFiltro() {
-		isBuilt();
+		validateBuid();
 		return _filtro.clone();
 	}
 
@@ -284,19 +284,19 @@ public abstract class Pool2DBase extends Layer {
 	 * @return formato dos strides da camada.
 	 */
 	public int[] shapeStride() {
-		isBuilt();
+		validateBuid();
 		return _stride.clone();
 	}
 
 	@Override
 	public Tensor gradInput() {
-		isBuilt();
+		validateBuid();
 		return _gradEntrada;
 	}
 
 	@Override
 	public String info() {
-		isBuilt();
+		validateBuid();
 
 		StringBuilder sb = new StringBuilder();
 		String pad = " ".repeat(4);

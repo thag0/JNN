@@ -135,7 +135,7 @@ public abstract class Activation extends Layer implements Cloneable {
 
     @Override
     public Tensor output() {
-        isBuilt();
+        validateBuid();
         return _output;
     }
 

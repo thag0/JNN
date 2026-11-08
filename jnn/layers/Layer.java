@@ -108,7 +108,7 @@ public abstract class Layer {
 	/**
 	 * Verificador de inicialização para evitar problemas.
 	 */
-	protected void isBuilt() {
+	protected void validateBuid() {
 		if (!_built) {
 			throw new IllegalStateException(
 				"\nCamada " + name() + " (id = " + id + ") não foi construída."
@@ -427,7 +427,7 @@ public abstract class Layer {
 	 * Retorna se a camada está construída.
 	 * @return camada construída.
 	 */
-	public boolean construida() {
+	public boolean isBuilt() {
 		return _built;
 	}
 

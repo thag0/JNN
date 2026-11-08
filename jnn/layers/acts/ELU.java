@@ -45,7 +45,7 @@ public class ELU extends Activation {
 
     @Override
     public Tensor forward(Tensor x) {
-        isBuilt();
+        validateBuid();
 
         maybeFitToBatch(x);
 
@@ -61,7 +61,7 @@ public class ELU extends Activation {
 
     @Override
     public Tensor backward(Tensor g) {
-		isBuilt();
+		validateBuid();
 
 		_gradOutput = g.contiguous();
 
