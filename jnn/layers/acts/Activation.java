@@ -1,8 +1,8 @@
-package jnn.camadas.acts;
+package jnn.layers.acts;
 
-import jnn.camadas.Layer;
 import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
+import jnn.layers.Layer;
 
 /**
  * Camada de ativação base.

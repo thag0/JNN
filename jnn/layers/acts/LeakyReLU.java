@@ -1,4 +1,4 @@
-package jnn.camadas.acts;
+package jnn.layers.acts;
 
 import jnn.core.tensor.Tensor;
 

@@ -1,8 +1,8 @@
-package jnn.modelos;
+package jnn.models;
 
 import java.util.Iterator;
 
-import jnn.camadas.Layer;
+import jnn.layers.Layer;
 
 /**
  * Iterator para o modelo Sequencial.

@@ -4,7 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import jnn.camadas.Layer;
+import jnn.layers.Layer;
 
 /**
  * Interface base para camadas serializáveis.

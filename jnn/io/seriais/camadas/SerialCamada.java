@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import jnn.camadas.Layer;
 import jnn.io.seriais.SerializadorCamada;
 import jnn.io.seriais.acts.SerialELU;
 import jnn.io.seriais.acts.SerialGELU;
@@ -18,6 +17,7 @@ import jnn.io.seriais.acts.SerialSoftPlus;
 import jnn.io.seriais.acts.SerialSoftmax;
 import jnn.io.seriais.acts.SerialSwish;
 import jnn.io.seriais.acts.SerialTanh;
+import jnn.layers.Layer;
 
 /**
  * Interface para gravação/leitura de camadas.

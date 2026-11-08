@@ -1,4 +1,4 @@
-package jnn.camadas.pooling;
+package jnn.layers.pooling;
 
 /**
  * <p>

@@ -7,15 +7,15 @@ import ged.Ged;
 import geim.Geim;
 import geim.imagem.Imagem;
 import jnn.JNN;
-import jnn.camadas.Dense;
-import jnn.camadas.Input;
-import jnn.camadas.acts.Sigmoid;
-import jnn.camadas.acts.Tanh;
 import jnn.core.parallel.JNNparallel;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
-import jnn.modelos.Model;
-import jnn.modelos.Sequencial;
+import jnn.layers.Dense;
+import jnn.layers.Input;
+import jnn.layers.acts.Sigmoid;
+import jnn.layers.acts.Tanh;
+import jnn.models.Model;
+import jnn.models.Sequencial;
 import jnnview.JNNview;
 
 public class MainImg {

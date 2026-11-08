@@ -4,9 +4,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import jnn.camadas.acts.Tanh;
 import jnn.io.seriais.SerialBase;
 import jnn.io.seriais.SerializadorCamada;
+import jnn.layers.acts.Tanh;
 
 /**
  * Serializados para a camada de ativação Tanh.

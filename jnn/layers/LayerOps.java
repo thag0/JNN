@@ -1,4 +1,4 @@
-package jnn.camadas;
+package jnn.layers;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -37,7 +37,7 @@ public class LayerOps {
 	 * @param kernel {@code Tensor} contendos o kernel/pesos da camada.
 	 * @param bias {@code Tensor} contendo o bias da camada {@code (podendo ser nulo)}.
 	 * @param out {@code Tensor} de destino do resultado.
-	 * @see jnn.camadas.Dense Densa
+	 * @see jnn.layers.Dense Densa
 	 */
 	public void forwardDense(Tensor in, Parametro kernel, Optional<Parametro> bias, Tensor out) {
 		out.zero();// zerar acumulos anteriores
@@ -65,7 +65,7 @@ public class LayerOps {
 	 * @param grad {@code Tensor} contendo o gradiente em relação a saída da camada.
 	 * @param bias {@code Tensor} bias da camada (se houver).
 	 * @param gradIn {@code Tensor} contendo o gradiente em relação à entrada da camada.
-	 * @see jnn.camadas.Dense Densa
+	 * @see jnn.layers.Dense Densa
 	 */
 	public void backwardDense(Tensor in, Parametro kernel, Tensor grad, Optional<Parametro> bias, Tensor gradIn) {
 		gradIn.zero();// zerar acumulaçoes anteriores
@@ -96,7 +96,7 @@ public class LayerOps {
 	 * @param bias {@code Tensor} contendo o bias da camada {@code (podendo ser nulo)}.
 	 * @param out {@code Tensor} de destino do resultado.
 	 * @param padding {@code array} contendo o formato de padding (altura, largura)
-	 * @see jnn.camadas.Conv2D Conv2D
+	 * @see jnn.layers.Conv2D Conv2D
 	 */
 	public void forwardConv2D(
 		Tensor in,
@@ -231,7 +231,7 @@ public class LayerOps {
 	 * @param bias {@code Tensor} contendo o bias da camada.
 	 * @param gradIn {@code Tensor} contendo o gradiente em relação à entrada da camada.
 	 * @param pad {@code array} contendo o formato de padding (altura, largura)
-	 * @see jnn.camadas.Conv2D Conv2D
+	 * @see jnn.layers.Conv2D Conv2D
 	 */
 	public void backwardConv2D(
 		Tensor in, 

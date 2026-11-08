@@ -8,7 +8,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import jnn.core.tensor.Tensor;
-import jnn.modelos.Model;
+import jnn.models.Model;
 
 public class PainelTreino extends Widget {
 

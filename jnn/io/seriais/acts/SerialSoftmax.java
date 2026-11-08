@@ -4,9 +4,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import jnn.camadas.acts.Softmax;
 import jnn.io.seriais.SerialBase;
 import jnn.io.seriais.SerializadorCamada;
+import jnn.layers.acts.Softmax;
 
 /**
  * Serializados para a camada de ativação Softmax.

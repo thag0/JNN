@@ -6,14 +6,13 @@ import java.util.ArrayList;
 import ged.Ged;
 import ged.Dados;
 import jnn.JNN;
-import jnn.camadas.Dense;
-import jnn.camadas.Dropout;
-import jnn.camadas.Input;
-import jnn.camadas.acts.Softmax;
-import jnn.camadas.acts.Tanh;
 import jnn.dataloader.DataLoader;
-
-import jnn.modelos.Sequencial;
+import jnn.layers.Dense;
+import jnn.layers.Dropout;
+import jnn.layers.Input;
+import jnn.layers.acts.Softmax;
+import jnn.layers.acts.Tanh;
+import jnn.models.Sequencial;
 
 /**
  * Exemplo de criação, treino e validação de um modelo da biblioteca

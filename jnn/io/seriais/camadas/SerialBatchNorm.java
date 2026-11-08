@@ -4,20 +4,20 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import jnn.camadas.BatchNorm2D;
 import jnn.core.Parametro;
 import jnn.io.seriais.SerialBase;
 import jnn.io.seriais.SerializadorCamada;
+import jnn.layers.BatchNorm2D;
 
 /**
  * Interface de IO para camada BatchNorm2D.
- * @see jnn.camadas.BatchNorm2D
+ * @see jnn.layers.BatchNorm2D
  */
 public class SerialBatchNorm extends SerialBase implements SerializadorCamada<BatchNorm2D> {
 
 	/**
 	 * Interface de IO para camada MaxPool2D.
-	 * @see jnn.camadas.pooling.AvgPool2D
+	 * @see jnn.layers.pooling.AvgPool2D
 	 */
     public SerialBatchNorm() {}
 

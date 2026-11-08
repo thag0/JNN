@@ -1,9 +1,9 @@
-package jnn.camadas.pooling;
+package jnn.layers.pooling;
 
-import jnn.camadas.Layer;
-import jnn.camadas.LayerOps;
 import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
+import jnn.layers.Layer;
+import jnn.layers.LayerOps;
 
 /**
  * Camada base para facilitar novas implementações de operações

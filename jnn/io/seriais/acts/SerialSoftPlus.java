@@ -4,9 +4,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import jnn.camadas.acts.Softplus;
 import jnn.io.seriais.SerialBase;
 import jnn.io.seriais.SerializadorCamada;
+import jnn.layers.acts.Softplus;
 
 /**
  * Serializados para a camada de ativação Softplus.

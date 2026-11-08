@@ -1,23 +1,24 @@
+
 package jnn.io.seriais.camadas;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import jnn.camadas.Conv2D;
 import jnn.core.Parametro;
 import jnn.io.seriais.SerialBase;
 import jnn.io.seriais.SerializadorCamada;
+import jnn.layers.Conv2D;
 
 /**
  * Interface de IO para camada Conv2D.
- * @see jnn.camadas.Conv2D
+ * @see jnn.layers.Conv2D
  */
 class SerialConv extends SerialBase implements SerializadorCamada<Conv2D> {
 
 	/**
 	 * Interface de IO para camada Conv2D.
-	 * @see jnn.camadas.Conv2D
+	 * @see jnn.layers.Conv2D
 	 */
 	public SerialConv() {}
 

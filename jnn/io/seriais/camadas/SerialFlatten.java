@@ -4,19 +4,19 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import jnn.camadas.Flatten;
 import jnn.io.seriais.SerialBase;
 import jnn.io.seriais.SerializadorCamada;
+import jnn.layers.Flatten;
 
 /**
  * Interface de IO para camada Flatten.
- * @see jnn.camadas.Flatten
+ * @see jnn.layers.Flatten
  */
 class SerialFlatten extends SerialBase implements SerializadorCamada<Flatten> {
 
 	/**
 	 * Interface de IO para camada Flatten.
-	 * @see jnn.camadas.Flatten
+	 * @see jnn.layers.Flatten
 	 */
 	public SerialFlatten() {}
 

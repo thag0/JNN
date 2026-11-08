@@ -4,20 +4,20 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import jnn.camadas.Dense;
 import jnn.core.Parametro;
 import jnn.io.seriais.SerialBase;
 import jnn.io.seriais.SerializadorCamada;
+import jnn.layers.Dense;
 
 /**
  * Interface de IO para camada Densa.
- * @see jnn.camadas.Dense
+ * @see jnn.layers.Dense
  */
 class SerialDensa extends SerialBase implements SerializadorCamada<Dense> {
 
 	/**
 	 * Interface de IO para camada Densa.
-	 * @see jnn.camadas.Dense
+	 * @see jnn.layers.Dense
 	 */
 	public SerialDensa() {}
 

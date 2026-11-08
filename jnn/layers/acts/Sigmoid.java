@@ -1,23 +1,23 @@
-package jnn.camadas.acts;
+package jnn.layers.acts;
 
 import jnn.core.JNNnative;
 import jnn.core.tensor.Tensor;
 
 /**
- * Camada de ativação ReLU.
+ * Camada que opera a função de ativação Sigmoid.
  */
-public class ReLU extends Activation {
+public class Sigmoid extends Activation {
 
     /**
-     * Inicializa uma camada de ativação ReLU.
+     * Inicializa uma camada de ativação Sigmoid.
      */
-    public ReLU() {}
-
+    public Sigmoid() {}
+    
     /**
-     * Inicializa uma camada de ativação ReLU.
+     * Inicializa uma camada de ativação Sigmoid.
      * @param input formato de entrada para a camada.
      */
-    public ReLU(int... input) {
+    public Sigmoid(int... input) {
         build(input);
     }
 
@@ -30,13 +30,13 @@ public class ReLU extends Activation {
 		_input = x.contiguous();
 
         if (JNNnative.isOn()) {
-            JNNnative.relu(
+            JNNnative.sigmoid(
                 _input.array(),
                 _output.array(),
                 _input.len()
             );
         } else {
-            relu(
+            sigmoid(
                 _input.array(),
                 _output.array()
             );
@@ -52,16 +52,16 @@ public class ReLU extends Activation {
 		_gradOutput = g.contiguous();
 
         if (JNNnative.isOn()) {
-            JNNnative.relud(
-                _input.array(), 
-                _gradOutput.array(), 
-                _gradInput.array(), 
+            JNNnative.sigmoidd(
+                _output.array(),
+                _gradOutput.array(),
+                _gradInput.array(),
                 _input.len()
             );
         } else {
-            relud(
-                _input.array(),
-                _gradOutput.array(), 
+            sigmoidd(
+                _output.array(),
+                _gradOutput.array(),
                 _gradInput.array()
             );
         }
@@ -69,28 +69,28 @@ public class ReLU extends Activation {
         return _gradInput;
     }
 
-    private static void relu(float[] input, float[] output) {
+    private void sigmoid(float[] input, float[] output) {
         final int size = input.length;
 
         for (int i = 0; i < size; i++) {
             float val = input[i];
-            output[i] = val > 0 ? val : 0;
+            output[i] = (float) (1.0f / (1.0 + Math.exp(-val)));
         }
     }
 
-    private static void relud(float[] input, float[] gOut, float[] gIn) {
-        final int size = input.length;
+    private void sigmoidd(float[] sig, float[] gOut, float[] gIn) {
+        final int size = sig.length;
 
         for (int i = 0; i < size; i++) {
             final float g = gOut[i];
-            final float x = input[i];
-            gIn[i] = g * (x > 0 ? 1 : 0);
+            final float s = sig[i];
+            gIn[i] = g * (s * (1f - s));
         }
     }
     
     @Override
-    public ReLU clone() {
-        return (ReLU) super.clone();
+    public Sigmoid clone() {
+        return (Sigmoid) super.clone();
     }
 
 }

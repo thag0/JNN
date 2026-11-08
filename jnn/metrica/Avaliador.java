@@ -5,7 +5,7 @@ import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.metrica.metrica.*;
 import jnn.metrica.perda.*;
-import jnn.modelos.Model;
+import jnn.models.Model;
 
 /**
  * Contém implementações de métricas para analisar modelos.

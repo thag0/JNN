@@ -1,4 +1,4 @@
-package jnn.camadas;
+package jnn.layers;
 
 import jnn.core.JNNutils;
 import jnn.core.Parametro;

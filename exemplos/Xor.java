@@ -3,11 +3,11 @@ package exemplos;
 import java.text.DecimalFormat;
 
 import ged.Ged;
-import jnn.camadas.*;
-import jnn.camadas.acts.Sigmoid;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
-import jnn.modelos.*;
+import jnn.layers.*;
+import jnn.layers.acts.Sigmoid;
+import jnn.models.*;
 import jnn.otm.SGD;
 
 public class Xor{

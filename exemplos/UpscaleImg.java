@@ -7,13 +7,13 @@ import geim.imagem.Imagem;
 import ged.Dados;
 import geim.Geim;
 import jnn.JNN;
-import jnn.camadas.*;
-import jnn.camadas.acts.Sigmoid;
-import jnn.camadas.acts.Tanh;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
-import jnn.modelos.Model;
-import jnn.modelos.Sequencial;
+import jnn.layers.*;
+import jnn.layers.acts.Sigmoid;
+import jnn.layers.acts.Tanh;
+import jnn.models.Model;
+import jnn.models.Sequencial;
 import jnn.otm.SGD;
 
 /**

@@ -4,19 +4,19 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import jnn.camadas.pooling.MaxPool2D;
 import jnn.io.seriais.SerialBase;
 import jnn.io.seriais.SerializadorCamada;
+import jnn.layers.pooling.MaxPool2D;
 
 /**
  * Interface de IO para camada MaxPool2D.
- * @see jnn.camadas.pooling.MaxPool2D
+ * @see jnn.layers.pooling.MaxPool2D
  */
 class SerialMaxPool extends SerialBase implements SerializadorCamada<MaxPool2D> {
 
 	/**
 	 * Interface de IO para camada MaxPool2D.
-	 * @see jnn.camadas.pooling.MaxPool2D
+	 * @see jnn.layers.pooling.MaxPool2D
 	 */
 	public SerialMaxPool() {}
 

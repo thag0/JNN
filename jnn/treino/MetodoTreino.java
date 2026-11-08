@@ -6,7 +6,7 @@ import jnn.core.JNNlog;
 import jnn.core.JNNutils;
 import jnn.dataloader.DataLoader;
 import jnn.metrica.perda.Perda;
-import jnn.modelos.Model;
+import jnn.models.Model;
 import jnn.otm.Otimizador;
 import jnn.otm.scheduler.Scheduler;
 import jnn.treino.callback.CallbackFimEpoca;

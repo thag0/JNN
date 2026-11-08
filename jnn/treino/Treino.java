@@ -4,7 +4,7 @@ import jnn.core.tensor.Tensor;
 import jnn.dataloader.Sample;
 import jnn.dataloader.DataLoader;
 import jnn.metrica.perda.Perda;
-import jnn.modelos.Model;
+import jnn.models.Model;
 import jnn.otm.Otimizador;
 import jnn.treino.callback.InfoEpoca;
 

@@ -1,4 +1,4 @@
-package jnn.camadas;
+package jnn.layers;
 
 import java.util.Optional;
 

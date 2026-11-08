@@ -6,7 +6,7 @@ import java.io.File;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
-import jnn.modelos.Model;
+import jnn.models.Model;
 import render.widgets.PainelTreino;
 
 public class JanelaTreino extends JFrame {

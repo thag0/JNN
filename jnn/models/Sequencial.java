@@ -1,11 +1,11 @@
-package jnn.modelos;
+package jnn.models;
 
 import java.util.Iterator;
 
-import jnn.camadas.Layer;
-import jnn.camadas.Input;
 import jnn.core.Dicionario;
 import jnn.core.JNNutils;
+import jnn.layers.Input;
+import jnn.layers.Layer;
 import jnn.metrica.Avaliador;
 import jnn.treino.Treinador;
 

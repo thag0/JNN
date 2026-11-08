@@ -6,7 +6,7 @@ import java.util.concurrent.ForkJoinPool;
 import jnn.core.JNNutils;
 import jnn.core.parallel.JNNparallel;
 import jnn.dataloader.DataLoader;
-import jnn.modelos.Model;
+import jnn.models.Model;
 import jnn.otm.scheduler.Scheduler;
 import jnn.treino.callback.CallbackFimEpoca;
 
@@ -105,7 +105,8 @@ public class Treinador implements Cloneable {
 	 * @param tamLote tamanho do lote de amostras.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	public void executar(DataLoader loader, int epochs, int tamLote, boolean logs) {
+	public void 
+	executar(DataLoader loader, int epochs, int tamLote, boolean logs) {
 		if (tamLote < 1) {
 			throw new IllegalArgumentException(
 				"\nTamanho de lote " + tamLote + " inválido."

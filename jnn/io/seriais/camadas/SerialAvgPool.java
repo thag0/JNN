@@ -4,19 +4,19 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import jnn.camadas.pooling.AvgPool2D;
 import jnn.io.seriais.SerialBase;
 import jnn.io.seriais.SerializadorCamada;
+import jnn.layers.pooling.AvgPool2D;
 
 /**
  * Interface de IO para camada MaxPool2D.
- * @see jnn.camadas.pooling.AvgPool2D
+ * @see jnn.layers.pooling.AvgPool2D
  */
 class SerialAvgPool extends SerialBase implements SerializadorCamada<AvgPool2D> {
 
 	/**
 	 * Interface de IO para camada MaxPool2D.
-	 * @see jnn.camadas.pooling.AvgPool2D
+	 * @see jnn.layers.pooling.AvgPool2D
 	 */
 	public SerialAvgPool() {}
 

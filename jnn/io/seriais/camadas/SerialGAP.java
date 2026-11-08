@@ -4,19 +4,19 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import jnn.camadas.pooling.GlobalAvgPool2D;
 import jnn.io.seriais.SerialBase;
 import jnn.io.seriais.SerializadorCamada;
+import jnn.layers.pooling.GlobalAvgPool2D;
 
 /**
  * Interface de IO para camada GlobalAvgPool2D.
- * @see jnn.camadas.pooling.GlobalAvgPool2D
+ * @see jnn.layers.pooling.GlobalAvgPool2D
  */
 public class SerialGAP extends SerialBase implements SerializadorCamada<GlobalAvgPool2D> {
 
 	/**
 	 * Interface de IO para camada GlobalAvgPool2D.
-	 * @see jnn.camadas.pooling.GlobalAvgPool2D
+	 * @see jnn.layers.pooling.GlobalAvgPool2D
 	 */
     public SerialGAP() {}
 

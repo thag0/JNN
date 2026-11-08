@@ -4,19 +4,19 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import jnn.camadas.Dropout;
 import jnn.io.seriais.SerialBase;
 import jnn.io.seriais.SerializadorCamada;
+import jnn.layers.Dropout;
 
 /**
  * Interface de IO para camada Dropout.
- * @see jnn.camadas.Dropout
+ * @see jnn.layers.Dropout
  */
 class SerialDropout extends SerialBase implements SerializadorCamada<Dropout> {
 
 	/**
 	 * Interface de IO para camada MaxPool2D.
-	 * @see jnn.camadas.Dropout
+	 * @see jnn.layers.Dropout
 	 */
 	public SerialDropout() {}
 	

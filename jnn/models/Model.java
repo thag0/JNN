@@ -1,10 +1,10 @@
-package jnn.modelos;
+package jnn.models;
 
-import jnn.camadas.Layer;
 import jnn.core.JNNutils;
 import jnn.core.Parametro;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
+import jnn.layers.Layer;
 import jnn.metrica.Avaliador;
 import jnn.metrica.perda.Perda;
 import jnn.otm.Otimizador;
