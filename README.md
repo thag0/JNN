@@ -34,7 +34,7 @@ Tensor ([[1.0, 2.0],
 A biblioteca conta uma API para criação de modelos sequenciais de camadas.
 
 # *Exemplo de criação*
-<img width="962" height="1128" alt="Image" src="https://github.com/user-attachments/assets/cdc9418f-774f-45e0-bbc0-634c9b47d110" />
+<img width="482" height="564" alt="Image" src="https://github.com/user-attachments/assets/cdc9418f-774f-45e0-bbc0-634c9b47d110" />
 
 <img width="1701" height="647" alt="Image" src="https://github.com/user-attachments/assets/78ba9bcb-8eae-4931-82d7-9c8a5b25c805" />
 
