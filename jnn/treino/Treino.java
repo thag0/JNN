@@ -2,8 +2,8 @@ package jnn.treino;
 
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.Sample;
+import jnn.metrics.loss.Loss;
 import jnn.dataloader.DataLoader;
-import jnn.metrica.perda.Perda;
 import jnn.models.Model;
 import jnn.otm.Otimizador;
 import jnn.treino.callback.InfoEpoca;
@@ -31,7 +31,7 @@ public class Treino extends MetodoTreino {
 	}
 
 	@Override
-	protected void loop(DataLoader loader, Otimizador otm, Perda loss, int epochs, boolean logs) {
+	protected void loop(DataLoader loader, Otimizador otm, Loss loss, int epochs, boolean logs) {
 		if (logs) esconderCursor();
 		long tempo = 0;
 		int largEpocas = String.valueOf(epochs).length();

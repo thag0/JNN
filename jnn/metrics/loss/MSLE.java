@@ -1,4 +1,4 @@
-package jnn.metrica.perda;
+package jnn.metrics.loss;
 
 import jnn.core.tensor.Tensor;
 
@@ -7,8 +7,12 @@ import jnn.core.tensor.Tensor;
  * erro médio quadrado logarítmico entre as previsões e os 
  * valores reais.
  */
-public class MSLE extends Perda {
-	float eps = 1e-7f;//evitar log 0
+public class MSLE extends Loss {
+	
+	/**
+	 * Pequeno valor para evitar log de zero.
+	 */
+	float eps = 1e-7f;
 
 	/**
 	 * Inicializa a função de perda Mean Squared Logarithmic Error.
@@ -17,28 +21,28 @@ public class MSLE extends Perda {
 
 	@Override
 	public Tensor forward(Tensor prev, Tensor real) {
-		verificarDimensoes(prev, real);
+		validateDimensions(prev, real);
 		
 		if (prev.numDim() == 1) {
-			int tam = prev.len();
-			float emql = f(prev, real, tam);
-			
-			return new Tensor(1).set((emql/tam), 0);
+			int len = prev.len();
+			float emql = f(prev, real, len);
+		
+			return new Tensor(1).set((emql/len), 0);
 		}
 
-        int lotes = prev.lenDim(0);
-        int amostras = prev.lenDim(1);
+        int batches = prev.lenDim(0);
+        int samples = prev.lenDim(1);
 
-        float somaLote = 0;
-        for (int i = 0; i < lotes; i++) {
+        float sumBatch = 0;
+        for (int i = 0; i < batches; i++) {
             Tensor p = prev.subTensor(i);
             Tensor r = real.subTensor(i);
 
-            somaLote += f(p, r, amostras) / amostras;
+            sumBatch += f(p, r, samples) / samples;
         }
 
 
-        return new Tensor(1).set((somaLote / lotes), 0);
+        return new Tensor(1).set((sumBatch / batches), 0);
 	}
 
 	/**
@@ -60,14 +64,14 @@ public class MSLE extends Perda {
 	
 	@Override
 	public Tensor backward(Tensor prev, Tensor real) {
-		verificarDimensoes(prev, real);
+		validateDimensions(prev, real);
         
-		final int tam = prev.numDim() == 1 ? prev.lenDim(0) : prev.lenDim(1);
+		final int len = prev.numDim() == 1 ? prev.lenDim(0) : prev.lenDim(1);
 
         return prev.map(real, (p, r) -> {
             float lp = (float) Math.log(1.0 + p + eps);
             float lr = (float) Math.log(1.0 + r + eps);
-            return (2.0f / tam) * (lp - lr) * (1.0f / (1.0f + p + eps));
+            return (2.0f / len) * (lp - lr) * (1.0f / (1.0f + p + eps));
         });
 	}
 }

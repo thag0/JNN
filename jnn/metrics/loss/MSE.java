@@ -1,4 +1,4 @@
-package jnn.metrica.perda;
+package jnn.metrics.loss;
 
 import jnn.core.tensor.Tensor;
 
@@ -6,7 +6,7 @@ import jnn.core.tensor.Tensor;
  * Função de perda Mean Squared Error, calcula o erro médio 
  * quadrado entre as previsões e os valores reais.
  */
-public class MSE extends Perda {
+public class MSE extends Loss {
 
 	/**
 	 * Inicializa a função de perda Mean Squared Error.
@@ -15,7 +15,7 @@ public class MSE extends Perda {
 
 	@Override
 	public Tensor forward(Tensor prev, Tensor real) {
-		verificarDimensoes(prev, real);
+		validateDimensions(prev, real);
 
 		if (prev.numDim() == 1) {
 			final int tam = prev.len();
@@ -27,16 +27,16 @@ public class MSE extends Perda {
 		final int lotes = prev.lenDim(0);
 		final int amostras = prev.lenDim(1);
 
-		float somaLote = 0;
+		float sumBatch = 0;
 		for (int i = 0; i < lotes; i++) {
 			Tensor p = prev.subTensor(i);
 			Tensor r = real.subTensor(i);
-			float somaAmostras = f(p, r, amostras);
+			float sumSamples = f(p, r, amostras);
 
-			somaLote += somaAmostras / amostras;
+			sumBatch += sumSamples / amostras;
 		}
 
-		return new Tensor(1).set((somaLote / lotes), 0);
+		return new Tensor(1).set((sumBatch / lotes), 0);
 	}
 
 	/**
@@ -58,7 +58,7 @@ public class MSE extends Perda {
 	
 	@Override
 	public Tensor backward(Tensor prev, Tensor real) {
-		verificarDimensoes(prev, real);
+		validateDimensions(prev, real);
 
 		if (prev.numDim() == 1) {
 			final int tam = prev.len();
@@ -68,11 +68,11 @@ public class MSE extends Perda {
 			);
 		} 
 	
-		final int lotes = prev.lenDim(0);
-		final int amostras = prev.lenDim(1);
+		int batches = prev.lenDim(0);
+		int samples = prev.lenDim(1);
 
 		return prev.map(real,
-			(p, r) -> (2.0f / amostras) * (p - r) / lotes
+			(p, r) -> (2.0f / samples) * (p - r) / batches
 		);
 	}
 }

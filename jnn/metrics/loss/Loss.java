@@ -1,4 +1,4 @@
-package jnn.metrica.perda;
+package jnn.metrics.loss;
 
 import jnn.core.tensor.Tensor;
 
@@ -12,12 +12,12 @@ import jnn.core.tensor.Tensor;
  *    necessários para a atualização de parâmetros dos modelos.
  * </p>
  */
-public abstract class Perda {
+public abstract class Loss {
 
 	/**
 	 * Construtor privado.
 	 */
-	protected Perda() {}
+	protected Loss() {}
 
 	/**
 	 * Calcula a função de perda configurada.
@@ -41,7 +41,7 @@ public abstract class Perda {
 	 * @param prev {@code Tensor} com dados previstos.
 	 * @param real {@code Tensor} com dados reais.
 	 */
-	protected void verificarDimensoes(Tensor prev, Tensor real) {
+	protected void validateDimensions(Tensor prev, Tensor real) {
 		final int dimsPrev = prev.numDim();
 		final int dimsReal = real.numDim();
 
@@ -64,7 +64,7 @@ public abstract class Perda {
 	 * Retorna o nome da função de perda.
 	 * @return nome da função de perda.
 	 */
-	public String nome() {
+	public String name() {
 		return getClass().getSimpleName();
 	}
 }

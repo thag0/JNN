@@ -73,7 +73,7 @@ public class JNNserial extends SerialBase {
 		try (DataOutputStream out = new DataOutputStream(new FileOutputStream(arquivo))) {
 			escrever(out, modelo.numLayers());
 			escrever(out, modelo.optim().nome());
-			escrever(out, modelo.loss().nome());
+			escrever(out, modelo.loss().name());
 
 			for (Layer camada : modelo.layers()) {
 				serialCamada.serializar(camada, out);
@@ -204,7 +204,7 @@ public class JNNserial extends SerialBase {
 		for (int i = 0; i < modelo.numLayers(); i++) modelo.layer(i).setId(i);
 		modelo.setOptimizer(dicio.getOtimizador(otmStr));
 		modelo.optim().construir(modelo.params());
-		modelo.setLoss(dicio.getPerda(lossStr));
+		modelo.setLoss(dicio.getLoss(lossStr));
 
 		return modelo;
 	}

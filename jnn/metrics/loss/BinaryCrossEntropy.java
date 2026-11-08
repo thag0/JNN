@@ -1,4 +1,4 @@
-package jnn.metrica.perda;
+package jnn.metrics.loss;
 
 import jnn.core.tensor.Tensor;
 
@@ -7,39 +7,39 @@ import jnn.core.tensor.Tensor;
  * classificação binária. Ela é comumente aplicada quando há apenas duas 
  * classes possíveis.
  */
- public class EntropiaCruzadaBinaria extends Perda {
+ public class BinaryCrossEntropy extends Loss {
 	float eps = 1e-7f;//evitar log 0
 
 	/**
 	 * Inicializa a função de perda Binary Cross Entropy.
 	 */
-	public EntropiaCruzadaBinaria() {}
+	public BinaryCrossEntropy() {}
 
 	@Override
 	public Tensor forward(Tensor prev, Tensor real) {
-		verificarDimensoes(prev, real);
+		validateDimensions(prev, real);
 
         if (prev.numDim() == 1) {
-            int tam = prev.len();
-            float ecb = f(prev, real, tam);
+            int len = prev.len();
+            float bce = f(prev, real, len);
             
-			return new Tensor(1).set((-ecb / tam), 0);
+			return new Tensor(1).set((-bce / len), 0);
         }
 
-		final int lotes = prev.lenDim(0);
-		final int amostras = prev.lenDim(1);
+		int batches = prev.lenDim(0);
+		int samples = prev.lenDim(1);
 
-		float somaLote = 0.0f;
-		for (int i = 0; i < lotes; i++) {
+		float sumBatch = 0.0f;
+		for (int i = 0; i < batches; i++) {
 			Tensor p = prev.subTensor(i);
 			Tensor r = real.subTensor(i);
 			
-			float soma = f(p, r, amostras);
-			somaLote += -soma / amostras;
+			float sum = f(p, r, samples);
+			sumBatch += -sum / samples;
 		}
 
 
-		return new Tensor(1).set((somaLote / lotes), 0);
+		return new Tensor(1).set((sumBatch / batches), 0);
 	}
 
 	/**
@@ -50,19 +50,20 @@ import jnn.core.tensor.Tensor;
 	 * @return
 	 */
 	private float f(Tensor prev, Tensor real, int tam) {
-        double ecb = 0.0f;
-        for (int i = 0; i < tam; i++) {
+        double bce = 0.0f;
+        
+		for (int i = 0; i < tam; i++) {
             float p = prev.get(i);
             float r = real.get(i);
-            ecb += r * Math.log(p + eps) + (1.0 - r) * Math.log(1.0 - p + eps);
+            bce += r * Math.log(p + eps) + (1.0 - r) * Math.log(1.0 - p + eps);
         }
 
-        return (float) ecb;
+        return (float) bce;
 	}
 
 	@Override
 	public Tensor backward(Tensor prev, Tensor real) {
-		verificarDimensoes(prev, real);
+		validateDimensions(prev, real);
 		
 		if (prev.numDim() == 1) {
 			final int tam = prev.len();
@@ -71,9 +72,9 @@ import jnn.core.tensor.Tensor;
 			);
 		} 
 		
-		int amostras = prev.lenDim(1);
+		int sampes = prev.lenDim(1);
 		return prev.map(real,
-			(p, r) -> (((1.0f - r) / (1.0f - p + eps)) - (r / (p + eps))) / amostras
+			(p, r) -> (((1.0f - r) / (1.0f - p + eps)) - (r / (p + eps))) / sampes
 		);
 	}
 }

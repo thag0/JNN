@@ -9,16 +9,16 @@ import jnn.dataloader.Sample;
 import jnn.dataloader.DataLoader;
 import jnn.inicializadores.Identidade;
 import jnn.inicializadores.Inicializador;
-import jnn.metrica.metrica.Acuracia;
-import jnn.metrica.metrica.F1Score;
-import jnn.metrica.metrica.MatrizConfusao;
-import jnn.metrica.perda.EntropiaCruzada;
-import jnn.metrica.perda.EntropiaCruzadaBinaria;
-import jnn.metrica.perda.MAE;
-import jnn.metrica.perda.MSE;
-import jnn.metrica.perda.MSLE;
-import jnn.metrica.perda.Perda;
-import jnn.metrica.perda.RMSE;
+import jnn.metrics.loss.CossEntropy;
+import jnn.metrics.loss.BinaryCrossEntropy;
+import jnn.metrics.loss.MAE;
+import jnn.metrics.loss.MSE;
+import jnn.metrics.loss.MSLE;
+import jnn.metrics.loss.Loss;
+import jnn.metrics.loss.RMSE;
+import jnn.metrics.metric.Accuracy;
+import jnn.metrics.metric.F1Score;
+import jnn.metrics.metric.ConfusionMatrix;
 import jnn.otm.Otimizador;
 
 import java.util.random.RandomGenerator;
@@ -466,7 +466,7 @@ public final class JNN {
      * @return {@code Tensor} contendo o resultado.
      */
     public static Tensor crossEntropy(Tensor prev, Tensor real) {
-        return new EntropiaCruzada().forward(prev, real);
+        return new CossEntropy().forward(prev, real);
     }
 
     /**
@@ -477,7 +477,7 @@ public final class JNN {
      * @return {@code Tensor} contendo o resultado.
      */
     public static Tensor binaryCrossEntropy(Tensor prev, Tensor real) {
-        return new EntropiaCruzadaBinaria().forward(prev, real);
+        return new BinaryCrossEntropy().forward(prev, real);
     }
 
     // métricas
@@ -504,7 +504,7 @@ public final class JNN {
      * @return {@code Tensor} contendo o resultado.
      */
     public static Tensor acuracia(Tensor[] prev, Tensor[] real) { 
-        return new Acuracia().forward(prev, real);
+        return new Accuracy().forward(prev, real);
     }
 
     /**
@@ -554,7 +554,7 @@ public final class JNN {
      * @return {@code Tensor} contendo o resultado.
      */
     public static Tensor matrizConfusao(Tensor[] prev, Tensor[] real) {
-        return new MatrizConfusao().forward(prev, real);
+        return new ConfusionMatrix().forward(prev, real);
     }
 
     // dicionario
@@ -573,8 +573,8 @@ public final class JNN {
      * @param loss nome da função de perda desejado.
      * @return {@code Perda} buscada.
      */
-    public static Perda getPerda(String loss) {
-        return dicio.getPerda(loss);
+    public static Loss getPerda(String loss) {
+        return dicio.getLoss(loss);
     }
 
     /**

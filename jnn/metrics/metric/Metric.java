@@ -1,4 +1,4 @@
-package jnn.metrica.metrica;
+package jnn.metrics.metric;
 
 import jnn.core.tensor.Tensor;
 
@@ -8,7 +8,7 @@ import jnn.core.tensor.Tensor;
  *    Novas métricas devem implementar o método {@code calcular()}.
  * </p>
  */
-abstract class Metrica {
+abstract class Metric {
 
 	/**
 	 * Verifica se os dados previstos e reais possuem a mesma quantidade
@@ -16,7 +16,7 @@ abstract class Metrica {
 	 * @param p {@code Tensores} com dados previstos.
 	 * @param r {@code Tensores} com dados reais (rótulos).
 	 */
-	protected void validarDados(Tensor[] p, Tensor[] r) {
+	protected void validadeData(Tensor[] p, Tensor[] r) {
 		if (p.length != r.length) {
 			throw new IllegalArgumentException(
 				"\nQuantidade de amostras preditas (" + p.length + ") " +
@@ -41,24 +41,24 @@ abstract class Metrica {
 	 * @param tensor tensor desejado.
 	 * @return índice com o maior valor.
 	 */
-	protected int idMaiorValor(Tensor tensor) {
+	protected int idMaxVal(Tensor tensor) {
 		if (tensor.numDim() != 1) {
 			throw new UnsupportedOperationException(
 				"\nSem suporte para tensores com mais de uma dimensão."
 			);
 		}
 
-		int maiorId = 0;
+		int idMax = 0;
+		double maxVal = tensor.get(0);
 		int n = tensor.shape()[0];
-		double maiorVal = tensor.get(0);
 		for (int i = 1; i < n; i++) {
-			if (tensor.get(i) > maiorVal) {
-				maiorVal = tensor.get(i);
-				maiorId = i;
+			if (tensor.get(i) > maxVal) {
+				maxVal = tensor.get(i);
+				idMax = i;
 			}
 		}
   
-		return maiorId;
+		return idMax;
 	}
 
 	/**
@@ -70,23 +70,23 @@ abstract class Metrica {
 	 * @param real {@code Tensores} com dados reais.
 	 * @return {@code Tensor} contendo a matriz de confusão no formato (real, previsto).
 	 */
-	protected Tensor matrizConfusao(Tensor[] prev, Tensor[] real) {
+	protected Tensor confusionMatrix(Tensor[] prev, Tensor[] real) {
 		if (prev[0].numDim() != 1 || real[0].numDim() != 1) {
 			throw new UnsupportedOperationException(
 				"\nSuporte apenas parra tensores 1D."
 			);
 		}
 
-		int nClasses = prev[0].len();
-		Tensor mc = new Tensor(nClasses, nClasses);
+		int numClasses = prev[0].len();
+		Tensor cm = new Tensor(numClasses, numClasses);
 
 		for (int i = 0; i < prev.length; i++) {
-			int p = idMaiorValor(prev[i]);
-			int r = idMaiorValor(real[i]);
-			double val = mc.get(r, p);
-			mc.set((val += 1.0), r, p);
+			int p = idMaxVal(prev[i]);
+			int r = idMaxVal(real[i]);
+			double val = cm.get(r, p);
+			cm.set((val += 1.0), r, p);
 		}
 
-		return mc;
+		return cm;
 	} 
 }

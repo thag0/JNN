@@ -6,7 +6,7 @@ import jnn.core.Dicionario;
 import jnn.core.JNNutils;
 import jnn.layers.Input;
 import jnn.layers.Layer;
-import jnn.metrica.Avaliador;
+import jnn.metrics.Evaluator;
 import jnn.treino.Treinador;
 
 /**
@@ -287,7 +287,7 @@ public class Sequencial extends Model {
 		}
 		
 		Dicionario dicio = new Dicionario();
-		_loss = dicio.getPerda(loss);
+		_loss = dicio.getLoss(loss);
 		
 		_optimizer = dicio.getOtimizador(otm);
 		_optimizer.construir(params());
@@ -373,7 +373,7 @@ public class Sequencial extends Model {
 		sb.append("\n");
 
 		// Função de perda
-		sb.append(pad).append("Perda: ").append(_loss.nome());
+		sb.append(pad).append("Perda: ").append(_loss.name());
 
 		String params = String.format("%,d", numParams());
 		sb.append("\n");
@@ -406,13 +406,13 @@ public class Sequencial extends Model {
 	public Sequencial clone() {
 		Sequencial clone = (Sequencial) super.clone();
 
-		clone._evaluator = new Avaliador(clone);
+		clone._evaluator = new Evaluator(clone);
 		clone.trainHistory = this.trainHistory;
 		clone.name = "Clone de " + name();
 		
 		Dicionario dicio = new Dicionario();
 		clone._optimizer = dicio.getOtimizador(_optimizer.nome());
-		clone._loss = dicio.getPerda(_loss.nome());
+		clone._loss = dicio.getLoss(_loss.name());
 		clone._trainer = new Treinador(clone);
 		
 		int nCamadas = numLayers();

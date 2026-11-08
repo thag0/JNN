@@ -1,11 +1,11 @@
-package jnn.metrica.metrica;
+package jnn.metrics.metric;
 
 import jnn.core.tensor.Tensor;
 
 /**
  *	Matriz de confusão para avaliação de modelos de classificação.
  */
-public class MatrizConfusao extends Metrica {
+public class ConfusionMatrix extends Metric {
 
 	/**
 	 * Instancia a métrica da <strong>Matriz de confusão</strong>.
@@ -16,11 +16,11 @@ public class MatrizConfusao extends Metrica {
 	 * 		reais de cada classe e cada coluna representa as instâncias preditas.
 	 * </p>
 	 */
-	public MatrizConfusao() {}
+	public ConfusionMatrix() {}
 
 	@Override
 	public Tensor forward(Tensor[] prev, Tensor[] real) {
-		return matrizConfusao(prev, real);
+		return confusionMatrix(prev, real);
 	}
 
 }

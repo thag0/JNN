@@ -11,13 +11,13 @@ import jnn.inicializadores.Identidade;
 import jnn.inicializadores.Inicializador;
 import jnn.inicializadores.LeCun;
 import jnn.inicializadores.Zeros;
-import jnn.metrica.perda.EntropiaCruzada;
-import jnn.metrica.perda.EntropiaCruzadaBinaria;
-import jnn.metrica.perda.MAE;
-import jnn.metrica.perda.MSE;
-import jnn.metrica.perda.MSLE;
-import jnn.metrica.perda.Perda;
-import jnn.metrica.perda.RMSE;
+import jnn.metrics.loss.CossEntropy;
+import jnn.metrics.loss.BinaryCrossEntropy;
+import jnn.metrics.loss.MAE;
+import jnn.metrics.loss.MSE;
+import jnn.metrics.loss.MSLE;
+import jnn.metrics.loss.Loss;
+import jnn.metrics.loss.RMSE;
 import jnn.otm.AdaGrad;
 import jnn.otm.Adadelta;
 import jnn.otm.Adam;
@@ -94,24 +94,24 @@ public class Dicionario {
      * @param loss tipo de função de perda.
      * @return instância da função de perda lida.
      */
-	public Perda getPerda(Object loss) {
+	public Loss getLoss(Object loss) {
 		JNNutils.validarNaoNulo(loss, "loss == null.");
 
-		if (loss instanceof Perda) {
-			return (Perda) loss;
+		if (loss instanceof Loss) {
+			return (Loss) loss;
 
 		} else if (loss instanceof String) {
-			String nome = (String) loss;
-			switch (tratarNome(nome)) {
-				case "mse"                    : return new MSE();
-				case "mae"                    : return new MAE();
-				case "msle"                   : return new MSLE();
-				case "rmse"                   : return new RMSE();
-				case "entropiacruzada"        : return new EntropiaCruzada();
-				case "entropiacruzadabinaria" : return new EntropiaCruzadaBinaria();
+			String name = (String) loss;
+			switch (tratarNome(name)) {
+				case "mse"                : return new MSE();
+				case "mae"                : return new MAE();
+				case "msle"               : return new MSLE();
+				case "rmse"               : return new RMSE();
+				case "crossentropy"       : return new CossEntropy();
+				case "binarycrossentropy" : return new BinaryCrossEntropy();
 	
 				default: throw new IllegalArgumentException(
-					"\nFunção de perda \"" + nome + "\" não encontada."
+					"\nFunção de perda \"" + name + "\" não encontada."
 				);
 			}           
 		} else {

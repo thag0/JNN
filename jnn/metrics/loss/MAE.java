@@ -1,4 +1,4 @@
-package jnn.metrica.perda;
+package jnn.metrics.loss;
 
 import jnn.core.tensor.Tensor;
 
@@ -6,7 +6,7 @@ import jnn.core.tensor.Tensor;
  * Função de perda Mean Absolute Error, calcula o erro médio 
  * absoluto entre as previsões e os valores reais.
  */
-public class MAE extends Perda {
+public class MAE extends Loss {
 
 	/**
 	 * Inicializa a função de perda Mean Absolute Error.
@@ -15,7 +15,7 @@ public class MAE extends Perda {
 
 	@Override
 	public Tensor forward(Tensor prev, Tensor real) {
-		verificarDimensoes(prev, real);
+		validateDimensions(prev, real);
 
 		if (prev.numDim() == 1) {
 			final int tam = prev.len();
@@ -23,19 +23,19 @@ public class MAE extends Perda {
 			return new Tensor(1).set((mae/tam), 0);
 		
 		} else {
-			final int lotes = prev.lenDim(0);
-			final int amostras = prev.lenDim(1);
+			int batches = prev.lenDim(0);
+			int samples = prev.lenDim(1);
 
-			float somaLote = 0;
-			for (int i = 0; i < lotes; i++) {
+			float sumBatch = 0;
+			for (int i = 0; i < batches; i++) {
 				Tensor p = prev.subTensor(i);
 				Tensor r = real.subTensor(i);
-				float somaAmostras = f(p, r, amostras);
+				float sumSmaples = f(p, r, samples);
 
-				somaLote += somaAmostras / amostras;
+				sumBatch += sumSmaples / samples;
 			}
 
-			return new Tensor(1).set((somaLote / lotes), 0);
+			return new Tensor(1).set((sumBatch / batches), 0);
 		}
 	}
 
@@ -57,7 +57,7 @@ public class MAE extends Perda {
 	
 	@Override
 	public Tensor backward(Tensor prev, Tensor real) {
-		verificarDimensoes(prev, real);
+		validateDimensions(prev, real);
 
 		if (prev.numDim() == 1) {
 			final int tam = prev.lenDim(0);
@@ -71,14 +71,14 @@ public class MAE extends Perda {
 			);
 		
 		} else {
-			int lotes = prev.lenDim(0);
-			int amostras = prev.lenDim(1);
-			float escala = 1.0f / (amostras * lotes);
+			int batches = prev.lenDim(0);
+			int samples = prev.lenDim(1);
+			float scale = 1.0f / (samples * batches);
 
 			return prev.map(real, (p, r) -> {
 				float d = p - r;
-				if (d > 0) return  escala;
-				if (d < 0) return -escala;
+				if (d > 0) return  scale;
+				if (d < 0) return -scale;
 				return 0.0f;
 			});
 		}

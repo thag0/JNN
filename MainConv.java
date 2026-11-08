@@ -58,7 +58,7 @@ public class MainConv {
 		var accs = new ArrayList<Float>();
 		modelo.trainer().setCallback(info -> {
 			modelo.setTraining(false);
-				float ac = modelo.evaluator().acuracia(teste).item();
+				float ac = modelo.evaluator().accuracy(teste).item();
 			modelo.setTraining(true);
 			
 			accs.add(ac);
@@ -89,7 +89,7 @@ public class MainConv {
 		System.out.println("\nTempo de treino: " + horas + "h " + minutos + "min " + segundos + "s");
 
 		System.out.println("loss: " + modelo.evaluate(teste));
-		System.out.println("acc: " + modelo.evaluator().acuracia(teste));
+		System.out.println("acc: " + modelo.evaluator().accuracy(teste));
 
 		JNNserial.salvar(modelo, CAMINHO_SAIDA_MODELO);
 

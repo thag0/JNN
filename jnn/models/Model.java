@@ -5,8 +5,8 @@ import jnn.core.Parametro;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.layers.Layer;
-import jnn.metrica.Avaliador;
-import jnn.metrica.perda.Perda;
+import jnn.metrics.Evaluator;
+import jnn.metrics.loss.Loss;
 import jnn.otm.Otimizador;
 import jnn.treino.Treinador;
 
@@ -35,7 +35,7 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 	/**
 	 * Função de perda para avaliar o erro durante o treino.
 	 */
-	protected Perda _loss;
+	protected Loss _loss;
 
 	/**
 	 * Otimizador usado para ajuste de parâmetros treináveis.
@@ -61,14 +61,14 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 	 *    Cada modelo possui seu próprio avaliador.
 	 * </p>
 	 */
-	protected Avaliador _evaluator;
+	protected Evaluator _evaluator;
 
 	/**
 	 * Inicialização implicita de um modelo.
 	 */
 	protected Model() {
 		_trainer = new Treinador(this);
-		_evaluator = new Avaliador(this);
+		_evaluator = new Evaluator(this);
 	}
 
 	/**
@@ -110,7 +110,7 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 	 * de treinamento do modelo.
 	 * @param loss nova função de perda.
 	 */
-	public void setLoss(Perda loss) {
+	public void setLoss(Loss loss) {
 		_loss = JNNutils.validarNaoNulo(loss, "loss == null.");
 	}
 
@@ -335,7 +335,7 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 	 * </p>
 	 * @return avaliador do modelo.
 	 */
-	public Avaliador evaluator() {
+	public Evaluator evaluator() {
 		return _evaluator;
 	}
 
@@ -360,7 +360,7 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 	 * Retorna a função de perda configurada do modelo.
 	 * @return função de perda atual do modelo.
 	 */
-	public Perda loss() {
+	public Loss loss() {
 		validateCompilation();
 		return _loss;
 	}

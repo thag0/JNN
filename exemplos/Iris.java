@@ -72,7 +72,7 @@ public class Iris {
 		DataLoader teste  = ds[1];
 		ArrayList<Float> accs = new ArrayList<>();
 		modelo.trainer().setCallback(info -> {
-			float acuracia = modelo.evaluator().acuracia(teste).item();
+			float acuracia = modelo.evaluator().accuracy(teste).item();
 			accs.add(acuracia);
 		});
 
@@ -80,13 +80,13 @@ public class Iris {
 		
 		// Avaliando o modelo
 		System.out.println("Perda = " + modelo.evaluate(teste).item());
-		float acc = modelo.evaluator().acuracia(teste).item();
+		float acc = modelo.evaluator().accuracy(teste).item();
 		System.out.println("Acurácia = " + formatarDecimal(acc*100, 4) + "%");
 
 		// Matriz de confusão
 		modelo
 		.evaluator()
-		.matrizConfusao(teste)
+		.confusionMatrix(teste)
 		.name("Matriz de confusão")
 		.print();
 

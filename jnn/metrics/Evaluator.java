@@ -1,39 +1,39 @@
-package jnn.metrica;
+package jnn.metrics;
 
 import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
-import jnn.metrica.metrica.*;
-import jnn.metrica.perda.*;
+import jnn.metrics.loss.*;
+import jnn.metrics.metric.*;
 import jnn.models.Model;
 
 /**
  * Contém implementações de métricas para analisar modelos.
  */
-public class Avaliador {
+public class Evaluator {
 
 	/**
 	 * Modelo base de avaliação.
 	 */
-	private Model modelo;
+	private Model model;
 
 	MSE mse = new MSE();
 	MAE mae = new MAE();
 	MSLE msle = new MSLE();
 	RMSE rmse = new RMSE();
-	EntropiaCruzada ce = new EntropiaCruzada();
-	EntropiaCruzadaBinaria bce = new EntropiaCruzadaBinaria();
+	CossEntropy ce = new CossEntropy();
+	BinaryCrossEntropy bce = new BinaryCrossEntropy();
 	
-	MatrizConfusao mc = new MatrizConfusao();
-	Acuracia acuracia = new Acuracia();
+	ConfusionMatrix mc = new ConfusionMatrix();
+	Accuracy acuracia = new Accuracy();
 	F1Score f1Score = new F1Score();
 
 	/**
 	 * Instancia um novo avaliador destinado a um Modelo.
-	 * @param modelo modelo base.
+	 * @param model modelo base.
 	 */
-	public Avaliador(Model modelo) {
-		this.modelo = JNNutils.validarNaoNulo(modelo, "modelo == null");
+	public Evaluator(Model model) {
+		this.model = JNNutils.validarNaoNulo(model, "model == null");
 	}
 
 	/**
@@ -186,24 +186,24 @@ public class Avaliador {
 	 * @param ys {@code Tensores} com dados reais.
 	 * @return {@code Tensor} contendo o resultado.
 	 */
-	public Tensor acuracia(Tensor[] xs, Tensor[] ys) {
+	public Tensor accuracy(Tensor[] xs, Tensor[] ys) {
 		final int n = xs.length;
 		int batch = 32;
 		
-		float acertos = 0;
+		float hits = 0;
 		for (int i = 0; i < n; i += batch) {
-			int inicio = i;
-			int fim = Math.min(inicio + batch, n);
-			Tensor[] x = JNNutils.subArray(xs, inicio, fim);
-			Tensor[] y = JNNutils.subArray(ys, inicio, fim);
-			Tensor[] prev = modelo.forward(x);
+			int start = i;
+			int end = Math.min(start + batch, n);
+			Tensor[] x = JNNutils.subArray(xs, start, end);
+			Tensor[] y = JNNutils.subArray(ys, start, end);
+			Tensor[] prev = model.forward(x);
 			
-			float accLote = acuracia.forward(prev, y).item();
-			int tamLote = fim - inicio;
-			acertos += accLote * tamLote;
+			float batchAcc = acuracia.forward(prev, y).item();
+			int batchSize = end - start;
+			hits += batchAcc * batchSize;
 		}
 
-		return new Tensor(1).set(acertos / n, 0);
+		return new Tensor(1).set(hits / n, 0);
 	}
 
 	/**
@@ -211,8 +211,8 @@ public class Avaliador {
 	 * @param loader {@code DataLoader} contendo dataset de teste.
 	 * @return {@code Tensor} resultado.
 	 */
-	public Tensor acuracia(DataLoader loader) {
-		return acuracia(loader.getX(), loader.getY());
+	public Tensor accuracy(DataLoader loader) {
+		return accuracy(loader.getX(), loader.getY());
 	}
 
 	/**
@@ -226,8 +226,8 @@ public class Avaliador {
 	 * @param ys {@code Tensores} com dados reais.
 	 * @return {@code Tensor} resultado.
 	 */
-	public Tensor matrizConfusao(Tensor[] xs, Tensor[] ys) {
-		Tensor[] prevs = modelo.forward(xs);
+	public Tensor confusionMatrix(Tensor[] xs, Tensor[] ys) {
+		Tensor[] prevs = model.forward(xs);
 		return mc.forward(prevs, ys);
 	}
 
@@ -241,8 +241,8 @@ public class Avaliador {
 	 * @param loader {@code DataLoader} contendo dataset de teste.
 	 * @return {@code Tensor} resultado.
 	 */
-	public Tensor matrizConfusao(DataLoader loader) {
-		return matrizConfusao(loader.getX(), loader.getY());
+	public Tensor confusionMatrix(DataLoader loader) {
+		return confusionMatrix(loader.getX(), loader.getY());
 	}
 
 	/**
@@ -258,7 +258,7 @@ public class Avaliador {
 	 * @return {@code Tensor} resultado.
 	 */
 	public Tensor f1Score(Tensor[] xs, Tensor[] ys) {
-		Tensor[] prevs = modelo.forward(xs);
+		Tensor[] prevs = model.forward(xs);
 		return f1Score.forward(prevs, ys);
 	}
 

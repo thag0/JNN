@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import jnn.core.JNNlog;
 import jnn.core.JNNutils;
 import jnn.dataloader.DataLoader;
-import jnn.metrica.perda.Perda;
+import jnn.metrics.loss.Loss;
 import jnn.models.Model;
 import jnn.otm.Otimizador;
 import jnn.otm.scheduler.Scheduler;
@@ -83,7 +83,7 @@ public abstract class MetodoTreino {
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param logs exibir logs de avanço;
 	 */
-	protected abstract void loop(DataLoader loader, Otimizador otm, Perda loss, int epochs, boolean logs);
+	protected abstract void loop(DataLoader loader, Otimizador otm, Loss loss, int epochs, boolean logs);
 
 	/**
 	 * Embaralha ambos os arrays de entrada e saída.

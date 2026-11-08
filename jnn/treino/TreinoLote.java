@@ -3,8 +3,8 @@ package jnn.treino;
 import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
+import jnn.metrics.loss.Loss;
 import jnn.dataloader.Batch;
-import jnn.metrica.perda.Perda;
 import jnn.models.Model;
 import jnn.otm.Otimizador;
 import jnn.treino.callback.InfoEpoca;
@@ -42,7 +42,7 @@ public class TreinoLote extends MetodoTreino {
 	}
 
 	@Override
-	protected void loop(DataLoader loader, Otimizador otm, Perda loss, int epochs, boolean logs) {
+	protected void loop(DataLoader loader, Otimizador otm, Loss loss, int epochs, boolean logs) {
 		if (logs) esconderCursor();
 		long tempo = 0;
 		int largEpocas = String.valueOf(epochs).length();
@@ -100,7 +100,7 @@ public class TreinoLote extends MetodoTreino {
 	 * @param loss função de perda do modelo.
 	 * @param perdaEpoca valor de perda por época de treinamento.
 	 */
-	private float processoLote(Tensor[] loteX, Tensor[] loteY, Perda loss) {
+	private float processoLote(Tensor[] loteX, Tensor[] loteY, Loss loss) {
 		Tensor xs = JNNutils.concatenar(loteX);
 		Tensor ys = JNNutils.concatenar(loteY);
 		

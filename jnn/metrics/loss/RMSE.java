@@ -1,4 +1,4 @@
-package jnn.metrica.perda;
+package jnn.metrics.loss;
 
 import jnn.core.tensor.Tensor;
 
@@ -6,7 +6,7 @@ import jnn.core.tensor.Tensor;
  * Função de perda Root Mean Squared Error, calcula a raiz do 
  * erro médio quadrado entre as previsões e os valores reais.
  */
-public class RMSE extends Perda {
+public class RMSE extends Loss {
  
 	/**
 	 * Inicializa a função de perda Root Mean Squared Error.
@@ -15,30 +15,30 @@ public class RMSE extends Perda {
 
 	@Override
 	public Tensor forward(Tensor prev, Tensor real) {
-		verificarDimensoes(prev, real);
+		validateDimensions(prev, real);
 		
 		if (prev.numDim() == 1) {
-			int tam = prev.len();
-			float rmse = f(prev, real, tam);
+			int len = prev.len();
+			float rmse = f(prev, real, len);
 			
 			return new Tensor(1)
-			.set((float) Math.sqrt(rmse / tam), 0);
+			.set((float) Math.sqrt(rmse / len), 0);
 		}
 
-        int lotes = prev.lenDim(0);
-        int amostras = prev.lenDim(1);
+        int batches = prev.lenDim(0);
+        int samples = prev.lenDim(1);
 
-        float somaLote = 0;
-        for (int i = 0; i < lotes; i++) {
+        float sumBatch = 0;
+        for (int i = 0; i < batches; i++) {
             Tensor p = prev.subTensor(i);
             Tensor r = real.subTensor(i);
 
-            float soma = f(p, r, amostras) / amostras;
-            somaLote += Math.sqrt(soma);
+            float sum = f(p, r, samples) / samples;
+            sumBatch += Math.sqrt(sum);
         }
 
         return new Tensor(1)
-		.set((somaLote / lotes), 0);
+		.set((sumBatch / batches), 0);
 	}
 
 	/**
@@ -60,7 +60,7 @@ public class RMSE extends Perda {
 	 
 	@Override
 	public Tensor backward(Tensor prev, Tensor real) {
-		super.verificarDimensoes(prev, real);
+		super.validateDimensions(prev, real);
 		final int tam = prev.len();
 		float rrmse = (float) Math.sqrt(forward(prev, real).item());
 

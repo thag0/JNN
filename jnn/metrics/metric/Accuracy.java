@@ -1,11 +1,11 @@
-package jnn.metrica.metrica;
+package jnn.metrics.metric;
 
 import jnn.core.tensor.Tensor;
 
 /**
  * Acurácia para avaliação de modelos de classificação.
  */
-public class Acuracia extends Metrica {
+public class Accuracy extends Metric {
 
     /**
      * Instancia a métrica de <strong>Acurácia</strong>.
@@ -15,23 +15,23 @@ public class Acuracia extends Metrica {
 	 *		previsões corretas dividido pelo número total de exemplos.
      * </p>
      */
-	public Acuracia() {}
+	public Accuracy() {}
 
 	@Override
 	public Tensor forward(Tensor[] prev, Tensor[] real) {
-		validarDados(prev, real);
+		validadeData(prev, real);
 
-		int n = prev.length;
-		int acertos = 0;
+		int hits = 0;
+		int len = prev.length;
 		
-		for (int i = 0; i < n; i++) {
-			int idPrev = idMaiorValor(prev[i]);
-			int idReal = idMaiorValor(real[i]);
+		for (int i = 0; i < len; i++) {
+			int idPrev = idMaxVal(prev[i]);
+			int idReal = idMaxVal(real[i]);
 
-			if (idPrev == idReal) acertos++;
+			if (idPrev == idReal) hits++;
 		}
 
-		float acc = (float) acertos / n;
+		float acc = (float) hits / len;
 
 		return new Tensor(1).set(acc, 0);
 	}
