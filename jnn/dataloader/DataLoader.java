@@ -7,9 +7,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Random;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import jnn.core.JNNutils;
+import jnn.core.parallel.JNNparallel;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.transform.Transform;
 
@@ -164,14 +169,49 @@ public class DataLoader implements Iterable<Sample> {
     }
 
     /**
+     * Aplica uma transformação no conjunto de dados definido pelo getter e setter.
+     * @param tf Transformação desejada.
+     * @param getter função que recebe um Sample e retorna o tensor correspondente.
+     * @param setter função que recebe um Sample e aplica no tensor a transformação.
+     */
+    private void applyAll(Transform tf, Function<Sample, Tensor> getter, BiConsumer<Sample, Tensor> setter) {
+        int n = len();
+
+        ForkJoinPool pool = JNNparallel.common();
+
+        int threads = pool.getParallelism();
+        int chunkSize = (n + threads - 1) / threads;
+
+        var tasks = new ArrayList<ForkJoinTask<?>>();
+
+        for (int i = 0; i < n; i += chunkSize) {
+            int start = i;
+            int end = Math.min(i + chunkSize, n);
+
+            tasks.add(
+                pool.submit(() -> {
+                    for (int j = start; j < end; j++) {
+                        Sample sample = data[j];
+
+                        setter.accept(
+                            sample,
+                            applyTransform(tf, getter.apply(sample))
+                        );
+                    }
+                })
+            );
+        }
+
+        for (var task : tasks) task.join();
+    }
+
+    /**
      * Aplica uma transformação nos dados de {@code X} do DataLoader.
      * @param tf função transformadora.
      * @return {@code DataLoader} alterado.
      */
     public DataLoader applyX(Transform tf) {
-        for (Sample a : data) {
-            a.setX(applyTransform(tf, a.x()));
-        }
+        applyAll(tf, Sample::x, Sample::setX);
 
         return this;
     }
@@ -182,9 +222,7 @@ public class DataLoader implements Iterable<Sample> {
      * @return {@code DataLoader} alterado.
      */
     public DataLoader applyY(Transform tf) {
-        for (Sample a : data) {
-            a.setY(applyTransform(tf, a.y()));
-        }
+        applyAll(tf, Sample::y, Sample::setY);
 
         return this;
     }
