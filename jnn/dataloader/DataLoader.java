@@ -391,19 +391,32 @@ public class DataLoader implements Iterable<Sample> {
     public Batch batch(int start, int len) {
         if (start < 0) {
             throw new IllegalArgumentException(
-                "\nInicio deve ser maior ou igual a zero, mas recebido " + start
+                "\nInicio deve ser maior ou igual a zero, recebido " + start
+            );
+        }
+        
+        if (len < 0) {
+            throw new IllegalArgumentException(
+                "\nTamanho deve ser maior que zero, recebido " + len
             );
         }
 
-        int fim = Math.min(start + len, len());
-        int tamLote = fim - start;
-        
-        Tensor[] xs = new Tensor[tamLote];
-        Tensor[] ys = new Tensor[tamLote];
+        if (start > len()) {
+            throw new IllegalArgumentException(
+                "\nInicio excede o tamanho do dataloader."
+            );
+        }
 
-        for (int i = 0; i < tamLote; i++) {
-            xs[i] = get(start + i).x();
-            ys[i] = get(start + i).y();
+        int end = Math.min(start + len, len());
+        int batchSize = end - start;
+        
+        Tensor[] xs = new Tensor[batchSize];
+        Tensor[] ys = new Tensor[batchSize];
+
+        for (int i = 0; i < batchSize; i++) {
+            int id = start + i;
+            xs[i] = get(id).x();
+            ys[i] = get(id).y();
         }
 
         return new Batch(xs, ys);
