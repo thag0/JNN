@@ -8,9 +8,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import jnn.camadas.BatchNorm2D;
-import jnn.camadas.Camada;
+import jnn.camadas.Layer;
 import jnn.camadas.Conv2D;
-import jnn.camadas.Densa;
+import jnn.camadas.Dense;
 import jnn.camadas.Dropout;
 import jnn.camadas.Flatten;
 import jnn.camadas.acts.ELU;
@@ -68,14 +68,14 @@ public class JNNserial extends SerialBase {
 
 		// garantia de compilação do modelo e
 		// de que as dimensões das camadas estão
-		modelo.loteZero();
+		modelo.zeroBatch();
 
 		try (DataOutputStream out = new DataOutputStream(new FileOutputStream(arquivo))) {
-			escrever(out, modelo.numCamadas());
-			escrever(out, modelo.otm().nome());
+			escrever(out, modelo.numLayers());
+			escrever(out, modelo.optim().nome());
 			escrever(out, modelo.loss().nome());
 
-			for (Camada camada : modelo.camadas()) {
+			for (Layer camada : modelo.layers()) {
 				serialCamada.serializar(camada, out);
 			}
 
@@ -98,7 +98,7 @@ public class JNNserial extends SerialBase {
         }
 		
 		Dicionario dicio = new Dicionario();
-		Camada[] cs = {};
+		Layer[] cs = {};
 		String otmStr = "";
 		String lossStr = "";
 		
@@ -112,7 +112,7 @@ public class JNNserial extends SerialBase {
 
 				switch (nomeCamada) {
 					case "densa":
-						cs = JNNutils.addEmArray(cs, (Densa) serialCamada.ler(in, nomeCamada));
+						cs = JNNutils.addEmArray(cs, (Dense) serialCamada.ler(in, nomeCamada));
 					break;
 
 					case "conv2d":
@@ -199,12 +199,12 @@ public class JNNserial extends SerialBase {
 		
 		// mudar isso depois para algo como "modelo.compilar(otm, loss, false)"
 		// onde o false faria com que os parametros lidos não fossem mexidos na compilação
-		modelo._compilado = true;
+		modelo._compiled = true;
 
-		for (int i = 0; i < modelo.numCamadas(); i++) modelo.camada(i).setId(i);
-		modelo.setOtimizador(dicio.getOtimizador(otmStr));
-		modelo.otm().construir(modelo.params());
-		modelo.setPerda(dicio.getPerda(lossStr));
+		for (int i = 0; i < modelo.numLayers(); i++) modelo.layer(i).setId(i);
+		modelo.setOptimizer(dicio.getOtimizador(otmStr));
+		modelo.optim().construir(modelo.params());
+		modelo.setLoss(dicio.getPerda(lossStr));
 
 		return modelo;
 	}

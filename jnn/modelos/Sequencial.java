@@ -2,8 +2,8 @@ package jnn.modelos;
 
 import java.util.Iterator;
 
-import jnn.camadas.Camada;
-import jnn.camadas.Entrada;
+import jnn.camadas.Layer;
+import jnn.camadas.Input;
 import jnn.core.Dicionario;
 import jnn.core.JNNutils;
 import jnn.metrica.Avaliador;
@@ -153,12 +153,12 @@ import jnn.treino.Treinador;
  * @author Thiago Barroso, acadêmico de Engenharia da Computação pela Universidade Federal do Pará, 
  * Campus Tucuruí. Dezembro/2023.
  */
-public class Sequencial extends Modelo {
+public class Sequencial extends Model {
 
 	/**
 	 * Lista de camadas do modelo.
 	 */
-	private Camada[] _camadas;
+	private Layer[] _camadas;
 
 	/**
 	 * Instancia um modelo sequencial com o conjunto de camadas vazio.
@@ -172,8 +172,8 @@ public class Sequencial extends Modelo {
 	 * </p>
 	 */
 	public Sequencial() {
-		_camadas = new Camada[0];
-		_compilado = false;
+		_camadas = new Layer[0];
+		_compiled = false;
 	}
 
 	/**
@@ -187,7 +187,7 @@ public class Sequencial extends Modelo {
 	 * @throws IllegalArgumentException caso o conjunto de camadas seja nulo
 	 * ou alguma camada contida seja.
 	 */
-	public Sequencial(Camada... camadas) {
+	public Sequencial(Layer... camadas) {
 		this();// evitar repetição de código
 
 		JNNutils.validarNaoNulo(camadas, "camadas == null.");
@@ -200,7 +200,7 @@ public class Sequencial extends Modelo {
 		
 		add(camadas[0]);
 		for (int i = 1; i < camadas.length; i++) {
-			if (!(camadas[i] instanceof Entrada)) add(camadas[i]);
+			if (!(camadas[i] instanceof Input)) add(camadas[i]);
 		}
 	}
 
@@ -215,9 +215,9 @@ public class Sequencial extends Modelo {
 	 * @param c nova camada.
 	 * @throws IllegalArgumentException se a camada fornecida for nula,
 	 */
-	public void add(Camada c) {
+	public void add(Layer c) {
 		_camadas = JNNutils.addEmArray(_camadas, c);
-		_compilado = false;
+		_compiled = false;
 	}
 
 	/**
@@ -226,77 +226,77 @@ public class Sequencial extends Modelo {
 	 * @throws IllegalArgumentException caso o modelo já não possua nenhuma 
 	 * camada disponível.
 	 */
-	public Camada rem() {
+	public Layer rem() {
 		if (_camadas.length < 1) {
 			throw new IllegalArgumentException(
 				"\nNão há camadas no modelo."
 			);
 		}
 
-		Camada ultima = camadaSaida();
+		Layer ultima = outputLayer();
 
-		Camada[] novas = _camadas;
-		_camadas = new Camada[_camadas.length-1];
+		Layer[] novas = _camadas;
+		_camadas = new Layer[_camadas.length-1];
 		System.arraycopy(novas, 0, _camadas, 0, _camadas.length);
 
-		_compilado = false;
+		_compiled = false;
 
 		return ultima;
 	}
 
 	@Override
-	public void compilar(Object otm, Object loss) {
-		if (camadas().length < 1) {
+	public void compile(Object otm, Object loss) {
+		if (layers().length < 1) {
 			throw new IllegalStateException(
 				"\nNão há camadas no modelo."
 			);
 		}
 
-		if (camada(0) instanceof Entrada) {
-			int[] shape = camada(0).shapeOut();
+		if (layer(0) instanceof Input) {
+			int[] shape = layer(0).shapeOut();
 
 			// remover camada de entrada do modelo
-			Camada[] temp = camadas();
-			_camadas = new Camada[numCamadas()-1];
-			System.arraycopy(temp, 1, _camadas, 0, numCamadas());
+			Layer[] temp = layers();
+			_camadas = new Layer[numLayers()-1];
+			System.arraycopy(temp, 1, _camadas, 0, numLayers());
 
-			if (numCamadas() < 1) {
+			if (numLayers() < 1) {
 				throw new IllegalStateException(
 					"\nO modelo não possui camadas para compilar."
 				);
 			}
 
-			camada(0).construir(shape);
+			layer(0).build(shape);
 		
 		} else {
-			if (!camada(0).construida()) {
+			if (!layer(0).construida()) {
 				throw new IllegalArgumentException(
-					"\nÉ necessário que a primeira camada (" + camada(0).nome() +
+					"\nÉ necessário que a primeira camada (" + layer(0).name() +
 					") seja construída."
 				);
 			}
 		}
 
-		for (int i = 0; i < numCamadas(); i++) {
-			Camada camada = camada(i);
+		for (int i = 0; i < numLayers(); i++) {
+			Layer camada = layer(i);
 			
-			if (i != 0) camada.construir(camada(i-1).shapeOut());
+			if (i != 0) camada.build(layer(i-1).shapeOut());
 			
 			camada.initParams();
 			camada.setId(i);
 		}
 		
 		Dicionario dicio = new Dicionario();
-		_perda = dicio.getPerda(loss);
+		_loss = dicio.getPerda(loss);
 		
-		_otimizador = dicio.getOtimizador(otm);
-		_otimizador.construir(params());
+		_optimizer = dicio.getOtimizador(otm);
+		_optimizer.construir(params());
 		
-		_compilado = true;// modelo pode ser usado.
+		_compiled = true;// modelo pode ser usado.
 	}
 
 	@Override
-	public Camada camada(int id){
+	public Layer layer(int id){
 		if ((id < 0) || (id >= _camadas.length)) {
 			throw new IllegalArgumentException(
 				"O índice fornecido (" + id + 
@@ -308,12 +308,12 @@ public class Sequencial extends Modelo {
 	}
 
 	@Override
-	public Camada[] camadas() {
+	public Layer[] layers() {
 		return _camadas;
 	}
 
 	@Override
-	public Camada camadaSaida() {
+	public Layer outputLayer() {
 		if (_camadas.length < 1) {
 			throw new UnsupportedOperationException(
 				"\nO modelo não possui camadas adiciondas."
@@ -325,28 +325,28 @@ public class Sequencial extends Modelo {
 
 	@Override
 	public float[] saidaParaArray() {
-		validarCompilacao();
-		return camadaSaida().saida().array();
+		validateCompilation();
+		return outputLayer().output().array();
 	}
 
 	@Override
-	public String nome() {
-		return nome;
+	public String name() {
+		return name;
 	}
 
 	@Override
-	public int numCamadas() {
+	public int numLayers() {
 		return _camadas.length;
 	}
 
 	@Override
-	protected String construirInfo() {
+	protected String buildInfo() {
 		final String pad = " ".repeat(4);
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append(nome()).append(" [\n");
+		sb.append(name()).append(" [\n");
 
-		int larguraId = String.valueOf(numCamadas() - 1).length();
+		int larguraId = String.valueOf(numLayers() - 1).length();
 
 		sb.append(
 			pad + String.format(
@@ -355,9 +355,9 @@ public class Sequencial extends Modelo {
 			)
 		);
 
-		for (Camada camada : this) {
+		for (Layer camada : this) {
 			String idFormatado = String.format("%" + larguraId + "d", camada.id);
-			String nomeCamada = idFormatado + " - " + camada.nome();
+			String nomeCamada = idFormatado + " - " + camada.name();
 			String formEntrada = JNNutils.arrayStr(camada.shapeIn());
 			String formSaida   = JNNutils.arrayStr(camada.shapeOut());
 			String parametros = String.format("%,d", camada.numParams());
@@ -373,15 +373,15 @@ public class Sequencial extends Modelo {
 		sb.append("\n");
 
 		// Função de perda
-		sb.append(pad).append("Perda: ").append(_perda.nome());
+		sb.append(pad).append("Perda: ").append(_loss.nome());
 
 		String params = String.format("%,d", numParams());
 		sb.append("\n");
 		sb.append(pad).append("Parâmetros: ").append(params).append("\n");
 		
 		long tamParams = 0;
-		for (Camada camada : this) {
-			if (camada.treinavel()) {
+		for (Layer camada : this) {
+			if (camada.isTreinable()) {
 				for (var param : camada.params()) {
 					tamParams += param.weight.sizeBytes();
 				}
@@ -389,7 +389,7 @@ public class Sequencial extends Modelo {
 		}
 		sb.append(pad).append("Tamanho Params: ").append(JNNutils.formatarTamBytes(tamParams)).append("\n");
 		
-		sb.append(pad).append("Tamanho Total: ").append(JNNutils.formatarTamBytes(tamBytes())).append("\n");
+		sb.append(pad).append("Tamanho Total: ").append(JNNutils.formatarTamBytes(sizeBytes())).append("\n");
 
 		sb.append("]");
 
@@ -398,44 +398,44 @@ public class Sequencial extends Modelo {
 
 	@Override
 	public void print() {
-		validarCompilacao();
-		System.out.println(construirInfo());
+		validateCompilation();
+		System.out.println(buildInfo());
 	}
 
 	@Override
 	public Sequencial clone() {
 		Sequencial clone = (Sequencial) super.clone();
 
-		clone._avaliador = new Avaliador(clone);
-		clone.histTreino = this.histTreino;
-		clone.nome = "Clone de " + nome();
+		clone._evaluator = new Avaliador(clone);
+		clone.trainHistory = this.trainHistory;
+		clone.name = "Clone de " + name();
 		
 		Dicionario dicio = new Dicionario();
-		clone._otimizador = dicio.getOtimizador(_otimizador.nome());
-		clone._perda = dicio.getPerda(_perda.nome());
-		clone._treinador = new Treinador(clone);
+		clone._optimizer = dicio.getOtimizador(_optimizer.nome());
+		clone._loss = dicio.getPerda(_loss.nome());
+		clone._trainer = new Treinador(clone);
 		
-		int nCamadas = numCamadas();
-		clone._camadas = new Camada[nCamadas];
+		int nCamadas = numLayers();
+		clone._camadas = new Layer[nCamadas];
 		for (int i = 0; i < nCamadas; i++) {
-			clone._camadas[i] = camada(i).clone();
+			clone._camadas[i] = layer(i).clone();
 		}
-		clone._compilado = this._compilado;
+		clone._compiled = this._compiled;
 
 		return clone;
 	}
 
 	@Override
-	public Iterator<Camada> iterator() {
+	public Iterator<Layer> iterator() {
 		return new ModelIterator(_camadas);
 	}
 
 	@Override
-	public long tamBytes() {
+	public long sizeBytes() {
 		long tam = 0;
 
-		for (Camada c : this) {
-			tam += c.tamBytes();
+		for (Layer c : this) {
+			tam += c.sizeBytes();
 		}
 
 		return tam;

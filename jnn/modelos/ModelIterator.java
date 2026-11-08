@@ -2,12 +2,12 @@ package jnn.modelos;
 
 import java.util.Iterator;
 
-import jnn.camadas.Camada;
+import jnn.camadas.Layer;
 
 /**
  * Iterator para o modelo Sequencial.
  */
-class ModelIterator implements Iterator<Camada> {
+class ModelIterator implements Iterator<Layer> {
     
     /**
      * Índice atual da camada.
@@ -17,29 +17,29 @@ class ModelIterator implements Iterator<Camada> {
     /**
      * Array de elementos.
      */
-    Camada[] arr;
+    Layer[] layers;
 
     /**
      * Tamanho total do array de elementos.
      */
-    int tam;
+    int len;
 
     /**
      * Inicializa um ModelIterator.
-     * @param cs array de {@code Camada}.
+     * @param ls array de {@code Camada}.
      */
-    public ModelIterator(Camada[] cs) {
-        arr = cs;
-        tam = cs.length;
+    public ModelIterator(Layer[] ls) {
+        layers = ls;
+        len = ls.length;
     }
 
     @Override
     public boolean hasNext() {
-        return id < tam;
+        return id < len;
     }
 
     @Override
-    public Camada next() {
-        return arr[id++];
+    public Layer next() {
+        return layers[id++];
     }
 }

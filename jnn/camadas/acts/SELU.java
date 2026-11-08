@@ -5,7 +5,7 @@ import jnn.core.tensor.Tensor;
 /**
  * Camada que opera a função de ativação SELU.
  */
-public class SELU extends Ativacao {
+public class SELU extends Activation {
 
     /**
      * Parâmetro para controlar curvas negativas.
@@ -19,13 +19,13 @@ public class SELU extends Ativacao {
     
     /**
      * Inicializa uma camada de ativação SELU.
-     * @param shape formato de entrada para a camada.
+     * @param input formato de entrada para a camada.
      * @param alpha parâmetro para controlar curvas negativas.
      * @param gamma parâmetro para controlar a escala de saída.
      */
-    public SELU(int[] shape, Number alpha, Number gamma) {
+    public SELU(int[] input, Number alpha, Number gamma) {
         this(alpha, gamma);
-        construir(shape);
+        build(input);
     }
     
     /**
@@ -40,10 +40,10 @@ public class SELU extends Ativacao {
 
     /**
      * Inicializa uma camada de ativação SELU.
-     * @param shape formato de entrada para a camada.
+     * @param input formato de entrada para a camada.
      */
-    public SELU(int... shape) {
-        construir(shape);
+    public SELU(int... input) {
+        build(input);
     }
 
     /**
@@ -53,49 +53,51 @@ public class SELU extends Ativacao {
 
     @Override
     public Tensor forward(Tensor x) {
-        verificarConstrucao();
+        isBuilt();
 
-		talvesAjustarLote(x);
+		maybeFitToBatch(x);
 
-		_entrada = x.contiguous();
+		_input = x.contiguous();
 
         selu(
-            _entrada.array(), _entrada.offset(),
-            _saida.array(), _saida.offset(),
-            _entrada.len()
+            _input.array(),
+            _output.array()
         );
 
-        return _saida;
+        return _output;
     }
 
     @Override
     public Tensor backward(Tensor g) {
-		verificarConstrucao();
+		isBuilt();
 
-		_gradSaida = g.contiguous();
+		_gradOutput = g.contiguous();
 
         selud(
-            _gradSaida.array(), _gradSaida.offset(),
-            _gradEntrada.array(), _gradEntrada.offset(),
-            _entrada.array(), _entrada.offset(),
-            _entrada.len()
+            _input.array(),
+            _gradOutput.array(), 
+            _gradInput.array()
         );
 
-        return _gradEntrada;
+        return _gradInput;
     }
 
-    private void selu(float[] x, int offX, float[] dest, int offDest, int n) {
-        for (int i = 0; i < n; i++) {
-            float val = x[offX + i];
-            dest[offDest + i] = (val > 0.0) ? gamma * val : gamma * alpha * (float) (Math.exp(val) - 1.0);
+    private void selu(float[] input, float[] output) {
+        final int size = input.length;
+
+        for (int i = 0; i < size; i++) {
+            float val = input[i];
+            output[i] = (val > 0.0) ? gamma * val : gamma * alpha * (float) (Math.exp(val) - 1.0);
         }
     }
 
-    private void selud(float[] g, int offG, float[] gradE, int offGE, float[] x, int offX, int n) {
-        for (int i = 0; i < n; i++) {
-            final float grad = g[offG + i];
-            final float entrada = x[offX + i];
-            gradE[offGE + i] = grad * ((entrada > 0.0) ? gamma : gamma * alpha * (float) Math.exp(entrada));
+    private void selud(float[] input, float[] gOut, float[] gIn) {
+        final int size = input.length;
+
+        for (int i = 0; i < size; i++) {
+            final float g = gOut[i];
+            final float x = input[i];
+            gIn[i] = g * ((x > 0.0) ? gamma : gamma * alpha * (float) Math.exp(x));
         }
     }
     

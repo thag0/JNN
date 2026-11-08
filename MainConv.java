@@ -21,7 +21,7 @@ import jnn.dataloader.transform.Norm;
 import jnn.dataloader.transform.RandomCrop;
 import jnn.dataloader.transform.Transform;
 import jnn.io.JNNserial;
-import jnn.modelos.Modelo;
+import jnn.modelos.Model;
 import jnn.modelos.Sequencial;
 import jnn.otm.SGD;
 import jnn.otm.scheduler.CosineAnnealingLR;
@@ -56,20 +56,20 @@ public class MainConv {
 		modelo.print();
 		
 		var accs = new ArrayList<Float>();
-		modelo.treinador().setCallback(info -> {
-			modelo.treino(false);
-				float ac = modelo.avaliador().acuracia(teste).item();
-			modelo.treino(true);
+		modelo.trainer().setCallback(info -> {
+			modelo.setTraining(false);
+				float ac = modelo.evaluator().acuracia(teste).item();
+			modelo.setTraining(true);
 			
 			accs.add(ac);
 			System.out.println(" acurácia: " + (ac*100) + "%");
 		});
 
-		modelo.treinador().setScheduler(
+		modelo.trainer().setScheduler(
 			new CosineAnnealingLR(
-				modelo.otm(),
+				modelo.optim(),
 				0.0001f,
-				modelo.otm().getLr(),
+				modelo.optim().getLr(),
 				(TREINO_EPOCAS * (treino.len() / TREINO_LOTE))
 			)
 		);
@@ -78,7 +78,7 @@ public class MainConv {
 		JNNnative.on();
 		JNNnative.setTamArena(10 * 1024 * 1024);
 		long tempo = System.nanoTime();
-			modelo.treinar(treino, TREINO_EPOCAS, TREINO_LOTE, TREINO_LOGS);
+			modelo.fit(treino, TREINO_EPOCAS, TREINO_LOTE, TREINO_LOGS);
 		tempo = System.nanoTime() - tempo;
 
 		long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempo);
@@ -88,8 +88,8 @@ public class MainConv {
 
 		System.out.println("\nTempo de treino: " + horas + "h " + minutos + "min " + segundos + "s");
 
-		System.out.println("loss: " + modelo.avaliar(teste));
-		System.out.println("acc: " + modelo.avaliador().acuracia(teste));
+		System.out.println("loss: " + modelo.evaluate(teste));
+		System.out.println("acc: " + modelo.evaluator().acuracia(teste));
 
 		JNNserial.salvar(modelo, CAMINHO_SAIDA_MODELO);
 
@@ -140,19 +140,19 @@ public class MainConv {
 	 */
 	static Sequencial mlp() {
 		Sequencial modelo = new Sequencial(
-			new Entrada(1, 28, 28),
+			new Input(1, 28, 28),
 			new Flatten(),
-			new Densa(40),
+			new Dense(40),
 			new Tanh(),
-			new Densa(40),
+			new Dense(40),
 			new Tanh(),
-			new Densa(40),
+			new Dense(40),
 			new Tanh(),
-			new Densa(10),
+			new Dense(10),
 			new Softmax()
 		);
 
-		modelo.compilar("adam", "entropia-cruzada");
+		modelo.compile("adam", "entropia-cruzada");
 		
 		return modelo;
 	}
@@ -166,7 +166,7 @@ public class MainConv {
 		int[] poolK = {2, 2};
 
 		Sequencial modelo = new Sequencial(
-			new Entrada(3, 32, 32),
+			new Input(3, 32, 32),
 
 			new Conv2D(32, convK, "same", "he"),
 			new BatchNorm2D(),
@@ -195,7 +195,7 @@ public class MainConv {
 			new GlobalAvgPool2D(),
 
 			new Dropout(0.2),
-			new Densa(10, "glorot-uniforme"),
+			new Dense(10, "glorot-uniforme"),
 			new Softmax()
 		);
 
@@ -203,7 +203,7 @@ public class MainConv {
 		
 		Object otm = new SGD(0.01, 0.9, true);
 		Object loss = "entropia-cruzada";
-		modelo.compilar(otm, loss);
+		modelo.compile(otm, loss);
 
 		return modelo;		
 	}
@@ -213,7 +213,7 @@ public class MainConv {
 		int[] poolK = {2, 2};
 
 		Sequencial modelo = new Sequencial(
-			new Entrada(1, 28, 28),
+			new Input(1, 28, 28),
 
 			new Conv2D(16, convK, "same", "he"),
 			new ReLU(),
@@ -227,16 +227,16 @@ public class MainConv {
 
 			new GlobalAvgPool2D(),
 
-			new Densa(64, "he"),
+			new Dense(64, "he"),
 			new ReLU(),
 
-			new Densa(10, "glorot-uniforme"),
+			new Dense(10, "glorot-uniforme"),
 			new Softmax()
 		);
 
 		Object otm = new SGD(0.01, 0.9);
 		Object loss = "entropia-cruzada";
-		modelo.compilar(otm, loss);
+		modelo.compile(otm, loss);
 
 		return modelo;		
 	}
@@ -246,7 +246,7 @@ public class MainConv {
 	 * @param modelo modelo.
 	 * @param caminho caminho onde será salvo o arquivo.
 	 */
-	static void exportarHistorico(Modelo modelo, String caminho, ArrayList<Float> accs) {
+	static void exportarHistorico(Model modelo, String caminho, ArrayList<Float> accs) {
 		System.out.println("Exportando histórico de perda");
 
 		Dados dados = null;

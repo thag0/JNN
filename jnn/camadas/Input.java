@@ -27,7 +27,7 @@ import jnn.core.tensor.Tensor;
  * );
  * </pre>
  */
-public class Entrada extends Camada {
+public class Input extends Layer {
 
 	/**
 	 * Formato usado para entrada de um modelo.
@@ -38,7 +38,7 @@ public class Entrada extends Camada {
 	 * Inicializa um camada de entrada de acordo com o formato especificado.
 	 * @param shape formato de entrada usado para o modelo em que a camada estiver.
 	 */
-	public Entrada(int... shape) {
+	public Input(int... shape) {
 		JNNutils.validarNaoNulo(shape, "Formato recebido é nulo.");
 
 		if (shape.length < 1) {
@@ -57,7 +57,7 @@ public class Entrada extends Camada {
 	}
 
 	@Override
-	public void construir(int[] shape) {}
+	public void build(int[] shape) {}
 
 	@Override
 	public void initParams() {}
@@ -73,9 +73,9 @@ public class Entrada extends Camada {
 	}
 
 	@Override
-	public Tensor saida() {
+	public Tensor output() {
 		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui retorno de saída."
+			"\nCamada " + name() + " não possui retorno de saída."
 		);
 	}
 
@@ -100,7 +100,7 @@ public class Entrada extends Camada {
 
 		String pad = " ".repeat(4);
 		
-		sb.append(nome()).append("(").append("\n");
+		sb.append(name()).append("(").append("\n");
 		sb.append(pad).append("In: ").append(JNNutils.arrayStr(shape)).append("\n");
 		sb.append(")");
 

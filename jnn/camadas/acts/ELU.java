@@ -5,7 +5,7 @@ import jnn.core.tensor.Tensor;
 /**
  * Camada que opera a função de ativação ELU.
  */
-public class ELU extends Ativacao {
+public class ELU extends Activation {
     
 	/**
 	 * Parâmetro da camada.
@@ -16,11 +16,11 @@ public class ELU extends Ativacao {
 	 * Instancia a função de ativação ELU com 
 	 * seu valor de alfa configurável.
 	 * @param alpha novo valor alpha.
-     * @param shape formato de entrada da camada.
+     * @param input formato de entrada da camada.
 	 */
-	public ELU(Number alpha, int... shape) {
+	public ELU(Number alpha, int... input) {
 		this(alpha);
-        construir(shape);
+        build(input);
 	}
 
 	/**
@@ -45,49 +45,51 @@ public class ELU extends Ativacao {
 
     @Override
     public Tensor forward(Tensor x) {
-        verificarConstrucao();
+        isBuilt();
 
-        talvesAjustarLote(x);
+        maybeFitToBatch(x);
 
-		_entrada = x.contiguous();
+		_input = x.contiguous();
 
         elu(
-            _entrada.array(), _entrada.offset(),
-            _saida.array(), _saida.offset(),
-            _entrada.len()
+            _input.array(),
+            _output.array()
         );
 
-        return _saida;
+        return _output;
     }
 
     @Override
     public Tensor backward(Tensor g) {
-		verificarConstrucao();
+		isBuilt();
 
-		_gradSaida = g.contiguous();
+		_gradOutput = g.contiguous();
 
         elud(
-            _gradSaida.array(), _gradSaida.offset(),
-            _gradEntrada.array(), _gradEntrada.offset(),
-            _entrada.array(), _entrada.offset(),
-            _entrada.len()
+            _input.array(),
+            _gradOutput.array(),
+            _gradInput.array()
         );
 
-        return _gradEntrada;
+        return _gradInput;
     }
 
-    private void elu(float[] x, int offX, float[] dest, int offDest, int n) {
-        for (int i = 0; i < n; i++) {
-            float val = x[offX + i];
-            dest[offDest + i] = (val > 0) ? val : alpha * (float) (Math.exp(val) - 1.0);
+    private void elu(float[] input, float[] output) {
+        final int size = input.length;
+
+        for (int i = 0; i < size; i++) {
+            float val = input[i];
+            output[i] = (val > 0) ? val : alpha * (float) (Math.exp(val) - 1.0);
         }
     }
 
-    private void elud(float[] g, int offG, float[] gradE, int offGE, float[] x, int offX, int n) {
-        for (int i = 0; i < n; i++) {
-            final float grad = g[offG + i];
-            final float entrada = x[offX + i];
-            gradE[offGE + i] = grad * ((entrada > 0.0) ? 1.0f : alpha * (float) Math.exp(entrada));
+    private void elud(float[] input, float[] gOut, float[] gIn) {
+        final int size = input.length;
+
+        for (int i = 0; i < size; i++) {
+            final float g = gOut[i];
+            final float x = input[i];
+            gIn[i] = g * ((x > 0.0) ? 1.0f : alpha * (float) Math.exp(x));
         }
     }
 

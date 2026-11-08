@@ -22,7 +22,7 @@ class SerialMaxPool extends SerialBase implements SerializadorCamada<MaxPool2D> 
 
 	@Override
 	public void serializar(MaxPool2D camada, DataOutputStream dos) throws IOException {
-		escrever(dos, camada.nome());
+		escrever(dos, camada.name());
 		
 		int[] shapeIn = camada.shapeIn();
 		escrever(dos, shapeIn);
@@ -47,7 +47,7 @@ class SerialMaxPool extends SerialBase implements SerializadorCamada<MaxPool2D> 
 		int[] shapeStrides = lerArrInt(dis);
 	
 		MaxPool2D camada = new MaxPool2D(shapeFiltro, shapeStrides);
-		camada.construir(shapeIn);
+		camada.build(shapeIn);
 
 		return camada;
 	}

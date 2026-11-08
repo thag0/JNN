@@ -4,7 +4,7 @@ import jnn.core.tensor.Tensor;
 import jnn.dataloader.Sample;
 import jnn.dataloader.DataLoader;
 import jnn.metrica.perda.Perda;
-import jnn.modelos.Modelo;
+import jnn.modelos.Model;
 import jnn.otm.Otimizador;
 import jnn.treino.callback.InfoEpoca;
 
@@ -18,7 +18,7 @@ public class Treino extends MetodoTreino {
 	 * @param modelo modelo para treino.
 	 * @param hist calcular histórico de perda.
 	 */
-	public Treino(Modelo modelo, boolean hist) {
+	public Treino(Model modelo, boolean hist) {
 		super(modelo, hist);
 	}
 
@@ -26,7 +26,7 @@ public class Treino extends MetodoTreino {
 	 * Treinador sequencial, atualiza os parâmetros a cada amostra de dados.
 	 * @param modelo modelo para treino.
 	 */
-	public Treino(Modelo modelo) {
+	public Treino(Model modelo) {
 		this(modelo, false);
 	}
 
@@ -49,7 +49,7 @@ public class Treino extends MetodoTreino {
 				
 				if (calcHist) perdaEpoca += loss.forward(prev, a.y()).item();
 				
-				modelo.gradZero();
+				modelo.zeroGrad();
 				modelo.backward(loss.backward(prev, a.y()));
 				otm.update();
 			}

@@ -4,26 +4,26 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import jnn.camadas.Densa;
+import jnn.camadas.Dense;
 import jnn.core.Parametro;
 import jnn.io.seriais.SerialBase;
 import jnn.io.seriais.SerializadorCamada;
 
 /**
  * Interface de IO para camada Densa.
- * @see jnn.camadas.Densa
+ * @see jnn.camadas.Dense
  */
-class SerialDensa extends SerialBase implements SerializadorCamada<Densa> {
+class SerialDensa extends SerialBase implements SerializadorCamada<Dense> {
 
 	/**
 	 * Interface de IO para camada Densa.
-	 * @see jnn.camadas.Densa
+	 * @see jnn.camadas.Dense
 	 */
 	public SerialDensa() {}
 
 	@Override
-	public void serializar(Densa camada, DataOutputStream dos) throws IOException {
-		escrever(dos, camada.nome());
+	public void serializar(Dense camada, DataOutputStream dos) throws IOException {
+		escrever(dos, camada.name());
 
         int[] shapeIn = camada.shapeIn();
 		escrever(dos, shapeIn);
@@ -31,21 +31,21 @@ class SerialDensa extends SerialBase implements SerializadorCamada<Densa> {
         int[] shapeOut = camada.shapeOut();
 		escrever(dos, shapeOut);
 	
-		escrever(dos, camada.temBias());
+		escrever(dos, camada.hasBias());
 		
 		Parametro[] params = camada.params();
 
 		float[] kernel = params[0].weight.data().toArray();
 		escrever(dos, kernel);
 
-		if (camada.temBias()) {
+		if (camada.hasBias()) {
 			float[] bias = params[1].weight.data().toArray();
 			escrever(dos, bias);
 		}
 	}
 
 	@Override
-	public Densa ler(DataInputStream dis) throws IOException {
+	public Dense ler(DataInputStream dis) throws IOException {
 		// nome já é lido pra saber que camada é
 		int[] shapeIn = lerArrInt(dis);
 		int[] shapeOut = lerArrInt(dis);
@@ -54,9 +54,9 @@ class SerialDensa extends SerialBase implements SerializadorCamada<Densa> {
 		float[] bias = null;
 		if (temBias) bias = lerArrFloat(dis);
 
-		Densa camada = new Densa(shapeOut[0]);
+		Dense camada = new Dense(shapeOut[0]);
 		camada.setBias(temBias);
-		camada.construir(shapeIn);
+		camada.build(shapeIn);
 		
 		Parametro[] params = camada.params();
 		params[0].weight.copyElements(kernel);
@@ -71,8 +71,8 @@ class SerialDensa extends SerialBase implements SerializadorCamada<Densa> {
 	}
 
 	@Override
-	public Class<Densa> tipo() {
-		return Densa.class;
+	public Class<Dense> tipo() {
+		return Dense.class;
 	}
 
 }

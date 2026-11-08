@@ -20,7 +20,7 @@ public class SerialLeakyRelu extends SerialBase implements SerializadorCamada<Le
 
 	@Override
 	public void serializar(LeakyReLU camada, DataOutputStream dos) throws IOException {
-        escrever(dos, camada.nome());
+        escrever(dos, camada.name());
         escrever(dos, camada.shapeIn());
         escrever(dos, camada.getAlpha());
     }

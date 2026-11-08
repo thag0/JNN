@@ -8,11 +8,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import jnn.core.tensor.Tensor;
-import jnn.modelos.Modelo;
+import jnn.modelos.Model;
 
 public class PainelTreino extends Widget {
 
-   Modelo modelo;
+   Model modelo;
 
    BufferedImage imagem;
    int epocaAtual = 0;
@@ -34,9 +34,9 @@ public class PainelTreino extends Widget {
       setDoubleBuffered(true);
    }
 
-   public void desenhar(Modelo modelo, int epocasPorFrame) {
+   public void desenhar(Model modelo, int epocasPorFrame) {
       this.modelo = modelo;
-      int nSaida = modelo.camadaSaida().tamSaida();
+      int nSaida = modelo.outputLayer().sizeOutput();
 
       Tensor in = new Tensor(2);
       
@@ -88,10 +88,10 @@ public class PainelTreino extends Widget {
       repaint();
    }
 
-   public void desenhar(Modelo modelo, int epocasPorFrame, int numThreads) {
-      int numSaidas = modelo.camadaSaida().tamSaida();
+   public void desenhar(Model modelo, int epocasPorFrame, int numThreads) {
+      int numSaidas = modelo.outputLayer().sizeOutput();
       
-      Modelo[] clones = new Modelo[numThreads];
+      Model[] clones = new Model[numThreads];
       try (ExecutorService exec = Executors.newFixedThreadPool(numThreads)) {
          for (int i = 0; i < numThreads; i++) {
             final int id = i;
@@ -110,7 +110,7 @@ public class PainelTreino extends Widget {
       repaint();
    }
    
-   private void calcCinza(Modelo modelo, int y) {
+   private void calcCinza(Model modelo, int y) {
       Tensor in = new Tensor(2);
       in.set(((float) y / altura), 1);
 
@@ -130,7 +130,7 @@ public class PainelTreino extends Widget {
       imagem.setRGB(0, y, largura, 1, pixels, 0, largura);
    }
 
-   private void calcRgb(Modelo modelo, int y) {
+   private void calcRgb(Model modelo, int y) {
       Tensor in = new Tensor(2);
       in.set(((float) y / altura), 1);
 
@@ -140,7 +140,7 @@ public class PainelTreino extends Widget {
          in.set(((float) x / largura), 0);
          
          modelo.forward(in);
-         modelo.copiarDaSaida(saida);
+         modelo.copyFromOutput(saida);
 
          int r = (int) (saida[0] * 255);
          int g = (int) (saida[1] * 255);

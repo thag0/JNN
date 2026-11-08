@@ -1,7 +1,7 @@
 package exemplos;
 
 import ged.Ged;
-import jnn.camadas.Densa;
+import jnn.camadas.Dense;
 import jnn.io.JNNserial;
 import jnn.modelos.Sequencial;
 
@@ -19,10 +19,10 @@ public class ModelIO {
 
 		// Criando um modelo base
 		Sequencial modelo = new Sequencial(
-			new Densa(784, "tanh"),
-			new Densa(16, "tanh"),
-			new Densa(16, "tanh"),
-			new Densa(10, "sigmoid")
+			new Dense(784),
+			new Dense(16),
+			new Dense(16),
+			new Dense(10)
 		);
 		
 		modelo.print();

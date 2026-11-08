@@ -6,7 +6,7 @@ import jnn.core.tensor.Tensor;
 /**
  * Camada de ativação ReLU.
  */
-public class ReLU extends Ativacao {
+public class ReLU extends Activation {
 
     /**
      * Inicializa uma camada de ativação ReLU.
@@ -15,74 +15,76 @@ public class ReLU extends Ativacao {
 
     /**
      * Inicializa uma camada de ativação ReLU.
-     * @param shape formato de entrada para a camada.
+     * @param input formato de entrada para a camada.
      */
-    public ReLU(int... shape) {
-        construir(shape);
+    public ReLU(int... input) {
+        build(input);
     }
 
     @Override
     public Tensor forward(Tensor x) {
-        verificarConstrucao();
+        isBuilt();
 
-		talvesAjustarLote(x);
+		maybeFitToBatch(x);
 
-		_entrada = x.contiguous();
+		_input = x.contiguous();
 
         if (JNNnative.isOn()) {
             JNNnative.relu(
-                _entrada.array(),
-                _saida.array(),
-                _entrada.len()
+                _input.array(),
+                _output.array(),
+                _input.len()
             );
         } else {
             relu(
-                _entrada.array(),
-                _saida.array(),
-                _entrada.len()
+                _input.array(),
+                _output.array()
             );
         }
 
-        return _saida;
+        return _output;
     }
 
     @Override
     public Tensor backward(Tensor g) {
-		verificarConstrucao();
+		isBuilt();
 
-		_gradSaida = g.contiguous();
+		_gradOutput = g.contiguous();
 
         if (JNNnative.isOn()) {
             JNNnative.relud(
-                _entrada.array(), 
-                _gradSaida.array(), 
-                _gradEntrada.array(), 
-                _entrada.len()
+                _input.array(), 
+                _gradOutput.array(), 
+                _gradInput.array(), 
+                _input.len()
             );
         } else {
             relud(
-                _entrada.array(),
-                _gradSaida.array(), 
-                _gradEntrada.array(), 
-                _entrada.len()
+                _input.array(),
+                _gradOutput.array(), 
+                _gradInput.array()
             );
         }
 
-        return _gradEntrada;
+        return _gradInput;
     }
 
-    private static void relu(float[] x, float[] dst, int n) {
-        for (int i = 0; i < n; i++) {
-            float val = x[i];
-            dst[i] = val > 0 ? val : 0;
+    private static void relu(float[] input, float[] output) {
+        final int size = input.length;
+
+        for (int i = 0; i < size; i++) {
+            float val = input[i];
+            output[i] = val > 0 ? val : 0;
         }
     }
 
-    private static void relud(float[] x, float[] g, float[] dst, int n) {
-        for (int i = 0; i < n; i++) {
-            final float grad = g[i];
-            final float entrada = x[i];
-            dst[i] = grad * (entrada > 0 ? 1 : 0);
+    private static void relud(float[] input, float[] gOut, float[] gIn) {
+        final int size = input.length;
+
+        for (int i = 0; i < size; i++) {
+            final float g = gOut[i];
+            final float x = input[i];
+            gIn[i] = g * (x > 0 ? 1 : 0);
         }
     }
     

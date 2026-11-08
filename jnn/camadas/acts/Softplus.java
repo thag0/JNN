@@ -5,7 +5,7 @@ import jnn.core.tensor.Tensor;
 /**
  * Camada que opera a função de ativação Softplus.
  */
-public class Softplus extends Ativacao {
+public class Softplus extends Activation {
     
     /**
      * Inicializa uma camada de ativação Softplus.
@@ -14,58 +14,60 @@ public class Softplus extends Ativacao {
 
     /**
      * Inicializa uma camada de ativação Softplus.
-     * @param shape formato de entrada da camada.
+     * @param input formato de entrada da camada.
      */
-    public Softplus(int... shape) {
-        construir(shape);
+    public Softplus(int... input) {
+        build(input);
     }
 
     @Override
     public Tensor forward(Tensor x) {
-        verificarConstrucao();
+        isBuilt();
 
-		talvesAjustarLote(x);
+		maybeFitToBatch(x);
 
-		_entrada = x.contiguous();
+		_input = x.contiguous();
 
         softplus(
-            _entrada.array(), _entrada.offset(),
-            _saida.array(), _saida.offset(),
-            _entrada.len()
+            _input.array(),
+            _output.array()
         );
 
-        return _saida;
+        return _output;
     }
 
     @Override
     public Tensor backward(Tensor g) {
-		verificarConstrucao();
+		isBuilt();
 
-		_gradSaida = g.contiguous();
+		_gradOutput = g.contiguous();
 
         softplusd(
-            _gradSaida.array(), _gradSaida.offset(),
-            _gradEntrada.array(), _gradEntrada.offset(),
-            _entrada.array(), _entrada.offset(),
-            _entrada.len()
+            _input.array(),
+            _gradOutput.array(),
+            _gradInput.array()
         );
 
-        return _gradEntrada;
+        return _gradInput;
     }
 
-    private void softplus(float[] x, int offX, float[] dest, int offDest, int n) {
-        for (int i = 0; i < n; i++) {
-            float val = x[offX + i];
-            dest[offDest + i] = (float) Math.log(1.0 + Math.exp(val));
+    private void softplus(float[] input, float[] output) {
+        final int size = input.length;
+
+        for (int i = 0; i < size; i++) {
+            float val = input[i];
+            output[i] = (float) Math.log(1.0 + Math.exp(val));
         }
     }
 
-    private void softplusd(float[] g, int offG, float[] gradE, int offGE, float[] x, int offX, int n) {
-        for (int i = 0; i < n; i++) {
-            final float grad = g[offG + i];
-            final float entrada = x[offX + i];
-            float exp = (float) Math.exp(entrada);
-            gradE[offGE + i] = grad * (exp / (1.0f + exp));
+    private void softplusd(float[] input, float[] gOut, float[] gradIn) {
+        final int size = input.length;
+
+        for (int i = 0; i < size; i++) {
+            final float g = gOut[i];
+            final float x = input[i];
+            float exp = (float) Math.exp(x);
+            gradIn[i] = g * (exp / (1.0f + exp));
         }
     }
     

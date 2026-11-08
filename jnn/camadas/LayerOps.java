@@ -37,9 +37,9 @@ public class LayerOps {
 	 * @param kernel {@code Tensor} contendos o kernel/pesos da camada.
 	 * @param bias {@code Tensor} contendo o bias da camada {@code (podendo ser nulo)}.
 	 * @param out {@code Tensor} de destino do resultado.
-	 * @see jnn.camadas.Densa Densa
+	 * @see jnn.camadas.Dense Densa
 	 */
-	public void forwardDensa(Tensor in, Parametro kernel, Optional<Parametro> bias, Tensor out) {
+	public void forwardDense(Tensor in, Parametro kernel, Optional<Parametro> bias, Tensor out) {
 		out.zero();// zerar acumulos anteriores
 
 		ops.matmul(in, kernel.weight, out);
@@ -65,9 +65,9 @@ public class LayerOps {
 	 * @param grad {@code Tensor} contendo o gradiente em relação a saída da camada.
 	 * @param bias {@code Tensor} bias da camada (se houver).
 	 * @param gradIn {@code Tensor} contendo o gradiente em relação à entrada da camada.
-	 * @see jnn.camadas.Densa Densa
+	 * @see jnn.camadas.Dense Densa
 	 */
-	public void backwardDensa(Tensor in, Parametro kernel, Tensor grad, Optional<Parametro> bias, Tensor gradIn) {
+	public void backwardDense(Tensor in, Parametro kernel, Tensor grad, Optional<Parametro> bias, Tensor gradIn) {
 		gradIn.zero();// zerar acumulaçoes anteriores
 		
 		final int gradDim = grad.numDim();

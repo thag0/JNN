@@ -1,6 +1,6 @@
 package jnn.camadas.pooling;
 
-import jnn.camadas.Camada;
+import jnn.camadas.Layer;
 import jnn.camadas.LayerOps;
 import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
@@ -28,7 +28,7 @@ import jnn.core.tensor.Tensor;
  * y = ([2.5, 6.5])
  * </pre>
  */
-public class GlobalAvgPool2D extends Camada implements Cloneable {
+public class GlobalAvgPool2D extends Layer implements Cloneable {
 
     /**
      * Utilitário.
@@ -58,7 +58,7 @@ public class GlobalAvgPool2D extends Camada implements Cloneable {
 	 * </p>
 	 * <pre>shape = (canais, altura, largura) </pre>
 	 */
-    public Tensor _entrada;
+    public Tensor _input;
     
 	/**
 	 * Tensor contendo os valores de saída calculados pela camada.
@@ -67,7 +67,7 @@ public class GlobalAvgPool2D extends Camada implements Cloneable {
 	 * </p>
 	 * <pre>shape = (canais) </pre>
     */
-   public Tensor _saida;
+   public Tensor _output;
    
     /**
     * Tensor contendo os gradientes em relação a entrada da camada.
@@ -76,7 +76,7 @@ public class GlobalAvgPool2D extends Camada implements Cloneable {
      * </p>
      * <pre>shape = (canais, altura, largura) </pre>
      */
-    public Tensor _gradEntrada;
+    public Tensor _gradInput;
     
     /**
     * Tensor contendo os gradientes em relação a saída da camada.
@@ -85,7 +85,7 @@ public class GlobalAvgPool2D extends Camada implements Cloneable {
      * </p>
      * <pre>shape = (canais) </pre>
      */
-    public Tensor _gradSaida;
+    public Tensor _gradOutput;
 
     /**
      * Inicializa uma camada GlobalAvgPool2D, sem especificar o formato de
@@ -95,26 +95,26 @@ public class GlobalAvgPool2D extends Camada implements Cloneable {
     
     /**
      * Inicializa uma camada GlobalAvgPool2D.
-     * @param shape formato de entrada para a camada.
+     * @param input formato de entrada para a camada.
      */
-    public GlobalAvgPool2D(int[] shape) {
-        construir(shape);
+    public GlobalAvgPool2D(int[] input) {
+        build(input);
     }
 
     @Override
-    public void construir(int[] shape) {
+    public void build(int[] shape) {
         JNNutils.validarNaoNulo(shape, "shape == null.");
 
 		if (shape.length != 3) {
 			throw new IllegalArgumentException(
-				"\nFormato de entrada para a camada " + nome() + " deve conter três " + 
+				"\nFormato de entrada para a camada " + name() + " deve conter três " + 
 				"elementos (canais, altura, largura), mas recebido tamanho = " + shape.length
 			);
 		}
 
 		if (!JNNutils.apenasMaiorZero(shape)) {
 			throw new IllegalArgumentException(
-				"\nOs valores de dimensões de entrada para a camada " + nome() + 
+				"\nOs valores de dimensões de entrada para a camada " + name() + 
 				" devem ser maiores que zero."
 			);
 		}
@@ -125,57 +125,59 @@ public class GlobalAvgPool2D extends Camada implements Cloneable {
 
         shapeOut[0] = shapeIn[0];//canais
 
-        _gradEntrada = addBuffer("Grad Entrada", shapeIn);
-        _saida       = addBuffer("Saida", shapeOut);
+        _gradInput = addBuffer("grad input", shapeIn);
+        _output    = addBuffer("output", shapeOut);
 
-        _treinavel = false;
-        construida = true;
+        _treinable = false;
+        _built     = true;
     }
 
     @Override
     public void initParams() {}
 
     @Override
-    public void ajustarParaLote(int tamLote) {
+    public void fitToBatch(int batchSize) {
         int[] in;
         int[] out;
 
-        if (tamLote == 0) {
+        if (batchSize == 0) {
             in = shapeIn;
             out = shapeOut;
 
         } else {
-            in = new int[4];
-            in[0] = tamLote;
-            in[1] = shapeIn[0];
-            in[2] = shapeIn[1];
-            in[3] = shapeIn[2];
+            in = new int[] {
+                batchSize,
+                shapeIn[0],
+                shapeIn[1],
+                shapeIn[2]
+            };
 
-            out = new int[2];
-            out[0] = tamLote;
-            out[1] = shapeOut[0];
+            out = new int[] {
+                batchSize,
+                shapeOut[0]
+            };
         }
 
-        _gradEntrada = addBuffer("Grad Entrada", in);
-        _saida       = addBuffer("Saida", out);
+        _gradInput = addBuffer("grad input", in);
+        _output    = addBuffer("output", out);
 
-        this.tamLote = tamLote;
+        this.batchSize = batchSize;
     }
 
     @Override
     public Tensor forward(Tensor x) {
-        verificarConstrucao();
+        isBuilt();
 
         final int numDim = x.numDim();
 
         if (numDim == 3) {
-            validarShapes(x.shape(), shapeIn);
-            if (this.tamLote != 0) ajustarParaLote(0);
+            validateShapes(x.shape(), shapeIn);
+            if (this.batchSize != 0) fitToBatch(0);
             
         } else if (numDim == 4) {
-            validarShapes(x.shape(), shapeIn);
+            validateShapes(x.shape(), shapeIn);
             int lotes = x.lenDim(0);
-            if (lotes != this.tamLote) ajustarParaLote(lotes);
+            if (lotes != this.batchSize) fitToBatch(lotes);
 
         } else {
             throw new UnsupportedOperationException(
@@ -183,33 +185,33 @@ public class GlobalAvgPool2D extends Camada implements Cloneable {
             );
         }
 
-        _entrada = x.contiguous();
+        _input = x.contiguous();
 
-        lops.forwardGAP(_entrada, _saida, shapeIn);
+        lops.forwardGAP(_input, _output, shapeIn);
 
-        return _saida;
+        return _output;
     }
 
     @Override
     public Tensor backward(Tensor g) {
-        verificarConstrucao();
+        isBuilt();
 
-        _gradSaida = g.contiguous();
+        _gradOutput = g.contiguous();
 
-        lops.backwardGAP(_gradEntrada, _gradSaida, shapeIn, tamLote);
+        lops.backwardGAP(_gradInput, _gradOutput, shapeIn, batchSize);
 
-        return _gradEntrada;
+        return _gradInput;
     }
 
     @Override
     public int[] shapeIn() {
-        verificarConstrucao();
+        isBuilt();
         return shapeIn.clone();
     }
 
     @Override
     public int[] shapeOut() {
-        verificarConstrucao();
+        isBuilt();
         return shapeOut.clone();
     }
 
@@ -219,39 +221,39 @@ public class GlobalAvgPool2D extends Camada implements Cloneable {
     }
 
     @Override
-    public Tensor saida() {
-        verificarConstrucao();
-        return _saida;
+    public Tensor output() {
+        isBuilt();
+        return _output;
     }
 
 	@Override
-	public Tensor gradEntrada() {
-		verificarConstrucao();
-		return _gradEntrada; 
+	public Tensor gradInput() {
+		isBuilt();
+		return _gradInput; 
 	}
 
     @Override
-    public long tamBytes() {
-		long tamVars = super.tamBytes(); //base camada + tensores
+    public long sizeBytes() {
+		long tamVars = super.sizeBytes(); //base camada + tensores
 		tamVars += 4 * shapeIn.length; 
 		tamVars += 4 * shapeOut.length; 
 		tamVars += 4;//tamLote 
 
 		long tamTensores =
-		_saida.sizeBytes() +
-		_gradEntrada.sizeBytes();
+		_output.sizeBytes() +
+		_gradInput.sizeBytes();
 
 		return tamVars + tamTensores;
     }
 
     @Override
-    public Camada clone() {
-        verificarConstrucao();
+    public Layer clone() {
+        isBuilt();
 
         GlobalAvgPool2D clone = (GlobalAvgPool2D) super.clone();
 
-		clone._gradEntrada = this._gradEntrada.clone();
-		clone._saida = this._saida.clone();
+		clone._gradInput = this._gradInput.clone();
+		clone._output = this._output.clone();
 
         return clone;
     }
@@ -261,7 +263,7 @@ public class GlobalAvgPool2D extends Camada implements Cloneable {
         StringBuilder sb = new StringBuilder();
         String pad = " ".repeat(4);
 
-		sb.append(nome()).append("(\n");
+		sb.append(name()).append("(\n");
         sb.append(pad).append("In: ").append(JNNutils.arrayStr(shapeIn)).append("\n");
         sb.append(pad).append("Out: ").append(JNNutils.arrayStr(shapeOut)).append("\n");
         sb.append(")");

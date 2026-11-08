@@ -22,7 +22,7 @@ class SerialAvgPool extends SerialBase implements SerializadorCamada<AvgPool2D> 
 
 	@Override
 	public void serializar(AvgPool2D camada, DataOutputStream dos) throws IOException {
-		escrever(dos, camada.nome());
+		escrever(dos, camada.name());
 		
 		int[] shapeIn = camada.shapeIn();
 		escrever(dos, shapeIn);
@@ -47,7 +47,7 @@ class SerialAvgPool extends SerialBase implements SerializadorCamada<AvgPool2D> 
 		int[] shapeStrides = lerArrInt(dis);
 	
 		AvgPool2D camada = new AvgPool2D(shapeFiltro, shapeStrides);
-		camada.construir(shapeIn);
+		camada.build(shapeIn);
 
 		return camada;
 	}

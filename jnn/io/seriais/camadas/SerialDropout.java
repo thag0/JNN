@@ -22,12 +22,12 @@ class SerialDropout extends SerialBase implements SerializadorCamada<Dropout> {
 	
 	@Deprecated
 	public void serializar(Dropout camada, DataOutputStream dos) throws IOException {
-		escrever(dos, camada.nome());
+		escrever(dos, camada.name());
 
 		int[] shapeIn = camada.shapeIn();
 		escrever(dos, shapeIn);
 
-		escrever(dos, camada.taxa());
+		escrever(dos, camada.rate());
 	}
 
 	@Override
@@ -36,7 +36,7 @@ class SerialDropout extends SerialBase implements SerializadorCamada<Dropout> {
 		float taxa = lerFloat(dis);
 
 		Dropout camada = new Dropout(taxa);
-		camada.construir(shapeIn);
+		camada.build(shapeIn);
 		
 		return camada;
 	}

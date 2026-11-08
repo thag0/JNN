@@ -20,7 +20,7 @@ public class SerialELU extends SerialBase implements SerializadorCamada<ELU> {
 
 	@Override
 	public void serializar(ELU camada, DataOutputStream dos) throws IOException {
-        escrever(dos, camada.nome());
+        escrever(dos, camada.name());
         escrever(dos, camada.shapeIn());
         escrever(dos, camada.getAlpha());
     }

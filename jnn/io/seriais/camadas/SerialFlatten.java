@@ -22,7 +22,7 @@ class SerialFlatten extends SerialBase implements SerializadorCamada<Flatten> {
 
 	@Override
 	public void serializar(Flatten camada, DataOutputStream dos) throws IOException {
-		escrever(dos, camada.nome());
+		escrever(dos, camada.name());
 		
 		int[] shapeIn = camada.shapeIn();
 		escrever(dos, shapeIn);
@@ -38,7 +38,7 @@ class SerialFlatten extends SerialBase implements SerializadorCamada<Flatten> {
 		int[] shapeOut = lerArrInt(dis);// tem que ser lido pra avançar o buffer
 
 		Flatten camada = new Flatten();
-		camada.construir(shapeIn);
+		camada.build(shapeIn);
 
 		return camada;
 	}

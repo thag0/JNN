@@ -4,13 +4,13 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import jnn.camadas.Camada;
+import jnn.camadas.Layer;
 
 /**
  * Interface base para camadas serializáveis.
  * @param <T> tipo da camada
  */
-public interface SerializadorCamada <T extends Camada> {
+public interface SerializadorCamada <T extends Layer> {
     
     /**
      * Retorna o nome da camada.

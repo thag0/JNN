@@ -5,7 +5,7 @@ import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.dataloader.Batch;
 import jnn.metrica.perda.Perda;
-import jnn.modelos.Modelo;
+import jnn.modelos.Model;
 import jnn.otm.Otimizador;
 import jnn.treino.callback.InfoEpoca;
 
@@ -26,7 +26,7 @@ public class TreinoLote extends MetodoTreino {
 	 * @param hist calcular histórico de perda.
 	 * @param tamLote tamanho do lote de treino.
 	 */
-	public TreinoLote(Modelo modelo, boolean hist, int tamLote) {
+	public TreinoLote(Model modelo, boolean hist, int tamLote) {
 		super(modelo, hist);
 		this.tamLote = tamLote;
 	}
@@ -37,7 +37,7 @@ public class TreinoLote extends MetodoTreino {
 	 * @param modelo modelo base.
 	 * @param tamLote tamanho do lote de treino.
 	 */
-	public TreinoLote(Modelo modelo, int tamLote) {
+	public TreinoLote(Model modelo, int tamLote) {
 		this(modelo, false, tamLote);
 	}
 
@@ -57,7 +57,7 @@ public class TreinoLote extends MetodoTreino {
 			for (int i = 0; i < n; i += tamLote) {
 				Batch lote = loader.batch(i, tamLote);
 
-                modelo.gradZero();
+                modelo.zeroGrad();
 				perdaEpoca += processoLote(lote.arrX(), lote.arrY(), loss);
                 otm.update();      
 			}

@@ -5,7 +5,7 @@ import jnn.core.tensor.Tensor;
 /**
  * Camada que opera a função de ativação Softmax.
  */
-public class Softmax extends Ativacao {
+public class Softmax extends Activation {
     
     /**
      * Inicializa uma camada de ativação Softmax.
@@ -14,113 +14,113 @@ public class Softmax extends Ativacao {
 
     /**
      * Inicializa uma camada de ativação Softmax.
-     * @param shape formato de entrada para a camada.
+     * @param input formato de entrada para a camada.
      */
-    public Softmax(int... shape) {
-        construir(shape);
+    public Softmax(int... input) {
+        build(input);
     }
 
     @Override
     public Tensor forward(Tensor x) {
-        verificarConstrucao();
+        isBuilt();
 
         final int numDim = x.numDim();
-        int numAmostras = 1;
+        int numSamples = 1;
 
-        if (numDim == dimBase) {
-            validarShapes(x.shape(), shapeIn);
-            if (_tamLote != 0) ajustarParaLote(0);
+        if (numDim == baseDim) {
+            validateShapes(x.shape(), shapeIn);
+            if (this.batchSize != 0) fitToBatch(0);
             
-        } else if (numDim == dimBase + 1) {
-            validarShapes(x.shape(), shapeIn);
+        } else if (numDim == baseDim + 1) {
+            validateShapes(x.shape(), shapeIn);
             int lotes = x.lenDim(0);
-            if (lotes != this._tamLote) ajustarParaLote(lotes);
+            if (lotes != this.batchSize) fitToBatch(lotes);
             
-            numAmostras = lotes;
+            numSamples = lotes;
         
         } else {
             throw new UnsupportedOperationException(
-                "Esperado tensor com " + dimBase +
-                " ou " + (dimBase + 1) +
+                "Esperado tensor com " + baseDim +
+                " ou " + (baseDim + 1) +
                 " dimensões. Recebido: " + x.numDim()
             );
         }
 
-        _entrada = x.contiguous();
+        _input = x.contiguous();
 
-        int tamArray = _entrada.len() / numAmostras;
+        int arrayLen = _input.len() / numSamples;
 
         softmax(
-            _entrada.array(), _entrada.offset(),
-            _saida.array(), _saida.offset(),
-            numAmostras,
-            tamArray
+            _input.array(), 
+            _output.array(),
+            numSamples,
+            arrayLen
         );
 
-        return _saida;
+        return _output;
     }
 
     @Override
     public Tensor backward(Tensor g) {
-        verificarConstrucao();
+        isBuilt();
 
-        _gradSaida = g.contiguous();
+        _gradOutput = g.contiguous();
         
-        int totalElementos = _gradSaida.len();
+        int totalElementos = _gradOutput.len();
         int tamVetor = 1;
-        for(int s : shapeIn) tamVetor *= s;
+        for (int dim : shapeIn) tamVetor *= dim;
         int samples = totalElementos / tamVetor;
 
         softmaxGrad(
-            _gradSaida.array(), _gradSaida.offset(),
-            _gradEntrada.array(), _gradEntrada.offset(),
-            _saida.array(), _saida.offset(),
+            _gradOutput.array(), 
+            _gradInput.array(), 
+            _output.array(),
             samples,
             tamVetor
         );
 
-        return _gradEntrada;
+        return _gradInput;
     }
 
-    private void softmax(float[] x, int offX, float[] dest, int offDest, int samples, int tamArray) {
+    private void softmax(float[] input, float[] output, int samples, int arrayLen) {
         // o valor maximo é subtraido pra ter melhor estabilidade numerica
         
         for (int i = 0; i < samples; i++) {
-            int inicio = i * tamArray;
+            int start = i * arrayLen;
             
             float max = Float.NEGATIVE_INFINITY;
-            for (int j = 0; j < tamArray; j++) {
-                float val = x[offX + inicio + j];
+            for (int j = 0; j < arrayLen; j++) {
+                float val = input[start + j];
                 if (val > max) max = val;
             }
 
-            float soma = 0;
-            for (int j = 0; j < tamArray; j++) {
-                float exp = (float) Math.exp(x[offX + inicio + j] - max);
-                dest[offDest + inicio + j] = exp;
-                soma += exp;
+            float sum = 0;
+            for (int j = 0; j < arrayLen; j++) {
+                float exp = (float) Math.exp(input[start + j] - max);
+                output[start + j] = exp;
+                sum += exp;
             }
 
-            for (int j = 0; j < tamArray; j++) {
-                dest[offDest + inicio + j] /= soma;
+            for (int j = 0; j < arrayLen; j++) {
+                output[start + j] /= sum;
             }
         }
     }
 
-    private void softmaxGrad(float[] g, int offG, float[] gradE, int offGE, float[] y, int offY, int amostras, int tamArray) {
-        for (int i = 0; i < amostras; i++) {
-            int inicio = i * tamArray;
+    private void softmaxGrad(float[] gOut, float[] gIn, float[] output, int samples, int arrayLen) {
+        for (int i = 0; i < samples; i++) {
+            int start = i * arrayLen;
 
-            float soma = 0.f;
-            for (int j = 0; j < tamArray; j++) {
-                soma += g[offG + inicio + j] * y[offY + inicio + j];
+            float sum = 0.f;
+            for (int j = 0; j < arrayLen; j++) {
+                sum += gOut[start + j] * output[start + j];
             }
 
-            for (int j = 0; j < tamArray; j++) {
-                float vSaida = y[offY + inicio + j];
-                float vGrad = g[offG + inicio + j];
+            for (int j = 0; j < arrayLen; j++) {
+                float out = output[start + j];
+                float grad = gOut[start + j];
                 
-                gradE[offGE + inicio + j] = vSaida * (vGrad - soma);
+                gIn[start + j] = out * (grad - sum);
             }
         }
     }

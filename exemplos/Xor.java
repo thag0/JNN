@@ -24,19 +24,19 @@ public class Xor{
 		final int out = 1;// Saídas Y
 
 		Sequencial modelo = new Sequencial(
-			new Entrada(in),
-			new Densa(3),
+			new Input(in),
+			new Dense(3),
 			new Sigmoid(),
-			new Densa(out),
+			new Dense(out),
 			new Sigmoid()
 		);
 
-		modelo.compilar(new SGD(0.001, 0.999), "mse");
+		modelo.compile(new SGD(0.001, 0.999), "mse");
 		modelo.print();
-		modelo.treinar(xor, 5_000, false);
+		modelo.fit(xor, 5_000, false);
 		
 		// Avaliando
-		Tensor perda = modelo.avaliar(xor);
+		Tensor perda = modelo.evaluate(xor);
 		System.out.println("Perda: " + perda.item());
 
 		// Criando uma tabela verdade para verificação

@@ -6,7 +6,7 @@ import java.util.concurrent.ForkJoinPool;
 import jnn.core.JNNutils;
 import jnn.core.parallel.JNNparallel;
 import jnn.dataloader.DataLoader;
-import jnn.modelos.Modelo;
+import jnn.modelos.Model;
 import jnn.otm.scheduler.Scheduler;
 import jnn.treino.callback.CallbackFimEpoca;
 
@@ -18,7 +18,7 @@ public class Treinador implements Cloneable {
 	/**
 	 * Modelo base para treino.
 	 */
-	protected Modelo modelo;
+	protected Model modelo;
 
 	/**
 	 * Formato de execução de treino (amostra-amostra, lotes).
@@ -50,7 +50,7 @@ public class Treinador implements Cloneable {
 	 * @param modelo modelo base
 	 * @param hist calcular histórico de perda.
 	 */
-	public Treinador(Modelo modelo, boolean hist) {
+	public Treinador(Model modelo, boolean hist) {
 		this.modelo = JNNutils.validarNaoNulo(modelo, "modelo == null");
 		this.calcHist = hist;
 	}
@@ -59,7 +59,7 @@ public class Treinador implements Cloneable {
 	 * Iniciliza um novo treinador.
 	 * @param modelo modelo base.
 	 */
-	public Treinador(Modelo modelo) {
+	public Treinador(Model modelo) {
 		this(modelo, false);
 	}
 
@@ -120,15 +120,15 @@ public class Treinador implements Cloneable {
 
 		metodo.calcHist = calcHist;
 		
-		modelo.treino(true);	
+		modelo.setTraining(true);	
 		metodo.loop(
 			loader,
-			modelo.otm(),
+			modelo.optim(),
 			modelo.loss(),
 			epochs,
 			logs
 		);
-		modelo.treino(false);
+		modelo.setTraining(false);
 	}
 
 	/**

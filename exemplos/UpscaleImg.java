@@ -12,7 +12,7 @@ import jnn.camadas.acts.Sigmoid;
 import jnn.camadas.acts.Tanh;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
-import jnn.modelos.Modelo;
+import jnn.modelos.Model;
 import jnn.modelos.Sequencial;
 import jnn.otm.SGD;
 
@@ -37,26 +37,26 @@ public class UpscaleImg {
 		int nEntrada = 2;// posição x y do pixel
 		int nSaida = 1;// valor de escala de cinza/brilho do pixel
 		DataLoader img = JNN.dataloader(dados, nEntrada, nSaida);
-		img.applyY(t -> t.div(255));// normalizar entre 0 e 1
+		for (var sample : img) sample.x().div(255);// normalizar entre 0 e 1
 
 		// Criando modelo
 		// -Neste exemplo queremos que o modelo tenha overfitting
 		Sequencial modelo = new Sequencial(
-			new Entrada(nEntrada),
-			new Densa(12),
+			new Input(nEntrada),
+			new Dense(12),
 			new Tanh(),
-			new Densa(12),
+			new Dense(12),
 			new Tanh(),
-			new Densa(nSaida),
+			new Dense(nSaida),
 			new Sigmoid()
 		);
 
 		modelo.setHistorico(true);
-		modelo.compilar(new SGD(0.0001, 0.995), "mse");
-		modelo.treinar(img, 5_000, true);
+		modelo.compile(new SGD(0.0001, 0.995), "mse");
+		modelo.fit(img, 5_000, true);
 
 		// Avaliando o modelo
-		System.out.println("Perda = " + modelo.avaliar(img).item());
+		System.out.println("Perda = " + modelo.evaluate(img).item());
 
 		// Salvando dados
 		exportarHistoricoPerda(modelo.hist());// histórico de treino para plot
@@ -127,11 +127,11 @@ public class UpscaleImg {
 	 * @param escala fator de escala para altura e largura final.
 	 * @param caminho caminho para o arquivo.
 	 */
-	static void exportarImagemEscalaCinza(Modelo modelo, int altBase, int largBase, double escala, String caminho) {
-		modelo.loteZero();//remover dimensão de lote 
+	static void exportarImagemEscalaCinza(Model modelo, int altBase, int largBase, double escala, String caminho) {
+		modelo.zeroBatch();//remover dimensão de lote 
 
 		if (escala <= 0) throw new IllegalArgumentException("O valor de escala não pode ser menor que 1.");
-		if (modelo.camadaSaida().tamSaida() != 1) {
+		if (modelo.outputLayer().sizeOutput() != 1) {
 			throw new IllegalArgumentException(
 				"O modelo deve trabalhar apenas com uma unidade na camada de saída para a escala de cinza."
 			);
@@ -152,7 +152,7 @@ public class UpscaleImg {
 		}
 
 		Thread[] threads = new Thread[numThreads];
-		Modelo[] clones = new Modelo[numThreads];
+		Model[] clones = new Model[numThreads];
 		for (int i = 0; i < numThreads; i++) {
 			clones[i] = modelo.clone();
 		}

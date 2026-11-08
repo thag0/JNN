@@ -47,12 +47,12 @@ public class MaxPool2D extends Pool2DBase implements Cloneable {
 	 *filtro = (2, 2)
 	 *stride = (2, 2) // valor padrão
 	 * </pre>
-	 * @param filtro formato do filtro de max pooling.
+	 * @param filterSize formato do filtro de max pooling.
 	 * @throws IllegalArgumentException se o formato do filtro não atender as
 	 * requisições.
 	 */
-	public MaxPool2D(int[] filtro) {
-		this(filtro, filtro);// filtro == stride
+	public MaxPool2D(int[] filterSize) {
+		this(filterSize, filterSize);// filtro == stride
 	}
 
 	/**
@@ -62,14 +62,14 @@ public class MaxPool2D extends Pool2DBase implements Cloneable {
 	 *    O formato do filtro e dos strides devem conter as dimensões da entrada 
 	 *    da camada (altura, largura).
 	 * </p>
-	 * @param filtro formato do filtro de max pooling.
+	 * @param filterSize formato do filtro de max pooling.
 	 * @param stride strides que serão aplicados ao filtro.
 	 * @throws IllegalArgumentException se o formato do filtro não atender as
 	 * requisições.
 	 * @throws IllegalArgumentException se os strides não atenderem as requisições.
 	 */
-	public MaxPool2D(int[] filtro, int[] stride) {
-		super(filtro, stride);
+	public MaxPool2D(int[] filterSize, int[] stride) {
+		super(filterSize, stride);
 	}
 
 	/**
@@ -81,16 +81,16 @@ public class MaxPool2D extends Pool2DBase implements Cloneable {
 	 *    da camada (altura, largura).
 	 * </p>
 	 * A camada será automaticamente construída usando o formato de entrada especificado.
-	 * @param entrada formato de entrada para a camada.
-	 * @param filtro formato do filtro de max pooling.
+	 * @param input formato de entrada para a camada.
+	 * @param filterSize formato do filtro de max pooling.
 	 * @param stride strides que serão aplicados ao filtro.
 	 * @throws IllegalArgumentException se o formato do filtro não atender as
 	 * requisições.
 	 * @throws IllegalArgumentException se os strides não atenderem as requisições.
 	 */
-	public MaxPool2D(int[] entrada, int[] filtro, int[] stride) {
-		this(filtro, stride);
-		construir(entrada);
+	public MaxPool2D(int[] input, int[] filterSize, int[] stride) {
+		this(filterSize, stride);
+		build(input);
 	}
 
 	/**
@@ -103,9 +103,9 @@ public class MaxPool2D extends Pool2DBase implements Cloneable {
 	 * </pre>
 	 */
 	@Override
-	public void construir(int[] shape) {
-		super.construir(shape);
-		modo = "max";
+	public void build(int[] shape) {
+		super.build(shape);
+		mode = "max";
 	}
 
 	@Override

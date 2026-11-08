@@ -1,6 +1,6 @@
 package jnn.modelos;
 
-import jnn.camadas.Camada;
+import jnn.camadas.Layer;
 import jnn.core.JNNutils;
 import jnn.core.Parametro;
 import jnn.core.tensor.Tensor;
@@ -16,12 +16,12 @@ import jnn.treino.Treinador;
  * </h2>
  * Inteface para modelos criados dentro da biblioteca.
  */
-public abstract class Modelo implements Cloneable, Iterable<Camada> {
+public abstract class Model implements Cloneable, Iterable<Layer> {
 
 	/**
 	 * Nome da instância do modelo.
 	 */
-	protected String nome = getClass().getSimpleName();
+	protected String name = getClass().getSimpleName();
 
 	/**
 	 * <p>
@@ -30,28 +30,28 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 *		e dependências inicializadas previamente.
 	 * </p>
 	 */
-	public boolean _compilado;//mudar isso para protected assim que possivel
+	public boolean _compiled;//mudar isso para protected assim que possivel
 
 	/**
 	 * Função de perda para avaliar o erro durante o treino.
 	 */
-	protected Perda _perda;
+	protected Perda _loss;
 
 	/**
 	 * Otimizador usado para ajuste de parâmetros treináveis.
 	 */
-	protected Otimizador _otimizador;
+	protected Otimizador _optimizer;
 
 	/**
 	 * Gerenciador de treino do modelo.
 	 */
-	protected Treinador _treinador;
+	protected Treinador _trainer;
 
 	/**
 	 * Auxiliar na verificação de armazenagem do histórico
 	 * de perda do modelo durante o treinamento.
 	 */
-	protected boolean histTreino = false;
+	protected boolean trainHistory = false;
 
 	/**
 	 * Responsável pelo retorno de desempenho do modelo.
@@ -61,14 +61,14 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 *    Cada modelo possui seu próprio avaliador.
 	 * </p>
 	 */
-	protected Avaliador _avaliador;
+	protected Avaliador _evaluator;
 
 	/**
 	 * Inicialização implicita de um modelo.
 	 */
-	protected Modelo() {
-		_treinador = new Treinador(this);
-		_avaliador = new Avaliador(this);
+	protected Model() {
+		_trainer = new Treinador(this);
+		_evaluator = new Avaliador(this);
 	}
 
 	/**
@@ -77,12 +77,12 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * </p>
 	 * O nome é apenas estético e não influencia na performance ou na 
 	 * usabilidade do modelo.
-	 * @param nome novo nome da rede.
+	 * @param name novo nome da rede.
 	 */
-	public void setNome(String nome) {
-		if (nome != null) {
-			String s = nome.trim();
-			if (!s.isEmpty()) this.nome = s;
+	public void setName(String name) {
+		if (name != null) {
+			String s = name.trim();
+			if (!s.isEmpty()) this.name = s;
 		}
 	}
 
@@ -97,12 +97,12 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * <p>
 	 *    {@code O valor padrão é false}
 	 * </p>
-	 * @param calc se verdadeiro, o modelo armazenará o histórico de perda 
+	 * @param save se verdadeiro, o modelo armazenará o histórico de perda 
 	 * durante cada época de treinamento.
 	 */
-	public void setHistorico(boolean calc) {
-		histTreino = calc;
-		_treinador.setHistorico(calc);
+	public void setHistorico(boolean save) {
+		trainHistory = save;
+		_trainer.setHistorico(save);
 	}
 
 	/**
@@ -110,9 +110,8 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * de treinamento do modelo.
 	 * @param loss nova função de perda.
 	 */
-	public void setPerda(Perda loss) {
-		JNNutils.validarNaoNulo(loss, "loss == null.");
-		_perda = loss;
+	public void setLoss(Perda loss) {
+		_loss = JNNutils.validarNaoNulo(loss, "loss == null.");
 	}
 
 	/**
@@ -124,11 +123,10 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 *    padrão, o que pode ajudar a melhorar o desempenho de aprendizado do 
 	 *    modelo em cenários específicos.
 	 * </p>
-	 * @param otm novo otimizador.
+	 * @param opt novo otimizador.
 	 */
-	public void setOtimizador(Otimizador otm) {
-		JNNutils.validarNaoNulo(otm, "otm == null.");
-		_otimizador = otm;
+	public void setOptimizer(Otimizador opt) {
+		_optimizer = JNNutils.validarNaoNulo(opt, "otm == null.");
 	}
 
 	/**
@@ -146,20 +144,20 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 *    Para treinar o modelo deve-se fazer uso da função função {@code treinar()} 
 	 *    informando os dados necessários para treino.
 	 * </p>
-	 * @param otm otimizador usando para ajustar os parâmetros treinavéis do 
+	 * @param opt otimizador usando para ajustar os parâmetros treinavéis do 
 	 * modelo, pode ser uma {@code String} referente ao nome ou uma {@code instância} 
 	 * já inicializada.
 	 * @param loss função de perda usada para avaliar o erro do modelo durante o 
 	 * treino, pode ser uma {@code String} referente ao nome ou uma {@code instância} 
 	 * já inicializada.
 	 */
-	public abstract void compilar(Object otm, Object loss);
+	public abstract void compile(Object opt, Object loss);
 
 	/**
 	 * Auxiliar na verificação da compilação do modelo.
 	 */
-	protected void validarCompilacao() {
-		if (!_compilado) {
+	protected void validateCompilation() {
+		if (!_compiled) {
 			throw new IllegalStateException(
 				"\nO modelo deve ser compilado."
 			);
@@ -172,10 +170,10 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * @return {@code Tensor} contendo a saída prevista pelo modelo.
 	 */
 	public Tensor forward(Tensor x) {
-		validarCompilacao();
+		validateCompilation();
 
-		for (Camada camada : this) {
-			x = camada.forward(x);
+		for (Layer layer : this) {
+			x = layer.forward(x);
 		}
 
 		return x;
@@ -189,7 +187,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * correspondentes.
 	 */
 	public Tensor[] forward(Tensor[] xs) {
-		validarCompilacao();
+		validateCompilation();
 
 		JNNutils.validarNaoNulo(xs, "xs == null.");
 		
@@ -209,12 +207,12 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * @return {@code Tensor} contendo o gradiente da perda em relação a entrada do modelo.
 	 */
 	public Tensor backward(Tensor g) {
-		validarCompilacao();
+		validateCompilation();
 		
 		try {
-			final int n = numCamadas() - 1;
+			final int n = numLayers() - 1;
 			for (int i = n; i >= 0; i--) {
-				g = camada(i).backward(g);
+				g = layer(i).backward(g);
 			}
 		
 		} catch (NullPointerException npe) {
@@ -235,9 +233,9 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 *    Apenas camadas treináveis são afetadas.
 	 * </p>
 	 */
-	public void gradZero() {
-		for (Camada camada : this) {
-			if (camada.treinavel()) camada.gradZero();
+	public void zeroGrad() {
+		for (Layer layer : this) {
+			if (layer.isTreinable()) layer.zeroGrad();
 		}
 	}
 	
@@ -246,11 +244,11 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * treinamento em lotes.
 	 * @param loader conjunto de dados para treino.
 	 * @param epochs quantidade de épocas de treinamento.
-	 * @param tamLote tamanho do lote de treinamento.
+	 * @param batchSize tamanho do lote de treinamento.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	public void treinar(DataLoader loader, int epochs, int tamLote, boolean logs) {
-		validarCompilacao();
+	public void fit(DataLoader loader, int epochs, int batchSize, boolean logs) {
+		validateCompilation();
 
 		if (epochs < 1) {
 			throw new IllegalArgumentException(
@@ -258,13 +256,13 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 			);
 		}
 
-		if (tamLote < 1) {
+		if (batchSize < 1) {
 			throw new IllegalArgumentException(
-				"\nValor de lote deve ser maior que zero, recebido = " + tamLote
+				"\nValor de lote deve ser maior que zero, recebido = " + batchSize
 			);
 		}
 		
-		_treinador.executar(loader, epochs, tamLote, logs);
+		_trainer.executar(loader, epochs, batchSize, logs);
 	}
 	
 	/**
@@ -273,8 +271,8 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	public void treinar(DataLoader loader, int epochs, boolean logs) {
-		treinar(loader, epochs, 1, logs);
+	public void fit(DataLoader loader, int epochs, boolean logs) {
+		fit(loader, epochs, 1, logs);
 	}
 
 	/**
@@ -282,9 +280,9 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * @param is {@code true} caso o modelo deva estar no modo treino,
 	 * {@code false} caso contrário.
 	 */
-	public void treino(boolean is) {
-		for (Camada camada : this) {
-			camada.setTreino(is);
+	public void setTraining(boolean is) {
+		for (Layer layer : this) {
+			layer.setTraining(is);
 		}
 	}
 
@@ -300,9 +298,9 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * @param loader {@code DataLoader} com conjunto de dados.
 	 * @return {@code Tensor} contendo valor de perda.
 	 */
-	public Tensor avaliar(DataLoader loader) {
-		validarCompilacao();
-		treino(false);// garantia
+	public Tensor evaluate(DataLoader loader) {
+		validateCompilation();
+		setTraining(false);// garantia
 
 		Tensor[] xs = loader.getX();
 		Tensor[] ys = loader.getY();
@@ -321,7 +319,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 			
 			Tensor prev = forward(x);
 
-			float lossLote = _perda.forward(prev, y).item();
+			float lossLote = _loss.forward(prev, y).item();
 			int tamLote = fim - inicio;
 			loss += lossLote * tamLote;
 		}
@@ -337,25 +335,25 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * </p>
 	 * @return avaliador do modelo.
 	 */
-	public Avaliador avaliador() {
-		return _avaliador;
+	public Avaliador evaluator() {
+		return _evaluator;
 	}
 
 	/**
 	 * Retorna o treinador do modelo.
 	 * @return treinador do modelo.
 	 */
-	public Treinador treinador() {
-		return _treinador;
+	public Treinador trainer() {
+		return _trainer;
 	}
 
 	/**
 	 * Retorna o otimizador configurado para o treino do modelo modelo.
 	 * @return otimizador atual do modelo.
 	 */
-	public Otimizador otm() {
-		validarCompilacao();
-		return _otimizador;
+	public Otimizador optim() {
+		validateCompilation();
+		return _optimizer;
 	}
 
 	/**
@@ -363,28 +361,28 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * @return função de perda atual do modelo.
 	 */
 	public Perda loss() {
-		validarCompilacao();
-		return _perda;
+		validateCompilation();
+		return _loss;
 	}
 
 	/**
 	 * Retorna a {@code camada} do Modelo correspondente ao índice fornecido.
-	 * @param id índice da busca.
+	 * @param i índice da busca.
 	 * @return camada baseada na busca.
 	 */
-	public abstract Camada camada(int id);
+	public abstract Layer layer(int i);
 
 	/**
 	 * Retorna todo o conjunto de camadas presente no modelo.
 	 * @return conjunto de camadas do modelo.
 	 */
-	public abstract Camada[] camadas();
+	public abstract Layer[] layers();
 
 	/**
 	 * Retorna a {@code camada de saída}, ou última camada, do modelo.
 	 * @return camada de saída.
 	 */
-	public abstract Camada camadaSaida();
+	public abstract Layer outputLayer();
 
 	/**
 	 * Retorna o conjunto de parâmetros do modelo.
@@ -404,9 +402,9 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	public Parametro[] params() {
 		Parametro[] params = {};
 
-		for (Camada camada : this) {
-			if (camada.treinavel()) {
-				for (var p : camada.params()) {
+		for (Layer layer : this) {
+			if (layer.isTreinable()) {
+				for (var p : layer.params()) {
 					params = JNNutils.addEmArray(params, p);
 				}
 			}
@@ -418,11 +416,11 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	/**
 	 * Remove as dimensões de lote das camadas do modelo.
 	 */
-	public void loteZero() {
-		validarCompilacao();
+	public void zeroBatch() {
+		validateCompilation();
 		
-		for (Camada camada : this) {
-			camada.ajustarParaLote(0);
+		for (Layer camada : this) {
+			camada.fitToBatch(0);
 		}
 	}
 	
@@ -436,7 +434,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * Copia os dados de saída da última camada do modelo para o array.
 	 * @param arr array para cópia.
 	 */
-	public void copiarDaSaida(float[] arr) {
+	public void copyFromOutput(float[] arr) {
 		JNNutils.validarNaoNulo(arr, "arr == null.");
 		
 		float[] saida = saidaParaArray();
@@ -455,8 +453,8 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * Informa o nome configurado do modelo.
 	 * @return nome do modelo.
 	 */
-	public String nome() {
-		return nome;
+	public String name() {
+		return name;
 	}
 
 	/**
@@ -469,7 +467,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	public int numParams() {
 		int params = 0;
 
-		for (Camada camada : this) {
+		for (Layer camada : this) {
 			params += camada.numParams();
 		}
 
@@ -480,7 +478,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * Retorna a quantidade de camadas presente no modelo.
 	 * @return quantidade de camadas do modelo.
 	 */
-	public abstract int numCamadas();
+	public abstract int numLayers();
 
 	/**
 	 * Disponibiliza o histórico da função de perda do modelo durante cada época
@@ -493,14 +491,14 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * do modelo.
 	 */
 	public float[] hist() {
-		return _treinador.hist();
+		return _trainer.hist();
 	}
 
 	/**
 	 * Gera uma string representando as características do modelo.
 	 * @return {@code String} representando o modelo.
 	 */
-	protected abstract String construirInfo();
+	protected abstract String buildInfo();
 
 	/**
 	 * Exibe, via console, as informações do modelo.
@@ -509,8 +507,8 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 
 	@Override
 	public String toString() {
-		validarCompilacao();
-		return construirInfo();
+		validateCompilation();
+		return buildInfo();
 	}
 
 	/**
@@ -518,9 +516,9 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * @return clone do modelo.
 	 */
 	@Override
-	public Modelo clone() {
+	public Model clone() {
 		try {
-			Modelo clone = (Modelo) super.clone(); 
+			Model clone = (Model) super.clone(); 
 			return clone;
 
 		} catch (CloneNotSupportedException e) {
@@ -532,14 +530,14 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * Retorna o tamanho em bytes na memória que o modelo possui alocado.
 	 * @return tamanho calculado em bytes.
 	 */
-	public abstract long tamBytes();
+	public abstract long sizeBytes();
 
 	/**
 	 * Retorna o formato de entrada da primeira camada do modelo.
 	 * @return array contendo formato de entrada do modelo.
 	 */
 	public int[] shapeIn() {
-		return camada(0).shapeIn();
+		return layer(0).shapeIn();
 	}
 	
 	/**
@@ -547,7 +545,7 @@ public abstract class Modelo implements Cloneable, Iterable<Camada> {
 	 * @return array contendo formato de saída do modelo.
 	 */
 	public int[] shapeOut() {
-		return camadaSaida().shapeOut();
+		return outputLayer().shapeOut();
 	}
 
 }

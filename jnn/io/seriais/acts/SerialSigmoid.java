@@ -20,7 +20,7 @@ public class SerialSigmoid extends SerialBase implements SerializadorCamada<Sigm
 
 	@Override
 	public void serializar(Sigmoid camada, DataOutputStream dos) throws IOException {
-        escrever(dos, camada.nome());
+        escrever(dos, camada.name());
         escrever(dos, camada.shapeIn());
     }
 

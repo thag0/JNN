@@ -20,7 +20,7 @@ public class SerialSoftmax extends SerialBase implements SerializadorCamada<Soft
 
 	@Override
 	public void serializar(Softmax camada, DataOutputStream dos) throws IOException {
-        escrever(dos, camada.nome());
+        escrever(dos, camada.name());
         escrever(dos, camada.shapeIn());
     }
 

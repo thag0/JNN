@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import ged.Ged;
 import ged.Dados;
 import jnn.JNN;
-import jnn.camadas.Densa;
+import jnn.camadas.Dense;
 import jnn.camadas.Dropout;
-import jnn.camadas.Entrada;
+import jnn.camadas.Input;
 import jnn.camadas.acts.Softmax;
 import jnn.camadas.acts.Tanh;
 import jnn.dataloader.DataLoader;
@@ -52,18 +52,18 @@ public class Iris {
 		
 		// Criando um modelo
 		Sequencial modelo = new Sequencial(
-			new Entrada(numEntradas),
-			new Densa(10),
+			new Input(numEntradas),
+			new Dense(10),
 			new Tanh(),
 			new Dropout(0.25),
-			new Densa(10),
+			new Dense(10),
 			new Tanh(),
 			new Dropout(0.25),
-			new Densa(numSaidas),
+			new Dense(numSaidas),
 			new Softmax()
 		);
 			
-		modelo.compilar("adam", "entropia-cruzada");
+		modelo.compile("adam", "entropia-cruzada");
 		modelo.setHistorico(true);// guardar valores de perda do treino
 		
 		treino.print();
@@ -72,21 +72,21 @@ public class Iris {
 		// callback para capturar a acurácia ao longo do treino
 		DataLoader teste  = ds[1];
 		ArrayList<Float> accs = new ArrayList<>();
-		modelo.treinador().setCallback(info -> {
-			float acuracia = modelo.avaliador().acuracia(teste).item();
+		modelo.trainer().setCallback(info -> {
+			float acuracia = modelo.evaluator().acuracia(teste).item();
 			accs.add(acuracia);
 		});
 
-		modelo.treinar(treino, 250, 12, true);
+		modelo.fit(treino, 250, 12, true);
 		
 		// Avaliando o modelo
-		System.out.println("Perda = " + modelo.avaliar(teste).item());
-		float acc = modelo.avaliador().acuracia(teste).item();
+		System.out.println("Perda = " + modelo.evaluate(teste).item());
+		float acc = modelo.evaluator().acuracia(teste).item();
 		System.out.println("Acurácia = " + formatarDecimal(acc*100, 4) + "%");
 
 		// Matriz de confusão
 		modelo
-		.avaliador()
+		.evaluator()
 		.matrizConfusao(teste)
 		.name("Matriz de confusão")
 		.print();

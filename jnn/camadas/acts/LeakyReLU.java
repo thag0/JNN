@@ -5,7 +5,7 @@ import jnn.core.tensor.Tensor;
 /**
  * Camada de ativação Leaky ReLU.
  */
-public class LeakyReLU extends Ativacao {
+public class LeakyReLU extends Activation {
 
     /**
      * Parâmetro personalizável.
@@ -14,28 +14,28 @@ public class LeakyReLU extends Ativacao {
 
     /**
      * Inicializa uma camada de ativação Leaky ReLU.
-     * @param alfa constante da ativação.
-     * @param shape formato de entrada para a camada.
+     * @param alpha constante da ativação.
+     * @param input formato de entrada para a camada.
      */
-    public LeakyReLU(Number alfa, int... shape) {
-        this(alfa);
-        construir(shape);
+    public LeakyReLU(Number alpha, int... input) {
+        this(alpha);
+        build(input);
     }
 
     /**
      * Inicializa uma camada de ativação Leaky ReLU.
-     * @param shape formato de entrada para a camada.
+     * @param input formato de entrada para a camada.
      */
-    public LeakyReLU(int... shape) {
-        construir(shape);
+    public LeakyReLU(int... input) {
+        build(input);
     }
 
     /**
      * Inicializa uma camada de ativação Leaky ReLU.
-     * @param alfa constante da ativação.
+     * @param alpha constante da ativação.
      */
-    public LeakyReLU(Number alfa) {
-        this.alpha = alfa.floatValue();
+    public LeakyReLU(Number alpha) {
+        this.alpha = alpha.floatValue();
     }
 
     /**
@@ -47,49 +47,51 @@ public class LeakyReLU extends Ativacao {
 
     @Override
     public Tensor forward(Tensor x) {
-        verificarConstrucao();
+        isBuilt();
 
-        talvesAjustarLote(x);
+        maybeFitToBatch(x);
 
-		_entrada = x.contiguous();
+		_input = x.contiguous();
 
         leakyrelu(
-            _entrada.array(), _entrada.offset(),
-            _saida.array(), _saida.offset(),
-            _entrada.len()
+            _input.array(),
+            _output.array()
         );
 
-        return _saida;
+        return _output;
     }
 
     @Override
     public Tensor backward(Tensor g) {
-		verificarConstrucao();
+		isBuilt();
 
-		_gradSaida = g.contiguous();
+		_gradOutput = g.contiguous();
 
         leakyrelud(
-            _gradSaida.array(), _gradSaida.offset(),
-            _gradEntrada.array(), _gradEntrada.offset(),
-            _entrada.array(), _entrada.offset(),
-            _entrada.len()
+            _input.array(),
+            _gradOutput.array(),
+            _gradInput.array() 
         );
 
-        return _gradEntrada;
+        return _gradInput;
     }
 
-    private void leakyrelu(float[] x, int offX, float[] dest, int offDest, int n) {
-        for (int i = 0; i < n; i++) {
-            float val = x[offX + i];
-            dest[offDest + i] = val > 0 ? val : val * alpha;
+    private void leakyrelu(float[] input, float[] output) {
+        final int size = input.length;
+
+        for (int i = 0; i < size; i++) {
+            float val = input[i];
+            output[i] = val > 0.0 ? val : val * alpha;
         }
     }
 
-    private void leakyrelud(float[] g, int offG, float[] gradE, int offGE, float[] x, int offX, int n) {
-        for (int i = 0; i < n; i++) {
-            final float grad = g[offG + i];
-            final float entrada = x[offX + i];
-            gradE[offGE + i] = grad * (entrada > 0f ? 1f : alpha);
+    private void leakyrelud(float[] input, float[] gOut, float[] gIn) {
+        final int size = input.length;
+
+        for (int i = 0; i < size; i++) {
+            final float g = gOut[i];
+            final float x = input[i];
+            gIn[i] = g * (x > 0f ? 1f : alpha);
         }
     }
     

@@ -37,11 +37,11 @@ public class AvgPool2D extends Pool2DBase {
 	 *    O formato do filtro e dos strides devem conter as dimensões da entrada 
 	 *    da camada (altura, largura).
 	 * </p>
-	 * @param filtro formato do filtro de average pooling.
+	 * @param filterSize formato do filtro de average pooling.
 	 * @param stride strides que serão aplicados ao filtro.
 	 */
-	public AvgPool2D(int[] filtro, int[] stride) {
-		super(filtro, stride);
+	public AvgPool2D(int[] filterSize, int[] stride) {
+		super(filterSize, stride);
 	}
 
 	/**
@@ -59,10 +59,10 @@ public class AvgPool2D extends Pool2DBase {
 	 *filtro = (2, 2)
 	 *stride = (2, 2) // valor padrão
 	 * </pre>
-	 * @param filtro formato do filtro de average pooling.
+	 * @param filterSize formato do filtro de average pooling.
 	 */
-	public AvgPool2D(int[] filtro) {
-		super(filtro, filtro);// filtro == stride
+	public AvgPool2D(int[] filterSize) {
+		super(filterSize, filterSize);// filtro == stride
 	}
 
 	/**
@@ -74,13 +74,13 @@ public class AvgPool2D extends Pool2DBase {
 	 *    da camada (altura, largura).
 	 * </p>
 	 * A camada será automaticamente construída usando o formato de entrada especificado.
-	 * @param entrada formato de entrada para a camada.
-	 * @param filtro formato do filtro de average pooling.
+	 * @param input formato de entrada para a camada.
+	 * @param filterSize formato do filtro de average pooling.
 	 * @param stride strides que serão aplicados ao filtro.
 	 */
-	public AvgPool2D(int[] entrada, int[] filtro, int[] stride) {
-		this(filtro, stride);
-		construir(entrada);
+	public AvgPool2D(int[] input, int[] filterSize, int[] stride) {
+		this(filterSize, stride);
+		build(input);
 	}
 
 	/**
@@ -93,9 +93,9 @@ public class AvgPool2D extends Pool2DBase {
 	 * </pre>
 	 */
 	@Override
-	public void construir(int[] shape) {
-		super.construir(shape);
-		modo = "avg";
+	public void build(int[] shape) {
+		super.build(shape);
+		mode = "avg";
 	}
 
 	@Override

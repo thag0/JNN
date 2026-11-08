@@ -20,7 +20,7 @@ public class SerialReLU extends SerialBase implements SerializadorCamada<ReLU> {
 
 	@Override
 	public void serializar(ReLU camada, DataOutputStream dos) throws IOException {
-        escrever(dos, camada.nome());
+        escrever(dos, camada.name());
         escrever(dos, camada.shapeIn());
     }
 

@@ -23,7 +23,7 @@ public class SerialBatchNorm extends SerialBase implements SerializadorCamada<Ba
 
     @Override
     public void serializar(BatchNorm2D camada, DataOutputStream dos) throws IOException {
-        escrever(dos, camada.nome());
+        escrever(dos, camada.name());
 
         escrever(dos, camada.shapeIn());
         escrever(dos, camada.eps());
@@ -33,8 +33,8 @@ public class SerialBatchNorm extends SerialBase implements SerializadorCamada<Ba
         escrever(dos, params[0].weight.data().toArray());//gamma
         escrever(dos, params[1].weight.data().toArray());//beta
     
-        escrever(dos, camada._mediaMovel.data().toArray());
-        escrever(dos, camada._varianciaMovel.data().toArray());
+        escrever(dos, camada._runningMean.data().toArray());
+        escrever(dos, camada._runningVar.data().toArray());
     }
 
     @Override
@@ -49,14 +49,14 @@ public class SerialBatchNorm extends SerialBase implements SerializadorCamada<Ba
         float[] runVar = lerArrFloat(dis);
     
         BatchNorm2D bn = new BatchNorm2D(momentum, eps);
-        bn.construir(shapeIn);
+        bn.build(shapeIn);
 
         Parametro[] params = bn.params();
         params[0].weight.copyElements(gamma);
         params[1].weight.copyElements(beta);
     
-        bn._mediaMovel.copyElements(runMean);
-        bn._varianciaMovel.copyElements(runVar);
+        bn._runningMean.copyElements(runMean);
+        bn._runningVar.copyElements(runVar);
 
         return bn;
     }

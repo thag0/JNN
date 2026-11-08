@@ -5,7 +5,7 @@ import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.metrica.metrica.*;
 import jnn.metrica.perda.*;
-import jnn.modelos.Modelo;
+import jnn.modelos.Model;
 
 /**
  * Contém implementações de métricas para analisar modelos.
@@ -15,7 +15,7 @@ public class Avaliador {
 	/**
 	 * Modelo base de avaliação.
 	 */
-	private Modelo modelo;
+	private Model modelo;
 
 	MSE mse = new MSE();
 	MAE mae = new MAE();
@@ -32,7 +32,7 @@ public class Avaliador {
 	 * Instancia um novo avaliador destinado a um Modelo.
 	 * @param modelo modelo base.
 	 */
-	public Avaliador(Modelo modelo) {
+	public Avaliador(Model modelo) {
 		this.modelo = JNNutils.validarNaoNulo(modelo, "modelo == null");
 	}
 

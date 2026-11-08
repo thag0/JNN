@@ -48,29 +48,29 @@ import jnn.core.tensor.Tensor;
  *	</li>
  * </ul>
  */
-public abstract class Camada {
+public abstract class Layer {
 
 	// TODO fazer validação dos shapes dos tensores recebidos no backward
 
 	/**
 	 * Controlador para uso dentro dos algoritmos de treino.
 	 */
-	protected boolean _treinavel = false;
+	protected boolean _treinable = false;
 
 	/**
 	 * Controlador de construção da camada.
 	 */
-	protected boolean construida = false;
+	protected boolean _built = false;
 
 	/**
 	 * Controlador de treino da camada.
 	 */
-	protected boolean treinando = false;
+	protected boolean _training = false;
 
 	/**
 	 * Auxilar no controle de treinamento em lotes.
 	 */
-	protected int tamLote;
+	protected int batchSize;
 
 	/**
 	 * Identificador único da camada.
@@ -89,7 +89,7 @@ public abstract class Camada {
 	 *    como molde de base para as outras camadas terem suas próprias implementações.
 	 * </p>
 	 */
-	protected Camada() {}
+	protected Layer() {}
 
 	/**
 	 * Aloca a estrutura da camada, alocando os recursos necessários 
@@ -103,35 +103,36 @@ public abstract class Camada {
 	 * </p>
 	 * @param shape formato de entrada da camada.
 	 */
-	public abstract void construir(int[] shape);
+	public abstract void build(int[] shape);
 
 	/**
 	 * Verificador de inicialização para evitar problemas.
 	 */
-	protected void verificarConstrucao() {
-		if (!construida) {
+	protected void isBuilt() {
+		if (!_built) {
 			throw new IllegalStateException(
-				"\nCamada " + nome() + " (id = " + id + ") não foi construída."
+				"\nCamada " + name() + " (id = " + id + ") não foi construída."
 			);
 		}
 	}
 
 	/**
-	 * Verifica se o shape recebido é compatível com o shape esperado.
+	 * Verifica se o shape recebido é compatível com o shape esperado. Essa operação
+	 * leva em consideração que a primeira dimensão é de lote.
 	 * @param base shape recebido.
-	 * @param alvo shape esperado.
+	 * @param target shape esperado.
 	 */
-	protected void validarShapes(int[] base, int[] alvo) {
+	protected void validateShapes(int[] base, int[] target) {
 		// assumindo que base pode ter uma dimensão a mais para o lote.
 
 		int lb = base.length;
-		int la = alvo.length;
+		int la = target.length;
 
 		// comparando assim pra ignorar a primeira dimensão (lote)
 		for (int i = 1; i <= la; i++) {
-			if (base[lb - i] != alvo[la - i]) {
+			if (base[lb - i] != target[la - i]) {
 				throw new IllegalArgumentException(
-					"\nShapes incompatíveis, últimas dimensões esperadas = " + JNNutils.arrayStr(alvo) +
+					"\nShapes incompatíveis, últimas dimensões esperadas = " + JNNutils.arrayStr(target) +
 					", recebido = " + JNNutils.arrayStr(base)
 				);
 			}
@@ -166,21 +167,21 @@ public abstract class Camada {
 	 * <p>
 	 *    A configuração deve ser feita antes da construção da camada.
 	 * </p>
-	 * @param usarBias uso do bias.
+	 * @param useBias uso do bias.
 	 */
-	public void setBias(boolean usarBias) {
+	public void setBias(boolean useBias) {
 		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui configuração de bias."
+			"\nCamada " + name() + " não possui configuração de bias."
 		);    
 	}
 
 	/**
 	 * Configura a camada para treino.
-	 * @param treinando caso verdadeiro a camada será configurada para
+	 * @param isTraining caso verdadeiro a camada será configurada para
 	 * treino, caso contrário, será usada para testes/predições.
 	 */
-	public void setTreino(boolean treinando) {
-		this.treinando = treinando;
+	public void setTraining(boolean isTraining) {
+		this._training = isTraining;
 	}
 
 	/**
@@ -188,12 +189,12 @@ public abstract class Camada {
 	 * <p>
 	 *		O parâmetro serve como base para passagem aos otimizadores.
 	 * </p>
-	 * @param nome {@code String} contendo nome desejado.
+	 * @param name {@code String} contendo nome desejado.
 	 * @param shape {@code array} contendo os valores das dimensões do tensor.
 	 * @return {@code Parametro} criado.
 	 */
-	protected Parametro addParam(String nome, int... shape) {
-		Parametro p = new Parametro(nome, shape);
+	protected Parametro addParam(String name, int... shape) {
+		Parametro p = new Parametro(name, shape);
 		_params = JNNutils.addEmArray(_params, p);
 		return p;
 	}
@@ -201,11 +202,11 @@ public abstract class Camada {
 	/**
 	 * Inicializa um {@code Tensor} vazio com nome especificado.
 	 * @param shape {@code array} contendo os valores das dimensões do tensor.
-	 * @param nome {@code String} contendo nome desejado.
+	 * @param name {@code String} contendo nome desejado.
 	 * @return {@code Tensor} criado.
 	 */
-	protected Tensor addBuffer(String nome, int... shape) {
-		Tensor b = new Tensor(shape).name(nome);
+	protected Tensor addBuffer(String name, int... shape) {
+		Tensor b = new Tensor(shape).name(name);
 		// aqui não é adicionado nada
 		return b;
 	}
@@ -216,9 +217,9 @@ public abstract class Camada {
 	 * <p>
 	 *		Essa operação não altera kernels e bias.
 	 * </p>
-	 * @param tamLote tamanho do lote de dados.
+	 * @param batchSize tamanho do lote de dados.
 	 */
-	public void ajustarParaLote(int tamLote) {
+	public void fitToBatch(int batchSize) {
 		throw new UnsupportedOperationException(
 			"\nNão implementado."
 		);
@@ -242,7 +243,7 @@ public abstract class Camada {
 	 * Retorna a saída da camada.
 	 * @return saída da camada.
 	 */
-	public abstract Tensor saida();
+	public abstract Tensor output();
 	
 	/**
 	 * Retorna o formado dos dados de entrada suportados pela camada.
@@ -260,9 +261,9 @@ public abstract class Camada {
 	 * Retorna a saída da camada no formato de array.
 	 * @return saída da camada.
 	 */
-	public float[] saidaParaArray() {
+	public float[] outputToArray() {
 		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui retorno de saída para array."
+			"\nCamada " + name() + " não possui retorno de saída para array."
 		);    
 	}
 
@@ -270,9 +271,9 @@ public abstract class Camada {
 	 * Retorna a quantidade total de elementos presentes na saída da camada.
 	 * @return tamanho de saída da camada.
 	 */
-	public int tamSaida() {
+	public int sizeOutput() {
 		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui retorno de tamanho da saída."
+			"\nCamada " + name() + " não possui retorno de tamanho da saída."
 		);      
 	}
 
@@ -290,9 +291,9 @@ public abstract class Camada {
 	 * Retorna o verificador de uso do bias dentro da camada.
 	 * @return uso de bias na camada.
 	 */
-	public boolean temBias() {
+	public boolean hasBias() {
 		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui verificação de bias."
+			"\nCamada " + name() + " não possui verificação de bias."
 		);
 	}
 
@@ -305,7 +306,7 @@ public abstract class Camada {
 	 */
 	public Tensor bias() {
 		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui bias."
+			"\nCamada " + name() + " não possui bias."
 		);      
 	}
 
@@ -313,18 +314,18 @@ public abstract class Camada {
 	 * Retorna o gradiente em relação à entrada da camada.
 	 * @return {@code Tensor} contendo os gradientes em relação à entrada da camada.
 	 */
-	public Tensor gradEntrada() {
+	public Tensor gradInput() {
 		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui gradiente de entrada."
+			"\nCamada " + name() + " não possui gradiente de entrada."
 		);    
 	}
 
 	/**
 	 * Zera os gradientes de parâmetros treináveis.
 	 */
-	public void gradZero() {
+	public void zeroGrad() {
 		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui kernel/bias para zerar."
+			"\nCamada " + name() + " não possui kernel/bias para zerar."
 		);
 	}
 
@@ -333,8 +334,8 @@ public abstract class Camada {
 	 * @return {@code true} caso a camada seja treinável, {@code false}
 	 * caso contrário.
 	 */
-	public boolean treinavel() {
-		return _treinavel;
+	public boolean isTreinable() {
+		return _treinable;
 	}
 
 	/**
@@ -342,9 +343,9 @@ public abstract class Camada {
 	 * @return clone da camada.
 	 */
 	@Override
-	public Camada clone() {
+	public Layer clone() {
 		try {
-			return (Camada) super.clone();
+			return (Layer) super.clone();
 		} catch (CloneNotSupportedException e) {
 			throw new RuntimeException(e);
 		}
@@ -354,7 +355,7 @@ public abstract class Camada {
 	 * Retorna o nome da camada.
 	 * @return nome da camada.
 	 */
-	public String nome() {
+	public String name() {
 		return getClass().getSimpleName();
 	}
 
@@ -365,7 +366,7 @@ public abstract class Camada {
 	 */
 	public String info() {
 		throw new UnsupportedOperationException(
-			"\nCamada " + nome() + " não possui implementação para info()"
+			"\nCamada " + name() + " não possui implementação para info()"
 		);
 	}
 
@@ -385,7 +386,7 @@ public abstract class Camada {
 	 * Retorna o tamanho em bytes na memória ocupado pela camada.
 	 * @return tamanho aproximado em bytes.
 	 */
-	public long tamBytes() {
+	public long sizeBytes() {
 		String jvmBits = System.getProperty("sun.arch.data.model");
         long bits = Long.valueOf(jvmBits);
 
@@ -398,7 +399,7 @@ public abstract class Camada {
         );
 
 		long tamTensores = 0;
-		if (treinavel()) {
+		if (isTreinable()) {
 			for (var param : _params) {
 				tamTensores += param.weight.sizeBytes();
 				tamTensores += param.grad.sizeBytes();
@@ -427,7 +428,7 @@ public abstract class Camada {
 	 * @return camada construída.
 	 */
 	public boolean construida() {
-		return construida;
+		return _built;
 	}
 
 }

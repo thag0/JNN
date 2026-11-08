@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import jnn.camadas.Camada;
+import jnn.camadas.Layer;
 import jnn.io.seriais.SerializadorCamada;
 import jnn.io.seriais.acts.SerialELU;
 import jnn.io.seriais.acts.SerialGELU;
@@ -24,7 +24,7 @@ import jnn.io.seriais.acts.SerialTanh;
  */
 public class SerialCamada {
 
-    private Map<Class<? extends Camada>, SerializadorCamada<?>> porTipo = new HashMap<>();
+    private Map<Class<? extends Layer>, SerializadorCamada<?>> porTipo = new HashMap<>();
     private Map<String, SerializadorCamada<?>> porNome = new HashMap<>();
 
     /**
@@ -70,16 +70,16 @@ public class SerialCamada {
      * @throws IOException caso ocorra algum erro.
      */
     @SuppressWarnings("unchecked")
-    public void serializar(Camada c, DataOutputStream dos) throws IOException {
+    public void serializar(Layer c, DataOutputStream dos) throws IOException {
         var serial = porTipo.get(c.getClass());
 
         if (serial == null) {
             throw new UnsupportedOperationException(
-                "\nCamada " + c.nome() + " sem suporte."
+                "\nCamada " + c.name() + " sem suporte."
             );
         }
 
-        ((SerializadorCamada<Camada>) serial).serializar(c, dos);
+        ((SerializadorCamada<Layer>) serial).serializar(c, dos);
     }
 
     /**
@@ -89,7 +89,7 @@ public class SerialCamada {
      * @return {@code Camada} lida.
      * @throws IOException caso ocorra algum erro.
      */
-    public Camada ler(DataInputStream dis, String nome) throws IOException {
+    public Layer ler(DataInputStream dis, String nome) throws IOException {
         var s = porNome.get(nome.toLowerCase());
 
         if (s == null) {

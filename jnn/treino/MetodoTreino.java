@@ -6,7 +6,7 @@ import jnn.core.JNNlog;
 import jnn.core.JNNutils;
 import jnn.dataloader.DataLoader;
 import jnn.metrica.perda.Perda;
-import jnn.modelos.Modelo;
+import jnn.modelos.Model;
 import jnn.otm.Otimizador;
 import jnn.otm.scheduler.Scheduler;
 import jnn.treino.callback.CallbackFimEpoca;
@@ -19,7 +19,7 @@ public abstract class MetodoTreino {
 	/**
 	 * Modelo base para treino.
 	 */
-	protected Modelo modelo;
+	protected Model modelo;
 
 	/**
 	 * Histórico de perda do modelo durante o treinamento.
@@ -46,7 +46,7 @@ public abstract class MetodoTreino {
 	 * @param modelo modelo base.
 	 * @param hist calcular histórico de perda durante o treino.
 	 */
-	protected MetodoTreino(Modelo modelo, boolean hist) {
+	protected MetodoTreino(Model modelo, boolean hist) {
 		this.modelo = modelo;// já é validado != null pelo Treinador
 		this.calcHist = hist;
 	}
@@ -55,7 +55,7 @@ public abstract class MetodoTreino {
 	 * Construtor interno.
 	 * @param modelo modelo base.
 	 */
-	protected MetodoTreino(Modelo modelo) {
+	protected MetodoTreino(Model modelo) {
 		this(modelo, false);	
 	}
 

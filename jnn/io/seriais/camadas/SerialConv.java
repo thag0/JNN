@@ -23,7 +23,7 @@ class SerialConv extends SerialBase implements SerializadorCamada<Conv2D> {
 
 	@Override
 	public void serializar(Conv2D camada, DataOutputStream dos) throws IOException {
-		escrever(dos, camada.nome());
+		escrever(dos, camada.name());
 
 		int[] shapeIn = camada.shapeIn();
 		escrever(dos, shapeIn);
@@ -37,14 +37,14 @@ class SerialConv extends SerialBase implements SerializadorCamada<Conv2D> {
 		int[] padding = camada.shapePadding();
 		escrever(dos, padding);
 	
-		escrever(dos, camada.temBias());
+		escrever(dos, camada.hasBias());
 
 		Parametro[] params = camada.params();
 		
 		float[] kernel = params[0].weight.data().toArray();
 		escrever(dos, kernel);
 
-		if (camada.temBias()) {
+		if (camada.hasBias()) {
 			float[] bias = params[1].weight.data().toArray();
 			escrever(dos, bias);
 		}
@@ -67,7 +67,7 @@ class SerialConv extends SerialBase implements SerializadorCamada<Conv2D> {
 		
 		Conv2D camada = new Conv2D(numFiltros, filtro, pad);
 		camada.setBias(temBias);
-		camada.construir(shapeIn);
+		camada.build(shapeIn);
 
 		Parametro[] params = camada.params();
 		

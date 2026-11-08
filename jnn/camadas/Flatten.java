@@ -14,7 +14,7 @@ import jnn.core.tensor.Tensor;
  *    A camada de flatten não possui parâmetros treináveis nem função de ativação.
  * </p>
  */
-public class Flatten extends Camada implements Cloneable {
+public class Flatten extends Layer implements Cloneable {
 
 	/**
 	 * Array contendo o formato de entrada da camada, de acordo com o formato:
@@ -92,7 +92,7 @@ public class Flatten extends Camada implements Cloneable {
 	 * @param entrada formato dos dados de entrada para a camada.
 	 */
 	public Flatten(int[] entrada) {
-		construir(entrada);
+		build(entrada);
 	}
 
 	/**
@@ -111,7 +111,7 @@ public class Flatten extends Camada implements Cloneable {
 	 * </pre>
 	 */
 	@Override
-	public void construir(int[] shape) {
+	public void build(int[] shape) {
 		JNNutils.validarNaoNulo(shape, "shape == null.");
 
 		if (!JNNutils.apenasMaiorZero(shape)) {
@@ -121,24 +121,24 @@ public class Flatten extends Camada implements Cloneable {
 		}
 
 		shapeIn = shape.clone();
-		totalFlatten = tamSaida();
+		totalFlatten = sizeOutput();
 
 		shapeOut = new int[]{ totalFlatten };
 
 		_gradEntrada = addBuffer("Grad Entrada", shapeIn);
 		_saida 		 = addBuffer("Saida", shapeOut);
 
-		construida = true;// camada pode ser usada.
+		_built = true;// camada pode ser usada.
 	}
 
 	@Override
 	public void initParams() {}
 
 	@Override
-	public void ajustarParaLote(int tamLote) {
+	public void fitToBatch(int tamLote) {
 		if (tamLote == 0) {
 			_gradEntrada = addBuffer("Grad Entrada", shapeIn);
-			_saida 		= addBuffer("Saida", tamSaida());
+			_saida 		= addBuffer("Saida", sizeOutput());
 		
 		} else {
 			int[] shape = new int[shapeIn.length + 1];
@@ -152,21 +152,21 @@ public class Flatten extends Camada implements Cloneable {
 		}
 
 		
-		this.tamLote = tamLote;
+		this.batchSize = tamLote;
 	}
 
 	@Override
 	public Tensor forward(Tensor x) {
-		verificarConstrucao();
+		isBuilt();
 
 		if (x.numDim() == shapeIn.length) {
-			validarShapes(x.shape(), shapeIn);
-			if (this.tamLote != 0) ajustarParaLote(0);
+			validateShapes(x.shape(), shapeIn);
+			if (this.batchSize != 0) fitToBatch(0);
 		
 		} else if (x.numDim() == shapeIn.length + 1) {
-			validarShapes(x.shape(), shapeIn);
+			validateShapes(x.shape(), shapeIn);
 			int lotes = x.lenDim(0);
-			if (lotes != this.tamLote) ajustarParaLote(lotes);
+			if (lotes != this.batchSize) fitToBatch(lotes);
 		
 		} else {
 			throw new UnsupportedOperationException(
@@ -183,7 +183,7 @@ public class Flatten extends Camada implements Cloneable {
 
 	@Override
 	public Tensor backward(Tensor g) {
-		verificarConstrucao();
+		isBuilt();
 
 		_gradEntrada.copyElements(g);
 
@@ -191,18 +191,18 @@ public class Flatten extends Camada implements Cloneable {
 	}
 
 	@Override
-	public Tensor saida() {
-		verificarConstrucao();
+	public Tensor output() {
+		isBuilt();
 		return _saida;
 	}
 
 	@Override
-	public float[] saidaParaArray() {
-		return saida().array();
+	public float[] outputToArray() {
+		return output().array();
 	}
 
 	@Override
-	public int tamSaida() {
+	public int sizeOutput() {
 		// calculo individual baseado na entrada pra 
 		// evitar problemas com lotes
 
@@ -216,7 +216,7 @@ public class Flatten extends Camada implements Cloneable {
 
 	@Override
 	public int[] shapeIn() {
-		verificarConstrucao();
+		isBuilt();
 		return shapeIn.clone();
 	}
 
@@ -232,7 +232,7 @@ public class Flatten extends Camada implements Cloneable {
 	 */
 	 @Override
 	public int[] shapeOut() {
-		verificarConstrucao();
+		isBuilt();
 		return _saida.shape().clone();
 	}
 
@@ -242,22 +242,22 @@ public class Flatten extends Camada implements Cloneable {
 	}
 
 	@Override
-	public Tensor gradEntrada() {
-		verificarConstrucao();
+	public Tensor gradInput() {
+		isBuilt();
 		return _gradEntrada;
 	}
 
 	@Override
 	public String info() {
-		verificarConstrucao();
+		isBuilt();
 
 		StringBuilder sb = new StringBuilder();
 		String pad = " ".repeat(4);
 		
-		sb.append(nome() + " (id " + id + ") = [\n");
+		sb.append(name() + " (id " + id + ") = [\n");
 
 		sb.append(pad).append("Entrada: " + JNNutils.arrayStr(shapeIn) + "\n");
-		sb.append(pad).append("Saída: (1, " + tamSaida() + ")\n");
+		sb.append(pad).append("Saída: (1, " + sizeOutput() + ")\n");
 
 		sb.append("]\n");
 
@@ -268,9 +268,9 @@ public class Flatten extends Camada implements Cloneable {
 	public Flatten clone() {
 		Flatten clone = (Flatten) super.clone();
 
-		clone._treinavel = this._treinavel;
-		clone.treinando = this.treinando;
-		clone.construida = this.construida;
+		clone._treinable = this._treinable;
+		clone._training = this._training;
+		clone._built = this._built;
 
 		clone.shapeIn = shapeIn.clone();
 		clone.shapeOut = shapeOut.clone();
@@ -282,8 +282,8 @@ public class Flatten extends Camada implements Cloneable {
 	}
 
 	@Override
-	public long tamBytes() {
-		long tamVars = super.tamBytes(); //base camada + tensores
+	public long sizeBytes() {
+		long tamVars = super.sizeBytes(); //base camada + tensores
 		tamVars += 4 * shapeIn.length; 
 		tamVars += 4 * shapeOut.length; 
 		tamVars += 4; //totalFlatten

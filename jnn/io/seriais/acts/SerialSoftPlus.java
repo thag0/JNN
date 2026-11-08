@@ -20,7 +20,7 @@ public class SerialSoftPlus extends SerialBase implements SerializadorCamada<Sof
 
 	@Override
 	public void serializar(Softplus camada, DataOutputStream dos) throws IOException {
-        escrever(dos, camada.nome());
+        escrever(dos, camada.name());
         escrever(dos, camada.shapeIn());
     }
 

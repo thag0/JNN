@@ -6,7 +6,7 @@ import jnn.core.tensor.Tensor;
 /**
  * Camada que opera a função de ativação Sigmoid.
  */
-public class Sigmoid extends Ativacao {
+public class Sigmoid extends Activation {
 
     /**
      * Inicializa uma camada de ativação Sigmoid.
@@ -15,74 +15,76 @@ public class Sigmoid extends Ativacao {
     
     /**
      * Inicializa uma camada de ativação Sigmoid.
-     * @param shape formato de entrada para a camada.
+     * @param input formato de entrada para a camada.
      */
-    public Sigmoid(int... shape) {
-        construir(shape);
+    public Sigmoid(int... input) {
+        build(input);
     }
 
     @Override
     public Tensor forward(Tensor x) {
-        verificarConstrucao();
+        isBuilt();
 
-		talvesAjustarLote(x);
+		maybeFitToBatch(x);
 
-		_entrada = x.contiguous();
+		_input = x.contiguous();
 
         if (JNNnative.isOn()) {
             JNNnative.sigmoid(
-                _entrada.array(),
-                _saida.array(),
-                _entrada.len()
+                _input.array(),
+                _output.array(),
+                _input.len()
             );
         } else {
             sigmoid(
-                _entrada.array(),
-                _saida.array(),
-                _entrada.len()
+                _input.array(),
+                _output.array()
             );
         }
 
-        return _saida;
+        return _output;
     }
 
     @Override
     public Tensor backward(Tensor g) {
-		verificarConstrucao();
+		isBuilt();
 
-		_gradSaida = g.contiguous();
+		_gradOutput = g.contiguous();
 
         if (JNNnative.isOn()) {
             JNNnative.sigmoidd(
-                _saida.array(),
-                _gradSaida.array(),
-                _gradEntrada.array(),
-                _entrada.len()
+                _output.array(),
+                _gradOutput.array(),
+                _gradInput.array(),
+                _input.len()
             );
         } else {
             sigmoidd(
-                _saida.array(),
-                _gradSaida.array(),
-                _gradEntrada.array(),
-                _entrada.len()
+                _output.array(),
+                _gradOutput.array(),
+                _gradInput.array()
             );
         }
 
-        return _gradEntrada;
+        return _gradInput;
     }
 
-    private void sigmoid(float[] x, float[] dest, int n) {
-        for (int i = 0; i < n; i++) {
-            float val = x[i];
-            dest[i] = (float) (1.0f / (1.0 + Math.exp(-val)));
+    private void sigmoid(float[] input, float[] output) {
+        final int size = input.length;
+
+        for (int i = 0; i < size; i++) {
+            float val = input[i];
+            output[i] = (float) (1.0f / (1.0 + Math.exp(-val)));
         }
     }
 
-    private void sigmoidd(float[] sig, float[] g, float[] gradE, int n) {
-        for (int i = 0; i < n; i++) {
-            final float grad = g[i];
+    private void sigmoidd(float[] sig, float[] gOut, float[] gIn) {
+        final int size = sig.length;
+
+        for (int i = 0; i < size; i++) {
+            final float g = gOut[i];
             final float s = sig[i];
-            gradE[i] = grad * (s * (1f - s));
+            gIn[i] = g * (s * (1f - s));
         }
     }
     

@@ -5,7 +5,7 @@ import jnn.core.tensor.Tensor;
 /**
  * Camada que opera a função de ativação Tanh (Tangente Hiperbólica).
  */
-public class Tanh extends Ativacao {
+public class Tanh extends Activation {
     
     /**
      * Inicializa uma camada de ativação Tanh.
@@ -14,58 +14,60 @@ public class Tanh extends Ativacao {
     
     /**
      * Inicializa uma camada de ativação Tanh.
-     * @param shape formato de entrada para a camada.
+     * @param input formato de entrada para a camada.
      */
-    public Tanh(int... shape) {
-        construir(shape);
+    public Tanh(int... input) {
+        build(input);
     }
 
     @Override
     public Tensor forward(Tensor x) {
-        verificarConstrucao();
+        isBuilt();
 
-		talvesAjustarLote(x);
+		maybeFitToBatch(x);
 
-		_entrada = x.contiguous();
+		_input = x.contiguous();
 
         tanh(
-            _entrada.array(), _entrada.offset(),
-            _saida.array(), _saida.offset(),
-            _entrada.len()
+            _input.array(),
+            _output.array()
         );
 
-        return _saida;
+        return _output;
     }
 
     @Override
     public Tensor backward(Tensor g) {
-		verificarConstrucao();
+		isBuilt();
 
-		_gradSaida = g.contiguous();
+		_gradOutput = g.contiguous();
 
         tanhd(
-            _gradSaida.array(), _gradSaida.offset(),
-            _gradEntrada.array(), _gradEntrada.offset(),
-            _saida.array(), _saida.offset(),// tanh já calculada
-            _entrada.len()
+            _output.array(), // tanh já calculada
+            _gradOutput.array(),
+            _gradInput.array()
         );
 
-        return _gradEntrada;
+        return _gradInput;
     }
 
-    private void tanh(float[] x, int offX, float[] dest, int offDest, int n) {
-        for (int i = 0; i < n; i++) {
-            float val = x[offX + i];
-            dest[offDest + i] = (float) (2.0 / (1.0 + Math.exp(-2.0 * val)) - 1.0);
+    private void tanh(float[] input, float[] output) {
+        final int size = input.length;
+
+        for (int i = 0; i < size; i++) {
+            float val = input[i];
+            output[i] = (float) (2.0 / (1.0 + Math.exp(-2.0 * val)) - 1.0);
         }
     }
 
-    private void tanhd(float[] g, int offG, float[] gradE, int offGE, float[] tanh, int offTanh, int n) {
-        for (int i = 0; i < n; i++) {
-            final float grad = g[offG + i];
-            final float t = tanh[offTanh + i];
+    private void tanhd(float[] tanh, float[] gOut, float[] gradE) {
+        final int size = tanh.length;
+
+        for (int i = 0; i < size; i++) {
+            final float g = gOut[i];
+            final float t = tanh[i];
             final float d = 1.0f - (t * t);
-            gradE[offGE + i] = grad * d;
+            gradE[i] = g * d;
         }
     }
     

@@ -6,7 +6,7 @@ import java.io.File;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
-import jnn.modelos.Modelo;
+import jnn.modelos.Model;
 import render.widgets.PainelTreino;
 
 public class JanelaTreino extends JFrame {
@@ -38,7 +38,7 @@ public class JanelaTreino extends JFrame {
 		this.numThreads = numThreads;
 	}
 
-	public void desenharTreino(Modelo modelo, int epocasPorFrame) {
+	public void desenharTreino(Model modelo, int epocasPorFrame) {
 		if (numThreads == 1) {
 			pt.desenhar(modelo, epocasPorFrame);
 		

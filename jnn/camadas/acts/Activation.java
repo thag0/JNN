@@ -1,33 +1,33 @@
 package jnn.camadas.acts;
 
-import jnn.camadas.Camada;
+import jnn.camadas.Layer;
 import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
 
 /**
  * Camada de ativação base.
  */
-public abstract class Ativacao extends Camada implements Cloneable {
+public abstract class Activation extends Layer implements Cloneable {
     
     /**
      * Tensor contendo os dados de entrada da camada.
      */
-    protected Tensor _entrada;
+    protected Tensor _input;
 
     /**
      * Tensor contendo os dados de saída calculados pela camada.
      */
-    protected Tensor _saida;
+    protected Tensor _output;
 
     /**
      * Tensor contendo os gradientes em relação a entrada da camada.
      */
-    protected Tensor _gradEntrada;
+    protected Tensor _gradInput;
     
     /**
      * Tensor contendo os gradientes em relação a saída da camada.
      */
-    protected Tensor _gradSaida;
+    protected Tensor _gradOutput;
 
     /**
      * Formato de entrada (e saída) da camada.
@@ -35,22 +35,17 @@ public abstract class Ativacao extends Camada implements Cloneable {
     protected int[] shapeIn;
 
     /**
-     * Tamanho do lote de dados usado.
-     */
-    protected int _tamLote;
-
-    /**
      * Dimensão base da camada usada quando foi construída.
      */
-    protected int dimBase;
+    protected int baseDim;
 
     /**
      * Construtor privado.
      */
-    protected Ativacao() {}
+    protected Activation() {}
 
     @Override
-    public void construir(int[] shape) {
+    public void build(int[] shape) {
 		JNNutils.validarNaoNulo(shape, "shape == null");
 
 		if (shape.length < 1) {
@@ -66,59 +61,59 @@ public abstract class Ativacao extends Camada implements Cloneable {
 		}
 
         shapeIn = shape.clone();
-        dimBase = shape.length;
+        baseDim = shape.length;
 
-        _saida       = addBuffer("Saida", shapeIn);
-        _gradEntrada = addBuffer("Grad Entrada", shapeIn);
+        _output    = addBuffer("output", shapeIn);
+        _gradInput = addBuffer("grad input", shapeIn);
 
-        construida = true;
+        _built = true;
     }
 
     @Override
     public void initParams() {}
 
 	@Override
-	public void ajustarParaLote(int tamLote) {
+	public void fitToBatch(int batchSize) {
         int[] shape = {};
 
-		if (tamLote == 0) {
+		if (batchSize == 0) {
             shape = shapeIn;
             
 		} else {
             shape = new int[shapeIn.length + 1];
-            shape[0] = tamLote;
+            shape[0] = batchSize;
             for (int i = 0; i < shapeIn.length; i++) {
                 shape[i+1] = shapeIn[i];
             }
 
 		}
 
-        _gradEntrada = addBuffer("Grad Entrada", shape);
-        _saida = addBuffer("Saida", shape);
+        _gradInput = addBuffer("Grad Entrada", shape);
+        _output = addBuffer("Saida", shape);
 		
-		this._tamLote = tamLote;
+		this.batchSize = batchSize;
 	}
 
     /**
      * Pode reajustar os parâmetros da camada caso suas dimensões sejam compatíveis.
      * @param x {@code Tensor} base de entrada.
      */
-    protected void talvesAjustarLote(Tensor x) {
+    protected void maybeFitToBatch(Tensor x) {
         int numDims = x.numDim();
 
-        if (numDims == dimBase) {
-            validarShapes(x.shape(), shapeIn);
-            if (_tamLote != 0) ajustarParaLote(0);
+        if (numDims == baseDim) {
+            validateShapes(x.shape(), shapeIn);
+            if (this.batchSize != 0) fitToBatch(0);
 
-        } else if (numDims == dimBase + 1) {
-            validarShapes(x.shape(), shapeIn);
+        } else if (numDims == baseDim + 1) {
+            validateShapes(x.shape(), shapeIn);
             int lote = x.lenDim(0);
-            if (lote != this._tamLote) ajustarParaLote(lote);
+            if (lote != this.batchSize) fitToBatch(lote);
 
         } else {
             throw new UnsupportedOperationException(
-                "Esperado tensor com " + dimBase +
-                " ou " + (dimBase + 1) +
+                "Esperado tensor com " + baseDim +
+                " ou " + (baseDim + 1) +
                 " dimensões. Recebido: " + numDims
             );
         }
@@ -139,9 +134,9 @@ public abstract class Ativacao extends Camada implements Cloneable {
     }
 
     @Override
-    public Tensor saida() {
-        verificarConstrucao();
-        return _saida;
+    public Tensor output() {
+        isBuilt();
+        return _output;
     }
 
     @Override
@@ -160,36 +155,36 @@ public abstract class Ativacao extends Camada implements Cloneable {
     }
 
     @Override
-    public int tamSaida() {
-        return saida().len();
+    public int sizeOutput() {
+        return output().len();
     }
 
     @Override
-    public Tensor gradEntrada() {
-        return _gradEntrada;
+    public Tensor gradInput() {
+        return _gradInput;
     }
 
     @Override
-    public Ativacao clone() {
-        Ativacao clone = (Ativacao) super.clone();
+    public Activation clone() {
+        Activation clone = (Activation) super.clone();
 
-        clone._saida = _saida.clone();
-        clone._gradEntrada = _gradEntrada.clone();
+        clone._output = _output.clone();
+        clone._gradInput = _gradInput.clone();
         clone.shapeIn = shapeIn.clone();
     
         return clone;
     }
 
     @Override
-    public long tamBytes() {
-        long tamVars = super.tamBytes();//base
+    public long sizeBytes() {
+        long tamVars = super.sizeBytes();//base
         tamVars += 4 * shapeIn.length;
         tamVars += 4;//tamLote
         tamVars += 4;//dimBase
         
         long tamTensores =
-        _gradEntrada.sizeBytes() +
-        _saida.sizeBytes();
+        _gradInput.sizeBytes() +
+        _output.sizeBytes();
 
         return tamVars + tamTensores;
     }
@@ -199,7 +194,7 @@ public abstract class Ativacao extends Camada implements Cloneable {
         StringBuilder sb = new StringBuilder();
         String pad = " ".repeat(4);
 
-		sb.append(nome()).append("(\n");
+		sb.append(name()).append("(\n");
         sb.append(pad).append("In: ").append(JNNutils.arrayStr(shapeIn)).append("\n");
         sb.append(")");
 

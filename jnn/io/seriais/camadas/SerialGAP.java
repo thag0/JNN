@@ -22,7 +22,7 @@ public class SerialGAP extends SerialBase implements SerializadorCamada<GlobalAv
 
     @Override
     public void serializar(GlobalAvgPool2D camada, DataOutputStream dos) throws IOException {
-        escrever(dos, camada.nome());
+        escrever(dos, camada.name());
 
         int[] in = camada.shapeIn();
         escrever(dos, in);

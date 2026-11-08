@@ -24,12 +24,12 @@ import jnn.core.tensor.Tensor;
  *    A camada de dropout não possui parâmetros treináveis nem função de ativação.
  * </p>
  */
-public class Dropout extends Camada implements Cloneable {
+public class Dropout extends Layer implements Cloneable {
 
 	/**
 	 * Taxa de abandono usada durante o treinamento.
 	 */
-	private float taxa;
+	private float rate;
 
 	/**
 	 * Formato de entrada da camada.
@@ -39,12 +39,12 @@ public class Dropout extends Camada implements Cloneable {
 	/**
 	 * Controle da dimensão base da camada.
 	 */
-	private int dimBase;
+	private int baseDim;
 
 	/**
 	 * Tensor contendo os valores de entrada para a camada.
 	 */
-	public Tensor _entrada;
+	public Tensor _input;
 
 	/**
 	 * Tensor contendo as máscaras que serão usadas durante
@@ -53,7 +53,7 @@ public class Dropout extends Camada implements Cloneable {
 	 *    O formato das máscaras é dado pelo mesmo formato de entrada:
 	 * </p>
 	 */
-	public Tensor _mascara;
+	public Tensor _mask;
 
 	/**
 	 * Tensor contendo os valores de saída da camada.
@@ -61,7 +61,7 @@ public class Dropout extends Camada implements Cloneable {
 	 *    O formato de saída é dado pelo mesmo formato de entrada:
 	 * </p>
 	 */
-	public Tensor _saida;
+	public Tensor _output;
 
 	/**
 	 * Tensor contendo os valores dos gradientes que
@@ -70,41 +70,41 @@ public class Dropout extends Camada implements Cloneable {
 	 *    O formato dos gradientes é dado pelo mesmo formato de entrada:
 	 * </p>
 	 */
-	public Tensor _gradEntrada;
+	public Tensor _gradInput;
 
 	/**
 	 * Instancia uma nova camada de dropout, definindo a taxa
 	 * de abandono que será usada durante o processo de treinamento.
-	 * @param entrada formato de entrada da camada.
-	 * @param taxa taxa de dropout, um valor entre 0 e 1 representando a
+	 * @param input formato de entrada da camada.
+	 * @param rate taxa de dropout, um valor entre 0 e 1 representando a
 	 * taxa de abandono da camada.
 	 */
-	public Dropout(int[] entrada, Number taxa) {
-		this(taxa);
-		construir(entrada);
+	public Dropout(int[] input, Number rate) {
+		this(rate);
+		build(input);
 	}
 
 	/**
 	 * Instancia uma nova camada de dropout, definindo a taxa
 	 * de abandono que será usada durante o processo de treinamento.
-	 * @param taxa taxa de dropout, um {@code valor entre 0 e 1} representando a
+	 * @param rate taxa de dropout, um {@code valor entre 0 e 1} representando a
 	 * taxa de abandono da camada.
 	 */
-	public Dropout(Number taxa) {
-		float t = taxa.floatValue();
+	public Dropout(Number rate) {
+		float t = rate.floatValue();
 		
 		if (t < 0 || t >= 1) {
 			throw new IllegalArgumentException(
 				"\nTaxa de dropout deve estar entre 0 e 1, " + 
-				"recebido: " + taxa
+				"recebido: " + rate
 			);
 		}
 
-		this.taxa = t;
+		this.rate = t;
 	}
 
 	@Override
-	public void construir(int[] shape) {
+	public void build(int[] shape) {
 		JNNutils.validarNaoNulo(shape, "shape == null.");
 
 		if (shape.length < 1) {
@@ -121,20 +121,20 @@ public class Dropout extends Camada implements Cloneable {
 
 		shapeIn = shape.clone();
 
-		_gradEntrada = addBuffer("Grad Entrada", shapeIn);
-		_mascara 	 = addBuffer("Mascara", shapeIn);
-		_saida 		 = addBuffer("Saida", shapeIn);
+		_gradInput = addBuffer("grad input", shapeIn);
+		_mask 	   = addBuffer("mask", shapeIn);
+		_output    = addBuffer("grad output", shapeIn);
 
-		dimBase = _gradEntrada.numDim();
+		baseDim = _gradInput.numDim();
 		
-		construida = true;// camada pode ser usada
+		_built = true;// camada pode ser usada
 	}
 
 	@Override
 	public void initParams() {}
 
 	@Override
-	public void ajustarParaLote(int tamLote) {
+	public void fitToBatch(int tamLote) {
 		int[] shape;
 		if (tamLote == 0) {
 			shape = shapeIn;
@@ -147,46 +147,46 @@ public class Dropout extends Camada implements Cloneable {
 			}
 		}
 
-		_gradEntrada = addBuffer("Grad Entrada", shape);
-		_saida = addBuffer("Saida", _gradEntrada.shape());
-		_mascara = addBuffer("Mascara", _gradEntrada.shape());
+		_gradInput = addBuffer("grad input", shape);
+		_output = addBuffer("output", _gradInput.shape());
+		_mask = addBuffer("mask", _gradInput.shape());
 
-		this.tamLote = tamLote;
+		this.batchSize = tamLote;
 	}
 
 	@Override
 	public Tensor forward(Tensor x) {
-		verificarConstrucao();
+		isBuilt();
 
 		final int numDim = x.numDim();
 
-		if (numDim == dimBase) {
-			validarShapes(x.shape(), shapeIn);
-			if (this.tamLote != 0) ajustarParaLote(0);
+		if (numDim == baseDim) {
+			validateShapes(x.shape(), shapeIn);
+			if (this.batchSize != 0) fitToBatch(0);
 		
-		} else if (numDim == dimBase + 1) {
-			validarShapes(x.shape(), shapeIn);
+		} else if (numDim == baseDim + 1) {
+			validateShapes(x.shape(), shapeIn);
 			int lotes = x.lenDim(0);
-			if (lotes != this.tamLote) ajustarParaLote(lotes);
+			if (lotes != this.batchSize) fitToBatch(lotes);
 		
 		} else {
 			throw new UnsupportedOperationException(
-				"Esperado tensor com " + dimBase +
-				" ou " + (dimBase + 1) +
+				"Esperado tensor com " + baseDim +
+				" ou " + (baseDim + 1) +
 				" dimensões. Recebido: " + x.numDim()
 			);
 		}
 
-		_entrada = x.contiguous();
+		_input = x.contiguous();
 
-		_saida.copy(_entrada);
+		_output.copy(_input);
 
-		if (treinando) {
-			gerarMascaras();
-			_saida.mul(_mascara);
+		if (_training) {
+			generateMasks();
+			_output.mul(_mask);
 		}
 
-		return _saida;
+		return _output;
 	}
 
 	/**
@@ -205,32 +205,32 @@ public class Dropout extends Camada implements Cloneable {
 	 * Nos valores em que a máscara for igual a 1, o valor de entrada será
 	 * passado para a saída, nos valores iguais a 0, a entrada será desconsiderada. 
 	 */
-	private void gerarMascaras() {
-		_mascara.apply(
-			_ ->  (JNNutils.randFloat() >= taxa) ? (1.0f / (1.0f - taxa)) : 0.0f
+	private void generateMasks() {
+		_mask.apply(
+			_ ->  (JNNutils.randFloat() >= rate) ? (1.0f / (1.0f - rate)) : 0.0f
 		);
 	}
 
 	@Override
 	public Tensor backward(Tensor g) {
-		verificarConstrucao();
+		isBuilt();
 
-		_gradEntrada.copy(g);
+		_gradInput.copy(g);
 
-		if (treinando) _gradEntrada.mul(_mascara);
+		if (_training) _gradInput.mul(_mask);
 
-		return _gradEntrada;
+		return _gradInput;
 	}
 
 	@Override
-	public Tensor saida() {
-		verificarConstrucao();
-		return _saida;
+	public Tensor output() {
+		isBuilt();
+		return _output;
 	}
 
 	@Override
 	public int[] shapeIn() {
-		verificarConstrucao();
+		isBuilt();
 		return shapeIn.clone();
 	}
 
@@ -248,37 +248,37 @@ public class Dropout extends Camada implements Cloneable {
 	 * Retorna a taxa de dropout usada pela camada.
 	 * @return taxa de dropout da camada.
 	 */
-	public float taxa() {
-		return taxa;
+	public float rate() {
+		return rate;
 	}
 
 	@Override
 	public Dropout clone() {
-		verificarConstrucao();
+		isBuilt();
 
 		Dropout clone = (Dropout) super.clone();
 		clone.shapeIn = this.shapeIn.clone();
-		clone.taxa = this.taxa;
+		clone.rate = this.rate;
 
-		clone._mascara = this._mascara.clone();
-		clone._saida = this._saida.clone();
-		clone._gradEntrada = this._gradEntrada.clone();
+		clone._mask = this._mask.clone();
+		clone._output = this._output.clone();
+		clone._gradInput = this._gradInput.clone();
 
 		return clone;
 	}
 
 	@Override
 	public String info() {
-		verificarConstrucao();
+		isBuilt();
 
 		StringBuilder sb = new StringBuilder();
 		String pad = " ".repeat(4);
 		
-		sb.append(nome()).append("(\n");
+		sb.append(name()).append("(\n");
 
 		sb.append(pad).append("In: ").append(JNNutils.arrayStr(shapeIn)).append("\n");
 		sb.append(pad).append("Out: ").append(JNNutils.arrayStr(shapeIn)).append("\n");
-		sb.append(pad).append("Taxa: ").append(taxa()).append("\n");
+		sb.append(pad).append("Taxa: ").append(rate()).append("\n");
 
 		sb.append(")");
 
@@ -286,22 +286,22 @@ public class Dropout extends Camada implements Cloneable {
 	}
 
 	@Override
-	public Tensor gradEntrada() {
-		verificarConstrucao();
-		return _gradEntrada;
+	public Tensor gradInput() {
+		isBuilt();
+		return _gradInput;
 	}
 
 	@Override
-	public long tamBytes() {
-		long tamVars = super.tamBytes(); //base camada + tensores
+	public long sizeBytes() {
+		long tamVars = super.sizeBytes(); //base camada + tensores
 		tamVars += 4; //taxa 
 		tamVars += 4 * shapeIn.length; 
 		tamVars += 4; //dimbase
 
 		long tamTensores = 
-		_gradEntrada.sizeBytes() +
-		_mascara.sizeBytes() +
-		_saida.sizeBytes();
+		_gradInput.sizeBytes() +
+		_mask.sizeBytes() +
+		_output.sizeBytes();
 
 		return tamVars + tamTensores;
 	}

@@ -1,6 +1,6 @@
 package jnn.camadas.pooling;
 
-import jnn.camadas.Camada;
+import jnn.camadas.Layer;
 import jnn.camadas.LayerOps;
 import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
@@ -9,7 +9,7 @@ import jnn.core.tensor.Tensor;
  * Camada base para facilitar novas implementações de operações
  * personalizadas de pooling.
  */
-public abstract class Pool2DBase extends Camada {
+public abstract class Pool2DBase extends Layer {
 
 	/**
 	 * Utilitário.
@@ -82,7 +82,7 @@ public abstract class Pool2DBase extends Camada {
     /**
      * Identificador de operação (max, avg)
      */
-    protected String modo;
+    protected String mode;
 
     /**
      * Construtor interno.
@@ -122,12 +122,12 @@ public abstract class Pool2DBase extends Camada {
     }
 
     @Override
-    public void construir(int[] shape) {
+    public void build(int[] shape) {
 		JNNutils.validarNaoNulo(shape, "shape == null.");
 		
 		if (shape.length != 3) {
 			throw new IllegalArgumentException(
-				"\nFormato de entrada para a camada " + nome() + " deve conter três " + 
+				"\nFormato de entrada para a camada " + name() + " deve conter três " + 
 				"elementos (canais, altura, largura), mas recebido tamanho = " + shape.length
 			);
 		}
@@ -152,14 +152,14 @@ public abstract class Pool2DBase extends Camada {
 		_gradEntrada = addBuffer("Grad Entrada", shapeIn);
 		_saida 		 = addBuffer("Saida", shapeOut);
 
-		construida = true;// camada pode ser usada
+		_built = true;// camada pode ser usada
     }
 
     @Override
     public void initParams() {}
 
 	@Override
-	public void ajustarParaLote(int tamLote) {
+	public void fitToBatch(int tamLote) {
 		if (tamLote == 0) {
 			_gradEntrada = addBuffer("Grad Entrada", shapeIn);
 			_saida = addBuffer("Saida", shapeOut);
@@ -176,23 +176,23 @@ public abstract class Pool2DBase extends Camada {
 		}
 
 
-		this.tamLote = tamLote;
+		this.batchSize = tamLote;
 	}
 
     @Override
     public Tensor forward(Tensor x) {
-		verificarConstrucao();
+		isBuilt();
 
 		final int numDim = x.numDim();
 
 		if (numDim == 3) {
-			validarShapes(x.shape(), shapeIn);
-			if (tamLote != 0) ajustarParaLote(0);
+			validateShapes(x.shape(), shapeIn);
+			if (batchSize != 0) fitToBatch(0);
 		
 		} else if (numDim == 4) {
-			validarShapes(x.shape(), shapeIn);
+			validateShapes(x.shape(), shapeIn);
 			int lotes = x.lenDim(0);
-			if (lotes != this.tamLote) ajustarParaLote(lotes);
+			if (lotes != this.batchSize) fitToBatch(lotes);
 		
 		} else {
 			throw new UnsupportedOperationException(
@@ -204,15 +204,15 @@ public abstract class Pool2DBase extends Camada {
 
 		_entrada = x.contiguous();
 
-        if (modo.equals("avg")) {
+        if (mode.equals("avg")) {
             lops.forwardAvgPool2D(_entrada, _saida, _filtro, _stride);
         
-		} else if (modo.equals("max")) {
+		} else if (mode.equals("max")) {
             lops.forwardMaxPool2D(_entrada, _saida, _filtro, _stride);
         
         } else {
             throw new UnsupportedOperationException(
-                "\nModo \"" + modo + "\" sem suporte."
+                "\nModo \"" + mode + "\" sem suporte."
             );
         }
 
@@ -221,7 +221,7 @@ public abstract class Pool2DBase extends Camada {
 
     @Override
     public Tensor backward(Tensor g) {
-		verificarConstrucao();
+		isBuilt();
 
 		if (g.numDim() != _gradEntrada.numDim()) {
 			throw new IllegalStateException(
@@ -232,15 +232,15 @@ public abstract class Pool2DBase extends Camada {
 
 		_gradEntrada.zero();// limpar acumulações anteriores
 
-        if (modo.equals("avg")) {
+        if (mode.equals("avg")) {
             lops.backwardAvgPool(_entrada, g, _gradEntrada, _filtro, _stride);
         
-        } else if (modo.equals("max")) {
+        } else if (mode.equals("max")) {
             lops.backwardMaxPool2D(_entrada, g, _gradEntrada, _filtro, _stride);
         
         } else {
             throw new UnsupportedOperationException(
-                "\nModo \"" + modo + "\" sem suporte."
+                "\nModo \"" + mode + "\" sem suporte."
             ); 
         }
 
@@ -248,20 +248,20 @@ public abstract class Pool2DBase extends Camada {
     }
 
     @Override
-    public Tensor saida() {
-        verificarConstrucao();
+    public Tensor output() {
+        isBuilt();
 		return _saida;
     }
 
     @Override
     public int[] shapeIn() {
-		verificarConstrucao();
+		isBuilt();
 		return shapeIn;
     }
 
     @Override
     public int[] shapeOut() {
-        verificarConstrucao();
+        isBuilt();
 		return shapeOut;
     }
 
@@ -275,7 +275,7 @@ public abstract class Pool2DBase extends Camada {
 	 * @return formato do filtro da camada.
 	 */
 	public int[] shapeFiltro() {
-		verificarConstrucao();
+		isBuilt();
 		return _filtro.clone();
 	}
 
@@ -284,24 +284,24 @@ public abstract class Pool2DBase extends Camada {
 	 * @return formato dos strides da camada.
 	 */
 	public int[] shapeStride() {
-		verificarConstrucao();
+		isBuilt();
 		return _stride.clone();
 	}
 
 	@Override
-	public Tensor gradEntrada() {
-		verificarConstrucao();
+	public Tensor gradInput() {
+		isBuilt();
 		return _gradEntrada;
 	}
 
 	@Override
 	public String info() {
-		verificarConstrucao();
+		isBuilt();
 
 		StringBuilder sb = new StringBuilder();
 		String pad = " ".repeat(4);
 		
-		sb.append(nome()).append("(\n");
+		sb.append(name()).append("(\n");
 
 		sb.append(pad).append("In: ").append(JNNutils.arrayStr(shapeIn())).append("\n");
 		sb.append(pad).append("Out: ").append(JNNutils.arrayStr(shapeOut())).append("\n");
@@ -319,9 +319,9 @@ public abstract class Pool2DBase extends Camada {
 
 		clone.lops = new LayerOps();
 
-		clone._treinavel = this._treinavel;
-		clone.treinando = this.treinando;
-		clone.construida = this.construida;
+		clone._treinable = this._treinable;
+		clone._training = this._training;
+		clone._built = this._built;
 
 		clone.shapeIn = this.shapeIn.clone();
 		clone._filtro = this._filtro.clone();
@@ -335,8 +335,8 @@ public abstract class Pool2DBase extends Camada {
 	}
     
 	@Override
-	public long tamBytes() {
-		long tamVars = super.tamBytes(); //base camada + tensores
+	public long sizeBytes() {
+		long tamVars = super.sizeBytes(); //base camada + tensores
 		tamVars += 4 * shapeIn.length; 
 		tamVars += 4 * shapeOut.length;
 

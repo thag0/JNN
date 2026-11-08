@@ -20,7 +20,7 @@ public class SerialSELU extends SerialBase implements SerializadorCamada<SELU> {
 
 	@Override
 	public void serializar(SELU camada, DataOutputStream dos) throws IOException {
-        escrever(dos, camada.nome());
+        escrever(dos, camada.name());
         escrever(dos, camada.shapeIn());
         escrever(dos, camada.getAlpha());
         escrever(dos, camada.getGamma());

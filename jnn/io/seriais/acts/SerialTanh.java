@@ -20,7 +20,7 @@ public class SerialTanh extends SerialBase implements SerializadorCamada<Tanh> {
 
 	@Override
 	public void serializar(Tanh camada, DataOutputStream dos) throws IOException {
-        escrever(dos, camada.nome());
+        escrever(dos, camada.name());
         escrever(dos, camada.shapeIn());
     }
 

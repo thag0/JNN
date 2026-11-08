@@ -21,7 +21,7 @@ import jnn.core.tensor.Tensor;
  * </p>
  * @see <a href="https://arxiv.org/abs/1502.03167">Paper</a>
  */
-public class BatchNorm2D extends Camada implements Cloneable {
+public class BatchNorm2D extends Layer implements Cloneable {
 
     /**
      * Parâmetro de escala treinável, com formato:
@@ -40,56 +40,56 @@ public class BatchNorm2D extends Camada implements Cloneable {
      * fase de inferência, com fomato:
      * <pre>runningMean = (canais)</pre>
      */
-    public Tensor _mediaMovel;
+    public Tensor _runningMean;
 
     /**
      * Variância móvel acumulada durante o treinamento utilizada na 
      * fase de inferência, com fomato:
      * <pre>runningVar = (canais)</pre>
      */
-    public Tensor _varianciaMovel;
+    public Tensor _runningVar;
 
     /**
      * Entrada normalizada por canal, com fomato:
      * <pre>entradaNorm = (canais, altura, largura)</pre>
      */
-    public Tensor _entradaNorm;
+    public Tensor _normInput;
 
     /**
      * Média calculada de cada lote, com fomato:
      * <pre>media = (canais)</pre>
     */
-    public Tensor _media;
+    public Tensor _mean;
    
    /**
     * Variância calculada de cada lote, com fomato:
      * <pre>var = (canais)</pre>
      */
-    public Tensor _variancia;
+    public Tensor _variance;
 
 	/**
 	 * Entrada da camada, com fomato:
 	 * <pre>entrada = (canais, altura, largura) </pre>
 	 */
-    public Tensor _entrada;
+    public Tensor _input;
 
 	/**
 	 * Gradiente em relação a camada, com fomato:
 	 * <pre>gradEntrada = (canais, altura, largura) </pre>
 	 */
-    public Tensor _gradEntrada;
+    public Tensor _gradInput;
 
 	/**
 	 * Saída da camada, com fomato:
 	 * <pre>saída = (canais, altura, largura) </pre>
 	 */
-    public Tensor _saida;
+    public Tensor _output;
 	
     /**
 	 * Gradiente em relação a da camada, com fomato:
 	 * <pre>gradSaida = (canais, altura, largura) </pre>
 	 */
-    public Tensor _gradSaida;
+    public Tensor _gradOutput;
 
     /**
      * Pequeno valor para melhorar estabilidade e evitar divisão por zero.
@@ -145,7 +145,7 @@ public class BatchNorm2D extends Camada implements Cloneable {
     }
 
     @Override
-    public void construir(int[] shape) {
+    public void build(int[] shape) {
         JNNutils.validarNaoNulo(shape, "shape == null");
 
         if (shape.length != 3) {
@@ -165,66 +165,66 @@ public class BatchNorm2D extends Camada implements Cloneable {
         _gamma = addParam("gamma", canais);
         _beta = addParam("beta", canais);
 
-        _gradEntrada = addBuffer("Grad Entrada", shape);
-        _saida = addBuffer("Saida", shape);
-        _entradaNorm = addBuffer("Entrada Normalizada", shape);
+        _gradInput  = addBuffer("grad input", shape);
+        _output     = addBuffer("output", shape);
+        _normInput  = addBuffer("norm input", shape);
 
-        _mediaMovel = addBuffer("Media movel", canais);
-        _varianciaMovel = addBuffer("Variancia Movel", canais);
+        _runningMean = addBuffer("running mean", canais);
+        _runningVar  = addBuffer("running var",  canais);
 
-        _media = addBuffer("Media", canais);
-        _variancia = addBuffer("Variancia", canais);
+        _mean = addBuffer("mean", canais);
+        _variance = addBuffer("variance", canais);// melhor não colocar "var"
 
-		_treinavel = true;// camada pode ser treinada.
-		construida = true;// camada pode ser usada.
+		_treinable = true;// camada pode ser treinada.
+		_built      = true;// camada pode ser usada.
     }
 
     @Override
     public void initParams() {
-        verificarConstrucao();
+        isBuilt();
         
         _gamma.weight.fill(1);
         _beta.weight.fill(0);
 
-        _mediaMovel.fill(0);
-        _varianciaMovel.fill(1);
+        _runningMean.fill(0);
+        _runningVar.fill(1);
     }
 
     @Override
-    public void ajustarParaLote(int tamLote) {
+    public void fitToBatch(int batchSize) {
         int[] shape;
         
-        if (tamLote == 0) {
+        if (batchSize == 0) {
             shape = shapeIn;
             
         } else {
             shape = new int[shapeIn.length + 1];
-            shape[0] = tamLote;
+            shape[0] = batchSize;
             for (int i = 0; i < shapeIn.length; i++) {
                 shape[i+1] = shapeIn[i];
             }
         }
         
-        _entradaNorm = addBuffer("Entrada Normalizada", shape);
-        _saida       = addBuffer("Saida", shape);
-        _gradEntrada = addBuffer("Grad Entrada", shape);
+        _normInput = addBuffer("norm input", shape);
+        _output    = addBuffer("output", shape);
+        _gradInput = addBuffer("grad input", shape);
 
-        this.tamLote = tamLote;
+        this.batchSize = batchSize;
     }
 
     @Override
     public Tensor forward(Tensor x) {
-        verificarConstrucao();
+        isBuilt();
 
-        boolean entrada3D = x.numDim() == 3;
-        if (entrada3D) {
-            validarShapes(x.shape(), shapeIn);
-            ajustarParaLote(0);
+        boolean isInput3d = x.numDim() == 3;
+        if (isInput3d) {
+            validateShapes(x.shape(), shapeIn);
+            fitToBatch(0);
 
         } else if (x.numDim() == 4) {
-            validarShapes(x.shape(), shapeIn);
+            validateShapes(x.shape(), shapeIn);
             int lote = x.lenDim(0);
-            if (this.tamLote != lote) ajustarParaLote(lote);  
+            if (this.batchSize != lote) fitToBatch(lote);  
             
         } else {
             throw new IllegalArgumentException(
@@ -232,53 +232,48 @@ public class BatchNorm2D extends Camada implements Cloneable {
             );
         }
         
-        _entrada = x.contiguous();
+        _input = x.contiguous();
 
         lops.forwardBatchNorm2D(
-            _entrada,
+            _input,
             _gamma,
             _beta,
-            _entradaNorm,
-            _mediaMovel,
-            _varianciaMovel,
-            _media,
-            _variancia,
-            _saida,
+            _normInput,
+            _runningMean,
+            _runningVar,
+            _mean,
+            _variance,
+            _output,
             momentum,
             eps,
-            treinando
+            _training
         );
 
-        return _saida;
+        return _output;
     }
 
     @Override
     public Tensor backward(Tensor g) {
-        verificarConstrucao();
+        isBuilt();
 
-        if (!treinando) {
-            // se não acumula os gradientes
-            throw new IllegalStateException("\nBackward não deve ser chamado em modo avaliação.");
-        }
-
-        _gradSaida = g.contiguous();
+        _gradOutput = g.contiguous();
 
         lops.backwardBatchNorm2D(
-            _gradEntrada,
-            _entradaNorm,
-            _variancia,
+            _gradInput,
+            _normInput,
+            _variance,
             _gamma,
             _beta,
-            _gradSaida,
+            _gradOutput,
             eps
         );
 
-        return _gradEntrada;
+        return _gradInput;
     }
     
     @Override
-    public void gradZero() {
-        verificarConstrucao();
+    public void zeroGrad() {
+        isBuilt();
 
         _gamma.grad.fill(0);
         _beta.grad.fill(0);
@@ -286,7 +281,7 @@ public class BatchNorm2D extends Camada implements Cloneable {
 
     @Override
     public int[] shapeIn() {
-        verificarConstrucao();
+        isBuilt();
         return shapeIn.clone();
     }
 
@@ -301,15 +296,15 @@ public class BatchNorm2D extends Camada implements Cloneable {
     }
 
     @Override
-    public Tensor saida() {
-        verificarConstrucao();
-        return _saida;
+    public Tensor output() {
+        isBuilt();
+        return _output;
     }
 
     @Override
-    public Tensor gradEntrada() {
-        verificarConstrucao();
-        return _gradEntrada;
+    public Tensor gradInput() {
+        isBuilt();
+        return _gradInput;
     }
 
     /**
@@ -329,20 +324,20 @@ public class BatchNorm2D extends Camada implements Cloneable {
     }
 
     @Override
-    public Camada clone() {
+    public Layer clone() {
         try {
             BatchNorm2D clone = (BatchNorm2D) super.clone();
             
             clone._gamma = _gamma.clone();
             clone._beta = _beta.clone();
 
-            clone._mediaMovel = _mediaMovel.clone();
-            clone._varianciaMovel = _varianciaMovel.clone();
-            clone._entradaNorm = _entradaNorm.clone();
-            clone._media = _media.clone();
-            clone._variancia = _variancia.clone();
-            clone._gradEntrada = _gradEntrada.clone();
-            clone._saida = _saida.clone();
+            clone._runningMean = _runningMean.clone();
+            clone._runningVar = _runningVar.clone();
+            clone._normInput = _normInput.clone();
+            clone._mean = _mean.clone();
+            clone._variance = _variance.clone();
+            clone._gradInput = _gradInput.clone();
+            clone._output = _output.clone();
             
             clone.shapeIn = shapeIn.clone();
             
@@ -354,18 +349,18 @@ public class BatchNorm2D extends Camada implements Cloneable {
     }
 
     @Override
-    public boolean temBias() {
+    public boolean hasBias() {
         return true; //beta funciona como bias
     }
 
 	@Override
 	public String info() {
-		verificarConstrucao();
+		isBuilt();
 
 		StringBuilder sb = new StringBuilder();
 		String pad = " ".repeat(4);
 		
-		sb.append(nome()).append("(\n");
+		sb.append(name()).append("(\n");
 
 		sb.append(pad).append("In: ").append(JNNutils.arrayStr(shapeIn)).append("\n");
         sb.append(pad).append("Momentum: ").append(momentum).append("\n");

@@ -5,7 +5,7 @@ import jnn.core.tensor.Tensor;
 /**
  * Camada que opera a função de ativação GELU.
  */
-public class GELU extends Ativacao {
+public class GELU extends Activation {
 
     /**
      * Constante pré calculada.
@@ -19,10 +19,10 @@ public class GELU extends Ativacao {
     
     /**
      * Inicializa uma camada de ativação GELU.
-     * @param shape formato de entrada para a camada.
+     * @param input formato de entrada para a camada.
      */
-    public GELU(int... shape) {
-        construir(shape);
+    public GELU(int... input) {
+        build(input);
     }
  
     /**
@@ -32,61 +32,61 @@ public class GELU extends Ativacao {
 
     @Override
     public Tensor forward(Tensor x) {
-        verificarConstrucao();
+        isBuilt();
 
-		talvesAjustarLote(x);
+		maybeFitToBatch(x);
 
-		_entrada = x.contiguous();
+		_input = x.contiguous();
 
         gelu(
-            _entrada.array(), _entrada.offset(),
-            _saida.array(), _saida.offset(),
-            _entrada.len()
+            _input.array(),
+            _output.array()
         );
 
-        return _saida;
+        return _output;
     }
 
     @Override
     public Tensor backward(Tensor g) {
-		verificarConstrucao();
+		isBuilt();
 
-		_gradSaida = g.contiguous();
+		_gradOutput = g.contiguous();
 
         gelud(
-            _gradSaida.array(), _gradSaida.offset(),
-            _gradEntrada.array(), _gradEntrada.offset(),
-            _entrada.array(), _entrada.offset(),
-            _entrada.len()
+            _input.array(),
+            _gradOutput.array(),
+            _gradInput.array()
         );
 
-        return _gradEntrada;
+        return _gradInput;
     }
 
-    private void gelu(float[] x, int offX, float[] dest, int offDest, int n) {
-        for (int i = 0; i < n; i++) {
-            float v = x[offX + i];
-            float v3 = v * v * v;
+    private void gelu(float[] input, float[] output) {
+        final int size = input.length;
 
-            float u = RAIZ_2_POR_PI * (v + C * v3);
+        for (int i = 0; i < size; i++) {
+            float x = input[i];
+            float u = RAIZ_2_POR_PI * (x + C * (x*x*x));
             float t = tanh(u);
 
-            dest[offDest + i] = 0.5f * v * (1.0f + t);
+            output[i] = 0.5f * x * (1.0f + t);
         }
     }
 
-    private void gelud(float[] g, int offG, float[] gradE, int offGE, float[] x, int offX, int n) {
-        for (int i = 0; i < n; i++) {
-            float v = x[offX + i];
-            float v2 = v * v;
-            float v3 = v2 * v;
-            float u = RAIZ_2_POR_PI * (v + C * v3);
+    private void gelud(float[] input, float[] gOut, float[] gIn) {
+        final int size = input.length;
+
+        for (int i = 0; i < size; i++) {
+            float x = input[i];
+            float v2 = x * x;
+            float v3 = v2 * x;
+            float u = RAIZ_2_POR_PI * (x + C * v3);
             float t = tanh(u);
             float dt = 1.0f - t * t;
             float du = RAIZ_2_POR_PI * (1.0f + 3.0f * C * v2);
-            float dgelu = 0.5f * (1.0f + t) + 0.5f * v * dt * du;
+            float dgelu = 0.5f * (1.0f + t) + 0.5f * x * dt * du;
 
-            gradE[offGE + i] = g[offG + i] * dgelu;
+            gIn[i] = gOut[i] * dgelu;
         }
     }
 

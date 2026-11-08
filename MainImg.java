@@ -7,14 +7,14 @@ import ged.Ged;
 import geim.Geim;
 import geim.imagem.Imagem;
 import jnn.JNN;
-import jnn.camadas.Densa;
-import jnn.camadas.Entrada;
+import jnn.camadas.Dense;
+import jnn.camadas.Input;
 import jnn.camadas.acts.Sigmoid;
 import jnn.camadas.acts.Tanh;
 import jnn.core.parallel.JNNparallel;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
-import jnn.modelos.Modelo;
+import jnn.modelos.Model;
 import jnn.modelos.Sequencial;
 import jnnview.JNNview;
 
@@ -51,9 +51,9 @@ public class MainImg {
 		}
 		loader.print();
 
-		Modelo modelo = modelo(tamEntrada, tamSaida);
+		Model modelo = modelo(tamEntrada, tamSaida);
 		modelo.print();
-		modelo.otm().print();
+		modelo.optim().print();
 
 		System.out.println("Treinando.");
 		long tempo = treinoEmPainel(modelo, loader, imagem.getWidth(), imagem.getHeight());
@@ -61,7 +61,7 @@ public class MainImg {
 		long min = TimeUnit.NANOSECONDS.toMinutes(tempo);
 		long sec = TimeUnit.NANOSECONDS.toSeconds(tempo);
 
-		System.out.println("Perda = " + modelo.avaliar(loader).item());
+		System.out.println("Perda = " + modelo.evaluate(loader).item());
 		System.out.println("Tempo de treinamento: " + hrs + "h " + min + "m " + sec + "s");
 
 		if (historico) {
@@ -78,21 +78,21 @@ public class MainImg {
 	 * @param out quantidade de dados de saída.
 	 * @return {@code Modelo} criado.
 	 */
-	static Modelo modelo(int in, int out) {
+	static Model modelo(int in, int out) {
 		Sequencial modelo = new Sequencial(
-			new Entrada(in),
-			new Densa(16),
+			new Input(in),
+			new Dense(16),
 			new Tanh(),
-			new Densa(16),
+			new Dense(16),
 			new Tanh(),
-			new Densa(out),
+			new Dense(out),
 			new Sigmoid()
 		);
 
 		Object optm = "nadam";
 		Object loss = "mse"; 
 
-		modelo.compilar(optm, loss);
+		modelo.compile(optm, loss);
 		modelo.setHistorico(historico);
 
 		return modelo;
@@ -106,7 +106,7 @@ public class MainImg {
 	 * @param largura largura da janela renderizada.
 	 * @return tempo (em nano segundos) do treino.
 	 */
-	static long treinoEmPainel(Modelo modelo, DataLoader loader, int altura, int largura) {
+	static long treinoEmPainel(Model modelo, DataLoader loader, int altura, int largura) {
 		final int EPOCAS_POR_FRAME = 65;
 
 		Tensor in = new Tensor(2);
@@ -119,7 +119,7 @@ public class MainImg {
 		int i = 0;
 		long tempoTreino = System.nanoTime();
 		while (i < EPOCAS && window.isVisible()) {
-			modelo.treinar(loader, EPOCAS_POR_FRAME, false);
+			modelo.fit(loader, EPOCAS_POR_FRAME, false);
 			gerarImagem(modelo, in, img);
 			window.update(img.array(), img.shape());
 			window.on(i + "/" + EPOCAS);
@@ -140,7 +140,7 @@ public class MainImg {
 	 * @param in tensor cache de entrada.
 	 * @param img imagem final para desenho.
 	 */
-	static void gerarImagem(Modelo modelo, Tensor in, Tensor img) {
+	static void gerarImagem(Model modelo, Tensor in, Tensor img) {
 		float[] dataImg = img.array();
 		int alt = img.lenDim(0);
 		int larg = img.lenDim(1);
@@ -163,7 +163,7 @@ public class MainImg {
 	 * @param modelo modelo.
 	 * @param caminho caminho onde será salvo o arquivo.
 	 */
-	static void exportarHistorico(Modelo modelo, String caminho) {
+	static void exportarHistorico(Model modelo, String caminho) {
 		System.out.println("Exportando histórico de perda");
 		float[] perdas = modelo.hist();
 		float[][] valores = new float[perdas.length][1];
@@ -202,11 +202,11 @@ public class MainImg {
 	 * @param escala fator de escala para altura e largura final.
 	 * @param caminho caminho para o arquivo.
 	 */
-	static void exportarImagemEscalaCinza(Modelo modelo, int altBase, int largBase, double escala, String caminho) {
-		modelo.loteZero();
+	static void exportarImagemEscalaCinza(Model modelo, int altBase, int largBase, double escala, String caminho) {
+		modelo.zeroBatch();
 
 		if (escala <= 0) throw new IllegalArgumentException("O valor de escala não pode ser menor que 1.");
-		if (modelo.camadaSaida().tamSaida() != 1) {
+		if (modelo.outputLayer().sizeOutput() != 1) {
 			throw new IllegalArgumentException(
 				"O modelo deve trabalhar apenas com uma unidade na camada de saída para a escala de cinza."
 			);
@@ -227,7 +227,7 @@ public class MainImg {
 		}
 
 		Thread[] threads = new Thread[numThreads];
-		Modelo[] clones = new Modelo[numThreads];
+		Model[] clones = new Model[numThreads];
 		for (int i = 0; i < numThreads; i++) {
 			clones[i] = modelo.clone();
 		}
@@ -282,9 +282,9 @@ public class MainImg {
 	 * @param escala fator de escala para altura e largura final.
 	 * @param caminho caminho para o arquivo.
 	 */
-	static void exportarImagemRGB(Modelo modelo, int altBase, int largBase, double escala, String caminho) {
+	static void exportarImagemRGB(Model modelo, int altBase, int largBase, double escala, String caminho) {
 		if (escala <= 0) throw new IllegalArgumentException("O valor de escala não pode ser menor que 1.");
-		if (modelo.camadaSaida().tamSaida() != 3) {
+		if (modelo.outputLayer().sizeOutput() != 3) {
 			throw new IllegalArgumentException(
 				"O modelo deve trabalhar apenas com três neurônios na saída para RGB."
 			);
@@ -306,7 +306,7 @@ public class MainImg {
 		}
 
 		Thread[] threads = new Thread[numThreads];
-		Modelo[] redes = new Modelo[numThreads];
+		Model[] redes = new Model[numThreads];
 		for (int i = 0; i < numThreads; i++) {
 			redes[i] = modelo.clone();
 		}
