@@ -9,6 +9,7 @@ import jnn.dataloader.dataset.CIFAR10;
 import jnn.dataloader.dataset.MNIST;
 import jnn.dataloader.transform.ColorJitter;
 import jnn.dataloader.transform.Compose;
+import jnn.dataloader.transform.CutOut;
 import jnn.dataloader.transform.HFlip;
 import jnn.dataloader.transform.LabelSmoothing;
 import jnn.dataloader.transform.Norm;
@@ -68,7 +69,7 @@ public class MainConv {
 		modelo.trainer().setScheduler(
 			new CosineAnnealingLR(
 				modelo.optim(),
-				0.0001f,
+				0.0005f,
 				modelo.optim().getLr(),
 				(TREINO_EPOCAS * (treino.len() / TREINO_LOTE))
 			)
@@ -98,12 +99,12 @@ public class MainConv {
 	}
 
 	static DataLoader[] getData(String dataset) {
-		DataLoader treino = null, teste = null;
+		DataLoader train, test = null;
 
 		switch (dataset.toLowerCase().trim()) {
 			case "mnist":	
-				treino = MNIST.treino();
-				teste = MNIST.teste();
+				train = MNIST.treino();
+				test = MNIST.teste();
 			break;
 
 			case "cifar10":
@@ -112,25 +113,26 @@ public class MainConv {
 					new float[]{0.247f,  0.243f,  0.261f}
 				);//peguei de um forum do pytorch
 				
-				treino = CIFAR10.treino();
-				treino.setTransformX(new Compose(
+				train = CIFAR10.treino();
+				train.setTransformX(new Compose(
 					new ColorJitter(.2, .2, .2),
 					new HFlip(0.5),
 					new RandomCrop(32, 32, 4, true),
-					norm
+					norm,
+					new CutOut(8)
 				));
 					
-				teste = CIFAR10.teste().applyX(norm);
-				teste.applyY(new LabelSmoothing(1e-1));
+				test = CIFAR10.teste().applyX(norm);
+				test.applyY(new LabelSmoothing(1e-1));
 			break;
 
 			default:
 				throw new IllegalArgumentException("dataset \'" + dataset +"\' inválido");
 		}
 
-		return new DataLoader[]{
-			treino,
-			teste
+		return new DataLoader[] {
+			train,
+			test
 		};
 	}
 
@@ -139,7 +141,7 @@ public class MainConv {
 	 * @return {@code Sequencial}.
 	 */
 	static Sequential mlp() {
-		Sequential modelo = new Sequential(
+		Sequential model = new Sequential(
 			new Input(1, 28, 28),
 			new Flatten(),
 			new Dense(40),
@@ -152,9 +154,9 @@ public class MainConv {
 			new Softmax()
 		);
 
-		modelo.compile("adam", "entropia-cruzada");
+		model.compile("adam", "entropia-cruzada");
 		
-		return modelo;
+		return model;
 	}
 
 	/**
@@ -165,7 +167,7 @@ public class MainConv {
 		int[] convK = {3, 3};
 		int[] poolK = {2, 2};
 
-		Sequential modelo = new Sequential(
+		Sequential model = new Sequential(
 			new Input(3, 32, 32),
 
 			new Conv2D(32, convK, "same", "he"),
@@ -194,25 +196,25 @@ public class MainConv {
 
 			new GlobalAvgPool2D(),
 
-			new Dropout(0.2),
 			new Dense(10, "glorot-uniforme"),
 			new Softmax()
 		);
 
-		for (var camada : modelo) if (camada instanceof Conv2D) camada.setBias(false);
+		for (Layer layer : model) if (layer instanceof Conv2D) layer.setBias(false);
 		
 		Object otm = new SGD(0.01, 0.9, true);
-		Object loss = "entropia-cruzada";
-		modelo.compile(otm, loss);
+		Object loss = "cross-entropy";
 
-		return modelo;		
+		model.compile(otm, loss);
+
+		return model;		
 	}
 
 	static Sequential cnnMNIST() {
 		int[] convK = {3, 3};
 		int[] poolK = {2, 2};
 
-		Sequential modelo = new Sequential(
+		Sequential model = new Sequential(
 			new Input(1, 28, 28),
 
 			new Conv2D(16, convK, "same", "he"),
@@ -236,9 +238,10 @@ public class MainConv {
 
 		Object otm = new SGD(0.01, 0.9);
 		Object loss = "entropia-cruzada";
-		modelo.compile(otm, loss);
+		
+		model.compile(otm, loss);
 
-		return modelo;		
+		return model;		
 	}
 
 	/**
