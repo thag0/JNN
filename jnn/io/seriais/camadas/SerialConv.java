@@ -7,14 +7,14 @@ import java.io.IOException;
 
 import jnn.core.Parametro;
 import jnn.io.seriais.SerialBase;
-import jnn.io.seriais.SerializadorCamada;
+import jnn.io.seriais.SerialLayer;
 import jnn.layers.Conv2D;
 
 /**
  * Interface de IO para camada Conv2D.
  * @see jnn.layers.Conv2D
  */
-class SerialConv extends SerialBase implements SerializadorCamada<Conv2D> {
+class SerialConv extends SerialBase implements SerialLayer<Conv2D> {
 
 	/**
 	 * Interface de IO para camada Conv2D.
@@ -23,69 +23,67 @@ class SerialConv extends SerialBase implements SerializadorCamada<Conv2D> {
 	public SerialConv() {}
 
 	@Override
-	public void serializar(Conv2D camada, DataOutputStream dos) throws IOException {
-		escrever(dos, camada.name());
+	public void serialize(Conv2D layer, DataOutputStream dos) throws IOException {
+		write(dos, layer.name());
 
-		int[] shapeIn = camada.shapeIn();
-		escrever(dos, shapeIn);
+		int[] shapeIn = layer.shapeIn();
+		write(dos, shapeIn);
 
-        int[] shapeOut = camada.shapeOut();
-		escrever(dos, shapeOut);
+        int[] shapeOut = layer.shapeOut();
+		write(dos, shapeOut);
 
-		int[] filtro = camada.shapeKernel();
-		escrever(dos, filtro);
+		int[] shapeKernel = layer.shapeKernel();
+		write(dos, shapeKernel);
 
-		int[] padding = camada.shapePadding();
-		escrever(dos, padding);
+		int[] shapePadding = layer.shapePadding();
+		write(dos, shapePadding);
 	
-		escrever(dos, camada.hasBias());
+		write(dos, layer.hasBias());
 
-		Parametro[] params = camada.params();
+		Parametro[] params = layer.params();
 		
 		float[] kernel = params[0].weight.data().toArray();
-		escrever(dos, kernel);
+		write(dos, kernel);
 
-		if (camada.hasBias()) {
+		if (layer.hasBias()) {
 			float[] bias = params[1].weight.data().toArray();
-			escrever(dos, bias);
+			write(dos, bias);
 		}
 	}
 
 	@Override
-	public Conv2D ler(DataInputStream dis) throws IOException {
+	public Conv2D read(DataInputStream dis) throws IOException {
 		// nome já é lido pra saber que camada é
-		int[] shapeIn = lerArrInt(dis);
-		int[] shapeOut = lerArrInt(dis);
-		int[] filtro = lerArrInt(dis);
-		int[] padding = lerArrInt(dis);
-		boolean temBias = lerBoolean(dis);
-		int numFiltros = shapeOut[0];
-		int pad = padding[0];// altura == largura
+		int[] shapeIn = readIntArray(dis);
+		int[] shapeOut = readIntArray(dis);
+		int[] shapeKernel = readIntArray(dis);
+		int[] shapePadding = readIntArray(dis);
+		boolean hasBias = readBoolean(dis);
+		int numFilters = shapeOut[0];
+		int padding = shapePadding[0];// altura == largura
 
-		float[] kernel = lerArrFloat(dis);
+		float[] kernel = readFloatArray(dis);
 		float[] bias = null;
-		if (temBias) bias = lerArrFloat(dis);
+		if (hasBias) bias = readFloatArray(dis);
 		
-		Conv2D camada = new Conv2D(numFiltros, filtro, pad);
-		camada.setBias(temBias);
-		camada.build(shapeIn);
+		Conv2D layer = new Conv2D(numFilters, shapeKernel, padding);
+		layer.setBias(hasBias);
+		layer.build(shapeIn);
 
-		Parametro[] params = camada.params();
-		
+		Parametro[] params = layer.params();
 		params[0].weight.copyElements(kernel);
+		if (hasBias) params[1].weight.copyElements(bias);
 
-		if (temBias) params[1].weight.copyElements(bias);
-
-		return camada;
+		return layer;
 	}
 
 	@Override
-	public String nome() {
+	public String name() {
 		return "conv2d";
 	}
 
 	@Override
-	public Class<Conv2D> tipo() {
+	public Class<Conv2D> type() {
 		return Conv2D.class;
 	}
 }

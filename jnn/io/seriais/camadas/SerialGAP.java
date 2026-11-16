@@ -5,14 +5,14 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import jnn.io.seriais.SerialBase;
-import jnn.io.seriais.SerializadorCamada;
+import jnn.io.seriais.SerialLayer;
 import jnn.layers.pooling.GlobalAvgPool2D;
 
 /**
  * Interface de IO para camada GlobalAvgPool2D.
  * @see jnn.layers.pooling.GlobalAvgPool2D
  */
-public class SerialGAP extends SerialBase implements SerializadorCamada<GlobalAvgPool2D> {
+public class SerialGAP extends SerialBase implements SerialLayer<GlobalAvgPool2D> {
 
 	/**
 	 * Interface de IO para camada GlobalAvgPool2D.
@@ -21,29 +21,29 @@ public class SerialGAP extends SerialBase implements SerializadorCamada<GlobalAv
     public SerialGAP() {}
 
     @Override
-    public void serializar(GlobalAvgPool2D camada, DataOutputStream dos) throws IOException {
-        escrever(dos, camada.name());
+    public void serialize(GlobalAvgPool2D layer, DataOutputStream dos) throws IOException {
+        write(dos, layer.name());
 
-        int[] in = camada.shapeIn();
-        escrever(dos, in);
+        int[] in = layer.shapeIn();
+        write(dos, in);
 
         //nem precisa do formato de saida
     }
 
     @Override
-    public GlobalAvgPool2D ler(DataInputStream dis) throws IOException {
+    public GlobalAvgPool2D read(DataInputStream dis) throws IOException {
         //nome ja lido
-        int[] in = lerArrInt(dis);
+        int[] in = readIntArray(dis);
         return new GlobalAvgPool2D(in);
     }
 
     @Override
-    public String nome() {
+    public String name() {
         return "globalavgpool2d";
     }
 
     @Override
-    public Class<GlobalAvgPool2D> tipo() {
+    public Class<GlobalAvgPool2D> type() {
         return GlobalAvgPool2D.class;
     }
     

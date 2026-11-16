@@ -5,13 +5,13 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import jnn.io.seriais.SerialBase;
-import jnn.io.seriais.SerializadorCamada;
+import jnn.io.seriais.SerialLayer;
 import jnn.layers.acts.Tanh;
 
 /**
  * Serializados para a camada de ativação Tanh.
  */
-public class SerialTanh extends SerialBase implements SerializadorCamada<Tanh> {
+public class SerialTanh extends SerialBase implements SerialLayer<Tanh> {
     
 	/**
 	 * Interface de IO para camada de ativação.
@@ -19,24 +19,24 @@ public class SerialTanh extends SerialBase implements SerializadorCamada<Tanh> {
 	public SerialTanh() {}
 
 	@Override
-	public void serializar(Tanh camada, DataOutputStream dos) throws IOException {
-        escrever(dos, camada.name());
-        escrever(dos, camada.shapeIn());
+	public void serialize(Tanh layer, DataOutputStream dos) throws IOException {
+        write(dos, layer.name());
+        write(dos, layer.shapeIn());
     }
 
 	@Override
-	public Tanh ler(DataInputStream dis) throws IOException {
-        int[] shapeIn = lerArrInt(dis);
+	public Tanh read(DataInputStream dis) throws IOException {
+        int[] shapeIn = readIntArray(dis);
         return new Tanh(shapeIn);
     }
 
 	@Override
-	public String nome() {
+	public String name() {
 		return "tanh";
 	}
 
 	@Override
-	public Class<Tanh> tipo() {
+	public Class<Tanh> type() {
 		return Tanh.class;
 	}
 

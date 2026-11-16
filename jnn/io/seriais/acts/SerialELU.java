@@ -5,13 +5,13 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import jnn.io.seriais.SerialBase;
-import jnn.io.seriais.SerializadorCamada;
+import jnn.io.seriais.SerialLayer;
 import jnn.layers.acts.ELU;
 
 /**
  * Serializados para a camada de ativação ELU.
  */
-public class SerialELU extends SerialBase implements SerializadorCamada<ELU> {
+public class SerialELU extends SerialBase implements SerialLayer<ELU> {
 
 	/**
 	 * Interface de IO para camada de ativação.
@@ -19,26 +19,26 @@ public class SerialELU extends SerialBase implements SerializadorCamada<ELU> {
 	public SerialELU() {}
 
 	@Override
-	public void serializar(ELU camada, DataOutputStream dos) throws IOException {
-        escrever(dos, camada.name());
-        escrever(dos, camada.shapeIn());
-        escrever(dos, camada.getAlpha());
+	public void serialize(ELU layer, DataOutputStream dos) throws IOException {
+        write(dos, layer.name());
+        write(dos, layer.shapeIn());
+        write(dos, layer.getAlpha());
     }
 
 	@Override
-	public ELU ler(DataInputStream dis) throws IOException {
-        int[] shapeIn = lerArrInt(dis);
-        float alfa = lerFloat(dis);
-        return new ELU(alfa, shapeIn);
+	public ELU read(DataInputStream dis) throws IOException {
+        int[] shapeIn = readIntArray(dis);
+        float alpha = readFloat(dis);
+        return new ELU(alpha, shapeIn);
     }
 
 	@Override
-	public String nome() {
+	public String name() {
 		return "elu";
 	}
 
 	@Override
-	public Class<ELU> tipo() {
+	public Class<ELU> type() {
 		return ELU.class;
 	}
 

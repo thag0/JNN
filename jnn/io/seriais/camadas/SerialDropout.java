@@ -5,14 +5,14 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import jnn.io.seriais.SerialBase;
-import jnn.io.seriais.SerializadorCamada;
+import jnn.io.seriais.SerialLayer;
 import jnn.layers.Dropout;
 
 /**
  * Interface de IO para camada Dropout.
  * @see jnn.layers.Dropout
  */
-class SerialDropout extends SerialBase implements SerializadorCamada<Dropout> {
+class SerialDropout extends SerialBase implements SerialLayer<Dropout> {
 
 	/**
 	 * Interface de IO para camada MaxPool2D.
@@ -21,33 +21,33 @@ class SerialDropout extends SerialBase implements SerializadorCamada<Dropout> {
 	public SerialDropout() {}
 	
 	@Deprecated
-	public void serializar(Dropout camada, DataOutputStream dos) throws IOException {
-		escrever(dos, camada.name());
+	public void serialize(Dropout layer, DataOutputStream dos) throws IOException {
+		write(dos, layer.name());
 
-		int[] shapeIn = camada.shapeIn();
-		escrever(dos, shapeIn);
+		int[] shapeIn = layer.shapeIn();
+		write(dos, shapeIn);
 
-		escrever(dos, camada.rate());
+		write(dos, layer.rate());
 	}
 
 	@Override
-	public Dropout ler(DataInputStream dis) throws IOException {
-		int[] shapeIn = lerArrInt(dis);
-		float taxa = lerFloat(dis);
+	public Dropout read(DataInputStream dis) throws IOException {
+		int[] shapeIn = readIntArray(dis);
+		float rate = readFloat(dis);
 
-		Dropout camada = new Dropout(taxa);
-		camada.build(shapeIn);
+		Dropout layer = new Dropout(rate);
+		layer.build(shapeIn);
 		
-		return camada;
+		return layer;
 	}
 
 	@Override
-	public String nome() {
+	public String name() {
 		return "dropout";
 	}
 
 	@Override
-	public Class<Dropout> tipo() {
+	public Class<Dropout> type() {
 		return Dropout.class;
 	}
 }

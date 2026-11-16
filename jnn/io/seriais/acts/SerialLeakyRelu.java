@@ -5,13 +5,13 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import jnn.io.seriais.SerialBase;
-import jnn.io.seriais.SerializadorCamada;
+import jnn.io.seriais.SerialLayer;
 import jnn.layers.acts.LeakyReLU;
 
 /**
  * Serializados para a camada de ativação Leaky ReLU.
  */
-public class SerialLeakyRelu extends SerialBase implements SerializadorCamada<LeakyReLU> {
+public class SerialLeakyRelu extends SerialBase implements SerialLayer<LeakyReLU> {
 
 	/**
 	 * Interface de IO para camada de ativação.
@@ -19,26 +19,26 @@ public class SerialLeakyRelu extends SerialBase implements SerializadorCamada<Le
 	public SerialLeakyRelu() {}
 
 	@Override
-	public void serializar(LeakyReLU camada, DataOutputStream dos) throws IOException {
-        escrever(dos, camada.name());
-        escrever(dos, camada.shapeIn());
-        escrever(dos, camada.getAlpha());
+	public void serialize(LeakyReLU layer, DataOutputStream dos) throws IOException {
+        write(dos, layer.name());
+        write(dos, layer.shapeIn());
+        write(dos, layer.getAlpha());
     }
 
 	@Override
-	public LeakyReLU ler(DataInputStream dis) throws IOException {
-        int[] shapeIn = lerArrInt(dis);
-        float alpha = lerFloat(dis);
+	public LeakyReLU read(DataInputStream dis) throws IOException {
+        int[] shapeIn = readIntArray(dis);
+        float alpha = readFloat(dis);
         return new LeakyReLU(alpha, shapeIn);
     }
 
 	@Override
-	public String nome() {
+	public String name() {
 		return "leakyrelu";
 	}
 
 	@Override
-	public Class<LeakyReLU> tipo() {
+	public Class<LeakyReLU> type() {
 		return LeakyReLU.class;
 	}
 

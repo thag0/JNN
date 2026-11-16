@@ -6,14 +6,14 @@ import java.io.IOException;
 
 import jnn.core.Parametro;
 import jnn.io.seriais.SerialBase;
-import jnn.io.seriais.SerializadorCamada;
+import jnn.io.seriais.SerialLayer;
 import jnn.layers.BatchNorm2D;
 
 /**
  * Interface de IO para camada BatchNorm2D.
  * @see jnn.layers.BatchNorm2D
  */
-public class SerialBatchNorm extends SerialBase implements SerializadorCamada<BatchNorm2D> {
+public class SerialBatchNorm extends SerialBase implements SerialLayer<BatchNorm2D> {
 
 	/**
 	 * Interface de IO para camada MaxPool2D.
@@ -22,52 +22,52 @@ public class SerialBatchNorm extends SerialBase implements SerializadorCamada<Ba
     public SerialBatchNorm() {}
 
     @Override
-    public void serializar(BatchNorm2D camada, DataOutputStream dos) throws IOException {
-        escrever(dos, camada.name());
+    public void serialize(BatchNorm2D layer, DataOutputStream dos) throws IOException {
+        write(dos, layer.name());
 
-        escrever(dos, camada.shapeIn());
-        escrever(dos, camada.eps());
-        escrever(dos, camada.momentum());
+        write(dos, layer.shapeIn());
+        write(dos, layer.eps());
+        write(dos, layer.momentum());
 
-        Parametro[] params = camada.params();
-        escrever(dos, params[0].weight.data().toArray());//gamma
-        escrever(dos, params[1].weight.data().toArray());//beta
+        Parametro[] params = layer.params();
+        write(dos, params[0].weight.data().toArray());//gamma
+        write(dos, params[1].weight.data().toArray());//beta
     
-        escrever(dos, camada._runningMean.data().toArray());
-        escrever(dos, camada._runningVar.data().toArray());
+        write(dos, layer._runningMean.data().toArray());
+        write(dos, layer._runningVar.data().toArray());
     }
 
     @Override
-    public BatchNorm2D ler(DataInputStream dis) throws IOException {
-        int[] shapeIn = lerArrInt(dis);
-        float eps = lerFloat(dis);
-        float momentum = lerFloat(dis);
+    public BatchNorm2D read(DataInputStream dis) throws IOException {
+        int[] shapeIn = readIntArray(dis);
+        float eps = readFloat(dis);
+        float momentum = readFloat(dis);
 
-        float[] gamma = lerArrFloat(dis);
-        float[] beta = lerArrFloat(dis);
-        float[] runMean = lerArrFloat(dis);
-        float[] runVar = lerArrFloat(dis);
+        float[] gamma = readFloatArray(dis);
+        float[] beta = readFloatArray(dis);
+        float[] runMean = readFloatArray(dis);
+        float[] runVar = readFloatArray(dis);
     
-        BatchNorm2D bn = new BatchNorm2D(momentum, eps);
-        bn.build(shapeIn);
+        BatchNorm2D layer = new BatchNorm2D(momentum, eps);
+        layer.build(shapeIn);
 
-        Parametro[] params = bn.params();
+        Parametro[] params = layer.params();
         params[0].weight.copyElements(gamma);
         params[1].weight.copyElements(beta);
     
-        bn._runningMean.copyElements(runMean);
-        bn._runningVar.copyElements(runVar);
+        layer._runningMean.copyElements(runMean);
+        layer._runningVar.copyElements(runVar);
 
-        return bn;
+        return layer;
     }
 
     @Override
-    public String nome() {
+    public String name() {
         return "batchnorm2d";
     }
 
     @Override
-    public Class<BatchNorm2D> tipo() {
+    public Class<BatchNorm2D> type() {
         return BatchNorm2D.class;
     }
     

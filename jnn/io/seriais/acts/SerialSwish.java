@@ -5,13 +5,13 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import jnn.io.seriais.SerialBase;
-import jnn.io.seriais.SerializadorCamada;
+import jnn.io.seriais.SerialLayer;
 import jnn.layers.acts.Swish;
 
 /**
  * Serializados para a camada de ativação Swish.
  */
-public class SerialSwish extends SerialBase implements SerializadorCamada<Swish> {
+public class SerialSwish extends SerialBase implements SerialLayer<Swish> {
 
 	/**
 	 * Interface de IO para camada de ativação.
@@ -19,24 +19,24 @@ public class SerialSwish extends SerialBase implements SerializadorCamada<Swish>
 	public SerialSwish() {}
 
 	@Override
-	public void serializar(Swish camada, DataOutputStream dos) throws IOException {
-        escrever(dos, camada.name());
-        escrever(dos, camada.shapeIn());
+	public void serialize(Swish layer, DataOutputStream dos) throws IOException {
+        write(dos, layer.name());
+        write(dos, layer.shapeIn());
     }
 
 	@Override
-	public Swish ler(DataInputStream dis) throws IOException {
-        int[] shapeIn = lerArrInt(dis);
+	public Swish read(DataInputStream dis) throws IOException {
+        int[] shapeIn = readIntArray(dis);
         return new Swish(shapeIn);
     }
 
 	@Override
-	public String nome() {
+	public String name() {
 		return "swish";
 	}
 
 	@Override
-	public Class<Swish> tipo() {
+	public Class<Swish> type() {
 		return Swish.class;
 	}
 

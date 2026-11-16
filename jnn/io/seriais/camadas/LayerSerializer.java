@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import jnn.io.seriais.SerializadorCamada;
+import jnn.io.seriais.SerialLayer;
 import jnn.io.seriais.acts.SerialELU;
 import jnn.io.seriais.acts.SerialGELU;
 import jnn.io.seriais.acts.SerialLeakyRelu;
@@ -22,20 +22,20 @@ import jnn.layers.Layer;
 /**
  * Interface para gravação/leitura de camadas.
  */
-public class SerialCamada {
+public class LayerSerializer {
 
-    private Map<Class<? extends Layer>, SerializadorCamada<?>> porTipo = new HashMap<>();
-    private Map<String, SerializadorCamada<?>> porNome = new HashMap<>();
+    private Map<Class<? extends Layer>, SerialLayer<?>> perType = new HashMap<>();
+    private Map<String, SerialLayer<?>> perName = new HashMap<>();
 
     /**
      * Interface para gravação/leitura de camadas.
      */
-    public SerialCamada() {
-        registrar(
+    public LayerSerializer() {
+        register(
             //camadas
             new SerialAvgPool(),
             new SerialConv(),
-            new SerialDensa(),
+            new SerialDense(),
             new SerialDropout(),
             new SerialFlatten(),
             new SerialMaxPool(),
@@ -56,30 +56,30 @@ public class SerialCamada {
         );
     }
 
-    private final void registrar(SerializadorCamada<?>... seriais) {
-        for (var s : seriais) {
-            porTipo.put(s.tipo(), s);
-            porNome.put(s.nome().toLowerCase(), s);
+    private final void register(SerialLayer<?>... serials) {
+        for (var serial : serials) {
+            perType.put(serial.type(), serial);
+            perName.put(serial.name().toLowerCase(), serial);
         }
     }
     
     /**
      * Serializa uma camada.
-     * @param c {@code Camada} desejada.
+     * @param layer {@code Camada} desejada.
      * @param dos {@code DataOutputStream} gravador.
      * @throws IOException caso ocorra algum erro.
      */
     @SuppressWarnings("unchecked")
-    public void serializar(Layer c, DataOutputStream dos) throws IOException {
-        var serial = porTipo.get(c.getClass());
+    public void serialize(Layer layer, DataOutputStream dos) throws IOException {
+        var serial = perType.get(layer.getClass());
 
         if (serial == null) {
             throw new UnsupportedOperationException(
-                "\nCamada " + c.name() + " sem suporte."
+                "\nCamada " + layer.name() + " sem suporte."
             );
         }
 
-        ((SerializadorCamada<Layer>) serial).serializar(c, dos);
+        ((SerialLayer<Layer>) serial).serialize(layer, dos);
     }
 
     /**
@@ -89,16 +89,16 @@ public class SerialCamada {
      * @return {@code Camada} lida.
      * @throws IOException caso ocorra algum erro.
      */
-    public Layer ler(DataInputStream dis, String nome) throws IOException {
-        var s = porNome.get(nome.toLowerCase());
+    public Layer read(DataInputStream dis, String nome) throws IOException {
+        var serial = perName.get(nome.toLowerCase());
 
-        if (s == null) {
+        if (serial == null) {
             throw new UnsupportedOperationException(
                 "\nCamada " + nome + " não suportada."
             );
         }
 
-        return s.ler(dis);
+        return serial.read(dis);
     }
 
 }

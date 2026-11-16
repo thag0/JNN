@@ -5,13 +5,13 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import jnn.io.seriais.SerialBase;
-import jnn.io.seriais.SerializadorCamada;
+import jnn.io.seriais.SerialLayer;
 import jnn.layers.acts.Softmax;
 
 /**
  * Serializados para a camada de ativação Softmax.
  */
-public class SerialSoftmax extends SerialBase implements SerializadorCamada<Softmax> {
+public class SerialSoftmax extends SerialBase implements SerialLayer<Softmax> {
 
 	/**
 	 * Interface de IO para camada de ativação.
@@ -19,24 +19,24 @@ public class SerialSoftmax extends SerialBase implements SerializadorCamada<Soft
 	public SerialSoftmax() {}
 
 	@Override
-	public void serializar(Softmax camada, DataOutputStream dos) throws IOException {
-        escrever(dos, camada.name());
-        escrever(dos, camada.shapeIn());
+	public void serialize(Softmax layer, DataOutputStream dos) throws IOException {
+        write(dos, layer.name());
+        write(dos, layer.shapeIn());
     }
 
 	@Override
-	public Softmax ler(DataInputStream dis) throws IOException {
-        int[] shapeIn = lerArrInt(dis);
+	public Softmax read(DataInputStream dis) throws IOException {
+        int[] shapeIn = readIntArray(dis);
         return new Softmax(shapeIn);
     }
 
 	@Override
-	public String nome() {
+	public String name() {
 		return "softmax";
 	}
 
 	@Override
-	public Class<Softmax> tipo() {
+	public Class<Softmax> type() {
 		return Softmax.class;
 	}
 

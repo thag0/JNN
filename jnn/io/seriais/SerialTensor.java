@@ -43,11 +43,11 @@ public class SerialTensor extends SerialBase {
         int[] shape = t.shape();
 
         try (DataOutputStream out = new DataOutputStream(new FileOutputStream(arquivo))) {
-            escrever(out, shape);
+            write(out, shape);
 
             // copiar internamente o conteúdo pra tratar casos de views
             float[] data = t.data().toArray();
-            escrever(out, data);
+            write(out, data);
 
         } catch (IOException e) {
             System.out.println("\nErro ao salvar Tensor");
@@ -70,10 +70,10 @@ public class SerialTensor extends SerialBase {
 
         try (DataInputStream in = new DataInputStream(new FileInputStream(arquivo))) {
             // shape
-            int[] shape = lerArrInt(in);
+            int[] shape = readIntArray(in);
 
             // dados
-            float[] dados = lerArrFloat(in);
+            float[] dados = readFloatArray(in);
             t = new Tensor(dados).reshape(shape);
 
         } catch (IOException e) {

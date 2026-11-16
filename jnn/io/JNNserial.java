@@ -10,7 +10,7 @@ import java.io.IOException;
 import jnn.core.Dicionario;
 import jnn.core.JNNutils;
 import jnn.io.seriais.SerialBase;
-import jnn.io.seriais.camadas.SerialCamada;
+import jnn.io.seriais.camadas.LayerSerializer;
 import jnn.layers.BatchNorm2D;
 import jnn.layers.Conv2D;
 import jnn.layers.Dense;
@@ -46,7 +46,7 @@ public class JNNserial extends SerialBase {
 	/**
 	 * Operador de leitura/gravação.
 	 */
-	static private SerialCamada serialCamada = new SerialCamada();
+	static private LayerSerializer serializer = new LayerSerializer();
 
 	/**
 	 * Serializador e desserializador de modelos.
@@ -71,12 +71,12 @@ public class JNNserial extends SerialBase {
 		modelo.zeroBatch();
 
 		try (DataOutputStream out = new DataOutputStream(new FileOutputStream(arquivo))) {
-			escrever(out, modelo.numLayers());
-			escrever(out, modelo.optim().nome());
-			escrever(out, modelo.loss().name());
+			write(out, modelo.numLayers());
+			write(out, modelo.optim().nome());
+			write(out, modelo.loss().name());
 
 			for (Layer camada : modelo.layers()) {
-				serialCamada.serializar(camada, out);
+				serializer.serialize(camada, out);
 			}
 
 		} catch (IOException e) {
@@ -98,89 +98,89 @@ public class JNNserial extends SerialBase {
         }
 		
 		Dicionario dicio = new Dicionario();
-		Layer[] cs = {};
-		String otmStr = "";
-		String lossStr = "";
+		Layer[] layers = {};
+		String strOptim = "";
+		String strLoss 	= "";
 		
 		try (DataInputStream in = new DataInputStream(new FileInputStream(arquivo))) {
-			int numCamadas = lerInt(in);
-			otmStr = lerString(in);
-			lossStr = lerString(in);
+			int numCamadas = readInt(in);
+			strOptim = readString(in);
+			strLoss = readString(in);
 
 			for (int i = 0; i < numCamadas; i++) {
-				String nomeCamada = lerString(in).toLowerCase();
+				String nomeCamada = readString(in).toLowerCase();
 
 				switch (nomeCamada) {
-					case "densa":
-						cs = JNNutils.addEmArray(cs, (Dense) serialCamada.ler(in, nomeCamada));
+					case "dense":
+						layers = JNNutils.addEmArray(layers, (Dense) serializer.read(in, nomeCamada));
 					break;
 
 					case "conv2d":
-						cs = JNNutils.addEmArray(cs, (Conv2D) serialCamada.ler(in, nomeCamada));
+						layers = JNNutils.addEmArray(layers, (Conv2D) serializer.read(in, nomeCamada));
 					break;
 
 					case "batchnorm2d":
-						cs = JNNutils.addEmArray(cs, (BatchNorm2D) serialCamada.ler(in, nomeCamada));
+						layers = JNNutils.addEmArray(layers, (BatchNorm2D) serializer.read(in, nomeCamada));
 					break;
 
 					case "flatten":
-						cs = JNNutils.addEmArray(cs, (Flatten) serialCamada.ler(in, nomeCamada));
+						layers = JNNutils.addEmArray(layers, (Flatten) serializer.read(in, nomeCamada));
 					break;
 
 					case "maxpool2d":
-						cs = JNNutils.addEmArray(cs, (MaxPool2D) serialCamada.ler(in, nomeCamada));
+						layers = JNNutils.addEmArray(layers, (MaxPool2D) serializer.read(in, nomeCamada));
 					break;
 
 					case "avgpool2d":
-						cs = JNNutils.addEmArray(cs, (AvgPool2D) serialCamada.ler(in, nomeCamada));
+						layers = JNNutils.addEmArray(layers, (AvgPool2D) serializer.read(in, nomeCamada));
 					break;
 
 					case "globalavgpool2d":
-						cs = JNNutils.addEmArray(cs, (GlobalAvgPool2D) serialCamada.ler(in, nomeCamada));
+						layers = JNNutils.addEmArray(layers, (GlobalAvgPool2D) serializer.read(in, nomeCamada));
 					break;
 
 					case "dropout":
-						cs = JNNutils.addEmArray(cs, (Dropout) serialCamada.ler(in, nomeCamada));
+						layers = JNNutils.addEmArray(layers, (Dropout) serializer.read(in, nomeCamada));
 					break;
 
 					case "elu":
-						cs = JNNutils.addEmArray(cs, (ELU) serialCamada.ler(in, nomeCamada));
+						layers = JNNutils.addEmArray(layers, (ELU) serializer.read(in, nomeCamada));
 					break;
 					
 					case "gelu":
-						cs = JNNutils.addEmArray(cs, (GELU) serialCamada.ler(in, nomeCamada));
+						layers = JNNutils.addEmArray(layers, (GELU) serializer.read(in, nomeCamada));
 					break;
 
 					case "leakyrelu":
-						cs = JNNutils.addEmArray(cs, (LeakyReLU) serialCamada.ler(in, nomeCamada));
+						layers = JNNutils.addEmArray(layers, (LeakyReLU) serializer.read(in, nomeCamada));
 					break;
 
 					case "relu":
-						cs = JNNutils.addEmArray(cs, (ReLU) serialCamada.ler(in, nomeCamada));
+						layers = JNNutils.addEmArray(layers, (ReLU) serializer.read(in, nomeCamada));
 					break;
 
 					case "selu":
-						cs = JNNutils.addEmArray(cs, (SELU) serialCamada.ler(in, nomeCamada));
+						layers = JNNutils.addEmArray(layers, (SELU) serializer.read(in, nomeCamada));
 					break;
 
 					case "sigmoid":
-						cs = JNNutils.addEmArray(cs, (Sigmoid) serialCamada.ler(in, nomeCamada));
+						layers = JNNutils.addEmArray(layers, (Sigmoid) serializer.read(in, nomeCamada));
 					break;
 						
 					case "softmax":
-						cs = JNNutils.addEmArray(cs, (Softmax) serialCamada.ler(in, nomeCamada));
+						layers = JNNutils.addEmArray(layers, (Softmax) serializer.read(in, nomeCamada));
 					break;
 
 					case "softplus":
-						cs = JNNutils.addEmArray(cs, (Softplus) serialCamada.ler(in, nomeCamada));
+						layers = JNNutils.addEmArray(layers, (Softplus) serializer.read(in, nomeCamada));
 					break;
 
 					case "swish":
-						cs = JNNutils.addEmArray(cs, (Swish) serialCamada.ler(in, nomeCamada));
+						layers = JNNutils.addEmArray(layers, (Swish) serializer.read(in, nomeCamada));
 					break;
 
 					case "tanh":
-						cs = JNNutils.addEmArray(cs, (Tanh) serialCamada.ler(in, nomeCamada));
+						layers = JNNutils.addEmArray(layers, (Tanh) serializer.read(in, nomeCamada));
 					break;
 				
 					default:
@@ -195,17 +195,20 @@ public class JNNserial extends SerialBase {
 			System.exit(1);
 		}
 
-		Sequential modelo = new Sequential(cs);
+		Sequential model = new Sequential(layers);
 		
 		// mudar isso depois para algo como "modelo.compilar(otm, loss, false)"
 		// onde o false faria com que os parametros lidos não fossem mexidos na compilação
-		modelo._compiled = true;
+		model._compiled = true;
 
-		for (int i = 0; i < modelo.numLayers(); i++) modelo.layer(i).setId(i);
-		modelo.setOptimizer(dicio.getOtimizador(otmStr));
-		modelo.optim().construir(modelo.params());
-		modelo.setLoss(dicio.getLoss(lossStr));
+		for (int i = 0; i < model.numLayers(); i++) {
+			model.layer(i).setId(i);
+		}
 
-		return modelo;
+		model.setOptimizer(dicio.getOtimizador(strOptim));
+		model.optim().construir(model.params());
+		model.setLoss(dicio.getLoss(strLoss));
+
+		return model;
 	}
 }

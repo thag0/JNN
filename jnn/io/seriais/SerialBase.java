@@ -20,7 +20,7 @@ public abstract class SerialBase {
      * @param val valor desejado.
      * @throws IOException caso ocorra um erro.
      */
-    static protected void escrever(DataOutputStream dos, int val) throws IOException {
+    static protected void write(DataOutputStream dos, int val) throws IOException {
         dos.writeInt(val);
     }
 
@@ -30,7 +30,7 @@ public abstract class SerialBase {
      * @param val valor desejado.
      * @throws IOException caso ocorra um erro.
      */
-    static protected void escrever(DataOutputStream dos, float val) throws IOException {
+    static protected void write(DataOutputStream dos, float val) throws IOException {
         dos.writeFloat(val);
     }
 
@@ -40,7 +40,7 @@ public abstract class SerialBase {
      * @param val valor desejado.
      * @throws IOException caso ocorra um erro.
      */
-    static protected void escrever(DataOutputStream dos, boolean val) throws IOException {
+    static protected void write(DataOutputStream dos, boolean val) throws IOException {
         dos.writeBoolean(val);
     }
 
@@ -50,7 +50,7 @@ public abstract class SerialBase {
      * @param arr {@code array} desejado.
      * @throws IOException caso ocorra um erro.
      */
-    static protected void escrever(DataOutputStream dos, int[] arr) throws IOException {
+    static protected void write(DataOutputStream dos, int[] arr) throws IOException {
         dos.writeInt(arr.length);
         for (int val : arr) {
             dos.writeInt(val);
@@ -63,7 +63,7 @@ public abstract class SerialBase {
      * @param arr {@code array} desejado.
      * @throws IOException caso ocorra um erro.
      */
-    static protected void escrever(DataOutputStream dos, float[] arr) throws IOException {
+    static protected void write(DataOutputStream dos, float[] arr) throws IOException {
         dos.writeInt(arr.length);
         for (float val : arr) {
             dos.writeFloat(val);
@@ -76,7 +76,7 @@ public abstract class SerialBase {
      * @param s {@code String} desejada.
      * @throws IOException caso ocorra um erro.
      */
-    static protected void escrever(DataOutputStream dos, String s) throws IOException {
+    static protected void write(DataOutputStream dos, String s) throws IOException {
         byte[] bytes = s.getBytes("UTF-8");
         dos.writeInt(bytes.length);
         dos.write(bytes);
@@ -88,7 +88,7 @@ public abstract class SerialBase {
      * @return valor lido.
      * @throws IOException caso ocorra um erro.
      */
-    static protected int lerInt(DataInputStream dis) throws IOException {
+    static protected int readInt(DataInputStream dis) throws IOException {
         return dis.readInt();
     }
 
@@ -98,7 +98,7 @@ public abstract class SerialBase {
      * @return valor lido.
      * @throws IOException caso ocorra um erro.
      */
-    static protected float lerFloat(DataInputStream dis) throws IOException {
+    static protected float readFloat(DataInputStream dis) throws IOException {
         return dis.readFloat();
     }
 
@@ -108,7 +108,7 @@ public abstract class SerialBase {
      * @return valor lido.
      * @throws IOException caso ocorra um erro.
      */
-    static protected boolean lerBoolean(DataInputStream dis) throws IOException {
+    static protected boolean readBoolean(DataInputStream dis) throws IOException {
         return dis.readBoolean();
     }
 
@@ -118,11 +118,11 @@ public abstract class SerialBase {
      * @return array lido.
      * @throws IOException caso ocorra um erro.
      */
-    static protected int[] lerArrInt(DataInputStream dis) throws IOException {
-        int tam = dis.readInt();// considerando que já escreve o tamanho.
+    static protected int[] readIntArray(DataInputStream dis) throws IOException {
+        int len = dis.readInt();// considerando que já escreve o tamanho.
         
-        int[] arr = new int[tam];
-        for (int i = 0; i < tam; i++) {
+        int[] arr = new int[len];
+        for (int i = 0; i < len; i++) {
             arr[i] = dis.readInt();
         }
 
@@ -135,11 +135,11 @@ public abstract class SerialBase {
      * @return array lido.
      * @throws IOException caso ocorra um erro.
      */
-    static protected float[] lerArrFloat(DataInputStream dis) throws IOException {
-        int tam = dis.readInt();// considerando que já escreve o tamanho.
+    static protected float[] readFloatArray(DataInputStream dis) throws IOException {
+        int len = dis.readInt();// considerando que já escreve o tamanho.
 
-        float[] arr = new float[tam];
-        for (int i = 0; i < tam; i++) {
+        float[] arr = new float[len];
+        for (int i = 0; i < len; i++) {
             arr[i] = dis.readFloat();
         }
 
@@ -153,9 +153,9 @@ public abstract class SerialBase {
      * @return String lida
      * @throws IOException caso ocorra algum erro.
      */
-    static protected String lerString(DataInputStream dis) throws IOException {
-        int tam = dis.readInt();
-        byte[] bytes = new byte[tam];
+    static protected String readString(DataInputStream dis) throws IOException {
+        int len = dis.readInt();
+        byte[] bytes = new byte[len];
         dis.readFully(bytes);
         return new String(bytes, "UTF-8");
     }

@@ -5,14 +5,14 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import jnn.io.seriais.SerialBase;
-import jnn.io.seriais.SerializadorCamada;
+import jnn.io.seriais.SerialLayer;
 import jnn.layers.Flatten;
 
 /**
  * Interface de IO para camada Flatten.
  * @see jnn.layers.Flatten
  */
-class SerialFlatten extends SerialBase implements SerializadorCamada<Flatten> {
+class SerialFlatten extends SerialBase implements SerialLayer<Flatten> {
 
 	/**
 	 * Interface de IO para camada Flatten.
@@ -21,35 +21,35 @@ class SerialFlatten extends SerialBase implements SerializadorCamada<Flatten> {
 	public SerialFlatten() {}
 
 	@Override
-	public void serializar(Flatten camada, DataOutputStream dos) throws IOException {
-		escrever(dos, camada.name());
+	public void serialize(Flatten layer, DataOutputStream dos) throws IOException {
+		write(dos, layer.name());
 		
-		int[] shapeIn = camada.shapeIn();
-		escrever(dos, shapeIn);
+		int[] shapeIn = layer.shapeIn();
+		write(dos, shapeIn);
 
-		int[] shapeOut = camada.shapeOut();
-		escrever(dos, shapeOut);
+		int[] shapeOut = layer.shapeOut();
+		write(dos, shapeOut);
 	}
 
 	@Override
 	@SuppressWarnings("unused")//só pro vscode não ficar reclamando
-	public Flatten ler(DataInputStream dis) throws IOException {
-		int[] shapeIn = lerArrInt(dis);
-		int[] shapeOut = lerArrInt(dis);// tem que ser lido pra avançar o buffer
+	public Flatten read(DataInputStream dis) throws IOException {
+		int[] shapeIn = readIntArray(dis);
+		int[] shapeOut = readIntArray(dis);// tem que ser lido pra avançar o buffer
 
-		Flatten camada = new Flatten();
-		camada.build(shapeIn);
+		Flatten layer = new Flatten();
+		layer.build(shapeIn);
 
-		return camada;
+		return layer;
 	}
 
 	@Override
-	public String nome() {
+	public String name() {
 		return "flatten";
 	}
 
 	@Override
-	public Class<Flatten> tipo() {
+	public Class<Flatten> type() {
 		return Flatten.class;
 	}
 }

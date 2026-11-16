@@ -5,14 +5,14 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import jnn.io.seriais.SerialBase;
-import jnn.io.seriais.SerializadorCamada;
+import jnn.io.seriais.SerialLayer;
 import jnn.layers.pooling.AvgPool2D;
 
 /**
  * Interface de IO para camada MaxPool2D.
  * @see jnn.layers.pooling.AvgPool2D
  */
-class SerialAvgPool extends SerialBase implements SerializadorCamada<AvgPool2D> {
+class SerialAvgPool extends SerialBase implements SerialLayer<AvgPool2D> {
 
 	/**
 	 * Interface de IO para camada MaxPool2D.
@@ -21,44 +21,44 @@ class SerialAvgPool extends SerialBase implements SerializadorCamada<AvgPool2D> 
 	public SerialAvgPool() {}
 
 	@Override
-	public void serializar(AvgPool2D camada, DataOutputStream dos) throws IOException {
-		escrever(dos, camada.name());
+	public void serialize(AvgPool2D layer, DataOutputStream dos) throws IOException {
+		write(dos, layer.name());
 		
-		int[] shapeIn = camada.shapeIn();
-		escrever(dos, shapeIn);
+		int[] shapeIn = layer.shapeIn();
+		write(dos, shapeIn);
 
-		int[] shapeOut = camada.shapeOut();
-		escrever(dos, shapeOut);
+		int[] shapeOut = layer.shapeOut();
+		write(dos, shapeOut);
 
-		int[] shapeFiltro = camada.shapeFiltro();
-		escrever(dos, shapeFiltro);
+		int[] shapeKernel = layer.shapeFiltro();
+		write(dos, shapeKernel);
 		
-		int[] shapeStride = camada.shapeStride();
-		escrever(dos, shapeStride);
+		int[] shapeStride = layer.shapeStride();
+		write(dos, shapeStride);
 	}
 
 	@Override
 	@SuppressWarnings("unused")
-	public AvgPool2D ler(DataInputStream dis) throws IOException {
+	public AvgPool2D read(DataInputStream dis) throws IOException {
 		// nome já é lido pra saber que camada é
-		int[] shapeIn = lerArrInt(dis);
-		int[] shapeOut = lerArrInt(dis);
-		int[] shapeFiltro = lerArrInt(dis);
-		int[] shapeStrides = lerArrInt(dis);
+		int[] shapeIn = readIntArray(dis);
+		int[] shapeOut = readIntArray(dis);
+		int[] shapeKernel = readIntArray(dis);
+		int[] shapeStrides = readIntArray(dis);
 	
-		AvgPool2D camada = new AvgPool2D(shapeFiltro, shapeStrides);
-		camada.build(shapeIn);
+		AvgPool2D layer = new AvgPool2D(shapeKernel, shapeStrides);
+		layer.build(shapeIn);
 
-		return camada;
+		return layer;
 	}
 
 	@Override
-	public String nome() {
+	public String name() {
 		return "avgpool2d";
 	}
 
 	@Override
-	public Class<AvgPool2D> tipo() {
+	public Class<AvgPool2D> type() {
 		return AvgPool2D.class;
 	}
 }

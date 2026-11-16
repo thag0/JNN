@@ -5,13 +5,13 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import jnn.io.seriais.SerialBase;
-import jnn.io.seriais.SerializadorCamada;
+import jnn.io.seriais.SerialLayer;
 import jnn.layers.acts.GELU;
 
 /**
  * Serializados para a camada de ativação GELU.
  */
-public class SerialGELU extends SerialBase implements SerializadorCamada<GELU> {
+public class SerialGELU extends SerialBase implements SerialLayer<GELU> {
     
 	/**
 	 * Interface de IO para camada de ativação.
@@ -19,24 +19,24 @@ public class SerialGELU extends SerialBase implements SerializadorCamada<GELU> {
 	public SerialGELU() {}
 
 	@Override
-	public void serializar(GELU camada, DataOutputStream dos) throws IOException {
-        escrever(dos, camada.name());
-        escrever(dos, camada.shapeIn());
+	public void serialize(GELU layer, DataOutputStream dos) throws IOException {
+        write(dos, layer.name());
+        write(dos, layer.shapeIn());
     }
 
 	@Override
-	public GELU ler(DataInputStream dis) throws IOException {
-        int[] shapeIn = lerArrInt(dis);
+	public GELU read(DataInputStream dis) throws IOException {
+        int[] shapeIn = readIntArray(dis);
         return new GELU(shapeIn);
     }
 
 	@Override
-	public String nome() {
+	public String name() {
 		return "gelu";
 	}
 
 	@Override
-	public Class<GELU> tipo() {
+	public Class<GELU> type() {
 		return GELU.class;
 	}
 
