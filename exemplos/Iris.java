@@ -114,7 +114,7 @@ public class Iris {
 
 	/**
 	 * Salva um arquivo csv com o historico de desempenho do modelo.
-	 * @param modelo modelo.
+	 * @param model modelo.
 	 * @param caminho caminho onde será salvo o arquivo.
 	 */
 	static void exportarHistorico(float[] hist, String caminho, Float[] accs) {

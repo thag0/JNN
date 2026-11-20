@@ -8,7 +8,7 @@ import jnn.layers.Layer;
 import jnn.metrics.Evaluator;
 import jnn.metrics.loss.Loss;
 import jnn.otm.Otimizador;
-import jnn.treino.Treinador;
+import jnn.train.Trainer;
 
 /**
  * <h2>
@@ -45,7 +45,7 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 	/**
 	 * Gerenciador de treino do modelo.
 	 */
-	protected Treinador _trainer;
+	protected Trainer _trainer;
 
 	/**
 	 * Auxiliar na verificação de armazenagem do histórico
@@ -67,7 +67,7 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 	 * Inicialização implicita de um modelo.
 	 */
 	protected Model() {
-		_trainer = new Treinador(this);
+		_trainer = new Trainer(this);
 		_evaluator = new Evaluator(this);
 	}
 
@@ -102,7 +102,7 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 	 */
 	public void setHistorico(boolean save) {
 		trainHistory = save;
-		_trainer.setHistorico(save);
+		_trainer.setHistory(save);
 	}
 
 	/**
@@ -262,7 +262,7 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 			);
 		}
 		
-		_trainer.executar(loader, epochs, batchSize, logs);
+		_trainer.execute(loader, epochs, batchSize, logs);
 	}
 	
 	/**
@@ -276,13 +276,20 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 	}
 
 	/**
-	 * Configura o modelo para o modo de treino
-	 * @param is {@code true} caso o modelo deva estar no modo treino,
-	 * {@code false} caso contrário.
+	 * Configura todas as camadas do modelo em modo de avaliação.
 	 */
-	public void setTraining(boolean is) {
-		for (Layer layer : this) {
-			layer.setTraining(is);
+	public void eval() {
+		for (var layer : this) {
+			layer.setTraining(false);
+		}
+	}
+
+	/**
+	 * Configura todas as camadas do modelo em modo de treino.
+	 */
+	public void train() {
+		for (var layer : this) {
+			layer.setTraining(true);
 		}
 	}
 
@@ -300,7 +307,6 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 	 */
 	public Tensor evaluate(DataLoader loader) {
 		validateCompilation();
-		setTraining(false);// garantia
 
 		Tensor[] xs = loader.getX();
 		Tensor[] ys = loader.getY();
@@ -343,7 +349,7 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 	 * Retorna o treinador do modelo.
 	 * @return treinador do modelo.
 	 */
-	public Treinador trainer() {
+	public Trainer trainer() {
 		return _trainer;
 	}
 

@@ -1,9 +1,9 @@
-package jnn.treino.callback;
+package jnn.train.callback;
 
 /**
  * Classe base para uso em callbacks de treino.
  */
-public final class InfoEpoca {
+public final class EpochInfo {
 
     /**
      * Índice da época atual.
@@ -20,7 +20,7 @@ public final class InfoEpoca {
      * @param epoca índice da época atual.
      * @param perda valor de perda da época atual.
      */
-    public InfoEpoca(int epoca, float perda) {
+    public EpochInfo(int epoca, float perda) {
         this.epoca = epoca;
         this.perda = perda;
     }

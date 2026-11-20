@@ -7,7 +7,7 @@ import jnn.core.JNNutils;
 import jnn.layers.Input;
 import jnn.layers.Layer;
 import jnn.metrics.Evaluator;
-import jnn.treino.Treinador;
+import jnn.train.Trainer;
 
 /**
  * <p>
@@ -413,7 +413,7 @@ public class Sequential extends Model {
 		Dicionario dicio = new Dicionario();
 		clone._optimizer = dicio.getOtimizador(_optimizer.nome());
 		clone._loss = dicio.getLoss(_loss.name());
-		clone._trainer = new Treinador(clone);
+		clone._trainer = new Trainer(clone);
 		
 		int nCamadas = numLayers();
 		clone._layers = new Layer[nCamadas];

@@ -58,9 +58,9 @@ public class MainConv {
 		
 		var accs = new ArrayList<Float>();
 		modelo.trainer().setCallback(info -> {
-			modelo.setTraining(false);
+			modelo.eval();
 				float ac = modelo.evaluator().accuracy(teste).item();
-			modelo.setTraining(true);
+			modelo.train();
 			
 			accs.add(ac);
 			System.out.println(" acurácia: " + (ac*100) + "%");

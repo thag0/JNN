@@ -1,4 +1,4 @@
-package jnn.treino;
+package jnn.train.method;
 
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.Sample;
@@ -6,33 +6,33 @@ import jnn.metrics.loss.Loss;
 import jnn.dataloader.DataLoader;
 import jnn.models.Model;
 import jnn.otm.Otimizador;
-import jnn.treino.callback.InfoEpoca;
+import jnn.train.callback.EpochInfo;
 
 /**
   * Implementação de treino dos modelos.
  */
-public class Treino extends MetodoTreino {
+public class RegularTrain extends TrainMethod {
 
 	/**
 	 * Treinador sequencial, atualiza os parâmetros a cada amostra de dados.
-	 * @param modelo modelo para treino.
+	 * @param model modelo para treino.
 	 * @param hist calcular histórico de perda.
 	 */
-	public Treino(Model modelo, boolean hist) {
-		super(modelo, hist);
+	public RegularTrain(Model model, boolean hist) {
+		super(model, hist);
 	}
 
 	/**
 	 * Treinador sequencial, atualiza os parâmetros a cada amostra de dados.
-	 * @param modelo modelo para treino.
+	 * @param model modelo para treino.
 	 */
-	public Treino(Model modelo) {
-		this(modelo, false);
+	public RegularTrain(Model model) {
+		this(model, false);
 	}
 
 	@Override
-	protected void loop(DataLoader loader, Otimizador otm, Loss loss, int epochs, boolean logs) {
-		if (logs) esconderCursor();
+	public void loop(DataLoader loader, Otimizador otm, Loss loss, int epochs, boolean logs) {
+		if (logs) hideCursor();
 		long tempo = 0;
 		int largEpocas = String.valueOf(epochs).length();
 
@@ -44,19 +44,19 @@ public class Treino extends MetodoTreino {
 			loader.suffle();
 			
 			for (int i = 0; i < n; i++) {
-				Sample a = loader.get(i);
-				Tensor prev = modelo.forward(a.x());
+				Sample sample = loader.get(i);
+				Tensor prev = model.forward(sample.x());
 				
-				if (calcHist) perdaEpoca += loss.forward(prev, a.y()).item();
+				if (calculate) perdaEpoca += loss.forward(prev, sample.y()).item();
 				
-				modelo.zeroGrad();
-				modelo.backward(loss.backward(prev, a.y()));
+				model.zeroGrad();
+				model.backward(loss.backward(prev, sample.y()));
 				otm.update();
 			}
 			
 			if (logs) {
 				tempo = System.nanoTime() - tempo;
-				limparLinha();
+				clearLine();
 				String perda = String.format("%.8f", (perdaEpoca/n)).replaceAll(",", ".");
 				String log = String.format("(Época %" + largEpocas + "d/%" + largEpocas + "d) loss: %s", (e + 1), epochs, perda);
 
@@ -70,17 +70,17 @@ public class Treino extends MetodoTreino {
 					log += String.format(" (%dmin %ds)", min, seg);
 				}
 
-				exibirLogTreino(log);
+				showTrainLog(log);
 			}
 
-			if (calcHist) historico.add(perdaEpoca/n);
+			if (calculate) history.add(perdaEpoca/n);
 
 			if (scheduler != null) scheduler.update();
-			if (callback != null)  callback.run(new InfoEpoca(e, perdaEpoca));
+			if (callback != null)  callback.onEpochEnd(new EpochInfo(e, perdaEpoca));
 		}
 
 		if (logs) {
-			exibirCursor();
+			showCursor();
 			System.out.println();
 		}
 

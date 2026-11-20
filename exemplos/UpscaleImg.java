@@ -65,7 +65,7 @@ public class UpscaleImg {
 
 	/**
 	 * Salva um arquivo csv com o historico de desempenho da rede.
-	 * @param modelo modelo.
+	 * @param model modelo.
 	 */
 	public static void exportarHistoricoPerda(float[] hist) {
 		System.out.println("Exportando histórico de perda");

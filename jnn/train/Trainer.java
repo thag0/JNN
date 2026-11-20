@@ -1,4 +1,4 @@
-package jnn.treino;
+package jnn.train;
 
 import java.util.LinkedList;
 import java.util.concurrent.ForkJoinPool;
@@ -8,37 +8,40 @@ import jnn.core.parallel.JNNparallel;
 import jnn.dataloader.DataLoader;
 import jnn.models.Model;
 import jnn.otm.scheduler.Scheduler;
-import jnn.treino.callback.CallbackFimEpoca;
+import jnn.train.callback.Callback;
+import jnn.train.method.BatchTrain;
+import jnn.train.method.RegularTrain;
+import jnn.train.method.TrainMethod;
 
 /**
  * Interface para treino de modelos da biblioteca.
  */
-public class Treinador implements Cloneable {
+public class Trainer implements Cloneable {
 
 	/**
 	 * Modelo base para treino.
 	 */
-	protected Model modelo;
+	protected Model model;
 
 	/**
 	 * Formato de execução de treino (amostra-amostra, lotes).
 	 */
-	MetodoTreino metodo;
+	TrainMethod method;
 
 	/**
 	 * Histórico de perda do modelo durante o treinamento.
 	 */
-	protected LinkedList<Float> historico = new LinkedList<>();
+	protected LinkedList<Float> history = new LinkedList<>();
 
 	/**
 	 * Armazenar histórico de perda durante o treino.
 	 */
-	protected boolean calcHist;
+	protected boolean calculateHistory;
 
 	/**
 	 * Callback de fim de época.
 	 */
-	private CallbackFimEpoca callback;
+	private Callback callback;
 
 	/**
 	 * Agendador para lr dinâmico dos otimizadores.
@@ -47,30 +50,30 @@ public class Treinador implements Cloneable {
 
 	/**
 	 * Inicializa um novo treinador.
-	 * @param modelo modelo base
-	 * @param hist calcular histórico de perda.
+	 * @param model modelo base
+	 * @param history calcular histórico de perda.
 	 */
-	public Treinador(Model modelo, boolean hist) {
-		this.modelo = JNNutils.validarNaoNulo(modelo, "modelo == null");
-		this.calcHist = hist;
+	public Trainer(Model model, boolean history) {
+		this.model = JNNutils.validarNaoNulo(model, "modelo == null");
+		this.calculateHistory = history;
 	}
 
 	/**
 	 * Iniciliza um novo treinador.
-	 * @param modelo modelo base.
+	 * @param model modelo base.
 	 */
-	public Treinador(Model modelo) {
-		this(modelo, false);
+	public Trainer(Model model) {
+		this(model, false);
 	}
 
 	/**
 	 * Configura um novo método de treino.
-	 * @param metodo novo método de treino.
+	 * @param method novo método de treino.
 	 */
-	public void setMetodo(MetodoTreino metodo) {
-		if (metodo != null) {
-			this.metodo = metodo;
-			this.metodo.historico = historico;
+	public void setMethod(TrainMethod method) {
+		if (method != null) {
+			this.method = method;
+			this.method.history = history;
 		}
 	}
 
@@ -78,7 +81,7 @@ public class Treinador implements Cloneable {
 	 * Configura um callback para ser chamado a cada final de época.
 	 * @param callback novo callback.
 	 */
-	public void setCallback(CallbackFimEpoca callback) {
+	public void setCallback(Callback callback) {
 		this.callback = callback;
 	}
 
@@ -92,44 +95,45 @@ public class Treinador implements Cloneable {
 
 	/**
 	 * Configura o cálculo para o histórico de perdas durante o treinamento.
-	 * @param calcular calcular ou não o histórico de custo.
+	 * @param calculate calcular ou não o histórico de custo.
 	 */
-	public void setHistorico(boolean calcular) {
-		this.calcHist = calcular;
+	public void setHistory(boolean calculate) {
+		this.calculateHistory = calculate;
 	}
 
 	/**
 	 * Executa a regra de treino durante um determinado número de épocas.
 	 * @param loader {@code DataLoader} com conjunto de dados.
 	 * @param epochs quantidade de épocas de treinamento.
-	 * @param tamLote tamanho do lote de amostras.
+	 * @param batchSize tamanho do lote de amostras.
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 */
-	public void 
-	executar(DataLoader loader, int epochs, int tamLote, boolean logs) {
-		if (tamLote < 1) {
+	public void execute(DataLoader loader, int epochs, int batchSize, boolean logs) {
+		if (batchSize < 1) {
 			throw new IllegalArgumentException(
-				"\nTamanho de lote " + tamLote + " inválido."
+				"\nTamanho de lote " + batchSize + " inválido."
 			);
 		}
 
-		if (tamLote < 2) setMetodo(new Treino(modelo));
-		else setMetodo(new TreinoLote(modelo, tamLote));
+		if (batchSize < 2) setMethod(new RegularTrain(model));
+		else setMethod(new BatchTrain(model, batchSize));
 
-		metodo.setCallback(callback);
-		metodo.setScheduler(scheduler);
+		method.setCallback(callback);
+		method.setScheduler(scheduler);
 
-		metodo.calcHist = calcHist;
+		method.calculate = calculateHistory;
 		
-		modelo.setTraining(true);	
-		metodo.loop(
+		// talvez remover train e eval e jogar a responsabiidade
+		// pro usuario
+		model.train();
+		method.loop(
 			loader,
-			modelo.optim(),
-			modelo.loss(),
+			model.optim(),
+			model.loss(),
 			epochs,
 			logs
 		);
-		modelo.setTraining(false);
+		model.eval();
 	}
 
 	/**
@@ -139,8 +143,8 @@ public class Treinador implements Cloneable {
 	 * @param logs logs para perda durante as épocas de treinamento.
 	 * @see jnn.dataloader.DataLoader
 	 */
-	public void executar(DataLoader loader, int epochs, boolean logs) {
-		executar(loader, epochs, 1, logs);
+	public void execute(DataLoader loader, int epochs, boolean logs) {
+		execute(loader, epochs, 1, logs);
 	}
 
 	/**
@@ -148,8 +152,8 @@ public class Treinador implements Cloneable {
 	 * @param loader conjunto de dados.
 	 * @param epochs quantidade de épocas de treinamento.
 	 */
-	public void executar(DataLoader loader, int epochs) {
-		executar(loader, epochs, 1, false);
+	public void execute(DataLoader loader, int epochs) {
+		execute(loader, epochs, 1, false);
 	}
 
 	/**
@@ -157,7 +161,7 @@ public class Treinador implements Cloneable {
 	 * @return lista de perdas do modelo.
 	 */
 	public float[] hist() {
-		Float[] hist = metodo.hist();
+		Float[] hist = method.hist();
 		float[] h = new float[hist.length];
 
 		final int t = Runtime.getRuntime().availableProcessors();
@@ -175,7 +179,7 @@ public class Treinador implements Cloneable {
 	 * Retorna o nome do treinador.
 	 * @return nome do treinador.
 	 */
-	public String nome() {
+	public String name() {
 		return getClass().getSimpleName();
 	}
 	

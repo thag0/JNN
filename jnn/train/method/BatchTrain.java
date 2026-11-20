@@ -1,4 +1,4 @@
-package jnn.treino;
+package jnn.train.method;
 
 import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
@@ -7,43 +7,43 @@ import jnn.metrics.loss.Loss;
 import jnn.dataloader.Batch;
 import jnn.models.Model;
 import jnn.otm.Otimizador;
-import jnn.treino.callback.InfoEpoca;
+import jnn.train.callback.EpochInfo;
 
 /**
   * Implementação de treino em lote dos modelos.
  */
-public class TreinoLote extends MetodoTreino {
+public class BatchTrain extends TrainMethod {
 
 	/**
 	 * Tamanho do lote de amostras por iteração
 	 */
-	int tamLote;
+	int batchSize;
 
 	/**
 	 * Treinador em lotes, atualiza os parâmetros a subamostra
 	 * do dataset fornecido.
-	 * @param modelo modelo base.
+	 * @param model modelo base.
 	 * @param hist calcular histórico de perda.
-	 * @param tamLote tamanho do lote de treino.
+	 * @param batchSize tamanho do lote de treino.
 	 */
-	public TreinoLote(Model modelo, boolean hist, int tamLote) {
-		super(modelo, hist);
-		this.tamLote = tamLote;
+	public BatchTrain(Model model, boolean hist, int batchSize) {
+		super(model, hist);
+		this.batchSize = batchSize;
 	}
 
 	/**
 	 * Treinador em lotes, atualiza os parâmetros a subamostra
 	 * do dataset fornecido.
-	 * @param modelo modelo base.
-	 * @param tamLote tamanho do lote de treino.
+	 * @param model modelo base.
+	 * @param batchSize tamanho do lote de treino.
 	 */
-	public TreinoLote(Model modelo, int tamLote) {
-		this(modelo, false, tamLote);
+	public BatchTrain(Model model, int batchSize) {
+		this(model, false, batchSize);
 	}
 
 	@Override
-	protected void loop(DataLoader loader, Otimizador otm, Loss loss, int epochs, boolean logs) {
-		if (logs) esconderCursor();
+	public void loop(DataLoader loader, Otimizador otm, Loss loss, int epochs, boolean logs) {
+		if (logs) hideCursor();
 		long tempo = 0;
 		int largEpocas = String.valueOf(epochs).length();
 
@@ -54,10 +54,10 @@ public class TreinoLote extends MetodoTreino {
 			loader.suffle();
 			float perdaEpoca = 0.0f;
 
-			for (int i = 0; i < n; i += tamLote) {
-				Batch lote = loader.batch(i, tamLote);
+			for (int i = 0; i < n; i += batchSize) {
+				Batch lote = loader.batch(i, batchSize);
 
-                modelo.zeroGrad();
+                model.zeroGrad();
 				perdaEpoca += processoLote(lote.arrX(), lote.arrY(), loss);
                 otm.update();      
 			}
@@ -65,7 +65,7 @@ public class TreinoLote extends MetodoTreino {
 			if (logs) {
 				tempo = System.nanoTime() - tempo;
 
-				limparLinha();
+				clearLine();
 				String perda = String.format("%.8f", (perdaEpoca/n)).replaceAll(",", ".");
 				String log = String.format("(Época %" + largEpocas + "d/%" + largEpocas + "d) loss: %s", (e + 1), epochs, perda);
 
@@ -78,17 +78,17 @@ public class TreinoLote extends MetodoTreino {
 					log += String.format(" (%dmin %ds)", min, seg);
 				}
 
-				exibirLogTreino(log);
+				showTrainLog(log);
 			}
 
-			if (calcHist) historico.add(perdaEpoca / n);
+			if (calculate) history.add(perdaEpoca / n);
 
 			if (scheduler != null) scheduler.update();
-			if (callback != null)  callback.run(new InfoEpoca(e, perdaEpoca));
+			if (callback != null)  callback.onEpochEnd(new EpochInfo(e, perdaEpoca));
 		}
 
 		if (logs) {
-			exibirCursor();
+			showCursor();
 			System.out.println();
 		}
 	}
@@ -104,12 +104,12 @@ public class TreinoLote extends MetodoTreino {
 		Tensor xs = JNNutils.concatenar(loteX);
 		Tensor ys = JNNutils.concatenar(loteY);
 		
-		Tensor y = modelo.forward(xs);
+		Tensor y = model.forward(xs);
 		Tensor g = loss.backward(y, ys);
 		
-		modelo.backward(g);
+		model.backward(g);
 
-		if (calcHist) {
+		if (calculate) {
 			float l = loss.forward(y, ys).item();
 			int n = loteX.length;
 			return l * n;

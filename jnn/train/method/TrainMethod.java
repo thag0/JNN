@@ -1,4 +1,4 @@
-package jnn.treino;
+package jnn.train.method;
 
 import java.util.LinkedList;
 
@@ -9,32 +9,32 @@ import jnn.metrics.loss.Loss;
 import jnn.models.Model;
 import jnn.otm.Otimizador;
 import jnn.otm.scheduler.Scheduler;
-import jnn.treino.callback.CallbackFimEpoca;
+import jnn.train.callback.Callback;
 
 /**
  * Método base de treino de modelo.
  */
-public abstract class MetodoTreino {
+public abstract class TrainMethod {
 
 	/**
 	 * Modelo base para treino.
 	 */
-	protected Model modelo;
+	protected Model model;
 
 	/**
 	 * Histórico de perda do modelo durante o treinamento.
 	 */
-	protected LinkedList<Float> historico;
+	public LinkedList<Float> history;
 
 	/**
 	 * Variável de controle para armazenagem do histórico de treino.
 	 */
-	protected boolean calcHist;
+	public boolean calculate;
 	
 	/**
 	 * Callback usada a cada final de época.
 	 */
-	CallbackFimEpoca callback;
+	Callback callback;
 
 	/**
 	 * Scheduler usado a cada final de época.
@@ -43,27 +43,27 @@ public abstract class MetodoTreino {
 
 	/**
 	 * Construtor interno.
-	 * @param modelo modelo base.
-	 * @param hist calcular histórico de perda durante o treino.
+	 * @param model modelo base.
+	 * @param calcHistory calcular histórico de perda durante o treino.
 	 */
-	protected MetodoTreino(Model modelo, boolean hist) {
-		this.modelo = modelo;// já é validado != null pelo Treinador
-		this.calcHist = hist;
+	protected TrainMethod(Model model, boolean calcHistory) {
+		this.model = model;// já é validado != null pelo Treinador
+		this.calculate = calcHistory;
 	}
 
 	/**
 	 * Construtor interno.
-	 * @param modelo modelo base.
+	 * @param model modelo base.
 	 */
-	protected MetodoTreino(Model modelo) {
-		this(modelo, false);	
+	protected TrainMethod(Model model) {
+		this(model, false);	
 	}
 
 	/**
 	 * Configura um callback para ser chamado a cada final de época.
 	 * @param callback novo callback.
 	 */
-	public void setCallback(CallbackFimEpoca callback) {
+	public void setCallback(Callback callback) {
 		if (callback != null) this.callback = callback;
 	}
 
@@ -83,7 +83,7 @@ public abstract class MetodoTreino {
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param logs exibir logs de avanço;
 	 */
-	protected abstract void loop(DataLoader loader, Otimizador otm, Loss loss, int epochs, boolean logs);
+	public abstract void loop(DataLoader loader, Otimizador otm, Loss loss, int epochs, boolean logs);
 
 	/**
 	 * Embaralha ambos os arrays de entrada e saída.
@@ -91,21 +91,21 @@ public abstract class MetodoTreino {
 	 * @param xs {@code array} com dados de entrada.
 	 * @param ys {@code array} com dados de saída.
 	 */
-	protected <T> void embaralhar(T[] xs, T[] ys) {
+	protected <T> void shuffle(T[] xs, T[] ys) {
 		JNNutils.embaralhar(xs, ys, null);
 	}
 
 	/** 
 	 * Esconde o cursor do terminal.
 	 */
-	protected void esconderCursor() {
+	protected void hideCursor() {
 		System.out.print("\033[?25l");
 	}
 
 	/**
 	 * Exibe o cursor no terminal.
 	 */
-	protected void exibirCursor() {
+	protected void showCursor() {
 		System.out.print("\033[?25h");
 	}
 
@@ -113,15 +113,15 @@ public abstract class MetodoTreino {
 	 * Atualiza as informações do log de treino.
 	 * @param log informações desejadas.
 	 */
-	protected void exibirLogTreino(String log) {
-		limparLinha();
+	protected void showTrainLog(String log) {
+		clearLine();
 		JNNlog.logTreino(log);
 	}
 
 	/**
 	 * Limpa a linha de log
 	 */
-	protected void limparLinha() {
+	protected void clearLine() {
 		System.out.print("\033[2K");
 	}
 
@@ -130,7 +130,7 @@ public abstract class MetodoTreino {
 	 * @return histórico convertido em array de {@code Float}.
 	 */
 	public Float[] hist() {
-		return historico.toArray(new Float[]{});
+		return history.toArray(new Float[]{});
 	}
 	
 }
