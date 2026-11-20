@@ -52,25 +52,25 @@ public class MainConv {
 
 		treino.print();
 
-		Sequential modelo = cnnCifar10();
-		modelo.setHistorico(true);
-		modelo.print();
+		Sequential model = cnnCifar10();
+		model.setHistorico(true);
+		model.print();
 		
 		var accs = new ArrayList<Float>();
-		modelo.trainer().setCallback(info -> {
-			modelo.eval();
-				float ac = modelo.evaluator().accuracy(teste).item();
-			modelo.train();
+		model.trainer().setCallback(info -> {
+			model.eval();
+				float ac = model.evaluator().accuracy(teste).item();
+			model.train();
 			
 			accs.add(ac);
 			System.out.println(" acurácia: " + (ac*100) + "%");
 		});
 
-		modelo.trainer().setScheduler(
+		model.trainer().setScheduler(
 			new CosineAnnealingLR(
-				modelo.optim(),
+				model.optim(),
 				0.0005f,
-				modelo.optim().getLr(),
+				model.optim().getLr(),
 				(TREINO_EPOCAS * (treino.len() / TREINO_LOTE))
 			)
 		);
@@ -79,7 +79,8 @@ public class MainConv {
 		JNNnative.on();
 		JNNnative.setTamArena(10 * 1024 * 1024);
 		long tempo = System.nanoTime();
-			modelo.fit(treino, TREINO_EPOCAS, TREINO_LOTE, TREINO_LOGS);
+			model.train();
+			model.fit(treino, TREINO_EPOCAS, TREINO_LOTE, TREINO_LOGS);
 		tempo = System.nanoTime() - tempo;
 
 		long segundosTotais = TimeUnit.NANOSECONDS.toSeconds(tempo);
@@ -89,12 +90,13 @@ public class MainConv {
 
 		System.out.println("\nTempo de treino: " + horas + "h " + minutos + "min " + segundos + "s");
 
-		System.out.println("loss: " + modelo.evaluate(teste));
-		System.out.println("acc: " + modelo.evaluator().accuracy(teste));
+		model.eval();
+		System.out.println("loss: " + model.computeLoss(teste));
+		System.out.println("acc: "  + model.evaluator().accuracy(teste));
 
-		JNNserial.salvar(modelo, CAMINHO_SAIDA_MODELO);
+		JNNserial.salvar(model, CAMINHO_SAIDA_MODELO);
 
-		exportarHistorico(modelo, CAMINHO_HISTORICO, accs);
+		exportarHistorico(model, CAMINHO_HISTORICO, accs);
 		executarComando("python grafico.py " + CAMINHO_HISTORICO);
 	}
 

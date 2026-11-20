@@ -176,12 +176,17 @@ public abstract class Layer {
 	}
 
 	/**
-	 * Configura a camada para treino.
-	 * @param isTraining caso verdadeiro a camada será configurada para
-	 * treino, caso contrário, será usada para testes/predições.
+	 * Ajusta o comportamento da camada para o modo de avaliação.
 	 */
-	public void setTraining(boolean isTraining) {
-		this._training = isTraining;
+	public void eval() {
+		_training = false;
+	}
+
+	/**
+	 * Ajusta o comportamento da camada para o modo de treino.
+	 */
+	public void train() {
+		_training = true;
 	}
 
 	/**

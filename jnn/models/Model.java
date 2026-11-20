@@ -279,18 +279,14 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 	 * Configura todas as camadas do modelo em modo de avaliação.
 	 */
 	public void eval() {
-		for (var layer : this) {
-			layer.setTraining(false);
-		}
+		for (var layer : this) layer.eval();
 	}
-
+	
 	/**
 	 * Configura todas as camadas do modelo em modo de treino.
-	 */
+	*/
 	public void train() {
-		for (var layer : this) {
-			layer.setTraining(true);
-		}
+		for (var layer : this) layer.train();
 	}
 
 	/**
@@ -300,32 +296,46 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 	 *    da que o modelo usa, através de:
 	 * </p>
 	 * <pre>
-	 * modelo.avaliador()
+	 * modelo.evaluator()
 	 * </pre>
 	 * @param loader {@code DataLoader} com conjunto de dados.
 	 * @return {@code Tensor} contendo valor de perda.
 	 */
-	public Tensor evaluate(DataLoader loader) {
+	public Tensor computeLoss(DataLoader loader) {
+		// valor de lote mais ou menos ideal
+		return computeLoss(loader, 32);
+	}
+
+	/**
+	 * Avalia o modelo, utilizando a função de perda configurada.
+	 * <p>
+	 *    É possível utilizar outras funções de perda mesmo que sejam diferentes
+	 *    da que o modelo usa, através de:
+	 * </p>
+	 * <pre>
+	 * modelo.evaluator()
+	 * </pre>
+	 * @param loader {@code DataLoader} com conjunto de dados.
+	 * @param batchSize tamanho do lote a cada iteração.
+	 * @return {@code Tensor} contendo valor de perda.
+	 */
+	public Tensor computeLoss(DataLoader loader, int batchSize) {
 		validateCompilation();
 
 		Tensor[] xs = loader.getX();
 		Tensor[] ys = loader.getY();
 
-		// esse tamamho foi o mais ou menos ideal pra não ficar usando
-		// tanta memória e teve um leve ganho em tempo de execução.
-		final int batch = 32;
-
 		final int n = loader.len();
-		float loss = 0;
-		for (int i = 0; i < n; i += batch) {
+		double loss = 0;
+		for (int i = 0; i < n; i += batchSize) {
 			int inicio = i;
-			int fim = Math.min(inicio + batch, n);
+			int fim = Math.min(inicio + batchSize, n);
 			Tensor x = JNNutils.concatenar(JNNutils.subArray(xs, inicio, fim));
 			Tensor y = JNNutils.concatenar(JNNutils.subArray(ys, inicio, fim));
 			
 			Tensor prev = forward(x);
 
-			float lossLote = _loss.forward(prev, y).item();
+			double lossLote = _loss.forward(prev, y).item();
 			int tamLote = fim - inicio;
 			loss += lossLote * tamLote;
 		}

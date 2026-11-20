@@ -36,7 +36,7 @@ public class Xor{
 		modelo.fit(xor, 5_000, false);
 		
 		// Avaliando
-		Tensor perda = modelo.evaluate(xor);
+		Tensor perda = modelo.computeLoss(xor);
 		System.out.println("Perda: " + perda.item());
 
 		// Criando uma tabela verdade para verificação

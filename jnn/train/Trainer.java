@@ -123,9 +123,6 @@ public class Trainer implements Cloneable {
 
 		method.calculate = calculateHistory;
 		
-		// talvez remover train e eval e jogar a responsabiidade
-		// pro usuario
-		model.train();
 		method.loop(
 			loader,
 			model.optim(),
@@ -133,7 +130,6 @@ public class Trainer implements Cloneable {
 			epochs,
 			logs
 		);
-		model.eval();
 	}
 
 	/**

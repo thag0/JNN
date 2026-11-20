@@ -61,7 +61,7 @@ public class MainImg {
 		long min = TimeUnit.NANOSECONDS.toMinutes(tempo);
 		long sec = TimeUnit.NANOSECONDS.toSeconds(tempo);
 
-		System.out.println("Perda = " + modelo.evaluate(loader).item());
+		System.out.println("Perda = " + modelo.computeLoss(loader).item());
 		System.out.println("Tempo de treinamento: " + hrs + "h " + min + "m " + sec + "s");
 
 		if (historico) {

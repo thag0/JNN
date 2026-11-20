@@ -56,7 +56,7 @@ public class UpscaleImg {
 		modelo.fit(img, 5_000, true);
 
 		// Avaliando o modelo
-		System.out.println("Perda = " + modelo.evaluate(img).item());
+		System.out.println("Perda = " + modelo.computeLoss(img).item());
 
 		// Salvando dados
 		exportarHistoricoPerda(modelo.hist());// histórico de treino para plot

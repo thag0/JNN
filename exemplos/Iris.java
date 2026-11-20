@@ -76,10 +76,12 @@ public class Iris {
 			accs.add(acuracia);
 		});
 
+		modelo.train();
 		modelo.fit(treino, 250, 12, true);
-		
+		modelo.eval();
+
 		// Avaliando o modelo
-		System.out.println("Perda = " + modelo.evaluate(teste).item());
+		System.out.println("Perda = " + modelo.computeLoss(teste).item());
 		float acc = modelo.evaluator().accuracy(teste).item();
 		System.out.println("Acurácia = " + formatarDecimal(acc*100, 4) + "%");
 
