@@ -322,6 +322,12 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 	public Tensor computeLoss(DataLoader loader, int batchSize) {
 		validateCompilation();
 
+		if (batchSize <= 0 || batchSize > loader.len()) {
+			throw new IllegalArgumentException(
+				"\nTamanho de lote inválido, recebido " + batchSize
+			);
+		}
+
 		Tensor[] xs = loader.getX();
 		Tensor[] ys = loader.getY();
 
