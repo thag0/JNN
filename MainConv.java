@@ -36,7 +36,7 @@ public class MainConv {
 
 	// controle de treino
 	static final int TREINO_EPOCAS = 30;
-	static final int TREINO_LOTE = 32;
+	static final int TREINO_LOTE = 64;
 	static final boolean TREINO_LOGS = true;
 
 	// caminhos de arquivos externos
@@ -229,14 +229,15 @@ public class MainConv {
 
 			new GlobalAvgPool2D(),
 
-			new Dense(50, "he"),
+			new Dropout(0.3),
+			new Dense(100, "he"),
 			new ReLU(),
 
 			new Dense(10, "glorot-uniforme"),
 			new Softmax()
 		);
 
-		Object otm = new SGD(0.01, 0.9);
+		Object otm = "adam";
 		Object loss = "cross-entropy";
 		
 		model.compile(otm, loss);
