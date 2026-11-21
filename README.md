@@ -78,7 +78,7 @@ Importante reforçar que o jni por enquanto suporta apenas windows_x64 e que usa
 
 Para melhorar o refinamento de treino, é possível utilizar Scherdulers, tipicamente usados para evitar saltos muito grandes no meio-fim do treino. Eles alteram a taxa de aprendizado do otimizador usado com o objetivo de melhorar a convergência e estabilidade ao decorrer do treino.
 
-<img width="840" height="732" alt="scheduler-example" src="https://github.com/user-attachments/assets/db76cc3d-aaf0-4abe-8e23-a93f0622ff2e" />
+<img width="420" height="366" alt="scheduler-example" src="https://github.com/user-attachments/assets/db76cc3d-aaf0-4abe-8e23-a93f0622ff2e" />
 
 *Configurando um scheduler*
 
