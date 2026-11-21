@@ -70,7 +70,7 @@ Importante reforçar que o jni por enquanto suporta apenas windows_x64 e que usa
 
 É possível adicionar callbacks ao final de cada época de trieno para poder aproveitar os dados em processamentos para fazer análises especiais.
 
-<img width="1406" height="600" alt="Image" src="https://github.com/user-attachments/assets/886fcf8a-acf4-4bda-86f1-02f1fb4f7e71" />
+<img width="1370" height="600" alt="callback-example" src="https://github.com/user-attachments/assets/97e7a5d4-2a1f-4c56-985e-62ae9b7956d5" />
 
 *Utilizando callback para capturar acurácia do modelo durante o treino*
 
@@ -78,7 +78,7 @@ Importante reforçar que o jni por enquanto suporta apenas windows_x64 e que usa
 
 Para melhorar o refinamento de treino, é possível utilizar Scherdulers, tipicamente usados para evitar saltos muito grandes no meio-fim do treino. Eles alteram a taxa de aprendizado do otimizador usado com o objetivo de melhorar a convergência e estabilidade ao decorrer do treino.
 
-<img width="966" height="424" alt="Image" src="https://github.com/user-attachments/assets/b09c2b75-7fa3-4ceb-bbdb-29c85ba5aa60" />
+<img width="840" height="732" alt="scheduler-example" src="https://github.com/user-attachments/assets/db76cc3d-aaf0-4abe-8e23-a93f0622ff2e" />
 
 *Configurando um scheduler*
 
