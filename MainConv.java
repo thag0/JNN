@@ -105,8 +105,8 @@ public class MainConv {
 
 		switch (dataset.toLowerCase().trim()) {
 			case "mnist":	
-				train = MNIST.treino();
-				test = MNIST.teste();
+				train = MNIST.train();
+				test  = MNIST.test();
 			break;
 
 			case "cifar10":
@@ -115,7 +115,7 @@ public class MainConv {
 					new float[]{0.247f,  0.243f,  0.261f}
 				);//peguei de um forum do pytorch
 				
-				train = CIFAR10.treino();
+				train = CIFAR10.train();
 				train.setTransformX(new Compose(
 					new ColorJitter(.2, .2, .2),
 					new HFlip(0.5),
@@ -124,7 +124,7 @@ public class MainConv {
 					new CutOut(8)
 				));
 					
-				test = CIFAR10.teste().applyX(norm);
+				test = CIFAR10.test().applyX(norm);
 				test.applyY(new LabelSmoothing(1e-1));
 			break;
 

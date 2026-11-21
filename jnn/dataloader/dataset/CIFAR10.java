@@ -69,7 +69,7 @@ public class CIFAR10 {
      * Carrega todo o conjunto de dados de treino do dataset {@code CIFAR-10}.
      * @return {@code DataLoader} com dados lidos.
      */
-    public static DataLoader treino() {
+    public static DataLoader train() {
         return carregarTreino();
     }
 
@@ -77,7 +77,7 @@ public class CIFAR10 {
      * Carrega todo o conjunto de dados de teste do dataset {@code CIFAR-10}.
      * @return {@code DataLoader} com dados lidos.
      */
-    public static DataLoader teste() {
+    public static DataLoader test() {
         return carregarTeste();
     }
 

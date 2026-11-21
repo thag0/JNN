@@ -63,7 +63,7 @@ public class FashionMNIST {
      * Carrega todo o conjunto de dados de treino do dataset {@code Fashion MNIST}.
      * @return {@code DataLoader} com dados lidos.
      */
-    public static DataLoader treino() {
+    public static DataLoader train() {
         return carregar("treino-x", "treino-y");
     }
     
@@ -71,7 +71,7 @@ public class FashionMNIST {
      * Carrega todo o conjunto de dados de teste do dataset {@code Fashion MNIST}.
      * @return {@code DataLoader} com dados lidos.
      */
-    public static DataLoader teste() {
+    public static DataLoader test() {
         return carregar("teste-x", "teste-y");
     }
 

@@ -104,7 +104,7 @@ public abstract class Optimizer {
 	 * @return buffer formatado.
 	 */
 	public String info() {
-		return info.toString();
+		return info.toString() + ")";
 	}
 
 	/**
@@ -115,8 +115,7 @@ public abstract class Optimizer {
 		info = new StringBuilder();
 		
 		info
-		.append("Otimizador")
-		.append(" = [\n")
+		.append("Optimizer (\n")
 		.append(pad)
 		.append(name())
 		.append("\n");
@@ -136,7 +135,7 @@ public abstract class Optimizer {
 	 * Exibe, {@code via terminal}, as informações do otimizador.
 	 */
 	public void print() {
-		System.out.println(info() + "]");
+		System.out.println(info());
 	}
 
 	/**
@@ -145,5 +144,10 @@ public abstract class Optimizer {
 	 */
 	public String name() {
 		return getClass().getSimpleName();
+	}
+
+	@Override
+	public String toString() {
+		return info();	
 	}
 }
