@@ -343,14 +343,14 @@ public class Sequential extends Model {
 		final String pad = " ".repeat(4);
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append(name()).append(" [\n");
+		sb.append(name()).append(" (\n");
 
 		int larguraId = String.valueOf(numLayers() - 1).length();
 
 		sb.append(
 			pad + String.format(
 				"%-" + (larguraId + 3 + 16) + "s%-23s%-23s%-23s\n",
-				"Camada", "Entrada", "Saída", "Parâmetros"
+				"Layer", "Input", "Output", "Parameters"
 			)
 		);
 
@@ -372,11 +372,11 @@ public class Sequential extends Model {
 		sb.append("\n");
 
 		// Função de perda
-		sb.append(pad).append("Perda: ").append(_loss.name());
+		sb.append(pad).append("Loss: ").append(_loss.name());
 
 		String params = String.format("%,d", numParams());
 		sb.append("\n");
-		sb.append(pad).append("Parâmetros: ").append(params).append("\n");
+		sb.append(pad).append("Parameters: ").append(params).append("\n");
 		
 		long tamParams = 0;
 		for (Layer camada : this) {
@@ -386,11 +386,11 @@ public class Sequential extends Model {
 				}
 			}
 		}
-		sb.append(pad).append("Tamanho Params: ").append(JNNutils.formatSizeBytes(tamParams)).append("\n");
+		sb.append(pad).append("Param size: ").append(JNNutils.formatSizeBytes(tamParams)).append("\n");
 		
-		sb.append(pad).append("Tamanho Total: ").append(JNNutils.formatSizeBytes(sizeBytes())).append("\n");
+		sb.append(pad).append("Total size: ").append(JNNutils.formatSizeBytes(sizeBytes())).append("\n");
 
-		sb.append("]");
+		sb.append(")");
 
 		return sb.toString();
 	}

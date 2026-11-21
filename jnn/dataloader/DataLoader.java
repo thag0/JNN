@@ -550,20 +550,20 @@ public class DataLoader implements Iterable<Sample> {
 
         String n = new DecimalFormat("#,###").format(len()).replaceAll(",", ".");
 
-        sb.append("DataLoader = [\n");
-        sb.append(pad).append("Amostras: ").append(n).append("\n");
+        sb.append("DataLoader = (\n");
+        sb.append(pad).append("Samples: ").append(n).append("\n");
         
         if (len() > 0) {
             sb.append(pad).append("Shape X: ").append(data[0].x().shapeStr()).append("\n");
             sb.append(pad).append("Shape Y: ").append(data[0].y().shapeStr()).append("\n");
         }
 
-        sb.append(pad).append("Tamanho: ").append(JNNutils.formatSizeBytes(sizeBytes())).append("\n");
+        sb.append(pad).append("Size: ").append(JNNutils.formatSizeBytes(sizeBytes())).append("\n");
 
         sb.append(pad).append("Tx: ").append(transformX == null ? "-" : transformX.nome()).append("\n");
         sb.append(pad).append("Ty: ").append(transformY == null ? "-" : transformY.nome()).append("\n");
 
-        sb.append("]\n");
+        sb.append(")\n");
 
         return sb.toString();
     }

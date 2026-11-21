@@ -46,13 +46,13 @@ public class MainConv {
 	public static void main(String[] args) {
 		ged.limparConsole();
 		
-		DataLoader[] data = getData("cifar10");
+		DataLoader[] data = getData("mnist");
 		final DataLoader treino = data[0];
 		final DataLoader teste  = data[1];
 
 		treino.print();
 
-		Sequential model = cnnCifar10();
+		Sequential model = cnnMNIST();
 		model.setHistorico(true);
 		model.print();
 		
@@ -219,19 +219,17 @@ public class MainConv {
 		Sequential model = new Sequential(
 			new Input(1, 28, 28),
 
-			new Conv2D(16, convK, "same", "he"),
+			new Conv2D(16, convK),
 			new ReLU(),
 			new MaxPool2D(poolK),
 			
-			new Conv2D(32, convK, "same", "he"),
-			new ReLU(),
-			new Conv2D(64, convK, "same", "he"),
+			new Conv2D(32, convK),
 			new ReLU(),
 			new MaxPool2D(poolK),
 
 			new GlobalAvgPool2D(),
 
-			new Dense(64, "he"),
+			new Dense(50, "he"),
 			new ReLU(),
 
 			new Dense(10, "glorot-uniforme"),
@@ -239,7 +237,7 @@ public class MainConv {
 		);
 
 		Object otm = new SGD(0.01, 0.9);
-		Object loss = "entropia-cruzada";
+		Object loss = "cross-entropy";
 		
 		model.compile(otm, loss);
 

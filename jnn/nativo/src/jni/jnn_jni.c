@@ -28,8 +28,8 @@ JNI_OnLoad(JavaVM* vm, void* reserved) {
     return JNI_VERSION_1_8;
 }
 
-JNIEXPORT void JNICALL
-Java_jnn_core_JNNnative_setTamArena(JNIEnv* env, jclass cls, jlong size_bytes) {
+JNIEXPORT void JNICALL 
+Java_jnn_core_JNNnative_setArenaSize(JNIEnv* env, jclass cls, jlong size_bytes) {
     (void) cls;
 
     if (size_bytes <= 0) {
