@@ -36,7 +36,7 @@ public class MainConv {
 
 	// controle de treino
 	static final int TREINO_EPOCAS = 30;
-	static final int TREINO_LOTE = 64;
+	static final int TREINO_LOTE = 32;
 	static final boolean TREINO_LOGS = true;
 
 	// caminhos de arquivos externos
@@ -46,13 +46,13 @@ public class MainConv {
 	public static void main(String[] args) {
 		ged.limparConsole();
 		
-		DataLoader[] data = getData("mnist");
+		DataLoader[] data = getData("cifar10");
 		final DataLoader treino = data[0];
 		final DataLoader teste  = data[1];
 
 		treino.print();
 
-		Sequential model = cnnMNIST();
+		Sequential model = cnnCifar10();
 		model.setHistorico(true);
 		model.print();
 		
@@ -172,6 +172,14 @@ public class MainConv {
 		Sequential model = new Sequential(
 			new Input(3, 32, 32),
 
+			new Conv2D(16, convK, "same", "he"),
+			new BatchNorm2D(),
+			new ReLU(),
+			new Conv2D(16, convK, "same", "he"),
+			new BatchNorm2D(),
+			new ReLU(),
+			new MaxPool2D(poolK),
+			
 			new Conv2D(32, convK, "same", "he"),
 			new BatchNorm2D(),
 			new ReLU(),
@@ -184,14 +192,6 @@ public class MainConv {
 			new BatchNorm2D(),
 			new ReLU(),
 			new Conv2D(64, convK, "same", "he"),
-			new BatchNorm2D(),
-			new ReLU(),
-			new MaxPool2D(poolK),
-			
-			new Conv2D(128, convK, "same", "he"),
-			new BatchNorm2D(),
-			new ReLU(),
-			new Conv2D(128, convK, "same", "he"),
 			new BatchNorm2D(),
 			new ReLU(),
 			new MaxPool2D(poolK),
