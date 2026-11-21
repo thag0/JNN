@@ -1,7 +1,7 @@
 package jnn.otm;
 
 import jnn.core.JNNutils;
-import jnn.core.Parametro;
+import jnn.core.Parameter;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -19,7 +19,7 @@ public abstract class Otimizador {
 	/**
 	 * Conjunto de elementos que serão otimizados.
 	 */
-	protected Parametro[] _params = {};
+	protected Parameter[] _params = {};
 
 	/**
 	 * Buffer de informações sobre o otimizador.
@@ -57,11 +57,11 @@ public abstract class Otimizador {
 	 * atributos necessários para o otimizador.
 	 * @param params array de {@code Parametro} para otimização.
 	 */
-	protected void initParams(Parametro[] params) {
-		JNNutils.validarNaoNulo(params, "params == null.");
+	protected void initParams(Parameter[] params) {
+		JNNutils.validateNonNull(params, "params == null.");
 		
 		for (int i = 0, n = params.length; i < n; i++) {
-			Parametro p = params[i];
+			Parameter p = params[i];
 			Tensor w = p.weight;
 			Tensor g = p.grad;
 
@@ -80,7 +80,7 @@ public abstract class Otimizador {
 	 * Inicializa os parâmetros necessários do otimizador.
 	 * @param params array de {@code Tensor} contendo os parâmetros desejados.
 	 */
-	public abstract void construir(Parametro[] params);
+	public abstract void construir(Parameter[] params);
 
 	/**
 	 * Executa um passo de atualização do otimizador.

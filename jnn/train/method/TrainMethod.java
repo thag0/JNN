@@ -92,7 +92,7 @@ public abstract class TrainMethod {
 	 * @param ys {@code array} com dados de saída.
 	 */
 	protected <T> void shuffle(T[] xs, T[] ys) {
-		JNNutils.embaralhar(xs, ys, null);
+		JNNutils.shuffle(xs, ys, null);
 	}
 
 	/** 
@@ -115,7 +115,7 @@ public abstract class TrainMethod {
 	 */
 	protected void showTrainLog(String log) {
 		clearLine();
-		JNNlog.logTreino(log);
+		JNNlog.trainLog(log);
 	}
 
 	/**

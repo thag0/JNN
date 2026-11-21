@@ -1,7 +1,7 @@
 package jnn.otm;
 
 import jnn.core.JNNutils;
-import jnn.core.Parametro;
+import jnn.core.Parameter;
 import jnn.core.tensor.Tensor;
 import jnn.core.tensor.TensorData;
 
@@ -110,12 +110,12 @@ public class SGD extends Otimizador {
 	}
 
 	@Override
-	public void construir(Parametro[] params) {
+	public void construir(Parameter[] params) {
 		initParams(params);
 
 		for (var param : _params) {
 			Tensor w = param.weight;
-			m = JNNutils.addEmArray(m, new Tensor(w.shape()));
+			m = JNNutils.addToArray(m, new Tensor(w.shape()));
 		}
 		
 		_construido = true;// otimizador pode ser usado

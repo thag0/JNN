@@ -1,7 +1,7 @@
 package jnn.otm;
 
 import jnn.core.JNNutils;
-import jnn.core.Parametro;
+import jnn.core.Parameter;
 import jnn.core.tensor.Tensor;
 import jnn.core.tensor.TensorData;
 
@@ -106,11 +106,11 @@ public class Lion extends Otimizador {
     }
 
     @Override
-	public void construir(Parametro[] params) {
+	public void construir(Parameter[] params) {
 		initParams(params);
 		
         for (var param : _params) {
-            m = JNNutils.addEmArray(m, new Tensor(param.weight.shape()));
+            m = JNNutils.addToArray(m, new Tensor(param.weight.shape()));
         }
 
 		_construido = true;// otimizador pode ser usado

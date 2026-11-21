@@ -1,7 +1,7 @@
 package jnn.models;
 
 import jnn.core.JNNutils;
-import jnn.core.Parametro;
+import jnn.core.Parameter;
 import jnn.core.tensor.Tensor;
 import jnn.dataloader.DataLoader;
 import jnn.layers.Layer;
@@ -111,7 +111,7 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 	 * @param loss nova função de perda.
 	 */
 	public void setLoss(Loss loss) {
-		_loss = JNNutils.validarNaoNulo(loss, "loss == null.");
+		_loss = JNNutils.validateNonNull(loss, "loss == null.");
 	}
 
 	/**
@@ -126,7 +126,7 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 	 * @param opt novo otimizador.
 	 */
 	public void setOptimizer(Otimizador opt) {
-		_optimizer = JNNutils.validarNaoNulo(opt, "otm == null.");
+		_optimizer = JNNutils.validateNonNull(opt, "otm == null.");
 	}
 
 	/**
@@ -189,9 +189,9 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 	public Tensor[] forward(Tensor[] xs) {
 		validateCompilation();
 
-		JNNutils.validarNaoNulo(xs, "xs == null.");
+		JNNutils.validateNonNull(xs, "xs == null.");
 		
-		Tensor y = forward(JNNutils.concatenar(xs));
+		Tensor y = forward(JNNutils.concat(xs));
 		
 		Tensor[] prevs = new Tensor[xs.length];
 		for (int i = 0; i < xs.length; i++) {
@@ -336,8 +336,8 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 		for (int i = 0; i < n; i += batchSize) {
 			int inicio = i;
 			int fim = Math.min(inicio + batchSize, n);
-			Tensor x = JNNutils.concatenar(JNNutils.subArray(xs, inicio, fim));
-			Tensor y = JNNutils.concatenar(JNNutils.subArray(ys, inicio, fim));
+			Tensor x = JNNutils.concat(JNNutils.subArray(xs, inicio, fim));
+			Tensor y = JNNutils.concat(JNNutils.subArray(ys, inicio, fim));
 			
 			Tensor prev = forward(x);
 
@@ -421,13 +421,13 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 	 * Onde: {@code k = kernel} e {@code b = bias}.
 	 * @return array de {@code Tensor} contendo os parâmetros do modelo.
 	 */
-	public Parametro[] params() {
-		Parametro[] params = {};
+	public Parameter[] params() {
+		Parameter[] params = {};
 
 		for (Layer layer : this) {
 			if (layer.isTreinable()) {
 				for (var p : layer.params()) {
-					params = JNNutils.addEmArray(params, p);
+					params = JNNutils.addToArray(params, p);
 				}
 			}
 		}
@@ -457,7 +457,7 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 	 * @param arr array para cópia.
 	 */
 	public void copyFromOutput(float[] arr) {
-		JNNutils.validarNaoNulo(arr, "arr == null.");
+		JNNutils.validateNonNull(arr, "arr == null.");
 		
 		float[] saida = outputToArray();
 		

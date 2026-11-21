@@ -101,8 +101,8 @@ public class BatchTrain extends TrainMethod {
 	 * @param perdaEpoca valor de perda por época de treinamento.
 	 */
 	private float processoLote(Tensor[] loteX, Tensor[] loteY, Loss loss) {
-		Tensor xs = JNNutils.concatenar(loteX);
-		Tensor ys = JNNutils.concatenar(loteY);
+		Tensor xs = JNNutils.concat(loteX);
+		Tensor ys = JNNutils.concat(loteY);
 		
 		Tensor y = model.forward(xs);
 		Tensor g = loss.backward(y, ys);

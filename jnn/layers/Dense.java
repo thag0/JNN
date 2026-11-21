@@ -2,9 +2,9 @@ package jnn.layers;
 
 import java.util.Optional;
 
-import jnn.core.Dicionario;
+import jnn.core.JNNdict;
 import jnn.core.JNNutils;
-import jnn.core.Parametro;
+import jnn.core.Parameter;
 import jnn.core.tensor.Tensor;
 import jnn.inicializadores.GlorotUniforme;
 import jnn.inicializadores.Inicializador;
@@ -47,13 +47,13 @@ public class Dense extends Layer implements Cloneable {
 	 * entrada com a saída da camada, com formato:
 	 * <pre>kernel = (entrada, neuronios)</pre>
 	 */
-	public Parametro _kernel;
+	public Parameter _kernel;
 
 	/**
 	 * Parâmetro contendo o bias da camada, seu formato se dá por:
 	 * <pre>bias = (neuronios)</pre>
 	 */
-	public Optional<Parametro> _bias;
+	public Optional<Parameter> _bias;
 
 	/**
 	 * Auxiliar na verificação do uso do bias na camada.
@@ -163,9 +163,8 @@ public class Dense extends Layer implements Cloneable {
 		shapeOut[0] = out;
 
 		//usar os valores padrão se necessário
-		Dicionario dic = new Dicionario();
-		if (initKernel != null) this.kernelInit = dic.getInicializador(initKernel);
-		if (initBias != null)  this.biasInit = dic.getInicializador(initBias);
+		if (initKernel != null) this.kernelInit = JNNdict.getInitializer(initKernel);
+		if (initBias != null)  	this.biasInit 	= JNNdict.getInitializer(initBias);
 	}
 
 	/**
@@ -203,7 +202,7 @@ public class Dense extends Layer implements Cloneable {
 	 */
 	@Override
 	public void build(int[] shape) {
-		JNNutils.validarNaoNulo(shape, "shape == null.");
+		JNNutils.validateNonNull(shape, "shape == null.");
 
 		if (shape.length != 1) {
 			throw new IllegalArgumentException(

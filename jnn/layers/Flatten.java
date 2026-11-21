@@ -112,9 +112,9 @@ public class Flatten extends Layer implements Cloneable {
 	 */
 	@Override
 	public void build(int[] shape) {
-		JNNutils.validarNaoNulo(shape, "shape == null.");
+		JNNutils.validateNonNull(shape, "shape == null.");
 
-		if (!JNNutils.apenasMaiorZero(shape)) {
+		if (!JNNutils.isAllPositive(shape)) {
 			throw new IllegalArgumentException(
 				"\nOs valores do formato de entrada devem ser maiores que zero."
 			);

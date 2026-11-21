@@ -6,7 +6,7 @@ import jnn.core.tensor.Tensor;
 /**
  * Conteiner para pesos e bias.
  */
-public class Parametro {
+public class Parameter {
 
     /**
      * Peso.
@@ -20,23 +20,31 @@ public class Parametro {
 
     /**
      * Inicializa um novo parâmetro.
-     * @param nome nome para identificação.
+     * @param name nome para identificação.
      * @param shape formato desejado.
      */
-    public Parametro(String nome, int... shape) {
-        weight = JNN.zeros(shape).name(nome);
-        grad = JNN.zeros(shape).name("grad " + nome);
+    public Parameter(String name, int... shape) {
+        weight = JNN.zeros(shape).name(name);
+        grad = JNN.zeros(shape).name("grad " + name);
     }
 
     /**
      * Inicializa um novo parâmetro a partir de um tensor de base, os valores de peso
      * serão copiados.
-     * @param nome nome para identificação.
+     * @param name nome para identificação.
      * @param like {@code Tensor} base.
      */
-    public Parametro(String nome, Tensor like) {
+    public Parameter(String name, Tensor like) {
         weight = like.clone();
-        grad = JNN.zeros(like.shape()).name("grad " + nome);
+        grad = JNN.zeros(like.shape()).name("grad " + name);
+    }
+
+    /**
+     * Inicializa um novo parâmetro.
+     * @param shape formato desejado.
+     */
+    public Parameter(int... shape) {
+        this("Parameter", shape);
     }
 
     /**
@@ -51,11 +59,11 @@ public class Parametro {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         
-        sb.append("Parametro(")
-        
+        sb.append(name()).append(" (")
+
         .append('"').append(weight.name()).append('"')
         .append(", shape ").append(JNNutils.arrayStr(weight.shape()))
-        .append(", tam: ").append(JNNutils.formatarTamBytes(weight.sizeBytes()))
+        .append(", len: ").append(JNNutils.formatSizeBytes(weight.sizeBytes()))
         
         .append(")");
 
@@ -70,10 +78,18 @@ public class Parametro {
     }
 
     @Override
-    public Parametro clone() {
-        Parametro clone = new Parametro(weight.name(), weight);
+    public Parameter clone() {
+        Parameter clone = new Parameter(weight.name(), weight);
         clone.grad.copy(grad);
         return clone;
+    }
+
+    /**
+     * Retorna o nome do parâmetro, que é o mesmo nome da classe.
+     * @return nome do parâmetro.
+     */
+    public String name() {
+        return getClass().getSimpleName();
     }
 
 }

@@ -1,7 +1,7 @@
 package jnn.otm;
 
 import jnn.core.JNNutils;
-import jnn.core.Parametro;
+import jnn.core.Parameter;
 import jnn.core.tensor.Tensor;
 import jnn.core.tensor.TensorData;
 
@@ -100,15 +100,15 @@ public class Adadelta extends Otimizador {
 	}
 
 	@Override
-	public void construir(Parametro[] params) {
+	public void construir(Parameter[] params) {
 		initParams(params);
 
 		for (var param : _params) {
 			Tensor w = param.weight;
 
-			acg = JNNutils.addEmArray(acg, new Tensor(w.shape()));
-			deltas = JNNutils.addEmArray(deltas, new Tensor(w.shape()));
-			acd = JNNutils.addEmArray(acd, new Tensor(w.shape()));
+			acg = JNNutils.addToArray(acg, new Tensor(w.shape()));
+			deltas = JNNutils.addToArray(deltas, new Tensor(w.shape()));
+			acd = JNNutils.addToArray(acd, new Tensor(w.shape()));
 		}
 
 		_construido = true;// otimizador pode ser usado

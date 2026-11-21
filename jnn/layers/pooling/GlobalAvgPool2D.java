@@ -103,7 +103,7 @@ public class GlobalAvgPool2D extends Layer implements Cloneable {
 
     @Override
     public void build(int[] shape) {
-        JNNutils.validarNaoNulo(shape, "shape == null.");
+        JNNutils.validateNonNull(shape, "shape == null.");
 
 		if (shape.length != 3) {
 			throw new IllegalArgumentException(
@@ -112,7 +112,7 @@ public class GlobalAvgPool2D extends Layer implements Cloneable {
 			);
 		}
 
-		if (!JNNutils.apenasMaiorZero(shape)) {
+		if (!JNNutils.isAllPositive(shape)) {
 			throw new IllegalArgumentException(
 				"\nOs valores de dimensões de entrada para a camada " + name() + 
 				" devem ser maiores que zero."

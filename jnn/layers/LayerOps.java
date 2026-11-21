@@ -6,7 +6,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 
 import jnn.core.JNNnative;
-import jnn.core.Parametro;
+import jnn.core.Parameter;
 import jnn.core.ops.Ops;
 import jnn.core.parallel.JNNparallel;
 import jnn.core.tensor.Tensor;
@@ -39,7 +39,7 @@ public class LayerOps {
 	 * @param out {@code Tensor} de destino do resultado.
 	 * @see jnn.layers.Dense Densa
 	 */
-	public void forwardDense(Tensor in, Parametro kernel, Optional<Parametro> bias, Tensor out) {
+	public void forwardDense(Tensor in, Parameter kernel, Optional<Parameter> bias, Tensor out) {
 		out.zero();// zerar acumulos anteriores
 
 		ops.matmul(in, kernel.weight, out);
@@ -67,7 +67,7 @@ public class LayerOps {
 	 * @param gradIn {@code Tensor} contendo o gradiente em relação à entrada da camada.
 	 * @see jnn.layers.Dense Densa
 	 */
-	public void backwardDense(Tensor in, Parametro kernel, Tensor grad, Optional<Parametro> bias, Tensor gradIn) {
+	public void backwardDense(Tensor in, Parameter kernel, Tensor grad, Optional<Parameter> bias, Tensor gradIn) {
 		gradIn.zero();// zerar acumulaçoes anteriores
 		
 		final int gradDim = grad.numDim();
@@ -100,8 +100,8 @@ public class LayerOps {
 	 */
 	public void forwardConv2D(
 		Tensor in,
-		Parametro kernel,
-		Optional<Parametro> bias,
+		Parameter kernel,
+		Optional<Parameter> bias,
 		Tensor out,
 		int[] padding) {
 
@@ -125,8 +125,8 @@ public class LayerOps {
 	 */
 	private void runConv2DForward(
 		Tensor in,
-		Parametro kernel,
-		Optional<Parametro> bias,
+		Parameter kernel,
+		Optional<Parameter> bias,
 		Tensor out,
 		int[] pad) {
 		
@@ -235,9 +235,9 @@ public class LayerOps {
 	 */
 	public void backwardConv2D(
 		Tensor in, 
-		Parametro kernel, 
+		Parameter kernel, 
 		Tensor grad,  
-		Optional<Parametro> bias, 
+		Optional<Parameter> bias, 
 		Tensor gradIn, 
 		int[] pad) {
 
@@ -271,9 +271,9 @@ public class LayerOps {
 	 */
 	private void runConv2DBackward(
 		Tensor in,
-		Parametro kernel,
+		Parameter kernel,
 		Tensor grad,
-		Optional<Parametro> bias,
+		Optional<Parameter> bias,
 		Tensor gradIn,
 		int[] pad) {
 
@@ -885,8 +885,8 @@ public class LayerOps {
 	 */
 	public void forwardBatchNorm2D(
 		Tensor entrada,
-		Parametro gamma,
-		Parametro beta,
+		Parameter gamma,
+		Parameter beta,
 		Tensor entradaNorm,
 		Tensor mediaMovel,
 		Tensor varianciaMovel,
@@ -1020,8 +1020,8 @@ public class LayerOps {
 		Tensor gradE,
 		Tensor entradaNorm,
 		Tensor variancia,
-		Parametro gamma,
-		Parametro beta,
+		Parameter gamma,
+		Parameter beta,
 		Tensor gradS,
 		float eps) {
 

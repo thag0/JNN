@@ -61,7 +61,7 @@ public class JNNlog {
      * Exibe um log específico para o treino.
      * @param info informação.
      */
-    public static void logTreino(String info) {
+    public static void trainLog(String info) {
         if (info != null) {
             System.out.print("\r" + info);
         }        

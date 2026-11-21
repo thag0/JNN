@@ -7,7 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import jnn.core.Dicionario;
+import jnn.core.JNNdict;
 import jnn.core.JNNutils;
 import jnn.io.seriais.SerialBase;
 import jnn.io.seriais.camadas.LayerSerializer;
@@ -97,7 +97,6 @@ public class JNNserial extends SerialBase {
 			throw new IllegalArgumentException("O caminho deve conter a extensão " + formatoModelo);
         }
 		
-		Dicionario dicio = new Dicionario();
 		Layer[] layers = {};
 		String strOptim = "";
 		String strLoss 	= "";
@@ -112,75 +111,75 @@ public class JNNserial extends SerialBase {
 
 				switch (nomeCamada) {
 					case "dense":
-						layers = JNNutils.addEmArray(layers, (Dense) serializer.read(in, nomeCamada));
+						layers = JNNutils.addToArray(layers, (Dense) serializer.read(in, nomeCamada));
 					break;
 
 					case "conv2d":
-						layers = JNNutils.addEmArray(layers, (Conv2D) serializer.read(in, nomeCamada));
+						layers = JNNutils.addToArray(layers, (Conv2D) serializer.read(in, nomeCamada));
 					break;
 
 					case "batchnorm2d":
-						layers = JNNutils.addEmArray(layers, (BatchNorm2D) serializer.read(in, nomeCamada));
+						layers = JNNutils.addToArray(layers, (BatchNorm2D) serializer.read(in, nomeCamada));
 					break;
 
 					case "flatten":
-						layers = JNNutils.addEmArray(layers, (Flatten) serializer.read(in, nomeCamada));
+						layers = JNNutils.addToArray(layers, (Flatten) serializer.read(in, nomeCamada));
 					break;
 
 					case "maxpool2d":
-						layers = JNNutils.addEmArray(layers, (MaxPool2D) serializer.read(in, nomeCamada));
+						layers = JNNutils.addToArray(layers, (MaxPool2D) serializer.read(in, nomeCamada));
 					break;
 
 					case "avgpool2d":
-						layers = JNNutils.addEmArray(layers, (AvgPool2D) serializer.read(in, nomeCamada));
+						layers = JNNutils.addToArray(layers, (AvgPool2D) serializer.read(in, nomeCamada));
 					break;
 
 					case "globalavgpool2d":
-						layers = JNNutils.addEmArray(layers, (GlobalAvgPool2D) serializer.read(in, nomeCamada));
+						layers = JNNutils.addToArray(layers, (GlobalAvgPool2D) serializer.read(in, nomeCamada));
 					break;
 
 					case "dropout":
-						layers = JNNutils.addEmArray(layers, (Dropout) serializer.read(in, nomeCamada));
+						layers = JNNutils.addToArray(layers, (Dropout) serializer.read(in, nomeCamada));
 					break;
 
 					case "elu":
-						layers = JNNutils.addEmArray(layers, (ELU) serializer.read(in, nomeCamada));
+						layers = JNNutils.addToArray(layers, (ELU) serializer.read(in, nomeCamada));
 					break;
 					
 					case "gelu":
-						layers = JNNutils.addEmArray(layers, (GELU) serializer.read(in, nomeCamada));
+						layers = JNNutils.addToArray(layers, (GELU) serializer.read(in, nomeCamada));
 					break;
 
 					case "leakyrelu":
-						layers = JNNutils.addEmArray(layers, (LeakyReLU) serializer.read(in, nomeCamada));
+						layers = JNNutils.addToArray(layers, (LeakyReLU) serializer.read(in, nomeCamada));
 					break;
 
 					case "relu":
-						layers = JNNutils.addEmArray(layers, (ReLU) serializer.read(in, nomeCamada));
+						layers = JNNutils.addToArray(layers, (ReLU) serializer.read(in, nomeCamada));
 					break;
 
 					case "selu":
-						layers = JNNutils.addEmArray(layers, (SELU) serializer.read(in, nomeCamada));
+						layers = JNNutils.addToArray(layers, (SELU) serializer.read(in, nomeCamada));
 					break;
 
 					case "sigmoid":
-						layers = JNNutils.addEmArray(layers, (Sigmoid) serializer.read(in, nomeCamada));
+						layers = JNNutils.addToArray(layers, (Sigmoid) serializer.read(in, nomeCamada));
 					break;
 						
 					case "softmax":
-						layers = JNNutils.addEmArray(layers, (Softmax) serializer.read(in, nomeCamada));
+						layers = JNNutils.addToArray(layers, (Softmax) serializer.read(in, nomeCamada));
 					break;
 
 					case "softplus":
-						layers = JNNutils.addEmArray(layers, (Softplus) serializer.read(in, nomeCamada));
+						layers = JNNutils.addToArray(layers, (Softplus) serializer.read(in, nomeCamada));
 					break;
 
 					case "swish":
-						layers = JNNutils.addEmArray(layers, (Swish) serializer.read(in, nomeCamada));
+						layers = JNNutils.addToArray(layers, (Swish) serializer.read(in, nomeCamada));
 					break;
 
 					case "tanh":
-						layers = JNNutils.addEmArray(layers, (Tanh) serializer.read(in, nomeCamada));
+						layers = JNNutils.addToArray(layers, (Tanh) serializer.read(in, nomeCamada));
 					break;
 				
 					default:
@@ -205,9 +204,9 @@ public class JNNserial extends SerialBase {
 			model.layer(i).setId(i);
 		}
 
-		model.setOptimizer(dicio.getOtimizador(strOptim));
+		model.setOptimizer(JNNdict.getOptim(strOptim));
 		model.optim().construir(model.params());
-		model.setLoss(dicio.getLoss(strLoss));
+		model.setLoss(JNNdict.getLoss(strLoss));
 
 		return model;
 	}

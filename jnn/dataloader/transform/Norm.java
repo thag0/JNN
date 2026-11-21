@@ -31,8 +31,8 @@ public class Norm implements Transform {
      * @param desvp valores de desvio padrão.
      */
     public Norm(float[] media, float[] desvp) {
-        JNNutils.validarNaoNulo(media, "media == null");
-        JNNutils.validarNaoNulo(desvp, "desvp == null");
+        JNNutils.validateNonNull(media, "media == null");
+        JNNutils.validateNonNull(desvp, "desvp == null");
 
         if (media.length != desvp.length) {
             throw new IllegalArgumentException(
@@ -40,7 +40,7 @@ public class Norm implements Transform {
             );
         }
 
-        if (!JNNutils.apenasMaiorZero(desvp)) {
+        if (!JNNutils.isAllPositive(desvp)) {
             throw new IllegalArgumentException(
                 "\nDesvp não pode conter valores menores que zero."
             );

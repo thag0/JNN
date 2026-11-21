@@ -27,10 +27,10 @@ JNIEXPORT void JNICALL Java_jnn_core_JNNnative_setBackend
 
 /*
  * Class:     jnn_core_JNNnative
- * Method:    setTamArena
+ * Method:    setArenaSize
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_jnn_core_JNNnative_setTamArena
+JNIEXPORT void JNICALL Java_jnn_core_JNNnative_setArenaSize
   (JNIEnv *, jclass, jlong);
 
 /*

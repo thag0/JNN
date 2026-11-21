@@ -2,7 +2,7 @@ package jnn.models;
 
 import java.util.Iterator;
 
-import jnn.core.Dicionario;
+import jnn.core.JNNdict;
 import jnn.core.JNNutils;
 import jnn.layers.Input;
 import jnn.layers.Layer;
@@ -190,7 +190,7 @@ public class Sequential extends Model {
 	public Sequential(Layer... ls) {
 		this();// evitar repetição de código
 
-		JNNutils.validarNaoNulo(ls, "camadas == null.");
+		JNNutils.validateNonNull(ls, "camadas == null.");
 
 		if (ls.length < 1) {
 			throw new IllegalArgumentException(
@@ -216,7 +216,7 @@ public class Sequential extends Model {
 	 * @throws IllegalArgumentException se a camada fornecida for nula,
 	 */
 	public void add(Layer l) {
-		_layers = JNNutils.addEmArray(_layers, l);
+		_layers = JNNutils.addToArray(_layers, l);
 		_compiled = false;
 	}
 
@@ -286,10 +286,9 @@ public class Sequential extends Model {
 			layer.setId(i);
 		}
 		
-		Dicionario dicio = new Dicionario();
-		_loss = dicio.getLoss(loss);
+		_loss = JNNdict.getLoss(loss);
 		
-		_optimizer = dicio.getOtimizador(optim);
+		_optimizer = JNNdict.getOptim(optim);
 		_optimizer.construir(params());
 		
 		_compiled = true;// modelo pode ser usado.
@@ -387,9 +386,9 @@ public class Sequential extends Model {
 				}
 			}
 		}
-		sb.append(pad).append("Tamanho Params: ").append(JNNutils.formatarTamBytes(tamParams)).append("\n");
+		sb.append(pad).append("Tamanho Params: ").append(JNNutils.formatSizeBytes(tamParams)).append("\n");
 		
-		sb.append(pad).append("Tamanho Total: ").append(JNNutils.formatarTamBytes(sizeBytes())).append("\n");
+		sb.append(pad).append("Tamanho Total: ").append(JNNutils.formatSizeBytes(sizeBytes())).append("\n");
 
 		sb.append("]");
 
@@ -410,9 +409,8 @@ public class Sequential extends Model {
 		clone.trainHistory = this.trainHistory;
 		clone.name = "Clone de " + name();
 		
-		Dicionario dicio = new Dicionario();
-		clone._optimizer = dicio.getOtimizador(_optimizer.nome());
-		clone._loss = dicio.getLoss(_loss.name());
+		clone._optimizer = JNNdict.getOptim(_optimizer.nome());
+		clone._loss 	 = JNNdict.getLoss(_loss.name());
 		clone._trainer = new Trainer(clone);
 		
 		int nCamadas = numLayers();

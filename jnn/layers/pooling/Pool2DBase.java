@@ -90,8 +90,8 @@ public abstract class Pool2DBase extends Layer {
      * @param stride formato dos strides {@code altura, largura}.
      */
     protected Pool2DBase(int[] filtro, int[] stride) {
-		JNNutils.validarNaoNulo(filtro, "filtro == null.");
-        JNNutils.validarNaoNulo(stride, "stride == null.");
+		JNNutils.validateNonNull(filtro, "filtro == null.");
+        JNNutils.validateNonNull(stride, "stride == null.");
 
 		if (filtro.length != 2) {
 			throw new IllegalArgumentException(
@@ -99,7 +99,7 @@ public abstract class Pool2DBase extends Layer {
 			);
 		}
 
-		if (!JNNutils.apenasMaiorZero(filtro)) {
+		if (!JNNutils.isAllPositive(filtro)) {
 			throw new IllegalArgumentException(
 				"\nOs valores de dimensões do filtro devem ser maiores que zero."
 			);
@@ -111,7 +111,7 @@ public abstract class Pool2DBase extends Layer {
 			);
 		}
 
-		if (!JNNutils.apenasMaiorZero(stride)) {
+		if (!JNNutils.isAllPositive(stride)) {
 			throw new IllegalArgumentException(
 				"\nOs valores para os strides devem ser maiores que zero."
 			);
@@ -123,7 +123,7 @@ public abstract class Pool2DBase extends Layer {
 
     @Override
     public void build(int[] shape) {
-		JNNutils.validarNaoNulo(shape, "shape == null.");
+		JNNutils.validateNonNull(shape, "shape == null.");
 		
 		if (shape.length != 3) {
 			throw new IllegalArgumentException(

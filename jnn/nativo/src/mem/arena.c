@@ -44,7 +44,7 @@ static void* arena_alloc_ex(arena_t* arena, size_t size_bytes, bool zero) {
             arena->capacidade, capacidade, unidade
         );
 
-        fprintf(stderr," considere pre-alocar mais memoria com JNNnative.setTamArena().\n");
+        fprintf(stderr," considere pre-alocar mais memoria com JNNnative.setArenaSize(size_bytes).\n");
 
         exit(EXIT_FAILURE);
     }

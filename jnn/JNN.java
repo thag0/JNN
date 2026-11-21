@@ -1,6 +1,6 @@
 package jnn;
 
-import jnn.core.Dicionario;
+import jnn.core.JNNdict;
 import jnn.core.JNNutils;
 import jnn.core.ops.Ops;
 import jnn.core.tensor.Tensor;
@@ -27,11 +27,6 @@ import java.util.random.RandomGenerator;
  * Interface de funcionalidades da biblioteca.
  */
 public final class JNN {
-
-    /**
-     * Dicionário de recursos.
-     */
-    private static Dicionario dicio = new Dicionario();
     
     /**
      * Operador para tensores.
@@ -565,7 +560,7 @@ public final class JNN {
      * @return {@code Otimizador} buscado.
      */
     public static Otimizador getOtimizador(String otm) {
-        return dicio.getOtimizador(otm);
+        return JNNdict.getOptim(otm);
     }
 
     /**
@@ -574,7 +569,7 @@ public final class JNN {
      * @return {@code Perda} buscada.
      */
     public static Loss getPerda(String loss) {
-        return dicio.getLoss(loss);
+        return JNNdict.getLoss(loss);
     }
 
     /**
@@ -583,7 +578,7 @@ public final class JNN {
      * @return {@code Inicializador} buscado.
      */
     public static Inicializador getInicializador(String ini) {
-        return dicio.getInicializador(ini);
+        return JNNdict.getInitializer(ini);
     }
 
     // transformações de dados
@@ -594,7 +589,7 @@ public final class JNN {
      * @return array de {@code Tensores}
      */
     public static Tensor[] arrayParaTensores(float[] arr) {
-        return JNNutils.arrayParaTensores(arr);
+        return JNNutils.arrayToTensors(arr);
     }
 
     /**
@@ -603,7 +598,7 @@ public final class JNN {
      * @return array de {@code Tensores}
      */
     public static Tensor[] arrayParaTensores(float[][] arr) {
-        return JNNutils.arrayParaTensores(arr);
+        return JNNutils.arrayToTensors(arr);
     }
 
     /**
@@ -612,7 +607,7 @@ public final class JNN {
      * @return array de {@code Tensores}
      */
     public static Tensor[] arrayParaTensores(float[][][] arr) {
-        return JNNutils.arrayParaTensores(arr);
+        return JNNutils.arrayToTensors(arr);
     }
 
     /**
@@ -621,7 +616,7 @@ public final class JNN {
      * @return array de {@code Tensores}
      */
     public static Tensor[] arrayParaTensores(float[][][][] arr) {
-        return JNNutils.arrayParaTensores(arr);
+        return JNNutils.arrayToTensors(arr);
     }
 
 	/**

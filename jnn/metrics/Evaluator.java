@@ -33,7 +33,7 @@ public class Evaluator {
 	 * @param model modelo base.
 	 */
 	public Evaluator(Model model) {
-		this.model = JNNutils.validarNaoNulo(model, "model == null");
+		this.model = JNNutils.validateNonNull(model, "model == null");
 	}
 
 	/**
@@ -54,8 +54,8 @@ public class Evaluator {
 	 */
 	public Tensor mse(Tensor[] prev, Tensor[] real) {
 		return mse(
-			JNNutils.concatenar(prev),
-			JNNutils.concatenar(real)
+			JNNutils.concat(prev),
+			JNNutils.concat(real)
 		);
 	}
 
@@ -79,8 +79,8 @@ public class Evaluator {
 	 */
 	public Tensor msle(Tensor[] prev, Tensor[] real) {
 		return msle(
-			JNNutils.concatenar(prev),
-			JNNutils.concatenar(real)
+			JNNutils.concat(prev),
+			JNNutils.concat(real)
 		);
 	}
 
@@ -102,8 +102,8 @@ public class Evaluator {
 	 */
 	public Tensor mae(Tensor[] prev, Tensor[] real) {
 		return mae(
-			JNNutils.concatenar(prev),
-			JNNutils.concatenar(real)
+			JNNutils.concat(prev),
+			JNNutils.concat(real)
 		);
 	}
 
@@ -125,8 +125,8 @@ public class Evaluator {
 	 */
 	public Tensor rmse(Tensor[] prev, Tensor[] real) {
 		return rmse(
-			JNNutils.concatenar(prev),
-			JNNutils.concatenar(real)
+			JNNutils.concat(prev),
+			JNNutils.concat(real)
 		);
 	}
 
@@ -150,8 +150,8 @@ public class Evaluator {
 	 */
 	public Tensor crossEntropy(Tensor[] prev, Tensor[] real) {  
 		return crossEntropy(
-			JNNutils.concatenar(prev),
-			JNNutils.concatenar(real)
+			JNNutils.concat(prev),
+			JNNutils.concat(real)
 		);
 	}
 
@@ -175,8 +175,8 @@ public class Evaluator {
 	 */
 	public Tensor binaryCrossEntropy(Tensor[] prev, Tensor[] real) {
 		return binaryCrossEntropy(
-			JNNutils.concatenar(prev),
-			JNNutils.concatenar(real)
+			JNNutils.concat(prev),
+			JNNutils.concat(real)
 		);
 	}
 

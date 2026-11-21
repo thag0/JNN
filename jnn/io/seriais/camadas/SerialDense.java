@@ -4,7 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import jnn.core.Parametro;
+import jnn.core.Parameter;
 import jnn.io.seriais.SerialBase;
 import jnn.io.seriais.SerialLayer;
 import jnn.layers.Dense;
@@ -33,7 +33,7 @@ class SerialDense extends SerialBase implements SerialLayer<Dense> {
 	
 		write(dos, layer.hasBias());
 		
-		Parametro[] params = layer.params();
+		Parameter[] params = layer.params();
 
 		float[] kernel = params[0].weight.data().toArray();
 		write(dos, kernel);
@@ -58,7 +58,7 @@ class SerialDense extends SerialBase implements SerialLayer<Dense> {
 		layer.setBias(hasBias);
 		layer.build(shapeIn);
 		
-		Parametro[] params = layer.params();
+		Parameter[] params = layer.params();
 		params[0].weight.copyElements(kernel);
 		if (hasBias) params[1].weight.copyElements(bias);
 

@@ -4,7 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import jnn.core.Parametro;
+import jnn.core.Parameter;
 import jnn.io.seriais.SerialBase;
 import jnn.io.seriais.SerialLayer;
 import jnn.layers.BatchNorm2D;
@@ -29,7 +29,7 @@ public class SerialBatchNorm extends SerialBase implements SerialLayer<BatchNorm
         write(dos, layer.eps());
         write(dos, layer.momentum());
 
-        Parametro[] params = layer.params();
+        Parameter[] params = layer.params();
         write(dos, params[0].weight.data().toArray());//gamma
         write(dos, params[1].weight.data().toArray());//beta
     
@@ -51,7 +51,7 @@ public class SerialBatchNorm extends SerialBase implements SerialLayer<BatchNorm
         BatchNorm2D layer = new BatchNorm2D(momentum, eps);
         layer.build(shapeIn);
 
-        Parametro[] params = layer.params();
+        Parameter[] params = layer.params();
         params[0].weight.copyElements(gamma);
         params[1].weight.copyElements(beta);
     

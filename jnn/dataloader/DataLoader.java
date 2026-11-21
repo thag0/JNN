@@ -126,7 +126,7 @@ public class DataLoader implements Iterable<Sample> {
             }
         }
 
-        data = JNNutils.addEmArray(data, s);
+        data = JNNutils.addToArray(data, s);
     }
 
     /**
@@ -156,7 +156,7 @@ public class DataLoader implements Iterable<Sample> {
      * @see jnn.core.JNNutils JNNutils. 
      */
     public void suffle() {
-        JNNutils.embaralhar(data, null);
+        JNNutils.shuffle(data, null);
     }
 
     /**
@@ -165,7 +165,7 @@ public class DataLoader implements Iterable<Sample> {
      * @see jnn.core.JNNutils JNNutils. 
      */
     public void shuffle(Random rng) {
-        JNNutils.embaralhar(data, rng);
+        JNNutils.shuffle(data, rng);
     }
 
     /**
@@ -234,7 +234,7 @@ public class DataLoader implements Iterable<Sample> {
      * @return {@code DataLoader} alterado.
      */
     public DataLoader setTransformX(Transform tf) {
-        this.transformX = JNNutils.validarNaoNulo(tf, "tf == null");;
+        this.transformX = JNNutils.validateNonNull(tf, "tf == null");;
         return this;
     }
 
@@ -558,7 +558,7 @@ public class DataLoader implements Iterable<Sample> {
             sb.append(pad).append("Shape Y: ").append(data[0].y().shapeStr()).append("\n");
         }
 
-        sb.append(pad).append("Tamanho: ").append(JNNutils.formatarTamBytes(sizeBytes())).append("\n");
+        sb.append(pad).append("Tamanho: ").append(JNNutils.formatSizeBytes(sizeBytes())).append("\n");
 
         sb.append(pad).append("Tx: ").append(transformX == null ? "-" : transformX.nome()).append("\n");
         sb.append(pad).append("Ty: ").append(transformY == null ? "-" : transformY.nome()).append("\n");

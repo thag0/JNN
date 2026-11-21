@@ -109,10 +109,11 @@ public final class JNNutils {
 	 * @param arr array base.
 	 * @return último índice.
 	 */
-	public static int ultimoIndice(int[] arr) {
+	public static int lastIndex(int[] arr) {
 		if (arr.length == 0) {
 			throw new IllegalArgumentException("\nArray de tamanho 0.");
 		}
+
 		return arr.length-1;
 	}
 
@@ -121,7 +122,7 @@ public final class JNNutils {
 	 * @param arr array base.
 	 * @return resultado da verificação.
 	 */
-	public static boolean apenasMaiorZero(int[] arr) {
+	public static boolean isAllPositive(int[] arr) {
 		for (int i = 0; i < arr.length; i++) {
 			if (arr[i] < 1) return false;
 		}
@@ -134,7 +135,7 @@ public final class JNNutils {
 	 * @param arr array base.
 	 * @return resultado da verificação.
 	 */
-	public static boolean apenasMaiorZero(float[] arr) {
+	public static boolean isAllPositive(float[] arr) {
 		for (int i = 0; i < arr.length; i++) {
 			if (arr[i] < 0) return false;
 		}
@@ -189,75 +190,75 @@ public final class JNNutils {
 	/**
 	 * Converte um array primitivo para um array de tensores, cada tensor
 	 * contendo um único valor do array.
-	 * @param array array desejado.
+	 * @param arr array desejado.
 	 * @return array de {@code Tensores}.
 	 */
-	public static Tensor[] arrayParaTensores(float[] array) {
-		int n = array.length;
+	public static Tensor[] arrayToTensors(float[] arr) {
+		int n = arr.length;
 
-		Tensor[] arr = new Tensor[n];
+		Tensor[] newArr = new Tensor[n];
 		for (int i = 0; i < n; i++) {
-			arr[i] = new Tensor(1).set(array[i], 0);
-			arr[i].name("amostra " + i);// ajudar no debug
+			newArr[i] = new Tensor(1).set(arr[i], 0);
+			newArr[i].name("amostra " + i);// ajudar no debug
 		}
 
-		return arr;
+		return newArr;
 	}
 
 	/**
 	 * Converte um array primitivo para um array de tensores, cada tensor contendo
 	 * um {@code array1D}.
-	 * @param array array desejado.
+	 * @param arr array desejado.
 	 * @return array de {@code Tensores}.
 	 */
-	public static Tensor[] arrayParaTensores(float[][] array) {
-		int lin = array.length;
-		int col = array[0].length;
+	public static Tensor[] arrayToTensors(float[][] arr) {
+		int lin = arr.length;
+		int col = arr[0].length;
 
-		Tensor[] arr = new Tensor[lin];
+		Tensor[] newArr = new Tensor[lin];
 		for (int i = 0; i < lin; i++) {
-			arr[i] = new Tensor(col);
-			arr[i].copyElements(array[i]);
-			arr[i].name("amostra " + i);// ajudar no debug
+			newArr[i] = new Tensor(col);
+			newArr[i].copyElements(arr[i]);
+			newArr[i].name("amostra " + i);// ajudar no debug
 		}
 
-		return arr;
+		return newArr;
 	}
 
 	/**
 	 * Converte um array primitivo para um array de tensores, cada tensor contendo
 	 * um {@code array2D}.
-	 * @param array array desejado.
+	 * @param arr array desejado.
 	 * @return array de {@code Tensores}.
 	 */
-	public static Tensor[] arrayParaTensores(float[][][] array) {
-		Tensor[] arr = new Tensor[array.length];
+	public static Tensor[] arrayToTensors(float[][][] arr) {
+		Tensor[] newArr = new Tensor[arr.length];
 
-		int n = array.length;
+		int n = arr.length;
 		for (int i = 0; i < n; i++) {
-			arr[i] = new Tensor(array[i]);
-			arr[i].name("amostra " + i);// ajudar no debug
+			newArr[i] = new Tensor(arr[i]);
+			newArr[i].name("amostra " + i);// ajudar no debug
 		}
 
-		return arr;	
+		return newArr;	
 	}
 
 	/**
 	 * Converte um array primitivo para um array de tensores, cada tensor contendo
 	 * um {@code array3D}.
-	 * @param array array desejado.
+	 * @param arr array desejado.
 	 * @return array de {@code Tensores}.
 	 */
-	public static Tensor[] arrayParaTensores(float[][][][] array) {
-		Tensor[] arr = new Tensor[array.length];
+	public static Tensor[] arrayToTensors(float[][][][] arr) {
+		Tensor[] newArr = new Tensor[arr.length];
 
-		int n = array.length;
+		int n = arr.length;
 		for (int i = 0; i < n; i++) {
-			arr[i] = new Tensor(array[i]);
-			arr[i].name("amostra " + i);// ajudar no debug
+			newArr[i] = new Tensor(arr[i]);
+			newArr[i].name("amostra " + i);// ajudar no debug
 		}
 
-		return arr;
+		return newArr;
 	}
 
 	/**
@@ -268,7 +269,7 @@ public final class JNNutils {
 	 * @throws NullPointerException caso o objeto seja nulo.
 	 * @return objeto caso não seja nulo.
 	 */
-	public static <T> T validarNaoNulo(T obj, String msg) {
+	public static <T> T validateNonNull(T obj, String msg) {
 		if (obj == null) {
 			throw new NullPointerException(
 				"\n" + (msg == null || msg.isBlank() ? "obj == null." : msg.trim())
@@ -285,9 +286,9 @@ public final class JNNutils {
 	 * @param e elemento para adição.
 	 * @return novo array com elemento adicionado.
 	 */
-	public static <T> T[] addEmArray(T[] arr, T e) {
-		validarNaoNulo(arr, "arr = null");
-		validarNaoNulo(e, "e = null");
+	public static <T> T[] addToArray(T[] arr, T e) {
+		validateNonNull(arr, "arr = null");
+		validateNonNull(e, "e = null");
 		
 		@SuppressWarnings("unchecked")
 		T[] novo = (T[]) Array.newInstance(arr.getClass().getComponentType(), arr.length + 1);
@@ -302,22 +303,22 @@ public final class JNNutils {
 	 * Separa um sub conjunto dos dados do array de acordo com os índices fornecidos.
 	 * @param <T> tipo de dados do array.
 	 * @param arr conjunto de dados desejado.
-	 * @param inicio indice inicial (inclusivo).
-	 * @param fim índice final (exclusivo).
+	 * @param start indice inicial (inclusivo).
+	 * @param end índice final (exclusivo).
 	 * @return sub conjunto dos dados fornecidos.
 	 */
-    public static <T> T[] subArray(T[] arr, int inicio, int fim) {
-        if (inicio < 0 || fim > arr.length || inicio >= fim) {
+    public static <T> T[] subArray(T[] arr, int start, int end) {
+        if (start < 0 || end > arr.length || start >= end) {
             throw new IllegalArgumentException(
-				"\nÍndices de início ou fim inválidos, (i = " + inicio + ", f = " + fim + ")."
+				"\nÍndices de início ou fim inválidos, (i = " + start + ", f = " + end + ")."
 			);
         }
 
-        int tamanho = fim - inicio;
+        int tamanho = end - start;
 
         @SuppressWarnings("unchecked")
         T[] subArr = (T[]) Array.newInstance(arr.getClass().getComponentType(), tamanho);
-        System.arraycopy(arr, inicio, subArr, 0, tamanho);
+        System.arraycopy(arr, start, subArr, 0, tamanho);
 
         return subArr;
     }
@@ -327,7 +328,7 @@ public final class JNNutils {
 	 * @param ts array de {@code Tensor}.
 	 * @return {@code Tensor} concatenado.
 	 */
-	public static Tensor concatenar(Tensor[] ts) {
+	public static Tensor concat(Tensor[] ts) {
 		int batch = ts.length;
 
 		int[] shape = ts[0].shape();
@@ -351,7 +352,7 @@ public final class JNNutils {
 	 * @param arr {@code array} base.
 	 * @param r gerador de números aleatórios base.
 	 */
-	public static <T> void embaralhar(T[] arr, Random r) {
+	public static <T> void shuffle(T[] arr, Random r) {
 		int n = arr.length;
 		Random rand = r == null ? rng : r;
 		
@@ -372,7 +373,7 @@ public final class JNNutils {
 	 * @param arr2 {@code array} 2.
 	 * @param r gerador de números aleatórios base.
 	 */
-	public static <T> void embaralhar(T[] arr1, T[] arr2, Random r) {
+	public static <T> void shuffle(T[] arr1, T[] arr2, Random r) {
 		int n = arr1.length;
 		Random rand = r == null ? rng : r;
 		
@@ -396,7 +397,7 @@ public final class JNNutils {
 	 * @param obj objeto desejado.
 	 * @return {@code Tensor} com base nos dados do objeto.
 	 */
-	public static Tensor paraTensor(Object obj) {
+	public static Tensor toTensor(Object obj) {
 		return TensorConverter.tensor(obj);
 	}
 
@@ -405,7 +406,7 @@ public final class JNNutils {
      * @param bytes quantidade total em bytes.
      * @return valor formatado.
      */
-    public static String formatarTamBytes(long bytes) {
+    public static String formatSizeBytes(long bytes) {
         if (bytes < 1024) return bytes + " B";
         int exp = (int) (Math.log(bytes) / Math.log(1024));
         char prefixo = "KMGTPE".charAt(exp - 1); // K, M, G, T, P, E

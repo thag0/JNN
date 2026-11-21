@@ -1,7 +1,7 @@
 package jnn.layers;
 
 import jnn.core.JNNutils;
-import jnn.core.Parametro;
+import jnn.core.Parameter;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -80,7 +80,7 @@ public abstract class Layer {
 	/**
 	 * Array de parâmetros treináveis.
 	 */
-	Parametro[] _params = {};
+	Parameter[] _params = {};
 
 	/**
 	 * Instancia a camada base usada dentro dos modelos de Rede Neural.
@@ -198,9 +198,9 @@ public abstract class Layer {
 	 * @param shape {@code array} contendo os valores das dimensões do tensor.
 	 * @return {@code Parametro} criado.
 	 */
-	protected Parametro addParam(String name, int... shape) {
-		Parametro p = new Parametro(name, shape);
-		_params = JNNutils.addEmArray(_params, p);
+	protected Parameter addParam(String name, int... shape) {
+		Parameter p = new Parameter(name, shape);
+		_params = JNNutils.addToArray(_params, p);
 		return p;
 	}
 
@@ -424,7 +424,7 @@ public abstract class Layer {
 	 * Retorna um array contendo os parâmetros treináveis da camada.
 	 * @return array de parâmetros treináveis da camada.
 	 */
-	public Parametro[] params() {
+	public Parameter[] params() {
 		return _params;
 	}
 

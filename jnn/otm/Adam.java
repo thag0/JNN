@@ -1,7 +1,7 @@
 package jnn.otm;
 
 import jnn.core.JNNutils;
-import jnn.core.Parametro;
+import jnn.core.Parameter;
 import jnn.core.tensor.Tensor;
 import jnn.core.tensor.TensorData;
 
@@ -209,20 +209,20 @@ public class Adam extends Otimizador {
 	}
 
 	@Override
-	public void construir(Parametro[] params) {
+	public void construir(Parameter[] params) {
 		initParams(params);
 
 		for (var param : _params) {
 			int[] shape = param.weight.shape();
 
-			m = JNNutils.addEmArray(m, new Tensor(shape));
-			v = JNNutils.addEmArray(v, new Tensor(shape));
-			mc = JNNutils.addEmArray(mc, new Tensor(shape));
-			vc = JNNutils.addEmArray(vc, new Tensor(shape));
-			buf = JNNutils.addEmArray(buf, new Tensor(shape));
+			m = JNNutils.addToArray(m, new Tensor(shape));
+			v = JNNutils.addToArray(v, new Tensor(shape));
+			mc = JNNutils.addToArray(mc, new Tensor(shape));
+			vc = JNNutils.addToArray(vc, new Tensor(shape));
+			buf = JNNutils.addToArray(buf, new Tensor(shape));
 
 			if (amsgrad) {
-				ams = JNNutils.addEmArray(ams, new Tensor(shape));
+				ams = JNNutils.addToArray(ams, new Tensor(shape));
 			}
 		}
 

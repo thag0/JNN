@@ -105,7 +105,7 @@ public class Dropout extends Layer implements Cloneable {
 
 	@Override
 	public void build(int[] shape) {
-		JNNutils.validarNaoNulo(shape, "shape == null.");
+		JNNutils.validateNonNull(shape, "shape == null.");
 
 		if (shape.length < 1) {
 			throw new IllegalArgumentException(
@@ -113,7 +113,7 @@ public class Dropout extends Layer implements Cloneable {
 			);
 		}
 
-		if (!JNNutils.apenasMaiorZero(shape)) {
+		if (!JNNutils.isAllPositive(shape)) {
 			throw new IllegalArgumentException(
 				"\nValores do formato de entrada devem ser maiores que zero."
 			);

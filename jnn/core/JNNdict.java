@@ -31,42 +31,41 @@ import jnn.otm.SGD;
  * Tradutor para as funções de ativação, otimizadores e funções de perda 
  * e inicializadores.
  */
-public class Dicionario {
+public class JNNdict {
 
     /**
      * Tradutor para as funções de ativação, otimizadores, funções de perda 
      * e inicializadores.
      */
-   	public Dicionario() {}
+   	private JNNdict() {}
 
     /**
      * Remove caracteres especiais.
-     * @param nome nome de alguma instância que o dicionário lê.
+     * @param name nome de alguma instância que o dicionário lê.
      * @return nome tratado.
      */
-	private String tratarNome(String nome) {
-		nome = nome.trim();
-		nome = nome.replace("_", "");
-		nome = nome.replace("-", "");
-		nome = nome.replace(".", "");
-
-		return nome.toLowerCase();
+	private static String tratarNome(String name) {
+		return name.toLowerCase()
+		.replace("_", "")
+		.replace("-", "")
+		.replace(".", "")
+		.trim();
 	}
 
     /**
      * Converte o otimizador lido em uma instância de 
      * otimizador correspondente.
-     * @param otm tipode de otimizador.
+     * @param optim tipo de de otimizador.
      * @return instância do otimizador lido.
      */
-	public Otimizador getOtimizador(Object otm) {
-		JNNutils.validarNaoNulo(otm, "otm == null.");
+	public static Otimizador getOptim(Object optim) {
+		JNNutils.validateNonNull(optim, "optim == null.");
 
-		if (otm instanceof Otimizador) {
-			return (Otimizador) otm;
+		if (optim instanceof Otimizador) {
+			return (Otimizador) optim;
 
-		} else if (otm instanceof String) {
-			String nome = (String) otm;
+		} else if (optim instanceof String) {
+			String nome = (String) optim;
 			switch (tratarNome(nome)){
 				case "adadelta":  return new Adadelta();
 				case "adagrad":   return new AdaGrad();
@@ -83,7 +82,7 @@ public class Dicionario {
 
 		} else {
 			throw new IllegalArgumentException(
-				"\nTipo de dado \"" + otm.getClass().getTypeName() + "\" não suportado."
+				"\nTipo de dado \"" + optim.getClass().getTypeName() + "\" não suportado."
 			);
 		}
 	}
@@ -94,8 +93,8 @@ public class Dicionario {
      * @param loss tipo de função de perda.
      * @return instância da função de perda lida.
      */
-	public Loss getLoss(Object loss) {
-		JNNutils.validarNaoNulo(loss, "loss == null.");
+	public static Loss getLoss(Object loss) {
+		JNNutils.validateNonNull(loss, "loss == null.");
 
 		if (loss instanceof Loss) {
 			return (Loss) loss;
@@ -124,17 +123,17 @@ public class Dicionario {
 
     /**
      * Converte o inicializador recebido em uma instância de inicializador.
-     * @param ini tipo de inicializador.
+     * @param init tipo de inicializador.
      * @return instância do inicializador lido.
      */
-	public Inicializador getInicializador(Object ini) {
-		JNNutils.validarNaoNulo(ini, "ini == null.");
+	public static Inicializador getInitializer(Object init) {
+		JNNutils.validateNonNull(init, "init == null.");
 
-		if (ini instanceof Inicializador) {
-			return (Inicializador) ini;
+		if (init instanceof Inicializador) {
+			return (Inicializador) init;
 		
-		} else if (ini instanceof String) {
-			String nome = (String) ini;
+		} else if (init instanceof String) {
+			String nome = (String) init;
 			switch (tratarNome(nome)) {
 				case "aleatorio"           : return new Aleatorio();
 				case "aleatoriopositivo"   : return new AleatorioPositivo();
@@ -154,7 +153,7 @@ public class Dicionario {
 		
 		} else {
 			throw new IllegalArgumentException(
-				"\nTipo de dado \"" + ini.getClass().getTypeName() + "\" não suportado."
+				"\nTipo de dado \"" + init.getClass().getTypeName() + "\" não suportado."
 			);
 		}
 

@@ -54,7 +54,7 @@ public class Trainer implements Cloneable {
 	 * @param history calcular histórico de perda.
 	 */
 	public Trainer(Model model, boolean history) {
-		this.model = JNNutils.validarNaoNulo(model, "modelo == null");
+		this.model = JNNutils.validateNonNull(model, "modelo == null");
 		this.calculateHistory = history;
 	}
 

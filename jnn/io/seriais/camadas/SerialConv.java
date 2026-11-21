@@ -5,7 +5,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import jnn.core.Parametro;
+import jnn.core.Parameter;
 import jnn.io.seriais.SerialBase;
 import jnn.io.seriais.SerialLayer;
 import jnn.layers.Conv2D;
@@ -40,7 +40,7 @@ class SerialConv extends SerialBase implements SerialLayer<Conv2D> {
 	
 		write(dos, layer.hasBias());
 
-		Parametro[] params = layer.params();
+		Parameter[] params = layer.params();
 		
 		float[] kernel = params[0].weight.data().toArray();
 		write(dos, kernel);
@@ -70,7 +70,7 @@ class SerialConv extends SerialBase implements SerialLayer<Conv2D> {
 		layer.setBias(hasBias);
 		layer.build(shapeIn);
 
-		Parametro[] params = layer.params();
+		Parameter[] params = layer.params();
 		params[0].weight.copyElements(kernel);
 		if (hasBias) params[1].weight.copyElements(bias);
 

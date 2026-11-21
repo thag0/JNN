@@ -39,7 +39,7 @@ public class Input extends Layer {
 	 * @param shape formato de entrada usado para o modelo em que a camada estiver.
 	 */
 	public Input(int... shape) {
-		JNNutils.validarNaoNulo(shape, "Formato recebido é nulo.");
+		JNNutils.validateNonNull(shape, "Formato recebido é nulo.");
 
 		if (shape.length < 1) {
 			throw new UnsupportedOperationException(
@@ -47,7 +47,7 @@ public class Input extends Layer {
 			);
 		}
 
-		if (!JNNutils.apenasMaiorZero(shape)) {
+		if (!JNNutils.isAllPositive(shape)) {
 			throw new IllegalArgumentException(
 				"\nOs elementos do formato devem ser maiores que zero."
 			);

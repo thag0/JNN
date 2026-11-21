@@ -30,8 +30,8 @@ public class Sample {
      * @param y {@code Tensor} com dados de saída.
      */
     public Sample(Tensor x, Tensor y) {
-        this.x = JNNutils.validarNaoNulo(x, "x == null");
-        this.y = JNNutils.validarNaoNulo(y, "y == null");
+        this.x = JNNutils.validateNonNull(x, "x == null");
+        this.y = JNNutils.validateNonNull(y, "y == null");
     }
 
     /**

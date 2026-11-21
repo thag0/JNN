@@ -21,7 +21,7 @@ public class Compose implements Transform {
      * @param ts transformações para aplicação.
      */
     public Compose(Transform... ts) {
-        JNNutils.validarNaoNulo(ts, "transforms == null");
+        JNNutils.validateNonNull(ts, "transforms == null");
 
         if (ts.length == 0) {
             throw new IllegalArgumentException(
@@ -30,7 +30,7 @@ public class Compose implements Transform {
         }
         
         for (var t : ts) {
-            JNNutils.validarNaoNulo(t, "transform == null");
+            JNNutils.validateNonNull(t, "transform == null");
         }
 
         this.ts = ts;

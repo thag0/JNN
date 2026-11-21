@@ -2,9 +2,9 @@ package jnn.layers;
 
 import java.util.Optional;
 
-import jnn.core.Dicionario;
+import jnn.core.JNNdict;
 import jnn.core.JNNutils;
-import jnn.core.Parametro;
+import jnn.core.Parameter;
 import jnn.core.tensor.Tensor;
 import jnn.inicializadores.GlorotUniforme;
 import jnn.inicializadores.Inicializador;
@@ -77,7 +77,7 @@ public class Conv2D extends Layer implements Cloneable {
 	 * </p>
 	 * <pre>kernel = (filtros, canais, altura, largura) </pre>
 	 */
-	public Parametro _kernel;
+	public Parameter _kernel;
 
 	/**
 	 * Tensor contendo os bias (vieses) para cada valor de 
@@ -87,7 +87,7 @@ public class Conv2D extends Layer implements Cloneable {
 	 * </p>
 	 * <pre>bias = (filtros) </pre>
 	 */
-	public Optional<Parametro> _bias;
+	public Optional<Parameter> _bias;
 
 	/**
 	 * Auxiliar na verificação de uso do bias.
@@ -185,7 +185,7 @@ public class Conv2D extends Layer implements Cloneable {
 	 * @param initBias inicializador para os bias.
 	 */
 	public Conv2D(int filters, int[] filterSize, Object pad, Object initKernel, Object initBias) {
-		JNNutils.validarNaoNulo(filterSize, "filtro == null.");
+		JNNutils.validateNonNull(filterSize, "filtro == null.");
 
 		//formado dos filtros
 		if (filterSize.length != 2) {
@@ -195,7 +195,7 @@ public class Conv2D extends Layer implements Cloneable {
 			);
 		}
 
-		if (!JNNutils.apenasMaiorZero(filterSize)) {
+		if (!JNNutils.isAllPositive(filterSize)) {
 			throw new IllegalArgumentException(
 				"\nOs valores de formato para os filtros devem ser maiores que zero."
 			);      
@@ -214,9 +214,8 @@ public class Conv2D extends Layer implements Cloneable {
 
 		resolvePad(pad);
 		
-		Dicionario dicio = new Dicionario();
-		if (initKernel != null) this.kernelInit = dicio.getInicializador(initKernel);
-		if (initBias != null) this.biasInit = dicio.getInicializador(initBias);
+		if (initKernel != null) this.kernelInit = JNNdict.getInitializer(initKernel);
+		if (initBias != null) 	this.biasInit 	= JNNdict.getInitializer(initBias);
 	}
 
 	/**
@@ -298,7 +297,7 @@ public class Conv2D extends Layer implements Cloneable {
 
 	@Override
 	public void build(int[] shape) {
-		JNNutils.validarNaoNulo(shape, "shape == null.");
+		JNNutils.validateNonNull(shape, "shape == null.");
 
 		if (shape.length != 3) {
 			throw new IllegalArgumentException(
@@ -307,7 +306,7 @@ public class Conv2D extends Layer implements Cloneable {
 			);
 		}
 
-		if (!JNNutils.apenasMaiorZero(shape)) {
+		if (!JNNutils.isAllPositive(shape)) {
 			throw new IllegalArgumentException(
 				"\nOs valores de dimensões de entrada para a camada " + name() + 
 				" devem ser maiores que zero."

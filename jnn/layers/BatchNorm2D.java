@@ -1,7 +1,7 @@
 package jnn.layers;
 
 import jnn.core.JNNutils;
-import jnn.core.Parametro;
+import jnn.core.Parameter;
 import jnn.core.tensor.Tensor;
 
 /**
@@ -27,13 +27,13 @@ public class BatchNorm2D extends Layer implements Cloneable {
      * Parâmetro de escala treinável, com formato:
      * <pre>gamma = (canais)</pre>
      */
-    public Parametro _gamma;
+    public Parameter _gamma;
     
     /**
      * Parâmetro de deslocamento treinável, com fomato:
      * <pre>beta = (canais)</pre>
      */
-    public Parametro _beta;
+    public Parameter _beta;
 
     /**
      * Média móvel acumulada durante o treinamento, utilizada na 
@@ -146,13 +146,13 @@ public class BatchNorm2D extends Layer implements Cloneable {
 
     @Override
     public void build(int[] shape) {
-        JNNutils.validarNaoNulo(shape, "shape == null");
+        JNNutils.validateNonNull(shape, "shape == null");
 
         if (shape.length != 3) {
             throw new IllegalArgumentException("\nShape deve ter 3 dimensões (C, H, W)");
         }
 
-        if (!JNNutils.apenasMaiorZero(shape)) {
+        if (!JNNutils.isAllPositive(shape)) {
             throw new IllegalArgumentException("\nShape deve conter valores maiores que zero");
         }
 

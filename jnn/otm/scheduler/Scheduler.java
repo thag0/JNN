@@ -23,7 +23,7 @@ public abstract class Scheduler {
      * @param otm otimizador base.
      */
     protected Scheduler(Otimizador otm) {
-        this.otm = JNNutils.validarNaoNulo(otm, "otm == null.");
+        this.otm = JNNutils.validateNonNull(otm, "otm == null.");
     }
 
     /**

@@ -77,7 +77,7 @@ public class MainConv {
 		
 		System.out.println("Treinando.");
 		JNNnative.on();
-		JNNnative.setTamArena(10 * 1024 * 1024);
+		JNNnative.setArenaSize(10 * 1024 * 1024);
 		long tempo = System.nanoTime();
 			model.train();
 			model.fit(treino, TREINO_EPOCAS, TREINO_LOTE, TREINO_LOGS);
