@@ -1,4 +1,4 @@
-package jnn.inicializadores;
+package jnn.initializers;
 
 import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
@@ -6,7 +6,7 @@ import jnn.core.tensor.Tensor;
 /**
  * Inicializador de valores aleatórios para uso dentro da biblioteca.
  */
-public class Aleatorio extends Inicializador {
+public class Aleatorio extends Initializer {
 
 	/**
 	 * Valor mínimo de aleatorização.

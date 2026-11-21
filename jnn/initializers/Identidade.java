@@ -1,11 +1,11 @@
-package jnn.inicializadores;
+package jnn.initializers;
 
 import jnn.core.tensor.Tensor;
 
 /**
  * Inicializador de tensor identidade para uso dentro da biblioteca.
  */
-public class Identidade extends Inicializador {
+public class Identidade extends Initializer {
 
 	/**
 	 * Instancia um inicializador de tensores identidade.

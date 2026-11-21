@@ -1,11 +1,11 @@
-package jnn.inicializadores;
+package jnn.initializers;
 
 import jnn.core.tensor.Tensor;
 
 /**
  * Inicializador de valor constante para uso dentro da biblioteca.
  */
-public class Constante extends Inicializador {
+public class Constante extends Initializer {
 	
 	/**
 	 * Valor de preenchimento.

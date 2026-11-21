@@ -1,4 +1,4 @@
-package jnn.inicializadores;
+package jnn.initializers;
 
 import jnn.core.tensor.Tensor;
 
@@ -6,19 +6,19 @@ import jnn.core.tensor.Tensor;
  * Classe responsável pelas funções de inicialização dos pesos
  * da Rede Neural.
  */
-public abstract class Inicializador {
+public abstract class Initializer {
 
 	/**
 	 * Inicialização com seed aleatória
 	 */
-	protected Inicializador() {}
+	protected Initializer() {}
 
 	/**
 	 * Calcula os valores de fanIn e fanOut para ser usado pelos inicializadores.
 	 * @param tensor {@code Tensor} que será inicializado.
 	 * @return array contendo {@code [fanIn, fanOut]}.
 	 */
-	protected int[] calcularFans(Tensor tensor) {
+	protected int[] calculateFans(Tensor tensor) {
 		int[] shape = tensor.shape();
 		int[] fans = {0, 0};
 
@@ -53,7 +53,7 @@ public abstract class Inicializador {
 	 * Retorna o nome do inicializador.
 	 * @return nome do inicializador.
 	 */
-	public String nome() {
+	public String name() {
 		return getClass().getSimpleName();
 	}
 }

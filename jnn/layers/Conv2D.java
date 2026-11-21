@@ -6,9 +6,9 @@ import jnn.core.JNNdict;
 import jnn.core.JNNutils;
 import jnn.core.Parameter;
 import jnn.core.tensor.Tensor;
-import jnn.inicializadores.GlorotUniforme;
-import jnn.inicializadores.Inicializador;
-import jnn.inicializadores.Zeros;
+import jnn.initializers.GlorotUniforme;
+import jnn.initializers.Initializer;
+import jnn.initializers.Zeros;
 
 /**
  * <h2>
@@ -126,12 +126,12 @@ public class Conv2D extends Layer implements Cloneable {
 	/**
 	 * Inicializador para os filtros da camada.
 	 */
-	private Inicializador kernelInit = new GlorotUniforme();
+	private Initializer kernelInit = new GlorotUniforme();
 
 	/**
 	 * Inicializador para o bias da camada.
 	 */
-	private Inicializador biasInit = new Zeros();
+	private Initializer biasInit = new Zeros();
 
 	/**
 	 * Utilitário.

@@ -1,4 +1,4 @@
-package jnn.inicializadores;
+package jnn.initializers;
 
 import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
@@ -11,7 +11,7 @@ import jnn.core.tensor.Tensor;
  *		reduzindo o risco de vanishing/exploding gradients.
  *</p>
  */
-public class He extends Inicializador {
+public class He extends Initializer {
 
 	/**
 	 * Instancia um inicializador He para tensores com seed
@@ -21,7 +21,7 @@ public class He extends Inicializador {
 
 	@Override
 	public void forward(Tensor tensor) {
-		int fanIn = calcularFans(tensor)[0];
+		int fanIn = calculateFans(tensor)[0];
 		float desvP = (float) Math.sqrt(2.0 / fanIn);
 
 		tensor.apply(_ -> JNNutils.randGaussianf() * desvP);

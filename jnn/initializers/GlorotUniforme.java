@@ -1,4 +1,4 @@
-package jnn.inicializadores;
+package jnn.initializers;
 
 import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
@@ -6,7 +6,7 @@ import jnn.core.tensor.Tensor;
 /**
  * Inicializador Xavier para uso dentro da biblioteca.
  */
-public class GlorotUniforme extends Inicializador {
+public class GlorotUniforme extends Initializer {
 
 	/**
 	 * Instancia um inicializador Xavier para tensores com seed
@@ -16,7 +16,7 @@ public class GlorotUniforme extends Inicializador {
 
 	@Override
 	public void forward(Tensor tensor) {
-		int[] fans = calcularFans(tensor);
+		int[] fans = calculateFans(tensor);
 
 		int fin  = fans[0];
 		int fout = fans[1];

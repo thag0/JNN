@@ -6,9 +6,9 @@ import jnn.core.JNNdict;
 import jnn.core.JNNutils;
 import jnn.core.Parameter;
 import jnn.core.tensor.Tensor;
-import jnn.inicializadores.GlorotUniforme;
-import jnn.inicializadores.Inicializador;
-import jnn.inicializadores.Zeros;
+import jnn.initializers.GlorotUniforme;
+import jnn.initializers.Initializer;
+import jnn.initializers.Zeros;
 
 /**
  * <h2>
@@ -101,12 +101,12 @@ public class Dense extends Layer implements Cloneable {
 	/**
 	 * Inicializador para os pesos da camada.
 	 */
-	private Inicializador kernelInit = new GlorotUniforme();
+	private Initializer kernelInit = new GlorotUniforme();
 
 	/**
 	 * Inicializador para os bias da camada.
 	 */
-	private Inicializador biasInit = new Zeros();
+	private Initializer biasInit = new Zeros();
 
 	/**
 	 * Instancia uma nova camada densa de neurônios de acordo com os dados fornecidos.

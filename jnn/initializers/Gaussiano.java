@@ -1,4 +1,4 @@
-package jnn.inicializadores;
+package jnn.initializers;
 
 import jnn.core.JNNutils;
 import jnn.core.tensor.Tensor;
@@ -6,7 +6,7 @@ import jnn.core.tensor.Tensor;
 /**
  * Inicializador Gaussiano para uso dentro da biblioteca.
  */
-public class Gaussiano extends Inicializador {
+public class Gaussiano extends Initializer {
 
 	/**
 	 * Instancia um inicializador Gaussiano para tensores com seed

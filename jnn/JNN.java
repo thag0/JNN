@@ -6,9 +6,9 @@ import jnn.core.ops.Ops;
 import jnn.core.tensor.Tensor;
 import jnn.core.tensor.TensorConverter;
 import jnn.dataloader.Sample;
+import jnn.initializers.Identidade;
+import jnn.initializers.Initializer;
 import jnn.dataloader.DataLoader;
-import jnn.inicializadores.Identidade;
-import jnn.inicializadores.Inicializador;
 import jnn.metrics.loss.CossEntropy;
 import jnn.metrics.loss.BinaryCrossEntropy;
 import jnn.metrics.loss.MAE;
@@ -577,7 +577,7 @@ public final class JNN {
      * @param ini nome do inicializador desejado.
      * @return {@code Inicializador} buscado.
      */
-    public static Inicializador getInicializador(String ini) {
+    public static Initializer getInicializador(String ini) {
         return JNNdict.getInitializer(ini);
     }
 

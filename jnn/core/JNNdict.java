@@ -1,17 +1,17 @@
 package jnn.core;
 
-import jnn.inicializadores.Aleatorio;
-import jnn.inicializadores.AleatorioPositivo;
-import jnn.inicializadores.Constante;
-import jnn.inicializadores.Gaussiano;
-import jnn.inicializadores.GlorotNormal;
-import jnn.inicializadores.GlorotUniforme;
-import jnn.inicializadores.He;
-import jnn.inicializadores.Identidade;
-import jnn.inicializadores.Inicializador;
-import jnn.inicializadores.LeCun;
-import jnn.inicializadores.Zeros;
 import jnn.metrics.loss.CossEntropy;
+import jnn.initializers.Aleatorio;
+import jnn.initializers.AleatorioPositivo;
+import jnn.initializers.Constante;
+import jnn.initializers.Gaussiano;
+import jnn.initializers.GlorotNormal;
+import jnn.initializers.GlorotUniforme;
+import jnn.initializers.He;
+import jnn.initializers.Identidade;
+import jnn.initializers.Initializer;
+import jnn.initializers.LeCun;
+import jnn.initializers.Zeros;
 import jnn.metrics.loss.BinaryCrossEntropy;
 import jnn.metrics.loss.MAE;
 import jnn.metrics.loss.MSE;
@@ -126,11 +126,11 @@ public class JNNdict {
      * @param init tipo de inicializador.
      * @return instância do inicializador lido.
      */
-	public static Inicializador getInitializer(Object init) {
+	public static Initializer getInitializer(Object init) {
 		JNNutils.validateNonNull(init, "init == null.");
 
-		if (init instanceof Inicializador) {
-			return (Inicializador) init;
+		if (init instanceof Initializer) {
+			return (Initializer) init;
 		
 		} else if (init instanceof String) {
 			String nome = (String) init;
