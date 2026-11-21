@@ -17,7 +17,7 @@ import jnn.core.tensor.TensorData;
  * </p>
  * @see <a href="http://arxiv.org/abs/1212.5701"> Paper AdaDelta </a>
  */
-public class Adadelta extends Otimizador {
+public class Adadelta extends Optimizer {
 
 	/**
 	 * Valor padrão para a taxa de decaimento.
@@ -100,7 +100,7 @@ public class Adadelta extends Otimizador {
 	}
 
 	@Override
-	public void construir(Parameter[] params) {
+	public void build(Parameter[] params) {
 		initParams(params);
 
 		for (var param : _params) {
@@ -111,12 +111,12 @@ public class Adadelta extends Otimizador {
 			acd = JNNutils.addToArray(acd, new Tensor(w.shape()));
 		}
 
-		_construido = true;// otimizador pode ser usado
+		_built = true;// otimizador pode ser usado
 	}
 
 	@Override
 	public void update() {
-		checkInicial();
+		initialCheck();
 		
 		for (int i = 0, n = _params.length; i < n; i++) {
 			TensorData p_i   = _params[i].weight.data();
@@ -145,9 +145,9 @@ public class Adadelta extends Otimizador {
 
 	@Override
 	public String info() {
-		checkInicial();
-		construirInfo();
-
+		initialCheck();
+		
+		buildInfo();
 		addInfo("Rho: " + rho);
 		addInfo("Epsilon: " + eps);
 
@@ -157,14 +157,14 @@ public class Adadelta extends Otimizador {
 	@Override
 	public float getLr() {
 		throw new UnsupportedOperationException(
-			"\n" + nome() + " não suporta learning rate"
+			"\n" + name() + " não suporta learning rate"
 		);
 	}
 	
 	@Override
 	public void setLr(float lr) {
 		throw new UnsupportedOperationException(
-			"\n" + nome() + " não suporta learning rate"
+			"\n" + name() + " não suporta learning rate"
 		);
 	}
 }

@@ -1,6 +1,6 @@
 package jnn.otm.scheduler;
 
-import jnn.otm.Otimizador;
+import jnn.otm.Optimizer;
 
 /**
  * Scheduler de decaimento por gamma a cada passo de iteração.
@@ -28,7 +28,7 @@ public class StepLR extends Scheduler {
      * @param passo passo de iteração.
      * @param gamma escalar multiplicador de decaimento.
      */
-    public StepLR(Otimizador otm, int passo, float gamma) {
+    public StepLR(Optimizer otm, int passo, float gamma) {
         super(otm);
         this.lrBase = otm.getLr();
         this.passo = passo;

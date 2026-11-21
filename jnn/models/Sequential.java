@@ -289,7 +289,7 @@ public class Sequential extends Model {
 		_loss = JNNdict.getLoss(loss);
 		
 		_optimizer = JNNdict.getOptim(optim);
-		_optimizer.construir(params());
+		_optimizer.build(params());
 		
 		_compiled = true;// modelo pode ser usado.
 	}
@@ -409,7 +409,7 @@ public class Sequential extends Model {
 		clone.trainHistory = this.trainHistory;
 		clone.name = "Clone de " + name();
 		
-		clone._optimizer = JNNdict.getOptim(_optimizer.nome());
+		clone._optimizer = JNNdict.getOptim(_optimizer.name());
 		clone._loss 	 = JNNdict.getLoss(_loss.name());
 		clone._trainer = new Trainer(clone);
 		

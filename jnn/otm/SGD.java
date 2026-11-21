@@ -15,7 +15,7 @@ import jnn.core.tensor.TensorData;
  *    acelerador de nesterov.
  * </p>
  */
-public class SGD extends Otimizador {
+public class SGD extends Optimizer {
 
 	/**
 	 * Taxa de aprendizado padrão do otimizador.
@@ -110,7 +110,7 @@ public class SGD extends Otimizador {
 	}
 
 	@Override
-	public void construir(Parameter[] params) {
+	public void build(Parameter[] params) {
 		initParams(params);
 
 		for (var param : _params) {
@@ -118,12 +118,12 @@ public class SGD extends Otimizador {
 			m = JNNutils.addToArray(m, new Tensor(w.shape()));
 		}
 		
-		_construido = true;// otimizador pode ser usado
+		_built = true;// otimizador pode ser usado
 	}
 	
 	@Override
 	public void update() {
-		checkInicial();
+		initialCheck();
 		
         for (int i = 0, n = _params.length; i < n; i++) {
             TensorData p_i = _params[i].weight.data();
@@ -145,9 +145,9 @@ public class SGD extends Otimizador {
 
 	@Override
 	public String info() {
-		checkInicial();
-		construirInfo();
+		initialCheck();
 		
+		buildInfo();
 		addInfo("Lr: " + lr);
 		addInfo("Momentum: " + momentum);
 		addInfo("Nesterov: " + nesterov);

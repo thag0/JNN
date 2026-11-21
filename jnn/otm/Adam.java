@@ -16,7 +16,7 @@ import jnn.core.tensor.TensorData;
  * </p>
  * @see <a href="https://arxiv.org/pdf/1412.6980"> Paper Adam </a>
  */
-public class Adam extends Otimizador {
+public class Adam extends Optimizer {
 
 	/**
 	 * Valor de taxa de aprendizado padrão do otimizador.
@@ -26,12 +26,12 @@ public class Adam extends Otimizador {
 	/**
 	 * Valor padrão para o decaimento do momento de primeira ordem.
 	 */
-	static final float PADRAO_BETA1 = 0.9f;
+	static final float PADRAO_BETA_1 = 0.9f;
  
 	/**
 	 * Valor padrão para o decaimento do momento de segunda ordem.
 	 */
-	static final float PADRAO_BETA2 = 0.999f;
+	static final float PADRAO_BETA_2 = 0.999f;
 	 
 	/**
 	 * Valor padrão para epsilon.
@@ -185,7 +185,7 @@ public class Adam extends Otimizador {
 	 * @param lr taxa de aprendizado do otimizador.
 	 */
 	public Adam(Number lr) {
-		this(lr, PADRAO_BETA1, PADRAO_BETA2, PADRAO_EPS, PADRAO_AMSGRAD);
+		this(lr, PADRAO_BETA_1, PADRAO_BETA_2, PADRAO_EPS, PADRAO_AMSGRAD);
 	}
  
 	/**
@@ -194,7 +194,7 @@ public class Adam extends Otimizador {
 	 * @param amsgrad aplicar correção.
 	 */
 	public Adam(boolean amsgrad) {
-		this(PADRAO_LR, PADRAO_BETA1, PADRAO_BETA2, PADRAO_EPS, amsgrad);
+		this(PADRAO_LR, PADRAO_BETA_1, PADRAO_BETA_2, PADRAO_EPS, amsgrad);
 	}
 
 	/**
@@ -205,20 +205,20 @@ public class Adam extends Otimizador {
 	 * </p>
 	 */
 	public Adam() {
-		this(PADRAO_LR, PADRAO_BETA1, PADRAO_BETA2, PADRAO_EPS, PADRAO_AMSGRAD);
+		this(PADRAO_LR, PADRAO_BETA_1, PADRAO_BETA_2, PADRAO_EPS, PADRAO_AMSGRAD);
 	}
 
 	@Override
-	public void construir(Parameter[] params) {
+	public void build(Parameter[] params) {
 		initParams(params);
 
 		for (var param : _params) {
 			int[] shape = param.weight.shape();
 
-			m = JNNutils.addToArray(m, new Tensor(shape));
-			v = JNNutils.addToArray(v, new Tensor(shape));
-			mc = JNNutils.addToArray(mc, new Tensor(shape));
-			vc = JNNutils.addToArray(vc, new Tensor(shape));
+			m 	= JNNutils.addToArray(m,   new Tensor(shape));
+			v 	= JNNutils.addToArray(v,   new Tensor(shape));
+			mc 	= JNNutils.addToArray(mc,  new Tensor(shape));
+			vc 	= JNNutils.addToArray(vc,  new Tensor(shape));
 			buf = JNNutils.addToArray(buf, new Tensor(shape));
 
 			if (amsgrad) {
@@ -227,12 +227,12 @@ public class Adam extends Otimizador {
 		}
 
 		
-		_construido = true;// otimizador pode ser usado
+		_built = true;// otimizador pode ser usado
 	}
 
 	@Override
 	public void update() {
-		checkInicial();
+		initialCheck();
 		
 		iteracao += 1;
 
@@ -242,14 +242,13 @@ public class Adam extends Otimizador {
 		float corr1 = potBeta1;
 		float corr2 = potBeta2;
 
-		final int n = _params.length;
-		for (int i = 0; i < n; i++) {
-			TensorData p_i = _params[i].weight.data();
-			TensorData g_i = _params[i].grad.data();
-			TensorData m_i = m[i].data();
-			TensorData v_i = v[i].data();
-			TensorData mc_i = mc[i].data();
-			TensorData vc_i = vc[i].data();
+		for (int i = 0, n = _params.length; i < n; i++) {
+			TensorData p_i   = _params[i].weight.data();
+			TensorData g_i   = _params[i].grad.data();
+			TensorData m_i   = m[i].data();
+			TensorData v_i   = v[i].data();
+			TensorData mc_i  = mc[i].data();
+			TensorData vc_i  = vc[i].data();
 			TensorData buf_i = buf[i].data();
 
 			// m = β1*m + (g * (1 - β1))
@@ -280,9 +279,9 @@ public class Adam extends Otimizador {
 
 	@Override
 	public String info() {
-		checkInicial();
+		initialCheck();
 		
-		construirInfo();
+		buildInfo();
 		addInfo("Lr: " + lr);
 		addInfo("Beta1: " + beta1);
 		addInfo("Beta2: " + beta2);

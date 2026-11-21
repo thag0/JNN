@@ -19,7 +19,7 @@ import jnn.core.tensor.TensorData;
  * </p>
  * @see <a href="http://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf"> Paper AdaGrad </a>
  */
-public class AdaGrad extends Otimizador {
+public class AdaGrad extends Optimizer {
 
 	/**
 	 * Valor padrão para a taxa de aprendizado do otimizador.
@@ -92,26 +92,25 @@ public class AdaGrad extends Otimizador {
 	}
 
 	@Override
-	public void construir(Parameter[] params) {
+	public void build(Parameter[] params) {
 		initParams(params);
 		
-		float valorInicial = 0.1f;
+		float startVal = 0.1f;
 		for (var param : _params) {
 			ac = JNNutils.addToArray(
 				ac,
-				new Tensor(param.weight.shape()).fill(valorInicial)
+				new Tensor(param.weight.shape()).fill(startVal)
 			);
 		}
 		
-		_construido = true;// otimizador pode ser usado
+		_built = true;// otimizador pode ser usado
 	}
 
 	@Override
 	public void update() {
-		checkInicial();
+		initialCheck();
 		
-		final int n = _params.length;
-		for (int i = 0; i < n; i++) {
+		for (int i = 0, n = _params.length; i < n; i++) {
 			TensorData p_i = _params[i].weight.data();
 			TensorData g_i = _params[i].grad.data();
 			TensorData ac_i = ac[i].data();
@@ -129,9 +128,9 @@ public class AdaGrad extends Otimizador {
 
 	@Override
 	public String info() {
-		checkInicial();
-		construirInfo();
+		initialCheck();
 		
+		buildInfo();
 		addInfo("Lr: " + lr);
 		addInfo("Epsilon: " + eps);
 

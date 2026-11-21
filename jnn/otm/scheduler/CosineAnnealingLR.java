@@ -1,6 +1,6 @@
 package jnn.otm.scheduler;
 
-import jnn.otm.Otimizador;
+import jnn.otm.Optimizer;
 
 /**
  * Scheduler de decaimento da taxa de aprendizado utilizando uma função cosseno.
@@ -30,7 +30,7 @@ public class CosineAnnealingLR extends Scheduler {
      * @param tMax número máximo de iterações realizadas durante o treino.
      * Também pode ser calculado como: tMax = épocas * (amostras / lotes).
      */
-    public CosineAnnealingLR(Otimizador otm, float lrMin, float lrMax, long tMax) {
+    public CosineAnnealingLR(Optimizer otm, float lrMin, float lrMax, long tMax) {
         super(otm);
         
         if (lrMax <= 0f || lrMin < 0f || lrMin >= lrMax) {

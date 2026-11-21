@@ -23,7 +23,7 @@ import jnn.otm.Adadelta;
 import jnn.otm.Adam;
 import jnn.otm.Lion;
 import jnn.otm.Nadam;
-import jnn.otm.Otimizador;
+import jnn.otm.Optimizer;
 import jnn.otm.RMSProp;
 import jnn.otm.SGD;
 
@@ -58,11 +58,11 @@ public class JNNdict {
      * @param optim tipo de de otimizador.
      * @return instância do otimizador lido.
      */
-	public static Otimizador getOptim(Object optim) {
+	public static Optimizer getOptim(Object optim) {
 		JNNutils.validateNonNull(optim, "optim == null.");
 
-		if (optim instanceof Otimizador) {
-			return (Otimizador) optim;
+		if (optim instanceof Optimizer) {
+			return (Optimizer) optim;
 
 		} else if (optim instanceof String) {
 			String nome = (String) optim;

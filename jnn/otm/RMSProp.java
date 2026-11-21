@@ -17,7 +17,7 @@ import jnn.core.tensor.TensorData;
  * </p>
  * @see <a href="http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf"> Doc RMSProp </a>
  */
-public class RMSProp extends Otimizador {
+public class RMSProp extends Optimizer {
 
 	/**
 	 * Valor padrão para a taxa de aprendizagem do otimizador.
@@ -117,7 +117,7 @@ public class RMSProp extends Otimizador {
 	}
 
 	@Override
-	public void construir(Parameter[] params) {
+	public void build(Parameter[] params) {
 		initParams(params);
 
 		for (var param : _params) {
@@ -125,12 +125,12 @@ public class RMSProp extends Otimizador {
 			ac = JNNutils.addToArray(ac, new Tensor(w.shape()));
 		}
 		
-		_construido = true;// otimizador pode ser usado
+		_built = true;// otimizador pode ser usado
 	}
 
 	@Override
 	public void update() {
-		checkInicial();
+		initialCheck();
 		
 		final int n = _params.length;
 		for (int i = 0; i < n; i++) {
@@ -151,8 +151,8 @@ public class RMSProp extends Otimizador {
 
 	@Override
 	public String info() {
-		checkInicial();
-		construirInfo();
+		initialCheck();
+		buildInfo();
 		
 		addInfo("Lr: " + lr);
 		addInfo("Rho: " + rho);

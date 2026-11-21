@@ -17,7 +17,7 @@ import jnn.core.tensor.TensorData;
  * </p>
  * @see <a href="https://cs229.stanford.edu/proj2015/054_report.pdf"> Paper Nadam </a>
  */
-public class Nadam extends Otimizador {
+public class Nadam extends Optimizer {
 
 	/**
 	 * Valor padrão para a taxa de aprendizado do otimizador.
@@ -27,12 +27,12 @@ public class Nadam extends Otimizador {
 	/**
 	 * Valor padrão para o decaimento do momento de primeira ordem.
 	 */
-	private static final float PADRAO_BETA1 = 0.9f;
+	private static final float PADRAO_BETA_1 = 0.9f;
 
 	/**
 	 * Valor padrão para o decaimento do momento de segunda ordem.
 	 */
-	private static final float PADRAO_BETA2 = 0.999f;
+	private static final float PADRAO_BETA_2 = 0.999f;
 	
 	/**
 	 * Valor padrão para epsilon.
@@ -119,10 +119,10 @@ public class Nadam extends Otimizador {
 			);
 		}
 		
-		this.lr 	 = lr_;
-		this.beta1 	 = b1_;
-		this.beta2 	 = b2_;
-		this.eps 	 = ep_;
+		this.lr    = lr_;
+		this.beta1 = b1_;
+		this.beta2 = b2_;
+		this.eps   = ep_;
 	}
 
 	/**
@@ -142,7 +142,7 @@ public class Nadam extends Otimizador {
 	 * @param lr valor de taxa de aprendizado.
 	 */
 	public Nadam(Number lr) {
-		this(lr, PADRAO_BETA1, PADRAO_BETA2, PADRAO_EPS);
+		this(lr, PADRAO_BETA_1, PADRAO_BETA_2, PADRAO_EPS);
 	}
 
 	/**
@@ -152,11 +152,11 @@ public class Nadam extends Otimizador {
 	 * </p>
 	 */
 	public Nadam() {
-		this(PADRAO_LR, PADRAO_BETA1, PADRAO_BETA2, PADRAO_EPS);
+		this(PADRAO_LR, PADRAO_BETA_1, PADRAO_BETA_2, PADRAO_EPS);
 	}
 
 	@Override
-	public void construir(Parameter[] params) {
+	public void build(Parameter[] params) {
 		initParams(params);
 		
 		for (var param : _params) {
@@ -168,25 +168,24 @@ public class Nadam extends Otimizador {
 			vc = JNNutils.addToArray(vc, new Tensor(shape));
 		}
 
-		_construido = true;// otimizador pode ser usado
+		_built = true;// otimizador pode ser usado
 	}
 
 	@Override
 	public void update() {
-		checkInicial();
+		initialCheck();
 		
 		iteracoes++;
 		float fb1 = 1.0f - (float) Math.pow(beta1, iteracoes);
 		float fb2 = 1.0f - (float) Math.pow(beta2, iteracoes);
 		
-		final int n = _params.length;
-		for (int i = 0; i < n; i++) {
+		for (int i = 0, n = _params.length; i < n; i++) {
 			TensorData p_i  = _params[i].weight.data();
 			TensorData g_i  = _params[i].grad.data();
 			TensorData m_i  = m[i].data();
 			TensorData v_i  = v[i].data();
-			TensorData mc_i  = mc[i].data();
-			TensorData vc_i  = vc[i].data();
+			TensorData mc_i = mc[i].data();
+			TensorData vc_i = vc[i].data();
 
 			// m = β1*m + (1-β1)*g
 			m_i.mul(beta1).add(g_i, 1.0f - beta1);
@@ -210,9 +209,9 @@ public class Nadam extends Otimizador {
 
 	@Override
 	public String info() {
-		checkInicial();
-		construirInfo();
+		initialCheck();
 		
+		buildInfo();
 		addInfo("Lr: " + lr);
 		addInfo("Beta1: " + beta1);
 		addInfo("Beta2: " + beta2);

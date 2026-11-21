@@ -1,7 +1,7 @@
 package jnn.otm.scheduler;
 
 import jnn.core.JNNutils;
-import jnn.otm.Otimizador;
+import jnn.otm.Optimizer;
 
 /**
  * Scheduler base.
@@ -11,7 +11,7 @@ public abstract class Scheduler {
     /**
      * Otimizador alvo.
      */
-    protected Otimizador otm;
+    protected Optimizer otm;
 
     /**
      * Contador interno de iterações.
@@ -22,7 +22,7 @@ public abstract class Scheduler {
      * Construtor base privado.
      * @param otm otimizador base.
      */
-    protected Scheduler(Otimizador otm) {
+    protected Scheduler(Optimizer otm) {
         this.otm = JNNutils.validateNonNull(otm, "otm == null.");
     }
 

@@ -14,7 +14,7 @@ import jnn.core.tensor.Tensor;
  *		compilação e treino dos modelos.
  * </p>
  */
-public abstract class Otimizador {
+public abstract class Optimizer {
 
 	/**
 	 * Conjunto de elementos que serão otimizados.
@@ -34,18 +34,18 @@ public abstract class Otimizador {
 	/**
 	 * Auxiliar para o controle de inicialização do otimizador.
 	 */
-	protected boolean _construido = false;
+	protected boolean _built = false;
 
 	/**
 	 * Construtor privado.
 	 */
-	protected Otimizador() {}
+	protected Optimizer() {}
 
 	/**
 	 * Verifica se o otimizador pode ser utilizado.
 	 */
-	protected void checkInicial() {
-		if (!_construido) {
+	protected void initialCheck() {
+		if (!_built) {
 			throw new IllegalStateException(
 				"\nOtimizador deve ser construído antes de ser utilizado, utilize construir()."
 			);
@@ -80,7 +80,7 @@ public abstract class Otimizador {
 	 * Inicializa os parâmetros necessários do otimizador.
 	 * @param params array de {@code Tensor} contendo os parâmetros desejados.
 	 */
-	public abstract void construir(Parameter[] params);
+	public abstract void build(Parameter[] params);
 
 	/**
 	 * Executa um passo de atualização do otimizador.
@@ -111,14 +111,14 @@ public abstract class Otimizador {
 	 * Inicializa o valor padrão para informações do otimizador, informando
 	 * seu nome como informação inicial.
 	 */
-	protected void construirInfo() {
+	protected void buildInfo() {
 		info = new StringBuilder();
 		
 		info
 		.append("Otimizador")
 		.append(" = [\n")
 		.append(pad)
-		.append(nome())
+		.append(name())
 		.append("\n");
 	}
 
@@ -143,7 +143,7 @@ public abstract class Otimizador {
 	 * Retorna o nome do otimizador.
 	 * @return nome do otimizador.
 	 */
-	public String nome() {
+	public String name() {
 		return getClass().getSimpleName();
 	}
 }

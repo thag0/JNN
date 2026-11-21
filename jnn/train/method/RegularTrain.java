@@ -5,7 +5,7 @@ import jnn.dataloader.Sample;
 import jnn.metrics.loss.Loss;
 import jnn.dataloader.DataLoader;
 import jnn.models.Model;
-import jnn.otm.Otimizador;
+import jnn.otm.Optimizer;
 import jnn.train.callback.EpochInfo;
 
 /**
@@ -31,7 +31,7 @@ public class RegularTrain extends TrainMethod {
 	}
 
 	@Override
-	public void loop(DataLoader loader, Otimizador otm, Loss loss, int epochs, boolean logs) {
+	public void loop(DataLoader loader, Optimizer otm, Loss loss, int epochs, boolean logs) {
 		if (logs) hideCursor();
 		long tempo = 0;
 		int largEpocas = String.valueOf(epochs).length();

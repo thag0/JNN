@@ -7,7 +7,7 @@ import jnn.dataloader.DataLoader;
 import jnn.layers.Layer;
 import jnn.metrics.Evaluator;
 import jnn.metrics.loss.Loss;
-import jnn.otm.Otimizador;
+import jnn.otm.Optimizer;
 import jnn.train.Trainer;
 
 /**
@@ -40,7 +40,7 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 	/**
 	 * Otimizador usado para ajuste de parâmetros treináveis.
 	 */
-	protected Otimizador _optimizer;
+	protected Optimizer _optimizer;
 
 	/**
 	 * Gerenciador de treino do modelo.
@@ -125,7 +125,7 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 	 * </p>
 	 * @param opt novo otimizador.
 	 */
-	public void setOptimizer(Otimizador opt) {
+	public void setOptimizer(Optimizer opt) {
 		_optimizer = JNNutils.validateNonNull(opt, "otm == null.");
 	}
 
@@ -373,7 +373,7 @@ public abstract class Model implements Cloneable, Iterable<Layer> {
 	 * Retorna o otimizador configurado para o treino do modelo modelo.
 	 * @return otimizador atual do modelo.
 	 */
-	public Otimizador optim() {
+	public Optimizer optim() {
 		validateCompilation();
 		return _optimizer;
 	}

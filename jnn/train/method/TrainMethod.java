@@ -7,7 +7,7 @@ import jnn.core.JNNutils;
 import jnn.dataloader.DataLoader;
 import jnn.metrics.loss.Loss;
 import jnn.models.Model;
-import jnn.otm.Otimizador;
+import jnn.otm.Optimizer;
 import jnn.otm.scheduler.Scheduler;
 import jnn.train.callback.Callback;
 
@@ -83,7 +83,7 @@ public abstract class TrainMethod {
 	 * @param epochs quantidade de épocas de treinamento.
 	 * @param logs exibir logs de avanço;
 	 */
-	public abstract void loop(DataLoader loader, Otimizador otm, Loss loss, int epochs, boolean logs);
+	public abstract void loop(DataLoader loader, Optimizer otm, Loss loss, int epochs, boolean logs);
 
 	/**
 	 * Embaralha ambos os arrays de entrada e saída.

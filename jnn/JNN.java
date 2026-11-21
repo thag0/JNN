@@ -19,7 +19,7 @@ import jnn.metrics.loss.RMSE;
 import jnn.metrics.metric.Accuracy;
 import jnn.metrics.metric.F1Score;
 import jnn.metrics.metric.ConfusionMatrix;
-import jnn.otm.Otimizador;
+import jnn.otm.Optimizer;
 
 import java.util.random.RandomGenerator;
 
@@ -559,7 +559,7 @@ public final class JNN {
      * @param otm nome do otimizador desejado.
      * @return {@code Otimizador} buscado.
      */
-    public static Otimizador getOtimizador(String otm) {
+    public static Optimizer getOtimizador(String otm) {
         return JNNdict.getOptim(otm);
     }
 

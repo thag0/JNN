@@ -16,7 +16,7 @@ import jnn.core.tensor.TensorData;
  * </p>
  * @see <a href="http://arxiv.org/abs/2302.06675"> Paper Lion </a>
  */
-public class Lion extends Otimizador {
+public class Lion extends Optimizer {
 
 	/**
 	 * Valor de taxa de aprendizado padrão do otimizador.
@@ -26,12 +26,12 @@ public class Lion extends Otimizador {
 	/**
 	 * Valor padrão para o decaimento do momento de primeira ordem.
 	 */
-	private static final float PADRAO_BETA1 = 0.9f;
+	private static final float PADRAO_BETA_1 = 0.9f;
  
 	/**
 	 * Valor padrão para o decaimento do momento de segunda ordem.
 	 */
-	private static final float PADRAO_BETA2 = 0.99f;
+	private static final float PADRAO_BETA_2 = 0.99f;
 
 	/**
 	 * Valor de taxa de aprendizado do otimizador.
@@ -81,9 +81,9 @@ public class Lion extends Otimizador {
 			);
 		}
 		
-		this.lr 	 = lr_;
-		this.beta1 	 = b1_;
-		this.beta2 	 = b2_;
+		this.lr    = lr_;
+		this.beta1 = b1_;
+		this.beta2 = b2_;
     }
 
 	/**
@@ -92,7 +92,7 @@ public class Lion extends Otimizador {
 	 * @param lr taxa de aprendizado do otimizador
 	 */
 	public Lion(Number lr) {
-		this(lr, PADRAO_BETA1, PADRAO_BETA2);
+		this(lr, PADRAO_BETA_1, PADRAO_BETA_2);
 	}
 
 	/**
@@ -102,26 +102,25 @@ public class Lion extends Otimizador {
 	 * </p>
 	 */
     public Lion() {
-        this(PADRAO_LR, PADRAO_BETA1, PADRAO_BETA2);
+        this(PADRAO_LR, PADRAO_BETA_1, PADRAO_BETA_2);
     }
 
     @Override
-	public void construir(Parameter[] params) {
+	public void build(Parameter[] params) {
 		initParams(params);
 		
         for (var param : _params) {
             m = JNNutils.addToArray(m, new Tensor(param.weight.shape()));
         }
 
-		_construido = true;// otimizador pode ser usado
+		_built = true;// otimizador pode ser usado
     }
 
     @Override
     public void update() {
-		checkInicial();
+		initialCheck();
 
-		final int n = _params.length;
-        for (int i = 0; i < n; i++) {
+        for (int i = 0, n = _params.length; i < n; i++) {
 			TensorData p_i = _params[i].weight.data();
 			TensorData g_i = _params[i].grad.data();
 			TensorData m_i = m[i].data();
@@ -137,8 +136,9 @@ public class Lion extends Otimizador {
 
     @Override
     public String info() {
-        construirInfo();
-
+		initialCheck();
+		
+        buildInfo();
         addInfo("Lr: " + lr);
         addInfo("Beta1: " + beta1);
         addInfo("Beta2: " + beta2);
