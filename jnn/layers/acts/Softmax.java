@@ -22,7 +22,7 @@ public class Softmax extends Activation {
 
     @Override
     public Tensor forward(Tensor x) {
-        validateBuid();
+        validateBuild();
 
         final int numDim = x.numDim();
         int numSamples = 1;
@@ -62,7 +62,7 @@ public class Softmax extends Activation {
 
     @Override
     public Tensor backward(Tensor g) {
-        validateBuid();
+        validateBuild();
 
         _gradOutput = g.contiguous();
         

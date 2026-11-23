@@ -181,7 +181,7 @@ public class BatchNorm2D extends Layer implements Cloneable {
 
     @Override
     public void initParams() {
-        validateBuid();
+        validateBuild();
         
         _gamma.weight.fill(1);
         _beta.weight.fill(0);
@@ -214,7 +214,7 @@ public class BatchNorm2D extends Layer implements Cloneable {
 
     @Override
     public Tensor forward(Tensor x) {
-        validateBuid();
+        validateBuild();
 
         boolean isInput3d = x.numDim() == 3;
         if (isInput3d) {
@@ -254,7 +254,7 @@ public class BatchNorm2D extends Layer implements Cloneable {
 
     @Override
     public Tensor backward(Tensor g) {
-        validateBuid();
+        validateBuild();
 
         _gradOutput = g.contiguous();
 
@@ -273,7 +273,7 @@ public class BatchNorm2D extends Layer implements Cloneable {
     
     @Override
     public void zeroGrad() {
-        validateBuid();
+        validateBuild();
 
         _gamma.grad.fill(0);
         _beta.grad.fill(0);
@@ -281,7 +281,7 @@ public class BatchNorm2D extends Layer implements Cloneable {
 
     @Override
     public int[] shapeIn() {
-        validateBuid();
+        validateBuild();
         return shapeIn.clone();
     }
 
@@ -297,13 +297,13 @@ public class BatchNorm2D extends Layer implements Cloneable {
 
     @Override
     public Tensor output() {
-        validateBuid();
+        validateBuild();
         return _output;
     }
 
     @Override
     public Tensor gradInput() {
-        validateBuid();
+        validateBuild();
         return _gradInput;
     }
 
@@ -355,7 +355,7 @@ public class BatchNorm2D extends Layer implements Cloneable {
 
 	@Override
 	public String info() {
-		validateBuid();
+		validateBuild();
 
 		StringBuilder sb = new StringBuilder();
 		String pad = " ".repeat(4);

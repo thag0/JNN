@@ -238,7 +238,7 @@ public class Dense extends Layer implements Cloneable {
 
 	@Override
 	public void initParams() {
-		validateBuid();
+		validateBuild();
 
 		kernelInit.forward(_kernel.weight);
 		_bias.ifPresent(b -> biasInit.forward(b.weight));
@@ -270,7 +270,7 @@ public class Dense extends Layer implements Cloneable {
 
 	@Override
 	public Tensor forward(Tensor x) {
-		validateBuid();
+		validateBuild();
 
 		if (x.numDim() == 1) {
 			validateShapes(x.shape(), shapeIn);
@@ -297,7 +297,7 @@ public class Dense extends Layer implements Cloneable {
 
 	@Override
 	public Tensor backward(Tensor g) {
-		validateBuid();
+		validateBuild();
 		
 		_gradOutput = g.contiguous();
 
@@ -314,7 +314,7 @@ public class Dense extends Layer implements Cloneable {
 
 	@Override
 	public void zeroGrad() {
-		validateBuid();
+		validateBuild();
 
 		_kernel.grad.zero();
 		_bias.ifPresent(b -> b.grad.zero());
@@ -322,7 +322,7 @@ public class Dense extends Layer implements Cloneable {
 
 	@Override
 	public Tensor output() {
-		validateBuid();
+		validateBuild();
 		return _output;
 	}
 
@@ -331,7 +331,7 @@ public class Dense extends Layer implements Cloneable {
 	 * @return quantidade de neurônios presentes na camada.
 	 */
 	public int numNeurons() {
-		validateBuid();
+		validateBuild();
 		return shapeOut[0];
 	}
 
@@ -340,7 +340,7 @@ public class Dense extends Layer implements Cloneable {
 	 * @return tamanho de entrada da camada.
 	 */
 	public int sizeInput() {
-		validateBuid();
+		validateBuild();
 		return shapeIn[0];
 	}
 
@@ -349,7 +349,7 @@ public class Dense extends Layer implements Cloneable {
 	 * @return tamanho de saída da camada.
 	 */
 	public int sizeOutput() {
-		validateBuid();
+		validateBuild();
 		return numNeurons();
 	}
 
@@ -360,7 +360,7 @@ public class Dense extends Layer implements Cloneable {
 
 	@Override
 	public int numParams() {
-		validateBuid();
+		validateBuild();
 
 		int p = 0;
 		for (var param : params()) {
@@ -372,7 +372,7 @@ public class Dense extends Layer implements Cloneable {
 
 	@Override
 	public String info() {
-		validateBuid();
+		validateBuild();
 
 		StringBuilder sb = new StringBuilder();
 		String pad = " ".repeat(4);
@@ -392,7 +392,7 @@ public class Dense extends Layer implements Cloneable {
 
 	@Override
 	public Dense clone() {
-		validateBuid();
+		validateBuild();
 
 		Dense clone = (Dense) super.clone();
 
@@ -421,7 +421,7 @@ public class Dense extends Layer implements Cloneable {
 	 */
 	@Override
 	public int[] shapeIn() {
-		validateBuid();
+		validateBuild();
 		return _gradInput.shape();
 	}
 
@@ -439,13 +439,13 @@ public class Dense extends Layer implements Cloneable {
 	 */
 	@Override
 	public int[] shapeOut() {
-		validateBuid();
+		validateBuild();
 		return _output.shape();
 	}
 
 	@Override
 	public Tensor bias() {
-		validateBuid();
+		validateBuild();
 
 		if (hasBias()) return _bias.get().weight;
 
@@ -456,7 +456,7 @@ public class Dense extends Layer implements Cloneable {
 
 	@Override
 	public Tensor gradInput() {
-		validateBuid();
+		validateBuild();
 		return _gradInput;
 	}
 

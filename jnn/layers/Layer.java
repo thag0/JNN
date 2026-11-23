@@ -108,7 +108,7 @@ public abstract class Layer {
 	/**
 	 * Verificador de inicialização para evitar problemas.
 	 */
-	protected void validateBuid() {
+	protected void validateBuild() {
 		if (!_built) {
 			throw new IllegalStateException(
 				"\nCamada " + name() + " (id = " + id + ") não foi construída."

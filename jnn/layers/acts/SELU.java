@@ -53,7 +53,7 @@ public class SELU extends Activation {
 
     @Override
     public Tensor forward(Tensor x) {
-        validateBuid();
+        validateBuild();
 
 		maybeFitToBatch(x);
 
@@ -69,7 +69,7 @@ public class SELU extends Activation {
 
     @Override
     public Tensor backward(Tensor g) {
-		validateBuid();
+		validateBuild();
 
 		_gradOutput = g.contiguous();
 

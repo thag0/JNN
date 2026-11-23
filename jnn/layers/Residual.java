@@ -73,7 +73,7 @@ public class Residual extends Layer {
 
     @Override
     public void initParams() {
-        validateBuid();
+        validateBuild();
 
         for (var layer : main)     layer.initParams();
         for (var layer : skip) layer.initParams();
@@ -109,7 +109,7 @@ public class Residual extends Layer {
 
     @Override
     public Tensor forward(Tensor x) {
-        validateBuid();
+        validateBuild();
         validateShapes(x.shape(), shapeIn);
 
         int lotes = (x.numDim() == shapeIn.length + 1) ? x.lenDim(0) : 0;
@@ -141,7 +141,7 @@ public class Residual extends Layer {
 
     @Override
     public Tensor backward(Tensor g) {
-        validateBuid();
+        validateBuild();
 
         zeroAllGradInputs();
 
@@ -163,7 +163,7 @@ public class Residual extends Layer {
 
     @Override
     public void zeroGrad() {
-        validateBuid();
+        validateBuild();
         
         for (Parameter param : params()) {
             param.grad.zero();
@@ -178,25 +178,25 @@ public class Residual extends Layer {
 
     @Override
     public Tensor output() {
-        validateBuid();
+        validateBuild();
         return _output;
     }
 
     @Override
     public int[] shapeIn() {
-        validateBuid();
+        validateBuild();
         return shapeIn.clone();
     }
 
     @Override
     public int[] shapeOut() {
-        validateBuid();
+        validateBuild();
         return shapeOut.clone();
     }
 
     @Override
     public Parameter[] params() {
-        validateBuid();
+        validateBuild();
 
         Parameter[] params = {};
 
@@ -227,7 +227,7 @@ public class Residual extends Layer {
 
     @Override
     public int numParams() {
-        validateBuid();
+        validateBuild();
 
         int p = 0;
         
