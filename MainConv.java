@@ -35,7 +35,7 @@ public class MainConv {
 	static Ged ged = new Ged();
 
 	// controle de treino
-	static final int TREINO_EPOCAS = 40;
+	static final int TREINO_EPOCAS = 50;
 	static final int TREINO_LOTE = 64;
 	static final boolean TREINO_LOGS = true;
 
@@ -52,18 +52,18 @@ public class MainConv {
 
 		treino.print();
 
-		Sequential model = cnnCifar10();
+		Sequential model = resnetCifar10();
 		model.setHistorico(true);
 		model.print();
 		
 		var accs = new ArrayList<Float>();
-		model.trainer().setCallback(info -> {
+		model.trainer().setCallback((info) -> {
 			model.eval();
 				float ac = model.evaluator().accuracy(teste).item();
 			model.train();
 			
 			accs.add(ac);
-			System.out.println(" acurácia: " + (ac*100) + "%");
+			System.out.printf(" acurácia: %.2f%%\n", (ac * 100));
 		});
 
 		model.trainer().setScheduler(
@@ -124,8 +124,8 @@ public class MainConv {
 					new CutOut(8)
 				));
 					
+				train.applyY(new LabelSmoothing(1e-1));
 				test = CIFAR10.test().applyX(norm);
-				test.applyY(new LabelSmoothing(1e-1));
 			break;
 
 			default:
@@ -161,6 +161,61 @@ public class MainConv {
 		return model;
 	}
 
+	static Sequential resnetCifar10() {
+		int[] convK = {3, 3};
+		int[] poolK = {2, 2};
+
+		Sequential model = new Sequential(
+			new Input(3, 32, 32),
+
+			resConvBlock(32, convK, true),
+			new ReLU(),
+			new MaxPool2D(poolK),
+
+			resConvBlock(64, convK, true),
+			new ReLU(),
+			new MaxPool2D(poolK),
+
+			resConvBlock(128, convK, true),
+			new ReLU(),
+			new MaxPool2D(poolK),
+
+			new GlobalAvgPool2D(),
+			
+			new Dropout(0.3),
+			new Dense(128, "he"),
+			new ReLU(),
+
+			new Dense(10, "glorot-uniforme"),
+			new Softmax()
+		);
+
+		Object optim = new SGD(0.01, 0.9, true);
+		Object loss = "cross-entropy";
+		model.compile(optim, loss);
+
+		return model;
+	}
+
+	static Residual resConvBlock(int filters, int[] shape, boolean projection) {
+		Layer[] main = {
+			conv(filters, shape), new BatchNorm2D(), new ReLU(),
+			conv(filters, shape), new BatchNorm2D(),
+		};
+
+		Layer[] skip = projection
+		? new Layer[] { conv(filters, new int[]{1, 1}), new BatchNorm2D() }
+		: new Layer[0];
+
+		return new Residual(main, skip);
+	}
+
+	static Conv2D conv(int filters, int[] shape) {
+		Conv2D conv = new Conv2D(filters, shape, "same", "he");
+		conv.setBias(false);
+		return conv;
+	}
+
 	/**
 	 * Cria um modelo Convoluiconal.
 	 * @return {@code Sequencial}.
@@ -188,19 +243,17 @@ public class MainConv {
 			new ReLU(),
 			new MaxPool2D(poolK),
 			
-			new Conv2D(64, convK, "same", "he"),
+			new Conv2D(128, convK, "same", "he"),
 			new BatchNorm2D(),
 			new ReLU(),
-			new Conv2D(64, convK, "same", "he"),
-			new BatchNorm2D(),
-			new ReLU(),
-			new Conv2D(64, convK, "same", "he"),
+			new Conv2D(128, convK, "same", "he"),
 			new BatchNorm2D(),
 			new ReLU(),
 			new MaxPool2D(poolK),
 
 			new GlobalAvgPool2D(),
 
+			new Dropout(0.3),
 			new Dense(10, "glorot-uniforme"),
 			new Softmax()
 		);
